@@ -1,0 +1,19 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Prometheus Backend",
+  "main": "index.js",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "NODE_ENV=development ts-node-dev --transpile-only --no-notify --exit-child index.ts"
+  },
+  "dependencies": {
+    "apollo-server": "^3.6.7",
+    "graphql": "^16.3.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.7.0",
+    "ts-node-dev": "^1.1.8"
+  }
+}
