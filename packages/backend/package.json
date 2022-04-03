@@ -6,13 +6,22 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "db": "docker compose up",
     "dev": "NODE_ENV=development ts-node-dev --transpile-only --no-notify --exit-child index.ts"
   },
   "dependencies": {
     "apollo-server": "^3.6.7",
-    "graphql": "^16.3.0"
+    "apollo-server-errors": "^3.3.1",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.0.0",
+    "graphql": "^16.3.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^4.4.1"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^8.5.8",
+    "apollo-server-types": "^3.5.2",
+    "mongodb": "^4.4.1",
     "ts-node": "^10.7.0",
     "ts-node-dev": "^1.1.8"
   }

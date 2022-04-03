@@ -1,27 +1,5 @@
-import { ApolloServer, gql } from "apollo-server";
+import { apolloServer } from "backend/lib/server";
 
-const typeDefs = gql`
-  type User {
-    id: ID!
-    name: String
-  }
-
-  type Query {
-    users: [User]
-  }
-`;
-
-const server = new ApolloServer({
-  typeDefs,
-  resolvers: {
-    Query: {
-      users: () => {
-        console.log("Queried users");
-        return [];
-      },
-    },
-  },
-});
-server.listen().then(({ url }) => {
+apolloServer.listen().then(({ url }) => {
   console.log(`Server ready at ${url}`);
 });
