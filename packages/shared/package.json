@@ -2,6 +2,6 @@
   "name": "shared",
   "version": "1.0.0",
   "description": "Prometheus Shared Resources",
-  "main": "",
+  "main": "index.js",
   "private": true
 }
