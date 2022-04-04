@@ -5,8 +5,8 @@ import Label from "../../common/Label";
 import Input from "../../common/Input";
 
 const ResetPasswordPage: FC = () => {
-  const [passwordType, setPasswordType] = useState("password");
-  const [confirmType, setConfirmType] = useState("password");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   return (
     <div className="px-3">
       <div className="container mx-auto max-w-md">
@@ -15,25 +15,22 @@ const ResetPasswordPage: FC = () => {
           Create a new password.
         </Alert>
         <form className="mt-6">
+          <div className="hidden">
+            <Input type="email" name="email" autocomplete="email" />
+          </div>
           <div className="mt-4">
             <div className="flex flex-row justify-between">
               <Label for="password">Password</Label>
               <a
                 className="text-sm text-primary cursor-pointer"
-                onClick={() => {
-                  if (passwordType == "password") {
-                    setPasswordType("text");
-                  } else {
-                    setPasswordType("password");
-                  }
-                }}
+                onClick={() => setShowNewPassword(!showNewPassword)}
               >
-                {passwordType == "password" ? "Show" : "Hide"}
+                {showNewPassword ? "Hide" : "Show"}
               </a>
             </div>
             <Input
               id="password"
-              type={passwordType}
+              type={showNewPassword ? "text" : "password"}
               name="password"
               autocomplete="current-password"
               required
@@ -44,20 +41,14 @@ const ResetPasswordPage: FC = () => {
               <Label for="confirm-password">Confirm password</Label>
               <a
                 className="text-sm text-primary cursor-pointer"
-                onClick={() => {
-                  if (confirmType == "password") {
-                    setConfirmType("text");
-                  } else {
-                    setConfirmType("password");
-                  }
-                }}
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               >
-                {confirmType == "password" ? "Show" : "Hide"}
+                {showConfirmPassword ? "Hide" : "Show"}
               </a>
             </div>
             <Input
               id="confirm-password"
-              type={confirmType}
+              type={showConfirmPassword ? "text" : "password"}
               name="confirm-password"
               autocomplete="confirm-password"
               required

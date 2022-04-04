@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren } from "react";
+import { FC, MouseEventHandler, PropsWithChildren } from "react";
 
 type ButtonProps = PropsWithChildren<{
   type?: "button" | "submit" | "reset";
@@ -6,6 +6,7 @@ type ButtonProps = PropsWithChildren<{
   disabled?: boolean;
   className?: string;
   loading?: boolean;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
 }>;
 
 const Button: FC<ButtonProps> = ({
@@ -14,6 +15,7 @@ const Button: FC<ButtonProps> = ({
   disabled,
   className,
   loading,
+  onClick,
   children,
 }: ButtonProps) => {
   let buttonClass = "";
@@ -40,7 +42,12 @@ const Button: FC<ButtonProps> = ({
   }
   buttonClass += className ?? "";
   return (
-    <button type={type} className={buttonClass} disabled={disabled}>
+    <button
+      type={type}
+      className={buttonClass}
+      disabled={disabled}
+      onClick={onClick}
+    >
       {loading && (
         <svg
           className="mr-3 w-6 h-6 text-primary animate-spin fill-white"

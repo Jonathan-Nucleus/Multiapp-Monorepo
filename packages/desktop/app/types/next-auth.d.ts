@@ -12,7 +12,10 @@ declare module "next-auth" {
   }
 
   interface PagesOptions {
+    signUp: string;
     forgotPassword: string;
     resetPassword: string;
+    inviteCode: string;
+    preferences: string;
   }
 }

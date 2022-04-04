@@ -50,10 +50,13 @@ const AppAuthOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/login",
+    signUp: "/signup",
     signOut: "/logout",
     error: "/error",
     forgotPassword: "/forgot-password",
     resetPassword: "/reset-password",
+    inviteCode: "/invite-code",
+    preferences: "/preferences",
   },
 };
 

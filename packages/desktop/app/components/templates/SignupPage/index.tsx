@@ -1,8 +1,6 @@
 import { FC, useRef, useState } from "react";
-import Link from "next/link";
 import Input from "../../common/Input";
 import Label from "../../common/Label";
-import Checkbox from "../../common/Checkbox";
 import Button from "../../common/Button";
 import AppleIcon from "shared/assets/images/apple.svg";
 import GoogleIcon from "shared/assets/images/google.svg";
@@ -13,9 +11,11 @@ import { signIn } from "next-auth/react";
 import { RedirectableProviderType } from "next-auth/providers";
 import { useRouter } from "next/router";
 import Alert from "../../common/Alert";
+import Checkbox from "../../common/Checkbox";
 
-const LoginPage: FC = () => {
+const SignupPage: FC = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const [isFormValid, setFormValid] = useState(false);
   const [error, setError] = useState("");
@@ -24,15 +24,9 @@ const LoginPage: FC = () => {
   return (
     <div className="px-3">
       <div className="container mx-auto max-w-md">
-        <h1 className="text-white text-2xl">Login</h1>
-        <div className="mt-4">
-          <span className="text-white text-sm col-auto">New here?</span>
-          <Link href="/signup">
-            <a className="uppercase text-primary text-sm font-bold ml-4">
-              sign up with code
-            </a>
-          </Link>
-        </div>
+        <h1 className="text-white text-2xl">
+          You’re in! We just need a few details...
+        </h1>
         <div className="my-6">
           <div className={error ? "block" : "hidden"}>
             <Alert variant="error">
@@ -75,6 +69,26 @@ const LoginPage: FC = () => {
           }}
         >
           <div className="mt-9">
+            <Label for="first-name">First name</Label>
+            <Input
+              id="first-name"
+              type="text"
+              name="first-name"
+              autocomplete="first-name"
+              required
+            />
+          </div>
+          <div className="mt-4">
+            <Label for="last-name">Last name</Label>
+            <Input
+              id="last-name"
+              type="text"
+              name="last-name"
+              autocomplete="last-name"
+              required
+            />
+          </div>
+          <div className="mt-4">
             <Label for="email">Email</Label>
             <Input
               id="email"
@@ -102,31 +116,65 @@ const LoginPage: FC = () => {
               required
             />
           </div>
-          <div className="mt-2">
-            <Link href="/forgot-password">
-              <a className="text-primary text-sm">Forgot Password?</a>
-            </Link>
+          <div className="mt-4">
+            <div className="flex flex-row justify-between">
+              <Label for="confirm_password">Confirm password</Label>
+              <a
+                className="text-sm text-primary cursor-pointer"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? "Hide" : "Show"}
+              </a>
+            </div>
+            <Input
+              id="confirm-password"
+              type={showConfirmPassword ? "text" : "password"}
+              name="confirm-password"
+              autocomplete="confirm-password"
+              required
+            />
           </div>
-          <div className="mt-5 flex flex-row items-center">
-            <Checkbox id="remember" name="remember" />
-            <Label for="remember">
-              <span className="ml-2">Stay signed in</span>
-            </Label>
+          <div className="mt-6 flex flex-row items-center justify-between">
+            <div className="flex flex-row">
+              <Checkbox
+                id="terms-check"
+                name="terms-check"
+                className="flex-shrink-0 mt-1"
+              />
+              <Label for="terms-check" className="font-medium ml-2">
+                <span>I agree to the Prometheus Alts</span>
+                <a href="/terms" className="text-primary text-sm">
+                  {" "}
+                  Terms
+                </a>
+                ,
+                <a href="/community" className="text-primary text-sm">
+                  {" "}
+                  Community
+                  {" "}
+                </a>
+                and
+                <a href="/privacy" className="text-primary text-sm">
+                  {" "}
+                  Privacy Policy
+                </a>
+              </Label>
+            </div>
+            <div className="flex-shrink-0">
+              <Button
+                type="submit"
+                variant="gradient-primary"
+                className="w-full uppercase leading-6"
+                disabled={!isFormValid}
+                loading={loading}
+              >
+                Sign Up
+              </Button>
+            </div>
           </div>
-          <div className="mt-8">
-            <Button
-              type="submit"
-              variant="gradient-primary"
-              className="w-full uppercase leading-6"
-              disabled={!isFormValid}
-              loading={loading}
-            >
-              Log in
-            </Button>
-          </div>
-          <div className="mt-12 text-center text-white">OR, LOG IN WITH</div>
         </form>
       </div>
+      <div className="mt-12 text-center text-white">OR, SIGN UP WITH</div>
       <div className="container mx-auto mt-8 max-w-lg">
         <div className="flex items-center justify-center md:grid grid-cols-3 gap-7">
           <Button
@@ -156,4 +204,4 @@ const LoginPage: FC = () => {
   );
 };
 
-export default LoginPage;
+export default SignupPage;
