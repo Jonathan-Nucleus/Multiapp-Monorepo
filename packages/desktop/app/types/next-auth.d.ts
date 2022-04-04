@@ -10,4 +10,9 @@ declare module "next-auth" {
       email: string;
     } & DefaultSession["user"];
   }
+
+  interface PagesOptions {
+    forgotPassword: string;
+    resetPassword: string;
+  }
 }

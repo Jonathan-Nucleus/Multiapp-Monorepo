@@ -13,7 +13,7 @@ const AppAuthOptions: NextAuthOptions = {
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
         const res = await fetch("https://makai-pro-dev.makailabs.dev/auth/", {
           method: "POST",
           body: JSON.stringify({
@@ -24,7 +24,10 @@ const AppAuthOptions: NextAuthOptions = {
         });
         const user = await res.json();
         if (res.ok && user) {
-          return user;
+          return {
+            token: user.token,
+            email: credentials?.email,
+          };
         } else {
           return null;
         }
@@ -32,14 +35,25 @@ const AppAuthOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async jwt({ token, user }) {
+      // Persist the OAuth access_token to the token right after signin
+      if (user) {
+        token.accessToken = user.token;
+      }
+      return token;
+    },
     session({ session, token, user }) {
-      return session; // The return type will match the one returned in `useSession()`
+      // Send properties to the client, like an access_token from a provider.
+      session.accessToken = token.accessToken;
+      return session;
     },
   },
   pages: {
     signIn: "/login",
     signOut: "/logout",
     error: "/error",
+    forgotPassword: "/forgot-password",
+    resetPassword: "/reset-password",
   },
 };
 

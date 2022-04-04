@@ -5,7 +5,7 @@ import Image from "next/image";
 const AuthLayout: FC = ({ children }) => {
   return (
     <div className="container mx-auto">
-      <div className="pt-16 text-center">
+      <div className="py-16 text-center">
         <Image src={Logo} alt="" layout={"intrinsic"} />
       </div>
       {children}
