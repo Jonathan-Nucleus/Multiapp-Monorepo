@@ -15,6 +15,10 @@ export interface ContentCreatorProps {
   twitter?: string;
 }
 
+export function isUser(user: User.Mongo | User.Stub): user is User.Mongo {
+  return (user as User.Stub).role !== "stub";
+}
+
 export namespace User {
   export interface Mongo extends ContentCreatorProps {
     _id: ObjectId;
@@ -41,6 +45,10 @@ export namespace User {
     updatedAt?: number;
   }
 
+  export type Stub = Pick<Mongo, "_id" | "email" | "emailToken"> & {
+    role: "stub";
+  };
+
   export type GraphQL = GraphQLEntity<
     Omit<Mongo, "role" | "accreditation" | "reportedPost">
   > & {
@@ -50,6 +58,12 @@ export namespace User {
       violation: PostViolationEnum;
     };
   };
+
+  export type Input = Required<
+    Pick<GraphQL, "email" | "password" | "firstName" | "lastName"> & {
+      inviteCode: string;
+    }
+  >;
 }
 
 /** Enumeration describing the role of the user. */
@@ -65,8 +79,8 @@ export type UserRoleEnum = keyof typeof UserRoleOptions;
 export const AccreditationOptions = {
   NONE: "none",
   ACCREDITED: "accredited",
-  // QUALIFIED_CLIENT: "client",        NOT MVP
-  // QUALIFIED_PURCHASER: "purchaser",  NOT MVP
+  QUALIFIED_CLIENT: "client",
+  QUALIFIED_PURCHASER: "purchaser",
   // RIA: "ria",                        NOT MVP
 } as const;
 export type Accreditation = ValueOf<typeof AccreditationOptions>;
@@ -157,7 +171,23 @@ export const UserSchema = `
     mutedPosts: [Post!]!
     hiddenPosts: [Post!]!
     hiddenUsers: [User!]!
-    invitees: [User!]!
+    invitees: [Invitee!]!
+  }
+
+  type UserStub {
+    _id: ID!
+    email: String!
+    emailToken: String
+  }
+
+  union Invitee = User | UserStub
+
+  input UserInput {
+    email: String!
+    password: String!
+    inviteCode: String!
+    firstName: String!
+    lastName: String!
   }
 
   type AdjustableImage {

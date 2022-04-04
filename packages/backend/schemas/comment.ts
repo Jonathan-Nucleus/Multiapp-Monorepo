@@ -7,6 +7,7 @@ import type { Post } from "./post";
 export namespace Comment {
   export interface Mongo {
     _id: ObjectId;
+    body: string;
     userId: ObjectId;
     postId: ObjectId;
     commentId?: ObjectId;
@@ -27,6 +28,7 @@ export namespace Comment {
 export const CommentSchema = `
   type Comment {
     _id: ID!
+    body: String!
     userId: ID!
     postId: ID!
     commentId: ID

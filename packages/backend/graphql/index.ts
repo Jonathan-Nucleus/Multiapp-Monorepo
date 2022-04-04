@@ -7,6 +7,7 @@ import fundsDefinitions from "./funds.graphql";
 import postsDefinitions from "./posts.graphql";
 import usersDefinitions from "./users.graphql";
 import queryDefinitions from "./queries.graphql";
+import mutationDefinitions from "./mutations.graphql";
 
 const definitions = [
   commentsDefinitions,
@@ -15,6 +16,7 @@ const definitions = [
   postsDefinitions,
   usersDefinitions,
   queryDefinitions,
+  mutationDefinitions,
 ];
 
 const typeDefs = definitions.map((definition) => definition.schema);

@@ -1,3 +1,5 @@
+import jwt from "jsonwebtoken";
+
 import type { DocumentNode, GraphQLFieldResolver } from "graphql";
 import type { GraphQLFieldResolverParams } from "apollo-server-types";
 import { AuthenticationError } from "apollo-server-errors";
@@ -5,6 +7,15 @@ import type { IResolvers } from "@graphql-tools/utils";
 
 import type { IgniteDb } from "backend/db/";
 import type { DeserializedUser } from "backend/db/collections/users";
+import type { User } from "backend/schemas/user";
+
+import "dotenv/config";
+
+if (!process.env.IGNITE_SECRET) {
+  throw new Error("IGNITE_SECRET env var undefined");
+}
+
+const IGNITE_SECRET = process.env.IGNITE_SECRET as string;
 
 export type PartialSchema = {
   schema: DocumentNode;
@@ -51,7 +62,7 @@ type ResolverWithUser<
  *          is not present or calls the resolver provided as a parameter to this
  *          function.
  */
-export const secureEndpoint = function <
+export function secureEndpoint<
   Args = unknown,
   Parent = unknown,
   ReturnValue = void
@@ -71,4 +82,9 @@ export const secureEndpoint = function <
   };
 
   return secureResolver;
-};
+}
+
+export type AccessToken = string;
+export function getAccessToken(user: DeserializedUser): AccessToken {
+  return jwt.sign(user, IGNITE_SECRET);
+}
