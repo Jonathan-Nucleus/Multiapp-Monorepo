@@ -35,6 +35,35 @@
 			"response": []
 		},
 		{
+			"name": "Verify Invite",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query VerifyInvite($code: String!) {\n  verifyInvite(code: $code)\n}",
+						"variables": "{\n  \"code\": \"97b45a0a-edb6-4b4c-9e56-9332192792f6\"\n}"
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Register",
 			"request": {
 				"method": "POST",
@@ -68,8 +97,8 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query Login($email: String!, $password: String!) {\n  login(email: $email, password: $password)\n}",
-						"variables": "{\n  \"email\": \"test@test.com\",\n  \"password\": \"test-passa\"\n}"
+						"query": "mutation Login($email: String!, $password: String!) {\n  login(email: $email, password: $password) {\n      user {\n          _id\n          role\n          accreditation\n      }\n      token\n  }\n}",
+						"variables": "{\n  \"email\": \"test@test.com\",\n  \"password\": \"test-pass\"\n}"
 					}
 				},
 				"url": {
@@ -88,6 +117,42 @@
 		},
 		{
 			"name": "Invite User",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRhNjYzZmZiZDVmZmJlODcxNjAzNTAiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkwNDM2Mjd9.8sUii0pTi2PnVu_-rWIRHx1hmBfMG26OV-Gen5Ne-QM",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation Invite($email: String!) {\n  inviteUser(email: $email)\n}",
+						"variables": "{\n  \"email\": \"test2@test.com\"\n}"
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Settings",
 			"request": {
 				"auth": {
 					"type": "bearer",

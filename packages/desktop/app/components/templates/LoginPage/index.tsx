@@ -8,19 +8,30 @@ import AppleIcon from "shared/assets/images/apple.svg";
 import GoogleIcon from "shared/assets/images/google.svg";
 import LinkedInIcon from "shared/assets/images/linkedin.svg";
 import WarningIcon from "shared/assets/images/warning-red.svg";
-import Image from "next/image";
-import { signIn } from "next-auth/react";
+import Image, { StaticImageData } from "next/image";
+import { signIn, getProviders } from "next-auth/react";
 import { RedirectableProviderType } from "next-auth/providers";
 import { useRouter } from "next/router";
 import Alert from "../../common/Alert";
 
-const LoginPage: FC = () => {
+const PROVIDER_ICONS: Record<string, StaticImageData> = {
+  apple: AppleIcon,
+  google: GoogleIcon,
+  linkedin: LinkedInIcon,
+};
+
+interface LoginPageProps {
+  providers: ReturnType<typeof getProviders>;
+}
+
+const LoginPage: FC<LoginPageProps> = ({ providers }) => {
   const [showPassword, setShowPassword] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const [isFormValid, setFormValid] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
   return (
     <div className="px-3">
       <div className="container mx-auto max-w-md">
@@ -129,27 +140,21 @@ const LoginPage: FC = () => {
       </div>
       <div className="container mx-auto mt-8 max-w-lg">
         <div className="flex items-center justify-center md:grid grid-cols-3 gap-7">
-          <Button
-            variant="outline-primary"
-            className="w-12 h-12 md:w-full md:h-auto rounded-lg md:rounded-full border border-gray-400 md:border-primary"
-          >
-            <Image src={AppleIcon} alt="" />
-            <span className="ml-2 hidden md:inline-block">APPLE</span>
-          </Button>
-          <Button
-            variant="outline-primary"
-            className="w-12 h-12 md:w-full md:h-auto rounded-lg md:rounded-full border border-gray-400 md:border-primary"
-          >
-            <Image src={GoogleIcon} alt="" />
-            <span className="ml-2 hidden md:inline-block">GOOGLE</span>
-          </Button>
-          <Button
-            variant="outline-primary"
-            className="w-12 h-12 md:w-full md:h-auto rounded-lg md:rounded-full border border-gray-400 md:border-primary"
-          >
-            <Image src={LinkedInIcon} alt="" />
-            <span className="ml-2 hidden md:inline-block">LINKEDIN</span>
-          </Button>
+          {Object.keys(providers).map((provider) =>
+            provider === "credentials" ? undefined : (
+              <Button
+                key={provider}
+                variant="outline-primary"
+                className="w-12 h-12 md:w-full md:h-auto rounded-lg md:rounded-full border border-gray-400 md:border-primary"
+                onClick={() => signIn(provider)}
+              >
+                <Image src={PROVIDER_ICONS[provider]} alt="" />
+                <span className="ml-2 hidden md:inline-block">
+                  {provider.toUpperCase()}
+                </span>
+              </Button>
+            )
+          )}
         </div>
       </div>
     </div>

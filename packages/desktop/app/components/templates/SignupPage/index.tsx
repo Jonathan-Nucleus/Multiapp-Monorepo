@@ -13,6 +13,8 @@ import { useRouter } from "next/router";
 import Alert from "../../common/Alert";
 import Checkbox from "../../common/Checkbox";
 
+import { useRegisterUser } from "desktop/app/queries/authentication.graphql";
+
 const SignupPage: FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -21,6 +23,9 @@ const SignupPage: FC = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  const [registerUser] = useRegisterUser();
+
   return (
     <div className="px-3">
       <div className="container mx-auto max-w-md">
@@ -49,14 +54,26 @@ const SignupPage: FC = () => {
               setFormValid(!!formDataObj.email && !!formDataObj.password);
             }
           }}
-          onSubmit={(event) => {
+          onSubmit={async (event) => {
             event.preventDefault();
             const formData = new FormData(formRef.current!!);
             const formDataObj = Object.fromEntries(formData.entries());
+            const { email, password } = formDataObj;
             setLoading(true);
+
+            /*const { data } = await registerUser({
+              variables: {
+                user: {
+                  email,
+                  password,
+                },
+              },
+            });
+
+            if (data && data.register) {*/
             signIn<RedirectableProviderType>("credentials", {
-              email: formDataObj.email,
-              password: formDataObj.password,
+              email,
+              password,
               redirect: false,
             }).then(async (response) => {
               setLoading(false);
@@ -66,6 +83,7 @@ const SignupPage: FC = () => {
                 setError("Your email and/or password are incorrect.");
               }
             });
+            //}
           }}
         >
           <div className="mt-9">
@@ -150,8 +168,7 @@ const SignupPage: FC = () => {
                 ,
                 <a href="/community" className="text-primary text-sm">
                   {" "}
-                  Community
-                  {" "}
+                  Community{" "}
                 </a>
                 and
                 <a href="/privacy" className="text-primary text-sm">

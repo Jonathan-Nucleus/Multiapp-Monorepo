@@ -8,11 +8,13 @@ import {
   getAccessToken,
 } from "backend/lib/apollo-helper";
 
-import type { User } from "backend/schemas/user";
+import { User, isUser } from "backend/schemas/user";
 
 const schema = gql`
   type Mutation {
     register(user: UserInput!): String
+    login(email: String!, password: String!): String
+    loginOAuth(user: OAuthUserInput!): String
     requestInvite(email: String!): Boolean!
     inviteUser(email: String!): Boolean!
   }
@@ -29,6 +31,30 @@ const resolvers = {
       if (!userId) return null;
 
       const deserializedUser = await db.users.deserialize(userId);
+      return deserializedUser ? getAccessToken(deserializedUser) : null;
+    },
+
+    login: async (
+      parentIgnored: User.Mongo,
+      { email, password }: { email: string; password: string },
+      { db }: ApolloServerContext
+    ): Promise<AccessToken | null> => {
+      const user = await db.users.authenticate(email, password);
+      if (!user) return null;
+
+      const deserializedUser = await db.users.deserialize(user._id);
+      return deserializedUser ? getAccessToken(deserializedUser) : null;
+    },
+
+    loginOAuth: async (
+      parentIgnored: unknown,
+      { user }: { user: User.OAuthInput },
+      { db }: ApolloServerContext
+    ): Promise<AccessToken | null> => {
+      const authUser = await db.users.authenticateOAuth(user);
+      if (!authUser || !isUser(authUser)) return null;
+
+      const deserializedUser = await db.users.deserialize(authUser._id);
       return deserializedUser ? getAccessToken(deserializedUser) : null;
     },
 

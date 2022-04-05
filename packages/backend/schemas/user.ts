@@ -25,6 +25,7 @@ export namespace User {
     email: string;
     password?: string; // Hashed password
     salt?: string; // Password salt
+    authProvider?: string;
     firstName: string;
     lastName: string;
     role: UserRole;
@@ -64,6 +65,11 @@ export namespace User {
       inviteCode: string;
     }
   >;
+
+  export type OAuthInput = Pick<GraphQL, "email" | "firstName" | "lastName"> & {
+    provider: string;
+    tokenId: string;
+  };
 }
 
 /** Enumeration describing the role of the user. */
@@ -188,6 +194,14 @@ export const UserSchema = `
     inviteCode: String!
     firstName: String!
     lastName: String!
+  }
+
+  input OAuthUserInput {
+    email: String!
+    firstName: String!
+    lastName: String!
+    provider: String!
+    tokenId: String!
   }
 
   type AdjustableImage {

@@ -16,13 +16,17 @@ import {
   GraphQLEntity,
 } from "backend/lib/mongo-helper";
 import crypto from "crypto";
+import fetch from "node-fetch";
 import { v4 as uuid } from "uuid";
+import { OAuth2Client } from "google-auth-library";
 import {
   User,
   UserRoleOptions,
   AccreditationOptions,
   isUser,
 } from "backend/schemas/user";
+
+import "dotenv/config";
 
 // Read salt length from .env file and parse to a number. This represents
 // the number of bytes used for the salt. A default of 32 bytes (256 bits)
@@ -106,6 +110,84 @@ const createUsersCollection = (
       // Check credentials - i.e., compare bcrypt password hashes
       if (hashPassword(password, user.salt) != user.password) return null;
       return user;
+    },
+
+    /**
+     * Registers a new user authenticated using an external OAuth provider.
+     *
+     * @param user  User data for new account.
+     *
+     * @returns   Record id for the new account if registration was successful
+     *            and null otherwise.
+     */
+    authenticateOAuth: async (
+      user: User.OAuthInput
+    ): Promise<User.Mongo | null> => {
+      const { email, firstName, lastName, provider, tokenId } = user;
+
+      // Verify access tokens before fetching associated user record
+      if (provider === "google") {
+        // Verify google token
+        const client = new OAuth2Client(process.env.GOOGLE_ID as string);
+        try {
+          const ticket = await client.verifyIdToken({
+            idToken: tokenId,
+            audience: process.env.GOOLGE_ID as string,
+          });
+          const payload = ticket.getPayload();
+          console.log("payload", payload);
+        } catch (err) {
+          console.log(`Invalid google access token: ${tokenId}`);
+          return null;
+        }
+      } else if (provider === "linkedin") {
+        // Verify LinkedIn token
+        const res = await fetch(
+          `https://api.linkedin.com/v2/me?oauth2_access_token=${tokenId}`
+        );
+
+        if (!res.ok) {
+          console.log(`Invalid linkedin access token: ${tokenId}`);
+          return null;
+        }
+      } else {
+        return null; // Unsupported provider
+      }
+
+      const userData = await collection.find({ email });
+      if (userData && isUser(userData)) {
+        // Check to make sure that the provider that the account was created
+        // with matches the provider from which this OAuth token was provided.
+        if (userData?.authProvider !== provider) {
+          console.log(`Linked accounts not supported: ${email}`);
+          return null;
+        }
+
+        return userData;
+      }
+
+      // Create a new user if one does not exist
+      if (!userData) {
+        const newUser = {
+          _id: new ObjectId(),
+          email,
+          firstName,
+          lastName,
+          authProvider: provider,
+          role: UserRoleOptions.USER,
+          accreditation: AccreditationOptions.NONE,
+        };
+
+        try {
+          await usersCollection.insertOne(newUser);
+          return newUser;
+        } catch (err) {
+          console.log(`Error encountered while registering user: ${err}`);
+          return null;
+        }
+      }
+
+      return null;
     },
 
     /**
