@@ -1,0 +1,10 @@
+.button {
+  width: 56px;
+  height: 56px;
+  border-radius: 28px;
+}
+
+.rounded99 {
+  border-radius: 100px;
+  height: 56px;
+}

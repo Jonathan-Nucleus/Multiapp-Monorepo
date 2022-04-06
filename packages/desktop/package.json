@@ -13,6 +13,8 @@
     "@apollo/client": "^3.5.10",
     "@hookform/resolvers": "^2.8.8",
     "apollo3-cache-persist": "^0.14.0",
+    "@splidejs/react-splide": "^0.7.2",
+    "clsx": "^1.1.1",
     "deepmerge": "^4.2.2",
     "graphql": "^16.3.0",
     "jsonwebtoken": "^8.5.1",
@@ -24,6 +26,8 @@
     "react": "18.0.0",
     "react-dom": "18.0.0",
     "react-hook-form": "^7.29.0",
+    "react-input-mask": "^2.0.4",
+    "react-responsive-carousel": "^3.2.23",
     "shared": "^1.0.0",
     "yup": "^0.32.11"
   },

@@ -1,0 +1,19 @@
+.container {
+  background: linear-gradient(
+      0deg,
+      rgba(205, 64, 58, 0.3),
+      rgba(205, 64, 58, 0.3)
+    ),
+    rgba(18, 18, 18, 0.8);
+  opacity: 0.9;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  padding: 17px;
+}
+.message {
+  margin-left: 11px;
+  font-weight: 400;
+  font-size: 14px;
+  color: #ffffff;
+}
