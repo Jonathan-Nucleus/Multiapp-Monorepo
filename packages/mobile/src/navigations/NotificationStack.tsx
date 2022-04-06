@@ -2,8 +2,8 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 const Stack = createStackNavigator();
 
-import Notification from '../screens/Home/Notification';
-import NotificationDetail from '../screens/Home/Notification/Details';
+import Notification from '../screens/Notification';
+import NotificationDetail from '../screens/Notification/Details';
 
 const NotificationStacks = () => {
   return (

@@ -6,6 +6,7 @@ import { WHITE, BLACK, BGDARK } from 'shared/src/colors';
 
 import HomeScreen from '../screens/Home';
 import NotificationStack from './NotificationStack';
+import SettingsStack from './SettingsStack';
 import HomeSVG from '../assets/icons/tabHome.svg';
 import GreyHomeSVG from '../assets/icons/tabGreyHome.svg';
 import StarSVG from '../assets/icons/tabStar.svg';
@@ -61,7 +62,7 @@ export default function BottomTabNavigator() {
       />
       <Tab.Screen
         name="Profile"
-        component={HomeScreen}
+        component={SettingsStack}
         options={{
           tabBarIcon: ({ focused, size }) =>
             focused ? <ProfileSVG /> : <ProfileSVG />,

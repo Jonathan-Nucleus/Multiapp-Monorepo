@@ -5,7 +5,7 @@ import PLabel from '../../components/common/PLabel';
 import IconButton from '../../components/common/IconButton';
 import RoundImageView from '../../components/common/RoundImageView';
 import Tag from '../../components/common/Tag';
-import { BGDARK, GRAY10 } from 'shared/src/colors';
+import { BGDARK, GRAY10, WHITE60 } from 'shared/src/colors';
 import { Body1, Body3 } from '../../theme/fonts';
 
 import ThumbsUpSvg from 'shared/assets/images/thumbsUp.svg';
@@ -16,6 +16,8 @@ import Avatar from '../../assets/avatar.png';
 
 export interface FeedItemProps {
   name: string;
+  company: string;
+  date: string;
   description: string;
   tags: string[];
   commentCounts: number;
@@ -26,6 +28,8 @@ export interface FeedItemProps {
 const FeedItem: React.FC<FeedItemProps> = (props) => {
   const {
     name,
+    company,
+    date,
     description,
     tags,
     commentCounts,
@@ -39,6 +43,8 @@ const FeedItem: React.FC<FeedItemProps> = (props) => {
         <RoundImageView image={Avatar} />
         <View style={styles.userInfo}>
           <PLabel label={name} textStyle={styles.nameLabel} />
+          <PLabel label={company} textStyle={styles.smallLabel} />
+          <PLabel label={date} textStyle={styles.smallLabel} />
         </View>
       </View>
       <PLabel label={description} />
@@ -89,6 +95,7 @@ const styles = StyleSheet.create({
   },
   smallLabel: {
     ...Body3,
+    color: WHITE60,
   },
   tagWrapper: {
     flexDirection: 'row',

@@ -1,8 +1,12 @@
 export const WHITE = "#FFFFFF";
+export const WHITE60 = '#FFFFFF99';
 export const BLACK = "#000000";
 export const BGDARK = "#121212";
 export const PRIMARY = "#00AAE0";
+export const PRIMARYSTATE = '#714EFD';
 export const PRIMARYSOLID = "#544EFD";
+export const PRIMARYSOLID7 = "#544EFD12";
+export const PRIMARYLIGHT = '#EBEBFF';
 export const SECONDARY = "#0067E0";
 export const SUCCESS = "#55C090";
 export const DANGER = "#CD403A";
