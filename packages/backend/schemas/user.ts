@@ -1,6 +1,8 @@
 import { ObjectId } from "mongodb";
 import { ValueOf, GraphQLEntity } from "backend/lib/mongo-helper";
 
+import { PostCategory, PostCategoryEnum } from "./post";
+
 export interface ContentCreatorProps {
   avatar?: string;
   background?: AdjustableImage;
@@ -32,6 +34,7 @@ export namespace User {
     accreditation: Accreditation;
     position?: string;
     companyIds?: ObjectId[];
+    settings?: Settings;
 
     // TODO: still needs to finalized
     //settings: Settings;
@@ -51,12 +54,15 @@ export namespace User {
   };
 
   export type GraphQL = GraphQLEntity<
-    Omit<Mongo, "role" | "accreditation" | "reportedPost">
+    Omit<Mongo, "role" | "accreditation" | "reportedPost" | "settings">
   > & {
     role: UserRoleEnum;
     accreditation: AccreditationEnum;
     reportedPosts: Omit<GraphQLEntity<ReportedPost>, "violation"> & {
       violation: PostViolationEnum;
+    };
+    settings: Omit<Settings, "interests"> & {
+      interests?: PostCategoryEnum[];
     };
   };
 
@@ -70,6 +76,25 @@ export namespace User {
     provider: string;
     tokenId: string;
   };
+}
+
+export interface Settings {
+  interests?: PostCategory[];
+}
+
+export interface AdjustableImage {
+  url: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  scale: number;
+}
+
+export interface ReportedPost {
+  violation: PostViolation[];
+  comments: string;
+  postId: ObjectId;
 }
 
 /** Enumeration describing the role of the user. */
@@ -114,21 +139,6 @@ export const PostViolationOptions = {
 } as const;
 export type PostViolation = ValueOf<typeof PostViolationOptions>["value"];
 export type PostViolationEnum = keyof typeof PostViolationOptions;
-
-export interface AdjustableImage {
-  url: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  scale: number;
-}
-
-export interface ReportedPost {
-  violation: PostViolation[];
-  comments: string;
-  postId: ObjectId;
-}
 
 export const ContentCreatorSchema = `
   avatar: String
@@ -218,6 +228,14 @@ export const UserSchema = `
     comments: String
     postId: ID!
     post: Post!
+  }
+
+  type Settings {
+    interests: [PostCategory!]
+  }
+
+  input SettingsInput {
+    interests: [PostCategory!]
   }
 
   enum UserRole {

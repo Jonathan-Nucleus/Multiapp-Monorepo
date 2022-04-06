@@ -2,7 +2,14 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
-First, run the development server:
+Before getting started, created a `.env.local` file in the application root
+directory and add the following variables:
+
+```
+NEXTAUTH_SECRET={secret ≥ 32 characters}
+```
+
+Run the development server:
 
 ```bash
 npm run dev

@@ -12,12 +12,19 @@ import type { User } from "backend/schemas/user";
 
 const schema = gql`
   type Query {
+    verifyInvite(code: String!): Boolean!
     users: [User!]
   }
 `;
 
 const resolvers = {
   Query: {
+    verifyInvite: async (
+      parentIgnored: unknown,
+      { code }: { code: string },
+      { db }: ApolloServerContext
+    ): Promise<boolean> => db.users.verifyInvite(code),
+
     users: async (
       parentIgnored: User.Mongo,
       argsIgnored: NoArgs,

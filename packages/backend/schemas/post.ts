@@ -53,6 +53,7 @@ export const PostCategoryOptions = {
   CRYPTO: "crypto",
 } as const;
 export type PostCategory = ValueOf<typeof PostCategoryOptions>;
+export type PostCategoryEnum = keyof typeof PostCategoryOptions;
 
 export const PostSchema = `
   type Post {

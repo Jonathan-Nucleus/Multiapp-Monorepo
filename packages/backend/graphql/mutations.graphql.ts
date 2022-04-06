@@ -8,7 +8,7 @@ import {
   getAccessToken,
 } from "backend/lib/apollo-helper";
 
-import { User, isUser } from "backend/schemas/user";
+import { User, Settings, isUser } from "backend/schemas/user";
 
 const schema = gql`
   type Mutation {
@@ -17,6 +17,7 @@ const schema = gql`
     loginOAuth(user: OAuthUserInput!): String
     requestInvite(email: String!): Boolean!
     inviteUser(email: String!): Boolean!
+    updateSettings(settings: SettingsInput!): Boolean!
   }
 `;
 
@@ -70,6 +71,14 @@ const resolvers = {
         { email }: { email: string },
         { db, user }
       ): Promise<boolean | null> => db.users.invite(user._id, email)
+    ),
+
+    updateSettings: secureEndpoint(
+      async (
+        parentIgnored,
+        { settings }: { settings: Settings },
+        { db, user }
+      ): Promise<boolean> => db.users.updateSettings(user._id, settings)
     ),
   },
 };

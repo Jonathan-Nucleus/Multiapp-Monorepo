@@ -23,6 +23,7 @@ import {
   User,
   UserRoleOptions,
   AccreditationOptions,
+  Settings,
   isUser,
 } from "backend/schemas/user";
 
@@ -211,7 +212,7 @@ const createUsersCollection = (
 
       const newUser = {
         ...userData,
-        inviteCode: "",
+        emailToken: "",
         password: hash,
         salt,
         firstName,
@@ -262,6 +263,27 @@ const createUsersCollection = (
     },
 
     /**
+     * Verifies and invite code used to determine whethers users can continue
+     * to registration. Note, this is only used as a preliminary screen and
+     * only checks whether it is a valid invite code. During registration,
+     * the correct user-specific invite code is still required for successful
+     * account creation.
+     *
+     * @param email   The invite code.
+     *
+     * @returns   True if the invite code is valid, and false otherwise.
+     */
+    verifyInvite: async (code: string): Promise<boolean> => {
+      try {
+        const user = await usersCollection.findOne({ emailToken: code });
+        return !!user;
+      } catch (err) {
+        console.log(`Error verifying code ${code}: ${err}`);
+        return false;
+      }
+    },
+
+    /**
      * Sends an invitation from an existing user to a new user.
      *
      * @param userId  The ID the existing user sending the invitation.
@@ -281,6 +303,40 @@ const createUsersCollection = (
         );
       } catch (err) {
         console.log(`Error inviting user ${email}: ${err}`);
+        return false;
+      }
+
+      return true;
+    },
+
+    /**
+     * Sends an invitation from an existing user to a new user.
+     *
+     * @param userId  The ID the existing user sending the invitation.
+     * @param email   The email address for the new user.
+     *
+     * @returns   True if the invitation was successfully sent and false
+     *            otherwise.
+     */
+    updateSettings: async (
+      userId: MongoId,
+      settings: Settings
+    ): Promise<boolean> => {
+      try {
+        const user = await usersCollection.findOne({ _id: toObjectId(userId) });
+        if (!user || !isUser(user)) return false;
+
+        const newSettings = {
+          ...(user.settings ? user.settings : {}),
+          ...settings,
+        };
+
+        await usersCollection.updateOne(
+          { _id: toObjectId(userId) },
+          { $set: { settings: newSettings } }
+        );
+      } catch (err) {
+        console.log(`Error updating user settings for ${userId}: ${err}`);
         return false;
       }
 
