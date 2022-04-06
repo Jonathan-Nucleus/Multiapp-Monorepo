@@ -1,36 +1,76 @@
-import { FC, useRef, useState } from "react";
+import { FC, ReactElement, useState } from "react";
 import Link from "next/link";
 import Input from "../../common/Input";
 import Label from "../../common/Label";
 import Checkbox from "../../common/Checkbox";
 import Button from "../../common/Button";
-import AppleIcon from "shared/assets/images/apple.svg";
-import GoogleIcon from "shared/assets/images/google.svg";
-import LinkedInIcon from "shared/assets/images/linkedin.svg";
 import WarningIcon from "shared/assets/images/warning-red.svg";
-import Image, { StaticImageData } from "next/image";
+import Image from "next/image";
 import { signIn, getProviders } from "next-auth/react";
+import Alert from "../../common/Alert";
+import { AppleLogo, GoogleLogo, LinkedinLogo } from "phosphor-react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import { RedirectableProviderType } from "next-auth/providers";
 import { useRouter } from "next/router";
-import Alert from "../../common/Alert";
 
-const PROVIDER_ICONS: Record<string, StaticImageData> = {
-  apple: AppleIcon,
-  google: GoogleIcon,
-  linkedin: LinkedInIcon,
+const PROVIDER_ICONS: Record<string, ReactElement> = {
+  apple: <AppleLogo color="white" weight="fill" size={20} />,
+  google: <GoogleLogo color="white" weight="bold" size={20} />,
+  linkedin: <LinkedinLogo color="white" weight="fill" size={20} />,
 };
 
 interface LoginPageProps {
   providers: ReturnType<typeof getProviders>;
 }
 
-const LoginPage: FC<LoginPageProps> = ({ providers }) => {
+type FormValues = {
+  email: string;
+  password: string;
+  remember: boolean;
+};
+
+const schema = yup
+  .object({
+    email: yup.string().email("Must be a valid email").required(),
+    password: yup.string().min(8).required(),
+    remember: yup.boolean().required().default(false),
+  })
+  .required();
+
+const LoginPage: FC<LoginPageProps> = ({ providers }: LoginPageProps) => {
   const [showPassword, setShowPassword] = useState(false);
-  const formRef = useRef<HTMLFormElement>(null);
-  const [isFormValid, setFormValid] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { isValid },
+  } = useForm<yup.InferType<typeof schema>>({
+    resolver: yupResolver(schema),
+    mode: "onChange",
+  });
   const router = useRouter();
+  const onSubmit: SubmitHandler<FormValues> = (data) => {
+    setLoading(true);
+    signIn<RedirectableProviderType>("credentials", {
+      email: data.email,
+      password: data.password,
+      redirect: false,
+    }).then(async (response) => {
+      setLoading(false);
+      if (response?.ok) {
+        if (router.query.redirect) {
+          await router.replace(router.query.redirect as string);
+        } else {
+          await router.replace("/");
+        }
+      } else {
+        setError("Your email and/or password are incorrect.");
+      }
+    });
+  };
 
   return (
     <div className="px-3">
@@ -56,43 +96,14 @@ const LoginPage: FC<LoginPageProps> = ({ providers }) => {
             </Alert>
           </div>
         </div>
-        <form
-          ref={formRef}
-          method="post"
-          onChange={() => {
-            if (formRef.current) {
-              const formData = new FormData(formRef.current);
-              const formDataObj = Object.fromEntries(formData.entries());
-              setFormValid(!!formDataObj.email && !!formDataObj.password);
-            }
-          }}
-          onSubmit={(event) => {
-            event.preventDefault();
-            const formData = new FormData(formRef.current!!);
-            const formDataObj = Object.fromEntries(formData.entries());
-            setLoading(true);
-            signIn<RedirectableProviderType>("credentials", {
-              email: formDataObj.email,
-              password: formDataObj.password,
-              redirect: false,
-            }).then(async (response) => {
-              setLoading(false);
-              if (response?.ok) {
-                await router.replace("/");
-              } else {
-                setError("Your email and/or password are incorrect.");
-              }
-            });
-          }}
-        >
+        <form method="post" onSubmit={handleSubmit(onSubmit)}>
           <div className="mt-9">
             <Label for="email">Email</Label>
             <Input
               id="email"
               type="email"
-              name="email"
               autocomplete="email"
-              required
+              props={register("email")}
             />
           </div>
           <div className="mt-4">
@@ -108,9 +119,8 @@ const LoginPage: FC<LoginPageProps> = ({ providers }) => {
             <Input
               id="password"
               type={showPassword ? "text" : "password"}
-              name="password"
               autocomplete="current-password"
-              required
+              props={register("password")}
             />
           </div>
           <div className="mt-2">
@@ -119,7 +129,7 @@ const LoginPage: FC<LoginPageProps> = ({ providers }) => {
             </Link>
           </div>
           <div className="mt-5 flex flex-row items-center">
-            <Checkbox id="remember" name="remember" />
+            <Checkbox id="remember" props={register("remember")} />
             <Label for="remember">
               <span className="ml-2">Stay signed in</span>
             </Label>
@@ -129,7 +139,7 @@ const LoginPage: FC<LoginPageProps> = ({ providers }) => {
               type="submit"
               variant="gradient-primary"
               className="w-full uppercase leading-6"
-              disabled={!isFormValid}
+              disabled={!isValid}
               loading={loading}
             >
               Log in
@@ -148,7 +158,7 @@ const LoginPage: FC<LoginPageProps> = ({ providers }) => {
                 className="w-12 h-12 md:w-full md:h-auto rounded-lg md:rounded-full border border-gray-400 md:border-primary"
                 onClick={() => signIn(provider)}
               >
-                <Image src={PROVIDER_ICONS[provider]} alt="" />
+                {PROVIDER_ICONS[provider]}
                 <span className="ml-2 hidden md:inline-block">
                   {provider.toUpperCase()}
                 </span>

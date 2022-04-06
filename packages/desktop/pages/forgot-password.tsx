@@ -2,7 +2,6 @@ import Head from "next/head";
 import { NextPageWithLayout } from "../app/types/next-page";
 import AuthLayout from "../app/components/layouts/auth";
 import { ReactElement } from "react";
-import MainLayout from "../app/components/layouts/main";
 import ForgotPasswordPage from "../app/components/templates/ForgotPasswordPage";
 
 const ForgotPassword: NextPageWithLayout = () => {
@@ -18,12 +17,9 @@ const ForgotPassword: NextPageWithLayout = () => {
   );
 };
 
-ForgotPassword.getLayout = (page: ReactElement) => {
-  return (
-    <MainLayout>
-      <AuthLayout>{page}</AuthLayout>
-    </MainLayout>
-  );
-};
+ForgotPassword.getLayout = (page: ReactElement) => (
+  <AuthLayout>{page}</AuthLayout>
+);
+ForgotPassword.middleware = "guest";
 
-export default ForgotPassword
+export default ForgotPassword;

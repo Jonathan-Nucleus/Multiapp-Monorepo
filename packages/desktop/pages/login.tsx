@@ -4,9 +4,7 @@ import LoginPage from "../app/components/templates/LoginPage";
 import { NextPageWithLayout } from "../app/types/next-page";
 import AuthLayout from "../app/components/layouts/auth";
 import { ReactElement } from "react";
-import MainLayout from "../app/components/layouts/main";
-
-import { getSession, getProviders } from "next-auth/react";
+import { getProviders } from "next-auth/react";
 
 interface LoginProps {
   providers: ReturnType<typeof getProviders>;
@@ -25,19 +23,12 @@ const Login: NextPageWithLayout<LoginProps> = ({ providers }) => {
   );
 };
 
-Login.getLayout = (page: ReactElement) => {
-  return (
-    <MainLayout>
-      <AuthLayout>{page}</AuthLayout>
-    </MainLayout>
-  );
-};
+Login.getLayout = (page: ReactElement) => <AuthLayout>{page}</AuthLayout>;
+Login.middleware = "guest";
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { req } = context;
+export const getServerSideProps: GetServerSideProps = async () => {
   return {
     props: {
-      session: await getSession({ req }),
       providers: await getProviders(),
     },
   };

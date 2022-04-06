@@ -2,8 +2,7 @@ import Head from "next/head";
 import { NextPageWithLayout } from "../app/types/next-page";
 import AuthLayout from "../app/components/layouts/auth";
 import { ReactElement } from "react";
-import MainLayout from "../app/components/layouts/main";
-import PreferencesPage from '../app/components/templates/PreferencesPage'
+import PreferencesPage from "../app/components/templates/PreferencesPage";
 
 const Preferences: NextPageWithLayout = () => {
   return (
@@ -18,12 +17,7 @@ const Preferences: NextPageWithLayout = () => {
   );
 };
 
-Preferences.getLayout = (page: ReactElement) => {
-  return (
-    <MainLayout>
-      <AuthLayout>{page}</AuthLayout>
-    </MainLayout>
-  );
-};
+Preferences.getLayout = (page: ReactElement) => <AuthLayout>{page}</AuthLayout>;
+Preferences.middleware = "guest";
 
-export default Preferences
+export default Preferences;

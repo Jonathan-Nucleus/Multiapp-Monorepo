@@ -2,7 +2,6 @@ import Head from "next/head";
 import { NextPageWithLayout } from "../app/types/next-page";
 import AuthLayout from "../app/components/layouts/auth";
 import { ReactElement } from "react";
-import MainLayout from "../app/components/layouts/main";
 import InviteCodePage from "../app/components/templates/InviteCodePage";
 
 const InviteCode: NextPageWithLayout = () => {
@@ -18,12 +17,7 @@ const InviteCode: NextPageWithLayout = () => {
   );
 };
 
-InviteCode.getLayout = (page: ReactElement) => {
-  return (
-    <MainLayout>
-      <AuthLayout>{page}</AuthLayout>
-    </MainLayout>
-  );
-};
+InviteCode.getLayout = (page: ReactElement) => <AuthLayout>{page}</AuthLayout>;
+InviteCode.middleware = "guest";
 
-export default InviteCode
+export default InviteCode;

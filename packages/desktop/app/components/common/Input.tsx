@@ -1,6 +1,6 @@
-import { FC } from "react";
+import { FC, HTMLProps } from "react";
 
-type InputProps = {
+interface InputProps extends HTMLProps<HTMLInputElement> {
   id?: string;
   type: "email" | "text" | "password" | "hidden" | "number";
   name?: string;
@@ -8,7 +8,8 @@ type InputProps = {
   placeholder?: string;
   autocomplete?: string;
   required?: boolean;
-};
+  props?: HTMLProps<HTMLInputElement>;
+}
 
 const Input: FC<InputProps> = ({
   id,
@@ -17,8 +18,8 @@ const Input: FC<InputProps> = ({
   disabled,
   placeholder,
   autocomplete,
-  required,
-}: InputProps) => {
+  props,
+}) => {
   return (
     <input
       id={id}
@@ -28,7 +29,7 @@ const Input: FC<InputProps> = ({
       placeholder={placeholder}
       disabled={disabled}
       autoComplete={autocomplete}
-      required={required}
+      {...props}
     />
   );
 };

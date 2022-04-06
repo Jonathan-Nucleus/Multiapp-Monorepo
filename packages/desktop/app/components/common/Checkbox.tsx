@@ -1,4 +1,4 @@
-import { ChangeEventHandler, FC } from "react";
+import { ChangeEventHandler, FC, HTMLProps } from "react";
 
 type CheckboxProps = {
   id?: string;
@@ -7,6 +7,7 @@ type CheckboxProps = {
   required?: boolean;
   className?: string;
   onChange?: ChangeEventHandler<HTMLInputElement>;
+  props?: HTMLProps<HTMLInputElement>;
 };
 
 const Checkbox: FC<CheckboxProps> = ({
@@ -16,6 +17,7 @@ const Checkbox: FC<CheckboxProps> = ({
   required,
   className,
   onChange,
+  props,
 }: CheckboxProps) => {
   return (
     <input
@@ -29,8 +31,9 @@ const Checkbox: FC<CheckboxProps> = ({
       disabled={disabled}
       required={required}
       onChange={onChange}
+      {...props}
     />
   );
 };
 
-export default Checkbox;
+export default Checkbox

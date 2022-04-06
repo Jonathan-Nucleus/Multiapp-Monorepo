@@ -5,7 +5,7 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { Provider } from "next-auth/providers";
-import GoogleProvider, { GoogleProfile } from "next-auth/providers/google";
+import GoogleProvider from "next-auth/providers/google";
 import LinkedInProvider from "next-auth/providers/linkedin";
 
 import jwt, { JwtPayload } from "jsonwebtoken";
@@ -94,7 +94,7 @@ const AppAuthOptions: NextAuthOptions = {
       return token;
     },
 
-    session({ session, token, user }) {
+    session({ session, token }) {
       // Send properties to the client, like an access_token from a provider.
       session.accessToken = token.accessToken;
       return session;
@@ -128,7 +128,7 @@ const AppAuthOptions: NextAuthOptions = {
           : null;
 
       if (email && profileDetails) {
-        const result = await getApolloClient().mutate({
+        await getApolloClient().mutate({
           mutation: gql`
             mutation LoginOAuth($user: OAuthUserInput!) {
               loginOAuth(user: $user)

@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.5.10",
+    "@hookform/resolvers": "^2.8.8",
     "apollo3-cache-persist": "^0.14.0",
     "deepmerge": "^4.2.2",
     "graphql": "^16.3.0",
@@ -19,9 +20,12 @@
     "next-auth": "^4.3.1",
     "next-themes": "^0.1.1",
     "nextjs-progressbar": "^0.0.14",
+    "phosphor-react": "^1.4.1",
     "react": "18.0.0",
     "react-dom": "18.0.0",
-    "shared": "^1.0.0"
+    "react-hook-form": "^7.29.0",
+    "shared": "^1.0.0",
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^8.5.8",
