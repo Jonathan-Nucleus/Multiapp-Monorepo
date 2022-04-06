@@ -1,7 +1,6 @@
 import { FC } from "react";
 import Image from "next/image";
 import { Star } from "phosphor-react";
-import "react-multi-carousel/lib/styles.css";
 import Avatar from "shared/assets/images/avatar.svg";
 import Bank from "shared/assets/images/bank.svg";
 
