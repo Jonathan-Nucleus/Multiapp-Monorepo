@@ -42,7 +42,6 @@ const Filter: FC<FilterProps> = (props) => {
     }
     setSelectedFilters(_selectedFilters);
   };
-  console.log(111, selectedFilters);
 
   return (
     <div className="relative">

@@ -1,7 +1,5 @@
 import Head from "next/head";
 import { NextPageWithLayout } from "../app/types/next-page";
-import AuthLayout from "../app/components/layouts/auth";
-import { ReactElement } from "react";
 import PreferencesPage from "../app/components/templates/PreferencesPage";
 
 const Preferences: NextPageWithLayout = () => {
@@ -17,7 +15,7 @@ const Preferences: NextPageWithLayout = () => {
   );
 };
 
-Preferences.getLayout = (page: ReactElement) => <AuthLayout>{page}</AuthLayout>;
+Preferences.layout = "auth";
 Preferences.middleware = "guest";
 
 export default Preferences;

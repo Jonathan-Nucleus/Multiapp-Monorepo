@@ -1,0 +1,5 @@
+.main {
+  min-height: 100vh;
+  background: url("~shared/assets/images/background.png") no-repeat top;
+  background-size: cover;
+}

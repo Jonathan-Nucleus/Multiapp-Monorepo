@@ -3,7 +3,6 @@ import { Splide, SplideSlide } from "@splidejs/react-splide";
 import "@splidejs/react-splide/css";
 import Logo from "shared/assets/images/background.png";
 
-import { Navbar } from "../../common/Navbar";
 import CarouselItem from "./CarouselItem";
 import Filter from "./Filter";
 import CreatePost from "../../common/CreatePost";
@@ -61,7 +60,6 @@ const HomePage: FC = () => {
 
   return (
     <div>
-      <Navbar />
       <div className="flex flex-row px-2">
         <div className="basis-1/4 hidden lg:block">
           <UserInfo />

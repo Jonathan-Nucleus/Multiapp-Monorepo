@@ -1,7 +1,5 @@
 import Head from "next/head";
 import { NextPageWithLayout } from "../app/types/next-page";
-import AuthLayout from "../app/components/layouts/auth";
-import { ReactElement } from "react";
 import ResetPasswordPage from "../app/components/templates/ResetPasswordPage";
 
 const ResetPassword: NextPageWithLayout = () => {
@@ -17,9 +15,7 @@ const ResetPassword: NextPageWithLayout = () => {
   );
 };
 
-ResetPassword.getLayout = (page: ReactElement) => (
-  <AuthLayout>{page}</AuthLayout>
-);
+ResetPassword.layout = "auth";
 ResetPassword.middleware = "guest";
 
 export default ResetPassword;

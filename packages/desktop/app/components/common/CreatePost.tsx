@@ -32,7 +32,7 @@ const CreatePost: FC = () => {
 
         <PButton
           label={<Plus size={14} />}
-          onClick={() => console.log(111)}
+          onClick={() => {}}
           className={styles.button}
         />
       </div>

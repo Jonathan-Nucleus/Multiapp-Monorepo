@@ -3,9 +3,18 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        background: "#121212",
+        surface: {
+          DEFAULT: "#121212",
+          light10: "#19182a",
+        },
         primary: {
           DEFAULT: "#00AAE0",
           solid: "#544EFD",
+        },
+        secondary: {
+          DEFAULT: "#0067E0",
+          overlay: "#A5A5A5",
         },
         error: "#CD403A",
         info: "#544EFD",

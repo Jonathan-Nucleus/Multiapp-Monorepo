@@ -1,7 +1,5 @@
 import Head from "next/head";
 import { NextPageWithLayout } from "../app/types/next-page";
-import AuthLayout from "../app/components/layouts/auth";
-import { ReactElement } from "react";
 import SignupPage from "../app/components/templates/SignupPage";
 
 const Signup: NextPageWithLayout = () => {
@@ -17,7 +15,7 @@ const Signup: NextPageWithLayout = () => {
   );
 };
 
-Signup.getLayout = (page: ReactElement) => <AuthLayout>{page}</AuthLayout>;
+Signup.layout = "auth";
 Signup.middleware = "guest";
 
 export default Signup;

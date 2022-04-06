@@ -1,7 +1,8 @@
 import { NextPage } from "next";
-import { ReactElement, ReactNode } from "react";
 
-export type NextPageWithLayout<P = {}> = NextPage<P> & {
-  getLayout?: (page: ReactElement) => ReactNode;
+export interface AppPageProps {
+  layout?: "auth" | "main" | undefined;
   middleware?: "auth" | "guest";
-};
+}
+
+export type NextPageWithLayout<P = {}> = NextPage<P> & AppPageProps;

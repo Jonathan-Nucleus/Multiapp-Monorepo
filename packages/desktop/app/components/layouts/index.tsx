@@ -1,16 +1,18 @@
 import { FC, PropsWithChildren } from "react";
 import NextNProgress from "nextjs-progressbar";
-import styles from "./root.module.css";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import AppAuthOptions from "../../config/auth";
+import { AppPageProps } from "../../types/next-page";
+import AuthLayout from "./AuthLayout";
+import MainLayout from "./MainLayout";
+import styles from "./index.module.css";
 
-type RootLayoutProps = PropsWithChildren<{
-  middleware?: "auth" | "guest";
-}>;
+type RootLayoutProps = PropsWithChildren<AppPageProps>;
 
 const RootLayout: FC<RootLayoutProps> = ({
   middleware,
+  layout,
   children,
 }: RootLayoutProps) => {
   const { data: session } = useSession();
@@ -35,7 +37,11 @@ const RootLayout: FC<RootLayoutProps> = ({
         options={{ easing: "ease", speed: 500, showSpinner: false }}
         nonce=""
       />
-      <main className={styles.rootContainer}>{children}</main>
+      <main className={styles.main}>
+        {layout == "auth" && <AuthLayout>{children}</AuthLayout>}
+        {layout == "main" && <MainLayout>{children}</MainLayout>}
+        {layout == undefined && children}
+      </main>
     </>
   );
 };

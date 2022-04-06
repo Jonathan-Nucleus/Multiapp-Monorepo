@@ -36,14 +36,8 @@ const schema = yup
       .string()
       .oneOf([yup.ref("password")], "Confirm password mismatch")
       .required(),
-    acceptTerms: yup
-      .boolean()
-      .oneOf([true])
-      .required(),
-    crsCheck: yup
-      .boolean()
-      .oneOf([true])
-      .required(),
+    acceptTerms: yup.boolean().oneOf([true]).required(),
+    crsCheck: yup.boolean().oneOf([true]).required(),
   })
   .required();
 

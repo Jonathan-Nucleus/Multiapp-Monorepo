@@ -2,8 +2,6 @@ import Head from "next/head";
 import { GetServerSideProps } from "next";
 import LoginPage from "../app/components/templates/LoginPage";
 import { NextPageWithLayout } from "../app/types/next-page";
-import AuthLayout from "../app/components/layouts/auth";
-import { ReactElement } from "react";
 import { getProviders } from "next-auth/react";
 
 interface LoginProps {
@@ -23,7 +21,7 @@ const Login: NextPageWithLayout<LoginProps> = ({ providers }) => {
   );
 };
 
-Login.getLayout = (page: ReactElement) => <AuthLayout>{page}</AuthLayout>;
+Login.layout = "auth";
 Login.middleware = "guest";
 
 export const getServerSideProps: GetServerSideProps = async () => {
