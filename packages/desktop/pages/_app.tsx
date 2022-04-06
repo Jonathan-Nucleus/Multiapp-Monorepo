@@ -22,19 +22,16 @@ function MyApp({
     graphqlToken: session?.access_token,
   });
   const getLayout = Component.getLayout ?? ((page) => page);
-  const page = (
-    <SessionProvider session={session}>
-      <ThemeProvider>
-        <RootLayout middleware={Component.middleware}>
-          {getLayout(<Component {...pageProps} />)}
-        </RootLayout>
-      </ThemeProvider>
-    </SessionProvider>
-  );
-  return !apolloClient ? (
-    page
-  ) : (
-    <ApolloProvider client={apolloClient}>{page}</ApolloProvider>
+  return (
+    <ApolloProvider client={apolloClient}>
+      <SessionProvider session={session}>
+        <ThemeProvider>
+          <RootLayout middleware={Component.middleware}>
+            {getLayout(<Component {...pageProps} />)}
+          </RootLayout>
+        </ThemeProvider>
+      </SessionProvider>
+    </ApolloProvider>
   );
 }
 

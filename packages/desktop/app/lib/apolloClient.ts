@@ -189,7 +189,7 @@ export type ApolloPageProps = {
  */
 export function useApollo(
   pageProps: ApolloPageProps
-): ApolloClient<NormalizedCacheObject> | null {
+): ApolloClient<NormalizedCacheObject> {
   const { initialApolloState, graphqlToken } = pageProps;
 
   // For SSG and SSR always create a new Apollo Client
@@ -211,7 +211,7 @@ export function useApollo(
     }
   }, [initialApolloState, graphqlToken]);
 
-  return client;
+  return client || createApolloClient(graphqlToken);
 }
 
 export type SSRQueryResult<T> = ApolloQueryResult<T> & {
