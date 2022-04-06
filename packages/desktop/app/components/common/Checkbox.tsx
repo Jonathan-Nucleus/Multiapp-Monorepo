@@ -1,39 +1,21 @@
-import { ChangeEventHandler, FC, HTMLProps } from "react";
+import { forwardRef, HTMLProps } from "react";
 
-type CheckboxProps = {
-  id?: string;
-  name?: string;
-  disabled?: boolean;
-  required?: boolean;
-  className?: string;
-  onChange?: ChangeEventHandler<HTMLInputElement>;
-  props?: HTMLProps<HTMLInputElement>;
-};
+interface CheckboxProps extends HTMLProps<HTMLInputElement> {}
 
-const Checkbox: FC<CheckboxProps> = ({
-  id,
-  name,
-  disabled,
-  required,
-  className,
-  onChange,
-  props,
-}: CheckboxProps) => {
+const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>((props, ref) => {
   return (
     <input
-      id={id}
+      ref={ref}
+      {...props}
       type="checkbox"
-      name={name}
       className={
         "w-4 h-4 bg-gray-50 rounded border border-gray-300 focus:bg-primary accent-primary focus-visible:outline-none " +
-          className ?? ""
+          props.className ?? ""
       }
-      disabled={disabled}
-      required={required}
-      onChange={onChange}
-      {...props}
     />
   );
-};
+});
 
-export default Checkbox
+Checkbox.displayName = "Checkbox";
+
+export default Checkbox;

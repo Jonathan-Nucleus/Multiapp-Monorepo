@@ -1,4 +1,4 @@
-import { FC, useRef, useState } from "react";
+import { FC, useState } from "react";
 import Input from "../../common/Input";
 import Label from "../../common/Label";
 import Button from "../../common/Button";
@@ -7,28 +7,69 @@ import GoogleIcon from "shared/assets/images/google.svg";
 import LinkedInIcon from "shared/assets/images/linkedin.svg";
 import WarningIcon from "shared/assets/images/warning-red.svg";
 import Image from "next/image";
-import { signIn } from "next-auth/react";
-import { RedirectableProviderType } from "next-auth/providers";
-import { useRouter } from "next/router";
 import Alert from "../../common/Alert";
 import Checkbox from "../../common/Checkbox";
+import * as yup from "yup";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import Link from "next/link";
 
-import { useRegisterUser } from "desktop/app/queries/authentication.graphql";
+type FormValues = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  password: string;
+  confirmPassword: string;
+  acceptTerms: boolean;
+  crsCheck: boolean;
+};
+
+const schema = yup
+  .object({
+    firstName: yup.string().required(),
+    lastName: yup.string().required(),
+    email: yup.string().email("Must be a valid email").required(),
+    phoneNumber: yup.string().required(),
+    password: yup.string().min(8).required(),
+    confirmPassword: yup
+      .string()
+      .oneOf([yup.ref("password")], "Confirm password mismatch")
+      .required(),
+    acceptTerms: yup
+      .boolean()
+      .oneOf([true])
+      .required(),
+    crsCheck: yup
+      .boolean()
+      .oneOf([true])
+      .required(),
+  })
+  .required();
 
 const SignupPage: FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const formRef = useRef<HTMLFormElement>(null);
-  const [isFormValid, setFormValid] = useState(false);
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
-
-  const [registerUser] = useRegisterUser();
+  const [error, setError] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { isValid },
+  } = useForm<yup.InferType<typeof schema>>({
+    resolver: yupResolver(schema),
+    mode: "onChange",
+  });
+  const onSubmit: SubmitHandler<FormValues> = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+  };
 
   return (
     <div className="px-3">
-      <div className="container mx-auto max-w-md">
+      <div className="container mx-auto max-w-xl">
         <h1 className="text-white text-2xl">
           You’re in! We just need a few details...
         </h1>
@@ -44,81 +85,38 @@ const SignupPage: FC = () => {
             </Alert>
           </div>
         </div>
-        <form
-          ref={formRef}
-          method="post"
-          onChange={() => {
-            if (formRef.current) {
-              const formData = new FormData(formRef.current);
-              const formDataObj = Object.fromEntries(formData.entries());
-              setFormValid(!!formDataObj.email && !!formDataObj.password);
-            }
-          }}
-          onSubmit={async (event) => {
-            event.preventDefault();
-            const formData = new FormData(formRef.current!!);
-            const formDataObj = Object.fromEntries(formData.entries());
-            const { email, password } = formDataObj;
-            setLoading(true);
-
-            /*const { data } = await registerUser({
-              variables: {
-                user: {
-                  email,
-                  password,
-                },
-              },
-            });
-
-            if (data && data.register) {*/
-            signIn<RedirectableProviderType>("credentials", {
-              email,
-              password,
-              redirect: false,
-            }).then(async (response) => {
-              setLoading(false);
-              if (response?.ok) {
-                await router.replace("/");
-              } else {
-                setError("Your email and/or password are incorrect.");
-              }
-            });
-            //}
-          }}
-        >
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mt-9">
-            <Label for="first-name">First name</Label>
+            <Label htmlFor="first-name">First Name</Label>
             <Input
               id="first-name"
-              type="text"
-              name="first-name"
-              autocomplete="first-name"
-              required
+              autoComplete="first-name"
+              {...register("firstName")}
             />
           </div>
           <div className="mt-4">
-            <Label for="last-name">Last name</Label>
+            <Label htmlFor="last-name">Last Name</Label>
             <Input
               id="last-name"
-              type="text"
-              name="last-name"
-              autocomplete="last-name"
-              required
+              autoComplete="last-name"
+              {...register("lastName")}
             />
           </div>
           <div className="mt-4">
-            <Label for="email">Email</Label>
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" autoComplete="email" {...register("email")} />
+          </div>
+          <div className="mt-4">
+            <Label htmlFor="phone">Phone Number</Label>
             <Input
-              id="email"
-              type="email"
-              name="email"
-              autocomplete="email"
-              required
+              id="phone"
+              autoComplete="phone"
+              {...register("phoneNumber")}
             />
           </div>
           <div className="mt-4">
             <div className="flex flex-row justify-between">
-              <Label for="password">Password</Label>
+              <Label htmlFor="password">Password</Label>
               <a
                 className="text-sm text-primary cursor-pointer"
                 onClick={() => setShowPassword(!showPassword)}
@@ -129,14 +127,13 @@ const SignupPage: FC = () => {
             <Input
               id="password"
               type={showPassword ? "text" : "password"}
-              name="password"
-              autocomplete="current-password"
-              required
+              autoComplete="current-password"
+              {...register("password")}
             />
           </div>
           <div className="mt-4">
             <div className="flex flex-row justify-between">
-              <Label for="confirm_password">Confirm password</Label>
+              <Label htmlFor="confirm_password">Confirm Password</Label>
               <a
                 className="text-sm text-primary cursor-pointer"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
@@ -147,52 +144,63 @@ const SignupPage: FC = () => {
             <Input
               id="confirm-password"
               type={showConfirmPassword ? "text" : "password"}
-              name="confirm-password"
-              autocomplete="confirm-password"
-              required
+              autoComplete="confirm-password"
+              {...register("confirmPassword")}
             />
           </div>
-          <div className="mt-6 flex flex-row items-center justify-between">
-            <div className="flex flex-row">
-              <Checkbox
-                id="terms-check"
-                name="terms-check"
-                className="flex-shrink-0 mt-1"
-              />
-              <Label for="terms-check" className="font-medium ml-2">
-                <span>I agree to the Prometheus Alts</span>
-                <a href="/terms" className="text-primary text-sm">
-                  {" "}
-                  Terms
-                </a>
-                ,
-                <a href="/community" className="text-primary text-sm">
-                  {" "}
-                  Community{" "}
-                </a>
-                and
-                <a href="/privacy" className="text-primary text-sm">
-                  {" "}
-                  Privacy Policy
-                </a>
-              </Label>
-            </div>
-            <div className="flex-shrink-0">
-              <Button
-                type="submit"
-                variant="gradient-primary"
-                className="w-full uppercase leading-6"
-                disabled={!isFormValid}
-                loading={loading}
-              >
-                Sign Up
-              </Button>
-            </div>
+          <div className="flex flex-row items-center mt-6">
+            <Checkbox
+              id="terms-check"
+              className="flex-shrink-0"
+              {...register("acceptTerms")}
+            />
+            <Label htmlFor="terms-check" className="font-medium ml-2">
+              <span>I agree to the Prometheus Alts</span>
+              <a href="/terms" className="text-primary text-sm">
+                {" "}
+                Terms
+              </a>
+              ,
+              <a href="/community" className="text-primary text-sm">
+                {" "}
+                Community{" "}
+              </a>
+              and
+              <a href="/privacy" className="text-primary text-sm">
+                {" "}
+                Privacy Policy
+              </a>
+            </Label>
+          </div>
+          <div className="flex flex-row items-center mt-5">
+            <Checkbox
+              id="form-crs-check"
+              className="flex-shrink-0"
+              {...register("crsCheck")}
+            />
+            <Label htmlFor="form-crs-check" className="font-medium ml-2">
+              I also hereby acknowledge the receipt of
+              <Link href="/form-crs">
+                <a className="text-primary"> Prometheus’s Form CRS</a>
+              </Link>
+              .
+            </Label>
+          </div>
+          <div className="text-right mt-7">
+            <Button
+              type="submit"
+              variant="gradient-primary"
+              className="w-full md:w-48 uppercase leading-6"
+              disabled={!isValid}
+              loading={loading}
+            >
+              Sign Up
+            </Button>
           </div>
         </form>
       </div>
       <div className="mt-12 text-center text-white">OR, SIGN UP WITH</div>
-      <div className="container mx-auto mt-8 max-w-lg">
+      <div className="container mx-auto mt-8 pb-8 max-w-lg">
         <div className="flex items-center justify-center md:grid grid-cols-3 gap-7">
           <Button
             variant="outline-primary"

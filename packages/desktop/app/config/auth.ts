@@ -3,10 +3,6 @@
  *
  */
 import { NextAuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import { Provider } from "next-auth/providers";
-import GoogleProvider from "next-auth/providers/google";
-import LinkedInProvider from "next-auth/providers/linkedin";
 
 import { gql } from "@apollo/client";
 import { getApolloClient } from "desktop/app/lib/apolloClient";
@@ -44,7 +40,7 @@ const AppAuthOptions: NextAuthOptions = {
       // Extract access token from credentialed user object and persist it to
       // the jwt
       if (account && account.provider === "credentials") {
-        token.access_token = user.access_token;
+        token.access_token = user?.access_token;
       }
 
       // Fetch and persist Prometheus API access token on signin. Account

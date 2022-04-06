@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { ChangeEvent, FC, useState } from "react";
 import Checkbox from "../../common/Checkbox";
 import Label from "../../common/Label";
 import Button from "../../common/Button";
@@ -40,7 +40,7 @@ const PreferencesPage: FC = () => {
             >
               <Checkbox
                 id={`preference-${preference}`}
-                onChange={(event) => {
+                onChange={(event: ChangeEvent<HTMLInputElement>) => {
                   const _selections = [...selections];
                   const index = _selections.indexOf(preference);
                   if (event.target.checked) {
@@ -55,7 +55,7 @@ const PreferencesPage: FC = () => {
                   setSelections(_selections);
                 }}
               />
-              <Label for={`preference-${preference}`} className="ml-2">
+              <Label htmlFor={`preference-${preference}`} className="ml-2">
                 {preference}
               </Label>
             </div>

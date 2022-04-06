@@ -1,13 +1,10 @@
-import { FC, MouseEventHandler, PropsWithChildren } from "react";
+import { FC, HTMLProps } from "react";
 
-type ButtonProps = PropsWithChildren<{
-  type?: "button" | "submit" | "reset";
+interface ButtonProps extends HTMLProps<HTMLButtonElement> {
+  type?: "button" | "submit" | "reset" | undefined;
   variant: "outline-primary" | "gradient-primary" | "text";
-  disabled?: boolean;
-  className?: string;
   loading?: boolean;
-  onClick?: MouseEventHandler<HTMLButtonElement>;
-}>;
+}
 
 const Button: FC<ButtonProps> = ({
   type,
@@ -50,7 +47,7 @@ const Button: FC<ButtonProps> = ({
     >
       {loading && (
         <svg
-          className="mr-3 w-6 h-6 text-primary animate-spin fill-white"
+          className="w-5 h-5 text-primary animate-spin fill-white"
           viewBox="0 0 100 101"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"

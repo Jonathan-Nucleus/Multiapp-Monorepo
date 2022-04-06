@@ -1,9 +1,8 @@
-import { FC, PropsWithChildren } from "react";
+import { FC, HTMLProps } from "react";
 
-type AlertProps = PropsWithChildren<{
+interface AlertProps extends HTMLProps<HTMLDivElement> {
   variant: "error" | "info" | "success";
-  className?: string;
-}>;
+}
 
 const Alert: FC<AlertProps> = ({ variant, className, children }) => {
   let background = "";

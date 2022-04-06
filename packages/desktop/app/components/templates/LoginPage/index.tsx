@@ -98,17 +98,12 @@ const LoginPage: FC<LoginPageProps> = ({ providers }: LoginPageProps) => {
         </div>
         <form method="post" onSubmit={handleSubmit(onSubmit)}>
           <div className="mt-9">
-            <Label for="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              autocomplete="email"
-              props={register("email")}
-            />
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" autoComplete="email" {...register("email")} />
           </div>
           <div className="mt-4">
             <div className="flex flex-row justify-between">
-              <Label for="password">Password</Label>
+              <Label htmlFor="password">Password</Label>
               <a
                 className="text-sm text-primary cursor-pointer"
                 onClick={() => setShowPassword(!showPassword)}
@@ -119,8 +114,8 @@ const LoginPage: FC<LoginPageProps> = ({ providers }: LoginPageProps) => {
             <Input
               id="password"
               type={showPassword ? "text" : "password"}
-              autocomplete="current-password"
-              props={register("password")}
+              autoComplete="current-password"
+              {...register("password")}
             />
           </div>
           <div className="mt-2">
@@ -129,8 +124,8 @@ const LoginPage: FC<LoginPageProps> = ({ providers }: LoginPageProps) => {
             </Link>
           </div>
           <div className="mt-5 flex flex-row items-center">
-            <Checkbox id="remember" props={register("remember")} />
-            <Label for="remember">
+            <Checkbox id="remember" {...register("remember")} />
+            <Label htmlFor="remember">
               <span className="ml-2">Stay signed in</span>
             </Label>
           </div>
