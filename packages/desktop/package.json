@@ -9,6 +9,11 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "workspaces": {
+    "nohoist": [
+      "@splidejs/react-splide"
+    ]
+  },
   "dependencies": {
     "@apollo/client": "^3.5.10",
     "@hookform/resolvers": "^2.8.8",
