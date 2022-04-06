@@ -16,6 +16,7 @@ import {
   GraphQLEntity,
 } from "backend/lib/mongo-helper";
 import crypto from "crypto";
+import axios from "axios";
 import fetch from "node-fetch";
 import { v4 as uuid } from "uuid";
 import { OAuth2Client } from "google-auth-library";
@@ -143,11 +144,11 @@ const createUsersCollection = (
         }
       } else if (provider === "linkedin") {
         // Verify LinkedIn token
-        const res = await fetch(
-          `https://api.linkedin.com/v2/me?oauth2_access_token=${tokenId}`
-        );
-
-        if (!res.ok) {
+        try {
+          await axios.get(
+            `https://api.linkedin.com/v2/me?oauth2_access_token=${tokenId}`
+          );
+        } catch {
           console.log(`Invalid linkedin access token: ${tokenId}`);
           return null;
         }
@@ -235,8 +236,8 @@ const createUsersCollection = (
      *
      * @param email   The email address for the new user.
      *
-     * @returns   True if the invitation was successfully sent and false
-     *            otherwise.
+     * @returns   A stub user record for the newly invited user, or null if
+     *            the user already exists or an error was encountered.
      */
     requestInvite: async (email: string): Promise<User.Stub | null> => {
       const stubUser = {
@@ -257,12 +258,74 @@ const createUsersCollection = (
         return null;
       }
 
-      // TODO: Send email to invited user
-
       return stubUser;
     },
 
     /**
+     * Initiates a password reset if the user has a crendentialed account.
+     *
+     * @param email  The email of the user requesting a reset.
+     *
+     * @returns   A tuple containing the user id and the reset token.
+     */
+    requestPasswordReset: async (
+      email: string
+    ): Promise<[string, string] | null> => {
+      const user = await usersCollection.findOne({ email });
+      if (!user || !isUser(user) || !user.salt) return null;
+
+      try {
+        const token = uuid();
+        await usersCollection.updateOne(
+          { _id: user._id },
+          { $set: { emailToken: token } }
+        );
+
+        return [user._id.toString(), token];
+      } catch (err) {
+        console.log(
+          `Error generating password reset token for ${email}: ${err}`
+        );
+        return null;
+      }
+    },
+
+    /**
+     * Sets a new password for the user.
+     *
+     * @param password  The new password.
+     * @param token     A security token to authenticate the request.
+     *
+     * @returns   The user record if the password could successfully be reset
+     *            and null otherwise.
+     */
+    resetPassword: async (
+      password: string,
+      userId: MongoId,
+      token: string
+    ): Promise<User.Mongo | null> => {
+      const user = await usersCollection.findOne({ _id: toObjectId(userId) });
+      if (!user || !isUser(user) || !user.salt || user.emailToken !== token) {
+        return null;
+      }
+
+      try {
+        const salt = crypto.randomBytes(SALT_LENGTH).toString("hex");
+        const hash = hashPassword(password, salt);
+
+        await usersCollection.updateOne(
+          { _id: user._id },
+          { $set: { password: hash, salt, emailToken: "" } }
+        );
+
+        return user;
+      } catch (err) {
+        console.log(`Error resetting password for ${userId}: ${err}`);
+        return null;
+      }
+    },
+
+    /*
      * Verifies and invite code used to determine whethers users can continue
      * to registration. Note, this is only used as a preliminary screen and
      * only checks whether it is a valid invite code. During registration,
@@ -289,24 +352,27 @@ const createUsersCollection = (
      * @param userId  The ID the existing user sending the invitation.
      * @param email   The email address for the new user.
      *
-     * @returns   True if the invitation was successfully sent and false
-     *            otherwise.
+     * @returns   A stub user record for the newly invited user, or null if
+     *            the user already exists or an error was encountered.
      */
-    invite: async (userId: MongoId, email: string): Promise<boolean> => {
+    invite: async (
+      userId: MongoId,
+      email: string
+    ): Promise<User.Stub | null> => {
       try {
         const stubUser = await collection.requestInvite(email);
-        if (!stubUser) return false;
+        if (!stubUser) return null;
 
         await usersCollection.updateOne(
           { _id: toObjectId(userId) },
           { $addToSet: { invitees: stubUser._id } }
         );
+
+        return stubUser;
       } catch (err) {
         console.log(`Error inviting user ${email}: ${err}`);
-        return false;
+        return null;
       }
-
-      return true;
     },
 
     /**

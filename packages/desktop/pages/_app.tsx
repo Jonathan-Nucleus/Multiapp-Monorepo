@@ -17,7 +17,10 @@ function MyApp({
   Component,
   pageProps: { session, ...pageProps },
 }: AppPropsWithLayout) {
-  const apolloClient = useApollo(pageProps);
+  const apolloClient = useApollo({
+    ...pageProps,
+    graphqlToken: session?.access_token,
+  });
   const getLayout = Component.getLayout ?? ((page) => page);
   const page = (
     <SessionProvider session={session}>

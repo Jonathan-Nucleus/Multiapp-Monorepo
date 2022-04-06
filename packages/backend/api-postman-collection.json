@@ -97,6 +97,84 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
+						"query": "mutation Login($email: String!, $password: String!) {\n  login(email: $email, password: $password)\n}",
+						"variables": "{\n  \"email\": \"test@test.com\",\n  \"password\": \"test-pass\"\n}"
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login OAuth",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation LoginOAuth($user: OAuthUserInput!) {\n  loginOAuth(user: $user)\n}",
+						"variables": "{\n    \"user\": {\n        \"email\": \"test@test.com\",\n        \"firstName\": \"John\",\n        \"lastName\": \"Doe\",\n        \"provider\": \"google\",\n        \"token\": \"<google-token>\"\n    }\n}"
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Request Reset Password",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "mutation RequestPasswordReset($email: String!) {\n  requestPasswordReset(email: $email)\n}",
+						"variables": "{\n  \"email\": \"test@test.com\"\n}"
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reset Password",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
 						"query": "mutation Login($email: String!, $password: String!) {\n  login(email: $email, password: $password) {\n      user {\n          _id\n          role\n          accreditation\n      }\n      token\n  }\n}",
 						"variables": "{\n  \"email\": \"test@test.com\",\n  \"password\": \"test-pass\"\n}"
 					}

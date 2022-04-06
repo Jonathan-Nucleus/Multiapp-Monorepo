@@ -8,61 +8,15 @@ import { Provider } from "next-auth/providers";
 import GoogleProvider from "next-auth/providers/google";
 import LinkedInProvider from "next-auth/providers/linkedin";
 
-import jwt, { JwtPayload } from "jsonwebtoken";
 import { gql } from "@apollo/client";
 import { getApolloClient } from "desktop/app/lib/apolloClient";
 
-const providers: Provider[] = [
-  CredentialsProvider({
-    name: "Credentials",
-    credentials: {
-      email: { label: "Email", type: "text" },
-      password: { label: "Password", type: "password" },
-    },
-    async authorize(credentials) {
-      if (!credentials) return null;
-      const { email, password } = credentials;
-      const result = await getApolloClient().mutate({
-        mutation: gql`
-          mutation Login($email: String!, $password: String!) {
-            login(email: $email, password: $password)
-          }
-        `,
-        variables: { email, password },
-      });
+import providers from "./auth-providers";
 
-      const { data } = result;
-      if (data && data.login) {
-        const token = data.login;
-        const user = jwt.decode(token);
-
-        if (user) {
-          const { _id, role, acc } = user as JwtPayload;
-          return { _id, role, acc };
-        }
-      }
-
-      return null;
-    },
-  }),
-];
-
-if (process.env.GOOGLE_ID && process.env.GOOGLE_SECRET) {
-  providers.push(
-    GoogleProvider({
-      clientId: process.env.GOOGLE_ID,
-      clientSecret: process.env.GOOGLE_SECRET,
-    })
-  );
-}
-
-if (process.env.LINKEDIN_ID && process.env.LINKEDIN_SECRET) {
-  providers.push(
-    LinkedInProvider({
-      clientId: process.env.LINKEDIN_ID,
-      clientSecret: process.env.LINKEDIN_SECRET,
-    })
-  );
+export interface Session {
+  name: string;
+  email: string;
+  access_token: string;
 }
 
 const AppAuthOptions: NextAuthOptions = {
@@ -86,49 +40,28 @@ const AppAuthOptions: NextAuthOptions = {
     updateAge: 24 * 60 * 60, // 24 hours
   },
   callbacks: {
-    async jwt({ token, user }) {
-      // Persist the OAuth access_token to the token right after signin
-      if (user) {
-        token.accessToken = user.token;
-      }
-      return token;
-    },
-
-    session({ session, token }) {
-      // Send properties to the client, like an access_token from a provider.
-      session.accessToken = token.accessToken;
-      return session;
-    },
-
-    async signIn({ profile, account }) {
-      let { email } = profile;
-      if (account.provider === "linkedin") {
-        // Fetch primary email address for authenticated linkedin user
-        const emailResponse = await fetch(
-          "https://api.linkedin.com/v2/clientAwareMemberHandles?q=members&projection=(elements*(primary,type,handle~))",
-          { headers: { Authorization: `Bearer ${account.access_token}` } }
-        );
-        const emailData = await emailResponse.json();
-        email = emailData?.elements?.[0]?.["handle~"]?.emailAddress;
+    async jwt({ token, user, account }) {
+      // Extract access token from credentialed user object and persist it to
+      // the jwt
+      if (account && account.provider === "credentials") {
+        token.access_token = user.access_token;
       }
 
-      const profileDetails =
-        account.provider === "google"
-          ? {
-              firstName: profile.given_name as string,
-              lastName: profile.family_name as string,
-              tokenId: account.id_token as string,
-            }
-          : account.provider === "linkedin"
-          ? {
-              firstName: profile.localizedFirstName as string,
-              lastName: profile.localizedLastName as string,
-              tokenId: account.access_token as string,
-            }
-          : null;
+      // Fetch and persist Prometheus API access token on signin. Account
+      // variable is only defined during sign in.
+      else if (account && user && account.provider) {
+        const { firstName, lastName, email } = user;
+        const tokenId =
+          account.provider === "google"
+            ? account.id_token
+            : account.access_token;
 
-      if (email && profileDetails) {
-        await getApolloClient().mutate({
+        // Request an access token from the Prometheus API based on the
+        // OAuth token. The loginOAuth mutation also automatically creates a
+        // new user record if this user is logging into Prometheus for the
+        // first time. The access token requested here should be used to
+        // authenticate any requests to secured API endpoints.
+        const result = await getApolloClient().mutate({
           mutation: gql`
             mutation LoginOAuth($user: OAuthUserInput!) {
               loginOAuth(user: $user)
@@ -136,15 +69,27 @@ const AppAuthOptions: NextAuthOptions = {
           `,
           variables: {
             user: {
-              email,
+              email: email as string,
+              firstName: firstName as string,
+              lastName: lastName as string,
+              tokenId: tokenId as string,
               provider: account.provider as string,
-              ...profileDetails,
             },
           },
         });
+
+        if (result.data && result.data.loginOAuth) {
+          token.access_token = result.data.loginOAuth;
+        }
       }
 
-      return true;
+      return token;
+    },
+    session({ session, token }) {
+      // Propagate Prometheus API access token from the JWT to the user
+      // session
+      session.access_token = token.access_token;
+      return session;
     },
   },
   pages: {

@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 import type { ApolloServerContext } from "backend/lib/apollo-helper";
 import type { DeserializedUser } from "backend/db/collections/users";
 
-import { getIgniteDb } from "backend/db/";
+import { getIgniteDb } from "backend/db";
 import schema from "backend/graphql";
 
 import "dotenv/config";

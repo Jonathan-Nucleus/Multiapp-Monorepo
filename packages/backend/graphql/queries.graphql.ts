@@ -3,9 +3,7 @@ import {
   PartialSchema,
   ApolloServerContext,
   NoArgs,
-  AccessToken,
   secureEndpoint,
-  getAccessToken,
 } from "backend/lib/apollo-helper";
 
 import type { User } from "backend/schemas/user";

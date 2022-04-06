@@ -1,12 +1,19 @@
 import { gql } from "apollo-server";
+import { PrometheusMailer } from "backend/email";
+
 import {
   PartialSchema,
   ApolloServerContext,
   NoArgs,
-  AccessToken,
   secureEndpoint,
-  getAccessToken,
 } from "backend/lib/apollo-helper";
+import {
+  getAccessToken,
+  getResetToken,
+  decodeToken,
+  AccessToken,
+  ResetTokenPayload,
+} from "backend/lib/tokens";
 
 import { User, Settings, isUser } from "backend/schemas/user";
 
@@ -15,6 +22,8 @@ const schema = gql`
     register(user: UserInput!): String
     login(email: String!, password: String!): String
     loginOAuth(user: OAuthUserInput!): String
+    requestPasswordReset(email: String!): Boolean!
+    resetPassword(password: String!, token: String!): String
     requestInvite(email: String!): Boolean!
     inviteUser(email: String!): Boolean!
     updateSettings(settings: SettingsInput!): Boolean!
@@ -63,14 +72,53 @@ const resolvers = {
       parentIgnored: unknown,
       { email }: { email: string },
       { db }: ApolloServerContext
-    ): Promise<boolean | null> => !!db.users.requestInvite(email),
+    ): Promise<boolean | null> => {
+      const stubUser = await db.users.requestInvite(email);
+      if (!stubUser || !stubUser.emailToken) return null;
+
+      return PrometheusMailer.sendInviteCode(email, stubUser.emailToken);
+    },
+
+    requestPasswordReset: async (
+      parentIgnored: unknown,
+      { email }: { email: string },
+      { db }: ApolloServerContext
+    ): Promise<boolean> => {
+      const result = await db.users.requestPasswordReset(email);
+      if (!result) return false;
+
+      const [id, emailToken] = result;
+      const token = getResetToken(id, emailToken);
+      return PrometheusMailer.sendForgotPassword(email, token);
+    },
+
+    resetPassword: async (
+      parentIgnored: unknown,
+      { password, token }: { password: string; token: string },
+      { db }: ApolloServerContext
+    ): Promise<AccessToken | null> => {
+      const payload = decodeToken(token);
+      if (!payload) return null;
+
+      const { _id, tkn } = payload as ResetTokenPayload;
+      const user = await db.users.resetPassword(password, _id, tkn);
+      if (!user) return null;
+
+      const deserializedUser = await db.users.deserialize(user._id);
+      return deserializedUser ? getAccessToken(deserializedUser) : null;
+    },
 
     inviteUser: secureEndpoint(
       async (
         parentIgnored,
         { email }: { email: string },
         { db, user }
-      ): Promise<boolean | null> => db.users.invite(user._id, email)
+      ): Promise<boolean | null> => {
+        const stubUser = await db.users.invite(user._id, email);
+        if (!stubUser || !stubUser.emailToken) return null;
+
+        return PrometheusMailer.sendInviteCode(email, stubUser.emailToken);
+      }
     ),
 
     updateSettings: secureEndpoint(

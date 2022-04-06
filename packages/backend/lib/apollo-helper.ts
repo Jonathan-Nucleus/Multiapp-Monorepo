@@ -1,21 +1,11 @@
-import jwt from "jsonwebtoken";
-
 import type { DocumentNode, GraphQLFieldResolver } from "graphql";
 import type { GraphQLFieldResolverParams } from "apollo-server-types";
 import { AuthenticationError } from "apollo-server-errors";
 import type { IResolvers } from "@graphql-tools/utils";
 
-import type { IgniteDb } from "backend/db/";
+import type { IgniteDb } from "backend/db";
 import type { DeserializedUser } from "backend/db/collections/users";
 import type { User } from "backend/schemas/user";
-
-import "dotenv/config";
-
-if (!process.env.IGNITE_SECRET) {
-  throw new Error("IGNITE_SECRET env var undefined");
-}
-
-const IGNITE_SECRET = process.env.IGNITE_SECRET as string;
 
 export type PartialSchema = {
   schema: DocumentNode;
@@ -82,9 +72,4 @@ export function secureEndpoint<
   };
 
   return secureResolver;
-}
-
-export type AccessToken = string;
-export function getAccessToken(user: DeserializedUser): AccessToken {
-  return jwt.sign(user, IGNITE_SECRET);
 }

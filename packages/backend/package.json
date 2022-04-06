@@ -12,16 +12,19 @@
   "dependencies": {
     "apollo-server": "^3.6.7",
     "apollo-server-errors": "^3.3.1",
+    "aws-sdk": "^2.1108.0",
+    "axios": "^0.26.1",
     "crypto": "^1.0.1",
     "dotenv": "^16.0.0",
+    "ejs": "^3.1.6",
     "google-auth-library": "^7.14.1",
     "graphql": "^16.3.0",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^4.4.1",
-    "node-fetch": "2",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@types/ejs": "^3.1.0",
     "@types/jsonwebtoken": "^8.5.8",
     "@types/node-fetch": "^2.6.1",
     "@types/uuid": "^8.3.4",
