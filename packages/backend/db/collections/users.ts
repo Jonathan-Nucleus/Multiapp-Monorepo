@@ -25,6 +25,7 @@ import {
   UserRoleOptions,
   AccreditationOptions,
   Settings,
+  ReportedPost,
   isUser,
 } from "backend/schemas/user";
 
@@ -376,6 +377,102 @@ const createUsersCollection = (
     },
 
     /**
+     * Reports a post as inappropriate, indicating the violation data and
+     * logging under ther user record.
+     *
+     * @param report  Data describing the post and violation data.
+     * @param userId  The id of the user reporting the post.
+     *
+     * @returns   A stub user record for the newly invited user, or null if
+     *            the user already exists or an error was encountered.
+     */
+    reportPost: async (
+      report: ReportedPost,
+      userId: MongoId
+    ): Promise<boolean> => {
+      try {
+        const result = await usersCollection.updateOne(
+          { _id: toObjectId(userId) },
+          { $addToSet: { reportedPost: report } }
+        );
+
+        return result.acknowledged;
+      } catch (err) {
+        console.log(
+          `Error reporting post ${report.postId} user ${userId}: ${err}`
+        );
+        return false;
+      }
+    },
+
+    /**
+     * Hide or unhide a post from the home feed.
+     *
+     * @param hide    Whether or not to hide.
+     * @param postId  The id of the post.
+     * @param userId  The id the user.
+     *
+     * @returns   True if the hide state was successfully set, and false
+     *            otherwise.
+     */
+    hidePost: async (
+      hide: boolean,
+      postId: MongoId,
+      userId: MongoId
+    ): Promise<boolean> => {
+      try {
+        const result = hide
+          ? await usersCollection.updateOne(
+              { _id: toObjectId(userId) },
+              { $addToSet: { hiddenPostIds: toObjectId(postId) } }
+            )
+          : await usersCollection.updateOne(
+              { _id: toObjectId(userId) },
+              { $pull: { hiddenPostIds: toObjectId(postId) } }
+            );
+
+        return result.acknowledged;
+      } catch (err) {
+        console.log(`Error hiding post ${postId} user ${userId}: ${err}`);
+        return false;
+      }
+    },
+
+    /**
+     * Adds a post to list of posts that should be muted so that notifications
+     * of this post are not sent to the user.
+     *
+     * @param muted   Whether to mute or unmute this post.
+     * @param postId  The id of the post.
+     * @param userId  The id the user.
+     *
+     * @returns   True if the mute state was successfully set, and false
+     *            otherwise.
+     */
+    mutePost: async (
+      mute: boolean,
+      postId: MongoId,
+      userId: MongoId
+    ): Promise<boolean> => {
+      try {
+        const result = mute
+          ? await usersCollection.updateOne(
+              { _id: toObjectId(userId) },
+              { $addToSet: { mutedPostIds: toObjectId(postId) } }
+            )
+          : await usersCollection.updateOne(
+              { _id: toObjectId(userId) },
+              { $pull: { mutedPostIds: toObjectId(postId) } }
+            );
+
+        return result.acknowledged;
+      } catch (err) {
+        console.log(`Error muting post ${postId} for user ${userId}: ${err}`);
+        return false;
+      }
+    },
+
+    /**
      * Sends an invitation from an existing user to a new user.
      *
      * @param userId  The ID the existing user sending the invitation.
@@ -399,7 +496,7 @@ const createUsersCollection = (
 
         await usersCollection.updateOne(
           { _id: toObjectId(userId) },
-          { $set: { settings: newSettings } }
+          { $set: { settings: newSettings, updatedAt: new Date() } }
         );
       } catch (err) {
         console.log(`Error updating user settings for ${userId}: ${err}`);
@@ -407,6 +504,183 @@ const createUsersCollection = (
       }
 
       return true;
+    },
+
+    /**
+     * Set whether this user is following another user.
+     *
+     * @param follow        Whether or not this user is following another user.
+     * @param followUserId  The id of the user to follow or unfollow.
+     * @param userId        The id of the current user.
+     *
+     * @returns   True if the follow state was successfully set, and false
+     *            otherwise.
+     */
+    setFollowingUser: async (
+      follow: boolean,
+      followUserId: MongoId,
+      userId: MongoId
+    ): Promise<boolean> => {
+      try {
+        const result = follow
+          ? await usersCollection.updateOne(
+              { _id: toObjectId(userId) },
+              { $addToSet: { followingIds: toObjectId(followUserId) } }
+            )
+          : await usersCollection.updateOne(
+              { _id: toObjectId(userId) },
+              { $pull: { followingIds: toObjectId(followUserId) } }
+            );
+
+        return result.acknowledged;
+      } catch (err) {
+        console.log(`Error following user ${followUserId}: ${err}`);
+        return false;
+      }
+    },
+
+    /**
+     * Set whether another user is following this user.
+     *
+     * @param follow        Whether or not another user is following this user.
+     * @param followUserId  The id of the user that is following or unfollowing.
+     * @param userId        The id of the current user.
+     *
+     * @returns   True if the follow state was successfully set, and false
+     *            otherwise.
+     */
+    setFollower: async (
+      following: boolean,
+      followerId: MongoId,
+      userId: MongoId
+    ): Promise<boolean> => {
+      try {
+        const result = following
+          ? await usersCollection.updateOne(
+              { _id: toObjectId(userId) },
+              { $addToSet: { followerIds: toObjectId(followerId) } }
+            )
+          : await usersCollection.updateOne(
+              { _id: toObjectId(userId) },
+              { $pull: { followerIds: toObjectId(followerId) } }
+            );
+
+        return result.acknowledged;
+      } catch (err) {
+        console.log(`Error setting follower ${followerId}: ${err}`);
+        return false;
+      }
+    },
+
+    /**
+     * Set whether this user is following a company.
+     *
+     * @param follow            Whether or not this user is following another user.
+     * @param followCompanyId   The id of the company to follow or unfollow.
+     * @param userId            The id of the current user.
+     *
+     * @returns   True if the follow state was successfully set, and false
+     *            otherwise.
+     */
+    setFollowingCompany: async (
+      follow: boolean,
+      followCompanyId: MongoId,
+      userId: MongoId
+    ): Promise<boolean> => {
+      try {
+        const result = follow
+          ? await usersCollection.updateOne(
+              { _id: toObjectId(userId) },
+              {
+                $addToSet: { companyFollowingIds: toObjectId(followCompanyId) },
+              }
+            )
+          : await usersCollection.updateOne(
+              { _id: toObjectId(userId) },
+              { $pull: { companyFollowingIds: toObjectId(followCompanyId) } }
+            );
+
+        return result.acknowledged;
+      } catch (err) {
+        console.log(`Error following company ${followCompanyId}: ${err}`);
+        return false;
+      }
+    },
+
+    /**
+     * Set whether this user is being followed by a company.
+     *
+     * @param follower            Whether or not this user is following another company.
+     * @param followerCompanyId   The id of the company to follow or unfollow.
+     * @param userId            The id of the current user.
+     *
+     * @returns   True if the follow state was successfully set, and false
+     *            otherwise.
+     */
+    setFollowerCompany: async (
+      following: boolean,
+      followerCompanyId: MongoId,
+      userId: MongoId
+    ): Promise<boolean> => {
+      try {
+        const result = following
+          ? await usersCollection.updateOne(
+              { _id: toObjectId(userId) },
+              {
+                $addToSet: {
+                  companyFollowerIds: toObjectId(followerCompanyId),
+                },
+              }
+            )
+          : await usersCollection.updateOne(
+              { _id: toObjectId(userId) },
+              { $pull: { companyFollowerIds: toObjectId(followerCompanyId) } }
+            );
+
+        return result.acknowledged;
+      } catch (err) {
+        console.log(
+          `Error setting follower company ${followerCompanyId}: ${err}`
+        );
+        return false;
+      }
+    },
+
+    /**
+     * Set whether posts from a user should be hidden from the current user.
+     *
+     * @param hide          Whether or not to hide the user.
+     * @param hideenUserId  The id of the user to hide.
+     * @param userId        The id of the current user.
+     *
+     * @returns   True if the hide state was successfully set, and false
+     *            otherwise.
+     */
+    setHideUser: async (
+      hide: boolean,
+      hiddenUserId: MongoId,
+      userId: MongoId
+    ): Promise<boolean> => {
+      try {
+        const result = hide
+          ? await usersCollection.updateOne(
+              { _id: toObjectId(userId) },
+              {
+                $addToSet: {
+                  hiddenUserIds: toObjectId(hiddenUserId),
+                },
+              }
+            )
+          : await usersCollection.updateOne(
+              { _id: toObjectId(userId) },
+              { $pull: { hiddenUserIds: toObjectId(hiddenUserId) } }
+            );
+
+        return result.acknowledged;
+      } catch (err) {
+        console.log(`Error hiding user ${hiddenUserId}: ${err}`);
+        return false;
+      }
     },
 
     /**

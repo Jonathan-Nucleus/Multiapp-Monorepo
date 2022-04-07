@@ -17,7 +17,7 @@ export namespace Post {
     commentIds?: ObjectId[];
     visible: boolean;
     reporterIds?: ObjectId[];
-    updatedAt?: number;
+    updatedAt?: Date;
   }
 
   export type GraphQL = GraphQLEntity<Mongo> & {
@@ -27,6 +27,11 @@ export namespace Post {
     comments: Comment.GraphQL[];
     reporters: User.GraphQL[];
   };
+
+  export type Input = Pick<
+    GraphQL,
+    "audience" | "body" | "mediaUrl" | "categories" | "mentionIds"
+  >;
 }
 
 /** Enumeration describing the audience targeted by a post. */
@@ -68,14 +73,22 @@ export const PostSchema = `
     commentIds: [ID!]
     visible: Boolean!
     reporterIds: [ID!]
-    createdAt: Int!
-    updatedAt: Int
+    createdAt: Date!
+    updatedAt: Date
 
     user: User!
     mentions: [User!]!
     likes: [User!]!
     comments: [Comment!]!
     reporters: [User!]!
+  }
+
+  input PostInput {
+    audience: Audience!
+    body: String
+    mediaUrl: String
+    categories: [PostCategory!]!
+    mentionIds: [ID!]
   }
 
   enum Audience {

@@ -46,7 +46,7 @@ export namespace User {
     chatToken?: string;
     emailToken?: string;
     inviteeIds?: ObjectId[];
-    updatedAt?: number;
+    updatedAt?: Date;
   }
 
   export type Stub = Pick<Mongo, "_id" | "email" | "emailToken"> & {
@@ -58,8 +58,8 @@ export namespace User {
   > & {
     role: UserRoleEnum;
     accreditation: AccreditationEnum;
-    reportedPosts: Omit<GraphQLEntity<ReportedPost>, "violation"> & {
-      violation: PostViolationEnum;
+    reportedPosts: Omit<GraphQLEntity<ReportedPost>, "violations"> & {
+      violations: PostViolationEnum;
     };
     settings: Omit<Settings, "interests"> & {
       interests?: PostCategoryEnum[];
@@ -92,7 +92,7 @@ export interface AdjustableImage {
 }
 
 export interface ReportedPost {
-  violation: PostViolation[];
+  violations: PostViolation[];
   comments: string;
   postId: ObjectId;
 }
@@ -180,8 +180,8 @@ export const UserSchema = `
     chatToken: String
     emailToken: String
     inviteeIds: [ID!]
-    createdAt: Int!
-    updatedAt: Int
+    createdAt: Date!
+    updatedAt: Date
 
     companies: [Company!]!
     mutedPosts: [Post!]!
@@ -224,10 +224,16 @@ export const UserSchema = `
   }
 
   type ReportedPost {
-    violation: [PostViolation!]!
+    violations: [PostViolation!]!
     comments: String
     postId: ID!
     post: Post!
+  }
+
+  input ReportedPostInput {
+    violations: [PostViolation!]!
+    comments: String
+    postId: ID!
   }
 
   type Settings {

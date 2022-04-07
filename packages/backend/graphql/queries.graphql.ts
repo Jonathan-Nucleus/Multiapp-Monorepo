@@ -6,12 +6,13 @@ import {
   secureEndpoint,
 } from "backend/lib/apollo-helper";
 
-import type { User } from "backend/schemas/user";
+import { isUser } from "backend/schemas/user";
+import type { Post, PostCategory } from "backend/schemas/post";
 
 const schema = gql`
   type Query {
     verifyInvite(code: String!): Boolean!
-    users: [User!]
+    posts(categories: [PostCategory!]): [Post!]!
   }
 `;
 
@@ -23,11 +24,23 @@ const resolvers = {
       { db }: ApolloServerContext
     ): Promise<boolean> => db.users.verifyInvite(code),
 
-    users: async (
-      parentIgnored: User.Mongo,
-      argsIgnored: NoArgs,
-      { db }: ApolloServerContext
-    ): Promise<User.Mongo[]> => db.users.findAll(),
+    posts: secureEndpoint(
+      async (
+        parentIgnored,
+        { categories }: { categories?: PostCategory[] },
+        { db, user }
+      ): Promise<Post.Mongo[]> => {
+        const userData = await db.users.find({ _id: user._id });
+        if (!userData || !isUser(userData)) return [];
+
+        return db.posts.findByCategory(
+          user.acc === "none" ? "everyone" : user.acc,
+          categories,
+          userData.hiddenPostIds,
+          userData.hiddenUserIds
+        );
+      }
+    ),
   },
 };
 

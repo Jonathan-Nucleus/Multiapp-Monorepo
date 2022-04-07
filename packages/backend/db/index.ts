@@ -79,7 +79,7 @@ async function createInstance(): Promise<IgniteDb> {
     companies: companies(db.collection("companies")),
     funds: funds(db.collection("funds")),
     posts: posts(db.collection("posts")),
-    comments: comments(db.collection("comments")),
+    comments: comments(db.collection("comments"), db.collection("posts")),
   } as IgniteDb;
   return instance;
 }

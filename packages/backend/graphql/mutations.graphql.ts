@@ -15,7 +15,9 @@ import {
   ResetTokenPayload,
 } from "backend/lib/tokens";
 
-import { User, Settings, isUser } from "backend/schemas/user";
+import { User, Settings, ReportedPost, isUser } from "backend/schemas/user";
+import type { Post } from "backend/schemas/post";
+import type { Comment } from "backend/schemas/comment";
 
 const schema = gql`
   type Mutation {
@@ -27,6 +29,19 @@ const schema = gql`
     requestInvite(email: String!): Boolean!
     inviteUser(email: String!): Boolean!
     updateSettings(settings: SettingsInput!): Boolean!
+
+    createPost(post: PostInput!): Post
+    likePost(like: Boolean!, postId: ID!): Boolean!
+    reportPost(report: ReportedPostInput!): Boolean!
+    hidePost(hide: Boolean!, postId: ID!): Boolean!
+    mutePost(mute: Boolean!, postId: ID!): Boolean!
+    comment(comment: CommentInput!): Comment
+    editComment(comment: CommentUpdate!): Comment
+    deleteComment(commentId: ID!): Boolean!
+
+    followUser(follow: Boolean!, userId: ID!, asCompanyId: ID): Boolean!
+    followCompany(follow: Boolean!, companyId: ID!, asCompanyId: ID): Boolean!
+    hideUser(hide: Boolean!, userId: ID!): Boolean!
   }
 `;
 
@@ -127,6 +142,182 @@ const resolvers = {
         { settings }: { settings: Settings },
         { db, user }
       ): Promise<boolean> => db.users.updateSettings(user._id, settings)
+    ),
+
+    createPost: secureEndpoint(
+      async (
+        parentIgnored,
+        { post }: { post: Post.Input },
+        { db, user }
+      ): Promise<Post.Mongo | null> => db.posts.create(post, user._id)
+    ),
+
+    likePost: secureEndpoint(
+      async (
+        parentIgnored,
+        { postId, like }: { postId: string; like: boolean },
+        { db, user }
+      ): Promise<boolean> =>
+        like
+          ? db.posts.likePost(postId, user._id)
+          : db.posts.unlikePost(postId, user._id)
+    ),
+
+    reportPost: secureEndpoint(
+      async (
+        parentIgnored,
+        { report }: { report: ReportedPost },
+        { db, user }
+      ): Promise<boolean> => {
+        const postData = db.posts.find(report.postId);
+        if (!postData) return false;
+
+        return (
+          (await db.users.reportPost(report, user._id)) &&
+          (await db.posts.logReport(report.postId, user._id))
+        );
+      }
+    ),
+
+    hidePost: secureEndpoint(
+      async (
+        parentIgnored,
+        { postId, hide }: { postId: string; hide: boolean },
+        { db, user }
+      ): Promise<boolean> => {
+        const postData = db.posts.find(postId);
+        if (!postData) return false;
+
+        return db.users.hidePost(hide, postId, user._id);
+      }
+    ),
+
+    mutePost: secureEndpoint(
+      async (
+        parentIgnored,
+        { postId, mute }: { postId: string; mute: boolean },
+        { db, user }
+      ): Promise<boolean> => {
+        const postData = db.posts.find(postId);
+        if (!postData) return false;
+
+        return db.users.mutePost(mute, postId, user._id);
+      }
+    ),
+
+    comment: secureEndpoint(
+      async (
+        parentIgnored,
+        { comment }: { comment: Comment.Input },
+        { db, user }
+      ): Promise<Comment.Mongo | null> => {
+        const postData = db.posts.find(comment.postId);
+        if (!postData) return null;
+
+        return db.comments.create(comment, user._id);
+      }
+    ),
+
+    editComment: secureEndpoint(
+      async (
+        parentIgnored,
+        { comment }: { comment: Comment.Update },
+        { db, user }
+      ): Promise<Comment.Mongo | null> => db.comments.edit(comment, user._id)
+    ),
+
+    deleteComment: secureEndpoint(
+      async (
+        parentIgnored,
+        { commentId }: { commentId: string },
+        { db, user }
+      ): Promise<boolean> => db.comments.delete(commentId, user._id)
+    ),
+
+    followUser: secureEndpoint(
+      async (
+        parentIgnored,
+        {
+          follow,
+          userId,
+          asCompanyId,
+        }: { follow: boolean; userId: string; asCompanyId?: string },
+        { db, user }
+      ): Promise<boolean> => {
+        if (userId === user._id) return false;
+        if (asCompanyId) {
+          // Check company exists
+          const companyData = await db.companies.find(asCompanyId);
+          if (!companyData) return false;
+
+          return (
+            (await db.users.setFollowerCompany(follow, asCompanyId, userId)) &&
+            (await db.companies.setFollowingUser(follow, userId, asCompanyId))
+          );
+        }
+
+        // Check company exists
+        const userData = await db.users.find({ _id: userId });
+        if (!userData) return false;
+
+        return (
+          (await db.users.setFollowingUser(follow, userId, user._id)) &&
+          (await db.users.setFollower(follow, user._id, userId))
+        );
+      }
+    ),
+
+    followCompany: secureEndpoint(
+      async (
+        parentIgnored,
+        {
+          follow,
+          companyId,
+          asCompanyId,
+        }: { follow: boolean; companyId: string; asCompanyId?: string },
+        { db, user }
+      ): Promise<boolean> => {
+        if (companyId === asCompanyId) return false;
+
+        const companyData = await db.companies.find(companyId);
+        if (!companyData) return false;
+
+        if (asCompanyId) {
+          const asCompanyData = await db.companies.find(asCompanyId);
+          if (!asCompanyData) return false;
+
+          return (
+            (await db.companies.setFollowingCompany(
+              follow,
+              companyId,
+              asCompanyId
+            )) &&
+            (await db.companies.setFollowerCompany(
+              follow,
+              asCompanyId,
+              companyId
+            ))
+          );
+        }
+
+        return (
+          (await db.companies.setFollower(follow, user._id, companyId)) &&
+          (await db.users.setFollowingCompany(follow, companyId, user._id))
+        );
+      }
+    ),
+
+    hideUser: secureEndpoint(
+      async (
+        parentIgnored,
+        { hide, userId }: { hide: boolean; userId: string },
+        { db, user }
+      ): Promise<boolean> => {
+        const userData = await db.users.find({ _id: userId });
+        if (!userData) return false;
+
+        return db.users.setHideUser(hide, userId, user._id);
+      }
     ),
   },
 };

@@ -3,7 +3,7 @@
  * commments made on a post from a MongoDB database.
  */
 
-import { Collection, ObjectId } from "mongodb";
+import { Collection, ObjectId, UpdateFilter } from "mongodb";
 import {
   MongoId,
   toObjectId,
@@ -11,10 +11,12 @@ import {
   GraphQLEntity,
 } from "backend/lib/mongo-helper";
 import type { Comment } from "backend/schemas/comment";
+import type { Post } from "backend/schemas/post";
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 const createCommentsCollection = (
-  commentsCollection: Collection<Comment.Mongo>
+  commentsCollection: Collection<Comment.Mongo>,
+  postsCollection: Collection<Post.Mongo>
 ) => {
   return {
     /**
@@ -38,6 +40,111 @@ const createCommentsCollection = (
       const query =
         ids !== undefined ? { _id: { $in: ids ? toObjectIds(ids) : ids } } : {};
       return commentsCollection.find(query).toArray();
+    },
+
+    /**
+     * Create a new comment on a post.
+     *
+     * @param comment The comment data.
+     * @param userId  The id of the user making the comment.
+     *
+     * @returns   The comment object or null if an error was encountered.
+     */
+    create: async (
+      comment: Comment.Input,
+      userId: MongoId
+    ): Promise<Comment.Mongo | null> => {
+      const { body, postId, commentId, mentionIds } = comment;
+      const commentData = {
+        _id: new ObjectId(),
+        body,
+        postId: toObjectId(postId),
+        commentId: commentId ? toObjectId(commentId) : undefined,
+        mentionIds: mentionIds ? toObjectIds(mentionIds) : undefined,
+        userId: toObjectId(userId),
+      };
+      try {
+        await commentsCollection.insertOne(commentData);
+        await postsCollection.updateOne(
+          { _id: toObjectId(postId) },
+          {
+            $addToSet: { commentIds: commentData._id },
+            $set: { updatedAt: new Date() },
+          }
+        );
+
+        return commentData;
+      } catch (err) {
+        console.log("Error creating new comment:", err);
+        return null;
+      }
+    },
+
+    /**
+     * Edit an existing comment.
+     *
+     * @param comment  Updated comment data.
+     * @param userId  The id of the user editing the comment.
+     *
+     * @returns   The updated comment object or null if unauthorizered or an
+     *            error was encountered.
+     */
+    edit: async (
+      comment: Comment.Update,
+      userId: MongoId
+    ): Promise<Comment.Mongo | null> => {
+      const { _id, body, mentionIds } = comment;
+      let updateFilter: UpdateFilter<Comment.Mongo> = {
+        $set: {
+          body,
+          updatedAt: new Date(),
+          ...(mentionIds ? { mentionIds: toObjectIds(mentionIds) } : {}),
+        },
+      };
+
+      try {
+        const result = await commentsCollection.findOneAndUpdate(
+          { _id: toObjectId(_id), userId: toObjectId(userId) },
+          updateFilter,
+          { returnDocument: "after" }
+        );
+
+        return result.value;
+      } catch (err) {
+        console.log(`Error editing comment ${comment._id}:`, err);
+        return null;
+      }
+    },
+
+    /**
+     * Delete an existing comment.
+     *
+     * @param commentId  The id of the comment.
+     * @param userId  The id of the user editing the comment.
+     *
+     * @returns   True if the comment was successfully deleted and false
+     *            otherwise.
+     */
+    delete: async (commentId: MongoId, userId: MongoId): Promise<boolean> => {
+      try {
+        const result = await commentsCollection.findOneAndDelete({
+          _id: toObjectId(commentId),
+          userId: toObjectId(userId),
+        });
+
+        if (result.ok && result.value) {
+          await postsCollection.updateOne(
+            { _id: result.value.postId },
+            { $pull: { commentIds: result.value._id } }
+          );
+        }
+
+        return !!result.ok && result.value !== null;
+      } catch (err) {
+        console.log("Error creating deleting comment:", err);
+      }
+
+      return false;
     },
   };
 };

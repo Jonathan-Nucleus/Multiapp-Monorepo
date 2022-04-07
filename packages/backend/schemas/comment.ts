@@ -13,7 +13,7 @@ export namespace Comment {
     commentId?: ObjectId;
     likeIds?: ObjectId[];
     mentionIds?: ObjectId[];
-    updatedAt?: number;
+    updatedAt?: Date;
   }
 
   export type GraphQL = GraphQLEntity<Mongo> & {
@@ -23,6 +23,13 @@ export namespace Comment {
     likes: User.GraphQL[];
     mentions: User.GraphQL[];
   };
+
+  export type Input = Pick<
+    GraphQL,
+    "body" | "postId" | "commentId" | "mentionIds"
+  >;
+
+  export type Update = Pick<GraphQL, "_id" | "body" | "mentionIds">;
 }
 
 export const CommentSchema = `
@@ -34,13 +41,26 @@ export const CommentSchema = `
     commentId: ID
     likeIds: [ID!]
     mentionIds: [ID!]
-    createdAt: Int!
-    updatedAt: Int
+    createdAt: Date!
+    updatedAt: Date
 
     user: User!
     post: Post!
     comment: Comment
     likes: [User!]!
     mentions: [User!]!
+  }
+
+  input CommentInput {
+    body: String!
+    postId: ID!
+    commentId: ID
+    mentionIds: [ID!]
+  }
+
+  input CommentUpdate {
+    _id: ID!
+    body: String!
+    mentionIds: [ID!]
   }
 `;

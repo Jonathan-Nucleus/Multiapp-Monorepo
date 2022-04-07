@@ -11,7 +11,7 @@ export namespace Company {
     name: string;
     memberIds: ObjectId[];
     fundIds?: ObjectId[];
-    updatedAt?: number;
+    updatedAt?: Date;
   }
 
   export type GraphQL = GraphQLEntity<Mongo> & {
@@ -29,8 +29,8 @@ export const CompanySchema = `
     memberIds: [ID!]!
     fundIds: [ID!]!
     ${ContentCreatorSchema}
-    createdAt: Int!
-    updatedAt: Int
+    createdAt: Date!
+    updatedAt: Date
 
     members: [User!]!
     funds: [Fund!]!

@@ -20,7 +20,7 @@ export namespace Fund {
     documents?: Document[];
     teamIds: ObjectId[];
     tags: string[];
-    updatedAt?: number;
+    updatedAt?: Date;
 
     // TODO: Figure out the rest of these soon
     // attributes
@@ -86,8 +86,8 @@ export const FundSchema = `
     documents: [Document!]
     teamIds: [ID!]!
     tags: [String!]!
-    createdAt: Int!
-    updatedAt: Int
+    createdAt: Date!
+    updatedAt: Date
 
     manager: User!
     company: Company!

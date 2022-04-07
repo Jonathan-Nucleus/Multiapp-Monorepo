@@ -6,264 +6,834 @@
 	},
 	"item": [
 		{
-			"name": "Request Invite",
-			"request": {
-				"auth": {
-					"type": "noauth"
+			"name": "Queries",
+			"item": [
+				{
+					"name": "Verify Invite",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query VerifyInvite($code: String!) {\n  verifyInvite(code: $code)\n}",
+								"variables": "{\n  \"code\": \"97b45a0a-edb6-4b4c-9e56-9332192792f6\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
 				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "graphql",
-					"graphql": {
-						"query": "mutation RequestInvite($email: String!) {\n  requestInvite(email: $email)\n}",
-						"variables": "{\n  \"email\": \"test@test.com\"\n}"
-					}
+				{
+					"name": "Posts",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRjZmNiZGVkMDExN2M3MzQ0Nzc0NGMiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkyMTM5ODR9.t0qrvlROn-jyXQ06co_SKrz_X92YAWEsMSmUmLvZ5i0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query Posts {\n  posts {\n      _id\n      body\n      mediaUrl\n      mentionIds\n      likeIds\n      commentIds\n      createdAt\n      user {\n          _id\n          firstName\n          lastName\n      }\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://localhost:4000/",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						""
-					]
+				{
+					"name": "Posts Filtered",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRjZmNiZGVkMDExN2M3MzQ0Nzc0NGMiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkyMTM5ODR9.t0qrvlROn-jyXQ06co_SKrz_X92YAWEsMSmUmLvZ5i0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query Posts($categories: [PostCategory!]) {\n  posts(categories: $categories) {\n      _id\n      body\n      mediaUrl\n      mentionIds\n      likeIds\n      commentIds\n      createdAt\n      user {\n          _id\n          firstName\n          lastName\n      }\n  }\n}",
+								"variables": "{\n  \"categories\": [\n      \"NEWS\",\n      \"POLITICS\",\n      \"IDEAS\"\n  ]\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "Verify Invite",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "graphql",
-					"graphql": {
-						"query": "query VerifyInvite($code: String!) {\n  verifyInvite(code: $code)\n}",
-						"variables": "{\n  \"code\": \"97b45a0a-edb6-4b4c-9e56-9332192792f6\"\n}"
-					}
-				},
-				"url": {
-					"raw": "http://localhost:4000/",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						""
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Register",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "graphql",
-					"graphql": {
-						"query": "mutation Register($user: UserInput!) {\n  register(user: $user)\n}",
-						"variables": "{\n  \"user\": {\n    \"email\": \"test@test.com\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"inviteCode\": \"97b45a0a-edb6-4b4c-9e56-9332192792f6\",\n    \"password\": \"test-pass\"\n  }\n}"
-					}
-				},
-				"url": {
-					"raw": "http://localhost:4000/",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						""
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Login",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "graphql",
-					"graphql": {
-						"query": "mutation Login($email: String!, $password: String!) {\n  login(email: $email, password: $password)\n}",
-						"variables": "{\n  \"email\": \"test@test.com\",\n  \"password\": \"test-pass\"\n}"
-					}
-				},
-				"url": {
-					"raw": "http://localhost:4000/",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						""
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Login OAuth",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "graphql",
-					"graphql": {
-						"query": "mutation LoginOAuth($user: OAuthUserInput!) {\n  loginOAuth(user: $user)\n}",
-						"variables": "{\n    \"user\": {\n        \"email\": \"test@test.com\",\n        \"firstName\": \"John\",\n        \"lastName\": \"Doe\",\n        \"provider\": \"google\",\n        \"token\": \"<google-token>\"\n    }\n}"
-					}
-				},
-				"url": {
-					"raw": "http://localhost:4000/",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						""
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Request Reset Password",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "graphql",
-					"graphql": {
-						"query": "mutation RequestPasswordReset($email: String!) {\n  requestPasswordReset(email: $email)\n}",
-						"variables": "{\n  \"email\": \"test@test.com\"\n}"
-					}
-				},
-				"url": {
-					"raw": "http://localhost:4000/",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						""
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Reset Password",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "graphql",
-					"graphql": {
-						"query": "mutation Login($email: String!, $password: String!) {\n  login(email: $email, password: $password) {\n      user {\n          _id\n          role\n          accreditation\n      }\n      token\n  }\n}",
-						"variables": "{\n  \"email\": \"test@test.com\",\n  \"password\": \"test-pass\"\n}"
-					}
-				},
-				"url": {
-					"raw": "http://localhost:4000/",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						""
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Invite User",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
+			"name": "Mutations",
+			"item": [
+				{
+					"name": "Auth",
+					"item": [
 						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRhNjYzZmZiZDVmZmJlODcxNjAzNTAiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkwNDM2Mjd9.8sUii0pTi2PnVu_-rWIRHx1hmBfMG26OV-Gen5Ne-QM",
-							"type": "string"
+							"name": "Request Invite",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation RequestInvite($email: String!) {\n  requestInvite(email: $email)\n}",
+										"variables": "{\n  \"email\": \"ddesai@bu.edu\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Register",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation Register($user: UserInput!) {\n  register(user: $user)\n}",
+										"variables": "{\n  \"user\": {\n    \"email\": \"test@test.com\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"inviteCode\": \"97b45a0a-edb6-4b4c-9e56-9332192792f6\",\n    \"password\": \"test-pass\"\n  }\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Login",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation Login($email: String!, $password: String!) {\n  login(email: $email, password: $password)\n}",
+										"variables": "{\n  \"email\": \"test@test.com\",\n  \"password\": \"test-pass\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Login OAuth",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation LoginOAuth($user: OAuthUserInput!) {\n  loginOAuth(user: $user)\n}",
+										"variables": "{\n    \"user\": {\n        \"email\": \"test@test.com\",\n        \"firstName\": \"John\",\n        \"lastName\": \"Doe\",\n        \"provider\": \"google\",\n        \"token\": \"<google-token>\"\n    }\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Request Reset Password",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation RequestPasswordReset($email: String!) {\n  requestPasswordReset(email: $email)\n}",
+										"variables": "{\n  \"email\": \"test@test.com\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Reset Password",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation Login($email: String!, $password: String!) {\n  login(email: $email, password: $password) {\n      user {\n          _id\n          role\n          accreditation\n      }\n      token\n  }\n}",
+										"variables": "{\n  \"email\": \"test@test.com\",\n  \"password\": \"test-pass\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "graphql",
-					"graphql": {
-						"query": "mutation Invite($email: String!) {\n  inviteUser(email: $email)\n}",
-						"variables": "{\n  \"email\": \"test2@test.com\"\n}"
-					}
-				},
-				"url": {
-					"raw": "http://localhost:4000/",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						""
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Update Settings",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
+				{
+					"name": "Account",
+					"item": [
 						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRhNjYzZmZiZDVmZmJlODcxNjAzNTAiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkwNDM2Mjd9.8sUii0pTi2PnVu_-rWIRHx1hmBfMG26OV-Gen5Ne-QM",
-							"type": "string"
+							"name": "Invite User",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRhNjYzZmZiZDVmZmJlODcxNjAzNTAiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkwNDM2Mjd9.8sUii0pTi2PnVu_-rWIRHx1hmBfMG26OV-Gen5Ne-QM",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation Invite($email: String!) {\n  inviteUser(email: $email)\n}",
+										"variables": "{\n  \"email\": \"test2@test.com\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Settings",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRhNjYzZmZiZDVmZmJlODcxNjAzNTAiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkwNDM2Mjd9.8sUii0pTi2PnVu_-rWIRHx1hmBfMG26OV-Gen5Ne-QM",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation Invite($email: String!) {\n  inviteUser(email: $email)\n}",
+										"variables": "{\n  \"email\": \"test2@test.com\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Hide User",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRjY2FmMjIzM2ZjOGIzMzcxMGEyYjYiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkzMjYyMjB9.ezFB4OfX26NITncSGnzYtd0fSQcgT-DiUG5lglPqGNk",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation FollowCompany($follow: Boolean!, $companyId: ID!) {\n  followCompany(follow: $follow, companyId: $companyId)\n}",
+										"variables": "{\n  \"follow\": true,\n  \"companyId\": \"624d255545562688a8a3c6f1\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "graphql",
-					"graphql": {
-						"query": "mutation Invite($email: String!) {\n  inviteUser(email: $email)\n}",
-						"variables": "{\n  \"email\": \"test2@test.com\"\n}"
-					}
+				{
+					"name": "Posts",
+					"item": [
+						{
+							"name": "Create Post",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRhNjYzZmZiZDVmZmJlODcxNjAzNTAiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkwNDM2Mjd9.8sUii0pTi2PnVu_-rWIRHx1hmBfMG26OV-Gen5Ne-QM",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation CreatePost($post: PostInput!) {\n  createPost(post: $post)\n}",
+										"variables": "{\n     \"post\": {\n        \"categories\": [\n            \"NEWS\",\n            \"POLITICS\"\n        ],\n        \"audience\": \"EVERYONE\",\n        \"body\": \"This is my post\",\n        \"mediaUrl\": \"https://www.postmedia.com/this/is/my/image/or/video\",\n        \"mentionIds\": [\n          \"<userid1>\", \n          \"<userid2>\"\n        ]\n  }\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "LIke Post",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRjY2FmMjIzM2ZjOGIzMzcxMGEyYjYiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkzMjYyMjB9.ezFB4OfX26NITncSGnzYtd0fSQcgT-DiUG5lglPqGNk",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation LikePost($like: Boolean!, $postId: ID!) {\n  likePost(like: $like, postId: $postId)\n}",
+										"variables": "{\n  \"like\": true,\n  \"postId\": \"624ebb4f7a7d3e4ae91cb54a\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Report Post",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRhNjYzZmZiZDVmZmJlODcxNjAzNTAiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkwNDM2Mjd9.8sUii0pTi2PnVu_-rWIRHx1hmBfMG26OV-Gen5Ne-QM",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation Invite($email: String!) {\n  inviteUser(email: $email)\n}",
+										"variables": "{\n  \"email\": \"test2@test.com\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Hide Post",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRjY2FmMjIzM2ZjOGIzMzcxMGEyYjYiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkzMjYyMjB9.ezFB4OfX26NITncSGnzYtd0fSQcgT-DiUG5lglPqGNk",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation HidePost($postId: ID!) {\n  hidePost(postId: $postId)\n}",
+										"variables": "{\n  \"postId\": \"624ebb4f7a7d3e4ae91cb54a\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Mute Post",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRjY2FmMjIzM2ZjOGIzMzcxMGEyYjYiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkzMjYyMjB9.ezFB4OfX26NITncSGnzYtd0fSQcgT-DiUG5lglPqGNk",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation MutePost($mute: Boolean!, $postId: ID!) {\n  mutePost(mute: $mute, postId: $postId)\n}",
+										"variables": "{\n  \"mute\": false,\n  \"postId\": \"624ebb4f7a7d3e4ae91cb54a\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Comment",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRhNjYzZmZiZDVmZmJlODcxNjAzNTAiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkwNDM2Mjd9.8sUii0pTi2PnVu_-rWIRHx1hmBfMG26OV-Gen5Ne-QM",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation Invite($email: String!) {\n  inviteUser(email: $email)\n}",
+										"variables": "{\n  \"email\": \"test2@test.com\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Edit Comment",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRjY2FmMjIzM2ZjOGIzMzcxMGEyYjYiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkzMjYyMjB9.ezFB4OfX26NITncSGnzYtd0fSQcgT-DiUG5lglPqGNk",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation EditComment($comment: CommentUpdate!) {\n  editComment(comment: $comment) {\n      _id\n      body\n      postId\n      createdAt\n  }\n}",
+										"variables": "{\n    \"comment\": {\n        \"_id\": \"624ec1b48cbe8f03e862fbf6\",\n        \"body\": \"My updated comment with mentions erased\",\n        \"mentionIds\": []\n    }\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Comment",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRhNjYzZmZiZDVmZmJlODcxNjAzNTAiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkwNDM2Mjd9.8sUii0pTi2PnVu_-rWIRHx1hmBfMG26OV-Gen5Ne-QM",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation Invite($email: String!) {\n  inviteUser(email: $email)\n}",
+										"variables": "{\n  \"email\": \"test2@test.com\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
 				},
-				"url": {
-					"raw": "http://localhost:4000/",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						""
+				{
+					"name": "Profiles",
+					"item": [
+						{
+							"name": "Follow User",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRhNjYzZmZiZDVmZmJlODcxNjAzNTAiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkwNDM2Mjd9.8sUii0pTi2PnVu_-rWIRHx1hmBfMG26OV-Gen5Ne-QM",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation Invite($email: String!) {\n  inviteUser(email: $email)\n}",
+										"variables": "{\n  \"email\": \"test2@test.com\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Follow User As Company",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRjY2FmMjIzM2ZjOGIzMzcxMGEyYjYiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkzMjYyMjB9.ezFB4OfX26NITncSGnzYtd0fSQcgT-DiUG5lglPqGNk",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation FollowUserAsCompany($follow: Boolean!, $userId: ID!, $asCompanyId: ID!) {\n  followUser(follow: $follow, userId: $userId, asCompanyId: $asCompanyId)\n}",
+										"variables": "{\n  \"email\": \"test2@test.com\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Follow Company",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRjY2FmMjIzM2ZjOGIzMzcxMGEyYjYiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkzMjYyMjB9.ezFB4OfX26NITncSGnzYtd0fSQcgT-DiUG5lglPqGNk",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation FollowCompany($follow: Boolean!, $companyId: ID!) {\n  followCompany(follow: $follow, companyId: $companyId)\n}",
+										"variables": "{\n  \"follow\": true,\n  \"companyId\": \"624d255545562688a8a3c6f1\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Follow Company As Company",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRjY2FmMjIzM2ZjOGIzMzcxMGEyYjYiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkzMjYyMjB9.ezFB4OfX26NITncSGnzYtd0fSQcgT-DiUG5lglPqGNk",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation FollowCompany($follow: Boolean!, $companyId: ID!) {\n  followCompany(follow: $follow, companyId: $companyId)\n}",
+										"variables": "{\n  \"follow\": true,\n  \"companyId\": \"624d255545562688a8a3c6f1\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						}
 					]
 				}
-			},
-			"response": []
+			]
 		}
 	]
 }
