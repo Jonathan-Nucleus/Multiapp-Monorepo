@@ -18,7 +18,8 @@ const PHeader = (props) => {
       {!!leftIcon && (
         <TouchableOpacity
           onPress={onPressLeft}
-          style={[styles.leftIcon, leftStyle]}>
+          style={[styles.leftIcon, leftStyle]}
+        >
           {leftIcon}
         </TouchableOpacity>
       )}
@@ -26,7 +27,8 @@ const PHeader = (props) => {
       {!!rightIcon && (
         <TouchableOpacity
           onPress={onPressRight}
-          style={[styles.rightIcon, rightStyle]}>
+          style={[styles.rightIcon, rightStyle]}
+        >
           {rightIcon}
         </TouchableOpacity>
       )}

@@ -22,7 +22,8 @@ const PGradientButton = (props) => {
         colors={disabled ? ['#FFFFFF61', '#FFFFFF61'] : ['#844AFF', '#00AAE0']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
-        style={[styles.button, btnContainer]}>
+        style={[styles.button, btnContainer]}
+      >
         {isLoading ? (
           <UIActivityIndicator color={WHITE} size={24} />
         ) : (
@@ -31,7 +32,8 @@ const PGradientButton = (props) => {
               styles.textStyle,
               textStyle,
               disabled && styles.disabledLabel,
-            ]}>
+            ]}
+          >
             {label}
           </Text>
         )}

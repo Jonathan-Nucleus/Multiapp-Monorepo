@@ -1,13 +1,15 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import {
   StyleSheet,
   FlatList,
   View,
   Text,
   TouchableOpacity,
-  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import FastImage from 'react-native-fast-image';
+import { NavigationProp } from '@react-navigation/native';
+import { CaretRight } from 'phosphor-react-native';
 import {
   BGDARK,
   GRAY2,
@@ -21,37 +23,90 @@ import PHeader from '../../components/common/PHeader';
 import pStyles from '../../theme/pStyles';
 import { Body1, Body2, Body3 } from '../../theme/fonts';
 
-const DATA = [
-  {
-    id: '1',
-    label: 'Settings',
-    onPress: () => console.log(12312),
-  },
-  {
-    id: '2',
-    label: 'Terms and Disclosures',
-    onPress: () => console.log(12312),
-  },
-  {
-    id: '3',
-    label: 'Help & Support',
-    onPress: () => console.log(12312),
-  },
-  {
-    id: '4',
-    label: 'Delete Account',
-    onPress: () => console.log(12312),
-  },
-];
+interface RenderItemProps {
+  item: {
+    label: string;
+    onPress: () => void;
+  };
+}
 
-const Settings: FC = ({ navigation }) => {
-  const renderListItem = ({ item }) => {
+interface RouterProps {
+  navigation: NavigationProp<any, any>;
+}
+
+const Settings: FC<RouterProps> = ({ navigation }) => {
+  const DATA = [
+    {
+      id: '1',
+      label: 'Settings',
+      onPress: () => navigation.navigate('SettingDetails'),
+    },
+    {
+      id: '2',
+      label: 'Terms and Disclosures',
+      onPress: () => navigation.navigate('Terms'),
+    },
+    {
+      id: '3',
+      label: 'Help & Support',
+      onPress: () => navigation.navigate('Help'),
+    },
+    {
+      id: '4',
+      label: 'Delete Account',
+      onPress: () => console.log(12312),
+    },
+  ];
+
+  const renderListItem = ({ item }: RenderItemProps) => {
     return (
-      <TouchableOpacity onPress={() => navigation.navigate('Detail')}>
-        <View style={styles.item}>
+      <TouchableOpacity onPress={item.onPress}>
+        <View style={[styles.item, styles.between]}>
           <Text style={styles.label}>{item.label}</Text>
+          <CaretRight size={28} color={WHITE} />
         </View>
       </TouchableOpacity>
+    );
+  };
+
+  const renderListHeaderComponent = () => {
+    return (
+      <>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('ProfileSettings')}>
+          <View style={styles.item}>
+            <FastImage
+              style={styles.avatar}
+              source={{
+                uri: 'https://unsplash.it/400/400?image=1',
+                headers: { Authorization: 'someAuthToken' },
+              }}
+              resizeMode={FastImage.resizeMode.contain}
+            />
+            <View style={styles.rightItem}>
+              <Text style={styles.label}>John Doe</Text>
+              <Text style={styles.comment}>See your profile</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('CompanySettings')}>
+          <View style={styles.item}>
+            <FastImage
+              style={styles.avatar}
+              source={{
+                uri: 'https://unsplash.it/400/400?image=1',
+                headers: { Authorization: 'someAuthToken' },
+              }}
+              resizeMode={FastImage.resizeMode.contain}
+            />
+            <View style={styles.rightItem}>
+              <Text style={styles.label}>Cartenna Capital LP</Text>
+              <Text style={styles.comment}>See company page</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </>
     );
   };
 
@@ -63,13 +118,14 @@ const Settings: FC = ({ navigation }) => {
       />
       <FlatList
         data={DATA}
+        ListHeaderComponent={renderListHeaderComponent}
         renderItem={renderListItem}
         keyExtractor={(item) => item.id}
         style={styles.flatList}
         ListFooterComponent={
-          <View>
-            <Text>Logout</Text>
-          </View>
+          <TouchableOpacity style={styles.logoutBtn}>
+            <Text style={styles.logout}>Logout</Text>
+          </TouchableOpacity>
         }
       />
     </SafeAreaView>
@@ -107,10 +163,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingHorizontal: 16,
   },
-  avatar: {
-    width: 54,
-    height: 54,
-  },
   item: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -130,5 +182,28 @@ const styles = StyleSheet.create({
   comment: {
     color: GRAY100,
     ...Body3,
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  between: {
+    justifyContent: 'space-between',
+  },
+  logoutBtn: {
+    marginTop: 50,
+    borderRadius: 8,
+    height: 48,
+    backgroundColor: GRAY2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logout: {
+    textAlign: 'center',
+    color: GRAY100,
+  },
+  rightItem: {
+    marginLeft: 8,
   },
 });

@@ -9,7 +9,8 @@ const NotificationStacks = () => {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false, gestureEnabled: true }}
-      initialRouteName="Notification">
+      initialRouteName="Notification"
+    >
       <Stack.Screen name="Notification" component={Notification} />
       <Stack.Screen name="Detail" component={NotificationDetail} />
     </Stack.Navigator>

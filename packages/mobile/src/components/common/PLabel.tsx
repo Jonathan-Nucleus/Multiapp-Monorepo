@@ -16,7 +16,8 @@ const PLabel: React.FC<PLabelProps> = (props) => {
   return (
     <TouchableWithoutFeedback
       style={[styles.container, viewStyle]}
-      onPress={onPress}>
+      onPress={onPress}
+    >
       <Text style={[styles.textStyle, textStyle]}>{label}</Text>
     </TouchableWithoutFeedback>
   );

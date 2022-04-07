@@ -47,7 +47,8 @@ const AppNavigator = () => {
     <NavigationContainer
       ref={navigationRef}
       onReady={onReady}
-      onStateChange={onStateChange}>
+      onStateChange={onStateChange}
+    >
       <Stack.Navigator screenOptions={defaultScreenOptions}>
         {/* <Stack.Screen
           name="SignUp"
