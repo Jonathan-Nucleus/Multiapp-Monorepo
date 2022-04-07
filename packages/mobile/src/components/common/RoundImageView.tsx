@@ -2,13 +2,14 @@ import React from 'react';
 import { StyleSheet, Image } from 'react-native';
 
 interface RoundImageViewProps {
+  imageStyle?: object;
   image: number;
 }
 
 const RoundImageView: React.FC<RoundImageViewProps> = (props) => {
-  const { image } = props;
+  const { image, imageStyle } = props;
 
-  return <Image source={image} style={styles.wrapper} />;
+  return <Image source={image} style={[styles.wrapper, imageStyle]} />;
 };
 
 const styles = StyleSheet.create({

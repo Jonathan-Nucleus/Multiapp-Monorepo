@@ -20,6 +20,7 @@ export const GRAY200 = "#E8E8E8";
 export const GRAY100 = "#9F9F9E";
 export const GRAY1 = "#333333";
 export const GRAY2 = "#1C1C1E";
+export const GRAY3 = '#181622';
 export const GRAY10 = "#CDA7861A";
 export const GRAY20 = "#363541";
 export const DISABLED = "#FFFFFF61";

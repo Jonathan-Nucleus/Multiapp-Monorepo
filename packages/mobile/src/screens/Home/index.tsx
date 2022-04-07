@@ -42,7 +42,9 @@ const FeedItems = [
 const Home: React.FC<ScreenProps> = ({ navigation }) => {
   const [category, setCategory] = useState('All');
 
-  const handleCreatePost = () => {};
+  const handleCreatePost = () => {
+    navigation.navigate('CreatePost');
+  };
 
   const renderItem = ({ item }: { item: FeedItemProps }) => (
     <FeedItem
@@ -89,7 +91,6 @@ const Home: React.FC<ScreenProps> = ({ navigation }) => {
 export default Home;
 
 const styles = StyleSheet.create({
-  container: {},
   tagStyle: {
     paddingHorizontal: 15,
     marginRight: 8,

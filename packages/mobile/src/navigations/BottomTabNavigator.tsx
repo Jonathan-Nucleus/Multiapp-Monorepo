@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { WHITE, BLACK, BGDARK } from 'shared/src/colors';
 
 import HomeScreen from '../screens/Home';
+import HomeStack from './HomeStack';
 import NotificationStack from './NotificationStack';
 import SettingsStack from './SettingsStack';
 import HomeSVG from '../assets/icons/tabHome.svg';
@@ -32,8 +33,8 @@ export default function BottomTabNavigator() {
       }}
     >
       <Tab.Screen
-        name="Home"
-        component={HomeScreen}
+        name="HomeStack"
+        component={HomeStack}
         options={{
           tabBarIcon: ({ focused, size }) =>
             focused ? <HomeSVG /> : <GreyHomeSVG />,
