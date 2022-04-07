@@ -14,7 +14,7 @@ export namespace Fund {
     managerId: ObjectId;
     companyId: ObjectId;
     status: FundStatus;
-    hightlights: string[];
+    highlights: string[];
     overview: string;
     presentationUrl?: string;
     documents?: Document[];
@@ -80,7 +80,7 @@ export const FundSchema = `
     managerId: ID!
     companyId: ID!
     status: FundStatus!
-    hightlights: [String!]!
+    highlights: [String!]!
     overview: String!
     presentationUrl: String
     documents: [Document!]

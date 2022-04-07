@@ -26,3 +26,8 @@ the mongo database.
 
 To run the server, first start the database by running `yarn db`.
 In a separate terminal, start the server in development using `yarn dev`.
+
+## Seeding database
+
+To seed the database with dummy data, run `yarn seed`. Note that this replaces
+all of the collections, so any existing data will be lost.

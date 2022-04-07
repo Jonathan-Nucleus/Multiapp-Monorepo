@@ -34,9 +34,12 @@ import "dotenv/config";
 // Read salt length from .env file and parse to a number. This represents
 // the number of bytes used for the salt. A default of 32 bytes (256 bits)
 // as a default.
-const SALT_LENGTH = parseInt(process.env.SALT_LEN ?? "32");
+export const SALT_LENGTH = parseInt(process.env.SALT_LEN ?? "32");
+export const generateSalt = (): string => {
+  return crypto.randomBytes(SALT_LENGTH).toString("hex");
+};
 
-const hashPassword = (password: string, salt: string): string => {
+export const hashPassword = (password: string, salt: string): string => {
   return crypto.scryptSync(password, salt, 64).toString("hex");
 };
 
@@ -209,7 +212,7 @@ const createUsersCollection = (
       if (!userData || isUser(userData) || userData.emailToken !== inviteCode)
         return null;
 
-      const salt = crypto.randomBytes(SALT_LENGTH).toString("hex");
+      const salt = generateSalt();
       const hash = hashPassword(password, salt);
 
       const newUser = {
