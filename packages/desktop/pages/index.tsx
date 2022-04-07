@@ -18,6 +18,6 @@ const Home: NextPageWithLayout = () => {
 };
 
 Home.layout = "main";
-// Home.middleware = "auth";
+Home.middleware = "auth";
 
 export default Home;

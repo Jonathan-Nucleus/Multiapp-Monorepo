@@ -10,12 +10,12 @@ import {
   ChatCircleDots,
   Bell,
   User,
-  CaretDown,
   List,
 } from "phosphor-react";
 import NavItem from "./NavItem";
 import Input from "../../../common/Input";
 import Sidebar from "./Sidebar";
+import AvatarMenu from "./AvatarMenu";
 
 const navItems = [
   {
@@ -38,7 +38,7 @@ const navItems = [
 const Header: FC = () => {
   const [showSidebar, setShowSidebar] = useState(false);
   return (
-    <header className="bg-surface-light10 shadow-md shadow-black">
+    <header className="bg-surface-light10 shadow-md shadow-black sticky top-0 z-10">
       <nav className="hidden md:flex flex-row items-center p-5">
         <div>
           <div className="w-72 hidden lg:block">
@@ -68,25 +68,24 @@ const Header: FC = () => {
               className="absolute right-5 top-0 h-full"
             />
           </div>
-          <div className="relative ml-8 cursor-pointer">
-            <ChatCircleDots color="white" size={24} />
-            <span className="bg-error rounded-full w-4 h-4 text-xs text-white absolute -top-1.5 -right-1.5 flex item-center justify-center font-medium">
-              1
-            </span>
-          </div>
-          <div className="relative ml-4 cursor-pointer">
-            <Bell color="white" size={24} />
-            <span className="bg-error rounded-full w-4 h-4 text-xs text-white absolute -top-1.5 -right-1.5 flex item-center justify-center font-medium">
-              1
-            </span>
-          </div>
-          <div className="ml-6 flex flex-row items-center cursor-pointer">
-            <div className="bg-white rounded-full w-8 h-8 flex items-center justify-center">
-              <User color="black" size={24} />
-            </div>
-            <div className="ml-2">
-              <CaretDown color="white" weight="bold" size={16} />
-            </div>
+          <Link href="/messages">
+            <a className="relative ml-8">
+              <ChatCircleDots color="white" size={24} />
+              <span className="bg-error rounded-full w-4 h-4 text-xs text-white absolute -top-1.5 -right-1.5 flex items-center justify-center font-medium">
+                1
+              </span>
+            </a>
+          </Link>
+          <Link href="/notifications">
+            <a className="relative ml-4">
+              <Bell color="white" size={24} />
+              <span className="bg-error rounded-full w-4 h-4 text-xs text-white absolute -top-1.5 -right-1.5 flex items-center justify-center font-medium">
+                1
+              </span>
+            </a>
+          </Link>
+          <div className="ml-6">
+            <AvatarMenu />
           </div>
         </div>
       </nav>
