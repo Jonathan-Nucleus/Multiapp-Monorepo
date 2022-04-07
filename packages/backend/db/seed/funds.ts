@@ -35,7 +35,7 @@ export default async function (
     return [...Array(randomInt(0, MAX_FUNDS_PER_COMPANY))].map<Fund.Mongo>(
       () => ({
         _id: new ObjectId(),
-        name: `${faker.commerce.product} Fund`,
+        name: `${faker.commerce.product()} Fund`,
         level:
           accreditationValues[randomInt(0, accreditationValues.length - 1)],
         managerId: userIds[randomInt(0, userIds.length - 1)],

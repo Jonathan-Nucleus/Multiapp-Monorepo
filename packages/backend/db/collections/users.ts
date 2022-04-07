@@ -252,9 +252,13 @@ const createUsersCollection = (
       } as const;
 
       try {
-        // Check whether user is already registered or invited
+        // Check whether user is already registered otherwise create a new
+        // record or replace existing record with new stub and invite code
         const user = await usersCollection.findOne({ email });
-        if (user) return null;
+        if (user) {
+          if (isUser(user)) return null;
+          await usersCollection.deleteOne({ _id: user._id });
+        }
 
         await usersCollection.insertOne(stubUser);
       } catch (err) {

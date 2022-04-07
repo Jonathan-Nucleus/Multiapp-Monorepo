@@ -26,7 +26,7 @@ const schema = gql`
     loginOAuth(user: OAuthUserInput!): String
     requestPasswordReset(email: String!): Boolean!
     resetPassword(password: String!, token: String!): String
-    requestInvite(email: String!): Boolean!
+    requestInvite(email: String!): Boolean
     inviteUser(email: String!): Boolean!
     updateSettings(settings: SettingsInput!): Boolean!
 
