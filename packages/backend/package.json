@@ -7,7 +7,7 @@
   "private": true,
   "scripts": {
     "db": "docker compose up",
-    "dev": "NODE_ENV=development ts-node-dev --transpile-only --no-notify --exit-child index.ts"
+    "dev": "ts-node-dev --transpile-only --no-notify --exit-child index.ts"
   },
   "dependencies": {
     "apollo-server": "^3.6.7",
