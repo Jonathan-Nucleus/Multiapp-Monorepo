@@ -35,7 +35,8 @@
     "react-input-mask": "^2.0.4",
     "react-responsive-carousel": "^3.2.23",
     "shared": "^1.0.0",
-    "yup": "^0.32.11"
+    "yup": "^0.32.11",
+    "yup-phone": "^1.3.2"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^8.5.8",

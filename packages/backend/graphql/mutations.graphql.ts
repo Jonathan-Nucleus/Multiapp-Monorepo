@@ -99,11 +99,10 @@ const resolvers = {
       { email }: { email: string },
       { db }: ApolloServerContext
     ): Promise<boolean> => {
-      const result = await db.users.requestPasswordReset(email);
-      if (!result) return false;
+      const emailToken = await db.users.requestPasswordReset(email);
+      if (!emailToken) return false;
 
-      const [id, emailToken] = result;
-      const token = getResetToken(id, emailToken);
+      const token = getResetToken(email, emailToken);
       return PrometheusMailer.sendForgotPassword(email, token);
     },
 
@@ -115,8 +114,8 @@ const resolvers = {
       const payload = decodeToken(token);
       if (!payload) return null;
 
-      const { _id, tkn } = payload as ResetTokenPayload;
-      const user = await db.users.resetPassword(password, _id, tkn);
+      const { email, tkn } = payload as ResetTokenPayload;
+      const user = await db.users.resetPassword(password, email, tkn);
       if (!user) return null;
 
       const deserializedUser = await db.users.deserialize(user._id);

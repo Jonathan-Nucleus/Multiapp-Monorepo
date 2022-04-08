@@ -3,38 +3,58 @@ import Button from "../../common/Button";
 import ArrowLeft from "shared/assets/images/arrow-left.svg";
 import Image from "next/image";
 import Alert from "../../common/Alert";
-import Label from "../../common/Label";
-import Input from "../../common/Input";
+import Field from "../../common/Field";
 import * as yup from "yup";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import AppAuthOptions from "../../../config/auth";
 import { useRouter } from "next/router";
+import { useRequestReset } from "desktop/app/queries/authentication.graphql";
 
 type FormValues = {
   email: string;
 };
 
 const schema = yup
-  .object({ email: yup.string().email("Must be a valid email").required() })
+  .object({
+    email: yup.string().email("Must be a valid email").required("Required"),
+  })
   .required();
 
 const ForgotPasswordPage: FC = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const {
-    register,
-    handleSubmit,
-    formState: { isValid },
-  } = useForm<yup.InferType<typeof schema>>({
+  const [alert, setAlert] = useState<{
+    message: string;
+    variant: "info" | "success" | "error";
+  }>({
+    message:
+      "Enter your email below and we’ll send you a link to reset your password.",
+    variant: "info",
+  });
+  const [requestReset] = useRequestReset();
+  const { register, handleSubmit, formState } = useForm<
+    yup.InferType<typeof schema>
+  >({
     resolver: yupResolver(schema),
     mode: "onChange",
   });
-  const onSubmit: SubmitHandler<FormValues> = () => {
+  const { isValid } = formState;
+  const onSubmit: SubmitHandler<FormValues> = async ({ email }) => {
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
+    const { data } = await requestReset({ variables: { email } });
+    setAlert(
+      data?.requestPasswordReset
+        ? {
+            message: `We sent an email to ${email} with a link to reset your password`,
+            variant: "success",
+          }
+        : {
+            message: `Looks like that account doesn't exist. Head to back to our login page to register.`,
+            variant: "error",
+          }
+    );
+    setLoading(false);
   };
   return (
     <div className="px-3">
@@ -49,26 +69,29 @@ const ForgotPasswordPage: FC = () => {
           </span>
         </Button>
         <h1 className="text-white text-2xl mt-6">Reset Password</h1>
-        <Alert variant="info" className="mt-6 text-white text-sm">
-          Enter your email below and we’ll send you a link to reset your
-          password.
+        <Alert variant={alert.variant} className="mt-6 text-white text-sm">
+          {alert.message}
         </Alert>
-        <form className="mt-6" onSubmit={handleSubmit(onSubmit)}>
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" autoComplete="email" {...register("email")} />
-          </div>
-          <div className="text-right mt-8">
-            <Button
-              variant="gradient-primary"
-              className="w-full md:w-48"
-              disabled={!isValid}
-              loading={loading}
-            >
-              SEND EMAIL
-            </Button>
-          </div>
-        </form>
+        {alert.variant !== "success" && (
+          <form className="mt-6" onSubmit={handleSubmit(onSubmit)}>
+            <Field
+              label="Email"
+              name="email"
+              register={register}
+              state={formState}
+            />
+            <div className="text-right mt-8">
+              <Button
+                variant="gradient-primary"
+                className="w-full md:w-48"
+                disabled={!isValid}
+                loading={loading}
+              >
+                SEND EMAIL
+              </Button>
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );

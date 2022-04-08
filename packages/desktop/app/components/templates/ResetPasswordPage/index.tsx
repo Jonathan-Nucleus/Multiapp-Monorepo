@@ -1,11 +1,23 @@
 import { FC, useState } from "react";
+import { useRouter } from "next/router";
+import Link from "next/link";
+import Image from "next/image";
+import { signIn } from "next-auth/react";
+import * as yup from "yup";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useResetPassword } from "desktop/app/queries/authentication.graphql";
+import jwt from "jsonwebtoken";
+import AppAuthOptions from "../../../config/auth";
+
+import ArrowLeft from "shared/assets/images/arrow-left.svg";
 import Button from "../../common/Button";
 import Alert from "../../common/Alert";
 import Label from "../../common/Label";
 import Input from "../../common/Input";
-import * as yup from "yup";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import ErrorMessage from "../../common/ErrorMessage";
+
+import { PASSWORD_PATTERN } from "shared/src/patterns";
 
 type FormValues = {
   password: string;
@@ -14,7 +26,18 @@ type FormValues = {
 
 const schema = yup
   .object({
-    password: yup.string().required(),
+    password: yup
+      .string()
+      .min(8, "Password must have a minimum length of 8 characters")
+      .matches(
+        PASSWORD_PATTERN,
+        `Oops, your password doesn't meet the following requirements:
+        1 number
+        1 uppercase letter
+        1 lowercase letter
+        1 special character (@$!%*?&.^)`
+      )
+      .required("Required"),
     confirmPassword: yup
       .string()
       .oneOf([yup.ref("password")], "Confirm password mismatch")
@@ -22,79 +45,130 @@ const schema = yup
   })
   .required();
 
-const ResetPasswordPage: FC = () => {
+interface ResetPasswordPageProps {
+  token: string;
+}
+
+const ResetPasswordPage: FC<ResetPasswordPageProps> = ({ token }) => {
+  const router = useRouter();
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState<{
+    message: string;
+    state: "info" | "error";
+  }>({
+    message: "Create a new password.",
+    state: "info",
+  });
+  const [resetPassword] = useResetPassword();
   const {
     register,
     handleSubmit,
-    formState: { isValid },
+    formState: { isValid, errors },
   } = useForm<yup.InferType<typeof schema>>({
     resolver: yupResolver(schema),
     mode: "onChange",
   });
-  const onSubmit: SubmitHandler<FormValues> = () => {
+  const onSubmit: SubmitHandler<FormValues> = async ({ password }) => {
     setLoading(true);
-    setTimeout(() => {
+    const { data } = await resetPassword({ variables: { password, token } });
+    if (data?.resetPassword) {
+      const { email } = jwt.decode(token) as Record<string, string>;
+      signIn("credentials", {
+        email: email,
+        password: password,
+        redirect: false,
+      }).then(async () => {
+        setLoading(false);
+        await router.replace("/");
+      });
+    } else {
+      setAlert({
+        message:
+          "Your reset token has expired. Head back to login to generate a new one.",
+        state: "error",
+      });
       setLoading(false);
-    }, 2000);
+    }
   };
 
   return (
     <div className="px-3">
       <div className="container mx-auto max-w-md">
+        {alert.state === "error" && (
+          <Link href={AppAuthOptions.pages?.signIn!!}>
+            <Button variant="text">
+              <Image src={ArrowLeft} alt="" />
+              <span className="font-medium text-primary uppercase ml-3">
+                Back to login
+              </span>
+            </Button>
+          </Link>
+        )}
         <h1 className="text-white text-2xl">Welcome back</h1>
-        <Alert variant="info" className="mt-6 text-white text-sm">
-          Create a new password.
+        <Alert variant={alert.state} className="mt-6 text-white text-sm">
+          {alert.message}
         </Alert>
-        <form className="mt-6" onSubmit={handleSubmit(onSubmit)}>
-          <div className="hidden">
-            <Input type="email" name="email" autoComplete="email" />
-          </div>
-          <div className="mt-4">
-            <div className="flex flex-row justify-between">
-              <Label htmlFor="password">Password</Label>
-              <a
-                className="text-sm text-primary cursor-pointer"
-                onClick={() => setShowNewPassword(!showNewPassword)}
-              >
-                {showNewPassword ? "Hide" : "Show"}
-              </a>
+        {alert.state !== "error" && (
+          <form className="mt-6" onSubmit={handleSubmit(onSubmit)}>
+            <div className="hidden">
+              <Input type="email" name="email" autoComplete="email" />
             </div>
-            <Input
-              id="password"
-              type={showNewPassword ? "text" : "password"}
-              autoComplete="current-password"
-              {...register("password")}
-            />
-          </div>
-          <div className="mt-4">
-            <div className="flex flex-row justify-between">
-              <Label htmlFor="confirm-password">Confirm password</Label>
-              <a
-                className="text-sm text-primary cursor-pointer"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              >
-                {showConfirmPassword ? "Hide" : "Show"}
-              </a>
+            <div className="mt-4">
+              <div className="flex flex-row justify-between">
+                <Label htmlFor="password" name="password" errors={errors}>
+                  Password
+                </Label>
+                <a
+                  className="text-sm text-primary cursor-pointer"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                >
+                  {showNewPassword ? "Hide" : "Show"}
+                </a>
+              </div>
+              <Input
+                id="password"
+                type={showNewPassword ? "text" : "password"}
+                autoComplete="current-password"
+                {...register("password")}
+              />
+              <ErrorMessage name="password" errors={errors} />
             </div>
-            <Input
-              id="confirm-password"
-              type={showConfirmPassword ? "text" : "password"}
-              autoComplete="confirm-password"
-              {...register("confirmPassword")}
-            />
-          </div>
-          <Button
-            variant="gradient-primary"
-            className="w-full mt-9 px-10 uppercase"
-            disabled={!isValid}
-            loading={loading}
-          >
-            save password and sign in
-          </Button>
-        </form>
+            <div className="mt-4">
+              <div className="flex flex-row justify-between">
+                <Label
+                  htmlFor="confirm-password"
+                  name="confirmPassword"
+                  errors={errors}
+                >
+                  Confirm password
+                </Label>
+                <a
+                  className="text-sm text-primary cursor-pointer"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? "Hide" : "Show"}
+                </a>
+              </div>
+              <Input
+                id="confirm-password"
+                type={showConfirmPassword ? "text" : "password"}
+                autoComplete="confirm-password"
+                {...register("confirmPassword")}
+              />
+              <ErrorMessage name="confirmPassword" errors={errors} />
+            </div>
+            <Button
+              variant="gradient-primary"
+              className="w-full mt-9 px-10 uppercase"
+              disabled={!isValid}
+              loading={loading}
+            >
+              save password and sign in
+            </Button>
+          </form>
+        )}
       </div>
     </div>
   );

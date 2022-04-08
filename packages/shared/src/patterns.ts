@@ -4,3 +4,5 @@ export const NAME_PATTERN = /^[a-zA-Z]+(\s+[a-zA-Z]+)*$/i;
 export const SSN_PATTERN = /^(?!(000|666|9))\d{3}-(?!00)\d{2}-(?!0000)\d{4}$/i;
 export const ZIPCODE_PATTERN = /^[0-9]{5}(?:-[0-9]{4})?$/i;
 export const PHONE_PATTERN = /^\d{3}-\d{3}-\d{4}$/i;
+export const PASSWORD_PATTERN =
+  /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&.^]).{8,}$/;

@@ -1,7 +1,18 @@
 import { FC, useState } from "react";
+import { useRouter } from "next/router";
+import Link from "next/link";
+import { signIn } from "next-auth/react";
+import * as yup from "yup";
+import "yup-phone";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { SubmitHandler, useForm } from "react-hook-form";
+
+import Field from "../../common/Field";
 import Input from "../../common/Input";
-import Label from "../../common/Label";
 import Button from "../../common/Button";
+import Label from "../../common/Label";
+import ErrorMessage from "../../common/ErrorMessage";
+
 import AppleIcon from "shared/assets/images/apple.svg";
 import GoogleIcon from "shared/assets/images/google.svg";
 import LinkedInIcon from "shared/assets/images/linkedin.svg";
@@ -9,10 +20,9 @@ import WarningIcon from "shared/assets/images/warning-red.svg";
 import Image from "next/image";
 import Alert from "../../common/Alert";
 import Checkbox from "../../common/Checkbox";
-import * as yup from "yup";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import Link from "next/link";
+
+import { PASSWORD_PATTERN } from "shared/src/patterns";
+import { useRegisterUser } from "desktop/app/queries/authentication.graphql";
 
 type FormValues = {
   firstName: string;
@@ -27,38 +37,96 @@ type FormValues = {
 
 const schema = yup
   .object({
-    firstName: yup.string().required(),
-    lastName: yup.string().required(),
-    email: yup.string().email("Must be a valid email").required(),
-    phoneNumber: yup.string().required(),
-    password: yup.string().min(8).required(),
+    firstName: yup.string().required("Required"),
+    lastName: yup.string().required("Required"),
+    email: yup.string().email("Must be a valid email").required("Required"),
+    phoneNumber: yup
+      .string()
+      .phone(undefined, false, "Oops, looks like an invalid phone number")
+      .required("Required"),
+    password: yup
+      .string()
+      .min(8, "Password must have a minimum length of 8 characters")
+      .matches(
+        PASSWORD_PATTERN,
+        `Oops, your password doesn't meet the following requirements:
+        1 number
+        1 uppercase letter
+        1 lowercase letter
+        1 special character (@$!%*?&.^)`
+      )
+      .required("Required"),
     confirmPassword: yup
       .string()
       .oneOf([yup.ref("password")], "Confirm password mismatch")
       .required(),
-    acceptTerms: yup.boolean().oneOf([true]).required(),
-    crsCheck: yup.boolean().oneOf([true]).required(),
+    acceptTerms: yup
+      .boolean()
+      .oneOf([true], "You must accept the terms and conditions")
+      .required(),
+    crsCheck: yup
+      .boolean()
+      .oneOf([true], "You must acknowledge receipt Form CRS")
+      .required(),
   })
   .required();
 
 const SignupPage: FC = () => {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const {
-    register,
-    handleSubmit,
-    formState: { isValid },
-  } = useForm<yup.InferType<typeof schema>>({
+  const [registerUser] = useRegisterUser();
+  const { register, handleSubmit, formState } = useForm<
+    yup.InferType<typeof schema>
+  >({
     resolver: yupResolver(schema),
     mode: "onChange",
   });
-  const onSubmit: SubmitHandler<FormValues> = () => {
+  const { dirtyFields, errors } = formState;
+  const isValid =
+    Object.keys(dirtyFields).length === Object.keys(schema.fields).length &&
+    Object.keys(errors).length === 0;
+  const { code } = router.query as Record<string, string>;
+  const onSubmit: SubmitHandler<FormValues> = async (values) => {
+    const {
+      firstName,
+      lastName,
+      acceptTerms,
+      crsCheck,
+      email,
+      password,
+      phoneNumber,
+    } = values;
+
     setLoading(true);
-    setTimeout(() => {
+    const result = await registerUser({
+      variables: {
+        user: {
+          email,
+          firstName,
+          lastName,
+          password,
+          inviteCode: code,
+        },
+      },
+    });
+
+    if (result.data?.register) {
+      signIn("credentials", {
+        email: email,
+        password: password,
+        redirect: false,
+      }).then(async () => {
+        await router.replace("/");
+      });
+    } else {
+      setError(
+        "Uh oh, looks like a different email address than we have on record"
+      );
       setLoading(false);
-    }, 2000);
+    }
   };
 
   return (
@@ -67,7 +135,7 @@ const SignupPage: FC = () => {
         <h1 className="text-white text-2xl">
           You’re in! We just need a few details...
         </h1>
-        <div className="my-6">
+        <div className="my-6 mb-9">
           <div className={error ? "block" : "hidden"}>
             <Alert variant="error">
               <div className="flex flex-row">
@@ -80,37 +148,39 @@ const SignupPage: FC = () => {
           </div>
         </div>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="mt-9">
-            <Label htmlFor="first-name">First Name</Label>
-            <Input
-              id="first-name"
-              autoComplete="first-name"
-              {...register("firstName")}
-            />
-          </div>
-          <div className="mt-4">
-            <Label htmlFor="last-name">Last Name</Label>
-            <Input
-              id="last-name"
-              autoComplete="last-name"
-              {...register("lastName")}
-            />
-          </div>
-          <div className="mt-4">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" autoComplete="email" {...register("email")} />
-          </div>
-          <div className="mt-4">
-            <Label htmlFor="phone">Phone Number</Label>
-            <Input
-              id="phone"
-              autoComplete="phone"
-              {...register("phoneNumber")}
-            />
-          </div>
+          <Field
+            register={register}
+            state={formState}
+            name="firstName"
+            label="First Name"
+            autoComplete="firstName"
+          />
+          <Field
+            register={register}
+            state={formState}
+            name="lastName"
+            label="Last Name"
+            autoComplete="lastName"
+          />
+          <Field
+            register={register}
+            state={formState}
+            name="email"
+            label="Email"
+            autoComplete="email"
+          />
+          <Field
+            register={register}
+            state={formState}
+            name="phoneNumber"
+            label="Phone Number"
+            autoComplete="phone"
+          />
           <div className="mt-4">
             <div className="flex flex-row justify-between">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" name="password" errors={errors}>
+                Password
+              </Label>
               <a
                 className="text-sm text-primary cursor-pointer"
                 onClick={() => setShowPassword(!showPassword)}
@@ -124,10 +194,17 @@ const SignupPage: FC = () => {
               autoComplete="current-password"
               {...register("password")}
             />
+            <ErrorMessage name="password" errors={errors} />
           </div>
           <div className="mt-4">
             <div className="flex flex-row justify-between">
-              <Label htmlFor="confirm_password">Confirm Password</Label>
+              <Label
+                htmlFor="confirm_password"
+                name="confirmPassword"
+                errors={errors}
+              >
+                Confirm Password
+              </Label>
               <a
                 className="text-sm text-primary cursor-pointer"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
@@ -141,44 +218,51 @@ const SignupPage: FC = () => {
               autoComplete="confirm-password"
               {...register("confirmPassword")}
             />
+            <ErrorMessage name="confirmPassword" errors={errors} />
           </div>
-          <div className="flex flex-row items-center mt-6">
-            <Checkbox
-              id="terms-check"
-              className="flex-shrink-0"
-              {...register("acceptTerms")}
-            />
-            <Label htmlFor="terms-check" className="font-medium ml-2">
-              <span>I agree to the Prometheus Alts</span>
-              <a href="/terms" className="text-primary text-sm">
-                {" "}
-                Terms
-              </a>
-              ,
-              <a href="/community" className="text-primary text-sm">
-                {" "}
-                Community{" "}
-              </a>
-              and
-              <a href="/privacy" className="text-primary text-sm">
-                {" "}
-                Privacy Policy
-              </a>
-            </Label>
+          <div className="mt-6">
+            <div className="flex flex-row items-center">
+              <Checkbox
+                id="terms-check"
+                className="flex-shrink-0"
+                {...register("acceptTerms")}
+              />
+              <Label htmlFor="terms-check" className="font-medium ml-2">
+                <span>I agree to the Prometheus Alts</span>
+                <a href="/terms" className="text-primary text-sm">
+                  {" "}
+                  Terms
+                </a>
+                ,
+                <a href="/community" className="text-primary text-sm">
+                  {" "}
+                  Community{" "}
+                </a>
+                and
+                <a href="/privacy" className="text-primary text-sm">
+                  {" "}
+                  Privacy Policy
+                </a>
+              </Label>
+            </div>
+            <ErrorMessage name="acceptTerms" errors={errors} className="ml-6" />
           </div>
-          <div className="flex flex-row items-center mt-5">
-            <Checkbox
-              id="form-crs-check"
-              className="flex-shrink-0"
-              {...register("crsCheck")}
-            />
-            <Label htmlFor="form-crs-check" className="font-medium ml-2">
-              I also hereby acknowledge the receipt of
-              <Link href="/form-crs">
-                <a className="text-primary"> Prometheus’s Form CRS</a>
-              </Link>
-              .
-            </Label>
+          <div className="mt-5">
+            <div className="flex flex-row items-center">
+              <Checkbox
+                id="form-crs-check"
+                className="flex-shrink-0"
+                {...register("crsCheck")}
+              />
+              <Label htmlFor="form-crs-check" className="font-medium ml-2">
+                I also hereby acknowledge the receipt of
+                <Link href="/form-crs">
+                  <a className="text-primary"> Prometheus’s Form CRS</a>
+                </Link>
+                .
+              </Label>
+            </div>
+            <ErrorMessage name="crsCheck" errors={errors} className="ml-6" />
           </div>
           <div className="text-right mt-7">
             <Button

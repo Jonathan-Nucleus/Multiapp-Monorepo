@@ -116,7 +116,7 @@ export const PrometheusMailer = {
     emailToken: string
   ): Promise<boolean> {
     try {
-      const resetLink = `${PROMETHEUS_URL}/reset-password?token=${emailToken}`;
+      const resetLink = `${PROMETHEUS_URL}/reset-password/${emailToken}`;
       await sendEmail(recipient, "reset-password", { resetLink });
 
       return true;

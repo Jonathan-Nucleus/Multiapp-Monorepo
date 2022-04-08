@@ -78,7 +78,7 @@ const LoginPage: FC<LoginPageProps> = ({ providers }: LoginPageProps) => {
         <h1 className="text-white text-2xl">Login</h1>
         <div className="mt-4">
           <span className="text-white text-sm col-auto">New here?</span>
-          <Link href="/signup">
+          <Link href="/invite-code">
             <a className="uppercase text-primary text-sm font-bold ml-4">
               sign up with code
             </a>
@@ -160,6 +160,13 @@ const LoginPage: FC<LoginPageProps> = ({ providers }: LoginPageProps) => {
               </Button>
             )
           )}
+          <Button
+            variant="outline-primary"
+            className="w-12 h-12 md:w-full md:h-auto rounded-lg md:rounded-full border border-gray-400 md:border-primary"
+          >
+            {PROVIDER_ICONS["apple"]}
+            <span className="ml-2 hidden md:inline-block">APPLE</span>
+          </Button>
         </div>
       </div>
     </div>

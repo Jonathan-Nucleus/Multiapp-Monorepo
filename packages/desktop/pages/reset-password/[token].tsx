@@ -1,8 +1,11 @@
 import Head from "next/head";
-import { NextPageWithLayout } from "../app/types/next-page";
-import ResetPasswordPage from "../app/components/templates/ResetPasswordPage";
+import { useRouter } from "next/router";
+import { NextPageWithLayout } from "../../app/types/next-page";
+import ResetPasswordPage from "../../app/components/templates/ResetPasswordPage";
 
 const ResetPassword: NextPageWithLayout = () => {
+  const router = useRouter();
+  const { token } = router.query as Record<string, string>;
   return (
     <div>
       <Head>
@@ -10,7 +13,7 @@ const ResetPassword: NextPageWithLayout = () => {
         <meta name="description" content="" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <ResetPasswordPage />
+      <ResetPasswordPage token={token} />
     </div>
   );
 };

@@ -274,11 +274,9 @@ const createUsersCollection = (
      *
      * @param email  The email of the user requesting a reset.
      *
-     * @returns   A tuple containing the user id and the reset token.
+     * @returns   The reset token.
      */
-    requestPasswordReset: async (
-      email: string
-    ): Promise<[string, string] | null> => {
+    requestPasswordReset: async (email: string): Promise<string | null> => {
       const user = await usersCollection.findOne({ email });
       if (!user || !isUser(user) || !user.salt) return null;
 
@@ -289,7 +287,7 @@ const createUsersCollection = (
           { $set: { emailToken: token } }
         );
 
-        return [user._id.toString(), token];
+        return token;
       } catch (err) {
         console.log(
           `Error generating password reset token for ${email}: ${err}`
@@ -302,6 +300,7 @@ const createUsersCollection = (
      * Sets a new password for the user.
      *
      * @param password  The new password.
+     * @param emailT    The email address of the user.
      * @param token     A security token to authenticate the request.
      *
      * @returns   The user record if the password could successfully be reset
@@ -309,10 +308,10 @@ const createUsersCollection = (
      */
     resetPassword: async (
       password: string,
-      userId: MongoId,
+      email: string,
       token: string
     ): Promise<User.Mongo | null> => {
-      const user = await usersCollection.findOne({ _id: toObjectId(userId) });
+      const user = await usersCollection.findOne({ email });
       if (!user || !isUser(user) || !user.salt || user.emailToken !== token) {
         return null;
       }
@@ -328,7 +327,7 @@ const createUsersCollection = (
 
         return user;
       } catch (err) {
-        console.log(`Error resetting password for ${userId}: ${err}`);
+        console.log(`Error resetting password for ${email}: ${err}`);
         return null;
       }
     },

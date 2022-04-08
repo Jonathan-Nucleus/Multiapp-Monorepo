@@ -15,11 +15,11 @@ export function getAccessToken(user: DeserializedUser): AccessToken {
 }
 
 export type Token = string;
-export type ResetTokenPayload = { _id: string; tkn: string };
-export function getResetToken(userId: string, emailToken: string): Token {
+export type ResetTokenPayload = { email: string; tkn: string };
+export function getResetToken(email: string, emailToken: string): Token {
   return jwt.sign(
     {
-      _id: userId,
+      email: email,
       tkn: emailToken,
     },
     IGNITE_SECRET
