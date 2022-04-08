@@ -20,7 +20,7 @@ export namespace Post {
     updatedAt?: Date;
   }
 
-  export type GraphQL = GraphQLEntity<Mongo> & {
+  export type GraphQL = GraphQLEntity<Omit<Mongo, "visible">> & {
     user: User.GraphQL;
     mentions: User.GraphQL[];
     likes: User.GraphQL[];
@@ -71,7 +71,6 @@ export const PostSchema = `
     categories: [PostCategory!]!
     likeIds: [ID!]
     commentIds: [ID!]
-    visible: Boolean!
     reporterIds: [ID!]
     createdAt: Date!
     updatedAt: Date

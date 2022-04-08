@@ -129,7 +129,7 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "mutation RequestInvite($email: String!) {\n  requestInvite(email: $email)\n}",
-										"variables": "{\n  \"email\": \"ddesai@bu.edu\"\n}"
+										"variables": "{\n  \"email\": \"darash.desai+test5@gmail.com\"\n}"
 									}
 								},
 								"url": {
@@ -155,7 +155,7 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "mutation Register($user: UserInput!) {\n  register(user: $user)\n}",
-										"variables": "{\n  \"user\": {\n    \"email\": \"test@test.com\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"inviteCode\": \"97b45a0a-edb6-4b4c-9e56-9332192792f6\",\n    \"password\": \"test-pass\"\n  }\n}"
+										"variables": "{\n  \"user\": {\n    \"email\": \"darash.desai+test5@gmail.com\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"inviteCode\": \"11fbfc9a-db38-4702-b56e-a2d9087fb9bd\",\n    \"password\": \"test-pass\"\n  }\n}"
 									}
 								},
 								"url": {
@@ -181,7 +181,7 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "mutation Login($email: String!, $password: String!) {\n  login(email: $email, password: $password)\n}",
-										"variables": "{\n  \"email\": \"test@test.com\",\n  \"password\": \"test-pass\"\n}"
+										"variables": "{\n  \"email\": \"darash.desai+test5@gmail.com\",\n  \"password\": \"test-pass\"\n}"
 									}
 								},
 								"url": {
@@ -233,7 +233,7 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "mutation RequestPasswordReset($email: String!) {\n  requestPasswordReset(email: $email)\n}",
-										"variables": "{\n  \"email\": \"test@test.com\"\n}"
+										"variables": "{\n  \"email\": \"darash.desai+test5@gmail.com\"\n}"
 									}
 								},
 								"url": {
@@ -258,8 +258,8 @@
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "mutation Login($email: String!, $password: String!) {\n  login(email: $email, password: $password) {\n      user {\n          _id\n          role\n          accreditation\n      }\n      token\n  }\n}",
-										"variables": "{\n  \"email\": \"test@test.com\",\n  \"password\": \"test-pass\"\n}"
+										"query": "mutation ResetPassword($token: String!, $password: String!) {\n  resetPassword(password: $password, token: $token)\n}",
+										"variables": "{\n  \"token\": \"<jwt from email>\",\n  \"password\": \"test-pass\"\n}"
 									}
 								},
 								"url": {
@@ -300,7 +300,7 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "mutation Invite($email: String!) {\n  inviteUser(email: $email)\n}",
-										"variables": "{\n  \"email\": \"test2@test.com\"\n}"
+										"variables": "{\n  \"email\": \"darash.desai+test6@gmail.com\"\n}"
 									}
 								},
 								"url": {
@@ -325,7 +325,7 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRhNjYzZmZiZDVmZmJlODcxNjAzNTAiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkwNDM2Mjd9.8sUii0pTi2PnVu_-rWIRHx1hmBfMG26OV-Gen5Ne-QM",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjUwNjUzNGIwYzA0NjI4NDhlM2U5MmEiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk0MzY4NDh9.aj-aOShwh7CtREU0uHpxDnNzqypxCORea4QodaaTgVU",
 											"type": "string"
 										}
 									]
@@ -335,8 +335,8 @@
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "mutation Invite($email: String!) {\n  inviteUser(email: $email)\n}",
-										"variables": "{\n  \"email\": \"test2@test.com\"\n}"
+										"query": "mutation UpdateSettings($settings: SettingsInput!) {\n  updateSettings(settings: $settings)\n}",
+										"variables": "{\n  \"settings\": {\n      \"interests\": [\n          \"NEWS\",\n          \"POLITICS\",\n          \"IDEAS\"\n      ]\n  }\n}"
 									}
 								},
 								"url": {
@@ -371,8 +371,8 @@
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "mutation FollowCompany($follow: Boolean!, $companyId: ID!) {\n  followCompany(follow: $follow, companyId: $companyId)\n}",
-										"variables": "{\n  \"follow\": true,\n  \"companyId\": \"624d255545562688a8a3c6f1\"\n}"
+										"query": "mutation HideUser($hide: Boolean!, $userId: ID!) {\n    hideUser(hide: $hide, userId: $userId)\n}",
+										"variables": "{\n  \"hide\": true,\n  \"userId\": \"624f1a2eed55addaea6b449a\"\n}"
 									}
 								},
 								"url": {
@@ -412,8 +412,8 @@
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "mutation CreatePost($post: PostInput!) {\n  createPost(post: $post)\n}",
-										"variables": "{\n     \"post\": {\n        \"categories\": [\n            \"NEWS\",\n            \"POLITICS\"\n        ],\n        \"audience\": \"EVERYONE\",\n        \"body\": \"This is my post\",\n        \"mediaUrl\": \"https://www.postmedia.com/this/is/my/image/or/video\",\n        \"mentionIds\": [\n          \"<userid1>\", \n          \"<userid2>\"\n        ]\n  }\n}"
+										"query": "mutation CreatePost($post: PostInput!) {\n  createPost(post: $post) {\n      _id\n      body\n      mediaUrl\n      likeIds\n      commentIds\n      createdAt\n      categories\n  }\n}",
+										"variables": "{\n     \"post\": {\n        \"categories\": [\n            \"NEWS\",\n            \"POLITICS\"\n        ],\n        \"audience\": \"EVERYONE\",\n        \"body\": \"This is my post\",\n        \"mediaUrl\": \"https://www.postmedia.com/this/is/my/image/or/video\",\n        \"mentionIds\": [\n          \"624f1a2eed55addaea6b4499\", \n          \"624f1a2eed55addaea6b4498\"\n        ]\n  }\n}"
 									}
 								},
 								"url": {
@@ -484,8 +484,8 @@
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "mutation Invite($email: String!) {\n  inviteUser(email: $email)\n}",
-										"variables": "{\n  \"email\": \"test2@test.com\"\n}"
+										"query": "mutation ReportPost($report: ReportedPostInput!) {\n  reportPost(report: $report)\n}",
+										"variables": "{\n  \"report\": {\n      \"violations\": [\n          \"OFF_TOPIC\",\n          \"PROJECTION\"\n      ],\n      \"comments\": \"My additional comments...\",\n      \"postId\": \"624f1a2eed55addaea6b449c\"\n  }\n}"
 									}
 								},
 								"url": {
@@ -520,8 +520,8 @@
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "mutation HidePost($postId: ID!) {\n  hidePost(postId: $postId)\n}",
-										"variables": "{\n  \"postId\": \"624ebb4f7a7d3e4ae91cb54a\"\n}"
+										"query": "mutation HidePost($hide: Boolean!, $postId: ID!) {\n  hidePost(hide: $hide, postId: $postId)\n}",
+										"variables": "{\n  \"postId\": \"624ebb4f7a7d3e4ae91cb54a\",\n  \"hide\": true\n}"
 									}
 								},
 								"url": {
@@ -557,7 +557,7 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "mutation MutePost($mute: Boolean!, $postId: ID!) {\n  mutePost(mute: $mute, postId: $postId)\n}",
-										"variables": "{\n  \"mute\": false,\n  \"postId\": \"624ebb4f7a7d3e4ae91cb54a\"\n}"
+										"variables": "{\n  \"mute\": true,\n  \"postId\": \"624ebb4f7a7d3e4ae91cb54a\"\n}"
 									}
 								},
 								"url": {
@@ -592,8 +592,8 @@
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "mutation Invite($email: String!) {\n  inviteUser(email: $email)\n}",
-										"variables": "{\n  \"email\": \"test2@test.com\"\n}"
+										"query": "mutation Comment($comment: CommentInput!) {\n  comment(comment: $comment) {\n      _id\n      body\n      likeIds\n      mentions {\n          _id\n          firstName\n          lastName\n      }\n  }\n}",
+										"variables": "{\n  \"comment\": {\n      \"body\": \"This is my comment\",\n      \"postId\": \"624f1a2eed55addaea6b449c\",\n      \"mentionIds\": [\n          \"624f1a2ded55addaea6b4492\"\n      ]\n  }\n}"
 									}
 								},
 								"url": {
@@ -618,7 +618,7 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRjY2FmMjIzM2ZjOGIzMzcxMGEyYjYiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkzMjYyMjB9.ezFB4OfX26NITncSGnzYtd0fSQcgT-DiUG5lglPqGNk",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRhNjYzZmZiZDVmZmJlODcxNjAzNTAiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkwNDM2Mjd9.8sUii0pTi2PnVu_-rWIRHx1hmBfMG26OV-Gen5Ne-QM",
 											"type": "string"
 										}
 									]
@@ -629,7 +629,7 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "mutation EditComment($comment: CommentUpdate!) {\n  editComment(comment: $comment) {\n      _id\n      body\n      postId\n      createdAt\n  }\n}",
-										"variables": "{\n    \"comment\": {\n        \"_id\": \"624ec1b48cbe8f03e862fbf6\",\n        \"body\": \"My updated comment with mentions erased\",\n        \"mentionIds\": []\n    }\n}"
+										"variables": "{\n    \"comment\": {\n        \"_id\": \"62506d23d5824432c50ad1c5\",\n        \"body\": \"My updated comment with mentions erased\",\n        \"mentionIds\": []\n    }\n}"
 									}
 								},
 								"url": {
@@ -664,8 +664,8 @@
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "mutation Invite($email: String!) {\n  inviteUser(email: $email)\n}",
-										"variables": "{\n  \"email\": \"test2@test.com\"\n}"
+										"query": "mutation DeleteComment($commentId: ID!) {\n  deleteComment(commentId: $commentId)\n}",
+										"variables": "{\n  \"commentId\": \"62506d23d5824432c50ad1c5\"\n}"
 									}
 								},
 								"url": {
@@ -705,8 +705,8 @@
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "mutation Invite($email: String!) {\n  inviteUser(email: $email)\n}",
-										"variables": "{\n  \"email\": \"test2@test.com\"\n}"
+										"query": "mutation FollowUser($follow: Boolean!, $userId: ID!) {\n    followUser(follow: $follow, userId: $userId)\n}",
+										"variables": "{\n  \"follow\": true,\n  \"userId\": \"624f1a2ded55addaea6b4492\"\n}"
 									}
 								},
 								"url": {
@@ -742,7 +742,7 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "mutation FollowUserAsCompany($follow: Boolean!, $userId: ID!, $asCompanyId: ID!) {\n  followUser(follow: $follow, userId: $userId, asCompanyId: $asCompanyId)\n}",
-										"variables": "{\n  \"email\": \"test2@test.com\"\n}"
+										"variables": "{\n  \"follow\": true,\n  \"userId\": \"624f1a2ded55addaea6b4492\",\n  \"asCompanyId\": \"624f1a2eed55addaea6b44b8\"\n}"
 									}
 								},
 								"url": {
@@ -778,7 +778,7 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "mutation FollowCompany($follow: Boolean!, $companyId: ID!) {\n  followCompany(follow: $follow, companyId: $companyId)\n}",
-										"variables": "{\n  \"follow\": true,\n  \"companyId\": \"624d255545562688a8a3c6f1\"\n}"
+										"variables": "{\n  \"follow\": true,\n  \"companyId\": \"624f1a2eed55addaea6b44b8\"\n}"
 									}
 								},
 								"url": {
@@ -813,8 +813,8 @@
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "mutation FollowCompany($follow: Boolean!, $companyId: ID!) {\n  followCompany(follow: $follow, companyId: $companyId)\n}",
-										"variables": "{\n  \"follow\": true,\n  \"companyId\": \"624d255545562688a8a3c6f1\"\n}"
+										"query": "mutation FollowCompanyAsCompany($follow: Boolean!, $companyId: ID!, $asCompanyId: ID!) {\n  followCompany(follow: $follow, companyId: $companyId, asCompanyId: $asCompanyId)\n}",
+										"variables": "{\n  \"follow\": true,\n  \"companyId\": \"624f1a2eed55addaea6b44b7\",\n  \"asCompanyId\": \"624f1a2eed55addaea6b44b8\"\n}"
 									}
 								},
 								"url": {
