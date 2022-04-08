@@ -4,13 +4,17 @@ import {
   StyleSheet,
   TouchableWithoutFeedback,
   Keyboard,
-  Platform,
+  ViewStyle,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-import { WHITE } from 'shared/src/colors';
+interface AppContainerProps {
+  style?: ViewStyle;
+  flatList?: boolean;
+  children: any;
+}
 
-const PAppContainer = (props) => {
+const PAppContainer: React.FC<AppContainerProps> = (props) => {
   const { children, style, flatList } = props;
 
   if (flatList) {

@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useMutation } from '@apollo/client';
+import { NavigationProp } from '@react-navigation/native';
 
 import PAppContainer from '../../components/common/PAppContainer';
 import PHeader from '../../components/common/PHeader';
@@ -16,54 +18,82 @@ import PGradientButton from '../../components/common/PGradientButton';
 import { Body2 } from '../../theme/fonts';
 import { BGDARK, PRIMARY, WHITE } from 'shared/src/colors';
 import LogoSvg from '../../assets/icons/logo.svg';
+import { FORGOT_PASSWORD } from '../../graphql/mutation/auth';
+import SuccessText from '../../components/common/SuccessText';
+import ErrorText from '../../components/common/ErrorTxt';
 
-const ForgotPass = ({ navigation }) => {
+interface RouterProps {
+  navigation: NavigationProp<any, any>;
+}
+
+const ForgotPass: React.FC<RouterProps> = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
+  const [err, setErr] = useState('');
+  const [forgotPassword] = useMutation(FORGOT_PASSWORD);
 
-  const handleNextPage = () => {
+  const handleReset = async () => {
     Keyboard.dismiss();
-    navigation.navigate('Login');
-  };
-
-  const handleReset = () => {
-    setSent(true);
+    try {
+      const { data } = await forgotPassword({
+        variables: {
+          email: email,
+        },
+      });
+      console.log(123, data);
+      if (data.requestPasswordReset) {
+        setSent(true);
+      } else {
+        setErr('Please try again');
+      }
+    } catch (e) {
+      console.error('forgot password error', e);
+    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <PHeader centerIcon={<LogoSvg />} />
       <PAppContainer>
-        <PTitle title={sent ? 'Email Sent' : 'Forgot Password'} />
+        <PTitle title="Forgot Password" />
+        {!!err && <ErrorText error={err} />}
         {sent ? (
-          <Text style={styles.txt}>
-            We’ve sent you an email containing a link that will allow you to to
-            reset your password. Once you receive the email follow instructions
-            to change your password.
-          </Text>
+          <SuccessText
+            message={`We sent an email to ${email} with a link to reset your password.`}
+          />
         ) : (
           <>
             <Text style={styles.txt}>
-              Enter your email / phone number below to reset your password.
+              Enter your email below and we’ll send you a link to reset your
+              password.
             </Text>
             <PTextInput
               label="Email"
-              onChangeText={(val: string) => setEmail(val)}
+              onChangeText={(val: string) => {
+                setErr('');
+                setEmail(val);
+              }}
               text={email}
               keyboardType="email-address"
               containerStyle={styles.textContainer}
             />
             <PGradientButton
-              label="Reset Password"
+              label="send email"
               btnContainer={styles.btnContainer}
               onPress={handleReset}
             />
           </>
         )}
-
+        {sent && (
+          <PGradientButton
+            label="Reset Password"
+            btnContainer={styles.btnContainer}
+            onPress={() => navigation.navigate('ResetPass', { email })}
+          />
+        )}
         <View style={styles.row}>
           <Text style={styles.txt}>Return to </Text>
-          <TouchableOpacity onPress={handleNextPage}>
+          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
             <Text style={styles.hyperText}>Sign In</Text>
           </TouchableOpacity>
         </View>
@@ -98,5 +128,10 @@ const styles = StyleSheet.create({
   txt: {
     ...Body2,
     color: WHITE,
+  },
+  back: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 24,
   },
 });

@@ -1,7 +1,17 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 
-const PHeader = (props) => {
+interface HeaderProps {
+  onPressLeft?: () => void;
+  onPressRight?: () => void;
+  rightIcon?: any;
+  leftIcon?: any;
+  centerIcon?: any;
+  containerStyle?: ViewStyle;
+  leftStyle?: ViewStyle;
+  rightStyle?: ViewStyle;
+}
+const PHeader: React.FC<HeaderProps> = (props) => {
   const {
     onPressLeft,
     onPressRight,
@@ -18,8 +28,7 @@ const PHeader = (props) => {
       {!!leftIcon && (
         <TouchableOpacity
           onPress={onPressLeft}
-          style={[styles.leftIcon, leftStyle]}
-        >
+          style={[styles.leftIcon, leftStyle]}>
           {leftIcon}
         </TouchableOpacity>
       )}
@@ -27,8 +36,7 @@ const PHeader = (props) => {
       {!!rightIcon && (
         <TouchableOpacity
           onPress={onPressRight}
-          style={[styles.rightIcon, rightStyle]}
-        >
+          style={[styles.rightIcon, rightStyle]}>
           {rightIcon}
         </TouchableOpacity>
       )}

@@ -92,11 +92,11 @@ const PTextInput = (props) => {
           autoCapitalize={autoCapitalize}
           onSubmitEditing={onSubmitEditing}
           onFocus={() => {
-            onFocus();
+            onFocus && onFocus();
             setIsFocused(true);
           }}
           onBlur={() => {
-            onBlur();
+            onBlur && onBlur();
             setIsFocused(false);
           }}
           autoFocus={autoFocus}

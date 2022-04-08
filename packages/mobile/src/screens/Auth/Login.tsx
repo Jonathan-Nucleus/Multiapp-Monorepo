@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useMutation } from '@apollo/client';
+import { NavigationProp } from '@react-navigation/native';
 
 import PAppContainer from '../../components/common/PAppContainer';
 import PHeader from '../../components/common/PHeader';
@@ -15,6 +17,7 @@ import PTextInput from '../../components/common/PTextInput';
 import PGradientButton from '../../components/common/PGradientButton';
 import PTextLine from '../../components/common/PTextLine';
 import ErrorText from '../../components/common/ErrorTxt';
+import { LOGIN } from '../../graphql/mutation/auth';
 import { Body2 } from '../../theme/fonts';
 import { BGDARK, PRIMARY, WHITE, BLUE200 } from 'shared/src/colors';
 import LogoSvg from '../../assets/icons/logo.svg';
@@ -24,14 +27,31 @@ import LinkedinSvg from '../../assets/icons/linkedin.svg';
 import CheckedSvg from '../../assets/icons/checked.svg';
 import UncheckedSvg from '../../assets/icons/unchecked.svg';
 
-const Login = ({ navigation }) => {
+interface RouterProps {
+  navigation: NavigationProp<any, any>;
+}
+
+const Login: React.FC<RouterProps> = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
   const [checked, setChecked] = useState(false);
   const [securePassEntry, setSecurePassEntry] = useState(true);
 
-  const handleNextPage = () => {
+  const [login] = useMutation(LOGIN);
+
+  const handleNextPage = async () => {
     Keyboard.dismiss();
+    try {
+      const { data } = await login({
+        variables: {
+          email: email,
+          password: pass,
+        },
+      });
+      console.log('logged user', data);
+    } catch (e) {
+      console.error('login error', e);
+    }
   };
 
   return (

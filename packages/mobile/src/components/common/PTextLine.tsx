@@ -1,11 +1,16 @@
 import React from 'react';
-import { View, StyleSheet, Text, Dimensions } from 'react-native';
+import { View, StyleSheet, Text, TextStyle, ViewStyle } from 'react-native';
 
 import { Body2 } from '../../theme/fonts';
 import { WHITE, GRAY10 } from 'shared/src/colors';
 
-const { width } = Dimensions.get('screen');
-const PTextLine = (props) => {
+interface TextLineProps {
+  textStyle?: TextStyle;
+  title: string;
+  containerStyle?: ViewStyle;
+}
+
+const PTextLine: React.FC<TextLineProps> = (props) => {
   const { textStyle, title, containerStyle } = props;
 
   return (

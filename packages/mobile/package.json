@@ -16,12 +16,15 @@
     ]
   },
   "dependencies": {
+    "@apollo/client": "^3.5.10",
     "@apollo/react-hooks": "^4.0.0",
     "@react-native-async-storage/async-storage": "^1.17.3",
     "@react-navigation/bottom-tabs": "^6.3.1",
     "@react-navigation/native": "^6.0.10",
     "@react-navigation/stack": "^6.2.1",
     "@types/react-native-indicators": "^0.16.2",
+    "apollo3-cache-persist": "^0.14.0",
+    "graphql": "^16.3.0",
     "phosphor-react-native": "^1.1.1",
     "react": "17.0.2",
     "react-native": "0.68.0",

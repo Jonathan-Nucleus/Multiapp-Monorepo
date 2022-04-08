@@ -30,8 +30,7 @@ export default function BottomTabNavigator() {
           height: 72,
         },
         tabBarShowLabel: false,
-      }}
-    >
+      }}>
       <Tab.Screen
         name="HomeStack"
         component={HomeStack}

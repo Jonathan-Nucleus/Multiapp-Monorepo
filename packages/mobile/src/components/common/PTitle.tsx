@@ -1,10 +1,17 @@
 import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet, Text, TextStyle, ViewStyle } from 'react-native';
 
 import { H5, Body2 } from '../../theme/fonts';
 import { WHITE } from 'shared/src/colors';
 
-const PTitle = (props: any) => {
+interface TitleProps {
+  style?: ViewStyle;
+  textStyle?: TextStyle;
+  title?: string;
+  subTitle?: string;
+}
+
+const PTitle: React.FC<TitleProps> = (props) => {
   const { style, textStyle, title, subTitle } = props;
 
   return (

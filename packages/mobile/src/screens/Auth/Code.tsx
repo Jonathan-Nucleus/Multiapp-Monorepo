@@ -7,23 +7,48 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { NavigationProp } from '@react-navigation/native';
+import { useApolloClient } from '@apollo/client';
 
 import PAppContainer from '../../components/common/PAppContainer';
 import PHeader from '../../components/common/PHeader';
 import PTitle from '../../components/common/PTitle';
 import PTextInput from '../../components/common/PTextInput';
+import ErrorText from '../../components/common/ErrorTxt';
 import { BGDARK, PRIMARY, WHITE } from 'shared/src/colors';
 import PGradientButton from '../../components/common/PGradientButton';
 import { Body2 } from '../../theme/fonts';
 import PTextLine from '../../components/common/PTextLine';
 import LogoSvg from '../../assets/icons/logo.svg';
+import { VERIFY_INVITE } from '../../graphql/query/auth';
 
-const CodeView = ({ navigation }) => {
+interface RouterProps {
+  navigation: NavigationProp<any, any>;
+}
+
+const CodeView: React.FC<RouterProps> = ({ navigation }) => {
   const [code, setCode] = useState('');
+  const [error, setError] = useState(false);
+  const client = useApolloClient();
 
-  const handleNextPage = () => {
+  const handleVerifyCode = async () => {
     Keyboard.dismiss();
-    navigation.navigate('Signup');
+    setError(false);
+    try {
+      const { data } = await client.query({
+        query: VERIFY_INVITE,
+        variables: { code },
+      });
+      console.log(12312, data);
+      if (data.verifyInvite) {
+        navigation.navigate('Signup', { code });
+        return;
+      }
+      setError(true);
+    } catch (err) {
+      setError(true);
+      console.log('err=======>', err);
+    }
   };
 
   return (
@@ -31,11 +56,15 @@ const CodeView = ({ navigation }) => {
       <PHeader centerIcon={<LogoSvg />} />
       <PAppContainer>
         <PTitle title="Join the inner circle!" />
+        {error && <ErrorText error="Verification code does not matched" />}
         <PTextInput
           label="Enter Code"
-          onChangeText={(val: string) => setCode(val)}
+          onChangeText={(val: string) => {
+            setCode(val);
+            // setError(false);
+          }}
           text={code}
-          onSubmitEditing={handleNextPage}
+          onSubmitEditing={handleVerifyCode}
           autoFocus={true}
           containerStyle={styles.textContainer}
           textInputStyle={styles.textInput}
@@ -43,7 +72,7 @@ const CodeView = ({ navigation }) => {
         <PGradientButton
           label="next"
           btnContainer={styles.btnContainer}
-          onPress={handleNextPage}
+          onPress={handleVerifyCode}
         />
         <View style={styles.wrap}>
           <Text style={styles.txt}>Already here? </Text>

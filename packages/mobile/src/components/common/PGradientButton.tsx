@@ -1,12 +1,28 @@
 import React from 'react';
-import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TextStyle,
+  ViewStyle,
+} from 'react-native';
 import { UIActivityIndicator } from 'react-native-indicators';
 import LinearGradient from 'react-native-linear-gradient';
 
 import { Body2 } from '../../theme/fonts';
 import { WHITE, DISABLED, DISABLEDTXT } from 'shared/src/colors';
 
-const PGradientButton = (props) => {
+interface ButtonProps {
+  btnContainer?: ViewStyle;
+  textStyle?: TextStyle;
+  label: string;
+  onPress: () => void;
+  disabled?: boolean;
+  isLoading?: boolean;
+}
+
+const PGradientButton: React.FC<ButtonProps> = (props) => {
   const {
     btnContainer,
     textStyle,
@@ -17,13 +33,15 @@ const PGradientButton = (props) => {
   } = props;
 
   return (
-    <TouchableOpacity onPress={onPress} disabled={disabled || isLoading}>
+    <TouchableOpacity
+      onPress={onPress}
+      disabled={disabled || isLoading}
+      style={btnContainer}>
       <LinearGradient
         colors={disabled ? ['#FFFFFF61', '#FFFFFF61'] : ['#844AFF', '#00AAE0']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
-        style={[styles.button, btnContainer]}
-      >
+        style={styles.button}>
         {isLoading ? (
           <UIActivityIndicator color={WHITE} size={24} />
         ) : (
@@ -32,8 +50,7 @@ const PGradientButton = (props) => {
               styles.textStyle,
               textStyle,
               disabled && styles.disabledLabel,
-            ]}
-          >
+            ]}>
             {label}
           </Text>
         )}

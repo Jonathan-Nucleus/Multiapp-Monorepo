@@ -8,7 +8,7 @@ import {
   StyleProp,
 } from 'react-native';
 
-import { WHITE } from 'shared/src/colors';
+import { WHITE, DANGER } from 'shared/src/colors';
 import { Body2 } from '../../theme/fonts';
 import ErrorSvg from '../../assets/icons/alert.svg';
 
@@ -34,7 +34,7 @@ export default ErrorText;
 const styles = StyleSheet.create({
   errorView: {
     marginBottom: 18,
-    backgroundColor: 'rgba(205, 64, 58, 0.3)',
+    backgroundColor: DANGER,
     borderRadius: 16,
     padding: 17,
     flexDirection: 'row',

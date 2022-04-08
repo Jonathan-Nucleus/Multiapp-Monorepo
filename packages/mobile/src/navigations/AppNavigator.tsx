@@ -1,8 +1,6 @@
 import React, { useRef, useEffect } from 'react';
-import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-// import analytics from '@react-native-firebase/analytics';
 
 const Stack = createStackNavigator();
 
@@ -47,15 +45,14 @@ const AppNavigator = () => {
     <NavigationContainer
       ref={navigationRef}
       onReady={onReady}
-      onStateChange={onStateChange}
-    >
+      onStateChange={onStateChange}>
       <Stack.Navigator screenOptions={defaultScreenOptions}>
-        {/* <Stack.Screen
-          name="SignUp"
+        <Stack.Screen
+          name="Auth"
           component={AuthStack}
           options={{ gestureEnabled: false }}
-        /> */}
-        <Stack.Screen name="Tabs" component={BottomTabNavigator} />
+        />
+        <Stack.Screen name="Main" component={BottomTabNavigator} />
       </Stack.Navigator>
     </NavigationContainer>
   );

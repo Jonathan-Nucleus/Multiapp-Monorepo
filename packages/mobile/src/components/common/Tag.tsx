@@ -31,8 +31,7 @@ const Tag: React.FC<TagProps> = (props) => {
   return (
     <TouchableOpacity
       style={usedViewStyle}
-      onPress={() => (onPress ? onPress(label) : {})}
-    >
+      onPress={() => (onPress ? onPress(label) : {})}>
       <PLabel label={label} textStyle={usedTextStyle} />
     </TouchableOpacity>
   );
