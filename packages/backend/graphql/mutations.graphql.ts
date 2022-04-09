@@ -14,6 +14,7 @@ import {
   AccessToken,
   ResetTokenPayload,
 } from "backend/lib/tokens";
+import { getUploadUrl, RemoteUpload } from "backend/lib/s3-helper";
 
 import { User, Settings, ReportedPost, isUser } from "backend/schemas/user";
 import type { Post } from "backend/schemas/post";
@@ -38,12 +39,20 @@ const schema = gql`
     comment(comment: CommentInput!): Comment
     editComment(comment: CommentUpdate!): Comment
     deleteComment(commentId: ID!): Boolean!
+    uploadLink(localFilename: String!): MediaUpload
 
     followUser(follow: Boolean!, userId: ID!, asCompanyId: ID): Boolean!
     followCompany(follow: Boolean!, companyId: ID!, asCompanyId: ID): Boolean!
     hideUser(hide: Boolean!, userId: ID!): Boolean!
   }
+
+  type MediaUpload {
+    remoteName: String!
+    uploadUrl: String!
+  }
 `;
+
+export type MediaUpload = RemoteUpload;
 
 const resolvers = {
   Mutation: {
@@ -231,6 +240,24 @@ const resolvers = {
         { commentId }: { commentId: string },
         { db, user }
       ): Promise<boolean> => db.comments.delete(commentId, user._id)
+    ),
+
+    /**
+     * Provides a signed AWS S3 upload link that can be used for a one-time
+     * client-side upload of a file to an S3 bucket.
+     */
+    uploadLink: secureEndpoint(
+      async (
+        parentIgnored,
+        { localFilename }: { localFilename: string },
+        { db, user }
+      ): Promise<RemoteUpload | null> => {
+        const fileExt = localFilename.substr(
+          localFilename.lastIndexOf(".") + 1
+        );
+        const uploadInfo = await getUploadUrl(fileExt);
+        return uploadInfo ?? null;
+      }
     ),
 
     followUser: secureEndpoint(

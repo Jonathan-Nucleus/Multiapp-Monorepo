@@ -431,6 +431,42 @@
 							"response": []
 						},
 						{
+							"name": "Upload Link",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRhNjYzZmZiZDVmZmJlODcxNjAzNTAiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkwNDM2Mjd9.8sUii0pTi2PnVu_-rWIRHx1hmBfMG26OV-Gen5Ne-QM",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation UploadLink($localFilename: String!) {\n    uploadLink(localFilename: $localFilename) {\n        remoteName\n        uploadUrl\n    }\n}",
+										"variables": "{\n    \"localFilename\": \"test.png\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "LIke Post",
 							"request": {
 								"auth": {
@@ -677,6 +713,69 @@
 									"port": "4000",
 									"path": [
 										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "AWS Upload Test",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "file",
+									"file": {
+										"src": "/Users/M3/Desktop/feather.jpeg"
+									}
+								},
+								"url": {
+									"raw": "https://prometheus-user-media.s3.us-east-1.amazonaws.com/logos/b014c86b-743e-46de-8304-a54494461c15.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIATWMGEWB6JFUTUX6P%2F20220409%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20220409T183550Z&X-Amz-Expires=60&X-Amz-Signature=da835ed87c8e8a9c0a80ef8d7dd6c00543787841016ffaef44a1524e589a1f80&X-Amz-SignedHeaders=host&x-id=PutObject",
+									"protocol": "https",
+									"host": [
+										"prometheus-user-media",
+										"s3",
+										"us-east-1",
+										"amazonaws",
+										"com"
+									],
+									"path": [
+										"logos",
+										"b014c86b-743e-46de-8304-a54494461c15.png"
+									],
+									"query": [
+										{
+											"key": "X-Amz-Algorithm",
+											"value": "AWS4-HMAC-SHA256"
+										},
+										{
+											"key": "X-Amz-Content-Sha256",
+											"value": "UNSIGNED-PAYLOAD"
+										},
+										{
+											"key": "X-Amz-Credential",
+											"value": "AKIATWMGEWB6JFUTUX6P%2F20220409%2Fus-east-1%2Fs3%2Faws4_request"
+										},
+										{
+											"key": "X-Amz-Date",
+											"value": "20220409T183550Z"
+										},
+										{
+											"key": "X-Amz-Expires",
+											"value": "60"
+										},
+										{
+											"key": "X-Amz-Signature",
+											"value": "da835ed87c8e8a9c0a80ef8d7dd6c00543787841016ffaef44a1524e589a1f80"
+										},
+										{
+											"key": "X-Amz-SignedHeaders",
+											"value": "host"
+										},
+										{
+											"key": "x-id",
+											"value": "PutObject"
+										}
 									]
 								}
 							},
