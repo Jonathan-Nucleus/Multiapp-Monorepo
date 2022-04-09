@@ -7,7 +7,7 @@ const Card: FC<CardProps> = (props: CardProps) => {
     <div
       {...props}
       className={
-        "bg-background-card rounded-2xl shadow-md shadow-black border border-white/[.12] p-4 " +
+        "bg-background-card rounded-2xl shadow-md shadow-black border border-white/[.12] p-4 overflow-hidden " +
         (props.className ?? "")
       }
     >

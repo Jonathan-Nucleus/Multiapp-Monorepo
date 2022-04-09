@@ -24,10 +24,16 @@ module.exports = {
           DEFAULT: "#0067E0",
           overlay: "#A5A5A5",
         },
+        elevation: {
+          overlay: "#1C1B35",
+        },
         error: "#CD403A",
         info: "#544EFD",
         success: "#55C090",
-        purple: "#181725",
+        purple: {
+          DEFAULT: "#544EFD12",
+          secondary: "#714EFD",
+        },
         dark: "#CDA7861A",
         gray: "#121212",
       },

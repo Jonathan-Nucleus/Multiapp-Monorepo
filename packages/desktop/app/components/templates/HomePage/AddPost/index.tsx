@@ -1,18 +1,16 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import Card from "../../../common/Card";
 import Image from "next/image";
 import Input from "../../../common/Input";
 import Button from "../../../common/Button";
 import { Plus, Image as ImageIcon } from "phosphor-react";
+import CreatePostModal from "./CreatePostModal";
 
 const profileImage =
   "https://t4.ftcdn.net/jpg/02/45/56/35/360_F_245563558_XH9Pe5LJI2kr7VQuzQKAjAbz9PAyejG1.jpg";
 
-interface CreatePostProps {
-  onClick: () => void;
-}
-
-const AddPost: FC<CreatePostProps> = (props) => {
+const AddPost: FC = () => {
+  const [showPostModal, setShowPostModal] = useState(false);
   return (
     <Card className="bg-background-popover p-4">
       <div className="flex items-center">
@@ -29,24 +27,28 @@ const AddPost: FC<CreatePostProps> = (props) => {
         </div>
         <Input
           placeholder="Animated suggestions..."
-          className="rounded-3xl mx-4"
+          className="rounded-3xl mx-4 px-5"
         />
         <Button
           variant="gradient-primary"
           className="w-12 h-12 rounded-full"
-          onClick={props.onClick}
+          onClick={() => setShowPostModal(true)}
         >
           <Plus color="white" size={24} />
         </Button>
       </div>
       <div className="mx-16 mt-2">
-        <Button variant="text">
+        <Button variant="text" onClick={() => setShowPostModal(true)}>
           <ImageIcon color="white" size={24} />
           <span className="text-white opacity-60 font-normal tracking-normal ml-2">
             Photo/Video
           </span>
         </Button>
       </div>
+      <CreatePostModal
+        show={showPostModal}
+        onClose={() => setShowPostModal(false)}
+      />
     </Card>
   );
 };

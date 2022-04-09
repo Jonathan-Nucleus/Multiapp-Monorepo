@@ -18,4 +18,4 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>((props, ref) => {
 
 Radio.displayName = "Radio";
 
-export default Radio
+export default Radio;

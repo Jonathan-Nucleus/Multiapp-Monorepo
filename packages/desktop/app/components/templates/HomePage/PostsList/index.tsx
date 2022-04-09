@@ -35,7 +35,7 @@ const PostsList: FC = () => {
         from={selectedFrom}
         onSelect={(topics, from) => {
           if (topics.length == 0) {
-            topics.push("All")
+            topics.push("All");
           }
           setSelectedTopics(topics);
           setSelectedFrom(from);

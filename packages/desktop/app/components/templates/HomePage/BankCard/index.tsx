@@ -1,7 +1,7 @@
 import { FC } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import Card from '../../../common/Card'
+import Card from "../../../common/Card";
 
 const profile = {
   image:
