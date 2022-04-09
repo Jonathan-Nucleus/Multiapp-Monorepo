@@ -7,6 +7,7 @@ export const PRIMARYSTATE = "#714EFD";
 export const PRIMARYSOLID = "#544EFD";
 export const PRIMARYSOLID7 = "#544EFD12";
 export const PRIMARYLIGHT = "#EBEBFF";
+export const PRIMARYOVERLAY = '#22204A';
 export const SECONDARY = "#0067E0";
 export const SUCCESS = "#55C090";
 export const DANGER = "#CD403A";

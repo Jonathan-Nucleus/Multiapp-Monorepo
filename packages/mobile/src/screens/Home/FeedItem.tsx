@@ -1,12 +1,14 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Image } from 'react-native';
+import FastImage from 'react-native-fast-image';
 
 import PLabel from '../../components/common/PLabel';
 import IconButton from '../../components/common/IconButton';
-import RoundImageView from '../../components/common/RoundImageView';
+import UserInfo from '../../components/common/UserInfo';
 import Tag from '../../components/common/Tag';
 import { BGDARK, GRAY10, WHITE60 } from 'shared/src/colors';
 import { Body1, Body3 } from '../../theme/fonts';
+import { PostDataType } from '../../graphql/post';
 
 import ThumbsUpSvg from 'shared/assets/images/thumbsUp.svg';
 import ThumbsUp2Svg from 'shared/assets/images/thumbsUp2.svg';
@@ -14,12 +16,10 @@ import ChatSvg from 'shared/assets/images/chat.svg';
 import ShareSvg from 'shared/assets/images/share.svg';
 import Avatar from '../../assets/avatar.png';
 
-export interface FeedItemProps {
+export interface FeedItemProps extends PostDataType {
   name: string;
   company: string;
   date: string;
-  description: string;
-  tags: string[];
   commentCounts: number;
   shareCounts: number;
   containerStyle?: object;
@@ -29,9 +29,9 @@ const FeedItem: React.FC<FeedItemProps> = (props) => {
   const {
     name,
     company,
-    date,
-    description,
-    tags,
+    body,
+    categories,
+    mediaUrl,
     commentCounts,
     shareCounts,
     containerStyle,
@@ -40,17 +40,26 @@ const FeedItem: React.FC<FeedItemProps> = (props) => {
   return (
     <View style={[styles.container, containerStyle]}>
       <View style={styles.headerWrapper}>
-        <RoundImageView image={Avatar} />
-        <View style={styles.userInfo}>
-          <PLabel label={name} textStyle={styles.nameLabel} />
-          <PLabel label={company} textStyle={styles.smallLabel} />
-          <PLabel label={date} textStyle={styles.smallLabel} />
-        </View>
+        <UserInfo
+          avatar={Avatar}
+          name={name}
+          role="CEO"
+          company={company}
+          isPro
+        />
       </View>
-      <PLabel label={description} />
+      <PLabel label={body} />
+      <Image
+        style={styles.postImage}
+        source={{
+          uri: mediaUrl,
+          // priority: FastImage.priority.normal,
+        }}
+        // resizeMode={FastImage.resizeMode.contain}
+      />
       <View style={styles.tagWrapper}>
-        {tags.map((item: string) => (
-          <Tag label={item} viewStyle={styles.tagStyle} />
+        {categories.map((item: string, index: number) => (
+          <Tag label={item} viewStyle={styles.tagStyle} key={index} />
         ))}
       </View>
       <View style={styles.otherInfo}>
@@ -96,6 +105,12 @@ const styles = StyleSheet.create({
   smallLabel: {
     ...Body3,
     color: WHITE60,
+  },
+  postImage: {
+    width: '100%',
+    height: 224,
+    marginVertical: 20,
+    borderRadius: 16,
   },
   tagWrapper: {
     flexDirection: 'row',

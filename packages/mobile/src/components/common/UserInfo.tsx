@@ -5,6 +5,7 @@ import PLabel from './PLabel';
 import RoundImageView from './RoundImageView';
 import { Body1, Body3 } from '../../theme/fonts';
 import { WHITE60 } from 'shared/src/colors';
+import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 
 interface UserInfoProps {
   avatar: number;
@@ -25,7 +26,12 @@ const UserInfo: React.FC<UserInfoProps> = (props) => {
       <View style={styles.userInfo}>
         <View style={styles.nameWrapper}>
           <PLabel label={name} textStyle={styles.nameLabel} />
-          {isPro && <PLabel label="PRO" textStyle={styles.proLabel} />}
+          {isPro && (
+            <View style={styles.proWrapper}>
+              <ShieldCheckSvg />
+              <PLabel label="PRO" textStyle={styles.proLabel} />
+            </View>
+          )}
         </View>
         <View>
           <PLabel
@@ -61,6 +67,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 4,
+  },
+  proWrapper: {
+    flexDirection: 'row',
+    marginLeft: 8,
+    alignItems: 'center',
   },
   proLabel: {
     marginLeft: 8,

@@ -15,6 +15,7 @@ import { WHITE, DISABLED, DISABLEDTXT } from 'shared/src/colors';
 
 interface ButtonProps {
   btnContainer?: ViewStyle;
+  gradientContainer?: ViewStyle;
   textStyle?: TextStyle;
   label: string;
   onPress: () => void;
@@ -25,6 +26,7 @@ interface ButtonProps {
 const PGradientButton: React.FC<ButtonProps> = (props) => {
   const {
     btnContainer,
+    gradientContainer,
     textStyle,
     label,
     onPress,
@@ -41,7 +43,7 @@ const PGradientButton: React.FC<ButtonProps> = (props) => {
         colors={disabled ? ['#FFFFFF61', '#FFFFFF61'] : ['#844AFF', '#00AAE0']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
-        style={styles.button}>
+        style={[styles.button, gradientContainer]}>
         {isLoading ? (
           <UIActivityIndicator color={WHITE} size={24} />
         ) : (

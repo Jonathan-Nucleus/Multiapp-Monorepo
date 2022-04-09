@@ -19,6 +19,10 @@ import ProfileSVG from '../assets/icons/tabProfile.svg';
 const Tab = createBottomTabNavigator();
 
 export default function BottomTabNavigator() {
+  const EmptyScreen = () => {
+    return null;
+  };
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -41,7 +45,7 @@ export default function BottomTabNavigator() {
       />
       <Tab.Screen
         name="Star"
-        component={HomeScreen}
+        component={EmptyScreen}
         options={{
           tabBarIcon: ({ focused, size }) => <StarSVG />,
         }}
@@ -56,7 +60,7 @@ export default function BottomTabNavigator() {
       />
       <Tab.Screen
         name="Chat"
-        component={HomeScreen}
+        component={EmptyScreen}
         options={{
           tabBarIcon: ({ focused, size }) => <ChatSVG />,
         }}

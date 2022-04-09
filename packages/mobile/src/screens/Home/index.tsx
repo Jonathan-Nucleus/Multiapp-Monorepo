@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { FlatList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useQuery } from '@apollo/client';
 import SplashScreen from 'react-native-splash-screen';
 
 import Header from './Header';
 import PAppContainer from '../../components/common/PAppContainer';
-import { BGDARK } from 'shared/src/colors';
 import pStyles from '../../theme/pStyles';
 import FeedItem, { FeedItemProps } from './FeedItem';
 import Tag from '../../components/common/Tag';
 import PGradientButton from '../../components/common/PGradientButton';
+import { GET_POSTS } from '../../graphql/post';
 
 interface ScreenProps {
   navigation: any;
@@ -17,31 +18,11 @@ interface ScreenProps {
 
 const CategoryList = ['All', 'Investment Ideas', 'World News', 'Politics'];
 
-const FeedItems = [
-  {
-    name: 'Michelle Jordan',
-    company: 'HedgeFunds',
-    date: 'Mar 30',
-    description:
-      'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more Read More..',
-    tags: ['user1', 'consumer1'],
-    commentCounts: 5,
-    shareCounts: 2,
-  },
-  {
-    name: 'Michelle Jordan',
-    company: 'HedgeFunds',
-    date: 'Mar 30',
-    description:
-      'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more Read More..',
-    tags: ['user2', 'consumer2'],
-    commentCounts: 3,
-    shareCounts: 12,
-  },
-];
-
 const Home: React.FC<ScreenProps> = ({ navigation }) => {
   const [category, setCategory] = useState('All');
+  const [refreshList, setRefreshList] = useState(false);
+  const { data, error, loading } = useQuery(GET_POSTS);
+  const postData = data?.posts;
 
   useEffect(() => {
     SplashScreen.hide();
@@ -53,13 +34,14 @@ const Home: React.FC<ScreenProps> = ({ navigation }) => {
 
   const renderItem = ({ item }: { item: FeedItemProps }) => (
     <FeedItem
-      name={item.name}
-      company={item.company}
+      name={`${item.user?.firstName} ${item.user?.lastName}`}
+      company={item.company || 'Company'}
       date={item.date}
-      description={item.description}
-      tags={item.tags}
-      commentCounts={item.commentCounts}
-      shareCounts={item.shareCounts}
+      mediaUrl={item.mediaUrl}
+      body={item.body}
+      categories={item.categories || []}
+      commentCounts={item.commentCounts || 0}
+      shareCounts={item.shareCounts || 0}
     />
   );
 
@@ -81,11 +63,18 @@ const Home: React.FC<ScreenProps> = ({ navigation }) => {
           )}
           listKey="category"
         />
-        <FlatList data={FeedItems} renderItem={renderItem} listKey="feed" />
+        <FlatList
+          data={postData || []}
+          renderItem={renderItem}
+          extraData={refreshList}
+          keyExtractor={(item: FeedItemProps) => `${item._id}`}
+          listKey="feed"
+        />
       </PAppContainer>
       <PGradientButton
         label="+"
         btnContainer={styles.postButton}
+        gradientContainer={styles.gradientContainer}
         textStyle={styles.postLabel}
         onPress={handleCreatePost}
       />
@@ -106,8 +95,10 @@ const styles = StyleSheet.create({
   },
   postButton: {
     position: 'absolute',
-    bottom: 0,
+    bottom: 22,
     right: 22,
+  },
+  gradientContainer: {
     width: 56,
     height: 56,
     paddingVertical: 0,
