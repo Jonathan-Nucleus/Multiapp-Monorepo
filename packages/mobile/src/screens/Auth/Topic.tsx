@@ -1,79 +1,96 @@
 import React, { useState } from 'react';
 import {
   StyleSheet,
-  Keyboard,
   View,
   Text,
   TouchableOpacity,
   FlatList,
+  ListRenderItem,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { NavigationProp, RouteProp } from '@react-navigation/native';
+import { useMutation } from '@apollo/client';
 
 import PAppContainer from '../../components/common/PAppContainer';
 import PHeader from '../../components/common/PHeader';
 import PTitle from '../../components/common/PTitle';
+import ErrorText from '../../components/common/ErrorTxt';
+import { UPDATE_SETTINGS } from '../../graphql/mutation/account';
 import { Body2, H6 } from '../../theme/fonts';
-import { BGDARK, PRIMARY, WHITE, PRIMARYSOLID } from 'shared/src/colors';
+import {
+  BGDARK,
+  PRIMARY,
+  WHITE,
+  PRIMARYSOLID7,
+  BLUE300,
+} from 'shared/src/colors';
 import LogoSvg from '../../assets/icons/logo.svg';
 import CheckedSvg from '../../assets/icons/checked.svg';
 import UncheckedSvg from '../../assets/icons/unchecked.svg';
 import PGradientButton from '../../components/common/PGradientButton';
+import { PostCategoryOptions } from 'backend/schemas/post';
 
-const DATA = [
-  {
-    id: '1',
-    label: 'News',
-  },
-  {
-    id: '2',
-    label: 'Politics',
-  },
-  {
-    id: '3',
-    label: 'Ideas',
-  },
-  {
-    id: '4',
-    label: 'Education',
-  },
-  {
-    id: '1',
-    label: 'News',
-  },
-  {
-    id: '2',
-    label: 'Politics',
-  },
-  {
-    id: '3',
-    label: 'Ideas',
-  },
-  {
-    id: '4',
-    label: 'Education',
-  },
-];
+import type { TopicScreen } from 'mobile/src/navigations/AuthStack';
+const preferences = Object.keys(PostCategoryOptions);
 
-const Topic = ({ navigation }) => {
-  const [checked, setChecked] = useState(false);
+const Topic: TopicScreen = ({ navigation }) => {
+  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+  const [error, setError] = useState('');
+  const [updateSettings] = useMutation(UPDATE_SETTINGS);
 
-  const handleNextPage = () => {
-    Keyboard.dismiss();
+  const handleNextPage = async (): Promise<void> => {
+    if (selectedTopics.length < 3) {
+      setError('Please select at least 3 topics');
+      return;
+    }
+    try {
+      const { data } = await updateSettings({
+        variables: {
+          settings: {
+            interests: selectedTopics,
+          },
+        },
+      });
+      if (data.updateSettings) {
+        navigation.navigate('Main');
+        return;
+      } else {
+        setError('Something went wrong, Please try again later');
+      }
+    } catch (e: any) {
+      setError(e.message);
+    }
   };
 
-  const handleSkip = () => {};
+  const handleSkip = (): void => {
+    navigation.navigate('Main');
+  };
 
-  const renderListItem = ({ item }) => {
+  const handleToggleCheck = (val: string): void => {
+    setError('');
+    const _selectedTopics = [...selectedTopics];
+    const findIndex: number = _selectedTopics.indexOf(val);
+    if (findIndex > -1) {
+      _selectedTopics.splice(findIndex, 1);
+    } else {
+      _selectedTopics.push(val);
+    }
+    setSelectedTopics(_selectedTopics);
+  };
+
+  const renderListItem: ListRenderItem<typeof preferences[number]> = ({
+    item,
+  }) => {
     return (
       <View style={styles.checkedWrap}>
-        <TouchableOpacity onPress={() => setChecked(!checked)}>
-          {checked ? (
-            <CheckedSvg width={16} height={16} />
+        <TouchableOpacity onPress={() => handleToggleCheck(item)}>
+          {selectedTopics.indexOf(item) > -1 ? (
+            <CheckedSvg />
           ) : (
-            <UncheckedSvg width={16} height={16} />
+            <UncheckedSvg />
           )}
         </TouchableOpacity>
-        <Text style={styles.checkedTxt}>{item.label}</Text>
+        <Text style={styles.checkedTxt}>{item.toLowerCase()}</Text>
       </View>
     );
   };
@@ -82,14 +99,15 @@ const Topic = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       <PHeader centerIcon={<LogoSvg />} />
       <PAppContainer>
+        {!!error && <ErrorText error={error} />}
         <PTitle subTitle="One last thing..." />
         <Text style={styles.txt}>
           Select at least 3 topics to help us personalize your experience.
         </Text>
         <FlatList
-          data={DATA}
+          data={preferences}
           renderItem={renderListItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item}
           style={styles.flatList}
           nestedScrollEnabled
           scrollEnabled={false}
@@ -124,13 +142,14 @@ const styles = StyleSheet.create({
   flatList: {
     flex: 1,
     marginTop: 18,
+    paddingBottom: 60,
   },
   checkedWrap: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
     marginBottom: 11,
-    backgroundColor: PRIMARYSOLID,
+    backgroundColor: PRIMARYSOLID7,
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 32,
@@ -139,6 +158,7 @@ const styles = StyleSheet.create({
     ...Body2,
     color: WHITE,
     marginLeft: 10,
+    textTransform: 'capitalize',
   },
   bottom: {
     height: 80,
@@ -148,7 +168,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'rgba(84, 78, 253, 0.24)',
+    backgroundColor: BLUE300,
     width: '100%',
     zIndex: 99,
   },

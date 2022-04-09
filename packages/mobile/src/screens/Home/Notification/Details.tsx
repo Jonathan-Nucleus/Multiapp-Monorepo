@@ -11,7 +11,9 @@ import { Body1, Body2, Body3 } from '../../../theme/fonts';
 import SearchSvg from '../../../assets/icons/search.svg';
 import BackSvg from '../../../assets/icons/back.svg';
 
-const NotificationDetail = ({ navigation }) => {
+import type { NotificationDetailsScreen } from 'mobile/src/navigations/NotificationStack';
+
+const NotificationDetail: NotificationDetailsScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={pStyles.globalContainer}>
       <PHeader

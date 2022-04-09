@@ -21,12 +21,9 @@ import { BGDARK, PRIMARY, WHITE } from 'shared/src/colors';
 import { Body2 } from '../../theme/fonts';
 import LogoSvg from '../../assets/icons/logo.svg';
 
-interface RouterProps {
-  navigation: NavigationProp<any, any>;
-  route: RouteProp<any, any>;
-}
+import type { ResetPassScreen } from 'mobile/src/navigations/AuthStack';
 
-const Signup: React.FC<RouterProps> = ({ navigation, route }) => {
+const Signup: ResetPassScreen = ({ navigation, route }) => {
   const [pass, setPass] = useState('');
   const [confirmPass, setConfirmPass] = useState('');
   const [securePassEntry, setSecurePassEntry] = useState(true);
@@ -57,13 +54,11 @@ const Signup: React.FC<RouterProps> = ({ navigation, route }) => {
           password: pass,
         },
       });
-      console.log(1231, data);
       if (data.login) {
         navigation.navigate('Main');
         return;
       }
     } catch (e: any) {
-      console.log(1111, e);
       setError(e.message);
     }
   };

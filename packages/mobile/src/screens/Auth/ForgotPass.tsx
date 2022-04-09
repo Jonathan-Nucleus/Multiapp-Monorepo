@@ -22,11 +22,9 @@ import { FORGOT_PASSWORD } from '../../graphql/mutation/auth';
 import SuccessText from '../../components/common/SuccessText';
 import ErrorText from '../../components/common/ErrorTxt';
 
-interface RouterProps {
-  navigation: NavigationProp<any, any>;
-}
+import type { ForgotPassScreen } from 'mobile/src/navigations/AuthStack';
 
-const ForgotPass: React.FC<RouterProps> = ({ navigation }) => {
+const ForgotPass: ForgotPassScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
   const [err, setErr] = useState('');

@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import {
   View,
+  ViewStyle,
   StyleSheet,
+  TextStyle,
   TextInput,
+  TextInputProps,
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from 'react-native';
@@ -11,36 +14,50 @@ import PFormLabel from './PFormLabel';
 import { Body2, Body1 } from '../../theme/fonts';
 import { WHITE, PRIMARY, BLACK } from 'shared/src/colors';
 
-const PTextInput = (props) => {
+interface PTextInputProps extends TextInputProps {
+  containerStyle?: ViewStyle;
+  label: string;
+  labelTextStyle?: TextStyle;
+  labelStyle?: ViewStyle;
+  subLabel?: string;
+  subLabelTextStyle?: TextStyle;
+  subLabelStyle?: ViewStyle;
+  text: string;
+  textInputStyle?: ViewStyle;
+  onPress?: () => void;
+  onPressText?: () => void;
+  icon?: string;
+}
+
+const PTextInput: React.FC<PTextInputProps> = (props) => {
   const {
-    onChangeText,
-    secureTextEntry = false,
     containerStyle,
+    label,
     labelStyle,
     labelTextStyle,
-    textInputStyle,
-    label,
-    subLabel,
     text,
-    error,
-    errorStyle,
-    keyboardType = 'default',
-    editable = true,
+    textInputStyle,
+    subLabel,
+    subLabelStyle,
+    subLabelTextStyle,
+    onChangeText,
+    onPressText,
     onPress,
-    icon,
-    placeholder,
-    autoCapitalize = 'none',
-    onSubmitEditing,
     onFocus,
     onBlur,
+    onSubmitEditing,
+    icon,
+    placeholder,
+    secureTextEntry = false,
+    keyboardType = 'default',
+    editable = true,
+    autoCapitalize = 'none',
     autoFocus = false,
     children,
     placeholderTextColor = '#888',
     multiline = false,
     autoCorrect = true,
-    subLabelStyle,
-    subLabelTextStyle,
-    onPressText,
+    ...textInputProps
   } = props;
 
   const [isFocused, setIsFocused] = useState(false);
@@ -60,8 +77,8 @@ const PTextInput = (props) => {
     }
   }, [isFocused]);
 
-  const handleOnChangeText = (val) => {
-    onChangeText(val);
+  const handleOnChangeText = (val: string): void => {
+    onChangeText?.(val);
   };
 
   return (
@@ -73,7 +90,7 @@ const PTextInput = (props) => {
           textStyle={labelTextStyle}
         />
         <PFormLabel
-          label={subLabel}
+          label={subLabel ?? ''}
           style={subLabelStyle}
           textStyle={subLabelTextStyle}
           onPress={onPressText}
@@ -81,6 +98,7 @@ const PTextInput = (props) => {
       </View>
       <View style={styles.view}>
         <TextInput
+          {...textInputProps}
           placeholder={placeholder}
           placeholderTextColor={placeholderTextColor}
           onChangeText={handleOnChangeText}
@@ -91,12 +109,12 @@ const PTextInput = (props) => {
           editable={editable}
           autoCapitalize={autoCapitalize}
           onSubmitEditing={onSubmitEditing}
-          onFocus={() => {
-            onFocus && onFocus();
+          onFocus={(evt) => {
+            onFocus?.(evt);
             setIsFocused(true);
           }}
-          onBlur={() => {
-            onBlur && onBlur();
+          onBlur={(evt) => {
+            onBlur?.(evt);
             setIsFocused(false);
           }}
           autoFocus={autoFocus}

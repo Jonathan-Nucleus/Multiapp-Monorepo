@@ -22,11 +22,9 @@ import PTextLine from '../../components/common/PTextLine';
 import LogoSvg from '../../assets/icons/logo.svg';
 import { VERIFY_INVITE } from '../../graphql/query/auth';
 
-interface RouterProps {
-  navigation: NavigationProp<any, any>;
-}
+import type { CodeScreen } from 'mobile/src/navigations/AuthStack';
 
-const CodeView: React.FC<RouterProps> = ({ navigation }) => {
+const CodeView: CodeScreen = ({ navigation }) => {
   const [code, setCode] = useState('');
   const [error, setError] = useState(false);
   const client = useApolloClient();
@@ -39,7 +37,6 @@ const CodeView: React.FC<RouterProps> = ({ navigation }) => {
         query: VERIFY_INVITE,
         variables: { code },
       });
-      console.log(12312, data);
       if (data.verifyInvite) {
         navigation.navigate('Signup', { code });
         return;

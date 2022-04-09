@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FlatList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import SplashScreen from 'react-native-splash-screen';
 
 import Header from './Header';
 import PAppContainer from '../../components/common/PAppContainer';
@@ -41,6 +42,10 @@ const FeedItems = [
 
 const Home: React.FC<ScreenProps> = ({ navigation }) => {
   const [category, setCategory] = useState('All');
+
+  useEffect(() => {
+    SplashScreen.hide();
+  }, []);
 
   const handleCreatePost = () => {
     navigation.navigate('CreatePost');

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   Keyboard,
@@ -9,6 +9,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useMutation } from '@apollo/client';
 import { NavigationProp } from '@react-navigation/native';
+import EncryptedStorage from 'react-native-encrypted-storage';
+import SplashScreen from 'react-native-splash-screen';
 
 import PAppContainer from '../../components/common/PAppContainer';
 import PHeader from '../../components/common/PHeader';
@@ -27,17 +29,19 @@ import LinkedinSvg from '../../assets/icons/linkedin.svg';
 import CheckedSvg from '../../assets/icons/checked.svg';
 import UncheckedSvg from '../../assets/icons/unchecked.svg';
 
-interface RouterProps {
-  navigation: NavigationProp<any, any>;
-}
+import type { LoginScreen } from 'mobile/src/navigations/AuthStack';
 
-const Login: React.FC<RouterProps> = ({ navigation }) => {
+const Login: LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
   const [checked, setChecked] = useState(false);
   const [securePassEntry, setSecurePassEntry] = useState(true);
 
   const [login] = useMutation(LOGIN);
+
+  useEffect(() => {
+    SplashScreen.hide();
+  }, []);
 
   const handleNextPage = async () => {
     Keyboard.dismiss();
@@ -48,6 +52,10 @@ const Login: React.FC<RouterProps> = ({ navigation }) => {
           password: pass,
         },
       });
+      if (data.login) {
+        await EncryptedStorage.setItem('accessToken', data.login);
+        navigation.navigate('Main');
+      }
       console.log('logged user', data);
     } catch (e) {
       console.error('login error', e);

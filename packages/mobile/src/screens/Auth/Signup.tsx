@@ -9,6 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NavigationProp, RouteProp } from '@react-navigation/native';
 import { useMutation } from '@apollo/client';
+import EncryptedStorage from 'react-native-encrypted-storage';
 
 import PAppContainer from '../../components/common/PAppContainer';
 import PHeader from '../../components/common/PHeader';
@@ -25,13 +26,9 @@ import AppleSvg from '../../assets/icons/apple.svg';
 import GoogleSvg from '../../assets/icons/google.svg';
 import LinkedinSvg from '../../assets/icons/linkedin.svg';
 
-interface RouterProps {
-  navigation: NavigationProp<any, any>;
-  route: RouteProp<any, any>;
-}
+import type { SignupScreen } from 'mobile/src/navigations/AuthStack';
 
-const Signup: React.FC<RouterProps> = ({ navigation, route }) => {
-  console.log(1231, route);
+const Signup: SignupScreen = ({ navigation, route }) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -78,6 +75,7 @@ const Signup: React.FC<RouterProps> = ({ navigation, route }) => {
         },
       });
       if (data.register) {
+        await EncryptedStorage.setItem('accessToken', data.register);
         navigation.navigate('Topic');
         return;
       }

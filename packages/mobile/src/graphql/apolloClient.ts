@@ -6,7 +6,7 @@ import {
   InMemoryCache,
   NormalizedCacheObject,
 } from '@apollo/client';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import EncryptedStorage from 'react-native-encrypted-storage';
 import { AsyncStorageWrapper, CachePersistor } from 'apollo3-cache-persist';
 
 const typePolicies = {};
@@ -17,17 +17,18 @@ const cache = new InMemoryCache({
 
 const persistor = new CachePersistor({
   cache,
-  storage: new AsyncStorageWrapper(AsyncStorage),
+  storage: new AsyncStorageWrapper(EncryptedStorage),
 });
 
 const GQL_GATEWAY_URL = 'http://localhost:4000';
 
-export const useInitializeClient = (token: string) => {
+export const useInitializeClient = () => {
   const [client, setClient] =
     useState<ApolloClient<NormalizedCacheObject> | null>(null);
   useEffect(() => {
     async function initializeCache() {
       await persistor.restore();
+      const token = await EncryptedStorage.getItem('accessToken');
       const _client = new ApolloClient({
         link: from([
           createHttpLink({

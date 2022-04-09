@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { ReactElement, useState } from 'react';
 import {
   StyleSheet,
   FlatList,
@@ -6,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
   Image,
+  ListRenderItem,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BGDARK, GRAY2, GRAY100, WHITE, BLACK } from 'shared/src/colors';
@@ -17,6 +18,8 @@ import ThreeDortSvg from '../../assets/icons/three-dot.svg';
 import SearchSvg from '../../assets/icons/search.svg';
 import ChatCenteredTextSvg from '../../assets/icons/ChatCenteredText.svg';
 import Avatar from '../../assets/avatar.png';
+
+import type { NotificationScreen } from 'mobile/src/navigations/NotificationStack';
 
 const DATA = [
   {
@@ -53,8 +56,8 @@ const DATA = [
   },
 ];
 
-const Notification = ({ navigation }) => {
-  const renderRight = () => {
+const Notification: NotificationScreen = ({ navigation }) => {
+  const renderRight = (): ReactElement => {
     return (
       <View style={styles.row}>
         <TouchableOpacity>
@@ -67,7 +70,7 @@ const Notification = ({ navigation }) => {
     );
   };
 
-  const renderListItem = ({ item }) => {
+  const renderListItem: ListRenderItem<typeof DATA[number]> = ({ item }) => {
     return (
       <TouchableOpacity onPress={() => navigation.navigate('Detail')}>
         <View style={styles.item}>

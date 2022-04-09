@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, StyleSheet, FlatList } from 'react-native';
+import { Text, StyleSheet, FlatList, ListRenderItem } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BGDARK, WHITE } from 'shared/src/colors';
 
@@ -12,37 +12,41 @@ import pStyles from '../../theme/pStyles';
 import SearchSvg from '../../assets/icons/search.svg';
 import BackSvg from '../../assets/icons/back.svg';
 
+import type { NotificationDetailsScreen } from 'mobile/src/navigations/NotificationStack';
+
 const FeedItems = [
   {
     name: 'Test1',
+    company: 'Test Company',
     description:
       'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more Read More..',
     tags: ['user1', 'consumer1'],
     commentCounts: 5,
     shareCounts: 2,
+    date: 'Mar 29',
   },
   {
     name: 'Test2',
+    company: 'Test Company 2',
     description:
       'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more Read More..',
     tags: ['user2', 'consumer2'],
     commentCounts: 3,
     shareCounts: 12,
+    date: 'Mar 30',
   },
 ];
 
-interface ScreenProps {
-  navigation: any;
-}
-
-const NotificationDetail: React.FC<ScreenProps> = ({ navigation }) => {
-  const renderItem = ({ item }: { item: FeedItemProps }) => (
+const NotificationDetail: NotificationDetailsScreen = ({ navigation }) => {
+  const renderItem: ListRenderItem<FeedItemProps> = ({ item }) => (
     <FeedItem
       name={item.name}
+      company={item.company}
       description={item.description}
       tags={item.tags}
       commentCounts={item.commentCounts}
       shareCounts={item.shareCounts}
+      date={item.date}
     />
   );
 
