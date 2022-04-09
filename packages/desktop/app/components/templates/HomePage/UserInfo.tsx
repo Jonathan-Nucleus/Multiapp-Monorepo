@@ -8,7 +8,7 @@ import AlSvg from "shared/assets/images/al.svg";
 const UserInfo: FC = () => {
   return (
     <div className="min-w-full md:min-w-sideLeft">
-      <div className="rounded-md border border-gray bg-dark	p-4">
+      <div className="rounded-md border border-gray bg-purple	p-4">
         <div className="m-auto text-center">
           <Image
             src={Avatar}
@@ -52,7 +52,7 @@ const UserInfo: FC = () => {
           </div>
         </Link>
       </div>
-      <div className="mt-20 rounded-md border border-gray bg-dark	p-4">
+      <div className="mt-20 rounded-md border border-gray bg-purple	p-4">
         <div className="m-auto text-center">
           <Image src={Bank} width={88} height={88} alt="" />
         </div>

@@ -3,7 +3,13 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: "#121212",
+        background: {
+          DEFAULT: "#121212",
+          header: "#181727",
+          card: "#171622",
+          modal: "#19192C",
+          popover: "#1A192E",
+        },
         surface: {
           DEFAULT: "#121212",
           light10: "#19182a",
@@ -11,6 +17,8 @@ module.exports = {
         primary: {
           DEFAULT: "#00AAE0",
           solid: "#544EFD",
+          overlay: "#57B1FF",
+          medium: "#A5A1FF",
         },
         secondary: {
           DEFAULT: "#0067E0",
@@ -19,14 +27,10 @@ module.exports = {
         error: "#CD403A",
         info: "#544EFD",
         success: "#55C090",
-        purple: "#544EFD12",
+        purple: "#181725",
         dark: "#CDA7861A",
         gray: "#121212",
       },
-    },
-    minWidth: {
-      sideRight: "347px",
-      sideLeft: "305px",
     },
   },
   plugins: [],

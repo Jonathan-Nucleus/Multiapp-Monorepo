@@ -60,7 +60,7 @@ const InviteCodePage: FC = () => {
             </Button>
           </div>
         </form>
-        <div className="text-center mt-12 text-white">OR</div>
+        <div className="text-center mt-12 text-white">OR, LOG IN WITH</div>
         <div className="text-center mt-4">
           <Button
             variant="text"

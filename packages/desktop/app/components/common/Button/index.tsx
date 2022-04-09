@@ -2,7 +2,7 @@ import { FC, HTMLProps } from "react";
 
 interface ButtonProps extends HTMLProps<HTMLButtonElement> {
   type?: "button" | "submit" | "reset" | undefined;
-  variant: "outline-primary" | "gradient-primary" | "text";
+  variant: "primary" | "outline-primary" | "gradient-primary" | "text";
   loading?: boolean;
 }
 
@@ -16,7 +16,13 @@ const Button: FC<ButtonProps> = ({
   children,
 }: ButtonProps) => {
   let buttonClass = "";
-  if (variant == "outline-primary") {
+  if (variant == "primary") {
+    buttonClass =
+      "text-primary bg-primary " +
+      "text-sm text-white font-bold rounded-full tracking-widest " +
+      "inline-flex justify-center items-center px-4 py-2 " +
+      "hover:bg-primary/75 focus:outline-none transition ";
+  } else if (variant == "outline-primary") {
     buttonClass =
       "text-primary border border-primary " +
       "text-sm font-bold rounded-full tracking-widest " +
@@ -67,4 +73,4 @@ const Button: FC<ButtonProps> = ({
   );
 };
 
-export default Button;
+export default Button

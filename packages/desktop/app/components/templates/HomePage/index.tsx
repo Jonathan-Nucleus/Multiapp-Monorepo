@@ -1,105 +1,57 @@
-import { FC, useState } from "react";
-import { Splide, SplideSlide } from "@splidejs/react-splide";
-import "@splidejs/react-splide/css";
-import Logo from "shared/assets/images/background.png";
+import { FC, useState, useEffect } from "react";
+import { Plus } from "phosphor-react";
 
-import CarouselItem from "./CarouselItem";
-import Filter from "./Filter";
-import CreatePost from "../../common/CreatePost";
-import PostDetail from "./PostDetails";
-import UserInfo from "./UserInfo";
-import Follow from "./Follow";
-
-const Items = [
-  {
-    name: "Mike Wang",
-    description: "Founder, Investor ",
-    company: "Cartenna Capital",
-    image: Logo,
-    id: 1,
-  },
-  {
-    name: "Mike Wang",
-    description: "Founder, Investor ",
-    company: "Cartenna Capital",
-    image: Logo,
-    id: 51,
-  },
-  {
-    name: "Mike Wang",
-    description: "Founder, Investor ",
-    company: "Cartenna Capital",
-    image: Logo,
-    id: 41,
-  },
-  {
-    name: "Mike Wang",
-    description: "Founder, Investor ",
-    company: "Cartenna Capital",
-    image: Logo,
-    id: 31,
-  },
-  {
-    name: "Mike Wang",
-    description: "Founder, Investor ",
-    company: "Cartenna Capital",
-    image: Logo,
-    id: 21,
-  },
-  {
-    name: "Mike Wang",
-    description: "Founder, Investor ",
-    company: "Cartenna Capital",
-    image: Logo,
-    id: 11,
-  },
-];
+import ProfileCard from "./ProfileCard";
+import BankCard from "./BankCard";
+import FeaturedProfessionals from "./FeaturedProfessionals";
+import AddPost from "./AddPost";
+import PostsList from "./PostsList";
+import InviteFriends from "./InviteFriends";
+import WatchList from "./WatchList";
+import Button from "../../common/Button";
+import CreatePostModal from "../CreatePostModal";
 
 const HomePage: FC = () => {
-  const [isVisible, setVisible] = useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
-    <div>
-      <div className="flex flex-row px-2">
-        <div className="basis-1/4 hidden lg:block">
-          <UserInfo />
+    <>
+      <div className="flex flex-row px-2 mt-10">
+        <div className="w-80 hidden lg:block flex-shrink-0 mx-4">
+          <div>
+            <ProfileCard />
+          </div>
+          <div className="mt-12">
+            <BankCard />
+          </div>
         </div>
-
-        <div className="w-full rounded-md overflow-auto	pr-4 pl-4">
-          <div className="text-center font-bold text-white mb-3">
-            Featured Professionals
+        <div className="min-w-0 mx-4">
+          <FeaturedProfessionals />
+          <div className="mt-10 hidden md:block">
+            <AddPost onClick={() => setOpen(true)} />
           </div>
-          <div className="border border-gray bg-dark rounded-md p-2">
-            <Splide
-              aria-label="My Favorite Images"
-              options={{
-                autoWidth: true,
-                rewind: true,
-                lazyLoad: "nearby",
-                cover: true,
-              }}
-            >
-              {Items.map((item, i) => (
-                <SplideSlide key={i}>
-                  <CarouselItem item={item} key={i} />
-                </SplideSlide>
-              ))}
-            </Splide>
+          <div className="mt-5">
+            <PostsList />
           </div>
-          <div className="hidden md:block">
-            <CreatePost />
-          </div>
-          <Filter
-            onClick={() => setVisible(!isVisible)}
-            isVisible={isVisible}
-          />
-          <PostDetail />
         </div>
-        <div className="basis-1/4 hidden lg:block">
-          <Follow />
+        <div className="w-80 flex-shrink-0 mx-4">
+          <InviteFriends />
+          <div className="mt-5">
+            <WatchList />
+          </div>
+        </div>
+        <div className="block md:hidden absolute bottom-5 right-5">
+          <Button
+            variant="gradient-primary"
+            className="w-12 h-12 rounded-full"
+            onClick={() => setOpen(true)}
+          >
+            <Plus color="white" size={24} />
+          </Button>
         </div>
       </div>
-    </div>
+      {open && <CreatePostModal setOpen={(val) => setOpen(val)} />}
+    </>
   );
 };
 
