@@ -11,14 +11,11 @@ import FeedItem, { FeedItemProps } from './FeedItem';
 import Tag from '../../components/common/Tag';
 import PGradientButton from '../../components/common/PGradientButton';
 import { GET_POSTS } from '../../graphql/post';
-
-interface ScreenProps {
-  navigation: any;
-}
+import { HomeScreen } from 'mobile/src/navigations/HomeStack';
 
 const CategoryList = ['All', 'Investment Ideas', 'World News', 'Politics'];
 
-const Home: React.FC<ScreenProps> = ({ navigation }) => {
+const Home: HomeScreen = ({ navigation }) => {
   const [category, setCategory] = useState('All');
   const [refreshList, setRefreshList] = useState(false);
   const { data, error, loading } = useQuery(GET_POSTS);

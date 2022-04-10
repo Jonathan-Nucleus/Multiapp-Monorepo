@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -31,6 +31,7 @@ import {
   PRIMARYSOLID7,
 } from 'shared/src/colors';
 import { CREATE_POST, PostDataType } from '../../graphql/post';
+import { CreatePostScreen } from 'mobile/src/navigations/HomeStack';
 
 import BackSvg from '../../assets/icons/back.svg';
 import ChatSvg from 'shared/assets/images/chat.svg';
@@ -38,9 +39,7 @@ import UserSvg from 'shared/assets/images/user.svg';
 import GlobalSvg from 'shared/assets/images/global.svg';
 import Avatar from '../../assets/avatar.png';
 
-interface CreatePostProps {
-  navigation: any;
-}
+const Steps: string[] = ['CreatePost', 'ReviewPost'];
 
 const radioButtonsData: RadioButtonProps[] = [
   {
@@ -63,11 +62,23 @@ const users = [
   { id: '123355654785', name: 'Alex Beinfeld' },
 ];
 
-const CreatePost: React.FC<CreatePostProps> = ({ navigation }) => {
+const CreatePost: CreatePostScreen = ({ route, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [description, setDescription] = useState('');
+  const [categories, setCategories] = useState<string[]>([]);
+  const [step, setStep] = useState(Steps[0]);
   const [mentions, setMentions] = useState<string[]>([]);
   const [createPost] = useMutation(CREATE_POST);
+
+  useEffect(() => {
+    const categoryList = route.params?.categories;
+    if (categoryList && categoryList.length > 0) {
+      setCategories(categoryList);
+      setStep(Steps[1]);
+    } else {
+      setStep(Steps[0]);
+    }
+  }, [route, route.params]);
 
   const openPicker = () => {
     ImagePicker.openPicker({
@@ -97,12 +108,18 @@ const CreatePost: React.FC<CreatePostProps> = ({ navigation }) => {
   };
 
   const handleNext = async () => {
+    if (step === Steps[0]) {
+      navigation.navigate('ChooseCategory');
+      return;
+    }
+
+    // step === 1 (ReviewPost)
     if (!checkValidation()) {
       return;
     }
 
     const postData: PostDataType = {
-      categories: ['NEWS', 'POLITICS'],
+      categories,
       audience: 'EVERYONE',
       body: replaceMentionValues(description, ({ name }) => `@${name}`),
       mediaUrl: 'https://unsplash.it/400/400?image=1',
