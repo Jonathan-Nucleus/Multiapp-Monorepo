@@ -35,13 +35,6 @@ const AppNavigator = () => {
     const current = navigationRef.current?.getCurrentRoute()?.name;
     console.log('Current: ', current);
     console.log('Prev: ', prev);
-    if (prev !== current) {
-      // await analytics().logScreenView({
-      //   screen_name: current,
-      //   screen_class: current,
-      // });
-    }
-
     routeNameRef.current = current;
   };
 
@@ -51,11 +44,11 @@ const AppNavigator = () => {
       onReady={onReady}
       onStateChange={onStateChange}>
       <Stack.Navigator screenOptions={defaultScreenOptions}>
-        <Stack.Screen
+        {/* <Stack.Screen
           name="Auth"
           component={AuthStack}
           options={{ gestureEnabled: false }}
-        />
+        /> */}
         <Stack.Screen name="Main" component={BottomTabNavigator} />
       </Stack.Navigator>
     </NavigationContainer>

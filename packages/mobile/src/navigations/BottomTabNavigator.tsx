@@ -1,28 +1,19 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import PropTypes from 'prop-types';
+import { House, Star, Chats, DotsThreeCircle } from 'phosphor-react-native';
 
 import { WHITE, BLACK, BGDARK } from 'shared/src/colors';
 
-import HomeScreen from '../screens/Home';
 import HomeStack from './HomeStack';
-import NotificationStack from './NotificationStack';
 import SettingsStack from './SettingsStack';
-import HomeSVG from '../assets/icons/tabHome.svg';
-import GreyHomeSVG from '../assets/icons/tabGreyHome.svg';
-import StarSVG from '../assets/icons/tabStar.svg';
-import ChatSVG from '../assets/icons/tabChat.svg';
-import BellSVG from 'shared/assets/images/bell.svg';
-import GreyBellSVG from 'shared/assets/images/grey-bell.svg';
-import ProfileSVG from '../assets/icons/tabProfile.svg';
+import BellSVG from 'shared/assets/images/tabStar.svg';
+import GreyBellSVG from 'shared/assets/images/tabStar.svg';
+import Help from '../screens/Help';
 
 const Tab = createBottomTabNavigator();
 
 export default function BottomTabNavigator() {
-  const EmptyScreen = () => {
-    return null;
-  };
-
   return (
     <Tab.Navigator
       screenOptions={{
@@ -31,46 +22,71 @@ export default function BottomTabNavigator() {
           backgroundColor: BGDARK,
           borderTopWidth: 1,
           borderTopColor: BLACK,
-          height: 72,
         },
-        tabBarShowLabel: false,
+        tabBarLabelStyle: {
+          color: WHITE,
+          textTransform: 'uppercase',
+        },
       }}>
       <Tab.Screen
         name="HomeStack"
         component={HomeStack}
         options={{
+          tabBarLabel: 'HOME',
           tabBarIcon: ({ focused, size }) =>
-            focused ? <HomeSVG /> : <GreyHomeSVG />,
+            focused ? (
+              <House size={size} color={WHITE} weight="fill" />
+            ) : (
+              <House size={size} color={WHITE} />
+            ),
         }}
       />
       <Tab.Screen
-        name="Star"
-        component={EmptyScreen}
+        name="Watchlist"
+        component={Help}
         options={{
-          tabBarIcon: ({ focused, size }) => <StarSVG />,
+          tabBarLabel: 'watchlist',
+          tabBarIcon: ({ focused, size }) =>
+            focused ? (
+              <Star size={size} color={WHITE} weight="fill" />
+            ) : (
+              <Star size={size} color={WHITE} />
+            ),
         }}
       />
       <Tab.Screen
-        name="Bell"
-        component={NotificationStack}
+        name="Funds"
+        component={Help}
         options={{
+          tabBarLabel: 'funds',
           tabBarIcon: ({ focused, size }) =>
             focused ? <BellSVG /> : <GreyBellSVG />,
         }}
       />
       <Tab.Screen
         name="Chat"
-        component={EmptyScreen}
+        component={Help}
         options={{
-          tabBarIcon: ({ focused, size }) => <ChatSVG />,
+          tabBarLabel: 'messages',
+          tabBarIcon: ({ focused, size }) =>
+            focused ? (
+              <Chats size={size} color={WHITE} weight="fill" />
+            ) : (
+              <Chats size={size} color={WHITE} />
+            ),
         }}
       />
       <Tab.Screen
-        name="Profile"
+        name="More"
         component={SettingsStack}
         options={{
+          tabBarLabel: 'MORE',
           tabBarIcon: ({ focused, size }) =>
-            focused ? <ProfileSVG /> : <ProfileSVG />,
+            focused ? (
+              <DotsThreeCircle size={size} color={WHITE} weight="fill" />
+            ) : (
+              <DotsThreeCircle size={size} color={WHITE} />
+            ),
         }}
       />
     </Tab.Navigator>

@@ -9,7 +9,8 @@ import {
   ListRenderItem,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BGDARK, GRAY2, GRAY100, WHITE, BLACK } from 'shared/src/colors';
+import { CaretLeft } from 'phosphor-react-native';
+import { BGDARK, GRAY2, GRAY100, WHITE, BLACK, GRAY } from 'shared/src/colors';
 
 import PHeader from '../../components/common/PHeader';
 import pStyles from '../../theme/pStyles';
@@ -24,35 +25,43 @@ import type { NotificationScreen } from 'mobile/src/navigations/NotificationStac
 const DATA = [
   {
     id: '1',
-    label: 'News',
+    label1: 'Jane onething commented on your post. 2h',
+    label2: 'Lorem ipsum dolor sit amet, consectetur...',
   },
   {
     id: '2',
-    label: 'Politics',
+    label1: 'Jane onething commented on your post. 2h',
+    label2: 'Lorem ipsum dolor sit amet, consectetur...',
   },
   {
     id: '3',
-    label: 'Ideas',
+    label1: 'Jane onething commented on your post. 2h',
+    label2: 'Lorem ipsum dolor sit amet, consectetur...',
   },
   {
     id: '4',
-    label: 'Education',
+    label1: 'Jane onething commented on your post. 2h',
+    label2: 'Lorem ipsum dolor sit amet, consectetur...',
   },
   {
     id: '5',
-    label: 'News',
+    label1: 'Jane onething commented on your post. 2h',
+    label2: 'Lorem ipsum dolor sit amet, consectetur...',
   },
   {
     id: '6',
-    label: 'Politics',
+    label1: 'Jane onething commented on your post. 2h',
+    label2: 'Lorem ipsum dolor sit amet, consectetur...',
   },
   {
     id: '7',
-    label: 'Ideas',
+    label1: 'Jane onething commented on your post. 2h',
+    label2: 'Lorem ipsum dolor sit amet, consectetur...',
   },
   {
     id: '8',
-    label: 'Education',
+    label1: 'Jane onething commented on your post. 2h',
+    label2: 'Lorem ipsum dolor sit amet, consectetur...',
   },
 ];
 
@@ -69,6 +78,16 @@ const Notification: NotificationScreen = ({ navigation }) => {
       </View>
     );
   };
+  const renderLeft = (): ReactElement => {
+    return (
+      <View style={styles.row}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <CaretLeft size={28} color={GRAY} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Activity</Text>
+      </View>
+    );
+  };
 
   const renderListItem: ListRenderItem<typeof DATA[number]> = ({ item }) => {
     return (
@@ -81,11 +100,9 @@ const Notification: NotificationScreen = ({ navigation }) => {
             </View>
           </View>
           <View style={styles.commentWrap}>
-            <Text style={styles.label}>
-              Jane onething commented on your post. 2h
-            </Text>
+            <Text style={styles.label}>{item.label1}</Text>
             <Text numberOfLines={1} style={styles.comment}>
-              Lorem ipsum dolor sit amet, consectetur...
+              {item.label2}
             </Text>
           </View>
         </View>
@@ -96,7 +113,7 @@ const Notification: NotificationScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={pStyles.globalContainer}>
       <PHeader
-        leftIcon={<Text style={styles.headerTitle}>Activity</Text>}
+        leftIcon={renderLeft()}
         rightIcon={renderRight()}
         containerStyle={styles.headerContainer}
       />

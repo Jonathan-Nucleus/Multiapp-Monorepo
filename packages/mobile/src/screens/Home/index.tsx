@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useQuery } from '@apollo/client';
 import SplashScreen from 'react-native-splash-screen';
 
-import Header from './Header';
+import Header from '../../components/main/Header';
 import PAppContainer from '../../components/common/PAppContainer';
 import pStyles from '../../theme/pStyles';
 import FeedItem, { FeedItemProps } from './FeedItem';
@@ -44,7 +44,7 @@ const Home: HomeScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={pStyles.globalContainer}>
-      <Header />
+      <Header navigation={navigation} />
       <PAppContainer>
         <FlatList
           horizontal

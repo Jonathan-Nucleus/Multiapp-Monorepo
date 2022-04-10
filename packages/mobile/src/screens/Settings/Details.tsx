@@ -87,7 +87,7 @@ const SettingDetails: FC<RouterProps> = ({ navigation }) => {
   return (
     <SafeAreaView style={pStyles.globalContainer}>
       <PHeader
-        centerIcon={<Text style={styles.headerTitle}>Settings</Text>}
+        centerIcon={<Text style={styles.headerTitle}>Preferences</Text>}
         containerStyle={styles.headerContainer}
         leftIcon={<CaretLeft size={28} color={WHITE} />}
         rightIcon={<MagnifyingGlass size={28} color={WHITE} />}

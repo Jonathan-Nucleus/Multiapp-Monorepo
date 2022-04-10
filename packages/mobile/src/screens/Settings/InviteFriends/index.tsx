@@ -5,31 +5,30 @@ import { NavigationProp } from '@react-navigation/native';
 import { CaretLeft, MagnifyingGlass } from 'phosphor-react-native';
 import { WHITE, BGDARK } from 'shared/src/colors';
 
-import PHeader from '../../components/common/PHeader';
-import pStyles from '../../theme/pStyles';
-import { Body1, Body2, Body3 } from '../../theme/fonts';
+import PHeader from '../../../components/common/PHeader';
+import pStyles from '../../../theme/pStyles';
+import { Body1, Body2, Body3 } from '../../../theme/fonts';
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
 }
-const Terms: FC<RouterProps> = ({ navigation }) => {
+
+const InviteFriends: FC<RouterProps> = ({ navigation }) => {
   return (
     <SafeAreaView style={pStyles.globalContainer}>
       <PHeader
-        centerIcon={
-          <Text style={styles.headerTitle}>Terms and Disclosures</Text>
-        }
+        centerIcon={<Text style={styles.headerTitle}>Invite Friends</Text>}
         containerStyle={styles.headerContainer}
         leftIcon={<CaretLeft size={28} color={WHITE} />}
         rightIcon={<MagnifyingGlass size={28} color={WHITE} />}
-        onPressLeft={navigation.goBack}
+        onPressLeft={() => navigation.goBack()}
         onPressRight={() => console.log(1231)}
       />
     </SafeAreaView>
   );
 };
 
-export default Terms;
+export default InviteFriends;
 
 const styles = StyleSheet.create({
   headerTitle: {

@@ -9,7 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FastImage from 'react-native-fast-image';
 import { NavigationProp } from '@react-navigation/native';
-import { CaretRight } from 'phosphor-react-native';
+import { CaretRight, CaretLeft, MagnifyingGlass } from 'phosphor-react-native';
 import {
   BGDARK,
   GRAY2,
@@ -19,9 +19,9 @@ import {
   PRIMARYSOLID7,
 } from 'shared/src/colors';
 
-import pStyles from '../../theme/pStyles';
-import { Body1, Body2, Body3 } from '../../theme/fonts';
-import Header from '../../components/main/Header';
+import pStyles from '../../../theme/pStyles';
+import { Body1, Body2, Body3 } from '../../../theme/fonts';
+import PHeader from '../../../components/common/PHeader';
 
 interface RenderItemProps {
   item: {
@@ -34,37 +34,22 @@ interface RouterProps {
   navigation: NavigationProp<any, any>;
 }
 
-const Settings: FC<RouterProps> = ({ navigation }) => {
+const AccountAdmin: FC<RouterProps> = ({ navigation }) => {
   const DATA = [
     {
       id: '11',
-      label: 'Invite Your Friends',
-      onPress: () => navigation.navigate('InviteFriends'),
+      label: 'Edit your profile',
+      onPress: () => console.log(123),
     },
     {
       id: '21',
-      label: 'Account Admin',
-      onPress: () => navigation.navigate('AccountAdmin'),
+      label: 'Change your password',
+      onPress: () => console.log(123),
     },
     {
       id: '1',
-      label: 'Preferences',
-      onPress: () => navigation.navigate('SettingDetails'),
-    },
-    {
-      id: '2',
-      label: 'Terms and Disclosures',
-      onPress: () => navigation.navigate('Terms'),
-    },
-    {
-      id: '3',
-      label: 'Help & Support',
-      onPress: () => navigation.navigate('Help'),
-    },
-    {
-      id: '4',
-      label: 'Log out',
-      onPress: () => console.log(12312),
+      label: 'Delete Account',
+      onPress: () => console.log(123),
     },
   ];
 
@@ -79,53 +64,18 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
     );
   };
 
-  const renderListHeaderComponent = () => {
-    return (
-      <>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('ProfileSettings')}>
-          <View style={styles.item}>
-            <FastImage
-              style={styles.avatar}
-              source={{
-                uri: 'https://unsplash.it/400/400?image=1',
-                headers: { Authorization: 'someAuthToken' },
-              }}
-              resizeMode={FastImage.resizeMode.contain}
-            />
-            <View style={styles.rightItem}>
-              <Text style={styles.label}>John Doe</Text>
-              <Text style={styles.comment}>See your profile</Text>
-            </View>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('CompanySettings')}>
-          <View style={styles.item}>
-            <FastImage
-              style={styles.avatar}
-              source={{
-                uri: 'https://unsplash.it/400/400?image=1',
-                headers: { Authorization: 'someAuthToken' },
-              }}
-              resizeMode={FastImage.resizeMode.contain}
-            />
-            <View style={styles.rightItem}>
-              <Text style={styles.label}>Cartenna Capital LP</Text>
-              <Text style={styles.comment}>See company page</Text>
-            </View>
-          </View>
-        </TouchableOpacity>
-      </>
-    );
-  };
-
   return (
     <SafeAreaView style={pStyles.globalContainer}>
-      <Header navigation={navigation} />
+      <PHeader
+        centerIcon={<Text style={styles.headerTitle}>Account Admin</Text>}
+        containerStyle={styles.headerContainer}
+        leftIcon={<CaretLeft size={28} color={WHITE} />}
+        rightIcon={<MagnifyingGlass size={28} color={WHITE} />}
+        onPressLeft={() => navigation.goBack()}
+        onPressRight={() => console.log(1231)}
+      />
       <FlatList
         data={DATA}
-        ListHeaderComponent={renderListHeaderComponent}
         renderItem={renderListItem}
         keyExtractor={(item) => item.id}
         style={styles.flatList}
@@ -134,7 +84,7 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
   );
 };
 
-export default Settings;
+export default AccountAdmin;
 
 const styles = StyleSheet.create({
   globalContainer: {
@@ -151,6 +101,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     paddingTop: 0,
     marginBottom: 0,
+    justifyContent: 'space-between',
   },
   row: {
     flexDirection: 'row',

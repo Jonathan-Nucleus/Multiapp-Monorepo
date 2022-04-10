@@ -7,19 +7,22 @@ import SettingDetails from '../screens/Settings/Details';
 import Help from '../screens/Help';
 import CompanySettings from '../screens/Settings/CompanySettings';
 import ProfileSettings from '../screens/Settings/ProfileSettings';
-import Terms from '../screens/Terms';
+import Terms from '../screens/Settings/Terms';
+import AccountAdmin from '../screens/Settings/AccountAdmin';
+import InviteFriends from '../screens/Settings/InviteFriends';
 
 const SettingsStacks = () => {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false, gestureEnabled: true }}
-      initialRouteName="Settings"
-    >
+      initialRouteName="Settings">
       <Stack.Screen name="Settings" component={Settings} />
       <Stack.Screen name="SettingDetails" component={SettingDetails} />
       <Stack.Screen name="Help" component={Help} />
       <Stack.Screen name="CompanySettings" component={CompanySettings} />
       <Stack.Screen name="ProfileSettings" component={ProfileSettings} />
+      <Stack.Screen name="AccountAdmin" component={AccountAdmin} />
+      <Stack.Screen name="InviteFriends" component={InviteFriends} />
       <Stack.Screen name="Terms" component={Terms} />
     </Stack.Navigator>
   );

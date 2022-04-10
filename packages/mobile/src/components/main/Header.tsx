@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 
-import RoundIcon from '../../components/common/RoundIcon';
+import RoundIcon from '../common/RoundIcon';
 
 import LogoSvg from '../../assets/icons/logo.svg';
 import SearchSvg from '../../assets/icons/search.svg';
@@ -11,17 +11,21 @@ import { BGDARK } from 'shared/src/colors';
 
 interface HeaderProps {
   containerStyle?: object;
+  navigation: any;
 }
 
 const Header: React.FC<HeaderProps> = (props) => {
-  const { containerStyle } = props;
+  const { containerStyle, navigation } = props;
 
   return (
     <View style={[styles.container, containerStyle]}>
       <LogoSvg />
       <View style={styles.iconContainer}>
         <RoundIcon icon={<SearchSvg />} />
-        <RoundIcon icon={<BellSvg />} />
+        <RoundIcon
+          icon={<BellSvg />}
+          onPress={() => navigation.navigate('Notification')}
+        />
       </View>
     </View>
   );
