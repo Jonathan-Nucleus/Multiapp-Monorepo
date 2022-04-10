@@ -129,7 +129,7 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "mutation RequestInvite($email: String!) {\n  requestInvite(email: $email)\n}",
-										"variables": "{\n  \"email\": \"darash.desai+test5@gmail.com\"\n}"
+										"variables": "{\n  \"email\": \"darash.desai+test7@gmail.com\"\n}"
 									}
 								},
 								"url": {
@@ -448,8 +448,8 @@
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "mutation UploadLink($localFilename: String!) {\n    uploadLink(localFilename: $localFilename) {\n        remoteName\n        uploadUrl\n    }\n}",
-										"variables": "{\n    \"localFilename\": \"test.png\"\n}"
+										"query": "mutation UploadLink($localFilename: String!, $type: MediaType!) {\n    uploadLink(localFilename: $localFilename, type: $type) {\n        remoteName\n        uploadUrl\n    }\n}",
+										"variables": "{\n    \"localFilename\": \"test.jpg\",\n    \"type\": \"POST\"\n}"
 									}
 								},
 								"url": {
@@ -484,7 +484,7 @@
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "mutation LikePost($like: Boolean!, $postId: ID!) {\n  likePost(like: $like, postId: $postId)\n}",
+										"query": "mutation LikePost($like: Boolean!, $postId: ID!) {\n  likePost(like: $like, postId: $postId) {\n      _id\n      likeIds\n  }\n}",
 										"variables": "{\n  \"like\": true,\n  \"postId\": \"624ebb4f7a7d3e4ae91cb54a\"\n}"
 									}
 								},

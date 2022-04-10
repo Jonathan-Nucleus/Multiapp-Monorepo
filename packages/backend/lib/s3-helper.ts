@@ -17,7 +17,8 @@ export interface RemoteUpload {
 }
 
 export async function getUploadUrl(
-  fileExt: string
+  fileExt: string,
+  type: "avatar" | "post"
 ): Promise<RemoteUpload | null> {
   if (
     !AWS_ACCESS_KEY_ID ||
@@ -29,7 +30,7 @@ export async function getUploadUrl(
   }
 
   const remoteFilename = `${uuid()}.${fileExt}`;
-  const remoteKey = `logos/${remoteFilename}`;
+  const remoteKey = `${type}s/${remoteFilename}`;
 
   const client = new S3Client({
     region: AWS_UPLOAD_REGION,

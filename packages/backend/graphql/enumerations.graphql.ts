@@ -1,0 +1,9 @@
+import { PostCategoryOptions, PostCategoryEnum } from "backend/schemas/post";
+
+export const PostCategories = Object.keys(PostCategoryOptions).reduce(
+  (acc, category) => {
+    acc[category] = PostCategoryOptions[category].label;
+    return acc;
+  },
+  {} as Record<PostCategoryEnum, string>
+);

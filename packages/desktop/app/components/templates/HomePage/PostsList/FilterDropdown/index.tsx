@@ -6,29 +6,12 @@ import Label from "../../../../common/Label";
 import Radio from "../../../../common/Radio";
 import Button from "../../../../common/Button";
 
-const topicItems = [
-  "All",
-  "Materials",
-  "News",
-  "Energy",
-  "Politics",
-  "Crypto",
-  "Ideas",
-  "ESG",
-  "Education",
-  "Venture Capital",
-  "Questions",
-  "Private Equity",
-  "Technology",
-  "Hedge Funds",
-  "Consumer",
-  "Entertainment",
-  "Industrials",
-  "Real Estate",
-  "Healthcare",
-  "OpEd",
-  "Financials",
-];
+import type { PostCategory } from "backend/graphql/posts.graphql";
+import { PostCategories } from "backend/graphql/enumerations.graphql";
+
+const allTopics = { ALL: "All", ...PostCategories };
+const orderedTopics = Object.keys(allTopics).sort();
+
 const fromItems = [
   "Pros + people I follow",
   "Professionals",
@@ -36,19 +19,32 @@ const fromItems = [
   "Everyone",
 ];
 
+export type FilterCategory = PostCategory | "ALL";
 interface FilterDropdownProps {
-  topics: string[];
+  initialTopics: FilterCategory[];
   from: string;
-  onSelect: (topics: string[], from: string) => void;
+  onSelect: (topics: FilterCategory[], from: string) => void;
 }
 
 const FilterDropdown: FC<FilterDropdownProps> = ({
-  topics,
+  initialTopics,
   from,
   onSelect,
 }: FilterDropdownProps) => {
-  const [selectedTopics, setSelectedTopics] = useState(topics);
+  const [selectedTopics, setSelectedTopics] = useState(initialTopics);
   const [selectedFrom, setSelectedFrom] = useState(from);
+
+  const removeTopic = (topic: FilterCategory): void => {
+    const index = selectedTopics.indexOf(topic);
+    if (index == -1) return;
+
+    const _selectedTopics = [...selectedTopics];
+    _selectedTopics.splice(index, 1);
+
+    setSelectedTopics(_selectedTopics);
+    onSelect(_selectedTopics, selectedFrom);
+  };
+
   return (
     <>
       <Popover as="div" className="relative">
@@ -60,7 +56,7 @@ const FilterDropdown: FC<FilterDropdownProps> = ({
                   <SlidersHorizontal color="white" size={24} />
                   <div className="text-white ml-2">
                     <span className="font-semibold">
-                      {topics.includes("All") ? "All" : "Filtered"}
+                      {initialTopics.includes("ALL") ? "All" : "Filtered"}
                     </span>
                     <span> posts from </span>
                     <span className="font-semibold">{from}</span>
@@ -69,20 +65,20 @@ const FilterDropdown: FC<FilterDropdownProps> = ({
                 </div>
               </Popover.Button>
             </div>
-            {!topics.includes("All") && (
+            {!initialTopics.includes("ALL") && (
               <div className="flex flex-wrap items-center -mx-1">
-                {topics.map((topic, index) => (
+                {initialTopics.map((topic, index) => (
                   <div
                     key={index}
                     className="bg-white/[.12] rounded-full flex items-center mx-1 my-1 px-3 py-1"
                   >
-                    <div className="text-xs text-white">{topic}</div>
+                    <div className="text-xs text-white">{allTopics[topic]}</div>
                     <X
                       color="white"
                       weight="bold"
                       size={16}
                       className="ml-2 cursor-pointer"
-                      onClick={() => {}}
+                      onClick={() => removeTopic(topic)}
                     />
                   </div>
                 ))}
@@ -93,22 +89,22 @@ const FilterDropdown: FC<FilterDropdownProps> = ({
                 <div className="col-span-2">
                   <div className="text-xs text-white font-medium">TOPICS</div>
                   <div className="grid grid-cols-2 mt-3">
-                    {topicItems.map((item, index) => (
+                    {orderedTopics.map((item, index) => (
                       <div key={index} className="flex items-center my-2">
                         <Checkbox
                           id={`topic-${index}`}
                           checked={selectedTopics.includes(item)}
-                          onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                          onChange={(event) => {
                             const _selectedTopics = [...selectedTopics];
                             const index = _selectedTopics.indexOf(item);
-                            if (event.target.checked) {
-                              if (item == "All") {
+                            if (event.currentTarget.checked) {
+                              if (item == "ALL") {
                                 _selectedTopics.splice(0);
                                 _selectedTopics.push(item);
                               } else {
-                                if (_selectedTopics.indexOf("All") != -1) {
+                                if (_selectedTopics.indexOf("ALL") != -1) {
                                   _selectedTopics.splice(
-                                    _selectedTopics.indexOf("All"),
+                                    _selectedTopics.indexOf("ALL"),
                                     1
                                   );
                                 }
@@ -128,7 +124,7 @@ const FilterDropdown: FC<FilterDropdownProps> = ({
                           htmlFor={`topic-${index}`}
                           className="font-medium ml-2"
                         >
-                          {item}
+                          {allTopics[item]}
                         </Label>
                       </div>
                     ))}

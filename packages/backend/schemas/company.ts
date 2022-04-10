@@ -17,6 +17,7 @@ export namespace Company {
   export type GraphQL = GraphQLEntity<Mongo> & {
     members: User.GraphQL[];
     funds: Fund.GraphQL[];
+    createdAt: Date;
   };
 }
 

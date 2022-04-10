@@ -22,6 +22,7 @@ export namespace Comment {
     comment?: Comment.GraphQL;
     likes: User.GraphQL[];
     mentions: User.GraphQL[];
+    createdAt: Date;
   };
 
   export type Input = Pick<

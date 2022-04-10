@@ -28,6 +28,7 @@
     "next": "12.1.4",
     "next-auth": "^4.3.1",
     "next-themes": "^0.1.1",
+    "next-transpile-modules": "^9.0.0",
     "nextjs-progressbar": "^0.0.14",
     "phosphor-react": "^1.4.1",
     "react": "18.0.0",

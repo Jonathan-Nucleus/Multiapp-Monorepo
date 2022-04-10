@@ -32,14 +32,14 @@ const schema = gql`
     updateSettings(settings: SettingsInput!): Boolean!
 
     createPost(post: PostInput!): Post
-    likePost(like: Boolean!, postId: ID!): Boolean!
+    likePost(like: Boolean!, postId: ID!): Post
     reportPost(report: ReportedPostInput!): Boolean!
     hidePost(hide: Boolean!, postId: ID!): Boolean!
     mutePost(mute: Boolean!, postId: ID!): Boolean!
     comment(comment: CommentInput!): Comment
     editComment(comment: CommentUpdate!): Comment
     deleteComment(commentId: ID!): Boolean!
-    uploadLink(localFilename: String!): MediaUpload
+    uploadLink(localFilename: String!, type: MediaType!): MediaUpload
 
     followUser(follow: Boolean!, userId: ID!, asCompanyId: ID): Boolean!
     followCompany(follow: Boolean!, companyId: ID!, asCompanyId: ID): Boolean!
@@ -50,9 +50,15 @@ const schema = gql`
     remoteName: String!
     uploadUrl: String!
   }
+
+  enum MediaType {
+    POST
+    AVATAR
+  }
 `;
 
 export type MediaUpload = RemoteUpload;
+export type MediaType = "POST" | "AVATAR";
 
 const resolvers = {
   Mutation: {
@@ -165,7 +171,7 @@ const resolvers = {
         parentIgnored,
         { postId, like }: { postId: string; like: boolean },
         { db, user }
-      ): Promise<boolean> =>
+      ): Promise<Post.Mongo | null> =>
         like
           ? db.posts.likePost(postId, user._id)
           : db.posts.unlikePost(postId, user._id)
@@ -249,13 +255,16 @@ const resolvers = {
     uploadLink: secureEndpoint(
       async (
         parentIgnored,
-        { localFilename }: { localFilename: string },
+        { localFilename, type }: { localFilename: string; type: MediaType },
         { db, user }
       ): Promise<RemoteUpload | null> => {
         const fileExt = localFilename.substr(
           localFilename.lastIndexOf(".") + 1
         );
-        const uploadInfo = await getUploadUrl(fileExt);
+        const uploadInfo = await getUploadUrl(
+          fileExt,
+          type.toLowerCase() as Lowercase<MediaType>
+        );
         return uploadInfo ?? null;
       }
     ),

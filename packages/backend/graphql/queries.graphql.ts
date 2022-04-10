@@ -12,7 +12,7 @@ import type { Post, PostCategory } from "backend/schemas/post";
 const schema = gql`
   type Query {
     verifyInvite(code: String!): Boolean!
-    posts(categories: [PostCategory!]): [Post!]!
+    posts(categories: [PostCategory!]): [Post!]
   }
 `;
 

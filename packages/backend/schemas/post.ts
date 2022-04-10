@@ -21,6 +21,7 @@ export namespace Post {
   }
 
   export type GraphQL = GraphQLEntity<Omit<Mongo, "visible">> & {
+    createdAt: Date;
     user: User.GraphQL;
     mentions: User.GraphQL[];
     likes: User.GraphQL[];
@@ -44,20 +45,88 @@ export type Audience = ValueOf<typeof AudienceOptions>;
 
 /** Enumeration describing the possible cateogories of a post. */
 export const PostCategoryOptions = {
-  NEWS: "news",
-  POLITICS: "politics",
-  IDEAS: "ideas",
-  EDUCATION: "education",
-  QUESTIONS: "questions",
-  TECH: "tech",
-  CONSUMER: "consumer",
-  INDUSTRIALS: "industrials",
-  HEALTHCARE: "healthcare",
-  FINANCIALS: "financials",
-  ENERGY: "energy",
-  CRYPTO: "crypto",
+  MATERIALS: {
+    value: "materials",
+    label: "Materials",
+  },
+  NEWS: {
+    value: "news",
+    label: "News",
+  },
+  ENERGY: {
+    value: "energy",
+    label: "Energy",
+  },
+  POLITICS: {
+    value: "politics",
+    label: "Politics",
+  },
+  CRYTPO: {
+    value: "crypto",
+    label: "Crypto",
+  },
+  IDEAS: {
+    value: "ideas",
+    label: "Ideas",
+  },
+  ESG: {
+    value: "esg",
+    label: "ESG",
+  },
+  EDUCATION: {
+    value: "education",
+    label: "Education",
+  },
+  VENTURE: {
+    value: "venture",
+    label: "Venture Capital",
+  },
+  QUESTIONS: {
+    value: "questions",
+    label: "Questions",
+  },
+  PE: {
+    value: "pe",
+    label: "Private Equity",
+  },
+  TECH: {
+    value: "tech",
+    label: "Technology",
+  },
+  HEDGE: {
+    value: "hedge",
+    label: "Hedge Funds",
+  },
+  CONSUMER: {
+    value: "consumer",
+    label: "Consumer",
+  },
+  ENTERTAINMENT: {
+    value: "entertainment",
+    label: "Entertainment",
+  },
+  INDUSTRIALS: {
+    value: "industrials",
+    label: "Industrials",
+  },
+  REAL_ESTATE: {
+    value: "real-estate",
+    label: "Real Estate",
+  },
+  HEALTHCARE: {
+    value: "healthcare",
+    label: "Healthcare",
+  },
+  OP_ED: {
+    value: "op-ed",
+    label: "OpEd",
+  },
+  FINANCIALS: {
+    value: "financials",
+    label: "Financials",
+  },
 } as const;
-export type PostCategory = ValueOf<typeof PostCategoryOptions>;
+export type PostCategory = ValueOf<typeof PostCategoryOptions>["value"];
 export type PostCategoryEnum = keyof typeof PostCategoryOptions;
 
 export const PostSchema = `
@@ -75,11 +144,11 @@ export const PostSchema = `
     createdAt: Date!
     updatedAt: Date
 
-    user: User!
-    mentions: [User!]!
-    likes: [User!]!
-    comments: [Comment!]!
-    reporters: [User!]!
+    user: User
+    mentions: [User!]
+    likes: [User!]
+    comments: [Comment!]
+    reporters: [User!]
   }
 
   input PostInput {

@@ -39,6 +39,7 @@ export namespace Fund {
     manager: User.GraphQL;
     company: Company.GraphQL;
     team: User.GraphQL[];
+    createdAt: Date;
   };
 }
 

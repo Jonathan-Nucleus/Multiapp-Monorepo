@@ -1,4 +1,12 @@
-import { gql } from "@apollo/client";
+import {
+  gql,
+  useMutation,
+  useQuery,
+  QueryResult,
+  MutationTuple,
+} from "@apollo/client";
+
+import { Post, PostCategory } from "backend/graphql/posts.graphql";
 
 export const VERIFY_INVITE = gql`
   query VerifyInvite($code: String!) {
@@ -6,23 +14,58 @@ export const VERIFY_INVITE = gql`
   }
 `;
 
-export const POSTS = gql`
-  query Posts {
-    posts {
-      _id
-      body
-      mediaUrl
-      mentionIds
-      likeIds
-      commentIds
-      createdAt
-      user {
+type FetchPostsVariables = {
+  categories?: PostCategory[];
+};
+
+export type FetchPostsData = {
+  posts?: (Pick<
+    Post,
+    | "_id"
+    | "body"
+    | "mediaUrl"
+    | "likeIds"
+    | "mentionIds"
+    | "commentIds"
+    | "createdAt"
+    | "categories"
+  > & {
+    user: Pick<
+      Post["user"],
+      "_id" | "firstName" | "lastName" | "avatar" | "role" | "position"
+    >;
+  })[];
+};
+
+/**
+ * GraphQL query that fetches posts for the current users home feed.
+ *
+ * @returns   GraphQL query.
+ */
+export function useFetchPosts(): QueryResult<
+  FetchPostsData,
+  FetchPostsVariables
+> {
+  return useQuery<FetchPostsData, FetchPostsVariables>(gql`
+    query Posts($categories: [PostCategory!]) {
+      posts(categories: $categories) {
         _id
-        firstName
-        lastName
+        body
+        categories
+        mediaUrl
+        mentionIds
+        likeIds
+        commentIds
+        createdAt
+        user {
+          _id
+          firstName
+          lastName
+          avatar
+          position
+          role
+        }
       }
     }
-  }
-`;
-
-// Posts Filtered
+  `);
+}

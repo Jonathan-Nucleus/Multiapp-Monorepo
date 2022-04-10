@@ -1,44 +1,37 @@
 import { FC, useState } from "react";
-import FilterDropdown from "./FilterDropdown";
+import { PostCategory } from "backend/graphql/posts.graphql";
+import FilterDropdown, { FilterCategory } from "./FilterDropdown";
 import Post from "../../../common/Post";
 
-const posts = [
-  {
-    user: {
-      image:
-        "https://img.freepik.com/free-vector/smiling-girl-avatar_102172-32.jpg",
-      name: "Michelle Jordan",
-      type: "PRO",
-      position: "CEO @ HedgeFunds ‘R’ Us",
-    },
-    description:
-      "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem?",
-    topics: ["news", "politics"],
-    image:
-      "https://as1.ftcdn.net/v2/jpg/02/42/27/42/1000_F_242274206_Z6r7HZ7e6gnqLth5AnyQUUyVFLrGZC1y.jpg",
-    postedAt: "Mar 30",
-    following: false,
-    followers: 23,
-    messages: 13,
-    shares: 4,
-    likes: 23,
-  },
-];
+import { useFetchPosts } from "desktop/app/graphql/queries";
 
 const PostsList: FC = () => {
-  const [selectedTopics, setSelectedTopics] = useState(["All"]);
+  const [selectedTopics, setSelectedTopics] = useState<FilterCategory[]>([
+    "ALL",
+  ]);
   const [selectedFrom, setSelectedFrom] = useState("Everyone");
+  const { data, refetch } = useFetchPosts();
+
+  const posts = data?.posts ?? [];
   return (
     <>
       <FilterDropdown
-        topics={selectedTopics}
+        initialTopics={selectedTopics}
         from={selectedFrom}
         onSelect={(topics, from) => {
           if (topics.length == 0) {
-            topics.push("All");
+            topics.push("ALL");
           }
+
           setSelectedTopics(topics);
           setSelectedFrom(from);
+
+          const postCategories = topics.includes("ALL")
+            ? undefined
+            : (topics as PostCategory[]);
+          refetch({
+            categories: postCategories,
+          });
         }}
       />
       <div>

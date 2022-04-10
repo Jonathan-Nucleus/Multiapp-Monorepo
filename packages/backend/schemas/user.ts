@@ -64,6 +64,7 @@ export namespace User {
     settings: Omit<Settings, "interests"> & {
       interests?: PostCategoryEnum[];
     };
+    createdAt: Date;
   };
 
   export type Input = Required<
@@ -121,20 +122,20 @@ export type AccreditationEnum = keyof typeof AccreditationOptions;
 export const PostViolationOptions = {
   OFF_TOPIC: {
     value: "off-topic",
-    message: "Off-topic (not financial in nature)",
+    label: "Off-topic (not financial in nature)",
   },
   PROJECTION: {
     value: "projection",
-    message: "Price or performance projection",
+    label: "Price or performance projection",
   },
   EXAGGERATION: {
     value: "exaggeration",
-    message: "Exaggeratory or promissory statements",
+    label: "Exaggeratory or promissory statements",
   },
-  PROMOTIONAL: { value: "promotional", message: "Promotional content" },
+  PROMOTIONAL: { value: "promotional", label: "Promotional content" },
   PROPRIETARY: {
     value: "proprietary",
-    message: "Discusses private funds, investments or trades ",
+    label: "Discusses private funds, investments or trades ",
   },
 } as const;
 export type PostViolation = ValueOf<typeof PostViolationOptions>["value"];

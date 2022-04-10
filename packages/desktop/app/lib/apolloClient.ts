@@ -117,7 +117,6 @@ export function createApolloClient(
         await persistor.restore();
       }
 
-      console.log("restoring cache from local storage");
       client.onClearStore(async () => {
         if (persistor) {
           await persistor.purge();

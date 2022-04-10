@@ -11,7 +11,11 @@ import {
   PostSchema,
   AudienceOptions,
   PostCategoryOptions,
+  PostCategoryEnum,
 } from "backend/schemas/post";
+
+type GraphQLPost = Post.GraphQL;
+export type { PostCategoryEnum as PostCategory, GraphQLPost as Post };
 
 const schema = gql`
   ${PostSchema}
@@ -19,7 +23,12 @@ const schema = gql`
 
 const resolvers = {
   Audience: AudienceOptions,
-  PostCategory: PostCategoryOptions,
+  PostCategory: Object.keys(PostCategoryOptions).reduce<{
+    [key: string]: string;
+  }>((acc, option) => {
+    acc[option] = PostCategoryOptions[option].value;
+    return acc;
+  }, {}),
   Post: {
     createdAt: async (
       parent: Post.Mongo,

@@ -118,19 +118,23 @@ const createPostsCollection = (postsCollection: Collection<Post.Mongo>) => {
      * @param postId  The id of the post.
      * @param userId  The id of the user liking the post.
      *
-     * @returns   Whether the like was successfully recorded.
+     * @returns   The updated post record or null if it was not found.
      */
-    likePost: async (postId: MongoId, userId: MongoId): Promise<boolean> => {
+    likePost: async (
+      postId: MongoId,
+      userId: MongoId
+    ): Promise<Post.Mongo | null> => {
       try {
-        const result = await postsCollection.updateOne(
+        const result = await postsCollection.findOneAndUpdate(
           { _id: toObjectId(postId) },
-          { $addToSet: { likeIds: toObjectId(userId) } }
+          { $addToSet: { likeIds: toObjectId(userId) } },
+          { returnDocument: "after" }
         );
 
-        return result.acknowledged;
+        return result.value;
       } catch (err) {
         console.log("Error creating new post:", err);
-        return false;
+        return null;
       }
     },
 
@@ -140,19 +144,23 @@ const createPostsCollection = (postsCollection: Collection<Post.Mongo>) => {
      * @param postId  The id of the post.
      * @param userId  The id of the user unliking the post.
      *
-     * @returns   Whether the like was successfully removed.
+     * @returns   The updated post record or null if it was not found.
      */
-    unlikePost: async (postId: MongoId, userId: MongoId): Promise<boolean> => {
+    unlikePost: async (
+      postId: MongoId,
+      userId: MongoId
+    ): Promise<Post.Mongo | null> => {
       try {
-        const result = await postsCollection.updateOne(
+        const result = await postsCollection.findOneAndUpdate(
           { _id: toObjectId(postId) },
-          { $pull: { likeIds: toObjectId(userId) } }
+          { $pull: { likeIds: toObjectId(userId) } },
+          { returnDocument: "after" }
         );
 
-        return result.acknowledged;
+        return result.value;
       } catch (err) {
         console.log("Error creating new post:", err);
-        return false;
+        return null;
       }
     },
 

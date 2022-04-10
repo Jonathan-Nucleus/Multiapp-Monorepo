@@ -1,6 +1,8 @@
 import { gql, useMutation, MutationTuple } from "@apollo/client";
 import { MediaUpload } from "backend/graphql/mutations.graphql";
 
+import { Post } from "backend/graphql/posts.graphql";
+
 export const CREATE_POST = gql`
   mutation CreatePost($post: PostInput!) {
     createPost(post: $post) {
@@ -65,6 +67,31 @@ export function useFetchUploadLink(): MutationTuple<
       uploadLink(localFilename: $localFilename) {
         remoteName
         uploadUrl
+      }
+    }
+  `);
+}
+
+type LikePostVariables = {
+  like: boolean;
+  postId: string;
+};
+
+type LikePostData = {
+  likePost: Pick<Post, "_id" | "likeIds">;
+};
+
+/**
+ * GraphQL mutation that resets a user's password
+ *
+ * @returns   GraphQL mutation.
+ */
+export function useLikePost(): MutationTuple<LikePostData, LikePostVariables> {
+  return useMutation<LikePostData, LikePostVariables>(gql`
+    mutation LikePost($like: Boolean!, $postId: ID!) {
+      likePost(like: $like, postId: $postId) {
+        _id
+        likeIds
       }
     }
   `);

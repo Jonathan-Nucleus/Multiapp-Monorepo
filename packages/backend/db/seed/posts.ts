@@ -20,8 +20,26 @@ const audienceValues = Object.keys(AudienceOptions).map(
   (key) => AudienceOptions[key]
 );
 const categoryValues = Object.keys(PostCategoryOptions).map(
-  (key) => PostCategoryOptions[key]
+  (key) => PostCategoryOptions[key].value
 );
+
+const stockImages = [
+  "e70fd9fd-9a60-48b0-8f77-e1009585dde7.png",
+  "e9978e62-5e23-4800-9485-492cddb7fae6.jpg",
+  "0d21bdea-727b-4407-8341-8e592fa2a1cd.jpg",
+  "c9ca1184-bd6d-43fe-98c9-018b5bfa2aad.jpg",
+  "8c2fc178-5637-4199-8718-fdbefb0162a9.jpg",
+  "917f9684-d655-44cc-98ff-b65e420395a4.jpg",
+  "df64375a-ab17-49d9-8cdc-e5e6344fd35a.jpg",
+  "28baa4ab-d70a-493b-8609-82966e2eb49a.jpg",
+  "836fc07b-1412-4106-9c06-90c4a5883c10.jpg",
+  "6659a517-b9b3-4b00-87fd-e98dadc73f8a.jpg",
+  "fc51fdcc-a91e-4011-9f67-4e86c1595519.jpg",
+  "895b9eaa-a135-4492-acad-5cfd9495e88a.jpg",
+  "98908bf5-3b33-42a9-9199-f96baf0575ee.jpg",
+  "c46e727a-6c62-4cba-8d77-8d29394b09f8.jpg",
+  "a7c04b79-a082-449b-bbd5-f567d4136203.jpg",
+];
 
 export default async function (
   db: Db,
@@ -41,6 +59,7 @@ export default async function (
         userId,
         visible: true,
         body: faker.lorem.paragraph(),
+        mediaUrl: stockImages[randomInt(0, stockImages.length - 1)],
         audience: audienceValues[randomInt(0, audienceValues.length - 1)],
         categories: Array.from(
           new Set(

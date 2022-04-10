@@ -3,17 +3,12 @@
  *
  */
 import { NextAuthOptions } from "next-auth";
-
+import jwt from "jsonwebtoken";
 import { gql } from "@apollo/client";
 import { createApolloClient } from "desktop/app/lib/apolloClient";
-
 import providers from "./auth-providers";
 
-export interface Session {
-  name: string;
-  email: string;
-  access_token: string;
-}
+import { AccessTokenPayload } from "backend/lib/tokens";
 
 const AppAuthOptions: NextAuthOptions = {
   providers,
@@ -84,7 +79,14 @@ const AppAuthOptions: NextAuthOptions = {
     session({ session, token }) {
       // Propagate Prometheus API access token from the JWT to the user
       // session
-      session.access_token = token.access_token;
+      session.access_token = token.access_token as string;
+      if (session.access_token) {
+        const payload = jwt.decode(session.access_token) as AccessTokenPayload;
+        session.user = {
+          ...session.user,
+          ...payload,
+        };
+      }
       return session;
     },
   },

@@ -1,5 +1,6 @@
 import { Menu } from "@headlessui/react";
 import { FC } from "react";
+import { signOut } from "next-auth/react";
 import {
   CaretDown,
   User,
@@ -9,6 +10,7 @@ import {
   EnvelopeOpen,
   Lifebuoy,
   FileText,
+  SignOut,
 } from "phosphor-react";
 import MenuItem from "./MenuItem";
 
@@ -87,6 +89,17 @@ const AvatarMenu: FC = () => {
               path={item.path}
             />
           ))}
+          <div>
+            <a
+              className="cursor-pointer px-4 py-3 flex flex-row items-center"
+              onClick={() => signOut()}
+            >
+              <span className="flex-shrink-0 flex items-center">
+                <SignOut color="white" weight="light" size={24} />
+              </span>
+              <span className="text-sm normal text-white ml-4">Sign Out</span>
+            </a>
+          </div>
         </div>
       </Menu.Items>
     </Menu>
