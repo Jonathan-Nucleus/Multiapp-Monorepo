@@ -1,25 +1,39 @@
-import React, { useState, useEffect } from 'react';
-import { FlatList, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useQuery } from '@apollo/client';
+import React, { useState, useEffect, memo } from 'react';
+import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
+import isEqual from 'react-fast-compare';
 import SplashScreen from 'react-native-splash-screen';
+import { useIsFocused } from '@react-navigation/native';
 
-import Header from '../../components/main/Header';
 import PAppContainer from '../../components/common/PAppContainer';
 import pStyles from '../../theme/pStyles';
 import FeedItem, { FeedItemProps } from './FeedItem';
 import Tag from '../../components/common/Tag';
 import PGradientButton from '../../components/common/PGradientButton';
-import { GET_POSTS } from '../../graphql/post';
 import { HomeScreen } from 'mobile/src/navigations/HomeStack';
+import usePost from '../../hooks/usePost';
+import PHeader from '../../components/common/PHeader';
+import PLabel from '../../components/common/PLabel';
+import RoundImageView from '../../components/common/RoundImageView';
+import { H6 } from '../../theme/fonts';
+import { BGHEADER } from 'shared/src/colors';
+
+import LogoSvg from 'shared/assets/images/logo-icon.svg';
+import SearchSvg from 'shared/assets/images/search.svg';
+import BellSvg from 'shared/assets/images/bell.svg';
+import Avatar from '../../assets/avatar.png';
 
 const CategoryList = ['All', 'Investment Ideas', 'World News', 'Politics'];
 
-const Home: HomeScreen = ({ navigation }) => {
+const HomeComponent: HomeScreen = ({ navigation }) => {
   const [category, setCategory] = useState('All');
-  const [refreshList, setRefreshList] = useState(false);
-  const { data, error, loading } = useQuery(GET_POSTS);
+  const { data, error, loading, refetch } = usePost();
   const postData = data?.posts;
+
+  const isFocused = useIsFocused();
+  if (isFocused) {
+    console.log('refetching...');
+    refetch();
+  }
 
   useEffect(() => {
     SplashScreen.hide();
@@ -43,8 +57,30 @@ const Home: HomeScreen = ({ navigation }) => {
   );
 
   return (
-    <SafeAreaView style={pStyles.globalContainer}>
-      <Header navigation={navigation} />
+    <View style={pStyles.globalContainer}>
+      <PHeader
+        leftIcon={
+          <View style={styles.headerLogoContainer}>
+            <LogoSvg />
+            <PLabel
+              label="Prometheus"
+              textStyle={styles.logoText}
+              viewStyle={styles.logoTextWrapper}
+            />
+          </View>
+        }
+        rightIcon={
+          <View style={styles.headerIconContainer}>
+            <SearchSvg />
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Notification')}>
+              <BellSvg style={styles.headerIcon} />
+            </TouchableOpacity>
+            <RoundImageView image={Avatar} imageStyle={styles.avatarImage} />
+          </View>
+        }
+        containerStyle={styles.headerContainer}
+      />
       <PAppContainer>
         <FlatList
           horizontal
@@ -63,7 +99,6 @@ const Home: HomeScreen = ({ navigation }) => {
         <FlatList
           data={postData || []}
           renderItem={renderItem}
-          extraData={refreshList}
           keyExtractor={(item: FeedItemProps) => `${item._id}`}
           listKey="feed"
         />
@@ -75,13 +110,42 @@ const Home: HomeScreen = ({ navigation }) => {
         textStyle={styles.postLabel}
         onPress={handleCreatePost}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 
-export default Home;
+export const Home = memo(HomeComponent, isEqual);
 
 const styles = StyleSheet.create({
+  headerContainer: {
+    justifyContent: 'space-between',
+    paddingTop: 50,
+    paddingBottom: 16,
+    backgroundColor: BGHEADER,
+    marginBottom: 16,
+  },
+  headerLogoContainer: {
+    flexDirection: 'row',
+  },
+  logoTextWrapper: {
+    marginLeft: 8,
+  },
+  logoText: {
+    ...H6,
+  },
+  headerIconContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  headerIcon: {
+    marginHorizontal: 20,
+  },
+  avatarImage: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+  },
   tagStyle: {
     paddingHorizontal: 15,
     marginRight: 8,

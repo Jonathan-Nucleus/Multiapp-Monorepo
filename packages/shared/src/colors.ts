@@ -2,6 +2,7 @@ export const WHITE = "#FFFFFF";
 export const WHITE60 = "#FFFFFF99";
 export const BLACK = "#000000";
 export const BGDARK = "#121212";
+export const BGHEADER = '#181727';
 export const PRIMARY = "#00AAE0";
 export const PRIMARYSTATE = "#714EFD";
 export const PRIMARYSOLID = "#544EFD";

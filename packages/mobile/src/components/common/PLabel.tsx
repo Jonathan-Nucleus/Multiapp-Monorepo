@@ -1,11 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { Body2 } from '../../theme/fonts';
 import { WHITE } from 'shared/src/colors';
 
 interface PLabelProps {
-  viewStyle?: object;
-  textStyle?: object;
+  viewStyle?: ViewStyle;
+  textStyle?: TextStyle;
   label: string;
 }
 

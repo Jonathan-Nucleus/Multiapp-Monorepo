@@ -4,7 +4,7 @@ import {
   StackScreenProps,
 } from '@react-navigation/stack';
 
-import Home from '../screens/Home';
+import { Home } from '../screens/Home';
 import CreatePost from '../screens/Home/CreatePost';
 import Notification from '../screens/Notification';
 import NotificationDetail from '../screens/Notification/Details';

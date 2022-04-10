@@ -28,6 +28,7 @@
     "graphql": "^16.3.0",
     "phosphor-react-native": "^1.1.1",
     "react": "17.0.2",
+    "react-fast-compare": "^3.2.0",
     "react-native": "0.68.0",
     "react-native-controlled-mentions": "^2.2.5",
     "react-native-encrypted-storage": "^4.0.2",
@@ -50,6 +51,7 @@
     "react-native-svg-transformer": "^1.0.0",
     "react-native-swiper": "^1.6.0",
     "react-native-text-input-mask": "^3.1.4",
+    "react-native-toast-message": "^2.1.5",
     "shared": "1.0.0"
   },
   "devDependencies": {
