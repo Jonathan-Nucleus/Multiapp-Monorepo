@@ -20,13 +20,13 @@ interface PostProps {
     };
     description: string;
     topics: string[];
-    image: string;
+    image?: string;
     postedAt: string;
     following: boolean;
     followers: number;
     messages: number;
     shares: number;
-    likes: number;
+    likes?: number;
   };
 }
 
@@ -81,16 +81,19 @@ const Post: FC<PostProps> = ({ post }: PostProps) => {
           </div>
         ))}
       </div>
-      <div className="relative h-80 mt-5 border-b border-white/[.12]">
-        <Image
-          loader={() => post.image}
-          src={post.image}
-          alt=""
-          layout="fill"
-          unoptimized={true}
-          objectFit="cover"
-        />
-      </div>
+      {!!post.image && (
+        <div className="relative h-80 mt-5 border-b border-white/[.12]">
+          <Image
+            loader={() => post.image}
+            src={post.image}
+            alt=""
+            layout="fill"
+            unoptimized={true}
+            objectFit="cover"
+          />
+        </div>
+      )}
+
       <div className="flex items-center p-4">
         <div className="opacity-60 text-white">
           <div className="flex items-center cursor-pointer">
@@ -115,7 +118,8 @@ const Post: FC<PostProps> = ({ post }: PostProps) => {
           </div>
         </div>
         <div className="ml-auto flex items-center opacity-60">
-          <div className="text-white">{post.likes} Likes</div>
+          {post.likes && <div className="text-white">{post.likes} Likes</div>}
+
           <div className="ml-3">
             <DotsThreeOutlineVertical color="white" weight="light" size={24} />
           </div>

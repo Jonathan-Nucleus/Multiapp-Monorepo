@@ -37,8 +37,6 @@ export function createApolloClient(
   token?: string,
   initialCache?: NormalizedCacheObject
 ): ApolloClient<NormalizedCacheObject> {
-  console.log("CREATING CLIENT", token);
-
   const fetcher = (
     input: RequestInfo,
     init?: RequestInit | undefined

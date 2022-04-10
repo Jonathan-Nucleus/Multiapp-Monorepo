@@ -242,8 +242,8 @@ const CreatePostModal: FC<CreatePostModalProps> = ({ show, onClose }) => {
                 <X color="white" weight="bold" size={24} onClick={onClose} />
               </Button>
             </div>
-            <div className="flex flex-col min-h-0 flex-grow md:flex-row ">
-              <div className="flex flex-col w-[40rem]">
+            <div className="flex flex-col flex-grow md:flex-row max-w-full md:min-h-0">
+              <div className="flex flex-col w-[40rem] max-w-full">
                 <div className="flex items-center p-4">
                   <div className="w-14 h-14 flex items-center justify-center flex-shrink-0">
                     <Image
@@ -355,7 +355,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({ show, onClose }) => {
                 </div>
               </div>
               {showCategories && (
-                <div className="w-80 border-l border-white/[.12]">
+                <div className="w-full border-l border-white/[.12] md:w-80">
                   <CategorySelector />
                 </div>
               )}
