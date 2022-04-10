@@ -1,10 +1,8 @@
 import "../app/styles/app.scss";
 import type { AppProps } from "next/app";
 
-import { ApolloProvider } from "@apollo/client";
-import { useApollo } from "desktop/app/lib/apolloClient";
-
 import RootLayout from "../app/components/layouts/index";
+import SecureApolloProvider from "../app/components/providers/SecureApolloProvider";
 import { ThemeProvider } from "next-themes";
 import { SessionProvider } from "next-auth/react";
 import { NextPageWithLayout } from "../app/types/next-page";
@@ -17,13 +15,9 @@ function MyApp({
   Component,
   pageProps: { session, ...pageProps },
 }: AppPropsWithLayout) {
-  const apolloClient = useApollo({
-    ...pageProps,
-    graphqlToken: session?.access_token,
-  });
   return (
-    <ApolloProvider client={apolloClient}>
-      <SessionProvider session={session}>
+    <SessionProvider session={session}>
+      <SecureApolloProvider apolloProps={pageProps}>
         <ThemeProvider>
           <RootLayout
             middleware={Component.middleware}
@@ -32,8 +26,8 @@ function MyApp({
             <Component {...pageProps} />
           </RootLayout>
         </ThemeProvider>
-      </SessionProvider>
-    </ApolloProvider>
+      </SecureApolloProvider>
+    </SessionProvider>
   );
 }
 

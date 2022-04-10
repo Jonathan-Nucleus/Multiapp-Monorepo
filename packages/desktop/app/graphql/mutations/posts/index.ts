@@ -1,4 +1,5 @@
-import { gql } from "@apollo/client";
+import { gql, useMutation, MutationTuple } from "@apollo/client";
+import { MediaUpload } from "backend/graphql/mutations.graphql";
 
 export const CREATE_POST = gql`
   mutation CreatePost($post: PostInput!) {
@@ -41,6 +42,33 @@ export const EDIT_COMMENT = gql`
     }
   }
 `;
+
+type UploadLinkVariables = {
+  localFilename: string;
+};
+
+type UploadLinkData = {
+  uploadLink: MediaUpload | null;
+};
+
+/**
+ * GraphQL mutation that resets a user's password
+ *
+ * @returns   GraphQL mutation.
+ */
+export function useFetchUploadLink(): MutationTuple<
+  UploadLinkData,
+  UploadLinkVariables
+> {
+  return useMutation<UploadLinkData, UploadLinkVariables>(gql`
+    mutation UploadLink($localFilename: String!) {
+      uploadLink(localFilename: $localFilename) {
+        remoteName
+        uploadUrl
+      }
+    }
+  `);
+}
 
 // TODO
 // delete

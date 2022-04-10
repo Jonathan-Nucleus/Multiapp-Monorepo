@@ -18,14 +18,14 @@ export interface RemoteUpload {
 
 export async function getUploadUrl(
   fileExt: string
-): Promise<RemoteUpload | false> {
+): Promise<RemoteUpload | null> {
   if (
     !AWS_ACCESS_KEY_ID ||
     !AWS_SECRET_ACCESS_KEY ||
     !AWS_UPLOAD_REGION ||
     !S3_BUCKET
   ) {
-    return false;
+    return null;
   }
 
   const remoteFilename = `${uuid()}.${fileExt}`;
@@ -50,6 +50,6 @@ export async function getUploadUrl(
       uploadUrl: url,
     };
   } catch (err) {
-    return false;
+    return null;
   }
 }

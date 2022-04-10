@@ -8,8 +8,6 @@ import {
   DotsThreeOutlineVertical,
 } from "phosphor-react";
 import Image from "next/image";
-
-import { Navbar } from "../../common/Navbar";
 import Button from "../../common/Button";
 
 const Items = [

@@ -5,7 +5,7 @@ import LinkedInProvider from "next-auth/providers/linkedin";
 
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { gql } from "@apollo/client";
-import { getApolloClient } from "desktop/app/lib/apolloClient";
+import { createApolloClient } from "desktop/app/lib/apolloClient";
 
 const providers: Provider[] = [
   CredentialsProvider({
@@ -17,7 +17,7 @@ const providers: Provider[] = [
     async authorize(credentials) {
       if (!credentials) return null;
       const { email, password } = credentials;
-      const result = await getApolloClient().mutate({
+      const result = await createApolloClient().mutate({
         mutation: gql`
           mutation Login($email: String!, $password: String!) {
             login(email: $email, password: $password)

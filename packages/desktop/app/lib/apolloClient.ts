@@ -16,7 +16,10 @@ import merge from "deepmerge";
 
 const SCHEMA_BUILD_KEY = "prometheus-apollo-schema-build";
 
-let apolloClient: ApolloClient<NormalizedCacheObject> | null;
+export type ApolloPageProps = {
+  initialApolloState?: NormalizedCacheObject;
+  graphqlToken?: string;
+};
 
 /**
  * Creates a new ApolloClient object for use on either the server or the client.
@@ -24,17 +27,17 @@ let apolloClient: ApolloClient<NormalizedCacheObject> | null;
  * that performs GraphQL queries directly rather than through the `/api/graphql`
  * application endpoint.
  *
- * @param token   The authentication token to make graphql requests.
- * @param cache   Optional apollo cache object to use for the client. Defaults
- *                to a new InMemoryCache.
+ * @param token         The authentication token to make graphql requests.
+ * @param initialCache  Optional apollo cache object to use for the client.
+ *                      Defaults to a new InMemoryCache.
  *
  * @returns   An ApolloClient object.
  */
-function createApolloClient(
-  token: string,
-  cache?: ApolloCache<NormalizedCacheObject>
+export function createApolloClient(
+  token?: string,
+  initialCache?: NormalizedCacheObject
 ): ApolloClient<NormalizedCacheObject> {
-  if (!cache) cache = new InMemoryCache();
+  console.log("CREATING CLIENT", token);
 
   const fetcher = (
     input: RequestInfo,
@@ -67,6 +70,7 @@ function createApolloClient(
     }
   });
 
+  const cache = new InMemoryCache();
   const client = new ApolloClient({
     ssrMode: typeof window === "undefined",
     link: from([
@@ -79,7 +83,7 @@ function createApolloClient(
         },
       }),
     ]),
-    cache: cache,
+    cache: cache ?? new InMemoryCache(),
     resolvers: {},
     defaultOptions: {
       mutate: { errorPolicy: "all" },
@@ -87,131 +91,50 @@ function createApolloClient(
     },
   });
 
-  return client;
-}
+  const initalizeCache = (): void => {
+    if (initialCache) {
+      const data = client.extract();
+      const mergedData = merge(data, initialCache);
 
-/**
- * Creates a new ApolloClient object specifically for client-side use. The new
- * client object is configured to persist the apollo cache to `localStorage`.
- * This method should only be called client-side. Server-side calls will result
- * in an error.
- *
- * @param token   The authentication token to make graphql requests.
- *
- * @returns   An ApolloClient object.
- */
-async function createPersistedApolloClient(
-  token: string
-): Promise<ApolloClient<NormalizedCacheObject>> {
-  const cache = new InMemoryCache();
-  const persistor = new CachePersistor({
-    cache,
-    storage: new LocalStorageWrapper(window.localStorage),
-  });
+      client.cache.restore(mergedData);
+    }
+  };
 
-  const serverBuild = process.env.SCHEMA_BUILD || "";
-  const localBuild = window.localStorage.getItem(SCHEMA_BUILD_KEY);
-  if (localBuild !== serverBuild.toString()) {
-    // TODO: Update to see if there is a smart way to migrate the existing
-    // apollo cache to the new schema
-    await persistor.purge();
-    localStorage.setItem(SCHEMA_BUILD_KEY, serverBuild);
+  if (typeof window !== "undefined") {
+    const restoreCache = async () => {
+      const cache = new InMemoryCache();
+      const persistor = new CachePersistor({
+        cache,
+        storage: new LocalStorageWrapper(window.localStorage),
+      });
+
+      const serverBuild = process.env.SCHEMA_BUILD || "";
+      const localBuild = window.localStorage.getItem(SCHEMA_BUILD_KEY);
+      if (localBuild !== serverBuild.toString()) {
+        // TODO: Update to see if there is a smart way to migrate the existing
+        // apollo cache to the new schema
+        await persistor.purge();
+        localStorage.setItem(SCHEMA_BUILD_KEY, serverBuild);
+      } else {
+        await persistor.restore();
+      }
+
+      console.log("restoring cache from local storage");
+      client.onClearStore(async () => {
+        if (persistor) {
+          await persistor.purge();
+        }
+      });
+
+      initalizeCache();
+    };
+
+    restoreCache();
   } else {
-    await persistor.restore();
+    initalizeCache();
   }
-
-  const client = createApolloClient(token, cache);
-  client.onClearStore(async () => {
-    if (persistor) {
-      await persistor.purge();
-    }
-  });
 
   return client;
-}
-
-/**
- * Client-side only function used to create a singleton instance of an
- * apollo client. Repeat calls to this function with updated state data will
- * merge the new state data with the existing singleton instance. Note that the
- * singleton instance is also configured to persist the apollo client cache
- * data to localStorage.
- *
- * @param token         The authentication token to make graphql requests.
- * @param initialState  Optional state data that the client should be
- *                      initialized with.
- *
- * @returns   Singleton apollo client instance for client-side use.
- */
-async function initializeApollo(
-  token: string,
-  initialState: NormalizedCacheObject | null = null
-): Promise<ApolloClient<NormalizedCacheObject>> {
-  const _apolloClient =
-    apolloClient ?? (await createPersistedApolloClient(token));
-
-  // If your page has Next.js data fetching methods that use Apollo Client,
-  // the initial state gets hydrated here
-  if (initialState) {
-    // Get existing cache, loaded during client side data fetching
-    const existingCache = _apolloClient.extract();
-
-    // Merge the existing cache into data passed from getStaticProps/getServerSideProps
-    const data = merge(initialState, existingCache);
-
-    // Restore the cache using the data passed from
-    // getStaticProps/getServerSideProps combined with the existing cached data
-    _apolloClient.cache.restore(data);
-  }
-
-  // Create the Apollo Client once in the client
-  if (!apolloClient) {
-    apolloClient = _apolloClient;
-  }
-
-  return _apolloClient;
-}
-
-export type ApolloPageProps = {
-  initialApolloState: NormalizedCacheObject;
-  graphqlToken: string;
-};
-
-/**
- * Universal hook that provides an apollo client instance. When used
- * server-side, this will always immediately create return a new apollo client
- * instance with a fresh cache. When used client-side, a singleton apollo client
- * instance is provided whose cache object is configured to persist data to the
- * client localStorage. As the cache configuration is performed asynchronously,
- * an initial call to this function when used client-side may return a null
- * value. The hook will provide an updated client-object with a fully configured
- * cache once it is ready, triggering a rerender.
- */
-export function useApollo(
-  pageProps: ApolloPageProps
-): ApolloClient<NormalizedCacheObject> {
-  const { initialApolloState, graphqlToken } = pageProps;
-
-  // For SSG and SSR always create a new Apollo Client
-  if (typeof window === "undefined") {
-    return createApolloClient(graphqlToken);
-  }
-
-  const [client, setClient] =
-    useState<ApolloClient<NormalizedCacheObject> | null>(null);
-
-  useEffect(() => {
-    if (!client) {
-      const getClient = async (): Promise<void> => {
-        const client = await initializeApollo(graphqlToken, initialApolloState);
-        setClient(client);
-      };
-
-      getClient();
-    }
-  }, [initialApolloState, graphqlToken]);
-
-  return client || createApolloClient(graphqlToken);
 }
 
 export type SSRQueryResult<T> = ApolloQueryResult<T> & {
@@ -267,86 +190,3 @@ export async function ssrQuery<T, TVariables = OperationVariables>(
     getApolloProps,
   };
 }
-
-export const getApolloClient = (
-  token?: string
-): ApolloClient<NormalizedCacheObject> => {
-  const cache = new InMemoryCache({});
-  let persistor: CachePersistor<NormalizedCacheObject> | null;
-  if (typeof window !== "undefined") {
-    persistor = new CachePersistor({
-      cache,
-      storage: new LocalStorageWrapper(window.localStorage),
-    });
-
-    const serverBuild = process.env.SCHEMA_BUILD || "";
-    const localBuild = window.localStorage.getItem(SCHEMA_BUILD_KEY);
-    if (localBuild !== serverBuild.toString()) {
-      // TODO: Update to see if there is a smart way to migrate the existing
-      // apollo cache to the new schema
-      persistor.purge();
-      localStorage.setItem(SCHEMA_BUILD_KEY, serverBuild);
-    } else {
-      persistor.restore();
-    }
-  }
-
-  const fetcher = (
-    input: RequestInfo,
-    init?: RequestInit | undefined
-  ): Promise<Response> => {
-    if (typeof window !== "undefined") {
-      return window.fetch(input, init);
-    } else {
-      return fetch(input, init);
-    }
-  };
-
-  const errorLink = onError(({ graphQLErrors, networkError, operation }) => {
-    if (graphQLErrors) {
-      console.log("operation: ", operation);
-      graphQLErrors.forEach(({ message, locations, path }) => {
-        console.log(
-          "[GraphQL error]: Message: ",
-          message,
-          ", Location: ",
-          locations,
-          ", Path: ",
-          path
-        );
-      });
-    }
-
-    if (networkError) {
-      console.log("network error:", JSON.stringify(networkError, null, 2));
-    }
-  });
-
-  const client = new ApolloClient({
-    ssrMode: typeof window === "undefined",
-    link: from([
-      errorLink,
-      createHttpLink({
-        uri: process.env.NEXT_PUBLIC_GRAPHQL_URI || "/api/graphql",
-        fetch: fetcher,
-        headers: token && {
-          authorization: `Bearer ${token}`,
-        },
-      }),
-    ]),
-    cache: cache,
-    resolvers: {},
-    defaultOptions: {
-      mutate: { errorPolicy: "all" },
-      query: { errorPolicy: "all" },
-    },
-  });
-
-  client.onClearStore(async () => {
-    if (persistor) {
-      await persistor.purge();
-    }
-  });
-
-  return client;
-};
