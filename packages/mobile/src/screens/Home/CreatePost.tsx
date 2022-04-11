@@ -32,6 +32,8 @@ import {
 } from 'shared/src/colors';
 import { CREATE_POST, PostDataType } from '../../graphql/post';
 import { CreatePostScreen } from 'mobile/src/navigations/HomeStack';
+import { showMessage } from '../../services/utils';
+import { SOMETHING_WRONG } from 'shared/src/constants';
 
 import BackSvg from '../../assets/icons/back.svg';
 import ChatSvg from 'shared/assets/images/chat.svg';
@@ -135,8 +137,10 @@ const CreatePost: CreatePostScreen = ({ route, navigation }) => {
         })
       ).data.createPost;
       console.log('success', result);
+      showMessage('Success', 'Successfully posted!', 'success');
     } catch (e) {
       console.log('error', e);
+      showMessage('Error', SOMETHING_WRONG, 'error');
     }
   };
 

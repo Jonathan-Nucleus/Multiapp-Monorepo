@@ -1,6 +1,7 @@
 import React from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ApolloProvider } from '@apollo/react-hooks';
+import Toast from 'react-native-toast-message';
 
 import AppNavigator from './navigations/AppNavigator';
 import { useInitializeClient } from './graphql/apolloClient';
@@ -14,6 +15,7 @@ const App = () => {
     <ApolloProvider client={client}>
       <SafeAreaProvider>
         <AppNavigator />
+        <Toast />
       </SafeAreaProvider>
     </ApolloProvider>
   );
