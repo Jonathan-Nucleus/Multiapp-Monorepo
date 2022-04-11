@@ -10,6 +10,7 @@ import ProfileSettings from '../screens/Settings/ProfileSettings';
 import Terms from '../screens/Settings/Terms';
 import AccountAdmin from '../screens/Settings/AccountAdmin';
 import InviteFriends from '../screens/Settings/InviteFriends';
+import ChangePass from '../screens/Settings/AccountAdmin/ChangePass';
 
 const SettingsStacks = () => {
   return (
@@ -24,6 +25,7 @@ const SettingsStacks = () => {
       <Stack.Screen name="AccountAdmin" component={AccountAdmin} />
       <Stack.Screen name="InviteFriends" component={InviteFriends} />
       <Stack.Screen name="Terms" component={Terms} />
+      <Stack.Screen name="ChangePass" component={ChangePass} />
     </Stack.Navigator>
   );
 };

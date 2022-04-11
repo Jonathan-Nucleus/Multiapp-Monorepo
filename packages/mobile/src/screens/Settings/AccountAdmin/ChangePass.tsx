@@ -8,29 +8,27 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NavigationProp, RouteProp } from '@react-navigation/native';
-import { useMutation } from '@apollo/client';
+import { CaretLeft, MagnifyingGlass } from 'phosphor-react-native';
 
-import PAppContainer from '../../components/common/PAppContainer';
-import PHeader from '../../components/common/PHeader';
-import PTitle from '../../components/common/PTitle';
-import PTextInput from '../../components/common/PTextInput';
-import PGradientButton from '../../components/common/PGradientButton';
-import ErrorText from '../../components/common/ErrorTxt';
-import { RESET_PASSWORD } from '../../graphql/mutation/auth';
+import PAppContainer from '../../../components/common/PAppContainer';
+import PHeader from '../../../components/common/PHeader';
+import PTextInput from '../../../components/common/PTextInput';
+import PGradientButton from '../../../components/common/PGradientButton';
+import ErrorText from '../../../components/common/ErrorTxt';
 import { BGDARK, PRIMARY, WHITE } from 'shared/src/colors';
-import { Body2 } from '../../theme/fonts';
-import LogoSvg from '../../assets/icons/logo.svg';
+import { Body1, Body2 } from '../../../theme/fonts';
 
-import type { ResetPassScreen } from 'mobile/src/navigations/AuthStack';
+interface RouterProps {
+  navigation: NavigationProp<any, any>;
+  route: RouteProp<any, any>;
+}
 
-const ResetPass: ResetPassScreen = ({ navigation, route }) => {
+const ChangePass: React.FC<RouterProps> = ({ navigation }) => {
   const [pass, setPass] = useState('');
   const [confirmPass, setConfirmPass] = useState('');
   const [securePassEntry, setSecurePassEntry] = useState(true);
   const [secureConfirmPassEntry, setSecureConfirmPassEntry] = useState(true);
   const [error, setError] = useState('');
-
-  const [resetPassword] = useMutation(RESET_PASSWORD);
 
   const disabled = useMemo(() => {
     if (pass && confirmPass && pass === confirmPass) {
@@ -46,31 +44,19 @@ const ResetPass: ResetPassScreen = ({ navigation, route }) => {
       setError('Password does not match');
       return;
     }
-
-    try {
-      const { data } = await resetPassword({
-        variables: {
-          email: route.params.email,
-          password: pass,
-        },
-      });
-      if (data.login) {
-        navigation.navigate('Main');
-        return;
-      }
-    } catch (e: any) {
-      setError(e.message);
-    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <PHeader centerIcon={<LogoSvg />} />
+      <PHeader
+        centerIcon={<Text style={styles.headerTitle}>Change Password</Text>}
+        containerStyle={styles.headerContainer}
+        leftIcon={<CaretLeft size={28} color={WHITE} />}
+        rightIcon={<MagnifyingGlass size={28} color={WHITE} />}
+        onPressLeft={() => navigation.goBack()}
+        onPressRight={() => console.log(1231)}
+      />
       <PAppContainer>
-        <PTitle
-          title="Welcome back, Elvis!"
-          subTitle="Create a new password."
-        />
         {!!error && <ErrorText error={error} />}
         <PTextInput
           label="Password"
@@ -92,25 +78,36 @@ const ResetPass: ResetPassScreen = ({ navigation, route }) => {
           subLabelTextStyle={styles.subLabelText}
         />
         <PGradientButton
-          label="SAVE PASSWORD AND LOGIN"
+          label="change password"
           btnContainer={styles.btnContainer}
           onPress={handleNextPage}
           disabled={disabled}
         />
-        <View style={styles.row}>
-          <Text style={styles.txt}>Return to </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.hyperText}>Sign In</Text>
-          </TouchableOpacity>
-        </View>
       </PAppContainer>
     </SafeAreaView>
   );
 };
 
-export default ResetPass;
+export default ChangePass;
 
 const styles = StyleSheet.create({
+  headerContainer: {
+    backgroundColor: BGDARK,
+    elevation: 5,
+    shadowColor: 'rgba(0, 0, 0, 0.5)',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.3,
+    paddingTop: 0,
+    marginBottom: 0,
+    justifyContent: 'space-between',
+  },
+  headerTitle: {
+    ...Body1,
+    color: WHITE,
+  },
   container: {
     flex: 1,
     backgroundColor: BGDARK,

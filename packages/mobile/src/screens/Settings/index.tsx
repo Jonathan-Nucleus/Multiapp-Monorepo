@@ -5,6 +5,7 @@ import {
   View,
   Text,
   TouchableOpacity,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FastImage from 'react-native-fast-image';
@@ -37,11 +38,6 @@ interface RouterProps {
 const Settings: FC<RouterProps> = ({ navigation }) => {
   const DATA = [
     {
-      id: '11',
-      label: 'Invite Your Friends',
-      onPress: () => navigation.navigate('InviteFriends'),
-    },
-    {
       id: '21',
       label: 'Account Admin',
       onPress: () => navigation.navigate('AccountAdmin'),
@@ -61,19 +57,16 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
       label: 'Help & Support',
       onPress: () => navigation.navigate('Help'),
     },
-    {
-      id: '4',
-      label: 'Log out',
-      onPress: () => console.log(12312),
-    },
   ];
 
   const renderListItem = ({ item }: RenderItemProps) => {
     return (
       <TouchableOpacity onPress={item.onPress}>
-        <View style={[styles.item, styles.between]}>
+        <View style={[styles.item, styles.renderItem, styles.between]}>
           <Text style={styles.label}>{item.label}</Text>
-          <CaretRight size={28} color={WHITE} />
+          <View>
+            <CaretRight size={28} color={WHITE} />
+          </View>
         </View>
       </TouchableOpacity>
     );
@@ -116,6 +109,12 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
             </View>
           </View>
         </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('InviteFriends')}>
+          <View style={[styles.item, styles.between]}>
+            <Text style={styles.label}>Invite Your Friends</Text>
+            <CaretRight size={28} color={WHITE} />
+          </View>
+        </TouchableOpacity>
       </>
     );
   };
@@ -129,6 +128,14 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
         renderItem={renderListItem}
         keyExtractor={(item) => item.id}
         style={styles.flatList}
+        numColumns={2}
+        ListFooterComponent={
+          <TouchableOpacity onPress={() => console.log(1)}>
+            <View style={[styles.item, styles.between]}>
+              <Text style={styles.label}>Logout</Text>
+            </View>
+          </TouchableOpacity>
+        }
       />
     </SafeAreaView>
   );
@@ -172,6 +179,13 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: PRIMARYSOLID7,
     marginTop: 16,
+  },
+  renderItem: {
+    width: Dimensions.get('screen').width / 2 - 20,
+    margin: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 68,
   },
   commentWrap: {
     marginLeft: 15,

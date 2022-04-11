@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import {
   StyleSheet,
   FlatList,
@@ -7,24 +7,26 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import FastImage from 'react-native-fast-image';
 import { NavigationProp } from '@react-navigation/native';
+import Modal from 'react-native-modal';
 import { CaretRight, CaretLeft, MagnifyingGlass } from 'phosphor-react-native';
 import {
   BGDARK,
   GRAY2,
   GRAY100,
   WHITE,
-  BLACK,
+  BGDARK100,
   PRIMARYSOLID7,
+  DANGER,
 } from 'shared/src/colors';
 
 import pStyles from '../../../theme/pStyles';
-import { Body1, Body2, Body3 } from '../../../theme/fonts';
+import { Body1, Body2, Body3, H5 } from '../../../theme/fonts';
 import PHeader from '../../../components/common/PHeader';
 
 interface RenderItemProps {
   item: {
+    id: string;
     label: string;
     onPress: () => void;
   };
@@ -44,20 +46,24 @@ const AccountAdmin: FC<RouterProps> = ({ navigation }) => {
     {
       id: '21',
       label: 'Change your password',
-      onPress: () => console.log(123),
+      onPress: () => navigation.navigate('ChangePass'),
     },
     {
-      id: '1',
+      id: 'delete',
       label: 'Delete Account',
-      onPress: () => console.log(123),
+      onPress: () => setIsVisible(true),
     },
   ];
+
+  const [isVisible, setIsVisible] = useState(false);
 
   const renderListItem = ({ item }: RenderItemProps) => {
     return (
       <TouchableOpacity onPress={item.onPress}>
         <View style={[styles.item, styles.between]}>
-          <Text style={styles.label}>{item.label}</Text>
+          <Text style={[styles.label, item.id === 'delete' && styles.delete]}>
+            {item.label}
+          </Text>
           <CaretRight size={28} color={WHITE} />
         </View>
       </TouchableOpacity>
@@ -80,6 +86,24 @@ const AccountAdmin: FC<RouterProps> = ({ navigation }) => {
         keyExtractor={(item) => item.id}
         style={styles.flatList}
       />
+      <Modal
+        isVisible={isVisible}
+        swipeDirection="down"
+        onBackdropPress={() => setIsVisible(false)}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>
+            Are you sure you want to delete account?
+          </Text>
+          <View style={[styles.row, styles.between]}>
+            <TouchableOpacity onPress={() => setIsVisible(false)}>
+              <Text style={styles.btnTxt}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setIsVisible(false)}>
+              <Text style={[styles.btnTxt, styles.danger]}>Delete Account</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -87,9 +111,6 @@ const AccountAdmin: FC<RouterProps> = ({ navigation }) => {
 export default AccountAdmin;
 
 const styles = StyleSheet.create({
-  globalContainer: {
-    flex: 1,
-  },
   headerContainer: {
     backgroundColor: BGDARK,
     elevation: 5,
@@ -158,5 +179,25 @@ const styles = StyleSheet.create({
   },
   rightItem: {
     marginLeft: 8,
+  },
+  delete: {
+    color: DANGER,
+  },
+  modalContent: {
+    backgroundColor: BGDARK100,
+    padding: 20,
+  },
+  modalTitle: {
+    textAlign: 'center',
+    ...H5,
+    color: WHITE,
+  },
+  btnTxt: {
+    padding: 20,
+    color: WHITE,
+    ...Body1,
+  },
+  danger: {
+    color: DANGER,
   },
 });
