@@ -124,7 +124,7 @@ const CreatePost: CreatePostScreen = ({ route, navigation }) => {
       categories,
       audience: 'EVERYONE',
       body: replaceMentionValues(description, ({ name }) => `@${name}`),
-      mediaUrl: 'https://unsplash.it/400/400?image=1',
+      mediaUrl: '28baa4ab-d70a-493b-8609-82966e2eb49a.jpg',
       mentionIds: mentions,
     };
 

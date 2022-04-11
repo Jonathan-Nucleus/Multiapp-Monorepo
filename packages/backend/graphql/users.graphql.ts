@@ -80,6 +80,13 @@ const resolvers = {
 
     hasPassword: (parent: User.Mongo): boolean => !!parent.password,
 
+    company: async (
+      parent: User.Mongo,
+      argsIgnored: NoArgs,
+      { db }: ApolloServerContext
+    ) =>
+      parent.companyIds?.[0] ? db.companies.find(parent.companyIds[0]) : null,
+
     companies: async (
       parent: User.Mongo,
       argsIgnored: NoArgs,

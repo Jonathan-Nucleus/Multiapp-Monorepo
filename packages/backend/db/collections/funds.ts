@@ -11,6 +11,7 @@ import {
   GraphQLEntity,
 } from "backend/lib/mongo-helper";
 import type { Fund } from "backend/schemas/fund";
+import type { Accreditation } from "backend/schemas/user";
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 const createFundsCollection = (fundsCollection: Collection<Fund.Mongo>) => {
@@ -36,6 +37,30 @@ const createFundsCollection = (fundsCollection: Collection<Fund.Mongo>) => {
       const query =
         ids !== undefined ? { _id: { $in: ids ? toObjectIds(ids) : ids } } : {};
       return fundsCollection.find(query).toArray();
+    },
+
+    /**
+     * Provides a list of all funds in the DB according to accreditation status.
+     *
+     * @param accreditation The accreditation level that funds should meet.
+     *
+     * @returns   An array of matching Fund objects.
+     */
+    findByAccreditation: async (
+      accreditation: Accreditation
+    ): Promise<Fund.Mongo[]> => {
+      const accreditationLevels: Accreditation[] = [
+        "accredited",
+        "client",
+        "purchaser",
+      ];
+      accreditationLevels.splice(
+        accreditationLevels.indexOf(accreditation) + 1
+      );
+
+      return fundsCollection
+        .find({ level: { $in: accreditationLevels } })
+        .toArray();
     },
   };
 };

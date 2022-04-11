@@ -16,6 +16,7 @@ import PLabel from '../../components/common/PLabel';
 import RoundImageView from '../../components/common/RoundImageView';
 import { H6 } from '../../theme/fonts';
 import { BGHEADER } from 'shared/src/colors';
+import { useFetchPosts } from 'mobile/src/hooks/queries';
 
 import LogoSvg from 'shared/assets/images/logo-icon.svg';
 import SearchSvg from 'shared/assets/images/search.svg';
@@ -26,13 +27,17 @@ const CategoryList = ['All', 'Investment Ideas', 'World News', 'Politics'];
 
 const HomeComponent: HomeScreen = ({ navigation }) => {
   const [category, setCategory] = useState('All');
-  const { data, error, loading, refetch } = usePost();
+  const { data, error, loading, refetch } = useFetchPosts();
   const postData = data?.posts;
 
   const isFocused = useIsFocused();
-  if (isFocused) {
+  const [focusState, setFocusState] = useState(isFocused);
+  if (isFocused != focusState) {
+    // Refetch whenever the focus state changes to avoid refetching during
+    // rerender cycles
     console.log('refetching...');
     refetch();
+    setFocusState(isFocused);
   }
 
   useEffect(() => {
@@ -44,16 +49,7 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
   };
 
   const renderItem = ({ item }: { item: FeedItemProps }) => (
-    <FeedItem
-      name={`${item.user?.firstName} ${item.user?.lastName}`}
-      company={item.company || 'Company'}
-      date={item.date}
-      mediaUrl={item.mediaUrl}
-      body={item.body}
-      categories={item.categories || []}
-      commentCounts={item.commentCounts || 0}
-      shareCounts={item.shareCounts || 0}
-    />
+    <FeedItem post={item} />
   );
 
   return (

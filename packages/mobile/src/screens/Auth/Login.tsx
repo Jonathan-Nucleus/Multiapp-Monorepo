@@ -29,6 +29,7 @@ import LinkedinSvg from '../../assets/icons/linkedin.svg';
 import CheckedSvg from '../../assets/icons/checked.svg';
 import UncheckedSvg from '../../assets/icons/unchecked.svg';
 
+import { setToken } from 'mobile/src/utils/auth-token';
 import type { LoginScreen } from 'mobile/src/navigations/AuthStack';
 
 const Login: LoginScreen = ({ navigation }) => {
@@ -53,7 +54,7 @@ const Login: LoginScreen = ({ navigation }) => {
         },
       });
       if (data.login) {
-        await EncryptedStorage.setItem('accessToken', data.login);
+        await setToken(data.login);
         navigation.navigate('Main');
       }
       console.log('logged user', data);

@@ -88,7 +88,7 @@ const ProfileSettings: FC<RouterProps> = ({ navigation }) => {
           </TouchableOpacity>
           <View style={styles.verticalLine} />
           <TouchableOpacity>
-            <Text style={styles.website}>Websiet</Text>
+            <Text style={styles.website}>Website</Text>
           </TouchableOpacity>
         </View>
       </PAppContainer>

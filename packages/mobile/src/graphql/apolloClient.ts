@@ -8,6 +8,10 @@ import {
 } from '@apollo/client';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import { AsyncStorageWrapper, CachePersistor } from 'apollo3-cache-persist';
+import {
+  attachTokenObserver,
+  detachTokenObserver,
+} from 'mobile/src/utils/auth-token';
 
 const typePolicies = {};
 
@@ -23,12 +27,21 @@ const persistor = new CachePersistor({
 const GQL_GATEWAY_URL = 'http://localhost:4000';
 
 export const useInitializeClient = () => {
+  const [reset, setReset] = useState(false); // Toggle to force a restart
   const [client, setClient] =
     useState<ApolloClient<NormalizedCacheObject> | null>(null);
+
   useEffect(() => {
+    // Create an observer that is notified whenever the auth token changes to
+    // trigger a reset of apollo client.
+    const tokenObserver = () => {
+      setReset(!reset);
+    };
+
     async function initializeCache() {
       await persistor.restore();
       const token = await EncryptedStorage.getItem('accessToken');
+
       const _client = new ApolloClient({
         link: from([
           createHttpLink({
@@ -49,8 +62,11 @@ export const useInitializeClient = () => {
         await persistor.purge();
       });
       setClient(_client);
+      attachTokenObserver(tokenObserver);
     }
+
     initializeCache();
-  }, []);
+    return () => detachTokenObserver(tokenObserver);
+  }, [reset]);
   return client;
 };

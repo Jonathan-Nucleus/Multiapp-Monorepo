@@ -27,6 +27,7 @@ import GoogleSvg from '../../assets/icons/google.svg';
 import LinkedinSvg from '../../assets/icons/linkedin.svg';
 
 import type { SignupScreen } from 'mobile/src/navigations/AuthStack';
+import { setToken } from 'mobile/src/utils/auth-token';
 
 const Signup: SignupScreen = ({ navigation, route }) => {
   const [firstName, setFirstName] = useState('');
@@ -75,7 +76,7 @@ const Signup: SignupScreen = ({ navigation, route }) => {
         },
       });
       if (data.register) {
-        await EncryptedStorage.setItem('accessToken', data.register);
+        await setToken(data.register);
         navigation.navigate('Topic');
         return;
       }

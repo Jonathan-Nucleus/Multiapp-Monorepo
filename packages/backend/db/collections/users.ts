@@ -248,7 +248,7 @@ const createUsersCollection = (
         _id: new ObjectId(),
         email,
         role: "stub",
-        emailToken: uuid(),
+        emailToken: crypto.randomBytes(3).toString("hex").toUpperCase(),
       } as const;
 
       try {

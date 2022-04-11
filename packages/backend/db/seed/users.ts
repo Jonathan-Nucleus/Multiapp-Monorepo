@@ -47,6 +47,7 @@ export default async function (db: Db): Promise<ObjectId[]> {
       accreditation: "none",
       website: faker.internet.url(),
       avatar: avatars[index % avatars.length],
+      position: faker.name.jobTitle(),
     };
   });
 

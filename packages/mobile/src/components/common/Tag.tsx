@@ -39,9 +39,9 @@ const Tag: React.FC<TagProps> = (props) => {
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 2,
+    borderRadius: 16,
     backgroundColor: GRAY10,
-    paddingHorizontal: 8,
+    paddingHorizontal: 16,
     paddingVertical: 4,
   },
   selectedContainer: {
@@ -50,6 +50,8 @@ const styles = StyleSheet.create({
   textStyle: {
     ...Body3,
     textTransform: 'uppercase',
+    letterSpacing: 1.25,
+    fontWeight: 'bold',
   },
   selectedTextStyle: {
     color: PRIMARYSTATE,

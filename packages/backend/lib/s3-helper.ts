@@ -18,7 +18,7 @@ export interface RemoteUpload {
 
 export async function getUploadUrl(
   fileExt: string,
-  type: "avatar" | "post"
+  type: "avatar" | "post" | "background"
 ): Promise<RemoteUpload | null> {
   if (
     !AWS_ACCESS_KEY_ID ||

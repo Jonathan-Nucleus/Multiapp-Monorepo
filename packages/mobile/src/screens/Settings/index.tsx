@@ -24,6 +24,8 @@ import pStyles from '../../theme/pStyles';
 import { Body1, Body2, Body3 } from '../../theme/fonts';
 import Header from '../../components/main/Header';
 
+import { clearToken } from 'mobile/src/utils/auth-token';
+
 interface RenderItemProps {
   item: {
     label: string;
@@ -36,7 +38,7 @@ interface RouterProps {
 }
 
 const Settings: FC<RouterProps> = ({ navigation }) => {
-  const DATA = [
+  const MENU_ITEMS = [
     {
       id: '21',
       label: 'Account Admin',
@@ -123,14 +125,14 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
     <SafeAreaView style={pStyles.globalContainer}>
       <Header navigation={navigation} />
       <FlatList
-        data={DATA}
+        data={MENU_ITEMS}
         ListHeaderComponent={renderListHeaderComponent}
         renderItem={renderListItem}
         keyExtractor={(item) => item.id}
         style={styles.flatList}
         numColumns={2}
         ListFooterComponent={
-          <TouchableOpacity onPress={() => console.log(1)}>
+          <TouchableOpacity onPress={() => clearToken()}>
             <View style={[styles.item, styles.between]}>
               <Text style={styles.label}>Logout</Text>
             </View>

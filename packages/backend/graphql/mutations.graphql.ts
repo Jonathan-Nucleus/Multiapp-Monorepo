@@ -54,6 +54,7 @@ const schema = gql`
   enum MediaType {
     POST
     AVATAR
+    BACKGROUND
   }
 `;
 

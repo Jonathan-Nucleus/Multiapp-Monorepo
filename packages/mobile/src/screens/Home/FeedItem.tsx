@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Image } from 'react-native';
 import FastImage from 'react-native-fast-image';
+import dayjs from 'dayjs';
 
 import PLabel from '../../components/common/PLabel';
 import IconButton from '../../components/common/IconButton';
@@ -11,68 +12,75 @@ import { Body1, Body3 } from '../../theme/fonts';
 import { PostDataType } from '../../graphql/post';
 
 import ThumbsUpSvg from 'shared/assets/images/thumbsUp.svg';
-import ThumbsUp2Svg from 'shared/assets/images/thumbsUp2.svg';
 import ChatSvg from 'shared/assets/images/chat.svg';
 import ShareSvg from 'shared/assets/images/share.svg';
 import Avatar from '../../assets/avatar.png';
 
-export interface FeedItemProps extends PostDataType {
-  name: string;
-  company: string;
-  date: string;
-  commentCounts: number;
-  shareCounts: number;
-  containerStyle?: object;
+import { FetchPostsData } from 'mobile/src/hooks/queries';
+import { PostCategories } from 'backend/graphql/enumerations.graphql';
+
+//import { AVATAR_URL, POST_URL } from '@env';
+const AVATAR_URL =
+  'https://prometheus-user-media.s3.us-east-1.amazonaws.com/avatars';
+const POST_URL =
+  'https://prometheus-user-media.s3.us-east-1.amazonaws.com/posts';
+
+type Post = Exclude<FetchPostsData['posts'], undefined>[number];
+interface FeedItemProps {
+  post: Post;
 }
 
-const FeedItem: React.FC<FeedItemProps> = (props) => {
-  const {
-    name,
-    company,
-    body,
-    categories,
-    mediaUrl,
-    commentCounts,
-    shareCounts,
-    containerStyle,
-  } = props;
+const FeedItem: React.FC<FeedItemProps> = ({ post }) => {
+  const { user } = post;
 
   return (
-    <View style={[styles.container, containerStyle]}>
+    <View style={[styles.container]}>
       <View style={styles.headerWrapper}>
         <UserInfo
-          avatar={Avatar}
-          name={name}
-          role="CEO"
-          company={company}
+          avatar={{ uri: `${AVATAR_URL}/${user.avatar}` }}
+          name={`${user.firstName} ${user.lastName}`}
+          role={user.position}
+          company={user.company?.name}
+          avatarSize={56}
+          auxInfo={dayjs(post.createdAt).format('MMM D')}
           isPro
         />
       </View>
-      <PLabel label={body} />
+      <PLabel label={post.body} textStyle={styles.body} />
       <Image
         style={styles.postImage}
-        source={{
-          uri: mediaUrl,
-          // priority: FastImage.priority.normal,
-        }}
-        // resizeMode={FastImage.resizeMode.contain}
+        source={{ uri: `${POST_URL}/${post.mediaUrl}` }}
       />
-      <View style={styles.tagWrapper}>
-        {categories.map((item: string, index: number) => (
-          <Tag label={item} viewStyle={styles.tagStyle} key={index} />
-        ))}
-      </View>
-      <View style={styles.otherInfo}>
-        <IconButton
-          icon={<ThumbsUp2Svg />}
-          label="Steve Jobs and 3 others"
-          textStyle={styles.smallLabel}
-        />
-        <PLabel
-          label={`${commentCounts} Comments`}
-          textStyle={styles.smallLabel}
-        />
-        <PLabel label={`${shareCounts} Shares`} textStyle={styles.smallLabel} />
+      <View style={styles.postInfo}>
+        <View style={styles.tagWrapper}>
+          {post.categories.map((item: string, index: number) => (
+            <Tag
+              label={PostCategories[item]}
+              viewStyle={styles.tagStyle}
+              key={index}
+            />
+          ))}
+        </View>
+        <View style={styles.otherInfo}>
+          {post.likeIds && post.likeIds.length > 0 && (
+            <PLabel
+              label={`${post.likeIds.length} Likes`}
+              textStyle={styles.smallLabel}
+            />
+          )}
+          {post.commentIds && post.commentIds.length > 0 && (
+            <PLabel
+              label={`${post.commentIds.length} Comments`}
+              textStyle={styles.smallLabel}
+            />
+          )}
+          {post.shareIds && post.shareIds.length > 0 && (
+            <PLabel
+              label={`${post.shareIds.length} Comments`}
+              textStyle={styles.smallLabel}
+            />
+          )}
+        </View>
       </View>
       <View style={styles.divider} />
       <View style={styles.bottomWrapper}>
@@ -86,7 +94,7 @@ const FeedItem: React.FC<FeedItemProps> = (props) => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 0,
     paddingVertical: 14,
     flexDirection: 'column',
     backgroundColor: BGDARK,
@@ -112,12 +120,21 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     borderRadius: 16,
   },
+  body: {
+    lineHeight: 20,
+  },
+  postInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   tagWrapper: {
     flexDirection: 'row',
-    marginVertical: 10,
+    flex: 1,
+    flexWrap: 'wrap',
   },
   tagStyle: {
     marginRight: 8,
+    marginBottom: 8,
   },
   otherInfo: {
     flexDirection: 'row',

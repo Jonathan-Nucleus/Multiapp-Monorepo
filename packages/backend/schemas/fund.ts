@@ -1,7 +1,12 @@
 import { ObjectId } from "mongodb";
 import { ValueOf, GraphQLEntity } from "backend/lib/mongo-helper";
 
-import type { User, Accreditation, AccreditationEnum } from "./user";
+import type {
+  User,
+  Accreditation,
+  AccreditationEnum,
+  AdjustableImage,
+} from "./user";
 import type { Company } from "./company";
 
 type UserCommonFields = Pick<User.Mongo, "avatar" | "background">;
@@ -10,6 +15,8 @@ export namespace Fund {
   export interface Mongo extends UserCommonFields {
     _id: ObjectId;
     name: string;
+    avatar?: string;
+    background: AdjustableImage;
     level: Accreditation;
     managerId: ObjectId;
     companyId: ObjectId;
@@ -77,6 +84,8 @@ export const FundSchema = `
   type Fund {
     _id: ID!
     name: String!
+    avatar: String
+    background: AdjustableImage
     level: Accreditation!
     managerId: ID!
     companyId: ID!
@@ -90,9 +99,9 @@ export const FundSchema = `
     createdAt: Date!
     updatedAt: Date
 
-    manager: User!
-    company: Company!
-    team: [User!]!
+    manager: User
+    company: Company
+    team: [User!]
   }
 
   type Document {

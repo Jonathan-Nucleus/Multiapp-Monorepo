@@ -15,6 +15,8 @@ export namespace Post {
     categories: PostCategory[];
     likeIds?: ObjectId[];
     commentIds?: ObjectId[];
+    shareIds?: ObjectId[];
+    sharedPostId?: ObjectId;
     visible: boolean;
     reporterIds?: ObjectId[];
     updatedAt?: Date;
@@ -25,6 +27,8 @@ export namespace Post {
     user: User.GraphQL;
     mentions: User.GraphQL[];
     likes: User.GraphQL[];
+    shares: Post.GraphQL[];
+    sharedPost?: Post.GraphQL;
     comments: Comment.GraphQL[];
     reporters: User.GraphQL[];
   };
@@ -119,7 +123,7 @@ export const PostCategoryOptions = {
   },
   OP_ED: {
     value: "op-ed",
-    label: "OpEd",
+    label: "Op-Ed",
   },
   FINANCIALS: {
     value: "financials",
@@ -140,6 +144,8 @@ export const PostSchema = `
     categories: [PostCategory!]!
     likeIds: [ID!]
     commentIds: [ID!]
+    shareIds: [ID!]
+    sharedPostId: ID
     reporterIds: [ID!]
     createdAt: Date!
     updatedAt: Date
@@ -149,6 +155,7 @@ export const PostSchema = `
     likes: [User!]
     comments: [Comment!]
     reporters: [User!]
+    sharedPost: Post
   }
 
   input PostInput {

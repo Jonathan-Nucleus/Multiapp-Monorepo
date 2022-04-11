@@ -8,11 +8,13 @@ import {
 
 import { isUser } from "backend/schemas/user";
 import type { Post, PostCategory } from "backend/schemas/post";
+import type { Fund } from "backend/schemas/fund";
 
 const schema = gql`
   type Query {
     verifyInvite(code: String!): Boolean!
     posts(categories: [PostCategory!]): [Post!]
+    funds: [Fund!]
   }
 `;
 
@@ -39,6 +41,19 @@ const resolvers = {
           userData.hiddenPostIds,
           userData.hiddenUserIds
         );
+      }
+    ),
+
+    funds: secureEndpoint(
+      async (
+        parentIgnored,
+        argsIgnored,
+        { db, user }
+      ): Promise<Fund.Mongo[]> => {
+        const userData = await db.users.find({ _id: user._id });
+        if (!userData || !isUser(userData)) return [];
+
+        return db.funds.findByAccreditation(user.acc);
       }
     ),
   },

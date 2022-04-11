@@ -28,10 +28,10 @@ import LogoSvg from '../../assets/icons/logo.svg';
 import CheckedSvg from '../../assets/icons/checked.svg';
 import UncheckedSvg from '../../assets/icons/unchecked.svg';
 import PGradientButton from '../../components/common/PGradientButton';
-import { PostCategoryOptions } from 'backend/schemas/post';
+import { PostCategories } from 'backend/graphql/enumerations.graphql';
 
 import type { TopicScreen } from 'mobile/src/navigations/AuthStack';
-const preferences = Object.keys(PostCategoryOptions);
+const preferences = Object.keys(PostCategories);
 
 const Topic: TopicScreen = ({ navigation }) => {
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
@@ -51,6 +51,7 @@ const Topic: TopicScreen = ({ navigation }) => {
           },
         },
       });
+
       if (data.updateSettings) {
         navigation.navigate('Main');
         return;
@@ -90,7 +91,7 @@ const Topic: TopicScreen = ({ navigation }) => {
             <UncheckedSvg />
           )}
         </TouchableOpacity>
-        <Text style={styles.checkedTxt}>{item.toLowerCase()}</Text>
+        <Text style={styles.checkedTxt}>{PostCategories[item]}</Text>
       </View>
     );
   };
@@ -158,7 +159,6 @@ const styles = StyleSheet.create({
     ...Body2,
     color: WHITE,
     marginLeft: 10,
-    textTransform: 'capitalize',
   },
   bottom: {
     height: 80,

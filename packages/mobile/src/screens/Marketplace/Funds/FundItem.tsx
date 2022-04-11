@@ -1,0 +1,295 @@
+import React, { FC } from 'react';
+import {
+  TouchableOpacity,
+  Image,
+  Text,
+  View,
+  ListRenderItem,
+  StyleSheet,
+} from 'react-native';
+import { House, Star, Chats, DotsThreeCircle } from 'phosphor-react-native';
+import PGradientButton from 'mobile/src/components/common/PGradientButton';
+import RoundImageView from 'mobile/src/components/common/RoundImageView';
+import {
+  PRIMARY,
+  SECONDARY,
+  WHITE,
+  SUCCESS,
+  DANGER,
+  GRAY100,
+} from 'shared/src/colors';
+import { Body1, Body2 } from 'mobile/src/theme/fonts';
+import { FetchFundsData } from 'mobile/src/graphql/query/marketplace';
+
+const AVATAR_URL =
+  'https://prometheus-user-media.s3.us-east-1.amazonaws.com/avatars';
+const BACKGROUND_URL =
+  'https://prometheus-user-media.s3.us-east-1.amazonaws.com/backgrounds';
+
+export type Fund = Exclude<FetchFundsData['funds'], undefined>[number];
+interface FundItemProps {
+  fund: Fund;
+}
+
+const FundItem: FC<FundItemProps> = ({ fund }) => {
+  return (
+    <View style={styles.fundItem}>
+      <View style={styles.imagesContainer}>
+        <Image
+          style={styles.backgroundImage}
+          source={{ uri: `${BACKGROUND_URL}/${fund.background.url}` }}
+        />
+        <Image
+          style={styles.avatarImage}
+          source={{
+            uri: `${AVATAR_URL}/5b2809ef-cba3-4dca-bb2e-64861926df61.png`,
+          }}
+        />
+      </View>
+      <View style={styles.fundDetailsContainer}>
+        <View style={styles.statusContainer}>
+          <View
+            style={[
+              styles.statusIndicator,
+              fund.status === 'OPEN' ? styles.open : styles.closed,
+            ]}></View>
+          <Text
+            style={[
+              styles.status,
+              styles.whiteText,
+              fund.status === 'OPEN' ? styles.successText : styles.dangerText,
+            ]}>
+            {fund.status}
+          </Text>
+        </View>
+        <Text style={[styles.whiteText, Body1, styles.fund]}>{fund.name}</Text>
+        <Text style={[styles.company, Body2]}>{fund.company.name}</Text>
+        <Text style={[styles.overview, styles.whiteText, Body2]}>
+          {fund.overview}
+        </Text>
+        <View style={styles.tags}>
+          {fund.tags.map((tag) => (
+            <Text id={tag} style={styles.tag}>
+              {tag}
+            </Text>
+          ))}
+        </View>
+        <View style={styles.managerContainer}>
+          <RoundImageView
+            size={48}
+            image={{ uri: `${AVATAR_URL}/${fund.manager.avatar}` }}
+            imageStyle={styles.managerAvatar}
+          />
+          <View>
+            <View style={styles.manager}>
+              <Text
+                style={[
+                  styles.whiteText,
+                  Body2,
+                ]}>{`${fund.manager.firstName} ${fund.manager.lastName}`}</Text>
+              <View style={styles.separator} />
+              <TouchableOpacity>
+                <Text style={styles.follow}>Follow</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.managerInfo}>
+              <Text style={[styles.grayText, Body2]}>{`${
+                fund.manager.followerIds?.length ?? 0
+              } Followers`}</Text>
+              <View style={styles.separator} />
+              <Text style={[styles.grayText, Body2]}>{`${
+                fund.manager.postIds?.length ?? 0
+              } Posts`}</Text>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View style={styles.fundSummaryContainer}>
+        <View style={[styles.fundDescriptorContainer, styles.rightSeparator]}>
+          <Text style={[styles.title, styles.center]}>Asset Class</Text>
+          <Text style={[styles.whiteText, styles.center]}>Hedge Fund</Text>
+        </View>
+        <View style={[styles.fundDescriptorContainer, styles.rightSeparator]}>
+          <Text style={[styles.title, styles.center]}>Strategy</Text>
+          <Text style={[styles.whiteText, styles.center]}>Multi-Strategy</Text>
+        </View>
+        <View style={styles.fundDescriptorContainer}>
+          <Text style={[styles.title, styles.center]}>Minimum</Text>
+          <Text style={[styles.whiteText, styles.center]}>$500K</Text>
+        </View>
+      </View>
+      <View style={styles.actionBar}>
+        <PGradientButton
+          label="View Fund Details"
+          textStyle={styles.button}
+          btnContainer={styles.buttonContainer}
+        />
+        <Star size={24} color={WHITE} style={styles.favorite} />
+      </View>
+    </View>
+  );
+};
+
+export default FundItem;
+
+const styles = StyleSheet.create({
+  fundItem: {
+    marginBottom: 16,
+  },
+  imagesContainer: {
+    width: '100%',
+    position: 'relative',
+    overflow: 'visible',
+    zIndex: 2,
+  },
+  backgroundImage: {
+    width: '100%',
+    height: 80,
+  },
+  avatarImage: {
+    width: 64,
+    aspectRatio: 1,
+    borderRadius: 4,
+    position: 'absolute',
+    left: 16,
+    bottom: -32,
+  },
+  fundDetailsContainer: {
+    backgroundColor: '#001D3B',
+    padding: 16,
+    borderColor: '#142E49',
+    borderBottomWidth: 1,
+    zIndex: 1,
+  },
+  whiteText: {
+    color: WHITE,
+  },
+  grayText: {
+    color: GRAY100,
+  },
+  successText: {
+    color: SUCCESS,
+  },
+  dangerText: {
+    color: DANGER,
+  },
+  fund: {
+    marginTop: 16,
+    lineHeight: 24,
+  },
+  company: {
+    color: PRIMARY,
+    marginBottom: 16,
+  },
+  overview: {
+    lineHeight: 20,
+  },
+  statusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    marginTop: -8,
+    marginRight: 16,
+  },
+  statusIndicator: {
+    width: 12,
+    aspectRatio: 1,
+    borderRadius: 6,
+    marginRight: 4,
+  },
+  open: {
+    backgroundColor: SUCCESS,
+  },
+  closed: {
+    backgroundColor: DANGER,
+  },
+  fundSummaryContainer: {
+    flexDirection: 'row',
+  },
+  fundDescriptorContainer: {
+    flex: 1,
+    padding: 16,
+    borderBottomColor: '#142E49',
+    borderBottomWidth: 1,
+  },
+  tags: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 16,
+  },
+  tag: {
+    color: WHITE,
+    paddingLeft: 12,
+    paddingRight: 12,
+    paddingTop: 4,
+    paddingBottom: 4,
+    marginRight: 8,
+    backgroundColor: '#1F3858',
+    borderRadius: 10,
+    overflow: 'hidden',
+    textTransform: 'uppercase',
+    fontSize: 10,
+    fontWeight: 'bold',
+    letterSpacing: 1.25,
+  },
+  managerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopColor: '#142E49',
+    borderTopWidth: 1,
+  },
+  manager: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  managerAvatar: {
+    marginRight: 12,
+  },
+  managerInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  separator: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: GRAY100,
+    marginLeft: 8,
+    marginRight: 8,
+    fontSize: 24,
+  },
+  follow: {
+    textTransform: 'uppercase',
+    color: PRIMARY,
+  },
+  center: {
+    textAlign: 'center',
+  },
+  rightSeparator: {
+    borderRightColor: '#142E49',
+    borderRightWidth: 1,
+  },
+  title: {
+    textTransform: 'uppercase',
+    color: GRAY100,
+    fontSize: 10,
+    letterSpacing: 2,
+  },
+  actionBar: {
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  buttonContainer: {
+    flex: 1,
+  },
+  button: {
+    fontWeight: 'bold',
+  },
+  favorite: {
+    marginLeft: 16,
+  },
+});

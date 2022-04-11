@@ -6,6 +6,7 @@ import { House, Star, Chats, DotsThreeCircle } from 'phosphor-react-native';
 import { WHITE, BLACK, BGDARK } from 'shared/src/colors';
 
 import HomeStack from './HomeStack';
+import MarketplaceStack from './MarketplaceStack';
 import SettingsStack from './SettingsStack';
 import BellSVG from 'shared/assets/images/tabStar.svg';
 import GreyBellSVG from 'shared/assets/images/tabStar.svg';
@@ -55,8 +56,8 @@ export default function BottomTabNavigator() {
         }}
       />
       <Tab.Screen
-        name="Funds"
-        component={Help}
+        name="Marketplace"
+        component={MarketplaceStack}
         options={{
           tabBarLabel: 'funds',
           tabBarIcon: ({ focused, size }) =>

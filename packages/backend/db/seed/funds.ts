@@ -41,6 +41,14 @@ export default async function (
         managerId: userIds[randomInt(0, userIds.length - 1)],
         companyId: companyIds[randomInt(0, companyIds.length - 1)],
         status: "open",
+        background: {
+          url: "aefca1e5-7378-45bf-81cf-89f7f88366f5.png",
+          width: 1000,
+          height: 521,
+          x: 0,
+          y: 0,
+          scale: 1,
+        },
         highlights: [...Array(4).map(() => faker.lorem.sentence())],
         overview: faker.lorem.paragraph(8),
         teamIds: Array.from(

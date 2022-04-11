@@ -13,6 +13,9 @@ import {
   DocumentCategoryOptions,
 } from "backend/schemas/fund";
 
+type GraphQLFund = Fund.GraphQL;
+export type { GraphQLFund as Fund };
+
 const schema = gql`
   ${FundSchema}
 `;

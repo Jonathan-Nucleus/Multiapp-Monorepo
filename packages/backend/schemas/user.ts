@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 import { ValueOf, GraphQLEntity } from "backend/lib/mongo-helper";
 
 import { PostCategory, PostCategoryEnum } from "./post";
+import { Company } from "./company";
 
 export interface ContentCreatorProps {
   avatar?: string;
@@ -65,6 +66,7 @@ export namespace User {
       interests?: PostCategoryEnum[];
     };
     createdAt: Date;
+    company?: Company.GraphQL;
   };
 
   export type Input = Required<
@@ -184,11 +186,12 @@ export const UserSchema = `
     createdAt: Date!
     updatedAt: Date
 
-    companies: [Company!]!
-    mutedPosts: [Post!]!
-    hiddenPosts: [Post!]!
-    hiddenUsers: [User!]!
-    invitees: [Invitee!]!
+    company: Company
+    companies: [Company!]
+    mutedPosts: [Post!]
+    hiddenPosts: [Post!]
+    hiddenUsers: [User!]
+    invitees: [Invitee!]
   }
 
   type UserStub {
