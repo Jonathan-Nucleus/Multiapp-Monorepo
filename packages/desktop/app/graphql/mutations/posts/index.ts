@@ -1,7 +1,10 @@
 import { gql, useMutation, MutationTuple } from "@apollo/client";
-import { MediaUpload } from "backend/graphql/mutations.graphql";
-
-import { Post } from "backend/graphql/posts.graphql";
+import { MediaUpload, MediaType } from "backend/graphql/mutations.graphql";
+import { Post, PostInput } from "backend/graphql/posts.graphql";
+import {
+  VIEW_POST_FRAGMENT,
+  FetchPostsData,
+} from "desktop/app/graphql/queries";
 
 export const CREATE_POST = gql`
   mutation CreatePost($post: PostInput!) {
@@ -47,6 +50,7 @@ export const EDIT_COMMENT = gql`
 
 type UploadLinkVariables = {
   localFilename: string;
+  type: MediaType;
 };
 
 type UploadLinkData = {
@@ -63,13 +67,45 @@ export function useFetchUploadLink(): MutationTuple<
   UploadLinkVariables
 > {
   return useMutation<UploadLinkData, UploadLinkVariables>(gql`
-    mutation UploadLink($localFilename: String!) {
-      uploadLink(localFilename: $localFilename) {
+    mutation UploadLink($localFilename: String!, $type: MediaType!) {
+      uploadLink(localFilename: $localFilename, type: $type) {
         remoteName
         uploadUrl
       }
     }
   `);
+}
+
+type CreatePostVariables = {
+  post: PostInput;
+};
+
+type CreatePostData = {
+  createPost?: Exclude<FetchPostsData["posts"], undefined>[number];
+};
+
+/**
+ * GraphQL mutation that creates a new post.
+ *
+ * @returns   GraphQL mutation.
+ */
+export function useCreatePost(): MutationTuple<
+  CreatePostData,
+  CreatePostVariables
+> {
+  return useMutation<CreatePostData, CreatePostVariables>(
+    gql`
+      ${VIEW_POST_FRAGMENT}
+      mutation CreatePost($post: PostInput!) {
+        createPost(post: $post) {
+          ...ViewPostFields
+        }
+      }
+    `,
+    {
+      refetchQueries: ["Posts"],
+    }
+  );
 }
 
 type LikePostVariables = {

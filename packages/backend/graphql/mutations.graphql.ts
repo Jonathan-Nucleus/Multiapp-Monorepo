@@ -59,7 +59,7 @@ const schema = gql`
 `;
 
 export type MediaUpload = RemoteUpload;
-export type MediaType = "POST" | "AVATAR";
+export type MediaType = "POST" | "AVATAR" | "BACKGROUND";
 
 const resolvers = {
   Mutation: {

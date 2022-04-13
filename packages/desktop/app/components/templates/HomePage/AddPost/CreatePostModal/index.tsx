@@ -1,6 +1,12 @@
-import { ChangeEvent, FC, useState, useEffect, FormEventHandler } from "react";
+import {
+  ChangeEvent,
+  FC,
+  FormEventHandler,
+  useState,
+  useEffect,
+  useRef,
+} from "react";
 import { Dialog } from "@headlessui/react";
-import { MentionsInput, Mention, OnChangeHandlerFunc } from "react-mentions";
 import {
   Buildings,
   User,
@@ -12,76 +18,42 @@ import {
   CaretDown,
   XCircle,
 } from "phosphor-react";
-import { useSession } from "next-auth/react";
-import { useMutation } from "@apollo/client";
 import Image from "next/image";
+import CategorySelector, { categoriesSchema } from "./CategorySelector";
+import Avatar from "desktop/app/components/common/Avatar";
+import Card from "desktop/app/components/common/Card";
+import Button from "desktop/app/components/common/Button";
+import Input from "desktop/app/components/common/Input";
+import Dropdown from "desktop/app/components/common/Dropdown";
+import Label from "desktop/app/components/common/Label";
+import MentionTextarea, {
+  mentionTextSchema,
+} from "desktop/app/components/common/MentionTextarea";
 
-import UserDropdown from "./UserDropdown";
-import CategorySelector from "./CategorySelector";
-import Card from "../../../../common/Card";
-import Button from "../../../../common/Button";
-import Textarea from "../../../../common/Textarea";
-import Input from "../../../../common/Input";
-import defaultStyle from "./styles";
-import defaultMentionStyle from "./defaultMentionStyle";
 import {
-  CREATE_POST,
+  SubmitHandler,
+  useForm,
+  Controller,
+  DefaultValues,
+} from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { useAccount } from "desktop/app/graphql/queries";
+import {
+  useCreatePost,
   useFetchUploadLink,
 } from "desktop/app/graphql/mutations/posts";
+import { Audience, PostCategory } from "backend/graphql/posts.graphql";
+import {
+  Audiences,
+  PostCategories,
+} from "backend/graphql/enumerations.graphql";
 
-const profileImage =
-  "https://t4.ftcdn.net/jpg/02/45/56/35/360_F_245563558_XH9Pe5LJI2kr7VQuzQKAjAbz9PAyejG1.jpg";
-
-const users = [
-  {
-    id: "walter",
-    display: "Walter White",
-  },
-  {
-    id: "jesse",
-    display: "Jesse Pinkman",
-  },
-  {
-    id: "gus",
-    display: 'Gustavo "Gus" Fring',
-  },
-  {
-    id: "saul",
-    display: "Saul Goodman",
-  },
-  {
-    id: "hank",
-    display: "Hank Schrader",
-  },
-  {
-    id: "skyler",
-    display: "Skyler White",
-  },
-  {
-    id: "mike",
-    display: "Mike Ehrmantraut",
-  },
-  {
-    id: "lydia",
-    display: "Lydìã Rôdarté-Qüayle",
-  },
-];
-
-const userOptions = [
-  {
-    icon: <User color="currentColor" weight="fill" size={24} />,
-    title: "Richard Branson",
-  },
-  {
-    icon: <Buildings color="currentColor" weight="fill" size={24} />,
-    title: "Virgin Atlantic",
-  },
-];
-
-const visibleOptions = [
+const audienceOptions = [
   {
     icon: <GlobeHemisphereEast color="currentColor" weight="fill" size={24} />,
     title: "Everyone",
+    value: "EVERYONE",
   },
   {
     icon: (
@@ -93,6 +65,7 @@ const visibleOptions = [
       </div>
     ),
     title: "Qualified Purchasers",
+    value: "QUALIFIED_PURCHASER",
   },
   {
     icon: (
@@ -104,6 +77,7 @@ const visibleOptions = [
       </div>
     ),
     title: "Qualified Clients",
+    value: "QUALIFIED_CLIENT",
   },
   {
     icon: (
@@ -115,8 +89,37 @@ const visibleOptions = [
       </div>
     ),
     title: "Accredited Investors",
+    value: "ACCREDITED",
   },
 ];
+
+type FormValues = {
+  user: string;
+  audience: Audience;
+  mediaUrl?: string;
+  categories: PostCategory[];
+  mentionInput: {
+    body?: string;
+    mentions?: {
+      id: string;
+      name: string;
+    }[];
+  };
+};
+
+const schema = yup
+  .object({
+    user: yup.string().required("Required"),
+    audience: yup
+      .mixed()
+      .oneOf<Audience>(Audiences)
+      .default("EVERYONE")
+      .required(),
+    mediaUrl: yup.string().notRequired(),
+    categories: categoriesSchema,
+    mentionInput: mentionTextSchema,
+  })
+  .required();
 
 interface CreatePostModalProps {
   show: boolean;
@@ -124,210 +127,211 @@ interface CreatePostModalProps {
 }
 
 const CreatePostModal: FC<CreatePostModalProps> = ({ show, onClose }) => {
-  const [selectedUser, setSelectedUser] = useState(0);
-  const [selectedVisible, setSelectedVisible] = useState(0);
-  const [text, setText] = useState("");
+  const { data: userData } = useAccount();
+  const selectedFile = useRef<File | undefined>(undefined);
+  const [localFileUrl, setLocalFileUrl] = useState<string | null>(null);
   const [showCategories, setShowCategories] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File>();
-  const [preview, setPreview] = useState("");
-  const [value, setValue] = useState("");
-  const [ids, setIds] = useState<any[]>([]);
-  const [message, setMessage] = useState("");
-  const [selections, setSelections] = useState<string[]>([]);
-  const [createPost] = useMutation(CREATE_POST);
+  const [createPost] = useCreatePost();
   const [fetchUploadLink] = useFetchUploadLink();
-  const { data: session, status } = useSession();
+  const [loading, setLoading] = useState(false);
 
+  const account = userData?.account;
+  const userOptions = account?._id
+    ? [
+        {
+          icon: <User color="currentColor" weight="fill" size={24} />,
+          title: "Richard Branson",
+          value: account._id,
+        },
+        ...account?.companies.map((company) => ({
+          icon: <Buildings color="currentColor" weight="fill" size={24} />,
+          title: company.name,
+          value: company._id,
+        })),
+      ]
+    : [];
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { isValid, errors },
+    reset,
+  } = useForm<yup.InferType<typeof schema>>({
+    resolver: yupResolver(schema),
+    defaultValues: schema.cast(
+      { user: account?._id },
+      { assert: false }
+    ) as DefaultValues<FormValues>,
+    mode: "onChange",
+  });
+
+  // Reset form default values once user data is available
   useEffect(() => {
-    if (!selectedFile) {
-      setPreview("");
-      return;
-    }
+    reset(
+      schema.cast(
+        { user: account?._id },
+        { assert: false }
+      ) as DefaultValues<FormValues>
+    );
+  }, [account]);
 
-    const objectUrl = URL.createObjectURL(selectedFile);
-    setPreview(objectUrl);
-
-    // free memory when ever this component is unmounted
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [selectedFile]);
-
-  const onSelectFile: FormEventHandler<HTMLInputElement> = (e) => {
-    const taget = e.currentTarget;
-    if (!taget.files || taget.files.length === 0) {
-      setSelectedFile(undefined);
-      return;
-    }
-
-    // I've kept this example simple by using the first image instead of multiple
-    setSelectedFile(taget.files[0]);
-  };
-
-  const handleChange: OnChangeHandlerFunc = (event, mentions) => {
-    const taget = event.target;
-    setMessage(mentions);
-    if (taget.value) {
-      setValue(taget.value);
-    } else {
-      setIds([]);
-    }
-  };
-
-  const onAdd = (id: string | number, display: string) => {
-    const _ids = [...ids];
-    _ids.push(id);
-    setIds(_ids);
-  };
-
-  const handleClear = () => {
-    setSelectedFile(undefined);
-    setPreview("");
-  };
-
-  const handleNext = async () => {
-    const key = Date.now().toString();
+  const onSubmit: SubmitHandler<FormValues> = async ({
+    user,
+    audience,
+    mediaUrl,
+    categories,
+    mentionInput,
+  }) => {
     try {
-      let mediaUrl = "";
-      if (selectedFile) {
-        const { data } = await fetchUploadLink({
-          variables: {
-            localFilename: selectedFile.name,
-          },
-        });
-
-        if (!data || !data.uploadLink) {
-          console.log("Error fetching upload link");
-          return;
-        }
-
-        const { remoteName, uploadUrl } = data.uploadLink;
-        const response = await fetch(uploadUrl, {
-          method: "PUT",
-          body: selectedFile,
-        });
-
-        mediaUrl = remoteName;
-      }
-
-      const result = await createPost({
+      const { data } = await createPost({
         variables: {
           post: {
-            categories: selections,
-            audience: "EVERYONE",
-            body: "This is my post",
-            mediaUrl: mediaUrl,
-            mentionIds: [],
+            audience,
+            categories,
+            mediaUrl,
+            body: mentionInput.body,
+            mentionIds: mentionInput.mentions?.map((mention) => mention.id),
           },
         },
       });
 
-      onClose();
+      if (data && data.createPost) {
+        closeModal();
+        return;
+      }
+
+      console.log("Unable to create post");
     } catch (err) {
-      console.log("icreatePost error", err);
+      console.log("Error creating post", err);
     }
   };
 
+  const uploadMedia = async (file: File): Promise<string | undefined> => {
+    setLoading(true);
+    setLocalFileUrl(URL.createObjectURL(file));
+
+    const { data } = await fetchUploadLink({
+      variables: {
+        localFilename: file.name,
+        type: "POST",
+      },
+    });
+
+    if (!data || !data.uploadLink) {
+      console.log("Error fetching upload link");
+      return undefined;
+    }
+
+    const { remoteName, uploadUrl } = data.uploadLink;
+    await fetch(uploadUrl, {
+      method: "PUT",
+      body: file,
+    });
+
+    setLoading(false);
+    return remoteName;
+  };
+
+  const closeModal = () => {
+    onClose();
+    setLocalFileUrl(null);
+    reset(schema.cast({}, { assert: false }) as DefaultValues<FormValues>);
+  };
+
   return (
-    <>
-      <Dialog
-        open={show}
-        onClose={onClose}
-        className="fixed z-10 inset-0 overflow-y-auto"
-      >
-        <div className="flex items-center justify-center h-screen">
+    <Dialog open={show} onClose={() => {}} className="fixed z-10 inset-0">
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="md:flex items-center justify-center h-screen p-4 overflow-y-auto">
           <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
-          <Card className="flex flex-col border-0 h-3/4 mx-auto p-0 z-10  overflow-y-auto">
+          <Card className="relative md:flex flex-col border-0 md:h-3/4 p-0 z-10">
             <div className="flex items-center justify-between p-4 border-b border-white/[.12]">
               <div className="text-xl text-white font-medium">Create Post</div>
               <Button variant="text">
-                <X color="white" weight="bold" size={24} onClick={onClose} />
+                <X color="white" weight="bold" size={24} onClick={closeModal} />
               </Button>
             </div>
-            <div className="flex flex-col flex-grow md:flex-row max-w-full md:min-h-0">
-              <div className="flex flex-col w-[40rem] max-w-full">
-                <div className="flex items-center p-4">
-                  <div className="w-14 h-14 flex items-center justify-center flex-shrink-0">
-                    <Image
-                      loader={() => profileImage}
-                      src={profileImage}
-                      alt=""
-                      width={56}
-                      height={56}
-                      className="object-cover rounded-full"
-                      unoptimized={true}
-                    />
-                  </div>
+            <div className="flex flex-col md:flex-row flex-grow md:min-h-0">
+              <div className="flex flex-col md:w-[40rem]">
+                <div className="flex flex-wrap items-center p-4">
+                  <Avatar size={56} />
                   <div className="ml-2">
-                    <UserDropdown
-                      selected={selectedUser}
+                    <Dropdown
                       items={userOptions}
-                      onSelect={setSelectedUser}
+                      control={control}
+                      name="user"
                     />
                   </div>
                   <div className="ml-2">
-                    <UserDropdown
-                      selected={selectedVisible}
-                      items={visibleOptions}
-                      onSelect={setSelectedVisible}
+                    <Dropdown
+                      items={audienceOptions}
+                      control={control}
+                      name="audience"
                     />
                   </div>
                 </div>
                 <div className="mx-4 mt-2 caret-primary min-h-0 flex-grow">
-                  {/* <Textarea
-                    className="bg-transparent w-full text-sm text-white h-48 max-h-80"
-                    placeholder={
-                      "Create a post\nUse $ before ticker symbols: ex: $TSLA\nUse @ to tag a user, page or fund"
-                    }
-                    value={text}
-                    onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
-                      setText(event.target.value)
-                    }
-                  /> */}
-                  <MentionsInput
-                    value={value}
-                    onChange={handleChange}
-                    style={defaultStyle}
-                    placeholder={"Mention people using '@'"}
-                  >
-                    <Mention
-                      trigger="@"
-                      data={users}
-                      style={defaultMentionStyle}
-                      onAdd={onAdd}
-                    />
-                  </MentionsInput>
+                  <MentionTextarea control={control} name="mentionInput" />
                 </div>
-                <div className="mb-4 max-h-72 max-w-full h-72 mt-2">
-                  {selectedFile && preview && (
-                    <div className="relative  max-h-72">
-                      <div className="h-64 relative w-full">
+                <div className="my-2">
+                  {localFileUrl && (
+                    <div className="relative px-4">
+                      <div className="h-64 relative">
                         <Image
                           alt="Mountains"
-                          src={preview}
+                          src={localFileUrl}
                           layout="fill"
                           className="rounded-md"
                           objectFit="cover"
+                          onLoad={() => {
+                            if (selectedFile.current) {
+                              URL.revokeObjectURL(localFileUrl);
+                            }
+                          }}
                         />
                       </div>
                       <Button
                         variant="text"
-                        className="absolute top-0 right-0"
-                        onClick={handleClear}
+                        className="absolute top-1 right-5 py-0"
+                        onClick={() => {
+                          selectedFile.current = undefined;
+                          URL.revokeObjectURL(localFileUrl);
+                          setLocalFileUrl(null);
+                        }}
                       >
                         <XCircle size={32} color="#5F5F5F" weight="fill" />
                       </Button>
                     </div>
                   )}
                 </div>
-
                 <div className="mx-4 mt-2 mb-2">
                   <div className="flex items-center">
-                    <Input
-                      type="file"
-                      onChange={onSelectFile}
-                      className="absolute w-32 opacity-0 cursor-pointer"
-                      accept="image/*, video/*, audio/*"
+                    <Controller
+                      control={control}
+                      name="mediaUrl"
+                      render={({ field }) => (
+                        <Input
+                          id="image-select"
+                          type="file"
+                          value=""
+                          onInput={async (evt) => {
+                            const file = evt.currentTarget.files?.[0];
+                            selectedFile.current = file;
+
+                            if (file) {
+                              const remoteFilename = await uploadMedia(file);
+                              field.onChange(remoteFilename);
+                            }
+                          }}
+                          className="hidden"
+                          accept="image/*, video/*"
+                        />
+                      )}
                     />
-                    <div className="flex items-center cursor-pointer">
+                    <Label
+                      htmlFor="image-select"
+                      className="flex items-center cursor-pointer hover:opacity-80 transition"
+                    >
                       <div className="text-purple-secondary">
                         <ImageIcon
                           color="currentColor"
@@ -335,11 +339,11 @@ const CreatePostModal: FC<CreatePostModalProps> = ({ show, onClose }) => {
                           size={24}
                         />
                       </div>
-                      <div className="text-sm text-white/[.6] ml-2">
+                      <div className="text-sm text-white/[.6] font-normal ml-2">
                         Photo/Video
                       </div>
-                    </div>
-                    <div className="flex items-center text-white/[.6] ml-4 cursor-pointer">
+                    </Label>
+                    <div className="flex items-center text-white/[.6] ml-4 cursor-pointer hover:opacity-80 transition">
                       <div className="text-success">
                         <Smiley color="currentColor" weight="light" size={24} />
                       </div>
@@ -355,8 +359,8 @@ const CreatePostModal: FC<CreatePostModalProps> = ({ show, onClose }) => {
                 </div>
               </div>
               {showCategories && (
-                <div className="w-full border-l border-white/[.12] md:w-80">
-                  <CategorySelector />
+                <div className="w-full md:border-l border-white/[.12] md:w-80">
+                  <CategorySelector control={control} name="categories" />
                 </div>
               )}
             </div>
@@ -364,25 +368,24 @@ const CreatePostModal: FC<CreatePostModalProps> = ({ show, onClose }) => {
               <Button
                 variant="text"
                 className="text-primary font-medium"
-                onClick={() => onClose()}
+                onClick={closeModal}
               >
                 CANCEL
               </Button>
               <Button
+                type={showCategories ? "submit" : "button"}
                 variant="gradient-primary"
                 className="w-48 font-medium"
-                // disabled={!text}
-                onClick={() => {
-                  showCategories ? handleNext() : setShowCategories(true);
-                }}
+                loading={loading}
+                onClick={() => !showCategories && setShowCategories(true)}
               >
                 NEXT
               </Button>
             </div>
           </Card>
         </div>
-      </Dialog>
-    </>
+      </form>
+    </Dialog>
   );
 };
 

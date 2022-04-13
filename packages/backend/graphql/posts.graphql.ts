@@ -10,12 +10,23 @@ import type { Post } from "backend/schemas/post";
 import {
   PostSchema,
   AudienceOptions,
+  AudienceEnum,
   PostCategoryOptions,
   PostCategoryEnum,
 } from "backend/schemas/post";
 
 type GraphQLPost = Post.GraphQL;
-export type { PostCategoryEnum as PostCategory, GraphQLPost as Post };
+type PostInput = Omit<Post.Input, "audience" | "categories"> & {
+  audience: AudienceEnum;
+  categories: PostCategoryEnum[];
+};
+
+export type {
+  GraphQLPost as Post,
+  PostInput,
+  PostCategoryEnum as PostCategory,
+  AudienceEnum as Audience,
+};
 
 const schema = gql`
   ${PostSchema}

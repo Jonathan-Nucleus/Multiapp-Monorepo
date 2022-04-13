@@ -14,6 +14,7 @@ const schema = gql`
   type Query {
     verifyInvite(code: String!): Boolean!
     posts(categories: [PostCategory!]): [Post!]
+    account: User
     funds: [Fund!]
   }
 `;
@@ -44,6 +45,15 @@ const resolvers = {
       }
     ),
 
+    /**
+     * Fetch account details for the currently authenticated user.
+     *
+     * @returns   The User object associated with the current user.
+     */
+    account: secureEndpoint(
+      async (parentIgnored, argsIgnored, { db, user }): Promise<Post.Mongo[]> =>
+        db.users.find({ _id: user._id })
+    
     funds: secureEndpoint(
       async (
         parentIgnored,

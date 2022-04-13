@@ -1,1 +1,1 @@
-export const SOMETHING_WRONG = 'Something went wrong. Please try again later';
+export const SOMETHING_WRONG = "Something went wrong. Please try again later";

@@ -13,6 +13,7 @@ import {
   SignOut,
 } from "phosphor-react";
 import MenuItem from "./MenuItem";
+import Avatar from "desktop/app/components/common/Avatar";
 
 const AvatarMenu: FC = () => {
   const items = [
@@ -62,8 +63,8 @@ const AvatarMenu: FC = () => {
     <Menu as="div" className="relative">
       <Menu.Button>
         <div className="flex flex-row items-center cursor-pointer">
-          <div className="bg-white rounded-full w-8 h-8 flex items-center justify-center">
-            <User color="black" size={24} />
+          <div className="w-8 h-8 flex items-center justify-center">
+            <Avatar size={32} />
           </div>
           <div className="ml-2">
             <CaretDown color="white" weight="bold" size={16} />
@@ -73,8 +74,8 @@ const AvatarMenu: FC = () => {
       <Menu.Items className="absolute right-0 w-64 mt-6 bg-surface-light10 shadow-md shadow-black rounded">
         <div className="divide-y border-white/[.12] divide-inherit pb-2">
           <div className="flex flex-row items-center p-4">
-            <div className="bg-white rounded-full w-16 h-16 flex items-center justify-center">
-              <User color="black" size={48} />
+            <div className="w-16 h-16 flex items-center justify-center">
+              <Avatar size={64} />
             </div>
             <div className="ml-3">
               <div className="text-xl text-white">Richard Branson</div>

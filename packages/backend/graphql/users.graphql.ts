@@ -18,6 +18,9 @@ import type { Post } from "backend/schemas/post";
 import type { Comment } from "backend/schemas/comment";
 import type { Company } from "backend/schemas/company";
 
+type GraphQLUser = User.GraphQL;
+export type { GraphQLUser as User };
+
 const schema = gql`
   ${UserSchema}
 `;
@@ -91,31 +94,31 @@ const resolvers = {
       parent: User.Mongo,
       argsIgnored: NoArgs,
       { db }: ApolloServerContext
-    ) => db.companies.findAll(parent.companyIds),
+    ) => (parent.companyIds ? db.companies.findAll(parent.companyIds) : []),
 
     mutedPosts: async (
       parent: User.Mongo,
       argsIgnored: NoArgs,
       { db }: ApolloServerContext
-    ) => db.posts.findAll(parent.mutedPostIds),
+    ) => (parent.mutedPostIds ? db.posts.findAll(parent.mutedPostIds) : []),
 
     hiddenPosts: async (
       parent: User.Mongo,
       argsIgnored: NoArgs,
       { db }: ApolloServerContext
-    ) => db.posts.findAll(parent.hiddenPostIds),
+    ) => (parent.hiddenPostIds ? db.posts.findAll(parent.hiddenPostIds) : []),
 
     hiddenUsers: async (
       parent: User.Mongo,
       argsIgnored: NoArgs,
       { db }: ApolloServerContext
-    ) => db.users.findAll(parent.hiddenUserIds),
+    ) => (parent.hiddenUserIds ? db.users.findAll(parent.hiddenUserIds) : []),
 
     invitees: async (
       parent: User.Mongo,
       argsIgnored: NoArgs,
       { db }: ApolloServerContext
-    ) => db.users.findAll(parent.inviteeIds),
+    ) => (parent.inviteeIds ? db.users.findAll(parent.inviteeIds) : []),
   },
 
   ReportedPost: {

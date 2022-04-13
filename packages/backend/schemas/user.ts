@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { ValueOf, GraphQLEntity } from "backend/lib/mongo-helper";
 
-import { PostCategory, PostCategoryEnum } from "./post";
+import { Post, PostCategory, PostCategoryEnum } from "./post";
 import { Company } from "./company";
 
 export interface ContentCreatorProps {
@@ -55,7 +55,17 @@ export namespace User {
   };
 
   export type GraphQL = GraphQLEntity<
-    Omit<Mongo, "role" | "accreditation" | "reportedPost" | "settings">
+    Omit<
+      Mongo,
+      | "password"
+      | "salt"
+      | "emailToken"
+      | "authProvider"
+      | "role"
+      | "accreditation"
+      | "reportedPost"
+      | "settings"
+    >
   > & {
     role: UserRoleEnum;
     accreditation: AccreditationEnum;
@@ -66,11 +76,17 @@ export namespace User {
       interests?: PostCategoryEnum[];
     };
     createdAt: Date;
+    companies: Company.GraphQL[];
+    mutedPosts: Post.GraphQL[];
+    hiddenPosts: Post.GraphQL[];
+    hiddenUsers: User.GraphQL[];
+    invitees: (User.Stub | User.GraphQL)[];
     company?: Company.GraphQL;
   };
 
   export type Input = Required<
-    Pick<GraphQL, "email" | "password" | "firstName" | "lastName"> & {
+    Pick<GraphQL, "email" | "firstName" | "lastName"> & {
+      password: string;
       inviteCode: string;
     }
   >;

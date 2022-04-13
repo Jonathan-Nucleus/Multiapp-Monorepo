@@ -46,6 +46,7 @@ export const AudienceOptions = {
   ...relevantAccrediationOptions,
 } as const;
 export type Audience = ValueOf<typeof AudienceOptions>;
+export type AudienceEnum = keyof typeof AudienceOptions;
 
 /** Enumeration describing the possible cateogories of a post. */
 export const PostCategoryOptions = {

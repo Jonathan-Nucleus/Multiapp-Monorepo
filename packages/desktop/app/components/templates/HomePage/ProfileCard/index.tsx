@@ -3,6 +3,7 @@ import Image from "next/image";
 import { CircleWavy } from "phosphor-react";
 import Link from "next/link";
 import Card from "../../../common/Card";
+import Avatar from "desktop/app/components/common/Avatar";
 
 const profile = {
   image:
@@ -19,15 +20,7 @@ const ProfileCard: FC = () => {
   return (
     <div>
       <div className="h-24 flex items-center justify-center">
-        <Image
-          loader={() => profile.image}
-          src={profile.image}
-          alt=""
-          width={88}
-          height={88}
-          className="object-cover rounded-full"
-          unoptimized={true}
-        />
+        <Avatar size={88} />
       </div>
       <Card className="text-center -mt-12">
         <div className="text-xl text-white font-medium mt-12">

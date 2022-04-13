@@ -1,0 +1,19 @@
+.mentions--multiLine {
+  @apply h-full;
+}
+
+.mentions--multiLine .mentions__input {
+  min-height: 100px;
+  @apply h-full outline-none;
+}
+
+.mentions__suggestions__list {
+  @apply bg-background-popover w-96 max-h-80 p-2 overflow-y-auto shadow-black shadow-md;
+}
+
+.mentions__suggestions__item--focused {
+  @apply bg-primary-overlay/[.24];
+}
+
+.mentions__mention {
+}
