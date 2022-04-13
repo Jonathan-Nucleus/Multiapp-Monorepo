@@ -15,16 +15,26 @@ const RootLayout: FC<RootLayoutProps> = ({
   layout,
   children,
 }: RootLayoutProps) => {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
-  if (middleware == "guest" && session) {
-    if (typeof window === "undefined") return null;
-    router.replace("/");
-    return <></>;
-  } else if (middleware == "auth" && !session) {
-    if (typeof window === "undefined") return null;
-    router.replace(`${AppAuthOptions.pages?.signIn}?redirect=${router.asPath}`);
-    return <></>;
+  if (middleware == "guest") {
+    if (status == "loading") {
+      return <></>;
+    }
+    if (session) {
+      router.replace("/");
+      return <></>;
+    }
+  } else if (middleware == "auth") {
+    if (status == "loading") {
+      return <></>;
+    }
+    if (!session) {
+      router.replace(
+        `${AppAuthOptions.pages?.signIn}?redirect=${router.asPath}`
+      );
+      return <></>;
+    }
   }
   return (
     <>

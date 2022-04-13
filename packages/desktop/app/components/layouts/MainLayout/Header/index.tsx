@@ -38,7 +38,7 @@ const navItems = [
 const Header: FC = () => {
   const [showSidebar, setShowSidebar] = useState(false);
   return (
-    <header className="bg-surface-light10 shadow-md shadow-black sticky top-0 z-10">
+    <header className="bg-surface-light10 shadow shadow-black sticky top-0 z-10">
       <nav className="hidden md:flex flex-row items-center p-5">
         <div>
           <div className="w-72 hidden lg:block">
