@@ -91,7 +91,7 @@ const Notification: NotificationScreen = ({ navigation }) => {
 
   const renderListItem: ListRenderItem<typeof DATA[number]> = ({ item }) => {
     return (
-      <TouchableOpacity onPress={() => navigation.navigate('Detail')}>
+      <TouchableOpacity>
         <View style={styles.item}>
           <View>
             <Image source={Avatar} style={styles.avatar} />

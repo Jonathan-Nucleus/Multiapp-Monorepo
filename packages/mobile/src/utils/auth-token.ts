@@ -26,9 +26,9 @@ export async function setToken(token: string): Promise<void> {
 /**
  * Clears any token stored in the encrypted storge of the user device.
  */
-export function clearToken(): Promise<void> {
+export async function clearToken(): Promise<void> {
   try {
-    EncryptedStorage.removeItem(TOKEN_KEY);
+    await EncryptedStorage.clear();
   } catch (err) {
     console.log('Error while clearing token', err);
   }

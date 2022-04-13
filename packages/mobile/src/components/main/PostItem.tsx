@@ -3,10 +3,10 @@ import { View, StyleSheet, Image } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import dayjs from 'dayjs';
 
-import PLabel from '../../components/common/PLabel';
-import IconButton from '../../components/common/IconButton';
-import UserInfo from '../../components/common/UserInfo';
-import Tag from '../../components/common/Tag';
+import PLabel from '../common/PLabel';
+import IconButton from '../common/IconButton';
+import UserInfo from '../common/UserInfo';
+import Tag from '../common/Tag';
 import { BGDARK, GRAY10, WHITE60 } from 'shared/src/colors';
 import { Body1, Body3 } from '../../theme/fonts';
 import { PostDataType } from '../../graphql/post';
@@ -30,7 +30,7 @@ interface FeedItemProps {
   post: Post;
 }
 
-const FeedItem: React.FC<FeedItemProps> = ({ post }) => {
+const PostItem: React.FC<FeedItemProps> = ({ post }) => {
   const { user } = post;
 
   return (
@@ -152,4 +152,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FeedItem;
+export default PostItem;

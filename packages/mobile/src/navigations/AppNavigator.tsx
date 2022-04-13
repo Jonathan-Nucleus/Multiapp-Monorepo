@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { View, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { NavigationContainerRef } from '@react-navigation/core';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -10,7 +9,6 @@ import AuthStack from './AuthStack';
 import BottomTabNavigator from './BottomTabNavigator';
 import * as NavigationService from '../services/navigation/NavigationService';
 
-import Splash from 'mobile/src/components/common/Splash';
 import {
   getToken,
   attachTokenObserver,
@@ -51,10 +49,6 @@ const AppNavigator = () => {
     setAuthenticated(!!token);
   })();
 
-  if (authenticated === null) {
-    return <Splash />;
-  }
-
   const onReady = () => {
     routeNameRef.current = navigationRef?.current?.getCurrentRoute()?.name;
     console.log('Running', routeNameRef.current);
@@ -67,6 +61,11 @@ const AppNavigator = () => {
     console.log('Prev: ', prev);
     routeNameRef.current = current;
   };
+  useEffect(() => {
+    if (authenticated) {
+      NavigationService.navigate('Main');
+    }
+  }, [authenticated]);
 
   return (
     <NavigationContainer
@@ -74,13 +73,11 @@ const AppNavigator = () => {
       onReady={onReady}
       onStateChange={onStateChange}>
       <Stack.Navigator screenOptions={defaultScreenOptions}>
-        {!authenticated && (
-          <Stack.Screen
-            name="Auth"
-            component={AuthStack}
-            options={{ gestureEnabled: false }}
-          />
-        )}
+        <Stack.Screen
+          name="Auth"
+          component={AuthStack}
+          options={{ gestureEnabled: false }}
+        />
         <Stack.Screen name="Main" component={BottomTabNavigator} />
       </Stack.Navigator>
     </NavigationContainer>

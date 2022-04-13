@@ -1,9 +1,15 @@
 import React, { FC, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { NavigationProp } from '@react-navigation/native';
 import { CaretLeft, MagnifyingGlass } from 'phosphor-react-native';
-import { WHITE, BGDARK, GRAY1, PRIMARY, BGDARK100 } from 'shared/src/colors';
+import {
+  WHITE,
+  BGDARK,
+  GRAY1,
+  PRIMARY,
+  BGDARK100,
+  BLUE300,
+} from 'shared/src/colors';
 
 import PHeader from '../../../components/common/PHeader';
 import pStyles from '../../../theme/pStyles';
@@ -11,6 +17,7 @@ import { Body1, Body2, Body3 } from '../../../theme/fonts';
 import PAppContainer from '../../../components/common/PAppContainer';
 import PTextInput from '../../../components/common/PTextInput';
 import PLabel from '../../../components/common/PLabel';
+import MainHeader from '../../../components/main/Header';
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
@@ -19,14 +26,17 @@ interface RouterProps {
 const InviteFriends: FC<RouterProps> = ({ navigation }) => {
   const [email, setEmail] = useState('');
   return (
-    <SafeAreaView style={pStyles.globalContainer}>
-      <PHeader
-        centerIcon={<Text style={styles.headerTitle}>Invite Friends</Text>}
-        containerStyle={styles.headerContainer}
-        leftIcon={<CaretLeft size={28} color={WHITE} />}
-        rightIcon={<MagnifyingGlass size={28} color={WHITE} />}
+    <View style={pStyles.globalContainer}>
+      <MainHeader
         onPressLeft={() => navigation.goBack()}
-        onPressRight={() => console.log(1231)}
+        leftIcon={
+          <View style={styles.row}>
+            <View style={styles.backIcon}>
+              <CaretLeft size={28} color={WHITE} />
+            </View>
+            <Text style={styles.headerTitle}>Invite Friends</Text>
+          </View>
+        }
       />
       <PAppContainer>
         <View style={styles.container}>
@@ -54,7 +64,7 @@ const InviteFriends: FC<RouterProps> = ({ navigation }) => {
           </View>
         </View>
       </PAppContainer>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -117,5 +127,18 @@ const styles = StyleSheet.create({
   },
   btnTxt: {
     textTransform: 'uppercase',
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backIcon: {
+    backgroundColor: BLUE300,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
   },
 });

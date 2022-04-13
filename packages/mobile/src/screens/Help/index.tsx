@@ -15,7 +15,7 @@ interface RouterProps {
 
 const Help: FC<RouterProps> = ({ navigation }) => {
   return (
-    <SafeAreaView style={pStyles.globalContainer}>
+    <View style={pStyles.globalContainer}>
       <PHeader
         containerStyle={styles.headerContainer}
         leftIcon={<CaretLeft size={28} color={WHITE} />}
@@ -23,7 +23,7 @@ const Help: FC<RouterProps> = ({ navigation }) => {
         onPressLeft={() => navigation.goBack()}
         onPressRight={() => console.log(1231)}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 

@@ -145,40 +145,12 @@ const styles = StyleSheet.create({
     backgroundColor: PRIMARYSOLID7,
     marginTop: 16,
   },
-  commentWrap: {
-    marginLeft: 15,
-    flex: 1,
-  },
   label: {
     ...Body2,
     color: WHITE,
   },
-  comment: {
-    color: GRAY100,
-    ...Body3,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
   between: {
     justifyContent: 'space-between',
-  },
-  logoutBtn: {
-    marginTop: 50,
-    borderRadius: 8,
-    height: 48,
-    backgroundColor: GRAY2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logout: {
-    textAlign: 'center',
-    color: GRAY100,
-  },
-  rightItem: {
-    marginLeft: 8,
   },
   delete: {
     color: DANGER,

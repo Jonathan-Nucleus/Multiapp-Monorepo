@@ -52,7 +52,8 @@ const FundItem: FC<FundItemProps> = ({ fund }) => {
             style={[
               styles.statusIndicator,
               fund.status === 'OPEN' ? styles.open : styles.closed,
-            ]}></View>
+            ]}
+          />
           <Text
             style={[
               styles.status,
@@ -82,24 +83,22 @@ const FundItem: FC<FundItemProps> = ({ fund }) => {
           />
           <View>
             <View style={styles.manager}>
-              <Text
-                style={[
-                  styles.whiteText,
-                  Body2,
-                ]}>{`${fund.manager.firstName} ${fund.manager.lastName}`}</Text>
+              <Text style={[styles.whiteText, Body2]}>
+                {`${fund.manager.firstName} ${fund.manager.lastName}`}
+              </Text>
               <View style={styles.separator} />
               <TouchableOpacity>
                 <Text style={styles.follow}>Follow</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.managerInfo}>
-              <Text style={[styles.grayText, Body2]}>{`${
-                fund.manager.followerIds?.length ?? 0
-              } Followers`}</Text>
+              <Text style={[styles.grayText, Body2]}>
+                {`${fund.manager.followerIds?.length ?? 0} Followers`}
+              </Text>
               <View style={styles.separator} />
-              <Text style={[styles.grayText, Body2]}>{`${
-                fund.manager.postIds?.length ?? 0
-              } Posts`}</Text>
+              <Text style={[styles.grayText, Body2]}>
+                {`${fund.manager.postIds?.length ?? 0} Posts`}
+              </Text>
             </View>
           </View>
         </View>
@@ -123,6 +122,7 @@ const FundItem: FC<FundItemProps> = ({ fund }) => {
           label="View Fund Details"
           textStyle={styles.button}
           btnContainer={styles.buttonContainer}
+          onPress={() => console.log(111)}
         />
         <Star size={24} color={WHITE} style={styles.favorite} />
       </View>

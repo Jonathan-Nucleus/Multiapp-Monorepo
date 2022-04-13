@@ -3,7 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 const Stack = createStackNavigator();
 
 import Settings from '../screens/Settings';
-import SettingDetails from '../screens/Settings/Details';
+import Preferences from '../screens/Settings/Preferences';
 import Help from '../screens/Help';
 import CompanySettings from '../screens/Settings/CompanySettings';
 import ProfileSettings from '../screens/Settings/ProfileSettings';
@@ -18,7 +18,7 @@ const SettingsStacks = () => {
       screenOptions={{ headerShown: false, gestureEnabled: true }}
       initialRouteName="Settings">
       <Stack.Screen name="Settings" component={Settings} />
-      <Stack.Screen name="SettingDetails" component={SettingDetails} />
+      <Stack.Screen name="Preferences" component={Preferences} />
       <Stack.Screen name="Help" component={Help} />
       <Stack.Screen name="CompanySettings" component={CompanySettings} />
       <Stack.Screen name="ProfileSettings" component={ProfileSettings} />

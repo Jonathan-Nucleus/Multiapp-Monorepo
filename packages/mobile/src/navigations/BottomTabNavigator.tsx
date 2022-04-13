@@ -3,13 +3,14 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import PropTypes from 'prop-types';
 import { House, Star, Chats, DotsThreeCircle } from 'phosphor-react-native';
 
-import { WHITE, BLACK, BGDARK } from 'shared/src/colors';
+import { WHITE, BLACK, BGDARK, GRAY400 } from 'shared/src/colors';
 
 import HomeStack from './HomeStack';
 import MarketplaceStack from './MarketplaceStack';
 import SettingsStack from './SettingsStack';
-import BellSVG from 'shared/assets/images/tabStar.svg';
-import GreyBellSVG from 'shared/assets/images/tabStar.svg';
+import FundsSVG from 'shared/assets/images/fund.svg';
+import GreyFundsSVG from 'shared/assets/images/grey-fund.svg';
+import WatchList from '../screens/WatchList';
 import Help from '../screens/Help';
 
 const Tab = createBottomTabNavigator();
@@ -38,20 +39,20 @@ export default function BottomTabNavigator() {
             focused ? (
               <House size={size} color={WHITE} weight="fill" />
             ) : (
-              <House size={size} color={WHITE} />
+              <House size={size} color={GRAY400} />
             ),
         }}
       />
       <Tab.Screen
         name="Watchlist"
-        component={Help}
+        component={WatchList}
         options={{
           tabBarLabel: 'watchlist',
           tabBarIcon: ({ focused, size }) =>
             focused ? (
               <Star size={size} color={WHITE} weight="fill" />
             ) : (
-              <Star size={size} color={WHITE} />
+              <Star size={size} color={GRAY400} />
             ),
         }}
       />
@@ -61,7 +62,7 @@ export default function BottomTabNavigator() {
         options={{
           tabBarLabel: 'funds',
           tabBarIcon: ({ focused, size }) =>
-            focused ? <BellSVG /> : <GreyBellSVG />,
+            focused ? <FundsSVG /> : <GreyFundsSVG />,
         }}
       />
       <Tab.Screen
@@ -73,7 +74,7 @@ export default function BottomTabNavigator() {
             focused ? (
               <Chats size={size} color={WHITE} weight="fill" />
             ) : (
-              <Chats size={size} color={WHITE} />
+              <Chats size={size} color={GRAY400} />
             ),
         }}
       />
@@ -86,7 +87,7 @@ export default function BottomTabNavigator() {
             focused ? (
               <DotsThreeCircle size={size} color={WHITE} weight="fill" />
             ) : (
-              <DotsThreeCircle size={size} color={WHITE} />
+              <DotsThreeCircle size={size} color={GRAY400} />
             ),
         }}
       />

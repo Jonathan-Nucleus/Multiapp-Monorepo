@@ -60,9 +60,18 @@ const styles = StyleSheet.create({
       height: 3,
     },
     shadowOpacity: 0.3,
+    height: 96,
   },
-  leftIcon: {},
-  rightIcon: {},
+  leftIcon: {
+    position: 'absolute',
+    left: 16,
+    top: 52,
+  },
+  rightIcon: {
+    position: 'absolute',
+    right: 16,
+    top: 52,
+  },
 });
 
 export default PHeader;

@@ -10,21 +10,19 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FastImage from 'react-native-fast-image';
 import { NavigationProp } from '@react-navigation/native';
+import { clearToken } from 'mobile/src/utils/auth-token';
 import { CaretRight } from 'phosphor-react-native';
 import {
-  BGDARK,
   GRAY2,
   GRAY100,
   WHITE,
-  BLACK,
   PRIMARYSOLID7,
+  BGHEADER,
 } from 'shared/src/colors';
 
+import MainHeader from '../../components/main/Header';
 import pStyles from '../../theme/pStyles';
-import { Body1, Body2, Body3 } from '../../theme/fonts';
-import Header from '../../components/main/Header';
-
-import { clearToken } from 'mobile/src/utils/auth-token';
+import { Body1, Body2, Body3, H6 } from '../../theme/fonts';
 
 interface RenderItemProps {
   item: {
@@ -47,7 +45,7 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
     {
       id: '1',
       label: 'Preferences',
-      onPress: () => navigation.navigate('SettingDetails'),
+      onPress: () => navigation.navigate('Preferences'),
     },
     {
       id: '2',
@@ -60,6 +58,15 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
       onPress: () => navigation.navigate('Help'),
     },
   ];
+
+  const handleLogout = async () => {
+    try {
+      await clearToken();
+      navigation.navigate('Auth');
+    } catch (err) {
+      console.log('logout err', err);
+    }
+  };
 
   const renderListItem = ({ item }: RenderItemProps) => {
     return (
@@ -101,7 +108,6 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
               style={styles.avatar}
               source={{
                 uri: 'https://unsplash.it/400/400?image=1',
-                headers: { Authorization: 'someAuthToken' },
               }}
               resizeMode={FastImage.resizeMode.contain}
             />
@@ -122,8 +128,8 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={pStyles.globalContainer}>
-      <Header navigation={navigation} />
+    <View style={pStyles.globalContainer}>
+      <MainHeader navigation={navigation} />
       <FlatList
         data={MENU_ITEMS}
         ListHeaderComponent={renderListHeaderComponent}
@@ -132,14 +138,14 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
         style={styles.flatList}
         numColumns={2}
         ListFooterComponent={
-          <TouchableOpacity onPress={() => clearToken()}>
+          <TouchableOpacity onPress={handleLogout}>
             <View style={[styles.item, styles.between]}>
-              <Text style={styles.label}>Logout</Text>
+              <Text style={styles.label}>Log Out</Text>
             </View>
           </TouchableOpacity>
         }
       />
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -149,25 +155,9 @@ const styles = StyleSheet.create({
   globalContainer: {
     flex: 1,
   },
-  headerContainer: {
-    backgroundColor: BGDARK,
-    elevation: 5,
-    shadowColor: 'rgba(0, 0, 0, 0.5)',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.3,
-    paddingTop: 0,
-    marginBottom: 0,
-  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  headerTitle: {
-    ...Body1,
-    color: WHITE,
   },
   flatList: {
     flex: 1,
@@ -208,18 +198,6 @@ const styles = StyleSheet.create({
   },
   between: {
     justifyContent: 'space-between',
-  },
-  logoutBtn: {
-    marginTop: 50,
-    borderRadius: 8,
-    height: 48,
-    backgroundColor: GRAY2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logout: {
-    textAlign: 'center',
-    color: GRAY100,
   },
   rightItem: {
     marginLeft: 8,

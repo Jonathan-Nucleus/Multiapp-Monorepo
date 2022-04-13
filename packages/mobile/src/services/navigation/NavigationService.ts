@@ -15,7 +15,7 @@ export function setNavigator(nav: NavigationContainerRef<{}> | null): void {
 
 export function navigate(
   routeName: string,
-  params: Record<string, unknown>,
+  params?: Record<string, unknown>,
 ): void {
   if (config.navigator && routeName) {
     let action = CommonActions.navigate({

@@ -15,7 +15,7 @@ import pStyles from 'mobile/src/theme/pStyles';
 import { Body1, Body2, Body3, H6 } from 'mobile/src/theme/fonts';
 
 import { useFetchFunds } from 'mobile/src/graphql/query/marketplace';
-import FundItem, { Fund } from './FundItem';
+import FundItem, { Fund } from '../../../components/main/FundItem';
 
 const Funds: FundsScreen = ({ navigation }) => {
   const { data } = useFetchFunds();
