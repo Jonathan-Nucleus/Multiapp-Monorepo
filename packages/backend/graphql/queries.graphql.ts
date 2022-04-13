@@ -53,7 +53,8 @@ const resolvers = {
     account: secureEndpoint(
       async (parentIgnored, argsIgnored, { db, user }): Promise<Post.Mongo[]> =>
         db.users.find({ _id: user._id })
-    
+    ),
+
     funds: secureEndpoint(
       async (
         parentIgnored,
