@@ -4,16 +4,16 @@ import {
   ApolloServerContext,
   NoArgs,
   secureEndpoint,
-} from "backend/lib/apollo-helper";
+} from "../lib/apollo-helper";
 
-import type { Post } from "backend/schemas/post";
+import type { Post } from "../schemas/post";
 import {
   PostSchema,
   AudienceOptions,
   AudienceEnum,
   PostCategoryOptions,
   PostCategoryEnum,
-} from "backend/schemas/post";
+} from "../schemas/post";
 
 type GraphQLPost = Post.GraphQL;
 type PostInput = Omit<Post.Input, "audience" | "categories"> & {

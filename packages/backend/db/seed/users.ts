@@ -1,8 +1,8 @@
 import { Db, ObjectId } from "mongodb";
 import { faker } from "@faker-js/faker";
 
-import { User } from "backend/schemas/user";
-import { generateSalt, hashPassword } from "backend/db/collections/users";
+import { User } from "../../schemas/user";
+import { generateSalt, hashPassword } from "../collections/users";
 
 // The name of the mongo collection
 const COLLECTION = "users";

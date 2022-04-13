@@ -2,7 +2,7 @@ import { Db, ObjectId } from "mongodb";
 import { faker } from "@faker-js/faker";
 
 import { randomInt } from "./helpers";
-import { Comment } from "backend/schemas/comment";
+import { Comment } from "../../schemas/comment";
 
 // The name of the mongo collection
 const COLLECTION = "comments";

@@ -4,11 +4,11 @@ import {
   ApolloServerContext,
   NoArgs,
   secureEndpoint,
-} from "backend/lib/apollo-helper";
+} from "../lib/apollo-helper";
 
-import { isUser } from "backend/schemas/user";
-import type { Post, PostCategory } from "backend/schemas/post";
-import type { Fund } from "backend/schemas/fund";
+import { User, isUser } from "../schemas/user";
+import type { Post, PostCategory } from "../schemas/post";
+import type { Fund } from "../schemas/fund";
 
 const schema = gql`
   type Query {
@@ -51,8 +51,14 @@ const resolvers = {
      * @returns   The User object associated with the current user.
      */
     account: secureEndpoint(
-      async (parentIgnored, argsIgnored, { db, user }): Promise<Post.Mongo[]> =>
-        db.users.find({ _id: user._id })
+      async (
+        parentIgnored,
+        argsIgnored,
+        { db, user }
+      ): Promise<User.Mongo | null> => {
+        const userData = await db.users.find({ _id: user._id });
+        return !userData || !isUser(userData) ? null : userData;
+      }
     ),
 
     funds: secureEndpoint(

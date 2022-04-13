@@ -4,14 +4,14 @@ import {
   ApolloServerContext,
   NoArgs,
   secureEndpoint,
-} from "backend/lib/apollo-helper";
+} from "../lib/apollo-helper";
 
-import type { Fund } from "backend/schemas/fund";
+import type { Fund } from "../schemas/fund";
 import {
   FundSchema,
   FundStatusOptions,
   DocumentCategoryOptions,
-} from "backend/schemas/fund";
+} from "../schemas/fund";
 
 type GraphQLFund = Fund.GraphQL;
 export type { GraphQLFund as Fund };

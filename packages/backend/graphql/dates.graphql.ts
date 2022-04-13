@@ -1,6 +1,6 @@
 import { gql } from "apollo-server";
 import { GraphQLScalarType } from "graphql";
-import { PartialSchema } from "backend/lib/apollo-helper";
+import { PartialSchema } from "../lib/apollo-helper";
 
 const schema = gql`
   scalar Date

@@ -9,9 +9,9 @@ import {
   toObjectId,
   toObjectIds,
   GraphQLEntity,
-} from "backend/lib/mongo-helper";
-import type { Fund } from "backend/schemas/fund";
-import type { Accreditation } from "backend/schemas/user";
+} from "../../lib/mongo-helper";
+import type { Fund } from "../../schemas/fund";
+import type { Accreditation } from "../../schemas/user";
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 const createFundsCollection = (fundsCollection: Collection<Fund.Mongo>) => {

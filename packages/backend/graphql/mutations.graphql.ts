@@ -1,24 +1,24 @@
 import { gql } from "apollo-server";
-import { PrometheusMailer } from "backend/email";
+import { PrometheusMailer } from "../email";
 
 import {
   PartialSchema,
   ApolloServerContext,
   NoArgs,
   secureEndpoint,
-} from "backend/lib/apollo-helper";
+} from "../lib/apollo-helper";
 import {
   getAccessToken,
   getResetToken,
   decodeToken,
   AccessToken,
   ResetTokenPayload,
-} from "backend/lib/tokens";
-import { getUploadUrl, RemoteUpload } from "backend/lib/s3-helper";
+} from "../lib/tokens";
+import { getUploadUrl, RemoteUpload } from "../lib/s3-helper";
 
-import { User, Settings, ReportedPost, isUser } from "backend/schemas/user";
-import type { Post } from "backend/schemas/post";
-import type { Comment } from "backend/schemas/comment";
+import { User, Settings, ReportedPost, isUser } from "../schemas/user";
+import type { Post } from "../schemas/post";
+import type { Comment } from "../schemas/comment";
 
 const schema = gql`
   type Mutation {

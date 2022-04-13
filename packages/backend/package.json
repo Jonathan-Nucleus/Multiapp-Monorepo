@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "description": "Prometheus Backend",
   "main": "index.js",
-  "type": "module",
   "private": true,
   "scripts": {
     "db": "docker compose up",
+    "seed": "ts-node-dev --transpile-only --no-notify --exit-child db/seed/index.ts",
     "dev": "ts-node-dev --transpile-only --no-notify --exit-child index.ts",
-    "seed": "ts-node-dev --transpile-only --no-notify --exit-child db/seed/index.ts"
+    "prod": "ts-node -P tsconfig-prod.json --transpile-only index.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.67.0",
@@ -24,6 +24,7 @@
     "graphql": "^16.3.0",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^4.4.1",
+    "ts-node": "^10.7.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
@@ -33,7 +34,6 @@
     "@types/node-fetch": "^2.6.1",
     "@types/uuid": "^8.3.4",
     "apollo-server-types": "^3.5.2",
-    "ts-node": "^10.7.0",
     "ts-node-dev": "^1.1.8"
   }
 }

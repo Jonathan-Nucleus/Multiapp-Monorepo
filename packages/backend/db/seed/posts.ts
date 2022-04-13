@@ -2,11 +2,7 @@ import { Db, ObjectId } from "mongodb";
 import { faker } from "@faker-js/faker";
 
 import { randomInt, randomArray } from "./helpers";
-import {
-  Post,
-  AudienceOptions,
-  PostCategoryOptions,
-} from "backend/schemas/post";
+import { Post, AudienceOptions, PostCategoryOptions } from "../../schemas/post";
 
 // The name of the mongo collection
 const COLLECTION = "posts";

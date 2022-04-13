@@ -14,7 +14,7 @@ import {
   toObjectId,
   toObjectIds,
   GraphQLEntity,
-} from "backend/lib/mongo-helper";
+} from "../../lib/mongo-helper";
 import crypto from "crypto";
 import axios from "axios";
 import fetch from "node-fetch";
@@ -27,7 +27,7 @@ import {
   Settings,
   ReportedPost,
   isUser,
-} from "backend/schemas/user";
+} from "../../schemas/user";
 
 import "dotenv/config";
 

@@ -9,8 +9,8 @@ import {
   toObjectId,
   toObjectIds,
   GraphQLEntity,
-} from "backend/lib/mongo-helper";
-import type { Company } from "backend/schemas/company";
+} from "../../lib/mongo-helper";
+import type { Company } from "../../schemas/company";
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 const createCompaniesCollection = (

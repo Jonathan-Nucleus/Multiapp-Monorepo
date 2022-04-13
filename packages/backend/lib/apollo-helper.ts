@@ -3,9 +3,9 @@ import type { GraphQLFieldResolverParams } from "apollo-server-types";
 import { AuthenticationError } from "apollo-server-errors";
 import type { IResolvers } from "@graphql-tools/utils";
 
-import type { IgniteDb } from "backend/db";
-import type { DeserializedUser } from "backend/db/collections/users";
-import type { User } from "backend/schemas/user";
+import type { IgniteDb } from "../db";
+import type { DeserializedUser } from "../db/collections/users";
+import type { User } from "../schemas/user";
 
 export type PartialSchema = {
   schema: DocumentNode;

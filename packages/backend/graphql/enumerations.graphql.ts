@@ -3,7 +3,7 @@ import {
   AudienceEnum,
   PostCategoryOptions,
   PostCategoryEnum,
-} from "backend/schemas/post";
+} from "../schemas/post";
 
 export const Audiences = Object.keys(AudienceOptions);
 export const PostCategories = Object.keys(PostCategoryOptions).reduce(

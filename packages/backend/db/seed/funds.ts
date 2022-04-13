@@ -2,9 +2,9 @@ import { Db, ObjectId } from "mongodb";
 import { faker } from "@faker-js/faker";
 
 import { randomInt, randomArray } from "./helpers";
-import { Company } from "backend/schemas/company";
-import { Fund } from "backend/schemas/fund";
-import { AccreditationOptions } from "backend/schemas/user";
+import { Company } from "../../schemas/company";
+import { Fund } from "../../schemas/fund";
+import { AccreditationOptions } from "../../schemas/user";
 
 // The name of the mongo collection
 const COLLECTION = "funds";

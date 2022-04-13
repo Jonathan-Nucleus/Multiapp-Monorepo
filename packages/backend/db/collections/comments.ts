@@ -9,9 +9,9 @@ import {
   toObjectId,
   toObjectIds,
   GraphQLEntity,
-} from "backend/lib/mongo-helper";
-import type { Comment } from "backend/schemas/comment";
-import type { Post } from "backend/schemas/post";
+} from "../../lib/mongo-helper";
+import type { Comment } from "../../schemas/comment";
+import type { Post } from "../../schemas/post";
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 const createCommentsCollection = (

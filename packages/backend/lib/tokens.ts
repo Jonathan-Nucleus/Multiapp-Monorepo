@@ -1,5 +1,5 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
-import type { DeserializedUser } from "backend/db/collections/users";
+import type { DeserializedUser } from "../db/collections/users";
 
 import "dotenv/config";
 

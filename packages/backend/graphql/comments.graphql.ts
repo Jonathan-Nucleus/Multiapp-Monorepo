@@ -3,10 +3,10 @@ import {
   PartialSchema,
   ApolloServerContext,
   NoArgs,
-} from "backend/lib/apollo-helper";
+} from "../lib/apollo-helper";
 
-import type { Comment } from "backend/schemas/comment";
-import { CommentSchema } from "backend/schemas/comment";
+import type { Comment } from "../schemas/comment";
+import { CommentSchema } from "../schemas/comment";
 
 const schema = gql`
   ${CommentSchema}

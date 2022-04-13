@@ -4,7 +4,7 @@ import {
   ApolloServerContext,
   NoArgs,
   secureEndpoint,
-} from "backend/lib/apollo-helper";
+} from "../lib/apollo-helper";
 
 import {
   UserSchema,
@@ -12,11 +12,11 @@ import {
   AccreditationOptions,
   PostViolationOptions,
   PostViolationEnum,
-} from "backend/schemas/user";
-import type { User, ReportedPost } from "backend/schemas/user";
-import type { Post } from "backend/schemas/post";
-import type { Comment } from "backend/schemas/comment";
-import type { Company } from "backend/schemas/company";
+} from "../schemas/user";
+import type { User, ReportedPost } from "../schemas/user";
+import type { Post } from "../schemas/post";
+import type { Comment } from "../schemas/comment";
+import type { Company } from "../schemas/company";
 
 type GraphQLUser = User.GraphQL;
 export type { GraphQLUser as User };

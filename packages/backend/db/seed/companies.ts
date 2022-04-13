@@ -2,8 +2,8 @@ import { Db, ObjectId } from "mongodb";
 import { faker } from "@faker-js/faker";
 
 import { randomInt, randomArray } from "./helpers";
-import { Company } from "backend/schemas/company";
-import { User } from "backend/schemas/user";
+import { Company } from "../../schemas/company";
+import { User } from "../../schemas/user";
 
 // The name of the mongo collection
 const COLLECTION = "companies";

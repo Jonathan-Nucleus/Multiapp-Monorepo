@@ -8,5 +8,11 @@ services:
       - "27017:27017"
     volumes:
       - ignite_mongo_data:/data/db
+  web:
+    build: "."
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env
 volumes:
   ignite_mongo_data:

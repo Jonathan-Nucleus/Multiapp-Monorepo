@@ -3,10 +3,10 @@ import {
   PartialSchema,
   ApolloServerContext,
   NoArgs,
-} from "backend/lib/apollo-helper";
+} from "../lib/apollo-helper";
 
-import type { Company } from "backend/schemas/company";
-import { CompanySchema } from "backend/schemas/company";
+import type { Company } from "../schemas/company";
+import { CompanySchema } from "../schemas/company";
 import { contentCreatorResolvers } from "./users.graphql";
 
 const schema = gql`

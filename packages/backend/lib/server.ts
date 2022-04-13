@@ -2,11 +2,11 @@ import { ApolloServer } from "apollo-server";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import jwt from "jsonwebtoken";
 
-import type { ApolloServerContext } from "backend/lib/apollo-helper";
-import type { DeserializedUser } from "backend/db/collections/users";
+import type { ApolloServerContext } from "./apollo-helper";
+import type { DeserializedUser } from "../db/collections/users";
 
-import { getIgniteDb } from "backend/db";
-import schema from "backend/graphql";
+import { getIgniteDb } from "../db";
+import schema from "../graphql";
 
 import "dotenv/config";
 
