@@ -98,6 +98,15 @@ const createUsersCollection = (
     },
 
     /**
+     * Provides a list of all fund managers in the database.
+     *
+     * @returns {User[]}  An array of User objects.
+     */
+    fundManagers: async (): Promise<User.FundManager[]> =>
+      (await usersCollection
+        .find({ managedFundsIds: { $exists: true } })
+        .toArray()) as User.FundManager[],
+    /**
      * Authenticates a user with the provided credentials.
      *
      * @param email     The email address of the account.
@@ -510,6 +519,39 @@ const createUsersCollection = (
       }
 
       return true;
+    },
+
+    /**
+     * Set whether a particular fund is on the user's watchlist.
+     *
+     * @param add           Whether to add or remove the fund.
+     * @param fundId        The id of the fund.
+     * @param userId        The id of the current user.
+     *
+     * @returns   True if the fund was successfully added or removed and false
+     *            otherwise.
+     */
+    setOnWatchlist: async (
+      add: boolean,
+      fundId: MongoId,
+      userId: MongoId
+    ): Promise<boolean> => {
+      try {
+        const result = add
+          ? await usersCollection.updateOne(
+              { _id: toObjectId(userId) },
+              { $addToSet: { watchlistIds: toObjectId(fundId) } }
+            )
+          : await usersCollection.updateOne(
+              { _id: toObjectId(userId) },
+              { $pull: { watchlistIds: toObjectId(fundId) } }
+            );
+
+        return result.acknowledged;
+      } catch (err) {
+        console.log(`Error updating watchlist for user ${userId}: ${err}`);
+        return false;
+      }
     },
 
     /**

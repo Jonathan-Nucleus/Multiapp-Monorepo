@@ -33,7 +33,7 @@ export const CompanySchema = `
     createdAt: Date!
     updatedAt: Date
 
-    members: [User!]!
+    members: [UserProfile!]!
     funds: [Fund!]!
   }
 `;

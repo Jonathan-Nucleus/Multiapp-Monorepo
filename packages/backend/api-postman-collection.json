@@ -45,7 +45,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRjZmNiZGVkMDExN2M3MzQ0Nzc0NGMiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkyMTM5ODR9.t0qrvlROn-jyXQ06co_SKrz_X92YAWEsMSmUmLvZ5i0",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4MDc2OWJjOGE3MDFkYjJkNjFiMTMiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk5MzYzMzB9.mlZBY5TUdliHkrEkRxYkjXSvEh5fVW88kmYMiMiTGSk",
 									"type": "string"
 								}
 							]
@@ -56,6 +56,114 @@
 							"mode": "graphql",
 							"graphql": {
 								"query": "query Posts {\n  posts {\n      _id\n      body\n      mediaUrl\n      mentionIds\n      likeIds\n      commentIds\n      createdAt\n      user {\n          _id\n          firstName\n          lastName\n      }\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Funds",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4MDc2OWJjOGE3MDFkYjJkNjFiMTMiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk5MzYzMzB9.mlZBY5TUdliHkrEkRxYkjXSvEh5fVW88kmYMiMiTGSk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query Funds {\n  funds {\n        _id\n        name\n        level\n        status\n        overview\n        tags\n        background {\n          url\n          x\n          y\n          width\n          height\n          scale\n        }\n        manager {\n          _id\n          firstName\n          lastName\n          avatar\n          followerIds\n          postIds\n        }\n        company {\n          _id\n          name\n        }\n      }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fund",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4MDc2OWJjOGE3MDFkYjJkNjFiMTMiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk5MzYzMzB9.mlZBY5TUdliHkrEkRxYkjXSvEh5fVW88kmYMiMiTGSk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query Fund($fundId: ID!) {\n  fund(fundId: $fundId) {\n        _id\n        name       \n        manager {\n          _id\n          firstName\n          lastName\n          avatar\n        }\n        company {\n          _id\n          name\n          avatar          \n        }\n      }\n}",
+								"variables": "{\n    \"fundId\": \"6258071f0dbb6820e20f9b15\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fund Managers",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4MDc2OWJjOGE3MDFkYjJkNjFiMTMiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk5MzYzMzB9.mlZBY5TUdliHkrEkRxYkjXSvEh5fVW88kmYMiMiTGSk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query FundManagers {\n  fundManagers {\n      funds {\n          _id\n          name\n          level\n      }\n      managers {\n          _id\n          firstName\n          lastName\n          avatar\n          managedFundsIds\n      }\n  }\n}",
 								"variables": ""
 							}
 						},
@@ -108,6 +216,114 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Account",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4MDc2OWJjOGE3MDFkYjJkNjFiMTMiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk5MzYzMzB9.mlZBY5TUdliHkrEkRxYkjXSvEh5fVW88kmYMiMiTGSk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query Account {\n    account {\n        firstName\n        lastName\n        avatar\n        role\n        accreditation\n        position\n        companies {\n            _id\n            name\n            avatar\n        }\n    }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4MDc2OWJjOGE3MDFkYjJkNjFiMTMiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk5MzYzMzB9.mlZBY5TUdliHkrEkRxYkjXSvEh5fVW88kmYMiMiTGSk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query UserProfile($userId: ID!) {\n    userProfile(userId: $userId) {\n        firstName\n        lastName\n        avatar\n        position\n        company {\n            _id\n            name\n            avatar\n        }\n        companies {\n            _id\n            name\n            avatar\n        }\n        linkedIn\n        website\n        twitter\n    }\n}",
+								"variables": "{\n    \"userId\": \"6258071e0dbb6820e20f9add\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Company Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4MDc2OWJjOGE3MDFkYjJkNjFiMTMiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk5MzYzMzB9.mlZBY5TUdliHkrEkRxYkjXSvEh5fVW88kmYMiMiTGSk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query CompanyProfile($companyId: ID!) {\n    companyProfile(companyId: $companyId) {\n        name\n        avatar\n        members {\n            _id\n            firstName\n            lastName\n            avatar\n        }\n    }\n}",
+								"variables": "{\n    \"companyId\": \"6258071e0dbb6820e20f9b06\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -129,7 +345,7 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "mutation RequestInvite($email: String!) {\n  requestInvite(email: $email)\n}",
-										"variables": "{\n  \"email\": \"darash.desai+test7@gmail.com\"\n}"
+										"variables": "{\n  \"email\": \"darash.desai+test@gmail.com\"\n}"
 									}
 								},
 								"url": {
@@ -181,7 +397,7 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "mutation Login($email: String!, $password: String!) {\n  login(email: $email, password: $password)\n}",
-										"variables": "{\n  \"email\": \"darash.desai+test5@gmail.com\",\n  \"password\": \"test-pass\"\n}"
+										"variables": "{\n  \"email\": \"darash.desai+test@gmail.com\",\n  \"password\": \"TestPass123!\"\n}"
 									}
 								},
 								"url": {
@@ -300,7 +516,7 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "mutation Invite($email: String!) {\n  inviteUser(email: $email)\n}",
-										"variables": "{\n  \"email\": \"darash.desai+test6@gmail.com\"\n}"
+										"variables": "{\n  \"email\": \"darash.desai+test2@gmail.com\"\n}"
 									}
 								},
 								"url": {
@@ -388,6 +604,42 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Watch Fund",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4MDc2OWJjOGE3MDFkYjJkNjFiMTMiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk5MzYzMzB9.mlZBY5TUdliHkrEkRxYkjXSvEh5fVW88kmYMiMiTGSk",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation WatchFund($watch: Boolean!, $fundId: ID!) {\n    watchFund(watch: $watch, fundId: $fundId)\n}",
+										"variables": "{\n  \"fundId\": \"6258071f0dbb6820e20f9b15\",\n  \"watch\": false\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},
@@ -449,7 +701,7 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "mutation UploadLink($localFilename: String!, $type: MediaType!) {\n    uploadLink(localFilename: $localFilename, type: $type) {\n        remoteName\n        uploadUrl\n    }\n}",
-										"variables": "{\n    \"localFilename\": \"test.jpg\",\n    \"type\": \"POST\"\n}"
+										"variables": "{\n    \"localFilename\": \"test.png\",\n    \"type\": \"BACKGROUND\"\n}"
 									}
 								},
 								"url": {

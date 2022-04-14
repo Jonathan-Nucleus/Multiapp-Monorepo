@@ -99,9 +99,9 @@ export const FundSchema = `
     createdAt: Date!
     updatedAt: Date
 
-    manager: User
+    manager: UserProfile
     company: Company
-    team: [User!]
+    team: [UserProfile!]
   }
 
   type Document {

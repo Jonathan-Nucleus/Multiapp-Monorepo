@@ -63,6 +63,27 @@ export const contentCreatorResolvers = {
   ) => db.users.findAll(parent.companyFollowingIds),
 };
 
+export const publicUserResolvers = {
+  company: async (
+    parent: User.Mongo,
+    argsIgnored: NoArgs,
+    { db }: ApolloServerContext
+  ) =>
+    parent.companyIds?.[0] ? db.companies.find(parent.companyIds[0]) : null,
+
+  companies: async (
+    parent: User.Mongo,
+    argsIgnored: NoArgs,
+    { db }: ApolloServerContext
+  ) => (parent.companyIds ? db.companies.findAll(parent.companyIds) : []),
+
+  watchlist: async (
+    parent: User.Mongo,
+    argsIgnored: NoArgs,
+    { db }: ApolloServerContext
+  ) => (parent.watchlistIds ? db.funds.findAll(parent.watchlistIds) : []),
+};
+
 const resolvers = {
   UserRole: UserRoleOptions,
   Accreditation: AccreditationOptions,
@@ -72,8 +93,13 @@ const resolvers = {
     acc[option] = PostViolationOptions[option].value;
     return acc;
   }, {}),
+  UserProfile: {
+    ...contentCreatorResolvers,
+    ...publicUserResolvers,
+  },
   User: {
     ...contentCreatorResolvers,
+    ...publicUserResolvers,
 
     createdAt: async (
       parent: User.Mongo,
@@ -81,20 +107,12 @@ const resolvers = {
       { db }: ApolloServerContext
     ) => parent._id.getTimestamp(),
 
-    hasPassword: (parent: User.Mongo): boolean => !!parent.password,
-
-    company: async (
+    managedFunds: async (
       parent: User.Mongo,
       argsIgnored: NoArgs,
       { db }: ApolloServerContext
     ) =>
-      parent.companyIds?.[0] ? db.companies.find(parent.companyIds[0]) : null,
-
-    companies: async (
-      parent: User.Mongo,
-      argsIgnored: NoArgs,
-      { db }: ApolloServerContext
-    ) => (parent.companyIds ? db.companies.findAll(parent.companyIds) : []),
+      parent.managedFundsIds ? db.funds.findAll(parent.managedFundsIds) : [],
 
     mutedPosts: async (
       parent: User.Mongo,

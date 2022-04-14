@@ -5,7 +5,7 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "db": "docker compose up",
+    "db": "docker compose up mongo",
     "seed": "ts-node-dev --transpile-only --no-notify --exit-child db/seed/index.ts",
     "dev": "ts-node-dev --transpile-only --no-notify --exit-child index.ts",
     "prod": "ts-node -P tsconfig-prod.json --transpile-only index.ts"

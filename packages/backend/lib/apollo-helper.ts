@@ -4,7 +4,6 @@ import { AuthenticationError } from "apollo-server-errors";
 import type { IResolvers } from "@graphql-tools/utils";
 
 import type { IgniteDb } from "../db";
-import type { DeserializedUser } from "../db/collections/users";
 import type { User } from "../schemas/user";
 
 export type PartialSchema = {
@@ -14,7 +13,7 @@ export type PartialSchema = {
 
 export interface ApolloServerContext {
   db: IgniteDb;
-  user?: DeserializedUser;
+  user?: User.Mongo;
 }
 
 export type ApolloServerResolverParams<

@@ -3,6 +3,7 @@ import { ValueOf, GraphQLEntity } from "../lib/mongo-helper";
 
 import { Post, PostCategory, PostCategoryEnum } from "./post";
 import { Company } from "./company";
+import { Fund } from "./fund";
 
 export interface ContentCreatorProps {
   avatar?: string;
@@ -35,11 +36,13 @@ export namespace User {
     accreditation: Accreditation;
     position?: string;
     companyIds?: ObjectId[];
+    watchlistIds?: ObjectId[];
     settings?: Settings;
 
     // TODO: still needs to finalized
     //settings: Settings;
 
+    managedFundsIds?: ObjectId[];
     mutedPostIds?: ObjectId[];
     hiddenPostIds?: ObjectId[];
     reportedPosts?: ReportedPost[];
@@ -52,6 +55,10 @@ export namespace User {
 
   export type Stub = Pick<Mongo, "_id" | "email" | "emailToken"> & {
     role: "stub";
+  };
+
+  export type FundManager = Omit<Mongo, "managedFundsIds"> & {
+    managedFundsIds: ObjectId[];
   };
 
   export type GraphQL = GraphQLEntity<
@@ -77,6 +84,7 @@ export namespace User {
     };
     createdAt: Date;
     companies: Company.GraphQL[];
+    managedFunds: Fund.GraphQL[];
     mutedPosts: Post.GraphQL[];
     hiddenPosts: Post.GraphQL[];
     hiddenUsers: User.GraphQL[];
@@ -136,6 +144,20 @@ export const AccreditationOptions = {
 export type Accreditation = ValueOf<typeof AccreditationOptions>;
 export type AccreditationEnum = keyof typeof AccreditationOptions;
 
+export function compareAccreditation(
+  a: Accreditation,
+  b: Accreditation
+): number {
+  const accreditationRanking = [
+    AccreditationOptions.NONE,
+    AccreditationOptions.ACCREDITED,
+    AccreditationOptions.QUALIFIED_CLIENT,
+    AccreditationOptions.QUALIFIED_PURCHASER,
+  ];
+
+  return accreditationRanking.indexOf(a) - accreditationRanking.indexOf(b);
+}
+
 /** Enumeration describing the accreditation status of the user. */
 export const PostViolationOptions = {
   OFF_TOPIC: {
@@ -174,24 +196,34 @@ export const ContentCreatorSchema = `
 
   posts: [Post!]!
   comments: [Comment!]!
-  followers: [User!]!
-  following: [User!]!
+  followers: [UserProfile!]!
+  following: [UserProfile!]!
   companyFollowers: [Company!]!
   companyFollowing: [Company!]!
 `;
 
+const UserProfileSchema = `
+  _id: ID!
+  firstName: String!
+  lastName: String!
+  position: String
+  companyIds: [ID!]
+  watchlistIds : [ID!]
+  ${ContentCreatorSchema}
+
+  company: Company
+  companies: [Company!]
+  watchlist: [Fund!]
+`;
+
 export const UserSchema = `
   type User {
-    _id: ID!
+    ${UserProfileSchema}
+
     email: String!
-    hasPassword: Boolean!
-    firstName: String!
-    lastName: String!
     role: UserRole!
     accreditation: Accreditation!
-    position: String
-    companyIds: [ID!]
-    ${ContentCreatorSchema}
+    managedFundsIds: [ID!]
     mutedPostIds: [ID!]
     hiddenPostIds: [ID!]
     reportedPosts: [ReportedPost!]
@@ -202,8 +234,7 @@ export const UserSchema = `
     createdAt: Date!
     updatedAt: Date
 
-    company: Company
-    companies: [Company!]
+    managedFunds: [Fund!]
     mutedPosts: [Post!]
     hiddenPosts: [Post!]
     hiddenUsers: [User!]
@@ -214,6 +245,10 @@ export const UserSchema = `
     _id: ID!
     email: String!
     emailToken: String
+  }
+
+  type UserProfile {
+    ${UserProfileSchema}
   }
 
   union Invitee = User | UserStub

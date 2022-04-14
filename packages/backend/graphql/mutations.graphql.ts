@@ -16,7 +16,13 @@ import {
 } from "../lib/tokens";
 import { getUploadUrl, RemoteUpload } from "../lib/s3-helper";
 
-import { User, Settings, ReportedPost, isUser } from "../schemas/user";
+import {
+  User,
+  Settings,
+  ReportedPost,
+  isUser,
+  compareAccreditation,
+} from "../schemas/user";
 import type { Post } from "../schemas/post";
 import type { Comment } from "../schemas/comment";
 
@@ -29,20 +35,21 @@ const schema = gql`
     resetPassword(password: String!, token: String!): String
     requestInvite(email: String!): Boolean
     inviteUser(email: String!): Boolean!
-    updateSettings(settings: SettingsInput!): Boolean!
+    updateSettings(settings: SettingsInput!): Boolean
 
     createPost(post: PostInput!): Post
     likePost(like: Boolean!, postId: ID!): Post
-    reportPost(report: ReportedPostInput!): Boolean!
-    hidePost(hide: Boolean!, postId: ID!): Boolean!
-    mutePost(mute: Boolean!, postId: ID!): Boolean!
+    reportPost(report: ReportedPostInput!): Boolean
+    hidePost(hide: Boolean!, postId: ID!): Boolean
+    mutePost(mute: Boolean!, postId: ID!): Boolean
     comment(comment: CommentInput!): Comment
     editComment(comment: CommentUpdate!): Comment
     deleteComment(commentId: ID!): Boolean!
     uploadLink(localFilename: String!, type: MediaType!): MediaUpload
 
-    followUser(follow: Boolean!, userId: ID!, asCompanyId: ID): Boolean!
-    followCompany(follow: Boolean!, companyId: ID!, asCompanyId: ID): Boolean!
+    watchFund(watch: Boolean!, fundId: ID!): Boolean
+    followUser(follow: Boolean!, userId: ID!, asCompanyId: ID): Boolean
+    followCompany(follow: Boolean!, companyId: ID!, asCompanyId: ID): Boolean
     hideUser(hide: Boolean!, userId: ID!): Boolean!
   }
 
@@ -270,6 +277,27 @@ const resolvers = {
       }
     ),
 
+    watchFund: secureEndpoint(
+      async (
+        parentIgnored,
+        { fundId, watch }: { fundId: string; watch: boolean },
+        { db, user }
+      ): Promise<Boolean> => {
+        if (!watch) {
+          return db.users.setOnWatchlist(false, fundId, user._id);
+        }
+
+        // Check that the user has access to this fund if adding to watclist
+        const fund = await db.funds.find(fundId);
+        if (!fund) return false;
+        if (compareAccreditation(user.accreditation, fund.level) < 0) {
+          return false;
+        }
+
+        return db.users.setOnWatchlist(true, fundId, user._id);
+      }
+    ),
+
     followUser: secureEndpoint(
       async (
         parentIgnored,
@@ -280,7 +308,7 @@ const resolvers = {
         }: { follow: boolean; userId: string; asCompanyId?: string },
         { db, user }
       ): Promise<boolean> => {
-        if (userId === user._id) return false;
+        if (userId === user._id.toString()) return false;
         if (asCompanyId) {
           // Check company exists
           const companyData = await db.companies.find(asCompanyId);
