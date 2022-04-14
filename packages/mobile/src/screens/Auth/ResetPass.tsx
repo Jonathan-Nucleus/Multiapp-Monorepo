@@ -17,7 +17,7 @@ import PTextInput from '../../components/common/PTextInput';
 import PGradientButton from '../../components/common/PGradientButton';
 import ErrorText from '../../components/common/ErrorTxt';
 import { RESET_PASSWORD } from '../../graphql/mutation/auth';
-import { BGDARK, PRIMARY, WHITE } from 'shared/src/colors';
+import { BLACK, PRIMARY, WHITE } from 'shared/src/colors';
 import { Body2 } from '../../theme/fonts';
 import LogoSvg from '../../assets/icons/logo.svg';
 
@@ -113,7 +113,7 @@ export default ResetPass;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BGDARK,
+    backgroundColor: BLACK,
   },
   textContainer: {
     marginTop: 21,

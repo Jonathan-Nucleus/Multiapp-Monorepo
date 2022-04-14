@@ -8,24 +8,26 @@ import { WHITE, BGDARK } from 'shared/src/colors';
 import PHeader from '../../../components/common/PHeader';
 import pStyles from '../../../theme/pStyles';
 import { Body1, Body2, Body3 } from '../../../theme/fonts';
+import MainHeader from '../../../components/main/Header';
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
 }
 const Terms: FC<RouterProps> = ({ navigation }) => {
   return (
-    <SafeAreaView style={pStyles.globalContainer}>
-      <PHeader
-        centerIcon={
-          <Text style={styles.headerTitle}>Terms and Disclosures</Text>
+    <View style={pStyles.globalContainer}>
+      <MainHeader
+        leftIcon={
+          <View style={styles.row}>
+            <CaretLeft size={28} color={WHITE} />
+            <Text style={styles.headerTitle} numberOfLines={1}>
+              Terms and Disclosures
+            </Text>
+          </View>
         }
-        containerStyle={styles.headerContainer}
-        leftIcon={<CaretLeft size={28} color={WHITE} />}
-        rightIcon={<MagnifyingGlass size={28} color={WHITE} />}
         onPressLeft={navigation.goBack}
-        onPressRight={() => console.log(1231)}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -36,17 +38,8 @@ const styles = StyleSheet.create({
     ...Body1,
     color: WHITE,
   },
-  headerContainer: {
-    backgroundColor: BGDARK,
-    elevation: 5,
-    shadowColor: 'rgba(0, 0, 0, 0.5)',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.3,
-    paddingTop: 0,
-    marginBottom: 0,
-    justifyContent: 'space-between',
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

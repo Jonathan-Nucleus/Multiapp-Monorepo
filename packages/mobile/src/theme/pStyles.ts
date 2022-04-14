@@ -1,9 +1,9 @@
-import { BGDARK } from 'shared/src/colors';
+import { BLACK } from 'shared/src/colors';
 
 const pStyles = {
   globalContainer: {
     flex: 1,
-    backgroundColor: BGDARK,
+    backgroundColor: BLACK,
   },
 };
 

@@ -13,23 +13,19 @@ import {
   GRAY900,
 } from 'shared/src/colors';
 import { Body1, Body3, Body4 } from 'mobile/src/theme/fonts';
+import { FetchFundsData } from '../../../graphql/query/marketplace';
 
-interface Fund {
-  _id: string;
-  status: string;
-  title: string;
-  star: boolean;
-}
+export type Fund = Exclude<FetchFundsData['funds'], undefined>[number];
 
 interface FundItemProps {
   fund: Fund;
 }
 
-const FundItem: React.FC<FundItemProps> = ({ fund }) => {
+const FundItem: React.FC<FundItemProps> = ({ fund }: FundItemProps) => {
   return (
     <View style={styles.container}>
       <View style={styles.top}>
-        <Text style={styles.overview}>{fund.title}</Text>
+        <Text style={styles.overview}>{fund.name}</Text>
         <View style={styles.statusContainer}>
           <View
             style={[
@@ -140,7 +136,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderTopColor: WHITE12,
     borderBottomColor: WHITE12,
-    borderWidth: 1,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
   },
   fundDescriptorContainer: {
     flex: 1,

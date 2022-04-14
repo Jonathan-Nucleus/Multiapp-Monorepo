@@ -1,253 +1,217 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import {
   StyleSheet,
+  FlatList,
   View,
   Text,
+  Switch,
+  Image,
+  Dimensions,
   TouchableOpacity,
   Linking,
-  FlatList,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import FastImage from 'react-native-fast-image';
-import { NavigationProp } from '@react-navigation/native';
-import {
-  CaretLeft,
-  MagnifyingGlass,
-  Gear,
-  DotsThreeVertical,
-  UserCirclePlus,
-} from 'phosphor-react-native';
+import { useIsFocused, NavigationProp } from '@react-navigation/native';
+import { CaretLeft } from 'phosphor-react-native';
 import {
   WHITE,
-  BGDARK,
-  PRIMARYSOLID7,
+  WHITE60,
+  BLUE300,
+  BGHEADER,
   GRAY100,
   PRIMARY,
-  BLACK,
-  BLUE400,
 } from 'shared/src/colors';
-import LinkedinSvg from 'shared/assets/images/linkedin.svg';
-import TwitterSvg from 'shared/assets/images/twitter.svg';
 
-import PHeader from '../../../components/common/PHeader';
 import pStyles from '../../../theme/pStyles';
-import { Body1, Body2, Body3 } from '../../../theme/fonts';
+import { Body2, Body3, H6 } from '../../../theme/fonts';
+import MainHeader from '../../../components/main/Header';
 import PAppContainer from '../../../components/common/PAppContainer';
 import PGradientButton from '../../../components/common/PGradientButton';
 import PLabel from '../../../components/common/PLabel';
+import PostItem, { PostItemProps } from '../../../components/main/PostItem';
+import FeaturedItem from '../../../components/main/settings/FeaturedItem';
+import Funds from '../../../components/main/settings/Funds';
+import usePost from '../../../hooks/usePost';
+import BackgroundImg from 'shared/assets/images/bg-cover.png';
+import LinkedinSvg from 'shared/assets/images/linkedin.svg';
+import TwitterSvg from 'shared/assets/images/twitter.svg';
+import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
+import AvatarImg from '../../../assets/avatar.png';
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
 }
 
-const user = {
-  image:
-    'https://img.freepik.com/free-vector/smiling-girl-avatar_102172-32.jpg',
-  name: 'Michelle Jordan',
-  type: 'PRO',
-  position: 'CEO @ HedgeFunds ‘R’ Us',
-  description:
-    'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem?',
-  following: 28,
-  followers: 23,
-  post: 23,
-  linkedin: 'https://linkedin.com',
-  twitter: 'https://twitter.com',
-  website: 'https://website.com',
-  companies: [
-    {
-      uri: 'https://unsplash.it/400/400?image=1',
-      name: 'Cartenna Capital LP',
-      position: 'CEO',
-      id: 1312,
-    },
-    {
-      uri: 'https://unsplash.it/400/400?image=1',
-      name: 'Cartenna Capital LP',
-      position: 'CEO',
-      id: 131222,
-    },
-  ],
-};
-
 const ProfileSettings: FC<RouterProps> = ({ navigation }) => {
-  const renderItem = ({ item }) => {
-    return (
-      <TouchableOpacity>
-        <View style={styles.company}>
-          <View style={styles.leftItem}>
-            <FastImage
-              style={styles.companyAvatar}
-              source={{
-                uri: 'https://unsplash.it/400/400?image=1',
-              }}
-              resizeMode={FastImage.resizeMode.contain}
-            />
-            <View style={styles.rightItem}>
-              <Text style={styles.label}>{item.position}</Text>
-              <Text style={styles.companyName}>{item.name}</Text>
-            </View>
-          </View>
-          <UserCirclePlus size={28} color={WHITE} />
-        </View>
-      </TouchableOpacity>
-    );
-  };
+  const { data, error, loading, refetch } = usePost();
+  const postData = data?.posts;
+
+  const isFocused = useIsFocused();
+  const [focusState, setFocusState] = useState(isFocused);
+  if (isFocused !== focusState) {
+    // Refetch whenever the focus state changes to avoid refetching during
+    // rerender cycles
+    console.log('refetching...');
+    refetch();
+    setFocusState(isFocused);
+  }
+
+  const renderItem = ({ item }: { item: PostItemProps }) => (
+    <TouchableOpacity>
+      <FeaturedItem post={item} />
+    </TouchableOpacity>
+  );
+
   return (
-    <SafeAreaView style={pStyles.globalContainer}>
-      <PHeader
-        containerStyle={styles.headerContainer}
-        leftIcon={<CaretLeft size={28} color={WHITE} />}
-        rightIcon={<MagnifyingGlass size={28} color={WHITE} />}
+    <View style={pStyles.globalContainer}>
+      <MainHeader
+        leftIcon={
+          <View style={styles.backIcon}>
+            <CaretLeft color={WHITE} />
+          </View>
+        }
         onPressLeft={() => navigation.goBack()}
-        onPressRight={() => console.log(1231)}
       />
-      <PAppContainer style={styles.appContainer}>
+      <PAppContainer style={styles.container}>
+        <Image
+          source={BackgroundImg}
+          resizeMode="cover"
+          style={styles.backgroundImg}
+        />
         <View style={styles.content}>
-          <View style={styles.item}>
-            <FastImage
+          <View style={styles.companyDetail}>
+            <Image
+              source={AvatarImg}
+              resizeMode="contain"
               style={styles.avatar}
-              source={{
-                uri: 'https://unsplash.it/400/400?image=1',
-                headers: { Authorization: 'someAuthToken' },
-              }}
-              resizeMode={FastImage.resizeMode.contain}
             />
-            <View style={styles.rightItem}>
-              <Text style={styles.label}>{user.name}</Text>
-              <Text style={styles.comment}>{user.type}</Text>
-              <Text style={styles.comment}>{user.position}</Text>
+            <View style={[styles.row, styles.justifyAround]}>
+              <View>
+                <Text style={styles.val}>64</Text>
+                <Text style={styles.comment}>Followers</Text>
+              </View>
+              <View>
+                <Text style={styles.val}>64</Text>
+                <Text style={styles.comment}>Following</Text>
+              </View>
+              <View>
+                <Text style={styles.val}>64</Text>
+                <Text style={styles.comment}>Posts</Text>
+              </View>
             </View>
           </View>
-          <Text style={styles.comment}>{user.description}</Text>
           <View style={styles.row}>
-            <PGradientButton
-              label="Edit Profile"
-              onPress={() => console.log(11)}
-              btnContainer={styles.editProfileBtn}
-            />
-            <TouchableOpacity>
-              <DotsThreeVertical size={28} color={GRAY100} />
-            </TouchableOpacity>
+            <Text style={styles.val}>Good Soil Invesments</Text>
+            <View style={styles.proWrapper}>
+              <ShieldCheckSvg />
+              <PLabel label="PRO" textStyle={styles.proLabel} />
+            </View>
           </View>
-          <View style={styles.row}>
-            <Text style={styles.comment}>
-              {user.followers} Followers | {user.following} Following |{' '}
-              {user.post} Posts
-            </Text>
-          </View>
+          <Text style={styles.decription}>
+            Virgin is a leading international investment group and one of the
+            world's most recognised and respected brands. Read More...
+          </Text>
+          <PGradientButton label="follow" onPress={() => console.log(11)} />
         </View>
-        <View style={[styles.row, styles.social]}>
-          <TouchableOpacity onPress={() => Linking.openURL(user.linkedin)}>
+        <View style={styles.social}>
+          <TouchableOpacity onPress={() => Linking.openURL('www.twitter.com')}>
             <LinkedinSvg />
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.icon}
-            onPress={() => Linking.openURL(user.twitter)}>
+            onPress={() => Linking.openURL('www.twitter.com')}
+            style={styles.icon}>
             <TwitterSvg />
           </TouchableOpacity>
-          <View style={styles.verticalLine} />
-          <TouchableOpacity onPress={() => Linking.openURL(user.website)}>
-            <Text style={styles.website}>Website</Text>
-          </TouchableOpacity>
         </View>
-        <View style={styles.content}>
-          <PLabel label="This is my bio data where I will write something about myself firm with a multi-strategy hedge fund offering. It is one of the world`s largest alternative asset management... More" />
+        <Funds />
+        <View style={styles.posts}>
+          {postData.length > 0 && (
+            <View>
+              <Text style={styles.text}>Featured Posts</Text>
+              <FlatList
+                data={postData || []}
+                renderItem={renderItem}
+                keyExtractor={(item: PostItemProps) => `${item._id}`}
+                listKey="post"
+                horizontal
+              />
+            </View>
+          )}
+
+          {postData.length > 0 && (
+            <FlatList
+              data={postData || []}
+              renderItem={({ item }) => <PostItem post={item} from="company" />}
+              keyExtractor={(item: PostItemProps) => `${item._id}`}
+              listKey="post"
+              ListHeaderComponent={<Text style={styles.text}>All Posts</Text>}
+            />
+          )}
         </View>
-        <FlatList
-          data={user.companies}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
-          showsVerticalScrollIndicator={false}
-          horizontal={true}
-          style={styles.flatList}
-        />
       </PAppContainer>
-    </SafeAreaView>
+    </View>
   );
 };
 
 export default ProfileSettings;
 
 const styles = StyleSheet.create({
-  headerTitle: {
-    ...Body1,
-    color: WHITE,
+  backIcon: {
+    backgroundColor: BLUE300,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  headerContainer: {
-    backgroundColor: BGDARK,
-    elevation: 5,
-    shadowColor: 'rgba(0, 0, 0, 0.5)',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.3,
-    paddingTop: 0,
-    marginBottom: 0,
-    justifyContent: 'space-between',
-  },
-  appContainer: {
+  container: {
     paddingHorizontal: 0,
   },
-  content: {
-    paddingHorizontal: 16,
+  backgroundImg: {
+    width: Dimensions.get('screen').width,
+    height: 65,
   },
-  item: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-  },
-  rightItem: {
-    marginLeft: 8,
-  },
-  label: {
-    ...Body2,
-    color: WHITE,
-  },
-  comment: {
-    color: GRAY100,
-    ...Body3,
-  },
-  avatar: {
+  logo: {
     width: 80,
     height: 80,
-    borderRadius: 50,
   },
   row: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 16,
   },
-  editProfileBtn: {
+  justifyAround: {
+    justifyContent: 'space-around',
+    alignItems: 'flex-end',
     flex: 1,
-    marginRight: 12,
-    width: '100%',
   },
-  editProfileTxt: {
-    textAlign: 'center',
-    color: PRIMARY,
-    ...Body2,
+  content: {
+    paddingHorizontal: 16,
+    backgroundColor: BGHEADER,
+    paddingBottom: 16,
   },
-  website: {
-    color: PRIMARY,
+  companyDetail: {
+    flexDirection: 'row',
+    marginTop: -40,
+    marginBottom: 16,
+  },
+  val: {
+    color: WHITE,
+    ...H6,
+  },
+  comment: {
+    color: WHITE60,
+    ...Body3,
+  },
+  decription: {
+    marginVertical: 16,
+    color: WHITE,
     ...Body3,
   },
   social: {
-    paddingVertical: 8,
-    borderTopColor: GRAY100,
-    borderBottomColor: GRAY100,
-    borderBottomWidth: 1,
-    borderTopWidth: 1,
-    elevation: 5,
-    shadowColor: BLACK,
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.7,
+    flexDirection: 'row',
+    paddingBottom: 16,
     marginBottom: 24,
+    backgroundColor: BGHEADER,
+    alignItems: 'center',
+    paddingHorizontal: 16,
   },
   verticalLine: {
     height: 32,
@@ -256,31 +220,34 @@ const styles = StyleSheet.create({
     marginLeft: 40,
     marginRight: 20,
   },
+  website: {
+    color: PRIMARY,
+    ...Body3,
+  },
+  text: {
+    color: WHITE,
+    ...Body2,
+    marginTop: 2,
+    marginBottom: 8,
+  },
+  posts: {
+    paddingHorizontal: 16,
+  },
+  avatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+  },
   icon: {
-    marginLeft: 20,
+    marginLeft: 32,
   },
-  company: {
+  proWrapper: {
     flexDirection: 'row',
+    marginLeft: 8,
     alignItems: 'center',
-    padding: 16,
-    borderRadius: 8,
-    backgroundColor: PRIMARYSOLID7,
-    marginLeft: 16,
   },
-  companyAvatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 8,
-  },
-  flatList: {
-    marginTop: 24,
-  },
-  companyName: {
-    color: BLUE400,
-  },
-  leftItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 24,
+  proLabel: {
+    marginLeft: 8,
+    ...Body3,
   },
 });

@@ -17,6 +17,8 @@ import PGradientButton from '../../../components/common/PGradientButton';
 import ErrorText from '../../../components/common/ErrorTxt';
 import { BGDARK, PRIMARY, WHITE } from 'shared/src/colors';
 import { Body1, Body2 } from '../../../theme/fonts';
+import MainHeader from '../../../components/main/Header';
+import pStyles from '../../../theme/pStyles';
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
@@ -47,14 +49,15 @@ const ChangePass: React.FC<RouterProps> = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <PHeader
-        centerIcon={<Text style={styles.headerTitle}>Change Password</Text>}
-        containerStyle={styles.headerContainer}
-        leftIcon={<CaretLeft size={28} color={WHITE} />}
-        rightIcon={<MagnifyingGlass size={28} color={WHITE} />}
+    <View style={pStyles.globalContainer}>
+      <MainHeader
+        leftIcon={
+          <View style={styles.row}>
+            <CaretLeft size={28} color={WHITE} />
+            <Text style={styles.headerTitle}>Change Password</Text>
+          </View>
+        }
         onPressLeft={() => navigation.goBack()}
-        onPressRight={() => console.log(1231)}
       />
       <PAppContainer>
         {!!error && <ErrorText error={error} />}
@@ -84,33 +87,16 @@ const ChangePass: React.FC<RouterProps> = ({ navigation }) => {
           disabled={disabled}
         />
       </PAppContainer>
-    </SafeAreaView>
+    </View>
   );
 };
 
 export default ChangePass;
 
 const styles = StyleSheet.create({
-  headerContainer: {
-    backgroundColor: BGDARK,
-    elevation: 5,
-    shadowColor: 'rgba(0, 0, 0, 0.5)',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.3,
-    paddingTop: 0,
-    marginBottom: 0,
-    justifyContent: 'space-between',
-  },
   headerTitle: {
     ...Body1,
     color: WHITE,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: BGDARK,
   },
   textContainer: {
     marginTop: 21,
@@ -128,8 +114,6 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 32,
   },
   txt: {
     ...Body2,

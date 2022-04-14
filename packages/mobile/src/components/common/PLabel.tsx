@@ -7,14 +7,17 @@ interface PLabelProps {
   viewStyle?: ViewStyle;
   textStyle?: TextStyle;
   label: string;
+  numberOfLines?: number;
 }
 
 const PLabel: React.FC<PLabelProps> = (props) => {
-  const { viewStyle, textStyle, label } = props;
+  const { viewStyle, textStyle, label, numberOfLines } = props;
 
   return (
     <View style={[styles.container, viewStyle]}>
-      <Text style={[styles.textStyle, textStyle]}>{label}</Text>
+      <Text style={[styles.textStyle, textStyle]} numberOfLines={numberOfLines}>
+        {label}
+      </Text>
     </View>
   );
 };

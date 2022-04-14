@@ -15,7 +15,7 @@ import PHeader from '../../components/common/PHeader';
 import PTitle from '../../components/common/PTitle';
 import PTextInput from '../../components/common/PTextInput';
 import ErrorText from '../../components/common/ErrorTxt';
-import { BGDARK, PRIMARY, WHITE } from 'shared/src/colors';
+import { BLACK, PRIMARY, WHITE } from 'shared/src/colors';
 import PGradientButton from '../../components/common/PGradientButton';
 import { Body2 } from '../../theme/fonts';
 import PTextLine from '../../components/common/PTextLine';
@@ -91,7 +91,7 @@ export default CodeView;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BGDARK,
+    backgroundColor: BLACK,
   },
   textContainer: {
     marginTop: 17,

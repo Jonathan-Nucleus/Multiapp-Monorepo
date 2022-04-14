@@ -28,12 +28,14 @@ import {
 } from 'shared/src/colors';
 
 import pStyles from '../../../theme/pStyles';
-import { Body1, Body2, Body3, H6 } from '../../../theme/fonts';
+import { Body2, Body3, H6 } from '../../../theme/fonts';
 import MainHeader from '../../../components/main/Header';
 import PAppContainer from '../../../components/common/PAppContainer';
 import PGradientButton from '../../../components/common/PGradientButton';
 import PostItem, { PostItemProps } from '../../../components/main/PostItem';
-import Funds from './Funds';
+import FeaturedItem from '../../../components/main/settings/FeaturedItem';
+import Funds from '../../../components/main/settings/Funds';
+import Members from '../../../components/main/settings/Members';
 import usePost from '../../../hooks/usePost';
 import BackgroundImg from 'shared/assets/images/bg-cover.png';
 import CompanyLogo from 'shared/assets/images/company-logo.svg';
@@ -60,10 +62,10 @@ const CompanySettings: FC<RouterProps> = ({ navigation }) => {
   }
 
   const renderItem = ({ item }: { item: PostItemProps }) => (
-    <PostItem post={item} />
+    <TouchableOpacity>
+      <FeaturedItem post={item} />
+    </TouchableOpacity>
   );
-
-  console.log(12312, postData);
 
   return (
     <View style={pStyles.globalContainer}>
@@ -121,27 +123,32 @@ const CompanySettings: FC<RouterProps> = ({ navigation }) => {
             <DotsThreeVerticalSvg />
           </TouchableOpacity>
         </View>
-        {postData.length > 0 && (
-          <FlatList
-            data={postData || []}
-            renderItem={renderItem}
-            keyExtractor={(item: PostItemProps) => `${item._id}`}
-            listKey="post"
-            ListHeaderComponent={
-              <Text style={styles.text}>Featured Posts</Text>
-            }
-          />
-        )}
-        {postData.length > 0 && (
-          <FlatList
-            data={postData || []}
-            renderItem={renderItem}
-            keyExtractor={(item: PostItemProps) => `${item._id}`}
-            listKey="post"
-            ListHeaderComponent={<Text style={styles.text}>All Posts</Text>}
-          />
-        )}
         <Funds />
+        <View style={styles.posts}>
+          <Members />
+          {postData.length > 0 && (
+            <View>
+              <Text style={styles.text}>Featured Posts</Text>
+              <FlatList
+                data={postData || []}
+                renderItem={renderItem}
+                keyExtractor={(item: PostItemProps) => `${item._id}`}
+                listKey="post"
+                horizontal
+              />
+            </View>
+          )}
+
+          {postData.length > 0 && (
+            <FlatList
+              data={postData || []}
+              renderItem={({ item }) => <PostItem post={item} from="company" />}
+              keyExtractor={(item: PostItemProps) => `${item._id}`}
+              listKey="post"
+              ListHeaderComponent={<Text style={styles.text}>All Posts</Text>}
+            />
+          )}
+        </View>
       </PAppContainer>
     </View>
   );
@@ -221,7 +228,11 @@ const styles = StyleSheet.create({
   },
   text: {
     color: WHITE,
-    ...Body1,
-    paddingLeft: 16,
+    ...Body2,
+    marginTop: 2,
+    marginBottom: 8,
+  },
+  posts: {
+    paddingHorizontal: 16,
   },
 });

@@ -16,7 +16,7 @@ import PTitle from '../../components/common/PTitle';
 import PTextInput from '../../components/common/PTextInput';
 import PGradientButton from '../../components/common/PGradientButton';
 import { Body2 } from '../../theme/fonts';
-import { BGDARK, PRIMARY, WHITE } from 'shared/src/colors';
+import { BLACK, PRIMARY, WHITE } from 'shared/src/colors';
 import LogoSvg from '../../assets/icons/logo.svg';
 import { FORGOT_PASSWORD } from '../../graphql/mutation/auth';
 import SuccessText from '../../components/common/SuccessText';
@@ -105,7 +105,7 @@ export default ForgotPass;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BGDARK,
+    backgroundColor: BLACK,
   },
   textContainer: {
     marginTop: 32,

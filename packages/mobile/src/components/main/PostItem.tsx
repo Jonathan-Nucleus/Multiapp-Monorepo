@@ -28,13 +28,14 @@ const POST_URL =
 type Post = Exclude<FetchPostsData['posts'], undefined>[number];
 interface FeedItemProps {
   post: Post;
+  from?: string;
 }
 
-const PostItem: React.FC<FeedItemProps> = ({ post }) => {
+const PostItem: React.FC<FeedItemProps> = ({ post, from }) => {
   const { user } = post;
 
   return (
-    <View style={[styles.container]}>
+    <View style={styles.container}>
       <View style={styles.headerWrapper}>
         <UserInfo
           avatar={{ uri: `${AVATAR_URL}/${user.avatar}` }}
@@ -97,7 +98,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingVertical: 14,
     flexDirection: 'column',
-    backgroundColor: BGDARK,
+    marginVertical: 8,
   },
   headerWrapper: {
     flexDirection: 'row',

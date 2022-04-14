@@ -7,9 +7,9 @@ export const H5 = {
   fontFamily: Gotham,
 };
 
-export const H5Bold = {
+export const H5Thin = {
   fontSize: 24,
-  fontFamily: GothamBold,
+  fontFamily: GothamThin,
 };
 
 export const H6 = {
@@ -17,9 +17,9 @@ export const H6 = {
   fontFamily: Gotham,
 };
 
-export const H6Bold = {
+export const H6Thin = {
   fontSize: 20,
-  fontFamily: GothamBold,
+  fontFamily: GothamThin,
 };
 
 export const Body4 = {
@@ -27,9 +27,9 @@ export const Body4 = {
   fontFamily: Gotham,
 };
 
-export const Body4Bold = {
+export const Body4Thin = {
   fontSize: 10,
-  fontFamily: GothamBold,
+  fontFamily: GothamThin,
 };
 
 export const Body3 = {
@@ -37,9 +37,9 @@ export const Body3 = {
   fontFamily: Gotham,
 };
 
-export const Body3Bold = {
+export const Body3Thin = {
   fontSize: 12,
-  fontFamily: GothamBold,
+  fontFamily: GothamThin,
 };
 
 export const Body2 = {
@@ -47,9 +47,9 @@ export const Body2 = {
   fontFamily: Gotham,
 };
 
-export const Body2Bold = {
+export const Body2Thin = {
   fontSize: 14,
-  fontFamily: GothamBold,
+  fontFamily: GothamThin,
 };
 
 export const Body1 = {
@@ -57,7 +57,7 @@ export const Body1 = {
   fontFamily: Gotham,
 };
 
-export const Body1Bold = {
+export const Body1Thin = {
   fontSize: 16,
-  fontFamily: GothamBold,
+  fontFamily: GothamThin,
 };

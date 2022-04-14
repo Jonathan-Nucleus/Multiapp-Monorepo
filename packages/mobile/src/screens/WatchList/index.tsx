@@ -16,7 +16,7 @@ import { Body2, Body3 } from '../../theme/fonts';
 import {
   GRAY400,
   WHITE,
-  PRIMARYSOLID7,
+  BGDARK,
   PINK,
   SUCCESS,
   WHITE60,
@@ -120,8 +120,8 @@ export default WatchList;
 
 const styles = StyleSheet.create({
   item: {
-    backgroundColor: PRIMARYSOLID7,
-    marginTop: 16,
+    backgroundColor: BGDARK,
+    marginVertical: 8,
   },
   company: {
     flexDirection: 'row',

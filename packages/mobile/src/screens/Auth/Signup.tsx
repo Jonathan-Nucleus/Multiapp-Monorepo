@@ -20,7 +20,7 @@ import PTextLine from '../../components/common/PTextLine';
 import ErrorText from '../../components/common/ErrorTxt';
 import { REGISTER } from '../../graphql/mutation/auth';
 import { Body2 } from '../../theme/fonts';
-import { BGDARK, PRIMARY, WHITE, BLUE200 } from 'shared/src/colors';
+import { BLACK, PRIMARY, WHITE, BLUE200 } from 'shared/src/colors';
 import LogoSvg from '../../assets/icons/logo.svg';
 import AppleSvg from '../../assets/icons/apple.svg';
 import GoogleSvg from '../../assets/icons/google.svg';
@@ -174,7 +174,7 @@ export default Signup;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BGDARK,
+    backgroundColor: BLACK,
   },
   textContainer: {
     marginTop: 21,

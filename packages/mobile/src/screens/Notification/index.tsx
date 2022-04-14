@@ -111,7 +111,7 @@ const Notification: NotificationScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={pStyles.globalContainer}>
+    <View style={pStyles.globalContainer}>
       <PHeader
         leftIcon={renderLeft()}
         rightIcon={renderRight()}
@@ -123,7 +123,7 @@ const Notification: NotificationScreen = ({ navigation }) => {
         keyExtractor={(item) => item.id}
         style={styles.flatList}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 

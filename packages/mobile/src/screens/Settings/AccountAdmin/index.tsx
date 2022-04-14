@@ -23,6 +23,7 @@ import {
 import pStyles from '../../../theme/pStyles';
 import { Body1, Body2, Body3, H5 } from '../../../theme/fonts';
 import PHeader from '../../../components/common/PHeader';
+import MainHeader from '../../../components/main/Header';
 
 interface RenderItemProps {
   item: {
@@ -71,14 +72,15 @@ const AccountAdmin: FC<RouterProps> = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={pStyles.globalContainer}>
-      <PHeader
-        centerIcon={<Text style={styles.headerTitle}>Account Admin</Text>}
-        containerStyle={styles.headerContainer}
-        leftIcon={<CaretLeft size={28} color={WHITE} />}
-        rightIcon={<MagnifyingGlass size={28} color={WHITE} />}
+    <View style={pStyles.globalContainer}>
+      <MainHeader
+        leftIcon={
+          <View style={styles.row}>
+            <CaretLeft size={28} color={WHITE} />
+            <Text style={styles.headerTitle}>Account Admin</Text>
+          </View>
+        }
         onPressLeft={() => navigation.goBack()}
-        onPressRight={() => console.log(1231)}
       />
       <FlatList
         data={DATA}
@@ -104,26 +106,13 @@ const AccountAdmin: FC<RouterProps> = ({ navigation }) => {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 };
 
 export default AccountAdmin;
 
 const styles = StyleSheet.create({
-  headerContainer: {
-    backgroundColor: BGDARK,
-    elevation: 5,
-    shadowColor: 'rgba(0, 0, 0, 0.5)',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.3,
-    paddingTop: 0,
-    marginBottom: 0,
-    justifyContent: 'space-between',
-  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',

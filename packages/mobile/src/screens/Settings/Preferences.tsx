@@ -18,6 +18,7 @@ import PHeader from '../../components/common/PHeader';
 import pStyles from '../../theme/pStyles';
 import { Body1, Body2, Body3 } from '../../theme/fonts';
 import PAppContainer from '../../components/common/PAppContainer';
+import MainHeader from '../../components/main/Header';
 
 interface renderItemProps {
   item: {
@@ -120,14 +121,15 @@ const Preferences: FC<RouterProps> = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={pStyles.globalContainer}>
-      <PHeader
-        centerIcon={<Text style={styles.headerTitle}>Preferences</Text>}
-        containerStyle={styles.headerContainer}
-        leftIcon={<CaretLeft size={28} color={WHITE} />}
-        rightIcon={<MagnifyingGlass size={28} color={WHITE} />}
+    <View style={pStyles.globalContainer}>
+      <MainHeader
+        leftIcon={
+          <View style={styles.row}>
+            <CaretLeft size={28} color={WHITE} />
+            <Text style={styles.headerTitle}>Preferences</Text>
+          </View>
+        }
         onPressLeft={() => navigation.goBack()}
-        onPressRight={() => console.log(1231)}
       />
       <PAppContainer>
         <View style={styles.listHeader}>
@@ -179,7 +181,7 @@ const Preferences: FC<RouterProps> = ({ navigation }) => {
           scrollEnabled={false}
         />
       </PAppContainer>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -189,19 +191,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     ...Body1,
     color: WHITE,
-  },
-  headerContainer: {
-    backgroundColor: BGDARK,
-    elevation: 5,
-    shadowColor: 'rgba(0, 0, 0, 0.5)',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.3,
-    paddingTop: 0,
-    marginBottom: 0,
-    justifyContent: 'space-between',
   },
   label: {
     ...Body2,
@@ -228,5 +217,9 @@ const styles = StyleSheet.create({
   },
   listHeader: {
     marginVertical: 16,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

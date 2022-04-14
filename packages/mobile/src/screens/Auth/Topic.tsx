@@ -18,7 +18,7 @@ import ErrorText from '../../components/common/ErrorTxt';
 import { UPDATE_SETTINGS } from '../../graphql/mutation/account';
 import { Body2, H6 } from '../../theme/fonts';
 import {
-  BGDARK,
+  BLACK,
   PRIMARY,
   WHITE,
   PRIMARYSOLID7,
@@ -133,7 +133,7 @@ export default Topic;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BGDARK,
+    backgroundColor: BLACK,
   },
   txt: {
     ...H6,
