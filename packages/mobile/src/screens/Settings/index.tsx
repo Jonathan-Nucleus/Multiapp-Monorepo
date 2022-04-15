@@ -11,19 +11,31 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import FastImage from 'react-native-fast-image';
 import { NavigationProp } from '@react-navigation/native';
 import { clearToken } from 'mobile/src/utils/auth-token';
-import { CaretRight } from 'phosphor-react-native';
+import {
+  CaretRight,
+  CircleWavy,
+  SlidersHorizontal,
+  Gear,
+  ShieldWarning,
+  EnvelopeSimple,
+  Lifebuoy,
+} from 'phosphor-react-native';
 import {
   GRAY2,
   GRAY100,
   WHITE,
+  WHITE12,
   PRIMARYSOLID7,
   BGHEADER,
 } from 'shared/src/colors';
+import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 
 import MainHeader from '../../components/main/Header';
+import PLabel from '../../components/common/PLabel';
 import pStyles from '../../theme/pStyles';
 import { Body1, Body2, Body3, H6 } from '../../theme/fonts';
-
+import { useAccount } from '../../graphql/query/account';
+import Alsvg from 'shared/assets/images/al.svg';
 interface RenderItemProps {
   item: {
     label: string;
@@ -31,38 +43,60 @@ interface RenderItemProps {
   };
 }
 
+const AVATAR_URL =
+  'https://prometheus-user-media.s3.us-east-1.amazonaws.com/avatars';
+
 interface RouterProps {
   navigation: NavigationProp<any, any>;
 }
 
 const Settings: FC<RouterProps> = ({ navigation }) => {
+  const { data } = useAccount();
+  const account = data?.account;
   const MENU_ITEMS = [
+    {
+      id: '21',
+      label: 'Accreditation',
+      comment: 'You are accredited',
+      onPress: () => navigation.navigate('AccountAdmin'),
+      icon: <Alsvg />,
+    },
     {
       id: '21',
       label: 'Account Admin',
       onPress: () => navigation.navigate('AccountAdmin'),
+      icon: <Gear size={26} color={WHITE} />,
     },
     {
       id: '1',
       label: 'Preferences',
       onPress: () => navigation.navigate('Preferences'),
-    },
-    {
-      id: '2',
-      label: 'Terms and Disclosures',
-      onPress: () => navigation.navigate('Terms'),
+      icon: <SlidersHorizontal size={26} color={WHITE} />,
     },
     {
       id: '3',
       label: 'Help & Support',
       onPress: () => navigation.navigate('Help'),
+      icon: <Lifebuoy size={26} color={WHITE} />,
+    },
+    {
+      id: '2',
+      label: 'Terms and Disclosures',
+      onPress: () => navigation.navigate('Terms'),
+      icon: <ShieldWarning size={26} color={WHITE} />,
+    },
+    {
+      id: '2',
+      label: 'Invite Your Friends',
+      onPress: () => navigation.navigate('InviteFriends'),
+      icon: <EnvelopeSimple size={26} color={WHITE} />,
     },
   ];
 
   const handleLogout = async () => {
     try {
-      await clearToken();
       navigation.navigate('Auth');
+      await clearToken();
     } catch (err) {
       console.log('logout err', err);
     }
@@ -71,8 +105,17 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
   const renderListItem = ({ item }: RenderItemProps) => {
     return (
       <TouchableOpacity onPress={item.onPress}>
-        <View style={[styles.item, styles.renderItem, styles.between]}>
-          <Text style={styles.label}>{item.label}</Text>
+        <View style={[styles.item, styles.between, styles.border]}>
+          <View style={[styles.row, styles.alignCenter]}>
+            {item.icon}
+            <View style={styles.rightItem}>
+              <Text style={styles.label}>{item.label}</Text>
+              {item.comment && (
+                <Text style={styles.comment}>{item.comment}</Text>
+              )}
+            </View>
+          </View>
+
           <View>
             <CaretRight size={28} color={WHITE} />
           </View>
@@ -90,39 +133,43 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
             <FastImage
               style={styles.avatar}
               source={{
-                uri: 'https://unsplash.it/400/400?image=1',
-                headers: { Authorization: 'someAuthToken' },
+                uri: `${AVATAR_URL}/${account?.avatar}`,
               }}
               resizeMode={FastImage.resizeMode.contain}
             />
             <View style={styles.rightItem}>
-              <Text style={styles.label}>John Doe</Text>
+              <View style={styles.row}>
+                <Text style={styles.name}>
+                  {account?.firstName} {account?.lastName}
+                </Text>
+                <View style={styles.proWrapper}>
+                  <ShieldCheckSvg />
+                  <PLabel label="PRO" textStyle={styles.proLabel} />
+                </View>
+              </View>
               <Text style={styles.comment}>See your profile</Text>
             </View>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('CompanySettings')}>
-          <View style={styles.item}>
-            <FastImage
-              style={styles.avatar}
-              source={{
-                uri: 'https://unsplash.it/400/400?image=1',
-              }}
-              resizeMode={FastImage.resizeMode.contain}
-            />
-            <View style={styles.rightItem}>
-              <Text style={styles.label}>Cartenna Capital LP</Text>
-              <Text style={styles.comment}>See company page</Text>
+        {account?.companies.map((company) => (
+          <TouchableOpacity
+            onPress={() => navigation.navigate('CompanySettings')}
+            key={company._id}>
+            <View style={[styles.item, styles.border]}>
+              <FastImage
+                style={styles.avatar}
+                source={{
+                  uri: company.avatar,
+                }}
+                resizeMode={FastImage.resizeMode.contain}
+              />
+              <View style={styles.rightItem}>
+                <Text style={styles.name}>{company.name}</Text>
+                <Text style={styles.comment}>See company page</Text>
+              </View>
             </View>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('InviteFriends')}>
-          <View style={[styles.item, styles.between]}>
-            <Text style={styles.label}>Invite Your Friends</Text>
-            <CaretRight size={28} color={WHITE} />
-          </View>
-        </TouchableOpacity>
+          </TouchableOpacity>
+        ))}
       </>
     );
   };
@@ -136,10 +183,9 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
         renderItem={renderListItem}
         keyExtractor={(item) => item.id}
         style={styles.flatList}
-        numColumns={2}
         ListFooterComponent={
           <TouchableOpacity onPress={handleLogout}>
-            <View style={[styles.item, styles.between]}>
+            <View style={[styles.item, styles.center]}>
               <Text style={styles.label}>Log Out</Text>
             </View>
           </TouchableOpacity>
@@ -162,23 +208,17 @@ const styles = StyleSheet.create({
   flatList: {
     flex: 1,
     marginTop: 8,
-    paddingHorizontal: 16,
   },
   item: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
-    borderRadius: 8,
-    backgroundColor: PRIMARYSOLID7,
-    marginTop: 16,
   },
-  renderItem: {
-    width: Dimensions.get('screen').width / 2 - 20,
-    margin: 2,
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 68,
+  border: {
+    borderTopColor: WHITE12,
+    borderTopWidth: 1,
   },
+
   commentWrap: {
     marginLeft: 15,
     flex: 1,
@@ -190,6 +230,7 @@ const styles = StyleSheet.create({
   comment: {
     color: GRAY100,
     ...Body3,
+    marginTop: 4,
   },
   avatar: {
     width: 40,
@@ -200,6 +241,25 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   rightItem: {
+    marginLeft: 16,
+  },
+  proWrapper: {
+    flexDirection: 'row',
     marginLeft: 8,
+    alignItems: 'center',
+  },
+  proLabel: {
+    marginLeft: 8,
+    ...Body3,
+  },
+  name: {
+    ...H6,
+    color: WHITE,
+  },
+  center: {
+    justifyContent: 'center',
+  },
+  alignCenter: {
+    alignItems: 'center',
   },
 });

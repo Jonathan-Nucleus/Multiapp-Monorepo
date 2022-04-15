@@ -19,6 +19,7 @@ export const DANGER = "#CD403A";
 export const BLUE200 = "#7CBCFA";
 export const BLUE300 = "#22204A";
 export const BLUE400 = "#9AD2FF";
+export const BLUE500 = "#333087";
 export const GRAY = "#676767";
 export const GRAY900 = "#0E0E0E";
 export const GRAY800 = "#373737";

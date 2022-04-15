@@ -31,17 +31,13 @@ import pStyles from '../../../theme/pStyles';
 import { Body2, Body3, H6 } from '../../../theme/fonts';
 import MainHeader from '../../../components/main/Header';
 import PAppContainer from '../../../components/common/PAppContainer';
-import PGradientButton from '../../../components/common/PGradientButton';
 import PostItem, { PostItemProps } from '../../../components/main/PostItem';
 import FeaturedItem from '../../../components/main/settings/FeaturedItem';
 import Funds from '../../../components/main/settings/Funds';
 import Members from '../../../components/main/settings/Members';
 import usePost from '../../../hooks/usePost';
-import BackgroundImg from 'shared/assets/images/bg-cover.png';
-import CompanyLogo from 'shared/assets/images/company-logo.svg';
-import LinkedinSvg from 'shared/assets/images/linkedin.svg';
-import TwitterSvg from 'shared/assets/images/twitter.svg';
-import DotsThreeVerticalSvg from 'shared/assets/images/dotsThreeVertical.svg';
+import { useAccount } from '../../../graphql/query/account';
+import CompanyProfile from './CompanyProfile';
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
@@ -49,6 +45,7 @@ interface RouterProps {
 
 const CompanySettings: FC<RouterProps> = ({ navigation }) => {
   const { data, error, loading, refetch } = usePost();
+  const { data: accountData } = useAccount();
   const postData = data?.posts;
 
   const isFocused = useIsFocused();
@@ -60,6 +57,8 @@ const CompanySettings: FC<RouterProps> = ({ navigation }) => {
     refetch();
     setFocusState(isFocused);
   }
+
+  const companyLists = accountData?.account.companies ?? [];
 
   const renderItem = ({ item }: { item: PostItemProps }) => (
     <TouchableOpacity>
@@ -78,51 +77,9 @@ const CompanySettings: FC<RouterProps> = ({ navigation }) => {
         onPressLeft={() => navigation.goBack()}
       />
       <PAppContainer style={styles.container}>
-        <Image
-          source={BackgroundImg}
-          resizeMode="cover"
-          style={styles.backgroundImg}
-        />
-        <View style={styles.content}>
-          <View style={styles.companyDetail}>
-            <CompanyLogo />
-            <View style={styles.row}>
-              <View>
-                <Text style={styles.val}>64</Text>
-                <Text style={styles.comment}>Followers</Text>
-              </View>
-              <View>
-                <Text style={styles.val}>64</Text>
-                <Text style={styles.comment}>Following</Text>
-              </View>
-              <View>
-                <Text style={styles.val}>64</Text>
-                <Text style={styles.comment}>Posts</Text>
-              </View>
-            </View>
-          </View>
-          <Text style={styles.val}>Good Soil Invesments</Text>
-          <Text style={styles.decription}>
-            Virgin is a leading international investment group and one of the
-            world's most recognised and respected brands. Read More...
-          </Text>
-          <PGradientButton label="follow" onPress={() => console.log(11)} />
-        </View>
-        <View style={[styles.row, styles.social]}>
-          <TouchableOpacity onPress={() => Linking.openURL('www.twitter.com')}>
-            <LinkedinSvg />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => Linking.openURL('www.twitter.com')}>
-            <TwitterSvg />
-          </TouchableOpacity>
-          <View style={styles.verticalLine} />
-          <TouchableOpacity onPress={() => Linking.openURL('www.twitter.com')}>
-            <Text style={styles.website}>Website</Text>
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <DotsThreeVerticalSvg />
-          </TouchableOpacity>
-        </View>
+        {companyLists.map((company) => (
+          <CompanyProfile company={company} key={company._id} />
+        ))}
         <Funds />
         <View style={styles.posts}>
           <Members />

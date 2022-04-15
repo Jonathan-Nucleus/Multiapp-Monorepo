@@ -4,12 +4,11 @@ import {
   FlatList,
   View,
   Text,
-  Switch,
-  Image,
   Dimensions,
   TouchableOpacity,
   Linking,
 } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import { useIsFocused, NavigationProp } from '@react-navigation/native';
 import { CaretLeft } from 'phosphor-react-native';
 import {
@@ -31,20 +30,24 @@ import PostItem, { PostItemProps } from '../../../components/main/PostItem';
 import FeaturedItem from '../../../components/main/settings/FeaturedItem';
 import Funds from '../../../components/main/settings/Funds';
 import usePost from '../../../hooks/usePost';
-import BackgroundImg from 'shared/assets/images/bg-cover.png';
+import { useAccount } from '../../../graphql/query/account';
+
 import LinkedinSvg from 'shared/assets/images/linkedin.svg';
 import TwitterSvg from 'shared/assets/images/twitter.svg';
 import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
-import AvatarImg from '../../../assets/avatar.png';
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
 }
 
-const ProfileSettings: FC<RouterProps> = ({ navigation }) => {
-  const { data, error, loading, refetch } = usePost();
-  const postData = data?.posts;
+const AVATAR_URL =
+  'https://prometheus-user-media.s3.us-east-1.amazonaws.com/avatars';
 
+const ProfileSettings: FC<RouterProps> = ({ navigation }) => {
+  const { data, refetch } = usePost();
+  const { data: accountData } = useAccount();
+  const postData = data?.posts;
+  const account: any = accountData?.account;
   const isFocused = useIsFocused();
   const [focusState, setFocusState] = useState(isFocused);
   if (isFocused !== focusState) {
@@ -72,38 +75,49 @@ const ProfileSettings: FC<RouterProps> = ({ navigation }) => {
         onPressLeft={() => navigation.goBack()}
       />
       <PAppContainer style={styles.container}>
-        <Image
-          source={BackgroundImg}
-          resizeMode="cover"
+        <FastImage
           style={styles.backgroundImg}
+          source={{
+            uri: account.background,
+          }}
+          resizeMode={FastImage.resizeMode.cover}
         />
         <View style={styles.content}>
           <View style={styles.companyDetail}>
-            <Image
-              source={AvatarImg}
-              resizeMode="contain"
+            <FastImage
               style={styles.avatar}
+              source={{
+                uri: `${AVATAR_URL}/${account?.avatar}`,
+              }}
+              resizeMode={FastImage.resizeMode.cover}
             />
-            <View style={[styles.row, styles.justifyAround]}>
-              <View>
-                <Text style={styles.val}>64</Text>
-                <Text style={styles.comment}>Followers</Text>
-              </View>
-              <View>
-                <Text style={styles.val}>64</Text>
-                <Text style={styles.comment}>Following</Text>
-              </View>
-              <View>
-                <Text style={styles.val}>64</Text>
-                <Text style={styles.comment}>Posts</Text>
-              </View>
-            </View>
           </View>
           <View style={styles.row}>
-            <Text style={styles.val}>Good Soil Invesments</Text>
+            <Text style={styles.val}>
+              {account.firstName} {account?.lastName}
+            </Text>
             <View style={styles.proWrapper}>
               <ShieldCheckSvg />
               <PLabel label="PRO" textStyle={styles.proLabel} />
+            </View>
+          </View>
+          <Text style={styles.comment}>
+            {account.role} {account?.position}
+          </Text>
+          <View style={[styles.row, styles.justifyAround]}>
+            <View>
+              <Text style={styles.val}>{account.followerIds?.length ?? 0}</Text>
+              <Text style={styles.comment}>Followers</Text>
+            </View>
+            <View>
+              <Text style={styles.val}>
+                {account.followingIds?.length ?? 0}
+              </Text>
+              <Text style={styles.comment}>Following</Text>
+            </View>
+            <View>
+              <Text style={styles.val}>{account.postIds?.length ?? 0}</Text>
+              <Text style={styles.comment}>Posts</Text>
             </View>
           </View>
           <Text style={styles.decription}>
@@ -140,7 +154,7 @@ const ProfileSettings: FC<RouterProps> = ({ navigation }) => {
           {postData.length > 0 && (
             <FlatList
               data={postData || []}
-              renderItem={({ item }) => <PostItem post={item} from="company" />}
+              renderItem={({ item }) => <PostItem post={item} />}
               keyExtractor={(item: PostItemProps) => `${item._id}`}
               listKey="post"
               ListHeaderComponent={<Text style={styles.text}>All Posts</Text>}
@@ -176,6 +190,7 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
+    marginVertical: 10,
   },
   justifyAround: {
     justifyContent: 'space-around',

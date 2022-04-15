@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Image } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import dayjs from 'dayjs';
@@ -18,17 +18,41 @@ import Avatar from '../../assets/avatar.png';
 
 import { FetchPostsData } from 'mobile/src/hooks/queries';
 import { PostCategories } from 'backend/graphql/enumerations.graphql';
+import { useLikePost } from '../../graphql/mutation/posts';
+import { useAccount } from '../../graphql/query/account';
 
 import { AVATAR_URL, POST_URL } from 'react-native-dotenv';
 
 type Post = Exclude<FetchPostsData['posts'], undefined>[number];
 interface FeedItemProps {
   post: Post;
-  from?: string;
 }
 
-const PostItem: React.FC<FeedItemProps> = ({ post, from }) => {
+const PostItem: React.FC<FeedItemProps> = ({ post }) => {
   const { user } = post;
+  const [liked, setLiked] = useState(false);
+  const [likePost] = useLikePost();
+  const { data } = useAccount();
+  const account = data?.account;
+
+  useEffect(() => {
+    setLiked(post.likeIds?.includes(account?._id));
+  }, [account, post]);
+
+  const toggleLike = async (): Promise<void> => {
+    const toggled = !liked;
+    try {
+      const { data: postData } = await likePost({
+        variables: { like: toggled, postId: post._id },
+      });
+
+      postData && postData.likePost
+        ? setLiked(toggled)
+        : console.log('Error liking post');
+    } catch (err) {
+      console.log('Error liking post', err);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -82,7 +106,11 @@ const PostItem: React.FC<FeedItemProps> = ({ post, from }) => {
       </View>
       <View style={styles.divider} />
       <View style={styles.bottomWrapper}>
-        <IconButton icon={<ThumbsUpSvg />} label="Like" />
+        <IconButton
+          icon={<ThumbsUpSvg />}
+          label="Like"
+          onPress={() => toggleLike()}
+        />
         <IconButton icon={<ChatSvg />} label="Comment" />
         <IconButton icon={<ShareSvg />} label="Share" />
       </View>

@@ -2,7 +2,7 @@ import React, { useState, useEffect, memo } from 'react';
 import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 import isEqual from 'react-fast-compare';
 import SplashScreen from 'react-native-splash-screen';
-import { useIsFocused } from '@react-navigation/native';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 
 import PAppContainer from '../../components/common/PAppContainer';
 import MainHeader from '../../components/main/Header';
@@ -11,13 +11,13 @@ import PostItem, { PostItemProps } from '../../components/main/PostItem';
 import Tag from '../../components/common/Tag';
 import PGradientButton from '../../components/common/PGradientButton';
 import { HomeScreen } from 'mobile/src/navigations/HomeStack';
-import usePost from '../../hooks/usePost';
+import { useFetchPosts } from 'mobile/src/hooks/queries';
 
 const CategoryList = ['All', 'Investment Ideas', 'World News', 'Politics'];
 
 const HomeComponent: HomeScreen = ({ navigation }) => {
   const [category, setCategory] = useState('All');
-  const { data, error, loading, refetch } = usePost();
+  const { data, error, loading, refetch } = useFetchPosts();
   const postData = data?.posts;
 
   const isFocused = useIsFocused();
