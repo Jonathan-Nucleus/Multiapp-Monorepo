@@ -20,6 +20,7 @@ export namespace Post {
     visible: boolean;
     reporterIds?: ObjectId[];
     updatedAt?: Date;
+    featured?: boolean;
   }
 
   export type GraphQL = GraphQLEntity<Omit<Mongo, "visible">> & {
@@ -150,6 +151,7 @@ export const PostSchema = `
     reporterIds: [ID!]
     createdAt: Date!
     updatedAt: Date
+    featured: Boolean
 
     user: User
     mentions: [User!]

@@ -29,13 +29,19 @@ const createPostsCollection = (postsCollection: Collection<Post.Mongo>) => {
     /**
      * Provides a list of all posts in the DB.
      *
-     * @param ids An optional array of specific IDs to filter by.
+     * @param ids       An optional array of specific IDs to filter by.
+     * @param featured  Optionally filter by featured posts.
      *
      * @returns   An array of matching Post objects.
      */
-    findAll: async (ids?: MongoId[]): Promise<Post.Mongo[]> => {
+    findAll: async (
+      ids?: MongoId[],
+      featured = false
+    ): Promise<Post.Mongo[]> => {
       const query = ids !== undefined ? { _id: { $in: toObjectIds(ids) } } : {};
-      return postsCollection.find(query).toArray();
+      return postsCollection
+        .find({ ...query, ...(featured ? { featured } : {}) })
+        .toArray();
     },
 
     /**
@@ -110,6 +116,33 @@ const createPostsCollection = (postsCollection: Collection<Post.Mongo>) => {
       }
 
       return postData;
+    },
+
+    /**
+     * Set whether a user's post is flagged as featured.
+     *
+     * @param postId    The ID of the post.
+     * @param userId    Teh ID of the user that owns the post.
+     * @param feature   Whether or not to feature the post.
+     *
+     * @returns   The updated Post or null if it could not be updated.
+     */
+    feature: async (
+      postId: MongoId,
+      userId: MongoId,
+      feature: boolean
+    ): Promise<Post.Mongo | null> => {
+      try {
+        const result = await postsCollection.findOneAndUpdate(
+          { _id: toObjectId(postId), userId: toObjectId(userId) },
+          { $set: { featured: feature } },
+          { returnDocument: "after" }
+        );
+        return result.value;
+      } catch (err) {
+        console.log(`Error updating featured state for post: ${postId}`, err);
+        return null;
+      }
     },
 
     /**

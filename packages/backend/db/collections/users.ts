@@ -98,14 +98,35 @@ const createUsersCollection = (
     },
 
     /**
+     * Provides a list of all professionals in the database.
+     *
+     * @param featured  Whether to filter by featured professionals.
+     *
+     * @returns The list of professionals.
+     */
+    professionals: async (featured = false): Promise<User.Mongo[]> =>
+      (await usersCollection
+        .find({
+          role: "professional",
+          ...(featured ? { featured: true } : {}),
+        })
+        .toArray()) as User.FundManager[],
+
+    /**
      * Provides a list of all fund managers in the database.
      *
-     * @returns {User[]}  An array of User objects.
+     * @param featured  Whether to filter by featured fund managers.
+     *
+     * @returns The list of fund managers.
      */
-    fundManagers: async (): Promise<User.FundManager[]> =>
+    fundManagers: async (featured = false): Promise<User.FundManager[]> =>
       (await usersCollection
-        .find({ managedFundsIds: { $exists: true } })
+        .find({
+          managedFundsIds: { $exists: true },
+          ...(featured ? { featured: true } : {}),
+        })
         .toArray()) as User.FundManager[],
+
     /**
      * Authenticates a user with the provided credentials.
      *
@@ -388,6 +409,30 @@ const createUsersCollection = (
       } catch (err) {
         console.log(`Error inviting user ${email}: ${err}`);
         return null;
+      }
+    },
+
+    /**
+     * Adds a post to the user's list of post.
+     *
+     * @param postId  The id of the post.
+     * @param userId  The id of the user.
+     *
+     * @returns   Whether or not the post was successfully add.
+     */
+    addPost: async (postId: MongoId, userId: MongoId): Promise<boolean> => {
+      try {
+        const result = await usersCollection.updateOne(
+          { _id: toObjectId(userId) },
+          { $addToSet: { postIds: toObjectId(postId) } }
+        );
+
+        return result.acknowledged;
+      } catch (err) {
+        console.log(
+          `Error reporting post ${report.postId} user ${userId}: ${err}`
+        );
+        return false;
       }
     },
 

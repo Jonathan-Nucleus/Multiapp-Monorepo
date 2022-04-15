@@ -153,7 +153,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4MDc2OWJjOGE3MDFkYjJkNjFiMTMiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk5MzYzMzB9.mlZBY5TUdliHkrEkRxYkjXSvEh5fVW88kmYMiMiTGSk",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4YTZjMjg5ZTAxN2YzYmVjNjUxNDciLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk5NzcxMDR9.2lITm_YcEXUwbojZUPnkJSNyN-mm2-0v4Jdao544nDc",
 									"type": "string"
 								}
 							]
@@ -163,8 +163,80 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query FundManagers {\n  fundManagers {\n      funds {\n          _id\n          name\n          level\n      }\n      managers {\n          _id\n          firstName\n          lastName\n          avatar\n          managedFundsIds\n      }\n  }\n}",
+								"query": "query FundManagers($featured: Boolean) {\n  fundManagers(featured: $featured) {\n      funds {\n          _id\n          name\n          level\n      }\n      managers {\n          _id\n          firstName\n          lastName\n          avatar\n          managedFundsIds\n      }\n  }\n}",
+								"variables": "{\n    \"featured\": true\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fund Companies",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4YTZjMjg5ZTAxN2YzYmVjNjUxNDciLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk5NzcxMDR9.2lITm_YcEXUwbojZUPnkJSNyN-mm2-0v4Jdao544nDc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query FundCompanies {\n  fundCompanies {\n    _id\n    name\n    avatar\n    funds {\n        _id\n        name\n    }\n  }\n}",
 								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Professionals",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4YTZjMjg5ZTAxN2YzYmVjNjUxNDciLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk5NzcxMDR9.2lITm_YcEXUwbojZUPnkJSNyN-mm2-0v4Jdao544nDc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query Professionals($featured: Boolean) {\n  professionals(featured: $featured) {\n    _id\n    firstName\n    lastName\n    avatar\n  }\n}",
+								"variables": "{\n    \"featured\": true\n}"
 							}
 						},
 						"url": {
@@ -225,7 +297,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4MDc2OWJjOGE3MDFkYjJkNjFiMTMiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk5MzYzMzB9.mlZBY5TUdliHkrEkRxYkjXSvEh5fVW88kmYMiMiTGSk",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4YTZjMjg5ZTAxN2YzYmVjNjUxNDciLCJyb2xlIjoidXNlciIsImFjYyI6ImFjY3JlZGl0ZWQiLCJpYXQiOjE2NDk5ODQ0Mzh9.vDYRBkQP9k3oT3HeNFYFqmF1VzCCQ8P1GDfEV3iXahE",
 									"type": "string"
 								}
 							]
@@ -235,8 +307,8 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query Account {\n    account {\n        firstName\n        lastName\n        avatar\n        role\n        accreditation\n        position\n        companies {\n            _id\n            name\n            avatar\n        }\n    }\n}",
-								"variables": ""
+								"query": "query Account($featured: Boolean) {\n    account {\n        firstName\n        lastName\n        avatar\n        role\n        accreditation\n        position\n        companies {\n            _id\n            name\n            avatar\n        }\n        posts(featured: $featured) {\n            _id\n        }\n    }\n}",
+								"variables": "{\n    \"featured\": true\n}"
 							}
 						},
 						"url": {
@@ -640,6 +712,42 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Feature Post",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4YTZjMjg5ZTAxN2YzYmVjNjUxNDciLCJyb2xlIjoidXNlciIsImFjYyI6ImFjY3JlZGl0ZWQiLCJpYXQiOjE2NDk5ODQ0Mzh9.vDYRBkQP9k3oT3HeNFYFqmF1VzCCQ8P1GDfEV3iXahE",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation FeaturePost($postId: ID!, $feature: Boolean!) {\n    featurePost(postId: $postId, feature: $feature) {\n        _id\n        featured\n    }\n}",
+										"variables": "{\n  \"postId\": \"6258c7d5a3382b28c7ae29d3\",\n  \"feature\": true\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},
@@ -654,7 +762,7 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRhNjYzZmZiZDVmZmJlODcxNjAzNTAiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkwNDM2Mjd9.8sUii0pTi2PnVu_-rWIRHx1hmBfMG26OV-Gen5Ne-QM",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4YTZjMjg5ZTAxN2YzYmVjNjUxNDciLCJyb2xlIjoidXNlciIsImFjYyI6ImFjY3JlZGl0ZWQiLCJpYXQiOjE2NDk5ODQ0Mzh9.vDYRBkQP9k3oT3HeNFYFqmF1VzCCQ8P1GDfEV3iXahE",
 											"type": "string"
 										}
 									]

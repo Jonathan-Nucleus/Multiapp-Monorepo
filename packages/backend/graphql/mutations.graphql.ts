@@ -38,6 +38,7 @@ const schema = gql`
     updateSettings(settings: SettingsInput!): Boolean
 
     createPost(post: PostInput!): Post
+    featurePost(postId: ID!, feature: Boolean!): Post
     likePost(like: Boolean!, postId: ID!): Post
     reportPost(report: ReportedPostInput!): Boolean
     hidePost(hide: Boolean!, postId: ID!): Boolean
@@ -171,7 +172,23 @@ const resolvers = {
         parentIgnored,
         { post }: { post: Post.Input },
         { db, user }
-      ): Promise<Post.Mongo | null> => db.posts.create(post, user._id)
+      ): Promise<Post.Mongo | null> => {
+        const postData = await db.posts.create(post, user._id);
+        if (!postData) return null;
+
+        return (await db.users.addPost(postData._id, user._id))
+          ? postData
+          : null;
+      }
+    ),
+
+    featurePost: secureEndpoint(
+      async (
+        parentIgnored,
+        { postId, feature }: { postId: string; feature: boolean },
+        { db, user }
+      ): Promise<Post.Mongo | null> =>
+        db.posts.feature(postId, user._id, feature)
     ),
 
     likePost: secureEndpoint(

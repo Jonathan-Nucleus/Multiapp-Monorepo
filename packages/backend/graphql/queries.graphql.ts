@@ -14,11 +14,13 @@ import type { Fund } from "../schemas/fund";
 const schema = gql`
   type Query {
     verifyInvite(code: String!): Boolean!
-    posts(categories: [PostCategory!]): [Post!]
     account: User
+    posts(categories: [PostCategory!]): [Post!]
     funds: [Fund!]
     fund(fundId: ID!): Fund
-    fundManagers: FundManagers
+    fundManagers(featured: Boolean): FundManagers
+    fundCompanies: [Company!]
+    professionals(featured: Boolean): [UserProfile!]
     userProfile(userId: ID!): UserProfile
     companyProfile(companyId: ID!): Company
   }
@@ -101,10 +103,10 @@ const resolvers = {
     fundManagers: secureEndpoint(
       async (
         parentIgnored,
-        argsIgnored,
+        { featured = false }: { featured?: boolean },
         { db, user }
       ): Promise<FundManagers> => {
-        const managers = await db.users.fundManagers();
+        const managers = await db.users.fundManagers(featured);
         const fundIds = Array.from(
           new Set(managers.map((manager) => manager.managedFundsIds).flat())
         );
@@ -127,6 +129,22 @@ const resolvers = {
           managers: filteredManagers,
         };
       }
+    ),
+
+    fundCompanies: secureEndpoint(
+      async (
+        parentIgnored,
+        argsIgnored,
+        { db, user }
+      ): Promise<Company.Mongo[]> => db.companies.fundCompanies()
+    ),
+
+    professionals: secureEndpoint(
+      async (
+        parentIgnored,
+        { featured = false }: { featured?: boolean },
+        { db, user }
+      ): Promise<User.Mongo[]> => db.users.professionals(featured)
     ),
 
     userProfile: secureEndpoint(

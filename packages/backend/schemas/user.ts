@@ -38,6 +38,7 @@ export namespace User {
     companyIds?: ObjectId[];
     watchlistIds?: ObjectId[];
     settings?: Settings;
+    featured?: boolean;
 
     // TODO: still needs to finalized
     //settings: Settings;
@@ -194,7 +195,7 @@ export const ContentCreatorSchema = `
   linkedIn: String
   twitter: String
 
-  posts: [Post!]!
+  posts(featured: Boolean): [Post!]!
   comments: [Comment!]!
   followers: [UserProfile!]!
   following: [UserProfile!]!

@@ -40,6 +40,9 @@ const createCompaniesCollection = (
       return companiesCollection.find(query).toArray();
     },
 
+    fundCompanies: async (): Promise<Company.Mongo[]> =>
+      companiesCollection.find({ "fundIds.0": { $exists: true } }).toArray(),
+
     /**
      * Set whether this company is following another user.
      *

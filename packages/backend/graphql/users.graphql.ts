@@ -28,9 +28,9 @@ const schema = gql`
 export const contentCreatorResolvers = {
   posts: async (
     parent: User.Mongo | Company.Mongo,
-    argsIgnored: NoArgs,
+    { featured = false }: { featured?: boolean },
     { db }: ApolloServerContext
-  ) => db.posts.findAll(parent.postIds),
+  ) => (parent.postIds ? db.posts.findAll(parent.postIds, featured) : []),
 
   comments: async (
     parent: User.Mongo | Company.Mongo,
