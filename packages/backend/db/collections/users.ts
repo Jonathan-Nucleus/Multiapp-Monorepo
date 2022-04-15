@@ -9,15 +9,9 @@
  */
 
 import { Collection, ObjectId } from "mongodb";
-import {
-  MongoId,
-  toObjectId,
-  toObjectIds,
-  GraphQLEntity,
-} from "../../lib/mongo-helper";
+import { MongoId, toObjectId, toObjectIds } from "../../lib/mongo-helper";
 import crypto from "crypto";
 import axios from "axios";
-import fetch from "node-fetch";
 import { v4 as uuid } from "uuid";
 import { OAuth2Client } from "google-auth-library";
 import {
@@ -28,6 +22,12 @@ import {
   ReportedPost,
   isUser,
 } from "../../schemas/user";
+import {
+  BadRequestError,
+  InvalidateError,
+  NotFoundError,
+  UnprocessableEntityError,
+} from "../../lib/validate";
 
 import "dotenv/config";
 
@@ -139,12 +139,16 @@ const createUsersCollection = (
     authenticate: async (
       email: string,
       password: string
-    ): Promise<User.Mongo | null> => {
+    ): Promise<User.Mongo> => {
       const user = await usersCollection.findOne({ email });
-      if (!user || !isUser(user) || !user.salt) return null;
+      if (!user || !isUser(user) || !user.salt) {
+        throw new NotFoundError();
+      }
 
       // Check credentials - i.e., compare bcrypt password hashes
-      if (hashPassword(password, user.salt) != user.password) return null;
+      if (hashPassword(password, user.salt) != user.password) {
+        throw new InvalidateError("password", "password is not correct");
+      }
       return user;
     },
 
@@ -156,9 +160,7 @@ const createUsersCollection = (
      * @returns   Record id for the new account if registration was successful
      *            and null otherwise.
      */
-    authenticateOAuth: async (
-      user: User.OAuthInput
-    ): Promise<User.Mongo | null> => {
+    authenticateOAuth: async (user: User.OAuthInput): Promise<User.Mongo> => {
       const { email, firstName, lastName, provider, tokenId } = user;
 
       // Verify access tokens before fetching associated user record
@@ -173,8 +175,7 @@ const createUsersCollection = (
           const payload = ticket.getPayload();
           console.log("payload", payload);
         } catch (err) {
-          console.log(`Invalid google access token: ${tokenId}`);
-          return null;
+          throw new BadRequestError(`Invalid google access token: ${tokenId}`);
         }
       } else if (provider === "linkedin") {
         // Verify LinkedIn token
@@ -183,47 +184,40 @@ const createUsersCollection = (
             `https://api.linkedin.com/v2/me?oauth2_access_token=${tokenId}`
           );
         } catch {
-          console.log(`Invalid linkedin access token: ${tokenId}`);
-          return null;
+          throw new BadRequestError(
+            `Invalid linkedin access token: ${tokenId}`
+          );
         }
       } else {
-        return null; // Unsupported provider
+        throw new BadRequestError(`Unsupported provider: ${provider}`);
       }
 
       const userData = await collection.find({ email });
-      if (userData && isUser(userData)) {
+      if (userData) {
         // Check to make sure that the provider that the account was created
         // with matches the provider from which this OAuth token was provided.
-        if (userData?.authProvider !== provider) {
-          console.log(`Linked accounts not supported: ${email}`);
-          return null;
+        if (!isUser(userData) || userData?.authProvider !== provider) {
+          throw new UnprocessableEntityError(
+            `Linked accounts not supported: ${email}`
+          );
         }
 
         return userData;
       }
 
       // Create a new user if one does not exist
-      if (!userData) {
-        const newUser = {
-          _id: new ObjectId(),
-          email,
-          firstName,
-          lastName,
-          authProvider: provider,
-          role: UserRoleOptions.USER,
-          accreditation: AccreditationOptions.NONE,
-        };
+      const newUser = {
+        _id: new ObjectId(),
+        email,
+        firstName,
+        lastName,
+        authProvider: provider,
+        role: UserRoleOptions.USER,
+        accreditation: AccreditationOptions.NONE,
+      };
 
-        try {
-          await usersCollection.insertOne(newUser);
-          return newUser;
-        } catch (err) {
-          console.log(`Error encountered while registering user: ${err}`);
-          return null;
-        }
-      }
-
-      return null;
+      await usersCollection.insertOne(newUser);
+      return newUser;
     },
 
     /**
@@ -234,13 +228,17 @@ const createUsersCollection = (
      * @returns   Record id for the new account if registration was successful
      *            and null otherwise.
      */
-    register: async (user: User.Input): Promise<ObjectId | null> => {
+    register: async (user: User.Input): Promise<ObjectId> => {
       const { email, firstName, lastName, password, inviteCode } = user;
 
       // Ensure user already already exists as a stub
       const userData = await collection.find({ email });
-      if (!userData || isUser(userData) || userData.emailToken !== inviteCode)
-        return null;
+      if (!userData || isUser(userData)) {
+        throw new NotFoundError();
+      }
+      if (userData.emailToken !== inviteCode) {
+        throw new InvalidateError("inviteCode", "invite code is not valid");
+      }
 
       const salt = generateSalt();
       const hash = hashPassword(password, salt);
@@ -256,13 +254,8 @@ const createUsersCollection = (
         accreditation: AccreditationOptions.NONE,
       };
 
-      try {
-        await usersCollection.replaceOne({ _id: userData._id }, newUser);
-        return newUser._id;
-      } catch (err) {
-        console.log(`Error encountered while registering user: ${err}`);
-        return null;
-      }
+      await usersCollection.replaceOne({ _id: userData._id }, newUser);
+      return newUser._id;
     },
 
     /**
@@ -273,7 +266,7 @@ const createUsersCollection = (
      * @returns   A stub user record for the newly invited user, or null if
      *            the user already exists or an error was encountered.
      */
-    requestInvite: async (email: string): Promise<User.Stub | null> => {
+    requestInvite: async (email: string): Promise<User.Stub> => {
       const stubUser = {
         _id: new ObjectId(),
         email,
@@ -281,21 +274,17 @@ const createUsersCollection = (
         emailToken: crypto.randomBytes(3).toString("hex").toUpperCase(),
       } as const;
 
-      try {
-        // Check whether user is already registered otherwise create a new
-        // record or replace existing record with new stub and invite code
-        const user = await usersCollection.findOne({ email });
-        if (user) {
-          if (isUser(user)) return null;
-          await usersCollection.deleteOne({ _id: user._id });
+      // Check whether user is already registered otherwise create a new
+      // record or replace existing record with new stub and invite code
+      const user = await usersCollection.findOne({ email });
+      if (user) {
+        if (isUser(user)) {
+          throw new UnprocessableEntityError("User already exists.");
         }
-
-        await usersCollection.insertOne(stubUser);
-      } catch (err) {
-        console.log(`Error inviting user ${email}: ${err}`);
-        return null;
+        await usersCollection.deleteOne({ _id: user._id });
       }
 
+      await usersCollection.insertOne(stubUser);
       return stubUser;
     },
 
@@ -306,24 +295,19 @@ const createUsersCollection = (
      *
      * @returns   The reset token.
      */
-    requestPasswordReset: async (email: string): Promise<string | null> => {
+    requestPasswordReset: async (email: string): Promise<string> => {
       const user = await usersCollection.findOne({ email });
-      if (!user || !isUser(user) || !user.salt) return null;
-
-      try {
-        const token = uuid();
-        await usersCollection.updateOne(
-          { _id: user._id },
-          { $set: { emailToken: token } }
-        );
-
-        return token;
-      } catch (err) {
-        console.log(
-          `Error generating password reset token for ${email}: ${err}`
-        );
-        return null;
+      if (!user || !isUser(user) || !user.salt) {
+        throw new NotFoundError();
       }
+
+      const token = uuid();
+      await usersCollection.updateOne(
+        { _id: user._id },
+        { $set: { emailToken: token } }
+      );
+
+      return token;
     },
 
     /**
@@ -340,26 +324,25 @@ const createUsersCollection = (
       password: string,
       email: string,
       token: string
-    ): Promise<User.Mongo | null> => {
+    ): Promise<User.Mongo> => {
       const user = await usersCollection.findOne({ email });
-      if (!user || !isUser(user) || !user.salt || user.emailToken !== token) {
-        return null;
+      if (!user || !isUser(user) || !user.salt) {
+        throw new NotFoundError();
       }
 
-      try {
-        const salt = crypto.randomBytes(SALT_LENGTH).toString("hex");
-        const hash = hashPassword(password, salt);
-
-        await usersCollection.updateOne(
-          { _id: user._id },
-          { $set: { password: hash, salt, emailToken: "" } }
-        );
-
-        return user;
-      } catch (err) {
-        console.log(`Error resetting password for ${email}: ${err}`);
-        return null;
+      if (user.emailToken !== token) {
+        throw new BadRequestError("Token is invalid.");
       }
+
+      const salt = crypto.randomBytes(SALT_LENGTH).toString("hex");
+      const hash = hashPassword(password, salt);
+
+      await usersCollection.updateOne(
+        { _id: user._id },
+        { $set: { password: hash, salt, emailToken: "" } }
+      );
+
+      return user;
     },
 
     /*
@@ -378,8 +361,7 @@ const createUsersCollection = (
         const user = await usersCollection.findOne({ emailToken: code });
         return !!user;
       } catch (err) {
-        console.log(`Error verifying code ${code}: ${err}`);
-        return false;
+        throw new InvalidateError("code", "Invalid verification code");
       }
     },
 
@@ -392,24 +374,15 @@ const createUsersCollection = (
      * @returns   A stub user record for the newly invited user, or null if
      *            the user already exists or an error was encountered.
      */
-    invite: async (
-      userId: MongoId,
-      email: string
-    ): Promise<User.Stub | null> => {
-      try {
-        const stubUser = await collection.requestInvite(email);
-        if (!stubUser) return null;
+    invite: async (userId: MongoId, email: string): Promise<User.Stub> => {
+      const stubUser = await collection.requestInvite(email);
 
-        await usersCollection.updateOne(
-          { _id: toObjectId(userId) },
-          { $addToSet: { invitees: stubUser._id } }
-        );
+      await usersCollection.updateOne(
+        { _id: toObjectId(userId) },
+        { $addToSet: { invitees: stubUser._id } }
+      );
 
-        return stubUser;
-      } catch (err) {
-        console.log(`Error inviting user ${email}: ${err}`);
-        return null;
-      }
+      return stubUser;
     },
 
     /**
@@ -429,9 +402,7 @@ const createUsersCollection = (
 
         return result.acknowledged;
       } catch (err) {
-        console.log(
-          `Error reporting post ${report.postId} user ${userId}: ${err}`
-        );
+        console.log(`Error reporting post ${postId} user ${userId}: ${err}`);
         return false;
       }
     },
@@ -545,23 +516,20 @@ const createUsersCollection = (
       userId: MongoId,
       settings: Settings
     ): Promise<boolean> => {
-      try {
-        const user = await usersCollection.findOne({ _id: toObjectId(userId) });
-        if (!user || !isUser(user)) return false;
-
-        const newSettings = {
-          ...(user.settings ? user.settings : {}),
-          ...settings,
-        };
-
-        await usersCollection.updateOne(
-          { _id: toObjectId(userId) },
-          { $set: { settings: newSettings, updatedAt: new Date() } }
-        );
-      } catch (err) {
-        console.log(`Error updating user settings for ${userId}: ${err}`);
-        return false;
+      const user = await usersCollection.findOne({ _id: toObjectId(userId) });
+      if (!user || !isUser(user)) {
+        throw new NotFoundError();
       }
+
+      const newSettings = {
+        ...(user.settings ? user.settings : {}),
+        ...settings,
+      };
+
+      await usersCollection.updateOne(
+        { _id: toObjectId(userId) },
+        { $set: { settings: newSettings, updatedAt: new Date() } }
+      );
 
       return true;
     },
@@ -785,11 +753,14 @@ const createUsersCollection = (
      * @returns A deserialized object contains the _id, user role, and
      *          accreditation status for the user.
      */
-    deserialize: async (userId: MongoId): Promise<DeserializedUser | null> => {
+    deserialize: async (userId: MongoId): Promise<DeserializedUser> => {
       const user = await usersCollection.findOne({ _id: toObjectId(userId) });
-      if (!user || !isUser(user)) return null;
+      if (!user || !isUser(user)) {
+        throw new NotFoundError();
+      }
 
       const { _id, role, accreditation } = user;
+
       return {
         _id: _id.toString(),
         role,

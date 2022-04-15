@@ -10,6 +10,7 @@ import {
   toObjectIds,
   GraphQLEntity,
 } from "../../lib/mongo-helper";
+import { NotFoundError } from "../../lib/validate";
 import type { Comment } from "../../schemas/comment";
 import type { Post } from "../../schemas/post";
 
@@ -53,7 +54,7 @@ const createCommentsCollection = (
     create: async (
       comment: Comment.Input,
       userId: MongoId
-    ): Promise<Comment.Mongo | null> => {
+    ): Promise<Comment.Mongo> => {
       const { body, postId, commentId, mentionIds } = comment;
       const commentData = {
         _id: new ObjectId(),
@@ -63,21 +64,16 @@ const createCommentsCollection = (
         mentionIds: mentionIds ? toObjectIds(mentionIds) : undefined,
         userId: toObjectId(userId),
       };
-      try {
-        await commentsCollection.insertOne(commentData);
-        await postsCollection.updateOne(
-          { _id: toObjectId(postId) },
-          {
-            $addToSet: { commentIds: commentData._id },
-            $set: { updatedAt: new Date() },
-          }
-        );
+      await commentsCollection.insertOne(commentData);
+      await postsCollection.updateOne(
+        { _id: toObjectId(postId) },
+        {
+          $addToSet: { commentIds: commentData._id },
+          $set: { updatedAt: new Date() },
+        }
+      );
 
-        return commentData;
-      } catch (err) {
-        console.log("Error creating new comment:", err);
-        return null;
-      }
+      return commentData;
     },
 
     /**
@@ -92,7 +88,7 @@ const createCommentsCollection = (
     edit: async (
       comment: Comment.Update,
       userId: MongoId
-    ): Promise<Comment.Mongo | null> => {
+    ): Promise<Comment.Mongo> => {
       const { _id, body, mentionIds } = comment;
       let updateFilter: UpdateFilter<Comment.Mongo> = {
         $set: {
@@ -102,18 +98,17 @@ const createCommentsCollection = (
         },
       };
 
-      try {
-        const result = await commentsCollection.findOneAndUpdate(
-          { _id: toObjectId(_id), userId: toObjectId(userId) },
-          updateFilter,
-          { returnDocument: "after" }
-        );
+      const result = await commentsCollection.findOneAndUpdate(
+        { _id: toObjectId(_id), userId: toObjectId(userId) },
+        updateFilter,
+        { returnDocument: "after" }
+      );
 
-        return result.value;
-      } catch (err) {
-        console.log(`Error editing comment ${comment._id}:`, err);
-        return null;
+      if (!result.value) {
+        throw new NotFoundError("Comment");
       }
+
+      return result.value;
     },
 
     /**
@@ -126,25 +121,23 @@ const createCommentsCollection = (
      *            otherwise.
      */
     delete: async (commentId: MongoId, userId: MongoId): Promise<boolean> => {
-      try {
-        const result = await commentsCollection.findOneAndDelete({
-          _id: toObjectId(commentId),
-          userId: toObjectId(userId),
-        });
+      const result = await commentsCollection.findOneAndDelete({
+        _id: toObjectId(commentId),
+        userId: toObjectId(userId),
+      });
 
-        if (result.ok && result.value) {
-          await postsCollection.updateOne(
-            { _id: result.value.postId },
-            { $pull: { commentIds: result.value._id } }
-          );
-        }
-
-        return !!result.ok && result.value !== null;
-      } catch (err) {
-        console.log("Error creating deleting comment:", err);
+      if (!result.value) {
+        throw new NotFoundError("Comment");
       }
 
-      return false;
+      if (result.ok) {
+        await postsCollection.updateOne(
+          { _id: result.value.postId },
+          { $pull: { commentIds: result.value._id } }
+        );
+      }
+
+      return !!result.ok;
     },
   };
 };

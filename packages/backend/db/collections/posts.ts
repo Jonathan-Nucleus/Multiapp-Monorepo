@@ -12,6 +12,7 @@ import {
 } from "../../lib/mongo-helper";
 import type { Post, PostCategory, Audience } from "../../schemas/post";
 import type { Comment } from "../../schemas/comment";
+import { NotFoundError } from "../../lib/validate";
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 const createPostsCollection = (postsCollection: Collection<Post.Mongo>) => {
@@ -95,10 +96,7 @@ const createPostsCollection = (postsCollection: Collection<Post.Mongo>) => {
      *
      * @returns   Persisted post data with id.
      */
-    create: async (
-      post: Post.Input,
-      userId: MongoId
-    ): Promise<Post.Mongo | null> => {
+    create: async (post: Post.Input, userId: MongoId): Promise<Post.Mongo> => {
       const { mentionIds } = post;
       const postData: Post.Mongo = {
         ...post,
@@ -108,12 +106,7 @@ const createPostsCollection = (postsCollection: Collection<Post.Mongo>) => {
         userId: toObjectId(userId),
       };
 
-      try {
-        await postsCollection.insertOne(postData);
-      } catch (err) {
-        console.log("Error creating new post:", err);
-        return null;
-      }
+      await postsCollection.insertOne(postData);
 
       return postData;
     },
@@ -131,18 +124,18 @@ const createPostsCollection = (postsCollection: Collection<Post.Mongo>) => {
       postId: MongoId,
       userId: MongoId,
       feature: boolean
-    ): Promise<Post.Mongo | null> => {
-      try {
-        const result = await postsCollection.findOneAndUpdate(
-          { _id: toObjectId(postId), userId: toObjectId(userId) },
-          { $set: { featured: feature } },
-          { returnDocument: "after" }
-        );
-        return result.value;
-      } catch (err) {
-        console.log(`Error updating featured state for post: ${postId}`, err);
-        return null;
+    ): Promise<Post.Mongo> => {
+      const result = await postsCollection.findOneAndUpdate(
+        { _id: toObjectId(postId), userId: toObjectId(userId) },
+        { $set: { featured: feature } },
+        { returnDocument: "after" }
+      );
+
+      if (!result.value) {
+        throw new NotFoundError("Post");
       }
+
+      return result.value;
     },
 
     /**
@@ -153,22 +146,18 @@ const createPostsCollection = (postsCollection: Collection<Post.Mongo>) => {
      *
      * @returns   The updated post record or null if it was not found.
      */
-    likePost: async (
-      postId: MongoId,
-      userId: MongoId
-    ): Promise<Post.Mongo | null> => {
-      try {
-        const result = await postsCollection.findOneAndUpdate(
-          { _id: toObjectId(postId) },
-          { $addToSet: { likeIds: toObjectId(userId) } },
-          { returnDocument: "after" }
-        );
+    likePost: async (postId: MongoId, userId: MongoId): Promise<Post.Mongo> => {
+      const result = await postsCollection.findOneAndUpdate(
+        { _id: toObjectId(postId) },
+        { $addToSet: { likeIds: toObjectId(userId) } },
+        { returnDocument: "after" }
+      );
 
-        return result.value;
-      } catch (err) {
-        console.log("Error creating new post:", err);
-        return null;
+      if (!result.value) {
+        throw new NotFoundError("Post");
       }
+
+      return result.value;
     },
 
     /**
@@ -182,19 +171,18 @@ const createPostsCollection = (postsCollection: Collection<Post.Mongo>) => {
     unlikePost: async (
       postId: MongoId,
       userId: MongoId
-    ): Promise<Post.Mongo | null> => {
-      try {
-        const result = await postsCollection.findOneAndUpdate(
-          { _id: toObjectId(postId) },
-          { $pull: { likeIds: toObjectId(userId) } },
-          { returnDocument: "after" }
-        );
+    ): Promise<Post.Mongo> => {
+      const result = await postsCollection.findOneAndUpdate(
+        { _id: toObjectId(postId) },
+        { $pull: { likeIds: toObjectId(userId) } },
+        { returnDocument: "after" }
+      );
 
-        return result.value;
-      } catch (err) {
-        console.log("Error creating new post:", err);
-        return null;
+      if (!result.value) {
+        throw new NotFoundError("Post");
       }
+
+      return result.value;
     },
 
     /**

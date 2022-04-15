@@ -1,10 +1,10 @@
 import { gql } from "apollo-server";
+import * as yup from "yup";
 import { PrometheusMailer } from "../email";
 
 import {
   PartialSchema,
   ApolloServerContext,
-  NoArgs,
   secureEndpoint,
 } from "../lib/apollo-helper";
 import {
@@ -15,14 +15,20 @@ import {
   ResetTokenPayload,
 } from "../lib/tokens";
 import { getUploadUrl, RemoteUpload } from "../lib/s3-helper";
+import {
+  InternalServerError,
+  NotFoundError,
+  UnprocessableEntityError,
+  validateArgs,
+} from "../lib/validate";
 
 import {
   User,
   Settings,
   ReportedPost,
-  isUser,
   compareAccreditation,
 } from "../schemas/user";
+import { AudienceOptions } from "../schemas/post";
 import type { Post } from "../schemas/post";
 import type { Comment } from "../schemas/comment";
 
@@ -73,58 +79,131 @@ const resolvers = {
   Mutation: {
     register: async (
       parentIgnored: unknown,
-      { user }: { user: User.Input },
+      args: { user: User.Input },
       { db }: ApolloServerContext
-    ): Promise<AccessToken | null> => {
+    ): Promise<AccessToken> => {
+      const validator = yup
+        .object()
+        .shape({
+          user: yup
+            .object()
+            .shape({
+              email: yup.string().email().required(),
+              firstName: yup.string().required(),
+              lastName: yup.string().required(),
+              password: yup.string().required(),
+            })
+            .required(),
+        })
+        .required();
+
+      validateArgs(validator, args);
+
+      const { user } = args;
+
       const userId = await db.users.register(user);
-      if (!userId) return null;
 
       const deserializedUser = await db.users.deserialize(userId);
-      return deserializedUser ? getAccessToken(deserializedUser) : null;
+      return getAccessToken(deserializedUser);
     },
 
     login: async (
       parentIgnored: User.Mongo,
-      { email, password }: { email: string; password: string },
+      args: { email: string; password: string },
       { db }: ApolloServerContext
-    ): Promise<AccessToken | null> => {
+    ): Promise<AccessToken> => {
+      const validator = yup
+        .object()
+        .shape({
+          email: yup.string().email().required(),
+          password: yup.string().required(),
+        })
+        .required();
+
+      validateArgs(validator, args);
+
+      const { email, password } = args;
+
       const user = await db.users.authenticate(email, password);
-      if (!user) return null;
 
       const deserializedUser = await db.users.deserialize(user._id);
-      return deserializedUser ? getAccessToken(deserializedUser) : null;
+
+      return getAccessToken(deserializedUser);
     },
 
     loginOAuth: async (
       parentIgnored: unknown,
-      { user }: { user: User.OAuthInput },
+      args: { user: User.OAuthInput },
       { db }: ApolloServerContext
     ): Promise<AccessToken | null> => {
+      const validator = yup
+        .object()
+        .shape({
+          user: yup
+            .object()
+            .shape({
+              email: yup.string().email().required(),
+              firstName: yup.string().required(),
+              lastName: yup.string().required(),
+              provider: yup.string().required(),
+              tokenId: yup.string().required(),
+            })
+            .required(),
+        })
+        .required();
+
+      validateArgs(validator, args);
+
+      const { user } = args;
+
       const authUser = await db.users.authenticateOAuth(user);
-      if (!authUser || !isUser(authUser)) return null;
 
       const deserializedUser = await db.users.deserialize(authUser._id);
-      return deserializedUser ? getAccessToken(deserializedUser) : null;
+      return getAccessToken(deserializedUser);
     },
 
     requestInvite: async (
       parentIgnored: unknown,
-      { email }: { email: string },
+      args: { email: string },
       { db }: ApolloServerContext
     ): Promise<boolean | null> => {
+      const validator = yup
+        .object()
+        .shape({
+          email: yup.string().email().required(),
+        })
+        .required();
+
+      validateArgs(validator, args);
+
+      const { email } = args;
+
       const stubUser = await db.users.requestInvite(email);
-      if (!stubUser || !stubUser.emailToken) return null;
+
+      if (!stubUser.emailToken) {
+        throw new UnprocessableEntityError("Email token not found.");
+      }
 
       return PrometheusMailer.sendInviteCode(email, stubUser.emailToken);
     },
 
     requestPasswordReset: async (
       parentIgnored: unknown,
-      { email }: { email: string },
+      args: { email: string },
       { db }: ApolloServerContext
     ): Promise<boolean> => {
+      const validator = yup
+        .object()
+        .shape({
+          email: yup.string().email().required(),
+        })
+        .required();
+
+      validateArgs(validator, args);
+
+      const { email } = args;
+
       const emailToken = await db.users.requestPasswordReset(email);
-      if (!emailToken) return false;
 
       const token = getResetToken(email, emailToken);
       return PrometheusMailer.sendForgotPassword(email, token);
@@ -132,28 +211,51 @@ const resolvers = {
 
     resetPassword: async (
       parentIgnored: unknown,
-      { password, token }: { password: string; token: string },
+      args: { password: string; token: string },
       { db }: ApolloServerContext
     ): Promise<AccessToken | null> => {
+      const validator = yup
+        .object()
+        .shape({
+          password: yup.string().required(),
+          token: yup.string().required(),
+        })
+        .required();
+
+      validateArgs(validator, args);
+
+      const { token, password } = args;
+
       const payload = decodeToken(token);
-      if (!payload) return null;
 
       const { email, tkn } = payload as ResetTokenPayload;
       const user = await db.users.resetPassword(password, email, tkn);
-      if (!user) return null;
 
       const deserializedUser = await db.users.deserialize(user._id);
-      return deserializedUser ? getAccessToken(deserializedUser) : null;
+      return getAccessToken(deserializedUser);
     },
 
     inviteUser: secureEndpoint(
       async (
         parentIgnored,
-        { email }: { email: string },
+        args: { email: string },
         { db, user }
       ): Promise<boolean | null> => {
+        const validator = yup
+          .object()
+          .shape({
+            email: yup.string().email().required(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { email } = args;
+
         const stubUser = await db.users.invite(user._id, email);
-        if (!stubUser || !stubUser.emailToken) return null;
+        if (!stubUser.emailToken) {
+          throw new UnprocessableEntityError("Email token not found.");
+        }
 
         return PrometheusMailer.sendInviteCode(email, stubUser.emailToken);
       }
@@ -162,54 +264,146 @@ const resolvers = {
     updateSettings: secureEndpoint(
       async (
         parentIgnored,
-        { settings }: { settings: Settings },
+        args: { settings: Settings },
         { db, user }
-      ): Promise<boolean> => db.users.updateSettings(user._id, settings)
+      ): Promise<boolean> => {
+        const validator = yup
+          .object()
+          .shape({
+            settings: yup
+              .object()
+              .shape({
+                interests: yup.array().of(yup.string().required()),
+              })
+              .required(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { settings } = args;
+
+        return db.users.updateSettings(user._id, settings);
+      }
     ),
 
     createPost: secureEndpoint(
       async (
         parentIgnored,
-        { post }: { post: Post.Input },
+        args: { post: Post.Input },
         { db, user }
-      ): Promise<Post.Mongo | null> => {
-        const postData = await db.posts.create(post, user._id);
-        if (!postData) return null;
+      ): Promise<Post.Mongo> => {
+        const validator = yup
+          .object()
+          .shape({
+            post: yup
+              .object()
+              .shape({
+                audience: yup
+                  .string()
+                  .oneOf(Object.keys(AudienceOptions))
+                  .required(),
+                categories: yup.array().of(yup.string().required()).required(),
+                body: yup.string(),
+                mediaUrl: yup.string().url(),
+                mentionIds: yup
+                  .array()
+                  .of(yup.string().length(24, "Invalid mention id")),
+              })
+              .required(),
+          })
+          .required();
 
-        return (await db.users.addPost(postData._id, user._id))
-          ? postData
-          : null;
+        validateArgs(validator, args);
+
+        const { post } = args;
+
+        const postData = await db.posts.create(post, user._id);
+
+        const isAdded = await db.users.addPost(postData._id, user._id);
+
+        if (!isAdded) {
+          throw new InternalServerError("Not able to create a post");
+        }
+
+        return postData;
       }
     ),
 
     featurePost: secureEndpoint(
       async (
         parentIgnored,
-        { postId, feature }: { postId: string; feature: boolean },
+        args: { postId: string; feature: boolean },
         { db, user }
-      ): Promise<Post.Mongo | null> =>
-        db.posts.feature(postId, user._id, feature)
+      ): Promise<Post.Mongo> => {
+        const validator = yup
+          .object()
+          .shape({
+            postId: yup.string().length(24, "Invalid post id").required(),
+            feature: yup.bool().required(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { postId, feature } = args;
+
+        return db.posts.feature(postId, user._id, feature);
+      }
     ),
 
     likePost: secureEndpoint(
       async (
         parentIgnored,
-        { postId, like }: { postId: string; like: boolean },
+        args: { postId: string; like: boolean },
         { db, user }
-      ): Promise<Post.Mongo | null> =>
-        like
+      ): Promise<Post.Mongo> => {
+        const validator = yup
+          .object()
+          .shape({
+            postId: yup.string().length(24, "Invalid post id").required(),
+            like: yup.bool().required(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { like, postId } = args;
+
+        return like
           ? db.posts.likePost(postId, user._id)
-          : db.posts.unlikePost(postId, user._id)
+          : db.posts.unlikePost(postId, user._id);
+      }
     ),
 
     reportPost: secureEndpoint(
       async (
         parentIgnored,
-        { report }: { report: ReportedPost },
+        args: { report: ReportedPost },
         { db, user }
       ): Promise<boolean> => {
-        const postData = db.posts.find(report.postId);
-        if (!postData) return false;
+        const validator = yup
+          .object()
+          .shape({
+            report: yup
+              .object()
+              .shape({
+                postId: yup.string().length(24, "Invalid post id").required(),
+                comments: yup.string().required(),
+                violations: yup.array().of(yup.string().required()).required(),
+              })
+              .required(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { report } = args;
+
+        const postData = await db.posts.find(report.postId);
+        if (!postData) {
+          throw new NotFoundError("Post");
+        }
 
         return (
           (await db.users.reportPost(report, user._id)) &&
@@ -221,11 +415,25 @@ const resolvers = {
     hidePost: secureEndpoint(
       async (
         parentIgnored,
-        { postId, hide }: { postId: string; hide: boolean },
+        args: { postId: string; hide: boolean },
         { db, user }
       ): Promise<boolean> => {
-        const postData = db.posts.find(postId);
-        if (!postData) return false;
+        const validator = yup
+          .object()
+          .shape({
+            postId: yup.string().length(24, "Invalid post id").required(),
+            hide: yup.bool().required(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { hide, postId } = args;
+
+        const postData = await db.posts.find(postId);
+        if (!postData) {
+          throw new NotFoundError("Post");
+        }
 
         return db.users.hidePost(hide, postId, user._id);
       }
@@ -234,11 +442,25 @@ const resolvers = {
     mutePost: secureEndpoint(
       async (
         parentIgnored,
-        { postId, mute }: { postId: string; mute: boolean },
+        args: { postId: string; mute: boolean },
         { db, user }
       ): Promise<boolean> => {
-        const postData = db.posts.find(postId);
-        if (!postData) return false;
+        const validator = yup
+          .object()
+          .shape({
+            postId: yup.string().length(24, "Invalid post id").required(),
+            mute: yup.bool().required(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { mute, postId } = args;
+
+        const postData = await db.posts.find(postId);
+        if (!postData) {
+          throw new NotFoundError("Post");
+        }
 
         return db.users.mutePost(mute, postId, user._id);
       }
@@ -247,11 +469,34 @@ const resolvers = {
     comment: secureEndpoint(
       async (
         parentIgnored,
-        { comment }: { comment: Comment.Input },
+        args: { comment: Comment.Input },
         { db, user }
-      ): Promise<Comment.Mongo | null> => {
-        const postData = db.posts.find(comment.postId);
-        if (!postData) return null;
+      ): Promise<Comment.Mongo> => {
+        const validator = yup
+          .object()
+          .shape({
+            comment: yup
+              .object()
+              .shape({
+                postId: yup.string().length(24, "Invalid post id").required(),
+                body: yup.string().required(),
+                mentionIds: yup
+                  .array()
+                  .of(yup.string().length(24, "Invalid mention id")),
+                commentId: yup.string().length(24, "Invalid comment id"),
+              })
+              .required(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { comment } = args;
+
+        const postData = await db.posts.find(comment.postId);
+        if (!postData) {
+          throw new NotFoundError("Post");
+        }
 
         return db.comments.create(comment, user._id);
       }
@@ -260,17 +505,52 @@ const resolvers = {
     editComment: secureEndpoint(
       async (
         parentIgnored,
-        { comment }: { comment: Comment.Update },
+        args: { comment: Comment.Update },
         { db, user }
-      ): Promise<Comment.Mongo | null> => db.comments.edit(comment, user._id)
+      ): Promise<Comment.Mongo> => {
+        const validator = yup
+          .object()
+          .shape({
+            comment: yup
+              .object()
+              .shape({
+                _id: yup.string().length(24, "Invalid comment id"),
+                body: yup.string().required(),
+                mentionIds: yup
+                  .array()
+                  .of(yup.string().length(24, "Invalid mention id")),
+              })
+              .required(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { comment } = args;
+
+        return db.comments.edit(comment, user._id);
+      }
     ),
 
     deleteComment: secureEndpoint(
       async (
         parentIgnored,
-        { commentId }: { commentId: string },
+        args: { commentId: string },
         { db, user }
-      ): Promise<boolean> => db.comments.delete(commentId, user._id)
+      ): Promise<boolean> => {
+        const validator = yup
+          .object()
+          .shape({
+            commentId: yup.string().length(24, "Invalid comment id").required(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { commentId } = args;
+
+        return db.comments.delete(commentId, user._id);
+      }
     ),
 
     /**
@@ -280,33 +560,59 @@ const resolvers = {
     uploadLink: secureEndpoint(
       async (
         parentIgnored,
-        { localFilename, type }: { localFilename: string; type: MediaType },
+        args: { localFilename: string; type: MediaType },
         { db, user }
       ): Promise<RemoteUpload | null> => {
-        const fileExt = localFilename.substr(
+        const validator = yup
+          .object()
+          .shape({
+            localFilename: yup.string().required(),
+            type: yup.string().oneOf(["POST", "AVATAR", "BACKGROUND"]),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { localFilename, type } = args;
+
+        const fileExt = localFilename.substring(
           localFilename.lastIndexOf(".") + 1
         );
         const uploadInfo = await getUploadUrl(
           fileExt,
           type.toLowerCase() as Lowercase<MediaType>
         );
-        return uploadInfo ?? null;
+        return uploadInfo;
       }
     ),
 
     watchFund: secureEndpoint(
       async (
         parentIgnored,
-        { fundId, watch }: { fundId: string; watch: boolean },
+        args: { fundId: string; watch: boolean },
         { db, user }
       ): Promise<Boolean> => {
+        const validator = yup
+          .object()
+          .shape({
+            watch: yup.bool().required(),
+            fundId: yup.string().length(24, "Invalid fund id").required(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { fundId, watch } = args;
+
         if (!watch) {
           return db.users.setOnWatchlist(false, fundId, user._id);
         }
 
         // Check that the user has access to this fund if adding to watclist
         const fund = await db.funds.find(fundId);
-        if (!fund) return false;
+        if (!fund) {
+          throw new NotFoundError("Fund");
+        }
         if (compareAccreditation(user.accreditation, fund.level) < 0) {
           return false;
         }
@@ -318,18 +624,32 @@ const resolvers = {
     followUser: secureEndpoint(
       async (
         parentIgnored,
-        {
-          follow,
-          userId,
-          asCompanyId,
-        }: { follow: boolean; userId: string; asCompanyId?: string },
+        args: { follow: boolean; userId: string; asCompanyId?: string },
         { db, user }
       ): Promise<boolean> => {
-        if (userId === user._id.toString()) return false;
+        const validator = yup
+          .object()
+          .shape({
+            follow: yup.bool().required(),
+            userId: yup.string().length(24, "Invalid user id").required(),
+            asCompanyId: yup.string().length(24, "Invalid company id"),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { follow, userId, asCompanyId } = args;
+
+        if (userId === user._id.toString()) {
+          throw new UnprocessableEntityError("Invalid user");
+        }
+
         if (asCompanyId) {
           // Check company exists
           const companyData = await db.companies.find(asCompanyId);
-          if (!companyData) return false;
+          if (!companyData) {
+            throw new NotFoundError("Company");
+          }
 
           return (
             (await db.users.setFollowerCompany(follow, asCompanyId, userId)) &&
@@ -339,7 +659,9 @@ const resolvers = {
 
         // Check company exists
         const userData = await db.users.find({ _id: userId });
-        if (!userData) return false;
+        if (!userData) {
+          throw new NotFoundError();
+        }
 
         return (
           (await db.users.setFollowingUser(follow, userId, user._id)) &&
@@ -351,21 +673,36 @@ const resolvers = {
     followCompany: secureEndpoint(
       async (
         parentIgnored,
-        {
-          follow,
-          companyId,
-          asCompanyId,
-        }: { follow: boolean; companyId: string; asCompanyId?: string },
+        args: { follow: boolean; companyId: string; asCompanyId?: string },
         { db, user }
       ): Promise<boolean> => {
-        if (companyId === asCompanyId) return false;
+        const validator = yup
+          .object()
+          .shape({
+            follow: yup.bool().required(),
+            companyId: yup.string().length(24, "Invalid company id").required(),
+            asCompanyId: yup.string().length(24, "Invalid company id"),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { follow, companyId, asCompanyId } = args;
+
+        if (companyId === asCompanyId) {
+          throw new UnprocessableEntityError("Invalid company");
+        }
 
         const companyData = await db.companies.find(companyId);
-        if (!companyData) return false;
+        if (!companyData) {
+          throw new NotFoundError("Company");
+        }
 
         if (asCompanyId) {
           const asCompanyData = await db.companies.find(asCompanyId);
-          if (!asCompanyData) return false;
+          if (!asCompanyData) {
+            throw new NotFoundError("Company");
+          }
 
           return (
             (await db.companies.setFollowingCompany(
@@ -391,11 +728,25 @@ const resolvers = {
     hideUser: secureEndpoint(
       async (
         parentIgnored,
-        { hide, userId }: { hide: boolean; userId: string },
+        args: { hide: boolean; userId: string },
         { db, user }
       ): Promise<boolean> => {
+        const validator = yup
+          .object()
+          .shape({
+            hide: yup.bool().required(),
+            userId: yup.string().length(24, "Invalid user id").required(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { hide, userId } = args;
+
         const userData = await db.users.find({ _id: userId });
-        if (!userData) return false;
+        if (!userData) {
+          throw new NotFoundError();
+        }
 
         return db.users.setHideUser(hide, userId, user._id);
       }

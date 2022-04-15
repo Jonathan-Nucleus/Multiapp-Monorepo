@@ -1,10 +1,11 @@
 import { gql } from "apollo-server";
+import * as yup from "yup";
 import {
   PartialSchema,
   ApolloServerContext,
-  NoArgs,
   secureEndpoint,
 } from "../lib/apollo-helper";
+import { NotFoundError, validateArgs } from "../lib/validate";
 
 import { User, isUser, compareAccreditation } from "../schemas/user";
 import type { Company } from "../schemas/company";
@@ -40,18 +41,44 @@ const resolvers = {
   Query: {
     verifyInvite: async (
       parentIgnored: unknown,
-      { code }: { code: string },
+      args: { code: string },
       { db }: ApolloServerContext
-    ): Promise<boolean> => db.users.verifyInvite(code),
+    ): Promise<boolean> => {
+      const validator = yup
+        .object()
+        .shape({
+          code: yup.string().uuid().required(),
+        })
+        .required();
+
+      validateArgs(validator, args);
+
+      const { code } = args;
+
+      return db.users.verifyInvite(code);
+    },
 
     posts: secureEndpoint(
       async (
         parentIgnored,
-        { categories }: { categories?: PostCategory[] },
+        args: { categories?: PostCategory[] },
         { db, user }
       ): Promise<Post.Mongo[]> => {
+        const validator = yup
+          .object()
+          .shape({
+            categories: yup.array().of(yup.string().required()),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { categories } = args;
+
         const userData = await db.users.find({ _id: user._id });
-        if (!userData || !isUser(userData)) return [];
+        if (!userData || !isUser(userData)) {
+          throw new NotFoundError();
+        }
 
         return db.posts.findByCategory(
           user.accreditation === "none" ? "everyone" : user.accreditation,
@@ -88,11 +115,24 @@ const resolvers = {
     fund: secureEndpoint(
       async (
         parentIgnored,
-        { fundId }: { fundId: string },
+        args: { fundId: string },
         { db, user }
       ): Promise<Fund.Mongo | null> => {
+        const validator = yup
+          .object()
+          .shape({
+            fundId: yup.string().length(24, "Invalid fund id").required(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { fundId } = args;
+
         const fund = await db.funds.find(fundId);
-        if (!fund) return null;
+        if (!fund) {
+          throw new NotFoundError("Fund");
+        }
 
         return compareAccreditation(user.accreditation, fund.level) >= 0
           ? fund
@@ -103,9 +143,17 @@ const resolvers = {
     fundManagers: secureEndpoint(
       async (
         parentIgnored,
-        { featured = false }: { featured?: boolean },
+        args: { featured?: boolean },
         { db, user }
       ): Promise<FundManagers> => {
+        const validator = yup.object().shape({
+          featured: yup.bool(),
+        });
+
+        validateArgs(validator, args);
+
+        const { featured = false } = args;
+
         const managers = await db.users.fundManagers(featured);
         const fundIds = Array.from(
           new Set(managers.map((manager) => manager.managedFundsIds).flat())
@@ -150,18 +198,54 @@ const resolvers = {
     userProfile: secureEndpoint(
       async (
         parentIgnored,
-        { userId }: { userId: string },
+        args: { userId: string },
         { db, user }
-      ): Promise<User.Mongo | null> =>
-        (await db.users.find({ _id: userId })) as User.Mongo | null
+      ): Promise<User.Mongo | User.Stub> => {
+        const validator = yup
+          .object()
+          .shape({
+            userId: yup.string().length(24, "Invalid user id").required(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { userId } = args;
+
+        const userData = await db.users.find({ _id: userId });
+
+        if (!userData) {
+          throw new NotFoundError();
+        }
+
+        return userData;
+      }
     ),
 
     companyProfile: secureEndpoint(
       async (
         parentIgnored,
-        { companyId }: { companyId: string },
+        args: { companyId: string },
         { db, user }
-      ): Promise<Company.Mongo | null> => db.companies.find(companyId)
+      ): Promise<Company.Mongo> => {
+        const validator = yup
+          .object()
+          .shape({
+            companyId: yup.string().length(24, "Invalid company id").required(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { companyId } = args;
+
+        const companyData = await db.companies.find(companyId);
+        if (!companyData) {
+          throw new NotFoundError("Company");
+        }
+
+        return companyData;
+      }
     ),
   },
 };

@@ -1,5 +1,6 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import type { DeserializedUser } from "../db/collections/users";
+import { BadRequestError } from "./validate";
 
 import "dotenv/config";
 
@@ -26,10 +27,10 @@ export function getResetToken(email: string, emailToken: string): Token {
   );
 }
 
-export function decodeToken(token: string): JwtPayload | null {
+export function decodeToken(token: string): JwtPayload {
   try {
     return jwt.verify(token, IGNITE_SECRET, { complete: false }) as JwtPayload;
   } catch {
-    return null;
+    throw new BadRequestError("Token is invalid.");
   }
 }

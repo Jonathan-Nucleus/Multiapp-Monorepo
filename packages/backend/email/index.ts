@@ -1,3 +1,4 @@
+import { ApolloError } from "apollo-server";
 import { SES } from "aws-sdk";
 import { promises as fs } from "fs";
 import { promisify } from "util";
@@ -99,9 +100,8 @@ export const PrometheusMailer = {
 
       return true;
     } catch (err) {
-      console.log(`Error sending invite code to ${recipient}`, err);
+      throw new ApolloError(`Error sending invite code to ${recipient}`);
     }
-    return false;
   },
 
   /**
@@ -121,8 +121,9 @@ export const PrometheusMailer = {
 
       return true;
     } catch (err) {
-      console.log(`Error sending password reset email to ${recipient}`, err);
+      throw new ApolloError(
+        `Error sending password reset email to ${recipient}`
+      );
     }
-    return false;
   },
 };

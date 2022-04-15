@@ -1,6 +1,7 @@
-import { ApolloServer } from "apollo-server";
+import { ApolloError, ApolloServer } from "apollo-server";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import jwt from "jsonwebtoken";
+import { MongoError } from "mongodb";
 
 import type { ApolloServerContext } from "./apollo-helper";
 import type { DeserializedUser } from "../db/collections/users";
@@ -8,6 +9,7 @@ import { isUser } from "../schemas/user";
 
 import { getIgniteDb } from "../db";
 import schema from "../graphql";
+import { InternalServerError } from "./validate";
 
 import "dotenv/config";
 
@@ -40,4 +42,18 @@ export const apolloServer = new ApolloServer({
 
     return { db };
   },
+  formatError: (error) => {
+    console.error(error);
+
+    // Format mongodb errors
+    if (
+      error instanceof MongoError ||
+      error.originalError instanceof MongoError
+    ) {
+      return new InternalServerError(error.message);
+    }
+
+    return error;
+  },
+  introspection: false,
 });

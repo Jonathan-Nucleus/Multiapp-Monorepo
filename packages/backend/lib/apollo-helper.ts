@@ -65,7 +65,9 @@ export function secureEndpoint<
     info
   ): ReturnValue | null => {
     const { user } = context;
-    if (!user) return null;
+    if (!user) {
+      throw new AuthenticationError("User is unauthenticated.");
+    }
 
     return resolver(parent, args, { ...context, user }, info);
   };

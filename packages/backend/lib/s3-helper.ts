@@ -1,8 +1,8 @@
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-
-import jwt from "jsonwebtoken";
 import { v4 as uuid } from "uuid";
+
+import { InternalServerError } from "./validate";
 
 import "dotenv/config";
 
@@ -19,14 +19,14 @@ export interface RemoteUpload {
 export async function getUploadUrl(
   fileExt: string,
   type: "avatar" | "post" | "background"
-): Promise<RemoteUpload | null> {
+): Promise<RemoteUpload> {
   if (
     !AWS_ACCESS_KEY_ID ||
     !AWS_SECRET_ACCESS_KEY ||
     !AWS_UPLOAD_REGION ||
     !S3_BUCKET
   ) {
-    return null;
+    throw new InternalServerError("Missing AWS configuration");
   }
 
   const remoteFilename = `${uuid()}.${fileExt}`;
@@ -51,6 +51,6 @@ export async function getUploadUrl(
       uploadUrl: url,
     };
   } catch (err) {
-    return null;
+    throw new InternalServerError("Not able to generate signed url.");
   }
 }
