@@ -1,17 +1,16 @@
 import { FC } from "react";
-import Card from "../../../../common/Card";
-import { FetchFundsData } from "../../../../../graphql/queries/marketplace";
+import { Fund } from "mobile/src/graphql/query/marketplace";
+import Card from "../../../common/Card";
 import Image from "next/image";
-import Button from "../../../../common/Button";
+import Button from "../../../common/Button";
 import { Share, Star } from "phosphor-react";
+import Link from "next/link";
 
-export type Fund = Exclude<FetchFundsData["funds"], undefined>[number];
-
-interface FundItemProps {
+interface FundCardProps {
   fund: Fund;
 }
 
-const FundItem: FC<FundItemProps> = ({ fund }: FundItemProps) => {
+const FundCard: FC<FundCardProps> = ({ fund }: FundCardProps) => {
   return (
     <>
       <Card className="hidden lg:block rounded p-0">
@@ -99,12 +98,16 @@ const FundItem: FC<FundItemProps> = ({ fund }: FundItemProps) => {
                 Follow
               </Button>
             </div>
-            <Button
-              variant="gradient-primary"
-              className="w-full text-sm uppercase font-medium"
-            >
-              view fund details
-            </Button>
+            <Link href={`/funds/${fund._id}`}>
+              <a>
+                <Button
+                  variant="gradient-primary"
+                  className="w-full text-sm uppercase font-medium"
+                >
+                  view fund details
+                </Button>
+              </a>
+            </Link>
           </div>
         </div>
         <div className="bg-secondary/[.12] border-t border-white/[.12]">
@@ -251,4 +254,4 @@ const FundItem: FC<FundItemProps> = ({ fund }: FundItemProps) => {
   );
 };
 
-export default FundItem;
+export default FundCard;

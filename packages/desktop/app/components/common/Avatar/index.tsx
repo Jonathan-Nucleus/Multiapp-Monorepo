@@ -10,15 +10,23 @@ interface AvatarProps extends HTMLProps<HTMLDivElement> {
 const DEFAULT_AVATAR =
   "https://t4.ftcdn.net/jpg/02/45/56/35/360_F_245563558_XH9Pe5LJI2kr7VQuzQKAjAbz9PAyejG1.jpg";
 
-const Avatar: FC<AvatarProps> = ({ children, src, size = 56, ...divProps }) => {
+const Avatar: FC<AvatarProps> = ({
+  children,
+  src,
+  size = 56,
+  ...divProps
+}: AvatarProps) => {
   const { data: accountData } = useAccount({ skip: !!src });
   const account = accountData?.account;
   const avatar = src ?? account?.avatar;
+  const spacing = size / 4;
 
   return (
     <div
       {...divProps}
-      className={`w-${size} h-${size} flex items-center justify-center flex-shrink-0 ${divProps.className}`}
+      className={`w-${spacing} h-${spacing} flex items-center justify-center flex-shrink-0 relative ${
+        divProps.className ?? ""
+      }`}
     >
       <Image
         src={

@@ -1,10 +1,10 @@
 import { FC } from "react";
-import Card from "../../../common/Card";
+import Card from "../../../../common/Card";
 import { Splide, SplideSlide, SplideTrack } from "@splidejs/react-splide";
 import "@splidejs/react-splide/css";
 import Image from "next/image";
 import Link from "next/link";
-import Button from "../../../common/Button";
+import Button from "../../../../common/Button";
 import { ArrowCircleLeft, ArrowCircleRight } from "phosphor-react";
 
 const items = [

@@ -14,7 +14,7 @@ const Navbar: FC = () => {
             <NavItem path={"/funds/managers"} title="FUND MANAGERS" />
           </li>
           <li className="md:w-44">
-            <NavItem path={"/companies"} title="COMPANIES" />
+            <NavItem path={"/funds/companies"} title="COMPANIES" />
           </li>
           <li className="hidden w-44 ml-auto">
             <NavItem

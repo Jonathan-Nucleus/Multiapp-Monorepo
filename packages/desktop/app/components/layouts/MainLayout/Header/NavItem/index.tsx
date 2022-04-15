@@ -6,11 +6,20 @@ interface NavItemProps {
   icon: ReactElement;
   title: string;
   path: string;
+  activePath?: string[] | string;
 }
 
-const NavItem: FC<NavItemProps> = ({ icon, title, path }: NavItemProps) => {
+const NavItem: FC<NavItemProps> = ({
+  icon,
+  title,
+  path,
+  activePath = [path],
+}: NavItemProps) => {
   const router = useRouter();
-  const active = router.pathname == path;
+  const active =
+    typeof activePath == "string"
+      ? router.pathname == activePath
+      : activePath.includes(router.pathname);
   return (
     <div className={"rounded-full" + (active ? " bg-primary-solid/[.3]" : "")}>
       <Link href={path}>

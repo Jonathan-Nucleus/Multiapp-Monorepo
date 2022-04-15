@@ -1,5 +1,5 @@
 import { FC } from "react";
-import Navbar from "../../modules/funds/Navbar";
+import Navbar from "../../../modules/funds/Navbar";
 import FeaturedManagers from "./FeaturedManagers";
 import ManagersTable from "./ManagersTable";
 

@@ -27,6 +27,7 @@ const navItems = [
     icon: <Image src={FundLogo} alt="" />,
     title: "Funds",
     path: "/funds",
+    active: ["/funds", "/funds/managers", "/funds/companies"],
   },
   {
     icon: <ChartLineUp color="white" size={24} />,
@@ -52,7 +53,12 @@ const Header: FC = () => {
         <div className="flex flex-row items-center">
           {navItems.map((item) => (
             <div key={item.path} className="mx-3">
-              <NavItem icon={item.icon} title={item.title} path={item.path} />
+              <NavItem
+                icon={item.icon}
+                title={item.title}
+                path={item.path}
+                activePath={item.active}
+              />
             </div>
           ))}
         </div>

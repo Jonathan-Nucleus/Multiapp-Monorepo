@@ -1,19 +1,21 @@
 import { gql, useQuery, QueryResult } from '@apollo/client';
-import { Fund } from 'backend/graphql/funds.graphql';
+import { Fund as GraphQLFund } from 'backend/graphql/funds.graphql';
 
 type FetchFundsVariables = never;
 
+export type Fund = Pick<
+  GraphQLFund,
+  '_id' | 'name' | 'level' | 'status' | 'overview' | 'tags' | 'background'
+> & {
+  manager: Pick<
+    GraphQLFund['manager'],
+    '_id' | 'firstName' | 'lastName' | 'avatar' | 'followerIds' | 'postIds'
+  >;
+  company: Pick<GraphQLFund['company'], '_id' | 'name'>;
+};
+
 export type FetchFundsData = {
-  funds?: (Pick<
-    Fund,
-    '_id' | 'name' | 'level' | 'status' | 'overview' | 'tags' | 'background'
-  > & {
-    manager: Pick<
-      Fund['manager'],
-      '_id' | 'firstName' | 'lastName' | 'avatar' | 'followerIds' | 'postIds'
-    >;
-    company: Pick<Fund['company'], '_id' | 'name'>;
-  })[];
+  funds?: Fund[];
 };
 
 /**

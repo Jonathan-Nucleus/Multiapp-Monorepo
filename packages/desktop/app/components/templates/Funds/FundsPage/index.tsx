@@ -1,8 +1,8 @@
 import { FC } from "react";
-import Navbar from "../../modules/funds/Navbar";
+import Navbar from "../../../modules/funds/Navbar";
 import { Info, Lock } from "phosphor-react";
-import Button from "../../common/Button";
-import { useFetchFunds } from "../../../graphql/queries/marketplace";
+import Button from "../../../common/Button";
+import { useFetchFunds } from "mobile/src/graphql/query/marketplace";
 import FundsList from "./FundsList";
 import { useSession } from "next-auth/react";
 

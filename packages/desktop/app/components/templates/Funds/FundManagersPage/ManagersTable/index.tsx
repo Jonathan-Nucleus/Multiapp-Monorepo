@@ -1,8 +1,8 @@
 import { FC, useState } from "react";
-import Input from "../../../common/Input";
-import Button from "../../../common/Button";
+import Input from "../../../../common/Input";
+import Button from "../../../../common/Button";
 import { SortAscending } from "phosphor-react";
-import Paginator from "../../../common/Paginator";
+import Paginator from "../../../../common/Paginator";
 import ManagerItem from "./ManagerItem";
 
 const managers = [

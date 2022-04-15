@@ -1,11 +1,4 @@
-import {
-  ChangeEvent,
-  FC,
-  FormEventHandler,
-  useState,
-  useEffect,
-  useRef,
-} from "react";
+import { FC, useState, useEffect, useRef } from "react";
 import { Dialog } from "@headlessui/react";
 import {
   Buildings,
@@ -44,10 +37,7 @@ import {
   useFetchUploadLink,
 } from "desktop/app/graphql/mutations/posts";
 import { Audience, PostCategory } from "backend/graphql/posts.graphql";
-import {
-  Audiences,
-  PostCategories,
-} from "backend/graphql/enumerations.graphql";
+import { Audiences } from "backend/graphql/enumerations.graphql";
 
 const audienceOptions = [
   {
@@ -389,4 +379,4 @@ const CreatePostModal: FC<CreatePostModalProps> = ({ show, onClose }) => {
   );
 };
 
-export default CreatePostModal;
+export default CreatePostModal

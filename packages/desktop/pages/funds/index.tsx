@@ -1,5 +1,5 @@
 import Head from "next/head";
-import FundsPage from "../../app/components/templates/FundsPage";
+import FundsPage from "../../app/components/templates/Funds/FundsPage";
 import { NextPageWithLayout } from "../../app/types/next-page";
 
 const Funds: NextPageWithLayout = () => {

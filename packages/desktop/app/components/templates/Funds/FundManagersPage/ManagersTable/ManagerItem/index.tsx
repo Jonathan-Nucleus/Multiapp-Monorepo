@@ -1,9 +1,9 @@
 import { FC } from "react";
-import Image from "next/image";
-import Button from "../../../../common/Button";
-import { Manager } from "..";
-import Card from "../../../../common/Card";
+import Button from "../../../../../common/Button";
+import Card from "../../../../../common/Card";
 import { ShieldCheck } from "phosphor-react";
+import Avatar from "../../../../../common/Avatar";
+import { Manager } from "../index";
 
 interface ManagerItemProps {
   manager: Manager;
@@ -14,20 +14,11 @@ const ManagerItem: FC<ManagerItemProps> = ({ manager }: ManagerItemProps) => {
     <>
       <div className="hidden lg:grid grid-cols-4 py-4">
         <div className="flex items-center">
-          <div className="w-14 h-14 relative bg-white flex flex-shrink-0 rounded-full overflow-hidden">
-            {manager.avatar && (
-              <Image
-                loader={() =>
-                  `${process.env.NEXT_PUBLIC_AVATAR_URL}/${manager.avatar}`
-                }
-                src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${manager.avatar}`}
-                alt=""
-                layout="fill"
-                className="object-cover"
-                unoptimized={true}
-              />
-            )}
-          </div>
+          <Avatar
+            size={56}
+            src={manager.avatar}
+            className="bg-white rounded-full overflow-hidden"
+          />
           <div className="ml-3">
             <div className="text-sm text-white">
               {manager.firstName} {manager.lastName}
@@ -38,20 +29,11 @@ const ManagerItem: FC<ManagerItemProps> = ({ manager }: ManagerItemProps) => {
           </div>
         </div>
         <div className="flex items-center px-1">
-          <div className="w-14 h-14 relative bg-white flex flex-shrink-0 rounded-full overflow-hidden">
-            {manager.company.avatar && (
-              <Image
-                loader={() =>
-                  `${process.env.NEXT_PUBLIC_AVATAR_URL}/${manager.company.avatar}`
-                }
-                src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${manager.company.avatar}`}
-                alt=""
-                layout="fill"
-                className="object-cover"
-                unoptimized={true}
-              />
-            )}
-          </div>
+          <Avatar
+            size={56}
+            src={manager.company.avatar}
+            className="bg-white rounded-full overflow-hidden"
+          />
           <div className="ml-3">
             <div className="text-sm text-white">{manager.company.name}</div>
           </div>
@@ -76,20 +58,11 @@ const ManagerItem: FC<ManagerItemProps> = ({ manager }: ManagerItemProps) => {
       </div>
       <Card className="block lg:hidden border-0 rounded-none bg-primary-solid/[.07] px-5 py-3">
         <div className="flex items-center">
-          <div className="w-14 h-14 relative bg-white flex flex-shrink-0 rounded-full overflow-hidden">
-            {manager.avatar && (
-              <Image
-                loader={() =>
-                  `${process.env.NEXT_PUBLIC_AVATAR_URL}/${manager.avatar}`
-                }
-                src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${manager.avatar}`}
-                alt=""
-                layout="fill"
-                className="object-cover"
-                unoptimized={true}
-              />
-            )}
-          </div>
+          <Avatar
+            size={56}
+            src={manager.avatar}
+            className="bg-white rounded-full overflow-hidden"
+          />
           <div className="w-14 ml-4">
             <div className="text-sm text-white font-medium">
               {manager.postIds.length}
