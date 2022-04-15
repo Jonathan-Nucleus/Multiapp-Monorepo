@@ -1,30 +1,23 @@
 import React, { FC } from 'react';
-import {
-  TouchableOpacity,
-  Image,
-  Text,
-  View,
-  ListRenderItem,
-  StyleSheet,
-} from 'react-native';
-import { House, Star, Chats, DotsThreeCircle } from 'phosphor-react-native';
+import { TouchableOpacity, Image, Text, View, StyleSheet } from 'react-native';
+import { Star } from 'phosphor-react-native';
+import FastImage from 'react-native-fast-image';
+
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import RoundImageView from 'mobile/src/components/common/RoundImageView';
+import Tag from '../common/Tag';
 import {
   PRIMARY,
-  SECONDARY,
   WHITE,
   SUCCESS,
   DANGER,
   GRAY100,
+  WHITE12,
 } from 'shared/src/colors';
 import { Body1, Body2 } from 'mobile/src/theme/fonts';
 import { FetchFundsData } from 'mobile/src/graphql/query/marketplace';
 
-const AVATAR_URL =
-  'https://prometheus-user-media.s3.us-east-1.amazonaws.com/avatars';
-const BACKGROUND_URL =
-  'https://prometheus-user-media.s3.us-east-1.amazonaws.com/backgrounds';
+import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
 
 export type Fund = Exclude<FetchFundsData['funds'], undefined>[number];
 interface FundItemProps {
@@ -35,9 +28,10 @@ const FundItem: FC<FundItemProps> = ({ fund }) => {
   return (
     <View style={styles.fundItem}>
       <View style={styles.imagesContainer}>
-        <Image
+        <FastImage
           style={styles.backgroundImage}
           source={{ uri: `${BACKGROUND_URL}/${fund.background.url}` }}
+          resizeMode={FastImage.resizeMode.cover}
         />
         <Image
           style={styles.avatarImage}
@@ -56,7 +50,6 @@ const FundItem: FC<FundItemProps> = ({ fund }) => {
           />
           <Text
             style={[
-              styles.status,
               styles.whiteText,
               fund.status === 'OPEN' ? styles.successText : styles.dangerText,
             ]}>
@@ -69,10 +62,8 @@ const FundItem: FC<FundItemProps> = ({ fund }) => {
           {fund.overview}
         </Text>
         <View style={styles.tags}>
-          {fund.tags.map((tag) => (
-            <Text id={tag} style={styles.tag}>
-              {tag}
-            </Text>
+          {fund.tags.map((tag, index) => (
+            <Tag label={tag} viewStyle={styles.tagStyle} key={index} />
           ))}
         </View>
         <View style={styles.managerContainer}>
@@ -155,9 +146,8 @@ const styles = StyleSheet.create({
     bottom: -32,
   },
   fundDetailsContainer: {
-    backgroundColor: '#001D3B',
     padding: 16,
-    borderColor: '#142E49',
+    borderColor: WHITE12,
     borderBottomWidth: 1,
     zIndex: 1,
   },
@@ -209,7 +199,7 @@ const styles = StyleSheet.create({
   fundDescriptorContainer: {
     flex: 1,
     padding: 16,
-    borderBottomColor: '#142E49',
+    borderBottomColor: WHITE12,
     borderBottomWidth: 1,
   },
   tags: {
@@ -217,27 +207,15 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     marginTop: 16,
   },
-  tag: {
-    color: WHITE,
-    paddingLeft: 12,
-    paddingRight: 12,
-    paddingTop: 4,
-    paddingBottom: 4,
+  tagStyle: {
     marginRight: 8,
-    backgroundColor: '#1F3858',
-    borderRadius: 10,
-    overflow: 'hidden',
-    textTransform: 'uppercase',
-    fontSize: 10,
-    fontWeight: 'bold',
-    letterSpacing: 1.25,
   },
   managerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 16,
     paddingTop: 16,
-    borderTopColor: '#142E49',
+    borderTopColor: WHITE12,
     borderTopWidth: 1,
   },
   manager: {
@@ -269,7 +247,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   rightSeparator: {
-    borderRightColor: '#142E49',
+    borderRightColor: WHITE12,
     borderRightWidth: 1,
   },
   title: {

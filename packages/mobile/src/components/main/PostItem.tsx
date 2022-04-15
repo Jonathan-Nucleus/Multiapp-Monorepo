@@ -19,11 +19,7 @@ import Avatar from '../../assets/avatar.png';
 import { FetchPostsData } from 'mobile/src/hooks/queries';
 import { PostCategories } from 'backend/graphql/enumerations.graphql';
 
-//import { AVATAR_URL, POST_URL } from '@env';
-const AVATAR_URL =
-  'https://prometheus-user-media.s3.us-east-1.amazonaws.com/avatars';
-const POST_URL =
-  'https://prometheus-user-media.s3.us-east-1.amazonaws.com/posts';
+import { AVATAR_URL, POST_URL } from 'react-native-dotenv';
 
 type Post = Exclude<FetchPostsData['posts'], undefined>[number];
 interface FeedItemProps {
@@ -48,9 +44,10 @@ const PostItem: React.FC<FeedItemProps> = ({ post, from }) => {
         />
       </View>
       <PLabel label={post.body} textStyle={styles.body} />
-      <Image
+      <FastImage
         style={styles.postImage}
         source={{ uri: `${POST_URL}/${post.mediaUrl}` }}
+        resizeMode={FastImage.resizeMode.contain}
       />
       <View style={styles.postInfo}>
         <View style={styles.tagWrapper}>

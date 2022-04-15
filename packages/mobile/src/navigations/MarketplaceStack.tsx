@@ -1,6 +1,8 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { ReactElement } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { StackScreenProps } from '@react-navigation/stack';
+
 const Tab = createMaterialTopTabNavigator();
 import {
   BLACK,
@@ -15,6 +17,24 @@ import Managers from '../screens/Marketplace/Managers';
 import Companies from '../screens/Marketplace/Companies';
 import MainHeader from '../components/main/Header';
 import { Body3 } from '../theme/fonts';
+
+type MarketplaceStackParamList = {
+  Funds: undefined;
+  Managers: undefined;
+  Companies: undefined;
+};
+
+export type FundsScreen = (
+  props: StackScreenProps<MarketplaceStackParamList, 'Funds'>,
+) => ReactElement;
+
+export type FundManagersScreen = (
+  props: StackScreenProps<MarketplaceStackParamList, 'Managers'>,
+) => ReactElement;
+
+export type FundCompaniesScreen = (
+  props: StackScreenProps<MarketplaceStackParamList, 'Companies'>,
+) => ReactElement;
 
 const MarketplaceStack = ({ navigation }) => {
   return (

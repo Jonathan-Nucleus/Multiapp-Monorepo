@@ -1,23 +1,14 @@
-import React, { ReactElement, useState } from 'react';
-import {
-  StyleSheet,
-  FlatList,
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  ListRenderItem,
-  List,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { BGDARK, GRAY2, GRAY100, WHITE, BLACK, GRAY } from 'shared/src/colors';
+import React from 'react';
+import { StyleSheet, FlatList, View, Text, ListRenderItem } from 'react-native';
+import { WHITE } from 'shared/src/colors';
 import pStyles from 'mobile/src/theme/pStyles';
-import { Body1, Body2, Body3, H6 } from 'mobile/src/theme/fonts';
+import { H6 } from 'mobile/src/theme/fonts';
 
 import { useFetchFunds } from 'mobile/src/graphql/query/marketplace';
 import FundItem, { Fund } from '../../../components/main/FundItem';
+import { FundsScreen } from '../../../navigations/MarketplaceStack';
 
-const Funds: FundsScreen = ({ navigation }) => {
+const Funds: FundsScreen = () => {
   const { data } = useFetchFunds();
 
   const keyExtractor = (item: Fund): string => item._id;
@@ -44,9 +35,6 @@ const Funds: FundsScreen = ({ navigation }) => {
 export default Funds;
 
 const styles = StyleSheet.create({
-  globalContainer: {
-    flex: 1,
-  },
   listHeaderText: {
     color: WHITE,
     padding: 16,

@@ -61,3 +61,40 @@ export function useFetchFunds(): QueryResult<
     }
   `);
 }
+
+export const GET_FUND_MANAGERS = gql`
+  query FundManagers {
+    fundManagers {
+      funds {
+        _id
+        name
+        level
+      }
+      managers {
+        _id
+        firstName
+        lastName
+        avatar
+        managedFundsIds
+      }
+    }
+  }
+`;
+
+export type FetchFundManagersData = {
+  fundManagers?: Pick<Fund, '_id' | 'name'>[];
+};
+
+/**
+ * GraphQL query that fetches fund managers for the current user.
+ *
+ * @returns   GraphQL query.
+ */
+export function useFetchFundManagers(): QueryResult<
+  FetchFundManagersData,
+  FetchFundsVariables
+> {
+  return useQuery<FetchFundManagersData, FetchFundsVariables>(
+    GET_FUND_MANAGERS,
+  );
+}

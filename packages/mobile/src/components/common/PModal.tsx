@@ -1,51 +1,34 @@
-import React, { useState } from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
 import Modal from 'react-native-modal';
-import RadioGroup, { RadioButtonProps } from 'react-native-radio-buttons-group';
 
-import PLabel from './PLabel';
 import PTitle from './PTitle';
-import { GRAY3, PRIMARYSOLID } from 'shared/src/colors';
+import { GRAY3 } from 'shared/src/colors';
 
 interface PModalProps {
   title: string;
   subTitle: string;
   isVisible: boolean;
-  optionsData: RadioButtonProps[];
   modalStyle?: object;
   onPressDone?: () => void;
 }
 
 const PModal: React.FC<PModalProps> = (props) => {
-  const { title, subTitle, isVisible, optionsData, modalStyle, onPressDone } =
+  const { title, subTitle, isVisible, children, modalStyle, onPressDone } =
     props;
-
-  const [radioButtons, setRadioButtons] =
-    useState<RadioButtonProps[]>(optionsData);
-
-  const onPressRadioButton = (radioButtonsArray: RadioButtonProps[]) => {
-    setRadioButtons(radioButtonsArray);
-  };
 
   return (
     <Modal
       isVisible={isVisible}
       style={[styles.bottomHalfModal, modalStyle]}
       onBackdropPress={onPressDone}>
-      <View>
+      <View style={styles.modalWrapper}>
         <PTitle
           title={title}
           subTitle={subTitle}
           textStyle={{ marginBottom: 20 }}
         />
-        <RadioGroup
-          radioButtons={radioButtons}
-          onPress={onPressRadioButton}
-          containerStyle={styles.radioGroupStyle}
-        />
-        <TouchableOpacity onPress={onPressDone} style={styles.doneBtn}>
-          <PLabel label="DONE" />
-        </TouchableOpacity>
+        {children}
       </View>
     </Modal>
   );
@@ -54,26 +37,15 @@ const PModal: React.FC<PModalProps> = (props) => {
 export default PModal;
 
 const styles = StyleSheet.create({
-  modalContainer: {
-    minHeight: 200,
-    backgroundColor: 'white',
-    borderRadius: 20,
-  },
-  bottomHalfModal: {
+  modalWrapper: {
     backgroundColor: GRAY3,
-    justifyContent: 'flex-end',
-    margin: 0,
     paddingHorizontal: 28,
     paddingVertical: 32,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
-  radioGroupStyle: {
-    marginVertical: 30,
-  },
-  doneBtn: {
-    width: '100%',
-    height: 45,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: PRIMARYSOLID,
+  bottomHalfModal: {
+    justifyContent: 'flex-end',
+    margin: 0,
   },
 });

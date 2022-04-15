@@ -3828,6 +3828,11 @@
   dependencies:
     "@types/react" "*"
 
+"@types/react-native-dotenv@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@types/react-native-dotenv/-/react-native-dotenv-0.2.0.tgz#32c58422a422c1adf68acce363ed791314d5a8e7"
+  integrity sha512-ZxX+dU/yoQc0jTk+/NWttkiuXceJyN5FpOSqDl0WynN5GDzxwH7OMruQ47qcY8llo2RD3irjvzJ9BwC8gDiq0A==
+
 "@types/react-native-indicators@^0.16.2":
   version "0.16.2"
   resolved "https://registry.yarnpkg.com/@types/react-native-indicators/-/react-native-indicators-0.16.2.tgz#f57c9bbf05aa9abefc0ef4b3b7c09e10eecccf3e"
@@ -11453,10 +11458,9 @@ react-native-pager-view@^5.4.15:
   resolved "https://registry.yarnpkg.com/react-native-pager-view/-/react-native-pager-view-5.4.15.tgz#075fef5ae4ba6ecc37e49b6c4a24770131a2a3cc"
   integrity sha512-5NssD840wFCuOL4B1ZRiRADvt+Vx2Dgify4SmAUqHXCx03yiGPnRWmFjYXyQeK6gq/8VY+gPGE4bTy9ahzBbDw==
 
-react-native-radio-button-group@^1.0.3:
+"react-native-radio-button-group@git+https://github.com/henry-makailabs/react-native-radio-button-group.git":
   version "1.0.3"
-  resolved "https://registry.yarnpkg.com/react-native-radio-button-group/-/react-native-radio-button-group-1.0.3.tgz#62a1c37b73adb6d3eb2bd819bc7749041cc94052"
-  integrity sha512-4zLOHi0sLjBOTBG+t+Rmx3syvS2P5AccRsnMljJn3kBLMm6vbIdxhYcmxb1IFikk1B/GnJTwdsHMJop8AxX4/A==
+  resolved "git+https://github.com/henry-makailabs/react-native-radio-button-group.git#14387f401842925713ac59d0ae7bf3b8dcf482c3"
   dependencies:
     prop-types "^15.7.2"
 

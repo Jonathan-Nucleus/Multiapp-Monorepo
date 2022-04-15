@@ -44,3 +44,12 @@ export const GET_POSTS = gql`
     }
   }
 `;
+
+export const UPLOAD_LINK = gql`
+  mutation UploadLink($localFilename: String!, $type: MediaType!) {
+    uploadLink(localFilename: $localFilename, type: $type) {
+      remoteName
+      uploadUrl
+    }
+  }
+`;
