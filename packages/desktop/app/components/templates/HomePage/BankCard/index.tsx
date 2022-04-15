@@ -51,7 +51,7 @@ const BankCard: FC = () => {
           </div>
         </div>
         <div className="my-5">
-          <Link href="/bank">
+          <Link href="/company">
             <a className="text-primary text-sm">See Your Profile</a>
           </Link>
         </div>

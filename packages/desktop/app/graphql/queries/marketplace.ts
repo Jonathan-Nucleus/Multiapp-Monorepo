@@ -12,7 +12,10 @@ export type FetchFundsData = {
       Fund["manager"],
       "_id" | "firstName" | "lastName" | "avatar" | "followerIds" | "postIds"
     >;
-    company: Pick<Fund["company"], "_id" | "name">;
+    company: Pick<
+      Fund["company"],
+      "_id" | "name" | "avatar" | "followerIds" | "postIds"
+    >;
   })[];
 };
 
@@ -54,6 +57,9 @@ export function useFetchFunds(): QueryResult<
         company {
           _id
           name
+          avatar
+          followerIds
+          postIds
         }
       }
     }

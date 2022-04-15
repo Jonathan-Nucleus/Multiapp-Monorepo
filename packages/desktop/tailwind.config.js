@@ -10,6 +10,7 @@ module.exports = {
           cardDark: "#15151E",
           modal: "#19192C",
           popover: "#1A192E",
+          blue: "#22214B",
         },
         surface: {
           DEFAULT: "#121212",

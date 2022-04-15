@@ -5,6 +5,8 @@ import { Splide, SplideSlide } from "@splidejs/react-splide";
 import Image from "next/image";
 import Link from "next/link";
 
+import { useFollowUser } from "desktop/app/graphql/mutations/profiles";
+
 const items = [
   {
     image:
@@ -58,6 +60,15 @@ const items = [
 ];
 
 const FeaturedProfessionals: FC = () => {
+  const [followUser] = useFollowUser();
+
+  const handleFollowUser = async (id: string): Promise<void> => {
+    // TODO
+    const { data } = await followUser({
+      variables: { follow: true, userId: id },
+    });
+  };
+
   return (
     <>
       <div className="font-medium text-xl text-white">

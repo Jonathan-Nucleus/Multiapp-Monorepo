@@ -9,6 +9,9 @@ import type { Company } from "../schemas/company";
 import { CompanySchema } from "../schemas/company";
 import { contentCreatorResolvers } from "./users.graphql";
 
+type GraphQLCompany = Company.GraphQL;
+export type { GraphQLCompany as Company };
+
 const schema = gql`
   ${CompanySchema}
 `;

@@ -93,6 +93,10 @@ export type AccountData = {
     | "role"
     | "accreditation"
     | "position"
+    | "background"
+    | "followerIds"
+    | "postIds"
+    | "followingIds"
   > & {
     companies: Pick<User["companies"][number], "_id" | "name" | "avatar">[];
   };
@@ -117,10 +121,38 @@ export function useAccount(
           role
           accreditation
           position
+          background {
+            url
+            x
+            y
+            width
+            height
+            scale
+          }
           companies {
             _id
             name
             avatar
+            members {
+              _id
+              firstName
+              lastName
+              avatar
+              company {
+                name
+              }
+            }
+            followerIds
+            postIds
+            followingIds
+            background {
+              url
+              x
+              y
+              width
+              height
+              scale
+            }
           }
         }
       }

@@ -39,7 +39,7 @@ const Post: FC<PostProps> = ({ post }: PostProps) => {
   };
 
   return (
-    <Card className="border-0 p-0">
+    <Card className="border-0 p-0 rounded-none	md:rounded-2xl">
       <div className="flex items-center px-4 pt-4">
         <div className="w-14 h-14 flex items-center justify-center">
           {user && user.avatar && <Avatar size={56} src={user.avatar} />}
