@@ -16,7 +16,7 @@ import {
 
 import PHeader from '../../components/common/PHeader';
 import pStyles from '../../theme/pStyles';
-import { Body1, Body2, Body3 } from '../../theme/fonts';
+import { Body1, Body1Bold, Body2, Body2Bold, Body3 } from '../../theme/fonts';
 import PAppContainer from '../../components/common/PAppContainer';
 import MainHeader from '../../components/main/Header';
 
@@ -70,6 +70,11 @@ const NotificationsMethods = [
     value: false,
     id: 44,
   },
+  {
+    label1: 'Email',
+    value: false,
+    id: 442,
+  },
 ];
 
 const Notifications = [
@@ -82,6 +87,21 @@ const Notifications = [
     label1: 'Likes on your posts',
     value: true,
     id: 66,
+  },
+  {
+    label1: 'Comments on you rposts',
+    value: true,
+    id: 626,
+  },
+  {
+    label1: 'Tagged in a post, comment or profile page',
+    value: true,
+    id: 661,
+  },
+  {
+    label1: 'New Messages',
+    value: true,
+    id: 665,
   },
 ];
 
@@ -133,7 +153,7 @@ const Preferences: FC<RouterProps> = ({ navigation }) => {
       />
       <PAppContainer>
         <View style={styles.listHeader}>
-          <Text style={styles.label}>General</Text>
+          <Text style={styles.title}>General</Text>
         </View>
         <FlatList
           data={Gnerals}
@@ -145,7 +165,7 @@ const Preferences: FC<RouterProps> = ({ navigation }) => {
           scrollEnabled={false}
         />
         <View style={styles.listHeader}>
-          <Text style={styles.label}>Messaging</Text>
+          <Text style={styles.title}>Messaging</Text>
         </View>
         <FlatList
           data={Messaging}
@@ -157,7 +177,7 @@ const Preferences: FC<RouterProps> = ({ navigation }) => {
           scrollEnabled={false}
         />
         <View style={styles.listHeader}>
-          <Text style={styles.label}>Notifications Methods</Text>
+          <Text style={styles.title}>Notifications Methods</Text>
         </View>
         <FlatList
           data={NotificationsMethods}
@@ -169,7 +189,7 @@ const Preferences: FC<RouterProps> = ({ navigation }) => {
           scrollEnabled={false}
         />
         <View style={styles.listHeader}>
-          <Text style={styles.label}>Notifications</Text>
+          <Text style={styles.title}>Notify Me When</Text>
         </View>
         <FlatList
           data={Notifications}
@@ -189,7 +209,11 @@ export default Preferences;
 
 const styles = StyleSheet.create({
   headerTitle: {
-    ...Body1,
+    ...Body1Bold,
+    color: WHITE,
+  },
+  title: {
+    ...Body2Bold,
     color: WHITE,
   },
   label: {

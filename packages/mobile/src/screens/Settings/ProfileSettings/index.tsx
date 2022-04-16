@@ -11,6 +11,8 @@ import {
 import FastImage from 'react-native-fast-image';
 import { useIsFocused, NavigationProp } from '@react-navigation/native';
 import { CaretLeft } from 'phosphor-react-native';
+import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
+
 import {
   WHITE,
   WHITE60,
@@ -21,7 +23,7 @@ import {
 } from 'shared/src/colors';
 
 import pStyles from '../../../theme/pStyles';
-import { Body2, Body3, H6 } from '../../../theme/fonts';
+import { Body2, Body3, H6Bold } from '../../../theme/fonts';
 import MainHeader from '../../../components/main/Header';
 import PAppContainer from '../../../components/common/PAppContainer';
 import PGradientButton from '../../../components/common/PGradientButton';
@@ -29,25 +31,25 @@ import PLabel from '../../../components/common/PLabel';
 import PostItem, { PostItemProps } from '../../../components/main/PostItem';
 import FeaturedItem from '../../../components/main/settings/FeaturedItem';
 import Funds from '../../../components/main/settings/Funds';
-import usePost from '../../../hooks/usePost';
 import { useAccount } from '../../../graphql/query/account';
+import { useFetchPosts } from '../../../hooks/queries';
+import type { User } from 'backend/graphql/users.graphql';
 
 import LinkedinSvg from 'shared/assets/images/linkedin.svg';
 import TwitterSvg from 'shared/assets/images/twitter.svg';
 import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
+import DotsThreeVerticalSvg from 'shared/assets/images/dotsThreeVertical.svg';
+import PGradientOutlineButton from '../../../components/common/PGradientOutlineButton';
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
 }
 
-const AVATAR_URL =
-  'https://prometheus-user-media.s3.us-east-1.amazonaws.com/avatars';
-
 const ProfileSettings: FC<RouterProps> = ({ navigation }) => {
-  const { data, refetch } = usePost();
+  const { data, refetch } = useFetchPosts();
   const { data: accountData } = useAccount();
   const postData = data?.posts;
-  const account: any = accountData?.account;
+  const account: User = accountData?.account;
   const isFocused = useIsFocused();
   const [focusState, setFocusState] = useState(isFocused);
   if (isFocused !== focusState) {
@@ -78,7 +80,7 @@ const ProfileSettings: FC<RouterProps> = ({ navigation }) => {
         <FastImage
           style={styles.backgroundImg}
           source={{
-            uri: account.background,
+            uri: `${BACKGROUND_URL}/${account.background}`,
           }}
           resizeMode={FastImage.resizeMode.cover}
         />
@@ -102,20 +104,20 @@ const ProfileSettings: FC<RouterProps> = ({ navigation }) => {
             </View>
           </View>
           <Text style={styles.comment}>
-            {account.role} {account?.position}
+            {account.role} - {account?.position}
           </Text>
           <View style={[styles.row, styles.justifyAround]}>
-            <View>
+            <View style={styles.follow}>
               <Text style={styles.val}>{account.followerIds?.length ?? 0}</Text>
               <Text style={styles.comment}>Followers</Text>
             </View>
-            <View>
+            <View style={styles.follow}>
               <Text style={styles.val}>
                 {account.followingIds?.length ?? 0}
               </Text>
               <Text style={styles.comment}>Following</Text>
             </View>
-            <View>
+            <View style={styles.follow}>
               <Text style={styles.val}>{account.postIds?.length ?? 0}</Text>
               <Text style={styles.comment}>Posts</Text>
             </View>
@@ -124,16 +126,44 @@ const ProfileSettings: FC<RouterProps> = ({ navigation }) => {
             Virgin is a leading international investment group and one of the
             world's most recognised and respected brands. Read More...
           </Text>
-          <PGradientButton label="follow" onPress={() => console.log(11)} />
+          <View style={[styles.row, styles.between]}>
+            <PGradientOutlineButton
+              label="Message"
+              onPress={() => console.log(11)}
+              gradientContainer={styles.button}
+            />
+            <PGradientButton
+              label="follow"
+              onPress={() => console.log(11)}
+              gradientContainer={styles.button}
+            />
+          </View>
         </View>
-        <View style={styles.social}>
-          <TouchableOpacity onPress={() => Linking.openURL('www.twitter.com')}>
-            <LinkedinSvg />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => Linking.openURL('www.twitter.com')}
-            style={styles.icon}>
-            <TwitterSvg />
+        <View style={[styles.row, styles.social]}>
+          <View style={styles.row}>
+            <TouchableOpacity
+              onPress={() => Linking.openURL('www.twitter.com')}>
+              <LinkedinSvg />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => Linking.openURL('www.twitter.com')}
+              style={styles.icon}>
+              <TwitterSvg />
+            </TouchableOpacity>
+          </View>
+          {account.website && (
+            <>
+              <View style={styles.verticalLine} />
+              <TouchableOpacity
+                onPress={() => Linking.openURL(account.website)}>
+                <Text style={styles.website} numberOfLines={1}>
+                  {account.website}
+                </Text>
+              </TouchableOpacity>
+            </>
+          )}
+          <TouchableOpacity>
+            <DotsThreeVerticalSvg />
           </TouchableOpacity>
         </View>
         <Funds />
@@ -154,7 +184,9 @@ const ProfileSettings: FC<RouterProps> = ({ navigation }) => {
           {postData.length > 0 && (
             <FlatList
               data={postData || []}
-              renderItem={({ item }) => <PostItem post={item} />}
+              renderItem={({ item }) => (
+                <PostItem post={item} userId={account?._id} />
+              )}
               keyExtractor={(item: PostItemProps) => `${item._id}`}
               listKey="post"
               ListHeaderComponent={<Text style={styles.text}>All Posts</Text>}
@@ -192,6 +224,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginVertical: 10,
   },
+  between: {
+    justifyContent: 'space-between',
+  },
   justifyAround: {
     justifyContent: 'space-around',
     alignItems: 'flex-end',
@@ -199,8 +234,11 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 16,
-    backgroundColor: BGHEADER,
     paddingBottom: 16,
+  },
+  follow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   companyDetail: {
     flexDirection: 'row',
@@ -209,11 +247,12 @@ const styles = StyleSheet.create({
   },
   val: {
     color: WHITE,
-    ...H6,
+    ...H6Bold,
   },
   comment: {
-    color: WHITE60,
+    color: WHITE,
     ...Body3,
+    marginLeft: 8,
   },
   decription: {
     marginVertical: 16,
@@ -221,12 +260,15 @@ const styles = StyleSheet.create({
     ...Body3,
   },
   social: {
-    flexDirection: 'row',
-    paddingBottom: 16,
+    paddingVertical: 8,
+    borderTopColor: GRAY100,
+    borderBottomColor: GRAY100,
+    borderBottomWidth: 1,
+    borderTopWidth: 1,
     marginBottom: 24,
-    backgroundColor: BGHEADER,
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingLeft: 16,
+    justifyContent: 'space-between',
   },
   verticalLine: {
     height: 32,
@@ -264,5 +306,8 @@ const styles = StyleSheet.create({
   proLabel: {
     marginLeft: 8,
     ...Body3,
+  },
+  button: {
+    width: Dimensions.get('screen').width / 2 - 24,
   },
 });

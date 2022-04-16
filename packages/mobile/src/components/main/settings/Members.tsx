@@ -4,47 +4,35 @@ import {
   FlatList,
   View,
   Text,
-  Image,
   TouchableOpacity,
+  Dimensions,
 } from 'react-native';
+import FastImage from 'react-native-fast-image';
+import { AVATAR_URL } from 'react-native-dotenv';
 import { BGDARK, WHITE, WHITE60 } from 'shared/src/colors';
+import type { User } from 'backend/graphql/users.graphql';
 
-import { Body1, Body2, Body3 } from '../../../theme/fonts';
-import AvatarImg from '../../../assets/avatar.png';
+import { Body1, Body2Bold, Body3 } from '../../../theme/fonts';
 
-const members = [
-  {
-    _id: '12311',
-    firstName: 'Enrique Javier',
-    lastName: ' Abeyta Ubillos',
-    position: 'CEO',
-    avatar: AvatarImg,
-  },
-  {
-    _id: '123',
-    firstName: 'Enrique Javier',
-    lastName: ' Abeyta Ubillos',
-    position: 'CEO',
-    avatar: AvatarImg,
-  },
-  {
-    _id: '123111',
-    firstName: 'Enrique Javier',
-    lastName: ' Abeyta Ubillos',
-    position: 'Digital Acquisition Manager',
-    avatar: AvatarImg,
-  },
-];
+interface MemberProps {
+  members: User[];
+}
 
-const Members: React.FC = () => {
-  const renderItem = ({ item }) => {
+interface RenderProps {
+  item: User;
+}
+
+const Members: React.FC<MemberProps> = ({ members }) => {
+  const renderItem = ({ item }: RenderProps) => {
     return (
       <TouchableOpacity>
         <View style={styles.member}>
-          <Image
-            source={item.avatar}
-            resizeMode="contain"
+          <FastImage
             style={styles.avatar}
+            source={{
+              uri: `${AVATAR_URL}/${item?.avatar}`,
+            }}
+            resizeMode={FastImage.resizeMode.cover}
           />
           <Text style={styles.name}>
             {item.firstName} {item.lastName}
@@ -79,14 +67,16 @@ const styles = StyleSheet.create({
     ...Body1,
   },
   member: {
-    backgroundColor: BGDARK,
-    width: 155,
+    borderColor: BGDARK,
+    borderWidth: 1,
+    width: Dimensions.get('screen').width / 2 - 20,
     height: 180,
     alignItems: 'center',
-    paddingTop: 8,
+    padding: 8,
     marginVertical: 16,
     marginRight: 8,
     borderRadius: 8,
+    alignSelf: 'center',
   },
   avatar: {
     width: 80,
@@ -96,11 +86,12 @@ const styles = StyleSheet.create({
   },
   name: {
     color: WHITE,
-    ...Body2,
+    ...Body2Bold,
   },
   position: {
     ...Body3,
     color: WHITE60,
     marginTop: 8,
+    textAlign: 'center',
   },
 });

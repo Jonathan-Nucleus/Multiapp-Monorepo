@@ -20,6 +20,8 @@ import {
   EnvelopeSimple,
   Lifebuoy,
 } from 'phosphor-react-native';
+import { AVATAR_URL, POST_URL } from 'react-native-dotenv';
+
 import {
   GRAY2,
   GRAY100,
@@ -33,7 +35,15 @@ import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 import MainHeader from '../../components/main/Header';
 import PLabel from '../../components/common/PLabel';
 import pStyles from '../../theme/pStyles';
-import { Body1, Body2, Body3, H6 } from '../../theme/fonts';
+import {
+  Body1,
+  Body2,
+  Body3,
+  H6,
+  H6Bold,
+  Body4Bold,
+  Body2Bold,
+} from '../../theme/fonts';
 import { useAccount } from '../../graphql/query/account';
 import Alsvg from 'shared/assets/images/al.svg';
 interface RenderItemProps {
@@ -42,9 +52,6 @@ interface RenderItemProps {
     onPress: () => void;
   };
 }
-
-const AVATAR_URL =
-  'https://prometheus-user-media.s3.us-east-1.amazonaws.com/avatars';
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
@@ -159,7 +166,7 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
               <FastImage
                 style={styles.avatar}
                 source={{
-                  uri: company.avatar,
+                  uri: `${AVATAR_URL}/${company?.avatar}`,
                 }}
                 resizeMode={FastImage.resizeMode.contain}
               />
@@ -224,7 +231,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   label: {
-    ...Body2,
+    ...Body2Bold,
     color: WHITE,
   },
   comment: {
@@ -250,10 +257,11 @@ const styles = StyleSheet.create({
   },
   proLabel: {
     marginLeft: 8,
-    ...Body3,
+    ...Body4Bold,
+    color: WHITE,
   },
   name: {
-    ...H6,
+    ...H6Bold,
     color: WHITE,
   },
   center: {

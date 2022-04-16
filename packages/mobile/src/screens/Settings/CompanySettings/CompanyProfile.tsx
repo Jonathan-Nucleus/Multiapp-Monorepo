@@ -15,56 +15,74 @@ import {
   GRAY100,
   PRIMARY,
 } from 'shared/src/colors';
+import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
+import type { Company } from 'backend/graphql/companies.graphql';
 
-import { Body2, Body3, H6 } from '../../../theme/fonts';
+import { Body2, Body3, H6Bold } from '../../../theme/fonts';
 import PGradientButton from '../../../components/common/PGradientButton';
+import PGradientOutlineButton from '../../../components/common/PGradientOutlineButton';
 import LinkedinSvg from 'shared/assets/images/linkedin.svg';
 import TwitterSvg from 'shared/assets/images/twitter.svg';
 import DotsThreeVerticalSvg from 'shared/assets/images/dotsThreeVertical.svg';
 import FastImage from 'react-native-fast-image';
 
-const CompanyProfile: FC = ({ company }) => {
+interface CompanyProp {
+  company: Company;
+}
+const CompanyProfile: FC<CompanyProp> = ({ company }) => {
   return (
     <>
-      <FastImage
-        style={styles.backgroundImg}
-        source={{
-          uri: company.background,
-        }}
-        resizeMode={FastImage.resizeMode.cover}
-      />
+      {company.background && (
+        <FastImage
+          style={styles.backgroundImg}
+          source={{
+            uri: `${BACKGROUND_URL}/${company.background}`,
+          }}
+          resizeMode={FastImage.resizeMode.cover}
+        />
+      )}
+
       <View style={styles.content}>
         <View style={styles.companyDetail}>
           <FastImage
             style={styles.backgroundImg}
             source={{
-              uri: company.avatar,
+              uri: `${AVATAR_URL}/${company?.avatar}`,
             }}
             resizeMode={FastImage.resizeMode.cover}
           />
-          <View style={styles.row}>
-            <View>
-              <Text style={styles.val}>{company.followerIds?.length ?? 0}</Text>
-              <Text style={styles.comment}>Followers</Text>
-            </View>
-            <View>
-              <Text style={styles.val}>
-                {company.followingIds?.length ?? 0}
-              </Text>
-              <Text style={styles.comment}>Following</Text>
-            </View>
-            <View>
-              <Text style={styles.val}>{company.postIds?.length ?? 0}</Text>
-              <Text style={styles.comment}>Posts</Text>
-            </View>
-          </View>
         </View>
         <Text style={styles.val}>{company.name}</Text>
+        <View style={styles.row}>
+          <View style={styles.follow}>
+            <Text style={styles.val}>{company.followerIds?.length ?? 0}</Text>
+            <Text style={styles.comment}>Followers</Text>
+          </View>
+          <View style={styles.follow}>
+            <Text style={styles.val}>{company.followingIds?.length ?? 0}</Text>
+            <Text style={styles.comment}>Following</Text>
+          </View>
+          <View style={styles.follow}>
+            <Text style={styles.val}>{company.postIds?.length ?? 0}</Text>
+            <Text style={styles.comment}>Posts</Text>
+          </View>
+        </View>
         <Text style={styles.decription}>
           Virgin is a leading international investment group and one of the
           world's most recognised and respected brands. Read More...
         </Text>
-        <PGradientButton label="follow" onPress={() => console.log(11)} />
+        <View style={styles.row}>
+          <PGradientOutlineButton
+            label="Message"
+            onPress={() => console.log(11)}
+            gradientContainer={styles.button}
+          />
+          <PGradientButton
+            label="follow"
+            onPress={() => console.log(11)}
+            gradientContainer={styles.button}
+          />
+        </View>
       </View>
       <View style={[styles.row, styles.social]}>
         <TouchableOpacity onPress={() => Linking.openURL('www.twitter.com')}>
@@ -73,10 +91,16 @@ const CompanyProfile: FC = ({ company }) => {
         <TouchableOpacity onPress={() => Linking.openURL('www.twitter.com')}>
           <TwitterSvg />
         </TouchableOpacity>
-        <View style={styles.verticalLine} />
-        <TouchableOpacity onPress={() => Linking.openURL('www.twitter.com')}>
-          <Text style={styles.website}>Website</Text>
-        </TouchableOpacity>
+        {company.website && (
+          <>
+            <View style={styles.verticalLine} />
+            <TouchableOpacity onPress={() => Linking.openURL(company.website)}>
+              <Text style={styles.website} numberOfLines={1}>
+                {company.website}
+              </Text>
+            </TouchableOpacity>
+          </>
+        )}
         <TouchableOpacity>
           <DotsThreeVerticalSvg />
         </TouchableOpacity>
@@ -112,11 +136,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'flex-end',
     flex: 1,
+    marginTop: 8,
   },
   content: {
     paddingHorizontal: 16,
-    backgroundColor: BGHEADER,
     paddingBottom: 16,
+  },
+  follow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   companyDetail: {
     flexDirection: 'row',
@@ -125,11 +153,12 @@ const styles = StyleSheet.create({
   },
   val: {
     color: WHITE,
-    ...H6,
+    ...H6Bold,
   },
   comment: {
-    color: WHITE12,
+    color: WHITE,
     ...Body3,
+    marginLeft: 8,
   },
   decription: {
     marginVertical: 16,
@@ -156,5 +185,8 @@ const styles = StyleSheet.create({
   website: {
     color: PRIMARY,
     ...Body3,
+  },
+  button: {
+    width: Dimensions.get('screen').width / 2 - 24,
   },
 });

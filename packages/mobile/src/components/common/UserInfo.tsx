@@ -5,6 +5,7 @@ import {
   Text,
   View,
   ImageURISource,
+  Dimensions,
 } from 'react-native';
 
 import PLabel from './PLabel';
@@ -42,12 +43,7 @@ const UserInfo: React.FC<UserInfoProps> = (props) => {
             </View>
           )}
         </View>
-        <View>
-          <PLabel
-            label={`${role} @ ${company}`}
-            textStyle={styles.smallLabel}
-          />
-        </View>
+        <PLabel label={`${role} @ ${company}`} textStyle={styles.smallLabel} />
         <View style={styles.auxInfo}>
           {auxInfo && (
             <>

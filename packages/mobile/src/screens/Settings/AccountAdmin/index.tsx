@@ -9,7 +9,13 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NavigationProp } from '@react-navigation/native';
 import Modal from 'react-native-modal';
-import { CaretRight, CaretLeft, MagnifyingGlass } from 'phosphor-react-native';
+import {
+  CaretRight,
+  CaretLeft,
+  UserCircle,
+  Key,
+  Trash,
+} from 'phosphor-react-native';
 import {
   BGDARK,
   GRAY2,
@@ -18,10 +24,17 @@ import {
   BGDARK100,
   PRIMARYSOLID7,
   DANGER,
+  BLUE100,
 } from 'shared/src/colors';
 
 import pStyles from '../../../theme/pStyles';
-import { Body1, Body2, Body3, H5 } from '../../../theme/fonts';
+import {
+  Body1,
+  Body2,
+  Body2Bold,
+  Body3,
+  Body1Bold,
+} from '../../../theme/fonts';
 import PHeader from '../../../components/common/PHeader';
 import MainHeader from '../../../components/main/Header';
 
@@ -43,16 +56,19 @@ const AccountAdmin: FC<RouterProps> = ({ navigation }) => {
       id: '11',
       label: 'Edit your profile',
       onPress: () => console.log(123),
+      icon: <UserCircle size={28} color={WHITE} />,
     },
     {
       id: '21',
       label: 'Change your password',
       onPress: () => navigation.navigate('ChangePass'),
+      icon: <Key size={28} color={WHITE} />,
     },
     {
       id: 'delete',
       label: 'Delete Account',
       onPress: () => setIsVisible(true),
+      icon: <Trash size={28} color={WHITE} />,
     },
   ];
 
@@ -62,9 +78,13 @@ const AccountAdmin: FC<RouterProps> = ({ navigation }) => {
     return (
       <TouchableOpacity onPress={item.onPress}>
         <View style={[styles.item, styles.between]}>
-          <Text style={[styles.label, item.id === 'delete' && styles.delete]}>
-            {item.label}
-          </Text>
+          <View style={styles.row}>
+            {item.icon}
+            <Text style={[styles.label, item.id === 'delete' && styles.delete]}>
+              {item.label}
+            </Text>
+          </View>
+
           <CaretRight size={28} color={WHITE} />
         </View>
       </TouchableOpacity>
@@ -96,9 +116,10 @@ const AccountAdmin: FC<RouterProps> = ({ navigation }) => {
           <Text style={styles.modalTitle}>
             Are you sure you want to delete account?
           </Text>
+          <Text style={styles.comment}>This cannot be undone.</Text>
           <View style={[styles.row, styles.between]}>
             <TouchableOpacity onPress={() => setIsVisible(false)}>
-              <Text style={styles.btnTxt}>Cancel</Text>
+              <Text style={[styles.btnTxt, styles.cancel]}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setIsVisible(false)}>
               <Text style={[styles.btnTxt, styles.danger]}>Delete Account</Text>
@@ -131,12 +152,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderRadius: 8,
-    backgroundColor: PRIMARYSOLID7,
     marginTop: 16,
   },
   label: {
-    ...Body2,
+    ...Body2Bold,
     color: WHITE,
+    marginLeft: 8,
   },
   between: {
     justifyContent: 'space-between',
@@ -145,20 +166,33 @@ const styles = StyleSheet.create({
     color: DANGER,
   },
   modalContent: {
-    backgroundColor: BGDARK100,
-    padding: 20,
+    backgroundColor: '#1D1D1D',
+    paddingTop: 20,
+    paddingHorizontal: 20,
+    borderRadius: 14,
   },
   modalTitle: {
     textAlign: 'center',
-    ...H5,
+    ...Body1Bold,
     color: WHITE,
   },
   btnTxt: {
     padding: 20,
     color: WHITE,
     ...Body1,
+    textAlign: 'center',
+    width: '100%',
   },
   danger: {
     color: DANGER,
+  },
+  comment: {
+    ...Body2,
+    color: WHITE,
+    textAlign: 'center',
+    marginTop: 8,
+  },
+  cancel: {
+    color: BLUE100,
   },
 });

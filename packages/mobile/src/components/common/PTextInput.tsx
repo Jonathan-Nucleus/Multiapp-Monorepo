@@ -11,8 +11,8 @@ import {
 } from 'react-native';
 
 import PFormLabel from './PFormLabel';
-import { Body2, Body1 } from '../../theme/fonts';
-import { WHITE, PRIMARY, BLACK } from 'shared/src/colors';
+import { Body1 } from '../../theme/fonts';
+import { WHITE, PRIMARY, BLACK, GRAY800, GRAY700 } from 'shared/src/colors';
 
 interface PTextInputProps extends TextInputProps {
   containerStyle?: ViewStyle;
@@ -136,15 +136,15 @@ const PTextInput: React.FC<PTextInputProps> = (props) => {
 const styles = StyleSheet.create({
   textInput: {
     ...Body1,
-    color: Body2,
-    height: 36,
-    borderColor: PRIMARY,
+    color: WHITE,
+    height: 43,
+    borderColor: GRAY800,
     borderWidth: 1,
     borderRadius: 8,
     paddingBottom: 5,
     paddingTop: 7,
     paddingHorizontal: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    backgroundColor: GRAY700,
     shadowOffset: {
       width: 0,
       height: 2,

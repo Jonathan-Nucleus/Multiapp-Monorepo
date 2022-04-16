@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet, Image } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import dayjs from 'dayjs';
+import { AVATAR_URL, POST_URL } from 'react-native-dotenv';
 
 import PLabel from '../../common/PLabel';
 import IconButton from '../../common/IconButton';
@@ -13,12 +14,6 @@ import { PostDataType } from '../../../graphql/post';
 
 import { FetchPostsData } from 'mobile/src/hooks/queries';
 import { PostCategories } from 'backend/graphql/enumerations.graphql';
-
-//import { AVATAR_URL, POST_URL } from '@env';
-const AVATAR_URL =
-  'https://prometheus-user-media.s3.us-east-1.amazonaws.com/avatars';
-const POST_URL =
-  'https://prometheus-user-media.s3.us-east-1.amazonaws.com/posts';
 
 type Post = Exclude<FetchPostsData['posts'], undefined>[number];
 interface FeedItemProps {
@@ -58,7 +53,6 @@ const FeaturedItem: React.FC<FeedItemProps> = ({ post, type }) => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
-    backgroundColor: BGDARK,
     marginBottom: 16,
     width: 300,
     marginRight: 16,
@@ -69,8 +63,9 @@ const styles = StyleSheet.create({
   },
   headerWrapper: {
     flexDirection: 'row',
-    marginVertical: 16,
     alignItems: 'center',
+    paddingHorizontal: 16,
+    flex: 1,
   },
   postImage: {
     width: '100%',

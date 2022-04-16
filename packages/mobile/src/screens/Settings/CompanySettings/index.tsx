@@ -4,20 +4,12 @@ import {
   FlatList,
   View,
   Text,
-  Switch,
-  Image,
   Dimensions,
   TouchableOpacity,
   Linking,
 } from 'react-native';
 import { useIsFocused, NavigationProp } from '@react-navigation/native';
-import {
-  CaretLeft,
-  MagnifyingGlass,
-  Gear,
-  DotsThreeVertical,
-  UserCirclePlus,
-} from 'phosphor-react-native';
+import { CaretLeft } from 'phosphor-react-native';
 import {
   WHITE,
   WHITE12,
@@ -35,16 +27,18 @@ import PostItem, { PostItemProps } from '../../../components/main/PostItem';
 import FeaturedItem from '../../../components/main/settings/FeaturedItem';
 import Funds from '../../../components/main/settings/Funds';
 import Members from '../../../components/main/settings/Members';
-import usePost from '../../../hooks/usePost';
 import { useAccount } from '../../../graphql/query/account';
 import CompanyProfile from './CompanyProfile';
+import type { Company } from 'backend/graphql/companies.graphql';
+import type { User } from 'backend/graphql/users.graphql';
+import { useFetchPosts } from '../../../hooks/queries';
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
 }
 
 const CompanySettings: FC<RouterProps> = ({ navigation }) => {
-  const { data, error, loading, refetch } = usePost();
+  const { data, error, loading, refetch } = useFetchPosts();
   const { data: accountData } = useAccount();
   const postData = data?.posts;
 
@@ -58,7 +52,7 @@ const CompanySettings: FC<RouterProps> = ({ navigation }) => {
     setFocusState(isFocused);
   }
 
-  const companyLists = accountData?.account.companies ?? [];
+  const companyLists: Company[] = accountData?.account.companies ?? [];
 
   const renderItem = ({ item }: { item: PostItemProps }) => (
     <TouchableOpacity>
@@ -82,7 +76,9 @@ const CompanySettings: FC<RouterProps> = ({ navigation }) => {
         ))}
         <Funds />
         <View style={styles.posts}>
-          <Members />
+          {companyLists.map((company) => (
+            <Members members={company.members || []} key={company._id} />
+          ))}
           {postData.length > 0 && (
             <View>
               <Text style={styles.text}>Featured Posts</Text>
@@ -99,7 +95,9 @@ const CompanySettings: FC<RouterProps> = ({ navigation }) => {
           {postData.length > 0 && (
             <FlatList
               data={postData || []}
-              renderItem={({ item }) => <PostItem post={item} from="company" />}
+              renderItem={({ item }) => (
+                <PostItem post={item} userId={accountData?.account._id} />
+              )}
               keyExtractor={(item: PostItemProps) => `${item._id}`}
               listKey="post"
               ListHeaderComponent={<Text style={styles.text}>All Posts</Text>}

@@ -2,42 +2,35 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Image } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import dayjs from 'dayjs';
+import { ThumbsUp, ChatCenteredText, Share } from 'phosphor-react-native';
+import { AVATAR_URL, POST_URL } from 'react-native-dotenv';
 
 import PLabel from '../common/PLabel';
 import IconButton from '../common/IconButton';
 import UserInfo from '../common/UserInfo';
 import Tag from '../common/Tag';
-import { BGDARK, GRAY10, WHITE60 } from 'shared/src/colors';
+import { PRIMARYSTATE, GRAY10, WHITE60 } from 'shared/src/colors';
 import { Body1, Body3 } from '../../theme/fonts';
 import { PostDataType } from '../../graphql/post';
-
-import ThumbsUpSvg from 'shared/assets/images/thumbsUp.svg';
-import ChatSvg from 'shared/assets/images/chat.svg';
-import ShareSvg from 'shared/assets/images/share.svg';
-import Avatar from '../../assets/avatar.png';
 
 import { FetchPostsData } from 'mobile/src/hooks/queries';
 import { PostCategories } from 'backend/graphql/enumerations.graphql';
 import { useLikePost } from '../../graphql/mutation/posts';
-import { useAccount } from '../../graphql/query/account';
-
-import { AVATAR_URL, POST_URL } from 'react-native-dotenv';
 
 type Post = Exclude<FetchPostsData['posts'], undefined>[number];
 interface FeedItemProps {
   post: Post;
+  userId: string;
 }
 
-const PostItem: React.FC<FeedItemProps> = ({ post }) => {
+const PostItem: React.FC<FeedItemProps> = ({ post, userId }) => {
   const { user } = post;
   const [liked, setLiked] = useState(false);
   const [likePost] = useLikePost();
-  const { data } = useAccount();
-  const account = data?.account;
 
   useEffect(() => {
-    setLiked(post.likeIds?.includes(account?._id));
-  }, [account, post]);
+    setLiked(post.likeIds?.includes(userId));
+  }, [post]);
 
   const toggleLike = async (): Promise<void> => {
     const toggled = !liked;
@@ -107,12 +100,21 @@ const PostItem: React.FC<FeedItemProps> = ({ post }) => {
       <View style={styles.divider} />
       <View style={styles.bottomWrapper}>
         <IconButton
-          icon={<ThumbsUpSvg />}
+          icon={
+            <ThumbsUp
+              weight={liked ? 'fill' : 'light'}
+              color={liked ? PRIMARYSTATE : WHITE60}
+              size={20}
+            />
+          }
           label="Like"
           onPress={() => toggleLike()}
         />
-        <IconButton icon={<ChatSvg />} label="Comment" />
-        <IconButton icon={<ShareSvg />} label="Share" />
+        <IconButton
+          icon={<ChatCenteredText color={WHITE60} size={20} />}
+          label="Comment"
+        />
+        <IconButton icon={<Share color={WHITE60} size={20} />} label="Share" />
       </View>
     </View>
   );

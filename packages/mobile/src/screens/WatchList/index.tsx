@@ -12,12 +12,12 @@ import FastImage from 'react-native-fast-image';
 
 import MainHeader from '../../components/main/Header';
 import pStyles from '../../theme/pStyles';
-import { Body2, Body3 } from '../../theme/fonts';
+import { Body1Bold, Body2Bold, Body3 } from '../../theme/fonts';
 import {
   GRAY400,
   WHITE,
   BGDARK,
-  PINK,
+  PRIMARYSOLID,
   SUCCESS,
   WHITE60,
 } from 'shared/src/colors';
@@ -64,41 +64,41 @@ const WatchList: React.FC<RouterProps> = ({ navigation }) => {
   const renderListItem = ({ item }) => {
     return (
       <View style={styles.item}>
-        <View style={styles.company}>
-          <View style={styles.leftItem}>
+        <FastImage
+          style={styles.companyAvatar}
+          source={{
+            uri: 'https://unsplash.it/400/400?image=1',
+          }}
+          resizeMode={FastImage.resizeMode.contain}
+        />
+        <View style={styles.flex}>
+          <View style={styles.company}>
+            <View style={styles.leftItem}>
+              <Text style={styles.title}>{item.company.name}</Text>
+              <Text style={styles.type}>{item.company.type}</Text>
+            </View>
+            <TouchableOpacity onPress={() => handleRemove(item.id)}>
+              <Star size={24} color={PRIMARYSOLID} weight="fill" />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.user}>
             <FastImage
-              style={styles.companyAvatar}
+              style={styles.userAvatar}
               source={{
-                uri: 'https://unsplash.it/400/400?image=1',
+                uri: item.user.uri,
               }}
               resizeMode={FastImage.resizeMode.contain}
             />
-            <View style={styles.rightItem}>
-              <Text style={styles.label}>{item.company.name}</Text>
-              <Text style={styles.type}>{item.company.type}</Text>
+            <View>
+              <Text style={styles.label}>{item.user.name}</Text>
+              <Text style={styles.type}>{item.user.position}</Text>
             </View>
-          </View>
-          <TouchableOpacity onPress={() => handleRemove(item.id)}>
-            <Star size={28} color={PINK} weight="fill" />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.user}>
-          <FastImage
-            style={styles.userAvatar}
-            source={{
-              uri: item.user.uri,
-            }}
-            resizeMode={FastImage.resizeMode.contain}
-          />
-          <View>
-            <Text style={styles.label}>{item.user.name}</Text>
-            <Text style={styles.type}>{item.user.position}</Text>
-          </View>
-          <View style={styles.row}>
-            <ShieldCheck size={16} color={SUCCESS} weight="fill" />
-            <Text style={[styles.label, styles.userType]}>
-              {item.user.type}
-            </Text>
+            <View style={styles.row}>
+              <ShieldCheck size={16} color={SUCCESS} weight="fill" />
+              <Text style={[styles.label, styles.userType]}>
+                {item.user.type}
+              </Text>
+            </View>
           </View>
         </View>
       </View>
@@ -120,12 +120,14 @@ export default WatchList;
 
 const styles = StyleSheet.create({
   item: {
-    backgroundColor: BGDARK,
+    flexDirection: 'row',
     marginVertical: 8,
+    paddingHorizontal: 16,
+    borderBottomColor: WHITE60,
+    borderBottomWidth: 1,
   },
   company: {
     flexDirection: 'row',
-    padding: 16,
     alignItems: 'center',
   },
   companyAvatar: {
@@ -139,28 +141,27 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginRight: 10,
   },
+  flex: { flex: 1 },
   leftItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
     flex: 1,
-    marginRight: 24,
-  },
-  rightItem: {
+    marginRight: 8,
     marginLeft: 16,
-    flex: 1,
+  },
+  title: {
+    ...Body1Bold,
+    color: WHITE,
   },
   label: {
-    ...Body2,
+    ...Body2Bold,
     color: WHITE,
   },
   type: {
     color: GRAY400,
     ...Body3,
+    marginTop: 8,
   },
   user: {
     flexDirection: 'row',
-    borderTopColor: WHITE60,
-    borderTopWidth: 1,
     padding: 16,
   },
   row: {

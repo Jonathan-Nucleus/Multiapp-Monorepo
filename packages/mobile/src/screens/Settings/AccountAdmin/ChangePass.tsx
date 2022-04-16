@@ -26,8 +26,10 @@ interface RouterProps {
 }
 
 const ChangePass: React.FC<RouterProps> = ({ navigation }) => {
+  const [oldPass, setOldPass] = useState('');
   const [pass, setPass] = useState('');
   const [confirmPass, setConfirmPass] = useState('');
+  const [secureOldPassEntry, setSecureOldPassEntry] = useState(true);
   const [securePassEntry, setSecurePassEntry] = useState(true);
   const [secureConfirmPassEntry, setSecureConfirmPassEntry] = useState(true);
   const [error, setError] = useState('');
@@ -62,6 +64,16 @@ const ChangePass: React.FC<RouterProps> = ({ navigation }) => {
       <PAppContainer>
         {!!error && <ErrorText error={error} />}
         <PTextInput
+          label="Old Password"
+          subLabel={secureOldPassEntry ? 'Show' : 'Hide'}
+          secureTextEntry={secureOldPassEntry}
+          onChangeText={(val: string) => setOldPass(val)}
+          onPressText={() => setSecureOldPassEntry(!securePassEntry)}
+          subLabelTextStyle={styles.subLabelText}
+          text={oldPass}
+          containerStyle={styles.textContainer}
+        />
+        <PTextInput
           label="Password"
           subLabel={securePassEntry ? 'Show' : 'Hide'}
           secureTextEntry={securePassEntry}
@@ -69,7 +81,6 @@ const ChangePass: React.FC<RouterProps> = ({ navigation }) => {
           onPressText={() => setSecurePassEntry(!securePassEntry)}
           subLabelTextStyle={styles.subLabelText}
           text={pass}
-          containerStyle={styles.textContainer}
         />
         <PTextInput
           label="Confirm Password"

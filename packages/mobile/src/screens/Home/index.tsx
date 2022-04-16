@@ -12,12 +12,15 @@ import Tag from '../../components/common/Tag';
 import PGradientButton from '../../components/common/PGradientButton';
 import { HomeScreen } from 'mobile/src/navigations/HomeStack';
 import { useFetchPosts } from 'mobile/src/hooks/queries';
+import { useAccount } from '../../graphql/query/account';
 
 const CategoryList = ['All', 'Investment Ideas', 'World News', 'Politics'];
 
 const HomeComponent: HomeScreen = ({ navigation }) => {
   const [category, setCategory] = useState('All');
   const { data, error, loading, refetch } = useFetchPosts();
+  const { data: userData } = useAccount();
+  const account = userData?.account;
   const postData = data?.posts;
 
   const isFocused = useIsFocused();
@@ -39,7 +42,7 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
   };
 
   const renderItem = ({ item }: { item: PostItemProps }) => (
-    <PostItem post={item} />
+    <PostItem post={item} userId={account?._id} />
   );
 
   return (

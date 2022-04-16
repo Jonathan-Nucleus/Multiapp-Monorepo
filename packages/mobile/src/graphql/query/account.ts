@@ -121,6 +121,9 @@ export function useAccount(
           role
           accreditation
           position
+          followerIds
+          postIds
+          followingIds
           background {
             url
             x
@@ -138,8 +141,10 @@ export function useAccount(
               firstName
               lastName
               avatar
+              position
               company {
                 name
+                avatar
               }
             }
             followerIds
@@ -153,10 +158,11 @@ export function useAccount(
               height
               scale
             }
+            website
           }
         }
       }
     `,
-    { fetchPolicy: 'cache-first', ...options },
+    { ...options },
   );
 }
