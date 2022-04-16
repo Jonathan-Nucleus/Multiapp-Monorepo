@@ -301,7 +301,7 @@ const resolvers = {
               .shape({
                 audience: yup
                   .string()
-                  .oneOf(Object.keys(AudienceOptions))
+                  .oneOf(Object.values(AudienceOptions))
                   .required(),
                 categories: yup.array().of(yup.string().required()).required(),
                 body: yup.string(),
