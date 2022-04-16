@@ -1,5 +1,6 @@
 import { gql } from "apollo-server";
 import * as yup from "yup";
+import { getChatToken } from "../lib/tokens";
 import {
   PartialSchema,
   ApolloServerContext,
@@ -16,6 +17,7 @@ const schema = gql`
   type Query {
     verifyInvite(code: String!): Boolean!
     account: User
+    chatToken: String
     posts(categories: [PostCategory!]): [Post!]
     funds: [Fund!]
     fund(fundId: ID!): Fund
@@ -100,6 +102,11 @@ const resolvers = {
         argsIgnored,
         { db, user }
       ): Promise<User.Mongo | null> => user
+    ),
+
+    chatToken: secureEndpoint(
+      async (parentIgnored, argsIgnored, { db, user }): Promise<string> =>
+        getChatToken(user._id.toString())
     ),
 
     funds: secureEndpoint(

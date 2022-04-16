@@ -5,6 +5,9 @@
 @import "import/variables";
 @import "import/utils";
 
+@import 'stream-chat-react/dist/css/index.css';
+@import './stream.scss';
+
 html,
 body {
   padding: 0;

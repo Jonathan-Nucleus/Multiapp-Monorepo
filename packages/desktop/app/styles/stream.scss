@@ -1,0 +1,30 @@
+.prometheus-messages {
+  &.str-chat-channel-list {
+    float: none;
+  }
+
+  &.str-chat-channel {
+    height: 100%;
+
+    .str-chat__list {
+      padding: 0 30px;
+    }
+
+    .str-chat__textarea-emoji {
+      position: absolute;
+      top: 20px;
+      right: 10px;
+    }
+  }
+
+  .messaging__channel-header__avatars, .channel-preview__avatars {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    min-width: 40px;
+    max-width: 40px;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-right: 5px;
+  }
+}

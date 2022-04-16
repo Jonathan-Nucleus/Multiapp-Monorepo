@@ -172,8 +172,6 @@ const createUsersCollection = (
             idToken: tokenId,
             audience: process.env.GOOLGE_ID as string,
           });
-          const payload = ticket.getPayload();
-          console.log("payload", payload);
         } catch (err) {
           throw new BadRequestError(`Invalid google access token: ${tokenId}`);
         }

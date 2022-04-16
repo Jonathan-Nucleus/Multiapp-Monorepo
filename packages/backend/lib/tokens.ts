@@ -1,6 +1,8 @@
+import { connect } from "getstream";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import type { DeserializedUser } from "../db/collections/users";
 import { BadRequestError } from "./validate";
+import { InternalServerError } from "./validate";
 
 import "dotenv/config";
 
@@ -33,4 +35,22 @@ export function decodeToken(token: string): JwtPayload {
   } catch {
     throw new BadRequestError("Token is invalid.");
   }
+}
+
+const GETSTREAM_ACCESS_KEY = process.env.GETSTREAM_ACCESS_KEY;
+const GETSTREAM_SECRET = process.env.GETSTREAM_SECRET;
+const GETSTREAM_APP_ID = process.env.GETSTREAM_APP_ID;
+
+export function getChatToken(userId: string): string {
+  if (!GETSTREAM_ACCESS_KEY || !GETSTREAM_SECRET || !GETSTREAM_APP_ID) {
+    throw new InternalServerError("Missing GetStream configuration");
+  }
+
+  const client = connect(
+    GETSTREAM_ACCESS_KEY,
+    GETSTREAM_SECRET,
+    GETSTREAM_APP_ID
+  );
+
+  return client.createUserToken(userId);
 }
