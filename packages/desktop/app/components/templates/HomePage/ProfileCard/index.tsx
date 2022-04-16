@@ -4,29 +4,35 @@ import { CircleWavy } from "phosphor-react";
 import Link from "next/link";
 import Card from "../../../common/Card";
 import Avatar from "desktop/app/components/common/Avatar";
+import type { User } from "backend/graphql/users.graphql";
 
-const profile = {
-  image:
-    "https://t4.ftcdn.net/jpg/02/45/56/35/360_F_245563558_XH9Pe5LJI2kr7VQuzQKAjAbz9PAyejG1.jpg",
-  name: "Richard Branson",
-  company: "Virgin Group",
-  position: "Accredited Investor",
-  posts: 64,
-  followers: 987,
-  following: 456,
-};
+interface ProfileProps {
+  user: User;
+}
 
-const ProfileCard: FC = () => {
+const ProfileCard: FC<ProfileProps> = ({ user }) => {
   return (
     <div>
       <div className="h-24 flex items-center justify-center">
-        <Avatar size={88} />
+        {user.avatar && (
+          <Image
+            loader={() =>
+              `${process.env.NEXT_PUBLIC_AVATAR_URL}/${user.avatar}`
+            }
+            src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${user.avatar}`}
+            alt=""
+            width={88}
+            height={88}
+            className="bg-white object-cover rounded-full"
+            unoptimized={true}
+          />
+        )}
       </div>
       <Card className="text-center -mt-12">
         <div className="text-xl text-white font-medium mt-12">
-          {profile.name}
+          {user.firstName} {user.lastName}
         </div>
-        <div className="text-sm text-white opacity-60">{profile.company}</div>
+        <div className="text-sm text-white opacity-60">{user.position}</div>
         <div className="flex items-center justify-center mt-3">
           <div className="relative text-success">
             <CircleWavy color="currentColor" weight="fill" size={24} />
@@ -34,24 +40,24 @@ const ProfileCard: FC = () => {
               AI
             </div>
           </div>
-          <div className="text-white text-xs ml-1">{profile.position}</div>
+          <div className="text-white text-xs ml-1">{user.role}</div>
         </div>
         <div className="grid grid-cols-3 border-white/[.12] divide-x divide-inherit mt-5">
           <div>
             <div className="font-medium text-xl text-white">
-              {profile.posts}
+              {user.postIds ?? 0}
             </div>
             <div className="text-sm text-white opacity-60">Posts</div>
           </div>
           <div>
             <div className="font-medium text-xl text-white">
-              {profile.followers}
+              {user.followerIds ?? 0}
             </div>
             <div className="text-sm text-white opacity-60">Followers</div>
           </div>
           <div>
             <div className="font-medium text-xl text-white">
-              {profile.following}
+              {user.followingIds ?? 0}
             </div>
             <div className="text-sm text-white opacity-60">Following</div>
           </div>

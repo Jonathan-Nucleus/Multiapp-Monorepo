@@ -8,7 +8,7 @@ const FundProfile: NextPageWithLayout = () => {
       <Head>
         <title>Fund Profile - Prometheus</title>
         <meta name="description" content="" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon.png" />
       </Head>
       <FundProfilePage />
     </>

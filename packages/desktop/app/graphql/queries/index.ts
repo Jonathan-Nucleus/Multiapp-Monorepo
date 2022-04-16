@@ -121,6 +121,9 @@ export function useAccount(
           role
           accreditation
           position
+          postIds
+          followerIds
+          followingIds
           background {
             url
             x

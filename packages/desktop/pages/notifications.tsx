@@ -8,7 +8,7 @@ const Notification: NextPageWithLayout = () => {
       <Head>
         <title>Notification - Prometheus</title>
         <meta name="description" content="Prometheus" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon.png" />
       </Head>
       <NotificationPage />
     </div>

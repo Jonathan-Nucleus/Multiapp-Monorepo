@@ -50,9 +50,9 @@ const Profile: FC<AccountProps> = ({ account, members }) => {
               <div className="w-24 h-24 flex justify-center relative shadow-2xl shadow-black rounded-full">
                 <Image
                   loader={() =>
-                    `${process.env.NEXT_PUBLIC_POST_URL}/${account.avatar}`
+                    `${process.env.NEXT_PUBLIC_AVATAR_URL}/${account.avatar}`
                   }
-                  src={`${process.env.NEXT_PUBLIC_POST_URL}/${account.avatar}`}
+                  src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${account.avatar}`}
                   alt=""
                   width={96}
                   height={96}

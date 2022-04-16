@@ -17,7 +17,11 @@ import { useAccount } from "desktop/app/graphql/queries";
 import type { Company } from "backend/graphql/companies.graphql";
 import type { User } from "backend/graphql/users.graphql";
 
-const CompanyPage: FC = () => {
+interface CompanyIdProps {
+  _id: string;
+}
+
+const CompanyPage: FC<CompanyIdProps> = ({ _id }) => {
   const { data, loading, refetch } = useFetchPosts();
   const { data: fundsData, loading: fundLoading } = useFetchFunds();
   const { data: accountData, loading: accountLoading } = useAccount();
@@ -25,8 +29,9 @@ const CompanyPage: FC = () => {
   const posts = data?.posts ?? [];
   const funds = fundsData?.funds ?? [];
   const companies = accountData?.account?.companies ?? [];
-  let members: User[] = [];
-  companies.forEach((company) => (members = [...members, ...company.members]));
+  const company: Company = companies.find((v) => v._id === _id);
+  let members: User[] = company?.members ?? [];
+
   if (fundLoading || accountLoading) {
     return null;
   }
@@ -34,9 +39,9 @@ const CompanyPage: FC = () => {
   return (
     <div className="flex flex-col p-0 mt-10 md:flex-row md:px-2">
       <div className="min-w-0 mx-0 md:mx-4">
-        {companies.map((company) => (
-          <Profile account={company} key={company._id} members={members} />
-        ))}
+        {company && (
+          <Profile account={company} members={members} />
+        )}
         <FundsList funds={funds} type="company" />
         <FeaturedPosts posts={posts} />
         <PostsList posts={posts} />

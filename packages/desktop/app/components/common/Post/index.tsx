@@ -104,7 +104,7 @@ const Post: FC<PostProps> = ({ post }: PostProps) => {
           >
             <ThumbsUp
               weight={liked ? "fill" : "light"}
-              color="currentColor"
+              color={liked ? "#00AAE0" : "currentColor"}
               size={24}
             />
             {post.likeIds && post.likeIds.length > 0 && (
