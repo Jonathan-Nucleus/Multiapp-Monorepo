@@ -3,11 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { Share, Star } from "phosphor-react";
 
-import type { User } from "backend/graphql/users.graphql";
 import { useAccount } from "desktop/app/graphql/queries";
-import { Fund } from "mobile/src/graphql/query/marketplace";
 import { useWatchFund } from "mobile/src/graphql/mutation/funds";
 import { useFollowUser } from "desktop/app/graphql/mutations/profiles";
+import type { User } from "backend/graphql/users.graphql";
+import type { Fund } from "mobile/src/graphql/query/marketplace";
 
 import Button from "desktop/app/components/common/Button";
 import Card from "desktop/app/components/common/Card";

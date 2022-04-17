@@ -57,25 +57,25 @@ const resolvers = {
       parent: Post.Mongo,
       argsIgnored: NoArgs,
       { db }: ApolloServerContext
-    ) => db.users.findAll(parent.mentionIds),
+    ) => (parent.mentionIds ? db.users.findAll(parent.mentionIds) : []),
 
     likes: async (
       parent: Post.Mongo,
       argsIgnored: NoArgs,
       { db }: ApolloServerContext
-    ) => db.users.findAll(parent.likeIds),
+    ) => (parent.likeIds ? db.users.findAll(parent.likeIds) : []),
 
     comments: async (
       parent: Post.Mongo,
       argsIgnored: NoArgs,
       { db }: ApolloServerContext
-    ) => db.comments.findAll(parent.commentIds),
+    ) => (parent.commentIds ? db.comments.findAll(parent.commentIds) : []),
 
     reporters: async (
       parent: Post.Mongo,
       argsIgnored: NoArgs,
       { db }: ApolloServerContext
-    ) => db.users.findAll(parent.reporterIds),
+    ) => (parent.reporterIds ? db.users.findAll(parent.reporterIds) : []),
   },
 };
 

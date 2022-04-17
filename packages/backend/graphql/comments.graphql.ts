@@ -24,7 +24,7 @@ const resolvers = {
       parent: Comment.Mongo,
       argsIgnored: NoArgs,
       { db }: ApolloServerContext
-    ) => db.users.find({ _id: parent._id }),
+    ) => db.users.find({ _id: parent.userId }),
 
     post: async (
       parent: Comment.Mongo,
@@ -45,13 +45,13 @@ const resolvers = {
       parent: Comment.Mongo,
       argsIgnored: NoArgs,
       { db }: ApolloServerContext
-    ) => db.users.findAll(parent.likeIds),
+    ) => (parent.likeIds ? db.users.findAll(parent.likeIds) : []),
 
     mentions: async (
       parent: Comment.Mongo,
       argsIgnored: NoArgs,
       { db }: ApolloServerContext
-    ) => db.users.findAll(parent.mentionIds),
+    ) => (parent.mentionIds ? db.users.findAll(parent.mentionIds) : []),
   },
 };
 

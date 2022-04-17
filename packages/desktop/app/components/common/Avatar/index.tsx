@@ -26,9 +26,8 @@ const Avatar: FC<AvatarProps> = ({
   return (
     <div
       {...divProps}
-      className={`w-${spacing} h-${spacing} flex items-center justify-center flex-shrink-0 relative ${
-        divProps.className ?? ""
-      }`}
+      className={`w-${spacing} h-${spacing} flex items-center justify-center
+      flex-shrink-0 relative ${divProps.className ?? ""}`}
     >
       <Image
         src={

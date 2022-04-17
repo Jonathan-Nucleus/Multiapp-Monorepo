@@ -17,6 +17,7 @@ export namespace Company {
   export type GraphQL = GraphQLEntity<Mongo> & {
     members: User.GraphQL[];
     funds: Fund.GraphQL[];
+    fundManagers: User.GraphQL[];
     createdAt: Date;
   };
 }
@@ -35,5 +36,6 @@ export const CompanySchema = `
 
     members: [UserProfile!]!
     funds: [Fund!]!
+    fundManagers: [User!]!
   }
 `;

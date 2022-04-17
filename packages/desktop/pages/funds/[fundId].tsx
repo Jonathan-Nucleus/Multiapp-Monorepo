@@ -1,8 +1,13 @@
-import { NextPageWithLayout } from "../../app/types/next-page";
 import Head from "next/head";
+import { useRouter } from "next/router";
+
 import FundProfilePage from "../../app/components/templates/Funds/FundProfilePage";
+import { NextPageWithLayout } from "../../app/types/next-page";
 
 const FundProfile: NextPageWithLayout = () => {
+  const router = useRouter();
+  const { fundId } = router.query as Record<string, string>;
+
   return (
     <>
       <Head>
@@ -10,7 +15,7 @@ const FundProfile: NextPageWithLayout = () => {
         <meta name="description" content="" />
         <link rel="icon" href="/favicon.png" />
       </Head>
-      <FundProfilePage />
+      <FundProfilePage fundId={fundId} />
     </>
   );
 };

@@ -1,12 +1,20 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import Card from "../../../common/Card";
 import Image from "next/image";
 import Button from "../../../common/Button";
 import { File, Info, Share, Star, TelevisionSimple } from "phosphor-react";
 import { Tab } from "@headlessui/react";
 import Avatar from "../../../common/Avatar";
+import TeamMember from "desktop/app/components/templates/CompanyPage/TeamMembers/Member";
+import MembersModal from "desktop/app/components/templates/CompanyPage/TeamMembers/MembersModal";
 
-const fund = {
+import { useAccount } from "desktop/app/graphql/queries";
+import { useFund } from "mobile/src/graphql/query/marketplace";
+import { useWatchFund } from "mobile/src/graphql/mutation/funds";
+
+import { PINK } from "shared/src/colors";
+
+const fundData = {
   background: "",
   name: "Good Soil Accelerated Opportunities",
   overview:
@@ -158,18 +166,46 @@ const fund = {
   ],
 };
 
-const FundProfilePage: FC = () => {
+interface FundProfileProps {
+  fundId?: string;
+}
+
+const FundProfile: FC<FundProfileProps> = ({ fundId }) => {
+  const [watchFund] = useWatchFund();
+  const { data } = useFund(fundId);
+  const { data: userData } = useAccount({ fetchPolicy: "cache-only" });
+  const [showModal, setShowModal] = useState(false);
+
+  const fund = data?.fund;
+  const isWatching = userData?.account?.watchlistIds?.includes(fundId) ?? false;
+  const toggleWatchFund = async (): Promise<void> => {
+    try {
+      const { data } = await watchFund({
+        variables: { watch: !isWatching, fundId },
+        refetchQueries: ["Account"],
+      });
+
+      if (!data?.watchFund) {
+        console.log("err", data);
+      }
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
+
   return (
-    <div className="container mx-auto mt-5 lg:px-4">
+    <div className="container mx-auto mt-5 lg:px-4 max-w-screen-xl">
       <div className="lg:grid grid-cols-3">
         <div className="col-span-2">
-          <Card className="bg-secondary/[.27] rounded p-0">
+          <Card className="bg-secondary/[.27] rounded p-0 border border-t-0">
             <div className="flex flex-row bg-secondary/[.27]">
               <div className="flex-shrink-0 w-72 h-72 bg-white relative">
-                {fund.background && (
+                {fund?.company?.background && (
                   <Image
-                    loader={() => fund.background}
-                    src={fund.background}
+                    loader={() =>
+                      `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund.company.background.url}`
+                    }
+                    src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund.company.background.url}`}
                     alt=""
                     layout="fill"
                     className="object-cover"
@@ -180,10 +216,12 @@ const FundProfilePage: FC = () => {
               <div className="flex flex-col flex-grow">
                 <div className="flex px-5">
                   <div className="w-24 h-24 flex-shrink-0 bg-purple-secondary rounded-b relative">
-                    {fund.company.avatar && (
+                    {fund?.company?.avatar && (
                       <Image
-                        loader={() => fund.company.avatar}
-                        src={fund.company.avatar}
+                        loader={() =>
+                          `${process.env.NEXT_PUBLIC_AVATAR_URL}/${fund.company.avatar}`
+                        }
+                        src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${fund.company.avatar}`}
                         alt=""
                         layout="fill"
                         className="object-cover"
@@ -193,26 +231,38 @@ const FundProfilePage: FC = () => {
                   </div>
                   <div className="self-center flex-grow mx-4">
                     <div className="text-xl text-white font-medium">
-                      {fund.name}
+                      {fund?.name}
                     </div>
-                    <div className="text-primary">{fund.company.name}</div>
+                    <div className="text-primary">{fund?.company?.name}</div>
                   </div>
                   <div className="self-start flex items-center mt-5">
                     <div className="w-3 h-3 bg-success rounded-full" />
                     <div className="text-xs text-success ml-1">
-                      {fund.status}
+                      {fund?.status}
                     </div>
                   </div>
                 </div>
-                <div className="min-h-0 flex-grow text-sm text-white px-5 py-3">
-                  {fund.overview}
+                <div className="min-h-0 flex flex-grow text-sm text-white px-5 py-3">
+                  <ul className="self-center list-disc ml-4">
+                    {fund?.highlights.map((highlight) => (
+                      <li key={highlight}>{highlight}</li>
+                    ))}
+                  </ul>
                 </div>
                 <div className="border-t border-white/[.12] text-right px-3 py-2">
                   <Button variant="text">
                     <Share color="white" weight="light" size={24} />
                   </Button>
-                  <Button variant="text" className="ml-3">
-                    <Star color="white" weight="light" size={24} />
+                  <Button
+                    variant="text"
+                    className="ml-2"
+                    onClick={() => toggleWatchFund(fund._id, !isWatching)}
+                  >
+                    <Star
+                      color={isWatching ? PINK : "white"}
+                      weight={isWatching ? "fill" : "light"}
+                      size={24}
+                    />
                   </Button>
                 </div>
               </div>
@@ -272,7 +322,7 @@ const FundProfilePage: FC = () => {
                       Strategy Overview
                     </div>
                     <div className="text-sm text-white mt-3">
-                      {fund.strategyOverView}
+                      {fund?.overview}
                     </div>
                   </div>
                   <div className="mt-5">
@@ -283,17 +333,19 @@ const FundProfilePage: FC = () => {
                   </div>
                   <div className="mt-8">
                     <div className="flex flex-wrap -mx-1 py-2">
-                      {fund.tags.map((tag) => (
+                      {fund?.tags.map((tag) => (
                         <div
                           key={tag}
-                          className="bg-white/[.12] text-xs text-white font-medium rounded-full uppercase m-1 px-3 py-1"
+                          className={`bg-white/[.12] text-tiny text-white
+                            font-medium rounded-full uppercase m-1 px-3 py-1
+                            tracking-widest`}
                         >
                           {tag}
                         </div>
                       ))}
                     </div>
                   </div>
-                  <div className="border-t border-white/[.12] mt-8" />
+                  <div className="border-t border-white/[.12] mt-4" />
                   <div className="mt-16">
                     <div className="text-xl text-white font-medium">
                       Performance
@@ -305,7 +357,7 @@ const FundProfilePage: FC = () => {
                             MTD RETURN
                           </div>
                           <div className="text-lg text-white mt-1">
-                            {fund.mtd}
+                            {fundData.mtd}
                           </div>
                         </div>
                         <div className="flex flex-col items-center p-6">
@@ -313,7 +365,7 @@ const FundProfilePage: FC = () => {
                             YTD RETURN
                           </div>
                           <div className="text-lg text-white mt-1">
-                            {fund.ytd}
+                            {fundData.ytd}
                           </div>
                         </div>
                         <div className="flex-grow" />
@@ -322,7 +374,7 @@ const FundProfilePage: FC = () => {
                             ANN. VOLATILITY
                           </div>
                           <div className="text-lg text-white mt-1">
-                            {fund.annualVolatility}
+                            {fundData.annualVolatility}
                           </div>
                         </div>
                         <div className="flex flex-col items-center p-6">
@@ -330,7 +382,7 @@ const FundProfilePage: FC = () => {
                             ARSI
                           </div>
                           <div className="text-lg text-white mt-1">
-                            {fund.arsi}
+                            {fundData.arsi}
                           </div>
                         </div>
                       </div>
@@ -358,12 +410,12 @@ const FundProfilePage: FC = () => {
                         </tr>
                       </thead>
                       <tbody className="text-sm text-white">
-                        {Object.keys(fund.netData).map((year) => (
+                        {Object.keys(fundData.netData).map((year) => (
                           <tr key={year}>
                             <td className="font-bold border border-white/[.12] p-2">
                               {year}
                             </td>
-                            {fund.netData[year].map((data, index) => (
+                            {fundData.netData[year].map((data, index) => (
                               <td
                                 key={index}
                                 className="text-center border border-white/[.12] p-2"
@@ -372,7 +424,7 @@ const FundProfilePage: FC = () => {
                               </td>
                             ))}
                             <td className="text-center font-bold border border-white/[.12] p-2">
-                              {fund.netData[year]
+                              {fundData.netData[year]
                                 .reduce((a, b) => a + b, 0)
                                 .toFixed(1)}
                               %
@@ -389,7 +441,7 @@ const FundProfilePage: FC = () => {
                       Recently Added
                     </div>
                     <div className="mt-3">
-                      {fund.documents.map((item, index) => (
+                      {fundData.documents.map((item, index) => (
                         <div key={index} className="mb-3">
                           <Card className="p-0">
                             <div className="flex items-center">
@@ -422,7 +474,7 @@ const FundProfilePage: FC = () => {
                       Presentations
                     </div>
                     <div className="border-white/[.12] divide-y divide-inherit mt-5">
-                      {fund.presentations.map((item, index) => (
+                      {fundData.presentations.map((item, index) => (
                         <div key={index} className="flex py-5">
                           <div className="text-white">
                             <File color="currentColor" size={24} />
@@ -450,7 +502,7 @@ const FundProfilePage: FC = () => {
                       Tearsheets
                     </div>
                     <div className="border-white/[.12] divide-y divide-inherit mt-5">
-                      {fund.tearSheets.map((item, index) => (
+                      {fundData.tearSheets.map((item, index) => (
                         <div key={index} className="flex py-5">
                           <div className="text-white">
                             <File color="currentColor" size={24} />
@@ -471,7 +523,7 @@ const FundProfilePage: FC = () => {
                       Investor Letters
                     </div>
                     <div className="border-white/[.12] divide-y divide-inherit mt-5">
-                      {fund.presentations.map((item, index) => (
+                      {fundData.presentations.map((item, index) => (
                         <div key={index} className="flex py-5">
                           <div className="text-white">
                             <File color="currentColor" size={24} />
@@ -499,7 +551,7 @@ const FundProfilePage: FC = () => {
                       Operational
                     </div>
                     <div className="border-white/[.12] divide-y divide-inherit mt-5">
-                      {fund.operational.map((item, index) => (
+                      {fundData.operational.map((item, index) => (
                         <div key={index} className="flex py-5">
                           <div className="text-white">
                             <File color="currentColor" size={24} />
@@ -541,32 +593,32 @@ const FundProfilePage: FC = () => {
           <Card className="p-0">
             <div className="border-white/[.12] divide-y divide-inherit">
               <div className="p-5">
-                <div className="flex flex-col items-center p-5">
-                  <Avatar size={128} src={fund.specialist.avatar} />
+                <div className="flex flex-col items-center p-5 pt-1">
+                  <Avatar size={128} src={fund?.manager?.avatar} />
                   <div className="flex items-center mt-2">
-                    <div className="text-sm text-white">
-                      {fund.specialist.firstName} {fund.specialist.lastName}
+                    <div className="text-sm text-white tracking-wider">
+                      {`${fund?.manager?.firstName} ${fund?.manager?.lastName}`}
                     </div>
                     <div className="text-white opacity-60 mx-2">•</div>
                     <div>
                       <Button
                         variant="text"
-                        className="text-sm text-primary font-normal tracking-normal py-0"
+                        className="text-sm text-primary font-normal tracking-wider py-0"
                       >
                         FOLLOW
                       </Button>
                     </div>
                   </div>
-                  <div className="text-xs text-white opacity-60">
-                    {fund.specialist.followerIds.length} Followers
+                  <div className="text-xs text-white opacity-60 tracking-wide">
+                    {fundData.specialist.followerIds.length} Followers
                     {" • "}
-                    {fund.specialist.postIds.length} Posts
+                    {fundData.specialist.postIds.length} Posts
                   </div>
                 </div>
-                <div className="mt-6">
+                <div className="my-2">
                   <Button
                     variant="gradient-primary"
-                    className="w-full font-medium"
+                    className="w-full font-medium h-12"
                   >
                     CONTACT SPECIALIST
                   </Button>
@@ -574,13 +626,13 @@ const FundProfilePage: FC = () => {
               </div>
               <div className="grid grid-cols-2">
                 <div className="p-4">
-                  <div className="text-xs text-white opacity-60 uppercase">
+                  <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
                     Asset Class
                   </div>
                   <div className="text-white">Hedge Fund</div>
                 </div>
                 <div className="p-4">
-                  <div className="text-xs text-white opacity-60 uppercase">
+                  <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
                     Strategy
                   </div>
                   <div className="text-white">L/S Equity</div>
@@ -588,13 +640,13 @@ const FundProfilePage: FC = () => {
               </div>
               <div className="grid grid-cols-2">
                 <div className="p-4">
-                  <div className="text-xs text-white opacity-60 uppercase">
+                  <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
                     AUM
                   </div>
                   <div className="text-white">$10M</div>
                 </div>
                 <div className="p-4">
-                  <div className="text-xs text-white opacity-60 uppercase">
+                  <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
                     Remaining Capacity
                   </div>
                   <div className="text-white">--</div>
@@ -602,13 +654,13 @@ const FundProfilePage: FC = () => {
               </div>
               <div className="grid grid-cols-2">
                 <div className="p-4">
-                  <div className="text-xs text-white opacity-60 uppercase">
+                  <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
                     Sharpe Ratio
                   </div>
                   <div className="text-white">2.5</div>
                 </div>
                 <div className="p-4">
-                  <div className="text-xs text-white opacity-60 uppercase">
+                  <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
                     ann. volatility
                   </div>
                   <div className="text-white">7.8%</div>
@@ -616,13 +668,13 @@ const FundProfilePage: FC = () => {
               </div>
               <div className="grid grid-cols-2">
                 <div className="p-4">
-                  <div className="text-xs text-white opacity-60 uppercase">
+                  <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
                     Target returns
                   </div>
                   <div className="text-white">8-10%</div>
                 </div>
                 <div className="p-4">
-                  <div className="text-xs text-white opacity-60 uppercase">
+                  <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
                     volatility
                   </div>
                   <div className="text-white">Low</div>
@@ -630,13 +682,13 @@ const FundProfilePage: FC = () => {
               </div>
               <div className="grid grid-cols-2">
                 <div className="p-4">
-                  <div className="text-xs text-white opacity-60 uppercase">
+                  <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
                     Minimum Investment
                   </div>
                   <div className="text-white">$25K</div>
                 </div>
                 <div className="p-4">
-                  <div className="text-xs text-white opacity-60 uppercase">
+                  <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
                     Lockup Period
                   </div>
                   <div className="text-white">2 years</div>
@@ -644,7 +696,7 @@ const FundProfilePage: FC = () => {
               </div>
               <div className="grid grid-cols-1">
                 <div className="p-4">
-                  <div className="text-xs text-white opacity-60 uppercase">
+                  <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
                     liquidity
                   </div>
                   <div className="text-white">Quarterly w/30 days notice</div>
@@ -667,41 +719,33 @@ const FundProfilePage: FC = () => {
                 <Button
                   variant="text"
                   className="text-sm text-primary font-medium tracking-normal py-0"
+                  onClick={() => setShowModal(true)}
                 >
                   VIEW ALL
                 </Button>
               </div>
             </div>
-            <div className="mt-3">
-              {fund.members.map((item, index) => (
-                <div key={index} className="mb-8">
-                  <div className="flex">
-                    <Avatar size={56} src={item.avatar} />
-                    <div className="ml-2">
-                      <div className="flex items-center">
-                        <div className="text-white">
-                          {item.firstName} {item.lastName} •
-                        </div>
-                        <Button
-                          variant="text"
-                          className="text-xs text-primary font-normal tracking-normal ml-2 py-0"
-                        >
-                          FOLLOW
-                        </Button>
-                      </div>
-                      <div className="text-xs text-white opacity-60 mt-1">
-                        {item.position}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+            <div className="mt-3 flex flex-col -space-y-4">
+              {fund?.team.map((member, index) => (
+                <TeamMember
+                  key={member._id}
+                  member={member}
+                  hiddenChat={true}
+                />
               ))}
             </div>
           </div>
         </div>
       </div>
+      {fund?.team && (
+        <MembersModal
+          members={fund.team}
+          show={showModal}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </div>
   );
 };
 
-export default FundProfilePage;
+export default FundProfile;

@@ -1,5 +1,6 @@
 import { gql, useQuery, QueryResult } from '@apollo/client';
 import { Fund as GraphQLFund } from 'backend/graphql/funds.graphql';
+import { Company as GraphQLCompany } from 'backend/graphql/companies.graphql';
 
 type FetchFundsVariables = never;
 
@@ -82,29 +83,105 @@ export function useFetchFunds(): QueryResult<
   `);
 }
 
-export const GET_FUND_MANAGERS = gql`
-  query FundManagers {
-    fundManagers {
-      funds {
-        _id
-        name
-        level
-      }
-      managers {
-        _id
-        firstName
-        lastName
-        avatar
-        managedFundsIds
-        followerIds
-        postIds
-      }
-    }
-  }
-`;
+type FundVariables = {
+  fundId: string;
+};
 
-export type FetchFundManagersData = {
-  fundManagers?: Pick<Fund, '_id' | 'name'>[];
+export type FundDetails = Pick<
+  GraphQLFund,
+  '_id' | 'name' | 'highlights' | 'overview' | 'tags' | 'documents' | 'status'
+> & {
+  manager: Pick<
+    GraphQLFund['manager'],
+    '_id' | 'firstName' | 'lastName' | 'avatar' | 'postIds' | 'followerIds'
+  >;
+  team: Pick<
+    GraphQLFund['team'][number],
+    '_id' | 'firstName' | 'lastName' | 'avatar' | 'position'
+  >[];
+  company: Pick<GraphQLFund['company'], '_id' | 'name' | 'avatar'> & {
+    background: Pick<GraphQLFund['company']['background'], 'url'>;
+  };
+};
+export type FundData = {
+  fund?: FundDetails;
+};
+
+/**
+ * GraphQL query that fetches details for a particular fund.
+ *
+ * @returns   GraphQL query.
+ */
+export function useFund(fundId?: string): QueryResult<FundData, FundVariables> {
+  return useQuery<FundData, FundVariables>(
+    gql`
+      query Fund($fundId: ID!) {
+        fund(fundId: $fundId) {
+          _id
+          name
+          highlights
+          overview
+          tags
+          status
+          documents {
+            title
+            url
+            category
+            date
+            createdAt
+          }
+          manager {
+            _id
+            firstName
+            lastName
+            avatar
+            postIds
+            followerIds
+          }
+          team {
+            _id
+            firstName
+            lastName
+            avatar
+            position
+          }
+          company {
+            _id
+            name
+            avatar
+            background {
+              url
+            }
+          }
+        }
+      }
+    `,
+    {
+      skip: !fundId,
+      variables: { fundId },
+    },
+  );
+}
+
+type FundManagersVariables = never;
+export type FundManager = Pick<
+  GraphQLFund['manager'],
+  | '_id'
+  | 'firstName'
+  | 'lastName'
+  | 'avatar'
+  | 'managedFundsIds'
+  | 'followerIds'
+  | 'postIds'
+  | 'position'
+> & {
+  company: Pick<GraphQLFund['manager']['company'], '_id' | 'name' | 'avatar'>;
+};
+export type FundManagersData = {
+  fundManagers?: {
+    managers: FundManager[];
+    funds: Pick<Fund, '_id' | 'name' | 'level'>[];
+  };
 };
 
 /**
@@ -112,11 +189,86 @@ export type FetchFundManagersData = {
  *
  * @returns   GraphQL query.
  */
-export function useFetchFundManagers(): QueryResult<
-  FetchFundManagersData,
-  FetchFundsVariables
+export function useFundManagers(): QueryResult<
+  FundManagersData,
+  FundManagersVariables
 > {
-  return useQuery<FetchFundManagersData, FetchFundsVariables>(
-    GET_FUND_MANAGERS,
+  return useQuery<FundManagersData, FundManagersVariables>(
+    gql`
+      query FundManagers {
+        fundManagers {
+          funds {
+            _id
+            name
+            level
+          }
+          managers {
+            _id
+            firstName
+            lastName
+            avatar
+            managedFundsIds
+            followerIds
+            postIds
+            position
+            company {
+              _id
+              name
+              avatar
+            }
+          }
+        }
+      }
+    `,
+  );
+}
+
+type FundCompaniesVariables = never;
+export type Company = Pick<
+  GraphQLCompany,
+  '_id' | 'name' | 'avatar' | 'postIds' | 'followerIds'
+> & {
+  funds: Pick<Fund, '_id' | 'name' | 'managerId'>;
+  fundManagers: Pick<
+    GraphQLCompany['fundManagers'][number],
+    '_id' | 'firstName' | 'lastName' | 'avatar'
+  >;
+};
+export type FundCompanyData = {
+  fundCompanies: Company[];
+};
+
+/**
+ * GraphQL query that fetches all companies that have at least one fund.
+ *
+ * @returns   GraphQL query.
+ */
+export function useFundCompanies(): QueryResult<
+  FundCompanyData,
+  FundCompaniesVariables
+> {
+  return useQuery<FundCompanyData, FundCompaniesVariables>(
+    gql`
+      query FundCompanies {
+        fundCompanies {
+          _id
+          name
+          avatar
+          postIds
+          followerIds
+          funds {
+            _id
+            name
+            managerId
+          }
+          fundManagers {
+            _id
+            firstName
+            lastName
+            avatar
+          }
+        }
+      }
+    `,
   );
 }

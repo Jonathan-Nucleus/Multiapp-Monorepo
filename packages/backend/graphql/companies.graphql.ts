@@ -37,6 +37,15 @@ const resolvers = {
       argsIgnored: NoArgs,
       { db }: ApolloServerContext
     ) => db.funds.findAll(parent.fundIds),
+
+    fundManagers: async (
+      parent: Company.Mongo,
+      argsIgnored: NoArgs,
+      { db }: ApolloServerContext
+    ) =>
+      (await db.users.findAll(parent.memberIds)).filter(
+        (member) => member.managedFundsIds && member.managedFundsIds.length > 0
+      ),
   },
 };
 

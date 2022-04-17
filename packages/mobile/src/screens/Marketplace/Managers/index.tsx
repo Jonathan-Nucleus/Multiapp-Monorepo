@@ -3,11 +3,11 @@ import { View, StyleSheet, FlatList, ListRenderItem } from 'react-native';
 
 import { BLACK } from 'shared/src/colors';
 import ManagerItem, { Fund } from '../../../components/main/ManagerItem';
-import { useFetchFundManagers } from '../../../graphql/query/marketplace';
+import { useFundManagers } from '../../../graphql/query/marketplace';
 import { FundManagersScreen } from '../../../navigations/MarketplaceStack';
 
 const Managers: FundManagersScreen = () => {
-  const { data } = useFetchFundManagers();
+  const { data } = useFundManagers();
   const managers = data?.fundManagers?.managers;
 
   const keyExtractor = (item: Fund): string => item._id;

@@ -18,6 +18,7 @@ const schema = gql`
     verifyInvite(code: String!): Boolean!
     account: User
     chatToken: String
+    post(postId: ID!): Post
     posts(categories: [PostCategory!]): [Post!]
     funds: [Fund!]
     fund(fundId: ID!): Fund
@@ -59,6 +60,19 @@ const resolvers = {
 
       return db.users.verifyInvite(code);
     },
+
+    /**
+     * Fetch account details for the currently authenticated user.
+     *
+     * @returns   The User object associated with the current user.
+     */
+    post: secureEndpoint(
+      async (
+        parentIgnored,
+        { postId }: { postId: string },
+        { db, user }
+      ): Promise<Post.Mongo | null> => db.posts.find(postId)
+    ),
 
     posts: secureEndpoint(
       async (

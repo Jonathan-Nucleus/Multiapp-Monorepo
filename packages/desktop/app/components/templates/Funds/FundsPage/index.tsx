@@ -13,7 +13,7 @@ const FundsPage: FC = () => {
   return (
     <>
       <Navbar />
-      <div className="container mx-auto my-6">
+      <div className="container mx-auto my-6 max-w-screen-xl">
         <header className="flex items-center px-4 lg:px-0">
           <h1 className="text-2xl text-white">Browse by Fund</h1>
           <div className="text-xs text-white opacity-60 ml-2 mt-2">

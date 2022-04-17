@@ -1,50 +1,94 @@
 import { FC } from "react";
-import { Company } from "..";
+import Link from "next/link";
+
 import Avatar from "desktop/app/components/common/Avatar";
 import Button from "../../../../../common/Button";
 import Card from "../../../../../common/Card";
 import { ShieldCheck } from "phosphor-react";
+
+import { useAccount } from "mobile/src/graphql/query/account";
+import { useFollowCompany } from "mobile/src/graphql/mutation/account";
+import { Company } from "mobile/src/graphql/query/marketplace";
 
 interface CompanyItemProps {
   company: Company;
 }
 
 const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
+  const { data: accountData } = useAccount({ fetchPolicy: "cache-only" });
+  const [followCompany] = useFollowCompany();
+
+  const isFollowing =
+    accountData?.account?.companyFollowingIds?.includes(company._id) ?? false;
+
+  const toggleFollowCompany = async (): Promise<void> => {
+    try {
+      const { data } = await followCompany({
+        variables: { follow: !isFollowing, companyId: company._id },
+        refetchQueries: ["Account"],
+      });
+
+      if (!data?.followCompany) {
+        console.log("err", data);
+      }
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
+
+  const managerLookup = company.fundManagers.reduce((acc, manager) => {
+    acc[manager._id] = manager;
+    return acc;
+  }, {} as { [key: string]: Company["fundManagers"][number] });
+
   return (
     <>
       <div className="hidden lg:grid grid-cols-4 py-4">
         <div className="flex items-center">
-          <Avatar
-            size={56}
-            src={company.avatar}
-            className="bg-white rounded-full overflow-hidden"
-          />
+          <Avatar size={56} src={company.avatar} />
           <div className="text-sm text-white ml-3">{company.name}</div>
         </div>
-        <div className="flex items-center px-1">
-          <div className="text-sm text-white">{company.name} Fund</div>
+        <div className="flex flex-col justify-center px-1">
+          {company.funds.map((fund) => (
+            <div key={fund._id} className="text-sm text-white">
+              {fund.name}
+            </div>
+          ))}
         </div>
         <div className="flex items-center px-1">
           <div className="text-sm text-white">
-            {company.manager.firstName} {company.manager.lastName}
+            {company.fundManagers?.map((manager) => (
+              <p key={manager._id}>
+                {manager.firstName} {manager.lastName}
+              </p>
+            ))}
           </div>
         </div>
         <div className="flex items-center justify-end">
           <Button
             variant="text"
-            className="text-primary font-normal tracking-normal py-0"
+            className="text-primary font-medium text-md py-0 uppercase"
+            onClick={toggleFollowCompany}
           >
-            FOLLOW
+            {isFollowing ? "unfollow" : "follow"}
           </Button>
-          <Button
-            variant="outline-primary"
-            className="text-primary text-white tracking-normal ml-4"
-          >
-            VIEW PROFILE
-          </Button>
+          <Link href={`/company/${company._id}`}>
+            <a>
+              <Button
+                variant="primary"
+                className={`text-primary text-white tracking-normal ml-4
+              bg-purple-dark border border-primary-solid hover:bg-primary-solid`}
+              >
+                VIEW PROFILE
+              </Button>
+            </a>
+          </Link>
         </div>
       </div>
-      <Card className="block lg:hidden border-0 rounded-none bg-primary-solid/[.07] px-5 py-3">
+      <Card
+        className={`block lg:hidden border-0 rounded-none
+        bg-primary-solid/[.07] px-5 py-3`}
+      >
         <div className="flex items-center">
           <Avatar
             size={56}
@@ -53,22 +97,23 @@ const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
           />
           <div className="w-14 ml-4">
             <div className="text-sm text-white font-medium">
-              {company.postIds.length}
+              {company.postIds?.length ?? 0}
             </div>
             <div className="text-xs text-white">Posts</div>
           </div>
           <div className="w-14 ml-4">
             <div className="text-sm text-white font-medium">
-              {company.followerIds.length}
+              {company.followerIds?.length ?? 0}
             </div>
             <div className="text-xs text-white">Followers</div>
           </div>
           <div className="ml-auto">
             <Button
               variant="outline-primary"
-              className="text-primary text-white tracking-normal"
+              className="text-primary text-white uppercase"
+              onClick={toggleFollowCompany}
             >
-              FOLLOW
+              {isFollowing ? "unfollow" : "follow"}
             </Button>
           </div>
         </div>
@@ -77,25 +122,28 @@ const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
         <div className="text-xs text-white">FUNDS MANAGED</div>
         <div className="mb-2">
           <div className="text-sm text-primary">{company.name} Fund</div>
-          <div className="flex mt-2">
-            <Avatar
-              size={24}
-              src={company.manager.avatar}
-              className="bg-white rounded-full overflow-hidden"
-            />
-            <div className="ml-2">
-              <div className="text-sm text-white">
-                {company.manager.firstName} {company.manager.lastName}
+          {company.funds.map((fund) => (
+            <div key={fund._id} className="flex mt-2">
+              <Avatar
+                size={24}
+                src={managerLookup[fund.managerId]?.avatar}
+                className="bg-white rounded-full overflow-hidden"
+              />
+              <div className="ml-2">
+                <div className="text-sm text-white">
+                  {managerLookup[fund.managerId]?.firstName}{" "}
+                  {managerLookup[fund.managerId]?.lastName}
+                </div>
+                <div className="text-xs text-gray-600">CEO</div>
               </div>
-              <div className="text-xs text-gray-600">CEO</div>
-            </div>
-            <div className="flex ml-3 mt-0.5">
-              <div className="text-success">
-                <ShieldCheck color="currentColor" weight="fill" size={16} />
+              <div className="flex ml-3 mt-0.5">
+                <div className="text-success">
+                  <ShieldCheck color="currentColor" weight="fill" size={16} />
+                </div>
+                <div className="text-xs text-white ml-1">PRO</div>
               </div>
-              <div className="text-xs text-white ml-1">PRO</div>
             </div>
-          </div>
+          ))}
         </div>
       </Card>
     </>
