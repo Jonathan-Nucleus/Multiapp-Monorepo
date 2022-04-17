@@ -77,18 +77,20 @@ const createUsersCollection = (
     },
 
     /**
-     * Provides a list of all users stored within the DB. Note that this does
-     * not include stub accounts for users with pending invitations.
+     * Provides a list of all users stored within the DB.
      *
-     * @param ids An optional array of specific IDs to filter by.
+     * @param ids           An optional array of specific IDs to filter by.
+     * @param includeStubs  Whether or not to include stub users. Defaults to
+     *                      false.
      *
      * @returns {User[]}  An array of User objects.
      */
     findAll: async (
-      ids: MongoId[] | undefined = undefined
+      ids: MongoId[] | undefined = undefined,
+      includeStubs = false
     ): Promise<User.Mongo[]> => {
       const query = {
-        firstName: { $exists: true },
+        ...(includeStubs ? {} : { firstName: { $exists: true } }),
         ...(ids !== undefined
           ? { _id: { $in: ids ? toObjectIds(ids) : ids } }
           : {}),
@@ -211,7 +213,7 @@ const createUsersCollection = (
         lastName,
         authProvider: provider,
         role: UserRoleOptions.USER,
-        accreditation: AccreditationOptions.NONE,
+        accreditation: AccreditationOptions.NONE.value,
       };
 
       await usersCollection.insertOne(newUser);
@@ -249,7 +251,7 @@ const createUsersCollection = (
         firstName,
         lastName,
         role: UserRoleOptions.USER,
-        accreditation: AccreditationOptions.NONE,
+        accreditation: AccreditationOptions.NONE.value,
       };
 
       await usersCollection.replaceOne({ _id: userData._id }, newUser);
@@ -377,7 +379,7 @@ const createUsersCollection = (
 
       await usersCollection.updateOne(
         { _id: toObjectId(userId) },
-        { $addToSet: { invitees: stubUser._id } }
+        { $addToSet: { inviteeIds: stubUser._id } }
       );
 
       return stubUser;

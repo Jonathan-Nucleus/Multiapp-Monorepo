@@ -4,12 +4,12 @@ import { Info, Lock } from "phosphor-react";
 import Button from "../../../common/Button";
 import { useFetchFunds } from "mobile/src/graphql/query/marketplace";
 import FundsList from "./FundsList";
-import { useSession } from "next-auth/react";
+import { useAccount } from "mobile/src/graphql/query/account";
 
 const FundsPage: FC = () => {
   const { data } = useFetchFunds();
   const funds = data?.funds ?? [];
-  const { data: session } = useSession();
+  const { data: accountData } = useAccount();
   return (
     <>
       <Navbar />
@@ -24,7 +24,7 @@ const FundsPage: FC = () => {
           </Button>
         </header>
         <div className="my-9">
-          {session?.user?.acc == "none" ? (
+          {accountData?.account?.accreditation == "NONE" ? (
             <div className="backdrop-blur text-center px-4 pt-36 pb-64">
               <div className="text-2xl text-white flex items-center justify-center">
                 <Lock color="currentColor" size={48} weight="light" />

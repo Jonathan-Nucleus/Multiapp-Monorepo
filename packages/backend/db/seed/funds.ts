@@ -16,7 +16,7 @@ const MAX_TAGS_PER_FUND = 5;
 const NUM_HIGHLIGHTS = 4;
 
 const accreditationValues = Object.keys(AccreditationOptions).map(
-  (key) => AccreditationOptions[key]
+  (key) => AccreditationOptions[key].value
 );
 
 export default async function (
@@ -59,7 +59,7 @@ export default async function (
             y: 0,
             scale: 1,
           },
-          highlights: [...Array(4).map(() => faker.lorem.sentence())],
+          highlights: [...Array(4)].map(() => faker.lorem.sentence()),
           overview: faker.lorem.paragraph(8),
           teamIds: Array.from(
             new Set(

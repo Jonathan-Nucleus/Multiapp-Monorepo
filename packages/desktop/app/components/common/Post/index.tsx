@@ -42,7 +42,7 @@ const Post: FC<PostProps> = ({ post }: PostProps) => {
     <Card className="border-0 p-0 rounded-none	md:rounded-2xl">
       <div className="flex items-center px-4 pt-4">
         <div className="w-14 h-14 flex items-center justify-center">
-          {user && user.avatar && <Avatar size={56} src={user.avatar} />}
+          {user && <Avatar size={56} src={user.avatar} />}
         </div>
         <div className="ml-2">
           <div className="flex items-center">
@@ -104,7 +104,7 @@ const Post: FC<PostProps> = ({ post }: PostProps) => {
           >
             <ThumbsUp
               weight={liked ? "fill" : "light"}
-              color={liked ? "#00AAE0" : "currentColor"}
+              color={liked ? "#A5A1FF" : "currentColor"}
               size={24}
             />
             {post.likeIds && post.likeIds.length > 0 && (
@@ -125,12 +125,17 @@ const Post: FC<PostProps> = ({ post }: PostProps) => {
         <div className="opacity-60 text-white ml-10">
           <div className="flex items-center cursor-pointer">
             <Share weight="light" color="currentColor" size={24} />
-            {/*<div className="text-white ml-2">{post.shares}</div>*/}
+            {post.shareIds?.length > 0 && (
+              <div className="text-white ml-2">{post.shareIds.length}</div>
+            )}
           </div>
         </div>
         <div className="ml-auto flex items-center opacity-60">
           {post.likeIds && post.likeIds.length > 0 && (
-            <div className="text-white">{post.likeIds.length} Likes</div>
+            <div className="text-white">
+              {post.likeIds.length}{" "}
+              {post.likeIds.length === 1 ? "Like" : "Likes"}
+            </div>
           )}
 
           <div className="ml-3">

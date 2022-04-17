@@ -29,11 +29,12 @@ const navItems = [
     path: "/funds",
     active: ["/funds", "/funds/managers", "/funds/companies"],
   },
+  /* Remove this for now as it is not in scope for MVP.
   {
     icon: <ChartLineUp color="white" size={24} />,
     title: "Portfolio",
     path: "/portfolio",
-  },
+  },*/
 ];
 
 const Header: FC = () => {
@@ -42,7 +43,7 @@ const Header: FC = () => {
     <header className="bg-surface-light10 shadow shadow-black sticky top-0 z-10">
       <nav className="hidden md:flex flex-row items-center p-5">
         <div>
-          <div className="w-72 hidden lg:block">
+          <div className="w-80 hidden lg:block mr-5">
             <Link href="/">
               <a className="flex items-center">
                 <Image src={Logo} alt="" layout={"intrinsic"} />

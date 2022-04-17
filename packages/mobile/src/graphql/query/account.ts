@@ -244,3 +244,42 @@ export function useChatToken(): QueryResult<ChatTokenData, ChatTokenVariables> {
     `,
   );
 }
+
+type InvitesVariables = never;
+export type InvitesData = {
+  account: Pick<User, '_id'> & {
+    invitees: Pick<User, 'avatar' | 'email' | 'firstName' | 'lastName'>;
+  };
+};
+
+/**
+ * GraphQL query that fetches invitations sent by this user.
+ *
+ * @returns   GraphQL query.
+ */
+export function useInvites(
+  options?: QueryHookOptions<InvitesData, InvitesVariables>,
+): QueryResult<InvitesData, InvitesVariables> {
+  return useQuery<InvitesData, InvitesVariables>(
+    gql`
+      query Invites {
+        account {
+          _id
+          invitees {
+            __typename
+            ... on User {
+              avatar
+              email
+              firstName
+              lastName
+            }
+            ... on UserStub {
+              email
+            }
+          }
+        }
+      }
+    `,
+    { ...options },
+  );
+}

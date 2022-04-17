@@ -317,12 +317,10 @@ const resolvers = {
         validateArgs(validator, args);
 
         const { post } = args;
-
         const postData = await db.posts.create(post, user._id);
 
-        const isAdded = await db.users.addPost(postData._id, user._id);
-
-        if (!isAdded) {
+        const wasAdded = await db.users.addPost(postData._id, user._id);
+        if (!wasAdded) {
           throw new InternalServerError("Not able to create a post");
         }
 

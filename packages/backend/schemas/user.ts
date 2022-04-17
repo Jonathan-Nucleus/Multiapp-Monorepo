@@ -8,6 +8,8 @@ import { Fund } from "./fund";
 export interface ContentCreatorProps {
   avatar?: string;
   background?: AdjustableImage;
+  tagline?: string;
+  overview?: string;
   postIds?: ObjectId[];
   commentIds?: ObjectId[];
   followerIds?: ObjectId[];
@@ -91,6 +93,7 @@ export namespace User {
     hiddenUsers: User.GraphQL[];
     invitees: (User.Stub | User.GraphQL)[];
     company?: Company.GraphQL;
+    watchlist: Fund.GraphQL[];
   };
 
   export type Input = Required<
@@ -136,13 +139,25 @@ export type UserRoleEnum = keyof typeof UserRoleOptions;
 
 /** Enumeration describing the accreditation status of the user. */
 export const AccreditationOptions = {
-  NONE: "none",
-  ACCREDITED: "accredited",
-  QUALIFIED_CLIENT: "client",
-  QUALIFIED_PURCHASER: "purchaser",
+  NONE: {
+    value: "none",
+    label: "Unaccredited",
+  },
+  ACCREDITED: {
+    value: "accredited",
+    label: "Accredited Investor",
+  },
+  QUALIFIED_CLIENT: {
+    value: "client",
+    label: "Qualified Client",
+  },
+  QUALIFIED_PURCHASER: {
+    value: "purchaser",
+    label: "Qualified Purchaser",
+  },
   // RIA: "ria",                        NOT MVP
 } as const;
-export type Accreditation = ValueOf<typeof AccreditationOptions>;
+export type Accreditation = ValueOf<typeof AccreditationOptions>["value"];
 export type AccreditationEnum = keyof typeof AccreditationOptions;
 
 export function compareAccreditation(
@@ -150,10 +165,10 @@ export function compareAccreditation(
   b: Accreditation
 ): number {
   const accreditationRanking = [
-    AccreditationOptions.NONE,
-    AccreditationOptions.ACCREDITED,
-    AccreditationOptions.QUALIFIED_CLIENT,
-    AccreditationOptions.QUALIFIED_PURCHASER,
+    AccreditationOptions.NONE.value,
+    AccreditationOptions.ACCREDITED.value,
+    AccreditationOptions.QUALIFIED_CLIENT.value,
+    AccreditationOptions.QUALIFIED_PURCHASER.value,
   ];
 
   return accreditationRanking.indexOf(a) - accreditationRanking.indexOf(b);
@@ -185,6 +200,8 @@ export type PostViolationEnum = keyof typeof PostViolationOptions;
 export const ContentCreatorSchema = `
   avatar: String
   background: AdjustableImage
+  tagline: String
+  overview: String
   postIds: [ID!]
   commentIds: [ID!]
   followerIds: [ID!]

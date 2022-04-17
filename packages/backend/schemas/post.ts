@@ -1,7 +1,12 @@
 import { ObjectId } from "mongodb";
 import { ValueOf, GraphQLEntity } from "../lib/mongo-helper";
 
-import { User, AccreditationOptions } from "./user";
+import {
+  User,
+  AccreditationOptions,
+  Accreditation,
+  AccreditationEnum,
+} from "./user";
 import type { Comment } from "./comment";
 
 export namespace Post {
@@ -41,13 +46,21 @@ export namespace Post {
 }
 
 /** Enumeration describing the audience targeted by a post. */
-const { NONE: ignored, ...relevantAccrediationOptions } = AccreditationOptions;
+const { NONE: ignored, ...relevantAccrediationOptions } = Object.keys(
+  AccreditationOptions
+).reduce<{
+  [key: string]: string;
+}>((acc, option) => {
+  acc[option] = AccreditationOptions[option].value;
+  return acc;
+}, {});
+
 export const AudienceOptions = {
   EVERYONE: "everyone",
   ...relevantAccrediationOptions,
 } as const;
-export type Audience = ValueOf<typeof AudienceOptions>;
-export type AudienceEnum = keyof typeof AudienceOptions;
+export type Audience = ValueOf<typeof AudienceOptions> | Accreditation;
+export type AudienceEnum = keyof typeof AudienceOptions | AccreditationEnum;
 
 /** Enumeration describing the possible cateogories of a post. */
 export const PostCategoryOptions = {

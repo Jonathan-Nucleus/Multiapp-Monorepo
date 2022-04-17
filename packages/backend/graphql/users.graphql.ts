@@ -13,7 +13,7 @@ import {
   PostViolationOptions,
   PostViolationEnum,
 } from "../schemas/user";
-import type { User, ReportedPost } from "../schemas/user";
+import { User, ReportedPost, isUser } from "../schemas/user";
 import type { Post } from "../schemas/post";
 import type { Comment } from "../schemas/comment";
 import type { Company } from "../schemas/company";
@@ -86,7 +86,12 @@ export const publicUserResolvers = {
 
 const resolvers = {
   UserRole: UserRoleOptions,
-  Accreditation: AccreditationOptions,
+  Accreditation: Object.keys(AccreditationOptions).reduce<{
+    [key: string]: string;
+  }>((acc, option) => {
+    acc[option] = AccreditationOptions[option].value;
+    return acc;
+  }, {}),
   PostViolation: Object.keys(PostViolationOptions).reduce<{
     [key: string]: string;
   }>((acc, option) => {
@@ -96,6 +101,11 @@ const resolvers = {
   UserProfile: {
     ...contentCreatorResolvers,
     ...publicUserResolvers,
+  },
+  Invitee: {
+    __resolveType(obj: User.Mongo | User.Stub): string {
+      return isUser(obj) ? "User" : "UserStub";
+    },
   },
   User: {
     ...contentCreatorResolvers,
@@ -136,7 +146,7 @@ const resolvers = {
       parent: User.Mongo,
       argsIgnored: NoArgs,
       { db }: ApolloServerContext
-    ) => (parent.inviteeIds ? db.users.findAll(parent.inviteeIds) : []),
+    ) => (parent.inviteeIds ? db.users.findAll(parent.inviteeIds, true) : []),
   },
 
   ReportedPost: {

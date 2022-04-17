@@ -19,7 +19,7 @@ const HomePage: FC = () => {
   const user = accountData?.account;
   const companies: Company[] = accountData?.account.companies ?? [];
   if (!user) {
-    return null;
+    return <></>;
   }
 
   return (
@@ -44,9 +44,11 @@ const HomePage: FC = () => {
         </div>
         <div className="w-80 hidden lg:block flex-shrink-0 mx-4">
           <InviteFriends />
-          <div className="mt-5">
-            <WatchList />
-          </div>
+          {user.watchlistIds && user.watchlistIds.length > 0 && (
+            <div className="mt-5">
+              <WatchList />
+            </div>
+          )}
         </div>
         <div className="block md:hidden absolute bottom-5 right-5">
           <Button

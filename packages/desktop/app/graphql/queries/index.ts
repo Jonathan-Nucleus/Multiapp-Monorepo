@@ -31,6 +31,7 @@ export type FetchPostsData = {
     | "commentIds"
     | "createdAt"
     | "categories"
+    | "shareIds"
   > & {
     user: Pick<
       Post["user"],
@@ -47,6 +48,7 @@ export const VIEW_POST_FRAGMENT = gql`
     mediaUrl
     mentionIds
     likeIds
+    shareIds
     commentIds
     createdAt
     user {
@@ -97,8 +99,15 @@ export type AccountData = {
     | "followerIds"
     | "postIds"
     | "followingIds"
+    | "watchlistIds"
   > & {
     companies: Pick<User["companies"][number], "_id" | "name" | "avatar">[];
+    watchlist: Pick<
+      User["watchlist"][number],
+      "_id" | "name" | "avatar" | "companyId" | "managerId"
+    > & {
+      company: Pick<User["watchlist"][number]["company"], "name">;
+    };
   };
 };
 

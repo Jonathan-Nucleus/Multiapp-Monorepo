@@ -48,6 +48,8 @@ export default async function (db: Db): Promise<ObjectId[]> {
       website: faker.internet.url(),
       avatar: avatars[index % avatars.length],
       position: faker.name.jobTitle(),
+      tagline: faker.lorem.sentence(),
+      overview: faker.lorem.paragraph(),
     };
   });
 
