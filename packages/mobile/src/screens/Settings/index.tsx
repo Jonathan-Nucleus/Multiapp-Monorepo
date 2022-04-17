@@ -69,13 +69,13 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
       icon: <Alsvg />,
     },
     {
-      id: '21',
+      id: '212',
       label: 'Account Admin',
       onPress: () => navigation.navigate('AccountAdmin'),
       icon: <Gear size={26} color={WHITE} />,
     },
     {
-      id: '1',
+      id: '11',
       label: 'Preferences',
       onPress: () => navigation.navigate('Preferences'),
       icon: <SlidersHorizontal size={26} color={WHITE} />,
@@ -93,7 +93,7 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
       icon: <ShieldWarning size={26} color={WHITE} />,
     },
     {
-      id: '2',
+      id: '12312',
       label: 'Invite Your Friends',
       onPress: () => navigation.navigate('InviteFriends'),
       icon: <EnvelopeSimple size={26} color={WHITE} />,
@@ -160,7 +160,9 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
         </TouchableOpacity>
         {account?.companies.map((company) => (
           <TouchableOpacity
-            onPress={() => navigation.navigate('CompanySettings')}
+            onPress={() =>
+              navigation.navigate('CompanySettings', { companyId: company._id })
+            }
             key={company._id}>
             <View style={[styles.item, styles.border]}>
               <FastImage

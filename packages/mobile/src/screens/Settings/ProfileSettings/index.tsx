@@ -142,11 +142,15 @@ const ProfileSettings: FC<RouterProps> = ({ navigation }) => {
         <View style={[styles.row, styles.social]}>
           <View style={styles.row}>
             <TouchableOpacity
-              onPress={() => Linking.openURL('www.twitter.com')}>
+              onPress={() =>
+                Linking.openURL(account.twitter ?? 'www.linkedin.com')
+              }>
               <LinkedinSvg />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => Linking.openURL('www.twitter.com')}
+              onPress={() =>
+                Linking.openURL(account.twitter ?? 'www.twitter.com')
+              }
               style={styles.icon}>
               <TwitterSvg />
             </TouchableOpacity>

@@ -121,9 +121,37 @@ export function useAccount(
           role
           accreditation
           position
-          followerIds
           postIds
+          website
+          linkedIn
+          twitter
+          followerIds
           followingIds
+          following {
+            _id
+            firstName
+            lastName
+            avatar
+            position
+            company {
+              _id
+              name
+            }
+          }
+          followers {
+            _id
+            firstName
+            lastName
+            avatar
+            position
+            company {
+              _id
+              name
+              website
+              linkedIn
+              twitter
+            }
+          }
           background {
             url
             x
@@ -132,6 +160,21 @@ export function useAccount(
             height
             scale
           }
+          watchlist {
+            _id
+            name
+            avatar
+            companyId
+            managerId
+            company {
+              _id
+              name
+              website
+              linkedIn
+              twitter
+            }
+          }
+          watchlistIds
           companies {
             _id
             name
@@ -141,11 +184,27 @@ export function useAccount(
               firstName
               lastName
               avatar
-              position
               company {
+                _id
                 name
-                avatar
+                website
+                linkedIn
+                twitter
               }
+            }
+            following {
+              _id
+              firstName
+              lastName
+              avatar
+              position
+            }
+            followers {
+              _id
+              firstName
+              lastName
+              avatar
+              position
             }
             followerIds
             postIds
@@ -158,7 +217,6 @@ export function useAccount(
               height
               scale
             }
-            website
           }
         }
       }

@@ -9,13 +9,24 @@ import CreatePost from '../screens/Home/CreatePost';
 import Notification from '../screens/Notification';
 import NotificationDetail from '../screens/Notification/Details';
 import ChooseCategory from '../screens/Home/ChooseCategory';
+import ReviewPost from '../screens/Home/ReviewPost';
 
 const Stack = createStackNavigator();
 
 type HomeStackParamList = {
   Home: undefined;
-  CreatePost: { categories: string[] };
-  ChooseCategory: undefined;
+  CreatePost: undefined;
+  ChooseCategory: {
+    description: string;
+    mentions: string[];
+    imageData: object;
+  };
+  ReviewPost: {
+    description: string;
+    mentions: string[];
+    imageData: object;
+    categories: string[];
+  };
 };
 
 export type HomeScreen = (
@@ -30,6 +41,10 @@ export type ChooseCategoryScreen = (
   props: StackScreenProps<HomeStackParamList, 'ChooseCategory'>,
 ) => ReactElement;
 
+export type ReviewPostScreen = (
+  props: StackScreenProps<HomeStackParamList, 'ReviewPost'>,
+) => ReactElement;
+
 const HomeStack = () => {
   return (
     <Stack.Navigator
@@ -40,6 +55,7 @@ const HomeStack = () => {
       <Stack.Screen name="Notification" component={Notification} />
       <Stack.Screen name="NotificationDetail" component={NotificationDetail} />
       <Stack.Screen name="ChooseCategory" component={ChooseCategory} />
+      <Stack.Screen name="ReviewPost" component={ReviewPost} />
     </Stack.Navigator>
   );
 };

@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Linking,
 } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import {
   WHITE,
   WHITE12,
@@ -24,12 +25,40 @@ import PGradientOutlineButton from '../../../components/common/PGradientOutlineB
 import LinkedinSvg from 'shared/assets/images/linkedin.svg';
 import TwitterSvg from 'shared/assets/images/twitter.svg';
 import DotsThreeVerticalSvg from 'shared/assets/images/dotsThreeVertical.svg';
-import FastImage from 'react-native-fast-image';
+import { useAccount } from '../../../graphql/query/account';
+import { useFollowCompany } from '../../../graphql/mutation/account';
 
 interface CompanyProp {
   company: Company;
 }
 const CompanyProfile: FC<CompanyProp> = ({ company }) => {
+  const { data: accountData, refetch } = useAccount();
+  const [followCompany] = useFollowCompany();
+  const userId = accountData?.account._id;
+
+  const isFollower = useMemo(() => {
+    if (company.followerIds && company.followerIds.length > 0) {
+      return company.followerIds.indexOf(userId) > -1 ? true : false;
+    }
+    return false;
+  }, [company]);
+
+  const toggleFollowCompany = async (id: string): Promise<void> => {
+    try {
+      const follow = isFollower ? false : true;
+      const { data } = await followCompany({
+        variables: { follow: follow, companyId: id },
+      });
+      if (data?.followCompany) {
+        refetch();
+      } else {
+        console.log('err', data);
+      }
+    } catch (err) {
+      console.log('err', err);
+    }
+  };
+
   return (
     <>
       {company.background && (
@@ -78,29 +107,40 @@ const CompanyProfile: FC<CompanyProp> = ({ company }) => {
             gradientContainer={styles.button}
           />
           <PGradientButton
-            label="follow"
-            onPress={() => console.log(11)}
+            label={isFollower ? 'unfollow' : 'follow'}
+            onPress={() => toggleFollowCompany(company._id)}
             gradientContainer={styles.button}
           />
         </View>
       </View>
       <View style={[styles.row, styles.social]}>
-        <TouchableOpacity onPress={() => Linking.openURL('www.twitter.com')}>
-          <LinkedinSvg />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => Linking.openURL('www.twitter.com')}>
-          <TwitterSvg />
-        </TouchableOpacity>
-        {company.website && (
-          <>
-            <View style={styles.verticalLine} />
-            <TouchableOpacity onPress={() => Linking.openURL(company.website)}>
-              <Text style={styles.website} numberOfLines={1}>
-                {company.website}
-              </Text>
-            </TouchableOpacity>
-          </>
-        )}
+        <View style={styles.socialView}>
+          <TouchableOpacity
+            onPress={() =>
+              Linking.openURL(company.linkedIn ?? 'www.linkedin.com')
+            }>
+            <LinkedinSvg />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() =>
+              Linking.openURL(company.twitter ?? 'www.twitter.com')
+            }
+            style={styles.socialItem}>
+            <TwitterSvg />
+          </TouchableOpacity>
+
+          {company.website && (
+            <>
+              <View style={styles.verticalLine} />
+              <TouchableOpacity
+                onPress={() => Linking.openURL(company.website)}>
+                <Text style={styles.website} numberOfLines={1}>
+                  {company.website}
+                </Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
         <TouchableOpacity>
           <DotsThreeVerticalSvg />
         </TouchableOpacity>
@@ -167,6 +207,7 @@ const styles = StyleSheet.create({
   },
   social: {
     paddingVertical: 8,
+    paddingLeft: 16,
     borderTopColor: GRAY100,
     borderBottomColor: GRAY100,
     borderBottomWidth: 1,
@@ -174,6 +215,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     backgroundColor: BGHEADER,
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
   verticalLine: {
     height: 32,
@@ -188,5 +230,11 @@ const styles = StyleSheet.create({
   },
   button: {
     width: Dimensions.get('screen').width / 2 - 24,
+  },
+  socialView: {
+    flexDirection: 'row',
+  },
+  socialItem: {
+    marginHorizontal: 16,
   },
 });

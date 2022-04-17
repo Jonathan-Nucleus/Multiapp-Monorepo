@@ -1,16 +1,12 @@
-import React, { useState } from 'react';
-import { StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import PLabel from '../../components/common/PLabel';
-import { GRAY800, WHITE60 } from 'shared/src/colors';
-import { Body1 } from '../../theme/fonts';
+import { WHITE60 } from 'shared/src/colors';
 import pStyles from '../../theme/pStyles';
 import PostCategory from './PostCategory';
-import PHeader from '../../components/common/PHeader';
-import RoundIcon from '../../components/common/RoundIcon';
-
-import BackSvg from '../../assets/icons/back.svg';
+import PostHeader from './PostHeader';
 import PAppContainer from '../../components/common/PAppContainer';
 import { ChooseCategoryScreen } from 'mobile/src/navigations/HomeStack';
 
@@ -30,8 +26,20 @@ const CategoryList: CategoryItem[] = [
   { id: 7, txt: 'Education', isChecked: false },
 ];
 
-const ChooseCategory: ChooseCategoryScreen = ({ navigation }) => {
+const ChooseCategory: ChooseCategoryScreen = ({ route, navigation }) => {
   const [categories, setCategories] = useState(CategoryList);
+  const [mentions, setMentions] = useState<string[]>([]);
+  const [imageData, setImageData] = useState<object>({});
+  const [description, setDescription] = useState('');
+
+  useEffect(() => {
+    const { description, mentions, imageData } = route.params;
+    if (description && imageData) {
+      setDescription(description);
+      setMentions(mentions);
+      setImageData(imageData);
+    }
+  }, [route, route.params]);
 
   const handleChange = (id: number) => {
     const temp = categories.map((category) => {
@@ -76,29 +84,22 @@ const ChooseCategory: ChooseCategoryScreen = ({ navigation }) => {
         updatedCategories.push(category.txt.toUpperCase());
       }
     });
-    navigation.navigate('CreatePost', { categories: updatedCategories });
+    navigation.navigate('ReviewPost', {
+      description,
+      mentions,
+      imageData,
+      categories: updatedCategories,
+    });
   };
 
   return (
     <SafeAreaView style={pStyles.globalContainer}>
-      <PHeader
-        leftIcon={
-          <RoundIcon icon={<BackSvg />} onPress={() => navigation.goBack()} />
-        }
-        centerIcon={
-          <PLabel label="Choose Categories" textStyle={styles.headerTitle} />
-        }
-        rightIcon={
-          <TouchableOpacity onPress={handleNext}>
-            <PLabel
-              label="NEXT"
-              textStyle={
-                checkValidation() ? styles.headerTitle : styles.disabledText
-              }
-            />
-          </TouchableOpacity>
-        }
-        containerStyle={styles.headerContainer}
+      <PostHeader
+        centerLabel="Choose Categories"
+        rightLabel="NEXT"
+        rightValidation={checkValidation()}
+        navigation={navigation}
+        handleNext={handleNext}
       />
       <PAppContainer>
         <PLabel
@@ -118,18 +119,6 @@ const ChooseCategory: ChooseCategoryScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  headerContainer: {
-    justifyContent: 'space-between',
-    paddingTop: 0,
-    marginBottom: 0,
-  },
-  headerTitle: {
-    ...Body1,
-  },
-  disabledText: {
-    ...Body1,
-    color: GRAY800,
-  },
   catWrapper: {
     marginTop: 8,
     marginBottom: 32,

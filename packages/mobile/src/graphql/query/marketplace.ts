@@ -76,6 +76,8 @@ export const GET_FUND_MANAGERS = gql`
         lastName
         avatar
         managedFundsIds
+        followerIds
+        postIds
       }
     }
   }

@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import {
   StyleSheet,
   FlatList,
@@ -8,7 +8,11 @@ import {
   TouchableOpacity,
   Linking,
 } from 'react-native';
-import { useIsFocused, NavigationProp } from '@react-navigation/native';
+import {
+  useIsFocused,
+  NavigationProp,
+  RouteProp,
+} from '@react-navigation/native';
 import { CaretLeft } from 'phosphor-react-native';
 import {
   WHITE,
@@ -35,30 +39,39 @@ import { useFetchPosts } from '../../../hooks/queries';
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
+  route: RouteProp<any, any>;
 }
 
-const CompanySettings: FC<RouterProps> = ({ navigation }) => {
-  const { data, error, loading, refetch } = useFetchPosts();
+const CompanySettings: FC<RouterProps> = ({ navigation, route }) => {
+  const { data, refetch } = useFetchPosts();
   const { data: accountData } = useAccount();
   const postData = data?.posts;
-
   const isFocused = useIsFocused();
   const [focusState, setFocusState] = useState(isFocused);
+  const companyLists: Company[] = accountData?.account.companies ?? [];
+
   if (isFocused !== focusState) {
-    // Refetch whenever the focus state changes to avoid refetching during
-    // rerender cycles
     console.log('refetching...');
     refetch();
     setFocusState(isFocused);
   }
 
-  const companyLists: Company[] = accountData?.account.companies ?? [];
+  const company = useMemo<Company>(() => {
+    if (route.params?.companyId && companyLists) {
+      return companyLists.find((v) => v._id === route.params?.companyId);
+    }
+    return null;
+  }, [route, companyLists]);
 
   const renderItem = ({ item }: { item: PostItemProps }) => (
     <TouchableOpacity>
       <FeaturedItem post={item} />
     </TouchableOpacity>
   );
+
+  if (!company) {
+    return null;
+  }
 
   return (
     <View style={pStyles.globalContainer}>
@@ -71,14 +84,10 @@ const CompanySettings: FC<RouterProps> = ({ navigation }) => {
         onPressLeft={() => navigation.goBack()}
       />
       <PAppContainer style={styles.container}>
-        {companyLists.map((company) => (
-          <CompanyProfile company={company} key={company._id} />
-        ))}
+        <CompanyProfile company={company} key={company._id} />
         <Funds />
         <View style={styles.posts}>
-          {companyLists.map((company) => (
-            <Members members={company.members || []} key={company._id} />
-          ))}
+          <Members members={company.members || []} key={company._id} />
           {postData.length > 0 && (
             <View>
               <Text style={styles.text}>Featured Posts</Text>

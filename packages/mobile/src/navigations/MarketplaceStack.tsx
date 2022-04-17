@@ -4,19 +4,14 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import { StackScreenProps } from '@react-navigation/stack';
 
 const Tab = createMaterialTopTabNavigator();
-import {
-  BLACK,
-  WHITE,
-  BGHEADER,
-  PRIMARY,
-  PRIMARYSTATE,
-} from 'shared/src/colors';
+import { BLACK, WHITE, PRIMARYSTATE, WHITE60 } from 'shared/src/colors';
 
 import Funds from '../screens/Marketplace/Funds';
 import Managers from '../screens/Marketplace/Managers';
 import Companies from '../screens/Marketplace/Companies';
 import MainHeader from '../components/main/Header';
-import { Body3 } from '../theme/fonts';
+import { Body2 } from '../theme/fonts';
+import { MarketplaceScreen } from './FundsStack';
 
 type MarketplaceStackParamList = {
   Funds: undefined;
@@ -36,21 +31,21 @@ export type FundCompaniesScreen = (
   props: StackScreenProps<MarketplaceStackParamList, 'Companies'>,
 ) => ReactElement;
 
-const MarketplaceStack = ({ navigation }) => {
+const MarketplaceStack: MarketplaceScreen = () => {
   return (
     <View style={styles.globalContainer}>
-      <MainHeader navigation={navigation} />
+      <MainHeader />
       <Tab.Navigator
         screenOptions={({ route }) => ({
           tabBarStyle: styles.tabBar,
           tabBarIndicatorStyle: styles.tabBarIndicator,
           tabBarActiveTintColor: WHITE,
-          tabBarInactiveTintColor: PRIMARY,
+          tabBarInactiveTintColor: WHITE60,
           tabBarLabel: ({ focused, color }) => (
             <Text
               style={[
                 styles.tabBarLabel,
-                Body3,
+                Body2,
                 { color },
                 focused ? styles.bold : {},
               ]}>
@@ -75,7 +70,7 @@ const styles = StyleSheet.create({
     backgroundColor: BLACK,
   },
   tabBar: {
-    backgroundColor: BGHEADER,
+    backgroundColor: BLACK,
     marginTop: 0,
     paddingTop: 0,
   },
@@ -83,7 +78,6 @@ const styles = StyleSheet.create({
     backgroundColor: PRIMARYSTATE,
   },
   tabBarLabel: {
-    textTransform: 'uppercase',
     letterSpacing: 1.25,
   },
   bold: {

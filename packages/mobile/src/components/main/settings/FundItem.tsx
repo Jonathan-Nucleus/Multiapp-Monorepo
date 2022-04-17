@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { TouchableOpacity, Text, View, StyleSheet } from 'react-native';
 import { Star } from 'phosphor-react-native';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
@@ -11,9 +11,14 @@ import {
   WHITE12,
   SUCCESS30,
   GRAY900,
+  PRIMARYSOLID,
 } from 'shared/src/colors';
 import { Body1, Body3, Body4 } from 'mobile/src/theme/fonts';
+import type { Fund } from 'backend/graphql/funds.graphql';
+import { useWatchFund } from '../../../graphql/mutation/account';
+import { useAccount } from '../../../graphql/query/account';
 import { FetchFundsData } from '../../../graphql/query/marketplace';
+import * as NavigationService from '../../../services/navigation/NavigationService';
 
 export type Fund = Exclude<FetchFundsData['funds'], undefined>[number];
 
@@ -22,6 +27,32 @@ interface FundItemProps {
 }
 
 const FundItem: React.FC<FundItemProps> = ({ fund }: FundItemProps) => {
+  const { data: accountData, refetch } = useAccount();
+  const [watchFund] = useWatchFund();
+  const watchList: Fund[] = accountData?.account.watchlist ?? [];
+
+  const isWatch = useMemo(() => {
+    if (fund && watchList.length) {
+      return watchList.find((v) => v._id === fund._id) ? true : false;
+    }
+    return false;
+  }, [fund, watchList]);
+
+  const handleRemoveWahchList = async (id: string): Promise<void> => {
+    try {
+      const { data } = await watchFund({
+        variables: { watch: isWatch ? false : true, fundId: id },
+      });
+      if (data?.watchFund) {
+        refetch();
+      } else {
+        console.log('err', data);
+      }
+    } catch (err) {
+      console.log('err', err);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.top}>
@@ -61,10 +92,22 @@ const FundItem: React.FC<FundItemProps> = ({ fund }: FundItemProps) => {
           label="View Fund Details"
           textStyle={styles.button}
           btnContainer={styles.buttonContainer}
-          onPress={() => console.log(111)}
+          onPress={() =>
+            NavigationService.navigate('Marketplace', {
+              screen: 'FundDetails',
+              params: {
+                fund: fund,
+              },
+            })
+          }
         />
-        <TouchableOpacity>
-          <Star size={24} color={WHITE} style={styles.favorite} />
+        <TouchableOpacity onPress={() => handleRemoveWahchList(fund._id)}>
+          <Star
+            size={24}
+            color={isWatch ? PRIMARYSOLID : WHITE}
+            style={styles.favorite}
+            weight={isWatch ? 'fill' : 'duotone'}
+          />
         </TouchableOpacity>
       </View>
     </View>

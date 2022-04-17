@@ -24,7 +24,7 @@ const FundUserInfo: React.FC<FundUserInfoProps> = ({ item }) => {
         <View>
           <PLabel
             textStyle={Body1Bold}
-            label={`${item.postIds?.length ?? 10}`}
+            label={`${item.postIds?.length ?? 0}`}
           />
           <PLabel textStyle={Body3} viewStyle={styles.postView} label="Posts" />
         </View>

@@ -47,7 +47,7 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
 
   return (
     <View style={pStyles.globalContainer}>
-      <MainHeader navigation={navigation} />
+      <MainHeader />
       <PAppContainer style={styles.container}>
         <FlatList
           horizontal

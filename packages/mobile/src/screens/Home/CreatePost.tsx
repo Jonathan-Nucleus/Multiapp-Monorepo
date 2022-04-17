@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
-  FlatList,
   Image,
-  Platform,
   Pressable,
   StyleSheet,
   TouchableOpacity,
@@ -15,46 +13,41 @@ import {
   MentionInput,
   MentionSuggestionsProps,
   Suggestion,
-  replaceMentionValues,
 } from 'react-native-controlled-mentions';
-import { useMutation } from '@apollo/client';
 import _ from 'lodash';
 
 import PAppContainer from '../../components/common/PAppContainer';
-import PHeader from '../../components/common/PHeader';
 import PLabel from '../../components/common/PLabel';
-import RoundIcon from '../../components/common/RoundIcon';
 import IconButton from '../../components/common/IconButton';
 import RoundImageView from '../../components/common/RoundImageView';
 import UserInfo from '../../components/common/UserInfo';
 import PModal from '../../components/common/PModal';
 import PostSelection from './PostSelection';
 import pStyles from '../../theme/pStyles';
-import { Body1 } from '../../theme/fonts';
 import {
   GRAY3,
-  GRAY800,
   SECONDARY,
   WHITE60,
   DISABLED,
   PRIMARY,
   PRIMARYSOLID7,
   PRIMARYSOLID,
+  WHITE,
+  WHITE12,
 } from 'shared/src/colors';
-import { CREATE_POST, PostDataType, UPLOAD_LINK } from '../../graphql/post';
 import { CreatePostScreen } from 'mobile/src/navigations/HomeStack';
-import { showMessage } from '../../services/utils';
-import { SOMETHING_WRONG } from 'shared/src/constants';
+import PostHeader from './PostHeader';
 
-import BackSvg from '../../assets/icons/back.svg';
-import ChatSvg from 'shared/assets/images/chat.svg';
 import UserSvg from 'shared/assets/images/user.svg';
 import GlobalSvg from 'shared/assets/images/global.svg';
 import AISvg from 'shared/assets/images/ai-badge.svg';
 import Avatar from '../../assets/avatar.png';
-import Tag from '../../components/common/Tag';
-
-const Steps: string[] = ['CreatePost', 'ReviewPost'];
+import {
+  Camera,
+  VideoCamera,
+  Image as GalleryImage,
+  CirclesFour,
+} from 'phosphor-react-native';
 
 const RadioBodyView = (props: any) => {
   const { icon, label } = props;
@@ -66,13 +59,13 @@ const RadioBodyView = (props: any) => {
   );
 };
 
-interface OptionProps {
+export interface OptionProps {
   id: number;
   val: string;
   labelView: React.ReactNode;
 }
 
-const postAsData: OptionProps[] = [
+export const postAsData: OptionProps[] = [
   {
     id: 1,
     val: 'Richard Branson',
@@ -95,7 +88,7 @@ const postAsData: OptionProps[] = [
   },
 ];
 
-const audienceData: OptionProps[] = [
+export const audienceData: OptionProps[] = [
   {
     id: 1,
     val: 'Everyone',
@@ -118,15 +111,15 @@ const audienceData: OptionProps[] = [
   },
 ];
 
-const users = [
-  { id: '123355654789', name: 'David Tabaka' },
-  { id: '123355654783', name: 'Michelle Miranda' },
-  { id: '123355654739', name: 'Brain Bueman' },
-  { id: '412335565478', name: 'Gary Guy' },
-  { id: '123355654785', name: 'Alex Beinfeld' },
+export const users = [
+  { id: '624f1a2eed55addaea6b4499', name: 'David Tabaka' },
+  { id: '624f1a2eed55addaea6b4491', name: 'Michelle Miranda' },
+  { id: '624f1a2eed55addaea6b4492', name: 'Brain Bueman' },
+  { id: '624f1a2eed55addaea6b4493', name: 'Gary Guy' },
+  { id: '624f1a2eed55addaea6b4494', name: 'Alex Beinfeld' },
 ];
 
-const CreatePost: CreatePostScreen = ({ route, navigation }) => {
+const CreatePost: CreatePostScreen = ({ navigation }) => {
   const [postAsModalVisible, setPostAsModalVisible] = useState(false);
   const [selectedPostAs, setSelectedPostAs] = useState<OptionProps>(
     postAsData[0],
@@ -137,21 +130,7 @@ const CreatePost: CreatePostScreen = ({ route, navigation }) => {
   );
   const [imageData, setImageData] = useState<any>({});
   const [description, setDescription] = useState('');
-  const [categories, setCategories] = useState<string[]>([]);
-  const [step, setStep] = useState(Steps[0]);
   const [mentions, setMentions] = useState<string[]>([]);
-  const [createPost] = useMutation(CREATE_POST);
-  const [uploadLink] = useMutation(UPLOAD_LINK);
-
-  useEffect(() => {
-    const categoryList = route.params?.categories;
-    if (categoryList && categoryList.length > 0) {
-      setCategories(categoryList);
-      setStep(Steps[1]);
-    } else {
-      setStep(Steps[0]);
-    }
-  }, [route, route.params]);
 
   const openPicker = () => {
     ImagePicker.openPicker({
@@ -183,68 +162,11 @@ const CreatePost: CreatePostScreen = ({ route, navigation }) => {
   };
 
   const handleNext = async () => {
-    if (step === Steps[0]) {
-      navigation.navigate('ChooseCategory');
-      return;
-    }
-
-    // step === 1 (ReviewPost)
     if (!checkValidation()) {
       return;
     }
 
-    try {
-      const { data } = await uploadLink({
-        variables: {
-          localFilename: imageData?.filename,
-          type: 'POST',
-        },
-      });
-
-      if (!data || !data.uploadLink) {
-        showMessage('Error', 'Image upload failed', 'error');
-        return;
-      }
-
-      const { remoteName, uploadUrl } = data.uploadLink;
-      const formdata = new FormData();
-      if (imageData != null) {
-        formdata.append('data_img', {
-          uri:
-            Platform.OS === 'ios'
-              ? `file:///${imageData.path}`
-              : imageData.path,
-          type: imageData.mime,
-          name: imageData.filename,
-        });
-      }
-
-      const response = await fetch(uploadUrl, {
-        method: 'PUT',
-        body: formdata,
-      });
-
-      const postData: PostDataType = {
-        categories,
-        audience: selectedAudience.val.toUpperCase(),
-        body: replaceMentionValues(description, ({ name }) => `@${name}`),
-        mediaUrl: remoteName,
-        mentionIds: mentions,
-      };
-
-      const result = (
-        await createPost({
-          variables: {
-            post: postData,
-          },
-        })
-      ).data.createPost;
-      console.log('success', result);
-      showMessage('Success', 'Successfully posted!', 'success');
-    } catch (e) {
-      console.log('error', e);
-      showMessage('Error', SOMETHING_WRONG, 'error');
-    }
+    navigation.navigate('ChooseCategory', { description, mentions, imageData });
   };
 
   const renderSuggestions: (
@@ -289,27 +211,12 @@ const CreatePost: CreatePostScreen = ({ route, navigation }) => {
 
   return (
     <SafeAreaView style={pStyles.globalContainer}>
-      <PHeader
-        leftIcon={
-          <RoundIcon icon={<BackSvg />} onPress={() => navigation.goBack()} />
-        }
-        centerIcon={
-          <PLabel
-            label={step === Steps[0] ? 'Create Post' : 'Preview Post'}
-            textStyle={styles.headerTitle}
-          />
-        }
-        rightIcon={
-          <TouchableOpacity onPress={handleNext}>
-            <PLabel
-              label={step === Steps[0] ? 'NEXT' : 'POST'}
-              textStyle={
-                checkValidation() ? styles.headerTitle : styles.disabledText
-              }
-            />
-          </TouchableOpacity>
-        }
-        containerStyle={styles.headerContainer}
+      <PostHeader
+        centerLabel="Create Post"
+        rightLabel="NEXT"
+        rightValidation={checkValidation()}
+        navigation={navigation}
+        handleNext={handleNext}
       />
       <PAppContainer>
         <View style={styles.usersPart}>
@@ -347,40 +254,30 @@ const CreatePost: CreatePostScreen = ({ route, navigation }) => {
         {!_.isEmpty(imageData) && (
           <Image source={{ uri: imageData.path }} style={styles.postImage} />
         )}
-        {categories && categories.length > 0 && (
-          <FlatList
-            horizontal
-            data={categories}
-            renderItem={({ item }) => (
-              <Tag label={item} viewStyle={styles.tagStyle} />
-            )}
-            listKey="category"
-          />
-        )}
       </PAppContainer>
       <View style={styles.actionWrapper}>
         <IconButton
-          icon={<ChatSvg />}
+          icon={<Camera size={32} color={WHITE} />}
           label="Take Photo"
           textStyle={styles.iconText}
           viewStyle={styles.iconButton}
           onPress={takePhoto}
         />
         <IconButton
-          icon={<ChatSvg />}
+          icon={<VideoCamera size={32} color={WHITE} />}
           label="Take Video"
           textStyle={styles.iconText}
           viewStyle={styles.iconButton}
         />
         <IconButton
-          icon={<ChatSvg />}
+          icon={<GalleryImage size={32} color={WHITE} />}
           label="Gallery"
           textStyle={styles.iconText}
           viewStyle={styles.iconButton}
           onPress={openPicker}
         />
         <IconButton
-          icon={<ChatSvg />}
+          icon={<CirclesFour size={32} color={WHITE} />}
           label="Categories"
           textStyle={styles.iconText}
           viewStyle={styles.iconButton}
@@ -433,18 +330,6 @@ const CreatePost: CreatePostScreen = ({ route, navigation }) => {
 export default CreatePost;
 
 const styles = StyleSheet.create({
-  headerContainer: {
-    justifyContent: 'space-between',
-    paddingTop: 0,
-    marginBottom: 0,
-  },
-  headerTitle: {
-    ...Body1,
-  },
-  disabledText: {
-    ...Body1,
-    color: GRAY800,
-  },
   usersPart: {
     marginTop: 16,
     flexDirection: 'row',
@@ -478,6 +363,8 @@ const styles = StyleSheet.create({
   },
   actionWrapper: {
     backgroundColor: GRAY3,
+    borderTopColor: WHITE12,
+    borderTopWidth: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
     position: 'absolute',
@@ -519,10 +406,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: PRIMARYSOLID7,
-  },
-  tagStyle: {
-    paddingHorizontal: 15,
-    marginRight: 8,
-    borderRadius: 16,
   },
 });

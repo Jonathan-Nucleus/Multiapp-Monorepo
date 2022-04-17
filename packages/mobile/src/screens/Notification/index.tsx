@@ -8,12 +8,16 @@ import {
   Image,
   ListRenderItem,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   Gear,
   Checks,
   Chats,
   DotsThreeOutlineVertical,
+  ChatCenteredText,
+  ThumbsUp,
+  UserCirclePlus,
+  At,
+  Share,
 } from 'phosphor-react-native';
 import {
   PRIMARYSTATE,
@@ -24,9 +28,11 @@ import {
   BGDARK,
   PRIMARY,
   BLUE500,
+  WHITE60,
 } from 'shared/src/colors';
 import Modal from 'react-native-modal';
 import LinearGradient from 'react-native-linear-gradient';
+import moment from 'moment';
 
 import pStyles from '../../theme/pStyles';
 import { Body1, Body2, Body3, H5GothamBold } from '../../theme/fonts';
@@ -35,60 +41,151 @@ import Avatar from '../../assets/avatar.png';
 import type { NotificationScreen } from 'mobile/src/navigations/NotificationStack';
 import MainHeader from '../../components/main/Header';
 
-const DATA = [
+const Items = [
   {
+    name: 'Mike Wang',
+    description: 'Founder, Investor ',
+    company: 'Cartenna Capital',
+    image: Avatar,
     id: '1',
-    label1: 'Jane onething commented on your post. 2h',
-    label2: 'Lorem ipsum dolor sit amet, consectetur...',
-    unRead: true,
+    unread: false,
+    lastMessage: 'What a great idea!',
+    liked: true,
+    createdAt: new Date('Thu Apr 10 2022 19:30:03 GMT-0600'),
   },
   {
-    id: '2',
-    label1: 'Jane onething commented on your post. 2h',
-    label2: 'Lorem ipsum dolor sit amet, consectetur...',
-    unRead: true,
+    name: 'Mike Wang',
+    description: 'Founder, Investor ',
+    company: 'Cartenna Capital',
+    image: Avatar,
+    id: '51',
+    unread: false,
+    lastMessage:
+      'Sure, I’ll send over the terms and conditions. What’s your name',
+    createdAt: new Date('Thu Apr 10 2022 18:30:03 GMT-0600'),
   },
   {
-    id: '3',
-    label1: 'Jane onething commented on your post. 2h',
-    label2: 'Lorem ipsum dolor sit amet, consectetur...',
+    name: 'Mike Wang',
+    description: 'Founder, Investor ',
+    company: 'Cartenna Capital',
+    image: Avatar,
+    id: '41',
+    unread: true,
+    lastMessage: 'Richard Branson - this is what I was talking about.',
+    commented: true,
+    createdAt: new Date('Thu Apr 05 2022 18:30:03 GMT-0600'),
   },
   {
-    id: '4',
-    label1: 'Jane onething commented on your post. 2h',
-    label2: 'Lorem ipsum dolor sit amet, consectetur...',
+    name: 'Mike Wang',
+    description: 'Founder, Investor ',
+    company: 'Cartenna Capital',
+    image: Avatar,
+    id: '31',
+    unread: true,
+    following: true,
+    createdAt: new Date('Thu Apr 05 2022 20:30:03 GMT-0600'),
   },
   {
-    id: '5',
-    label1: 'Jane onething commented on your post. 2h',
-    label2: 'Lorem ipsum dolor sit amet, consectetur...',
+    name: 'Mike Wang',
+    description: 'Founder, Investor ',
+    company: 'Cartenna Capital',
+    image: Avatar,
+    id: '21',
+    unread: true,
+    shared: true,
+    createdAt: new Date('Thu Apr 11 2022 21:22:03 GMT-0600'),
   },
   {
-    id: '6',
-    label1: 'Jane onething commented on your post. 2h',
-    label2: 'Lorem ipsum dolor sit amet, consectetur...',
+    name: 'Mike Wang',
+    description: 'Founder, Investor ',
+    company: 'Cartenna Capital',
+    image: Avatar,
+    id: '11',
+    unread: true,
+    message: true,
+    createdAt: new Date('Thu Apr 11 2022 20:30:03 GMT-0600'),
   },
   {
-    id: '7',
-    label1: 'Jane onething commented on your post. 2h',
-    label2: 'Lorem ipsum dolor sit amet, consectetur...',
-  },
-  {
-    id: '8',
-    label1: 'Jane onething commented on your post. 2h',
-    label2: 'Lorem ipsum dolor sit amet, consectetur...',
+    name: 'Robert Fox',
+    description: 'Founder, Investor ',
+    company: 'Cartenna Capital',
+    image: Avatar,
+    id: '121',
+    unread: true,
+    mentioned: true,
+    lastMesae: 'Richard Branson - this is what I was talking about.',
+    createdAt: new Date('Thu Apr 11 2022 17:30:03 GMT-0600'),
   },
 ];
+
+interface Notification {
+  name: string;
+  image: string;
+  id: string;
+  unread: boolean;
+  mentioned?: boolean;
+  commented?: boolean;
+  liked?: boolean;
+  message?: boolean;
+  following?: boolean;
+  shared?: boolean;
+  lastMessage?: string;
+  createdAt: Date;
+}
 
 const Notification: NotificationScreen = ({ navigation }) => {
   const [isVisible, setIsVisible] = useState(false);
 
-  const renderListItem: ListRenderItem<typeof DATA[number]> = ({ item }) => {
+  const title = (val: Notification) => {
+    if (val.commented) {
+      return `${val.name} commented on your post`;
+    }
+    if (val.liked) {
+      return `${val.name} liked your post`;
+    }
+    if (val.message) {
+      return `${val.name} sent you a message`;
+    }
+    if (val.following) {
+      return `${val.name} is following you`;
+    }
+    if (val.mentioned) {
+      return `${val.name} mentioned you in a comment`;
+    }
+    if (val.shared) {
+      return `${val.name} shared your post`;
+    }
+    return `${val.name} sent you a message`;
+  };
+
+  const renderIcon = (val: Notification) => {
+    if (val.commented) {
+      return <ChatCenteredText size={18} color={WHITE} />;
+    }
+    if (val.liked) {
+      return <ThumbsUp size={18} color={WHITE} />;
+    }
+    if (val.message) {
+      return <Chats size={18} color={WHITE} />;
+    }
+    if (val.following) {
+      return <UserCirclePlus size={18} color={WHITE} />;
+    }
+    if (val.mentioned) {
+      return <At size={18} color={WHITE} />;
+    }
+    if (val.shared) {
+      return <Share size={18} color={WHITE} />;
+    }
+    return <Chats size={18} color={WHITE} />;
+  };
+
+  const renderListItem: ListRenderItem<typeof Items[number]> = ({ item }) => {
     return (
       <TouchableOpacity onLongPress={() => setIsVisible(true)}>
-        <View style={[styles.item, item.unRead && styles.unRead]}>
+        <View style={[styles.item, item.unread && styles.unread]}>
           <View style={styles.avatarView}>
-            {item.unRead && (
+            {item.unread && (
               <LinearGradient
                 colors={['#844AFF', '#00AAE0']}
                 start={{ x: 0, y: 0 }}
@@ -97,14 +194,15 @@ const Notification: NotificationScreen = ({ navigation }) => {
               />
             )}
             <Image source={Avatar} style={styles.avatar} />
-            <View style={styles.chat}>
-              <Chats color={WHITE} size={14} />
-            </View>
+            <View style={styles.chat}>{renderIcon(item)}</View>
           </View>
           <View style={styles.commentWrap}>
-            <Text style={styles.label}>{item.label1}</Text>
+            <Text style={styles.label}>{title(item)}</Text>
             <Text numberOfLines={1} style={styles.comment}>
-              {item.label2}
+              {item.lastMessage}
+            </Text>
+            <Text style={styles.comment}>
+              {moment(item.createdAt).fromNow()}
             </Text>
           </View>
         </View>
@@ -117,10 +215,12 @@ const Notification: NotificationScreen = ({ navigation }) => {
       <MainHeader />
       <View style={[styles.row, styles.between]}>
         <Text style={styles.title}>Notifications</Text>
-        <DotsThreeOutlineVertical size={28} color={GRAY100} weight="fill" />
+        <TouchableOpacity onPress={() => setIsVisible(true)}>
+          <DotsThreeOutlineVertical size={28} color={GRAY100} weight="fill" />
+        </TouchableOpacity>
       </View>
       <FlatList
-        data={DATA}
+        data={Items}
         renderItem={renderListItem}
         keyExtractor={(item) => item.id}
         style={styles.flatList}
@@ -217,8 +317,9 @@ const styles = StyleSheet.create({
     color: WHITE,
   },
   comment: {
-    color: GRAY100,
+    color: WHITE60,
     ...Body3,
+    marginTop: 4,
   },
   modalContent: {
     backgroundColor: BGDARK,
@@ -255,7 +356,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     position: 'relative',
   },
-  unRead: {
+  unread: {
     backgroundColor: BLUE500,
   },
   title: {
