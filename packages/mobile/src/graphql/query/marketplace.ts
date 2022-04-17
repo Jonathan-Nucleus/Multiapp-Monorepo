@@ -5,13 +5,23 @@ type FetchFundsVariables = never;
 
 export type Fund = Pick<
   GraphQLFund,
-  '_id' | 'name' | 'level' | 'status' | 'overview' | 'tags' | 'background'
+  | '_id'
+  | 'name'
+  | 'level'
+  | 'status'
+  | 'highlights'
+  | 'overview'
+  | 'tags'
+  | 'background'
 > & {
   manager: Pick<
     GraphQLFund['manager'],
     '_id' | 'firstName' | 'lastName' | 'avatar' | 'followerIds' | 'postIds'
   >;
-  company: Pick<GraphQLFund['company'], '_id' | 'name'>;
+  company: Pick<
+    GraphQLFund['company'],
+    '_id' | 'name' | 'avatar' | 'background'
+  >;
 };
 
 export type FetchFundsData = {
@@ -35,6 +45,7 @@ export function useFetchFunds(): QueryResult<
         name
         level
         status
+        highlights
         overview
         tags
         background {
@@ -56,6 +67,15 @@ export function useFetchFunds(): QueryResult<
         company {
           _id
           name
+          avatar
+          background {
+            url
+            x
+            y
+            width
+            height
+            scale
+          }
         }
       }
     }

@@ -5,7 +5,7 @@ import { Splide, SplideSlide } from "@splidejs/react-splide";
 import Image from "next/image";
 
 import TeamMembersList from "./TeamMembers";
-import PostsList from "../../common/PostsList";
+import PostsList, { PostsListProps } from "../../common/PostsList";
 import FeaturedPosts from "../../common/FeaturedPosts";
 import FundsList from "../../common/FundsList";
 import Card from "../../common/Card";
@@ -14,35 +14,41 @@ import Profile from "./Profile";
 import { useFetchPosts } from "desktop/app/graphql/queries";
 import { useFetchFunds } from "desktop/app/graphql/queries/marketplace";
 import { useAccount } from "desktop/app/graphql/queries";
+import { useCompany } from "mobile/src/graphql/query/company";
 import type { Company } from "backend/graphql/companies.graphql";
 import type { User } from "backend/graphql/users.graphql";
 
-interface CompanyIdProps {
-  _id: string;
+interface CompanyPageProps {
+  companyId: string;
 }
 
-const CompanyPage: FC<CompanyIdProps> = ({ _id }) => {
-  const { data, loading, refetch } = useFetchPosts();
-  const { data: fundsData, loading: fundLoading } = useFetchFunds();
-  const { data: accountData, loading: accountLoading } = useAccount();
+const CompanyPage: FC<CompanyPageProps> = ({ companyId }) => {
+  const { data, loading: postsLoading, refetch } = useFetchPosts(); // Temporarily show all posts
+  const { data: companyData, loading } = useCompany(companyId);
 
   const posts = data?.posts ?? [];
-  const funds = fundsData?.funds ?? [];
-  const companies = accountData?.account?.companies ?? [];
-  const company: Company = companies.find((v) => v._id === _id);
-  let members: User[] = company?.members ?? [];
+  const company = companyData?.companyProfile;
+  const members = companyData?.companyProfile?.members ?? [];
+  const funds = (companyData?.companyProfile?.funds ?? []).map((fund) => ({
+    ...fund,
+    company, // Inject company data for the fund
+  }));
 
-  if (fundLoading || accountLoading || !company) {
-    return null;
+  if (loading || !company || !posts) {
+    return <></>;
   }
 
+  const filterPosts: PostsListProps["onFilter"] = (topics, audience) => {
+    console.log("filter by", topics, audience);
+  };
+
   return (
-    <div className="flex flex-col p-0 mt-10 md:flex-row md:px-2">
-      <div className="min-w-0 mx-0 md:mx-4">
+    <div className="flex flex-col justify-center p-0 mt-10 md:flex-row md:px-2">
+      <div className="min-w-0 max-w-4xl mx-0 md:mx-4">
         {company && <Profile account={company} members={members} />}
-        <FundsList funds={funds} type="company" />
-        <FeaturedPosts posts={posts} />
-        <PostsList posts={posts} />
+        <FundsList funds={funds} showImages={false} />
+        {posts?.[0] && <FeaturedPosts posts={[posts[0]]} />}
+        <PostsList posts={posts} onFilter={filterPosts} />
       </div>
       <div className="w-96 hidden md:block flex-shrink-0 mx-4">
         <TeamMembersList company={company} />

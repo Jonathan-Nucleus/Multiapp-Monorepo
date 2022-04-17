@@ -95,8 +95,9 @@ export type AccountData = {
     | 'position'
     | 'background'
     | 'followerIds'
-    | 'postIds'
     | 'followingIds'
+    | 'companyFollowingIds'
+    | 'postIds'
   > & {
     companies: Pick<User['companies'][number], '_id' | 'name' | 'avatar'>[];
   };
@@ -152,6 +153,7 @@ export function useAccount(
               twitter
             }
           }
+          companyFollowingIds
           background {
             url
             x

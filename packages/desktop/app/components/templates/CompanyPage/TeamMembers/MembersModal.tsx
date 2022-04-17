@@ -12,15 +12,9 @@ interface MembersModalProps {
   show: boolean;
   onClose: () => void;
   members: User[];
-  toggleFollowingUser: (id: string, follow: boolean) => void;
 }
 
-const MembersModal: FC<MembersModalProps> = ({
-  show,
-  onClose,
-  members,
-  toggleFollowingUser,
-}) => {
+const MembersModal: FC<MembersModalProps> = ({ show, onClose, members }) => {
   const [search, setSearch] = useState("");
   const [filteredMembers, setFilteredMembers] = useState<User[]>([]);
 
@@ -68,12 +62,7 @@ const MembersModal: FC<MembersModalProps> = ({
             </div>
             <div className="flex flex-col flex-grow  max-w-full md:min-h-0 p-4 overflow-y-auto">
               {filteredMembers.map((member, index) => (
-                <Member
-                  member={member}
-                  hiddenChat={true}
-                  key={index}
-                  toggleFollowingUser={toggleFollowingUser}
-                />
+                <Member member={member} hiddenChat={true} key={index} />
               ))}
             </div>
           </Card>

@@ -1,5 +1,9 @@
 const path = require("path");
-const withTM = require("next-transpile-modules")(["backend", "mobile"]);
+const withTM = require("next-transpile-modules")([
+  "backend",
+  "mobile",
+  "shared",
+]);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = withTM({

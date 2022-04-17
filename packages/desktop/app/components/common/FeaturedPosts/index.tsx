@@ -15,10 +15,10 @@ interface PostsProps {
 const FeaturedPosts: FC<PostsProps> = ({ posts }) => {
   return (
     <>
-      <div className="text-white mb-2 mt-3 ml-4 md:m-0">Featured Posts</div>
+      <div className="text-white mb-2 mt-8 ml-4">Featured Posts</div>
       <div className="hidden md:block">
         {posts.map((post, index) => (
-          <div key={index} className="mt-4 mb-4">
+          <div key={index} className="mt-2 mb-8">
             <Post post={post} />
           </div>
         ))}

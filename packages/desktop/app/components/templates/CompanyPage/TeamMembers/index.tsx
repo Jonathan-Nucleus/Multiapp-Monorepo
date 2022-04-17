@@ -6,7 +6,6 @@ import MembersModal from "./MembersModal";
 import type { User } from "backend/graphql/users.graphql";
 
 import { useAccount } from "desktop/app/graphql/queries";
-import { useFollowUserAsCompany } from "desktop/app/graphql/mutations/profiles";
 import type { Company } from "backend/graphql/companies.graphql";
 interface MembersModalProps {
   company: Company;
@@ -15,49 +14,33 @@ interface MembersModalProps {
 const TeamMembersList: FC<MembersModalProps> = ({ company }) => {
   const { data: userData, loading: userLoading, refetch } = useAccount();
   const [isVisible, setVisible] = useState(false);
-  const [followUser] = useFollowUserAsCompany();
-  const members = company.members;
-
-  const toggleFollowingUser = async (
-    id: string,
-    follow: boolean
-  ): Promise<void> => {
-    try {
-      const { data } = await followUser({
-        variables: { follow: follow, userId: id, asCompanyId: company._id },
-      });
-      if (data?.followUser) {
-        refetch();
-      } else {
-        console.log("err", data);
-      }
-    } catch (err) {
-      console.log("err", err);
-    }
-  };
+  const members = company.members.map((member) => ({
+    ...member,
+    company, // Inject company data
+  }));
 
   return (
     <div>
-      <div className="flex items-center">
-        <div className="text-white mr-2">Team Members</div>
+      <div className="flex items-center text-lg">
+        <div className="text-white tracking-wider">Team Members</div>
+        <span className="text-primary mx-2">•</span>
         <Button
           variant="text"
-          className="text-xs text-primary tracking-normal font-normal py-0"
+          className="text-primary tracking-widest font-semibold py-0"
           onClick={() => setVisible(true)}
         >
-          •VIEW ALL
+          VIEW ALL
         </Button>
       </div>
-      {members.map((member, index) => (
-        <div key={index} className="border-b border-white/[.12]">
-          <Member member={member} toggleFollowingUser={toggleFollowingUser} />
-        </div>
-      ))}
+      <div className="flex flex-col divide-y divide-white divide-opacity-20">
+        {members.map((member, index) => (
+          <Member key={member._id} member={member} />
+        ))}
+      </div>
       <MembersModal
         members={members}
         onClose={() => setVisible(false)}
         show={isVisible}
-        toggleFollowingUser={toggleFollowingUser}
       />
     </div>
   );
