@@ -9,9 +9,10 @@ import Card from "../../../../components/common/Card";
 interface MemberProps {
   member: User;
   hiddenChat?: boolean;
+  selelctedItem?: string;
 }
 const Member: FC<MemberProps> = (props) => {
-  const { member, hiddenChat } = props;
+  const { member, hiddenChat, selelctedItem } = props;
 
   return (
     <div className="flex items-center justify-between py-4">

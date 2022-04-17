@@ -45,19 +45,19 @@ const ProfileCard: FC<ProfileProps> = ({ user }) => {
         <div className="grid grid-cols-3 border-white/[.12] divide-x divide-inherit mt-5">
           <div>
             <div className="font-medium text-xl text-white">
-              {user.postIds ?? 0}
+              {user.postIds?.length ?? 0}
             </div>
             <div className="text-sm text-white opacity-60">Posts</div>
           </div>
           <div>
             <div className="font-medium text-xl text-white">
-              {user.followerIds ?? 0}
+              {user.followerIds?.length ?? 0}
             </div>
             <div className="text-sm text-white opacity-60">Followers</div>
           </div>
           <div>
             <div className="font-medium text-xl text-white">
-              {user.followingIds ?? 0}
+              {user.followingIds?.length ?? 0}
             </div>
             <div className="text-sm text-white opacity-60">Following</div>
           </div>

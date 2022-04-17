@@ -28,7 +28,7 @@ type FollowUserVariables = {
 };
 
 type FollowUserData = {
-  likePost: boolean;
+  followUser: boolean;
 };
 
 /**
@@ -37,15 +37,66 @@ type FollowUserData = {
  * @returns   GraphQL mutation.
  */
 export function useFollowUser(): MutationTuple<
-  FollowUserVariables,
-  FollowUserData
+  FollowUserData,
+  FollowUserVariables
 > {
-  return useMutation<FollowUserVariables, FollowUserData>(gql`
+  return useMutation<FollowUserData, FollowUserVariables>(gql`
     mutation FollowUser($follow: Boolean!, $userId: ID!) {
       followUser(follow: $follow, userId: $userId)
     }
   `);
 }
 
-// FOLLOW USER
-// Follow Company As Company
+type FollowCompanyVariables = {
+  companyId: string;
+  follow: boolean;
+};
+
+type FollowCompanyData = {
+  followCompany: boolean;
+};
+
+/**
+ *
+ * @returns   GraphQL mutation.
+ */
+export function useFollowCompany(): MutationTuple<
+  FollowCompanyData,
+  FollowCompanyVariables
+> {
+  return useMutation<FollowCompanyData, FollowCompanyVariables>(gql`
+    mutation FollowCompany($follow: Boolean!, $companyId: ID!) {
+      followCompany(follow: $follow, companyId: $companyId)
+    }
+  `);
+}
+
+type FollowUserAsCompanyVariables = {
+  follow: boolean;
+  userId: string;
+  asCompanyId: string;
+};
+
+type FollowUserAsCompanyData = {
+  followUser: boolean;
+};
+
+/**
+ * GraphQL mutation that resets a user's password
+ *
+ * @returns   GraphQL mutation.
+ */
+export function useFollowUserAsCompany(): MutationTuple<
+  FollowUserAsCompanyData,
+  FollowUserAsCompanyVariables
+> {
+  return useMutation<FollowUserAsCompanyData, FollowUserAsCompanyVariables>(gql`
+    mutation FollowUserAsCompany(
+      $follow: Boolean!
+      $userId: ID!
+      $asCompanyId: ID!
+    ) {
+      followUser(follow: $follow, userId: $userId, asCompanyId: $asCompanyId)
+    }
+  `);
+}

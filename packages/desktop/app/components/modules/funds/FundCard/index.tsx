@@ -1,16 +1,50 @@
-import { FC } from "react";
-import { Fund } from "mobile/src/graphql/query/marketplace";
-import Card from "../../../common/Card";
+import React, { FC } from "react";
 import Image from "next/image";
-import Button from "../../../common/Button";
-import { Share, Star } from "phosphor-react";
 import Link from "next/link";
+import { Share, Star } from "phosphor-react";
+import type { User } from "backend/graphql/users.graphql";
+import { useAccount } from "desktop/app/graphql/queries";
+import { Fund } from "mobile/src/graphql/query/marketplace";
+import { useFollowUser } from "desktop/app/graphql/mutations/profiles";
+
+import Button from "../../../common/Button";
+import Card from "../../../common/Card";
 
 interface FundCardProps {
   fund: Fund;
 }
 
 const FundCard: FC<FundCardProps> = ({ fund }: FundCardProps) => {
+  const { data: userData, loading: userLoading, refetch } = useAccount();
+  const account: User = userData?.account;
+  const [followUser] = useFollowUser();
+  const followers: User[] = account?.followers ?? [];
+  const following: User[] = account?.following ?? [];
+
+  console.log(3333, following, fund.manager._id);
+  const isFollower = following.find((v) => v._id === fund.manager._id)
+    ? true
+    : false;
+  console.log(111, isFollower);
+  const toggleFollowingUser = async (
+    id: string,
+    follow: boolean
+  ): Promise<void> => {
+    console.log(1231, { follow: follow, userId: id });
+    try {
+      const { data } = await followUser({
+        variables: { follow: follow, userId: id },
+      });
+      if (data?.followUser) {
+        refetch();
+      } else {
+        console.log("err", data);
+      }
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
+
   return (
     <>
       <Card className="hidden lg:block rounded p-0">
@@ -94,8 +128,11 @@ const FundCard: FC<FundCardProps> = ({ fund }: FundCardProps) => {
               <Button
                 variant="text"
                 className="text-sm text-primary tracking-normal font-normal"
+                onClick={() =>
+                  toggleFollowingUser(fund.manager._id, !isFollower)
+                }
               >
-                Follow
+                {isFollower ? "UNFOLLOW" : "FOLLOW"}
               </Button>
             </div>
             <Link href={`/funds/${fund._id}`}>
@@ -209,8 +246,11 @@ const FundCard: FC<FundCardProps> = ({ fund }: FundCardProps) => {
                   <Button
                     variant="text"
                     className="text-primary text-xs tracking-normal font-normal py-0"
+                    onClick={() =>
+                      toggleFollowingUser(fund.manager._id, !isFollower)
+                    }
                   >
-                    FOLLOW
+                    {isFollower ? "UNFOLLOW" : "FOLLOW"}
                   </Button>
                 </div>
                 <div className="text-xs text-white opacity-60">

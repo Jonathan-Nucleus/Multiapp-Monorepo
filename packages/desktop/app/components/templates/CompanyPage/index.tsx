@@ -32,22 +32,20 @@ const CompanyPage: FC<CompanyIdProps> = ({ _id }) => {
   const company: Company = companies.find((v) => v._id === _id);
   let members: User[] = company?.members ?? [];
 
-  if (fundLoading || accountLoading) {
+  if (fundLoading || accountLoading || !company) {
     return null;
   }
 
   return (
     <div className="flex flex-col p-0 mt-10 md:flex-row md:px-2">
       <div className="min-w-0 mx-0 md:mx-4">
-        {company && (
-          <Profile account={company} members={members} />
-        )}
+        {company && <Profile account={company} members={members} />}
         <FundsList funds={funds} type="company" />
         <FeaturedPosts posts={posts} />
         <PostsList posts={posts} />
       </div>
       <div className="w-96 hidden md:block flex-shrink-0 mx-4">
-        <TeamMembersList members={members} />
+        <TeamMembersList company={company} />
       </div>
       <div className="w-full block lg:hidden">
         <div className="font-medium text-white ml-4 md:m-0">Team Members</div>

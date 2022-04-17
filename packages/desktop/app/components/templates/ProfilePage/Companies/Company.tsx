@@ -8,9 +8,17 @@ import type { Company } from "backend/graphql/companies.graphql";
 
 interface Props {
   company: Company;
+  handleToggleFollowCompany: (id: string, follow: boolean) => void;
+  userId?: string;
 }
 
-const CompanyItem: FC<Props> = ({ company }) => {
+const CompanyItem: FC<Props> = ({
+  company,
+  handleToggleFollowCompany,
+  userId,
+}) => {
+  const isFollower = company.followerIds?.includes(userId);
+
   return (
     <div className="flex items-center py-4">
       <div className="w-14 h-14 flex items-center justify-center">
@@ -33,8 +41,9 @@ const CompanyItem: FC<Props> = ({ company }) => {
           <Button
             variant="text"
             className="text-xs text-primary tracking-normal font-normal py-0 ml-2"
+            onClick={() => handleToggleFollowCompany(company._id, !isFollower)}
           >
-            FOLLOW
+            {isFollower ? "UNFOLLOW" : "FOLLOW"}
           </Button>
         </div>
       </div>

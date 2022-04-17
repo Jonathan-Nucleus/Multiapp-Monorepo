@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useState, useEffect, InputEvent } from "react";
 import { Dialog } from "@headlessui/react";
 import { X, Image as ImageIcon } from "phosphor-react";
 
@@ -12,9 +12,36 @@ interface MembersModalProps {
   show: boolean;
   onClose: () => void;
   members: User[];
+  toggleFollowingUser: (id: string, follow: boolean) => void;
 }
 
-const MembersModal: FC<MembersModalProps> = ({ show, onClose, members }) => {
+const MembersModal: FC<MembersModalProps> = ({
+  show,
+  onClose,
+  members,
+  toggleFollowingUser,
+}) => {
+  const [search, setSearch] = useState("");
+  const [filteredMembers, setFilteredMembers] = useState<User[]>([]);
+
+  useEffect(() => {
+    setFilteredMembers(members);
+  }, [members]);
+
+  useEffect(() => {
+    const _members = [...members];
+    if (search) {
+      const data = _members.filter(
+        (v) =>
+          v.firstName.toLowerCase().includes(search.toLowerCase()) ||
+          v.lastName.toLowerCase().includes(search.toLowerCase())
+      );
+      setFilteredMembers(data);
+    } else {
+      setFilteredMembers(_members);
+    }
+  }, [search]);
+
   return (
     <>
       <Dialog open={show} onClose={onClose} className="fixed z-10 inset-0">
@@ -33,11 +60,20 @@ const MembersModal: FC<MembersModalProps> = ({ show, onClose, members }) => {
               <Input
                 placeholder="Search team members..."
                 className="rounded-full bg-background-DEFAULT"
+                value={search}
+                onChange={(event: InputEvent<HTMLInputElement>) => {
+                  setSearch(event.target.value);
+                }}
               />
             </div>
             <div className="flex flex-col flex-grow  max-w-full md:min-h-0 p-4 overflow-y-auto">
-              {members.map((member, index) => (
-                <Member member={member} hiddenChat={true} key={index} />
+              {filteredMembers.map((member, index) => (
+                <Member
+                  member={member}
+                  hiddenChat={true}
+                  key={index}
+                  toggleFollowingUser={toggleFollowingUser}
+                />
               ))}
             </div>
           </Card>

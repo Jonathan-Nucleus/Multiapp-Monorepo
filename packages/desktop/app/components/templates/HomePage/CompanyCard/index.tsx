@@ -33,19 +33,19 @@ const CompanyCard: FC<CompanyProps> = ({ company }) => {
         <div className="grid grid-cols-3 border-white/[.12] divide-x divide-inherit mt-5">
           <div>
             <div className="font-medium text-xl text-white">
-              {company.postIds ?? 0}
+              {company.postIds?.length ?? 0}
             </div>
             <div className="text-sm text-white opacity-60">Posts</div>
           </div>
           <div>
             <div className="font-medium text-xl text-white">
-              {company.followerIds ?? 0}
+              {company.followerIds?.length ?? 0}
             </div>
             <div className="text-sm text-white opacity-60">Followers</div>
           </div>
           <div>
             <div className="font-medium text-xl text-white">
-              {company.followingIds ?? 0}
+              {company.followingIds?.length ?? 0}
             </div>
             <div className="text-sm text-white opacity-60">Following</div>
           </div>

@@ -122,8 +122,33 @@ export function useAccount(
           accreditation
           position
           postIds
+          website
+          linkedIn
+          twitter
           followerIds
           followingIds
+          following {
+            _id
+            firstName
+            lastName
+            avatar
+            position
+            company {
+              _id
+              name
+            }
+          }
+          followers {
+            _id
+            firstName
+            lastName
+            avatar
+            position
+            company {
+              _id
+              name
+            }
+          }
           background {
             url
             x
@@ -132,6 +157,17 @@ export function useAccount(
             height
             scale
           }
+          watchlist {
+            _id
+            name
+            avatar
+            companyId
+            managerId
+            company {
+              name
+            }
+          }
+          watchlistIds
           companies {
             _id
             name
@@ -144,6 +180,20 @@ export function useAccount(
               company {
                 name
               }
+            }
+            following {
+              _id
+              firstName
+              lastName
+              avatar
+              position
+            }
+            followers {
+              _id
+              firstName
+              lastName
+              avatar
+              position
             }
             followerIds
             postIds

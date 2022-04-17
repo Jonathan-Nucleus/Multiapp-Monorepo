@@ -78,21 +78,21 @@ const Profile: FC<AccountProps> = ({ account, members }) => {
             </div>
             <div className="w-full my-4 grid grid-cols-3 divide-x md:w-72 flex-shrink-0">
               <div className="text-center">
-                <div>{account.postIds ?? 0}</div>
+                <div>{account.postIds?.length ?? 0}</div>
                 <div className="text-xs text-white opacity-60">Posts</div>
               </div>
               <div
                 className="text-center cursor-pointer"
                 onClick={() => setVisible(true)}
               >
-                <div>{account.followerIds ?? 0}</div>
+                <div>{account.followerIds?.length ?? 0}</div>
                 <div className="text-xs text-white opacity-60">Followers</div>
               </div>
               <div
                 className="text-center  cursor-pointer"
                 onClick={() => setVisible(true)}
               >
-                <div>{account.followingIds ?? 0}</div>
+                <div>{account.followingIds?.length ?? 0}</div>
                 <div className="text-xs text-white opacity-60">Following</div>
               </div>
             </div>
@@ -100,7 +100,7 @@ const Profile: FC<AccountProps> = ({ account, members }) => {
 
           <div className="flex items-center p-4 border-t border-white/[.12]">
             <div className="flex items-center cursor-pointer mr-4">
-              <Link href={account.linkedin ?? "/blank"}>
+              <Link href={account.linkedIn ?? "/blank"}>
                 <a className="flex items-center">
                   <LinkedinLogo size={24} weight="fill" />
                   <div className="text-primary ml-2 hidden md:block">
@@ -165,7 +165,7 @@ const Profile: FC<AccountProps> = ({ account, members }) => {
       <SearchModal
         show={isVisible}
         onClose={() => setVisible(false)}
-        members={members ?? []}
+        account={account}
       />
     </>
   );

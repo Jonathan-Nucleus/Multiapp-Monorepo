@@ -9,14 +9,15 @@ import Card from "../../../../components/common/Card";
 interface MemberProps {
   member: User;
   hiddenChat?: boolean;
+  selelctedItem?: string;
   toggleFollowingUser: (id: string, follow: boolean) => void;
 }
 const Member: FC<MemberProps> = (props) => {
-  const { member, hiddenChat, toggleFollowingUser } = props;
-
+  const { member, hiddenChat, selelctedItem, toggleFollowingUser } = props;
+  const isFollower = selelctedItem === "follower" ? true : false;
   return (
-    <div className="flex items-center justify-between py-4">
-      <div className="flex items-center">
+    <div className="flex items-center justify-between py-4 w-full">
+      <div className="flex items-center w-full">
         <div className="w-14 h-14 flex items-center justify-center">
           <Image
             loader={() =>
@@ -30,18 +31,17 @@ const Member: FC<MemberProps> = (props) => {
             unoptimized={true}
           />
         </div>
-        <div className="ml-2">
-          <div className="flex items-center">
+        <div className="ml-2 flex-1">
+          <div className="flex items-center justify-between">
             <div className="text-white">
-              {member.firstName} {member.lastName}
+              {member.firstName} {member.lastName} {member.position} •
             </div>
-            <div className="text-white mx-1">{member.position} •</div>
             <Button
               variant="text"
               className="text-xs text-primary tracking-normal font-normal py-0"
-              onClick={() => toggleFollowingUser(member._id, true)}
+              onClick={() => toggleFollowingUser(member._id, isFollower)}
             >
-              FOLLOW
+              {isFollower ? "FOLLOW" : "UNFOLLOW"}
             </Button>
           </div>
           <div className="text-xs text-white opacity-60">{member.position}</div>
