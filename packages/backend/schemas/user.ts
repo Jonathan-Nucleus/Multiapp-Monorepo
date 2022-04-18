@@ -94,6 +94,8 @@ export namespace User {
     invitees: (User.Stub | User.GraphQL)[];
     company?: Company.GraphQL;
     watchlist: Fund.GraphQL[];
+    followers: User.GraphQL[];
+    following: User.GraphQL[];
   };
 
   export type Input = Required<

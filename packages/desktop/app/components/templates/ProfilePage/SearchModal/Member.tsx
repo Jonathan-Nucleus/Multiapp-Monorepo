@@ -3,11 +3,12 @@ import Image from "next/image";
 import { Chats } from "phosphor-react";
 
 import type { User } from "backend/graphql/users.graphql";
+import type { FollowUser } from "desktop/app/graphql/queries";
 import Button from "../../../../components/common/Button";
 import Card from "../../../../components/common/Card";
 
 interface MemberProps {
-  member: User;
+  member: FollowUser;
   hiddenChat?: boolean;
   selelctedItem?: string;
   toggleFollowingUser: (id: string, follow: boolean) => void;

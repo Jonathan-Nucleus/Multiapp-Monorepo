@@ -29,8 +29,8 @@ const InvitationCoin: FC<InvitationCoin> = ({
     >
       {email && (
         <span className="uppercase text-xs">
-          {!!firstName
-            ? `${firstName.chartAt(0)}${lastName.charAt()}`
+          {!!firstName && !!lastName
+            ? `${firstName.charAt(0)}${lastName.charAt(0)}`
             : email.charAt(0)}
         </span>
       )}

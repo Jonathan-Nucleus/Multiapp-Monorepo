@@ -29,7 +29,7 @@ const UserProfile: FC = () => {
           <div className="w-full block lg:hidden">
             <CompanyList />
           </div>
-          {funds.length > 0 && <FundsList funds={funds} type="profile" />}
+          {funds.length > 0 && <FundsList funds={funds} />}
           {posts.length > 0 && <FeaturedPosts posts={posts} />}
           <PostsList posts={posts} />
         </div>

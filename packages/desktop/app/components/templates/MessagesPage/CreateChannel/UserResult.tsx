@@ -8,7 +8,7 @@ interface UserResultProps {
 
 const UserResult: FC<UserResultProps> = ({ user }) => (
   <li className="messaging-create-channel__user-result flex items-center p-2">
-    <Avatar image={user.image} size={40} />
+    <Avatar image={(user.image as string) ?? null} size={40} />
     {user.online && (
       <div className="messaging-create-channel__user-result-online" />
     )}

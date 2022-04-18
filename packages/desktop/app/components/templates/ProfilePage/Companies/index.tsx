@@ -10,11 +10,10 @@ const CompanyList: FC = () => {
   const { data: userData, loading, refetch } = useAccount();
   const [followCompany] = useFollowCompany();
 
-  const companies: Company[] = userData?.account.companies ?? [];
-
+  const companies = userData?.account?.companies ?? [];
   const handleToggleFollowCompany = async (
     id: string,
-    follow
+    follow: boolean
   ): Promise<void> => {
     try {
       const { data } = await followCompany({
@@ -38,7 +37,7 @@ const CompanyList: FC = () => {
           <CompanyItem
             company={company}
             handleToggleFollowCompany={handleToggleFollowCompany}
-            userId={userData?.account._id}
+            userId={userData?.account?._id}
           />
         </div>
       ))}

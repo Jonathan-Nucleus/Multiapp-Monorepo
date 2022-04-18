@@ -1,18 +1,19 @@
 import { FC, useState } from "react";
-import Card from "../../../common/Card";
-import Button from "../../../common/Button";
 import Image from "next/image";
 import { Star } from "phosphor-react";
-import type { Fund } from "backend/graphql/funds.graphql";
+
+import Card from "../../../common/Card";
+import Button from "../../../common/Button";
+
 import { useWatchFund } from "desktop/app/graphql/mutations/account";
-import { useAccount } from "desktop/app/graphql/queries";
+import { useAccount, WatchedFund } from "desktop/app/graphql/queries";
 
 const WatchList: FC = () => {
   const [watchFund] = useWatchFund();
   const { data: accountData, loading: accountLoading, refetch } = useAccount();
-  const watchList: Fund[] = accountData?.account.watchlist ?? [];
+  const watchList: WatchedFund[] = accountData?.account?.watchlist ?? [];
 
-  const handleRemoveWahchList = async (id: string): Promise<void> => {
+  const handleRemoveWatchList = async (id: string): Promise<void> => {
     try {
       const { data } = await watchFund({
         variables: { watch: false, fundId: id },
@@ -30,7 +31,7 @@ const WatchList: FC = () => {
   return (
     <Card className="p-0 border-white/[.12] divide-y divide-inherit">
       <div className="text-white  p-4">Watch List</div>
-      {watchList.map((item, index) => (
+      {watchList.map((item) => (
         <div key={item._id} className="flex items-center p-4">
           <div className="flex-shrink-0">
             <Image
@@ -55,7 +56,7 @@ const WatchList: FC = () => {
             <Button
               variant="text"
               className={"text-primary-medium"}
-              onClick={() => handleRemoveWahchList(item._id)}
+              onClick={() => handleRemoveWatchList(item._id)}
             >
               <Star color="currentColor" weight={"fill"} size={16} />
             </Button>

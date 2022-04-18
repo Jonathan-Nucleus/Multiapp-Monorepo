@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect, InputEvent } from "react";
+import React, { FC, useState, useEffect } from "react";
 import { Dialog } from "@headlessui/react";
 import { X, Image as ImageIcon } from "phosphor-react";
 
@@ -7,7 +7,7 @@ import Card from "../../../common/Card";
 import Button from "../../../common/Button";
 import Input from "../../../common/Input";
 import type { User } from "backend/graphql/users.graphql";
-import { useAccount } from "desktop/app/graphql/queries";
+import { useAccount, FollowUser } from "desktop/app/graphql/queries";
 import { useFollowUser } from "desktop/app/graphql/mutations/profiles";
 
 interface SearchModalProps {
@@ -18,13 +18,13 @@ interface SearchModalProps {
 const SearchModal: FC<SearchModalProps> = ({ show, onClose }) => {
   const { data: userData, loading: userLoading, refetch } = useAccount();
   const [followUser] = useFollowUser();
-  const account: User = userData?.account;
-  const followers: User[] = account?.followers ?? [];
-  const following: User[] = account?.following ?? [];
+  const account = userData?.account;
+  const followers = account?.followers ?? [];
+  const following = account?.following ?? [];
 
   const [selelctedItem, setSelectedItem] = useState("follower");
-  const [members, setMembers] = useState<User[]>([]);
-  const [allMembers, setAllMembers] = useState<User[]>([]);
+  const [members, setMembers] = useState<FollowUser[]>([]);
+  const [allMembers, setAllMembers] = useState<FollowUser[]>([]);
   const [search, setSearch] = useState("");
   useEffect(() => {
     if (selelctedItem === "follower") {
@@ -110,8 +110,8 @@ const SearchModal: FC<SearchModalProps> = ({ show, onClose }) => {
                 placeholder="Search team members..."
                 className="rounded-full bg-background-DEFAULT"
                 value={search}
-                onChange={(event: InputEvent<HTMLInputElement>) => {
-                  setSearch(event.target.value);
+                onChange={(event) => {
+                  setSearch(event.currentTarget.value);
                 }}
               />
             </div>

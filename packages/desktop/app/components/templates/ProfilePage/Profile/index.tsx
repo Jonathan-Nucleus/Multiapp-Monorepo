@@ -25,7 +25,7 @@ import { useAccount } from "desktop/app/graphql/queries";
 const Profile: FC = () => {
   const [isVisible, setVisible] = useState(false);
   const { data: userData, loading: userLoading } = useAccount();
-  const account: User = userData?.account;
+  const account = userData?.account;
 
   if (!account) {
     return null;

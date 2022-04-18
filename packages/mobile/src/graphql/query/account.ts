@@ -247,10 +247,11 @@ export function useChatToken(): QueryResult<ChatTokenData, ChatTokenVariables> {
   );
 }
 
+export type Invitee = Pick<User, 'avatar' | 'email' | 'firstName' | 'lastName'>;
 type InvitesVariables = never;
 export type InvitesData = {
   account: Pick<User, '_id'> & {
-    invitees: Pick<User, 'avatar' | 'email' | 'firstName' | 'lastName'>;
+    invitees: Invitee[];
   };
 };
 

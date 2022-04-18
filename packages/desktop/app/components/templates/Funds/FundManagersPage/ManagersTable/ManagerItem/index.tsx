@@ -9,11 +9,14 @@ import Avatar from "../../../../../common/Avatar";
 
 import { useAccount } from "mobile/src/graphql/query/account";
 import { useFollowUser } from "mobile/src/graphql/mutation/account";
-import type { FundManager, Fund } from "mobile/src/graphql/query/marketplace";
+import type {
+  FundManager,
+  FundList,
+} from "mobile/src/graphql/query/marketplace";
 
 interface ManagerItemProps {
   manager: FundManager;
-  funds: Fund[];
+  funds: FundList;
 }
 
 const ManagerItem: FC<ManagerItemProps> = ({
@@ -136,10 +139,14 @@ const ManagerItem: FC<ManagerItemProps> = ({
           <div className="text-white font-medium">
             {manager.firstName} {manager.lastName}
           </div>
-          <div className="text-success ml-3">
-            <ShieldCheck color="currentColor" weight="fill" size={16} />
-          </div>
-          <div className="text-xs text-white ml-1">{manager.type}</div>
+          {manager.role !== "USER" && (
+            <>
+              <div className="text-success ml-3">
+                <ShieldCheck color="currentColor" weight="fill" size={16} />
+              </div>
+              <div className="text-xs text-white ml-1">{manager.role}</div>
+            </>
+          )}
         </div>
         <div className="text-xs text-white mt-1">{manager.position}</div>
         <div className="text-xs text-primary">{manager.company.name}</div>

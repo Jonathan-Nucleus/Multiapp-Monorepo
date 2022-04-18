@@ -96,7 +96,7 @@ export function usePost(postId?: string): QueryResult<PostData, PostVariables> {
     `,
     {
       skip: !postId,
-      variables: { postId },
+      variables: { postId: postId ?? '' },
     },
   );
 }

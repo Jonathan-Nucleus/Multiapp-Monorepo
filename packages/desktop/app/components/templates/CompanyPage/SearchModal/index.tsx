@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect, InputEvent } from "react";
+import React, { FC, useState, useEffect } from "react";
 import { Dialog } from "@headlessui/react";
 import { X, Image as ImageIcon } from "phosphor-react";
 
@@ -8,32 +8,36 @@ import Button from "../../../common/Button";
 import Input from "../../../common/Input";
 import type { User } from "backend/graphql/users.graphql";
 import { useAccount } from "desktop/app/graphql/queries";
-import { useFollowUserAsCompany } from "desktop/app/graphql/mutations/profiles";
-import type { Company } from "backend/graphql/companies.graphql";
+import { useFollowCompany } from "desktop/app/graphql/mutations/profiles";
+import { Company, FollowUser } from "mobile/src/graphql/query/company";
 
 interface SearchModalProps {
   show: boolean;
   onClose: () => void;
-  account: Company;
+  company: Company;
 }
 
-const SearchModal: FC<SearchModalProps> = ({ show, onClose, account }) => {
-  const { data: userData, loading: userLoading, refetch } = useAccount();
-  const [followUser] = useFollowUserAsCompany();
-  const followers: User[] = account?.followers ?? [];
-  const following: User[] = account?.following ?? [];
-
-  const [selelctedItem, setSelectedItem] = useState("follower");
-  const [members, setMembers] = useState<User[]>([]);
-  const [allMembers, setAllMembers] = useState<User[]>([]);
+const SearchModal: FC<SearchModalProps> = ({ show, onClose, company }) => {
+  const { data: userData, loading: userLoading } = useAccount({
+    fetchPolicy: "cache-only",
+  });
+  const [followCompany] = useFollowCompany();
+  const [selectedItem, setSelectedItem] = useState("follower");
+  const [members, setMembers] = useState<FollowUser[]>([]);
+  const [allMembers, setAllMembers] = useState<FollowUser[]>([]);
   const [search, setSearch] = useState("");
+
+  const account = userData?.account;
+  const followers = company.followers ?? [];
+  const following = company.following ?? [];
+
   useEffect(() => {
-    if (selelctedItem === "follower") {
+    if (selectedItem === "follower") {
       setAllMembers(followers);
     } else {
       setAllMembers(following);
     }
-  }, [selelctedItem, followers, following]);
+  }, [selectedItem, followers, following]);
 
   useEffect(() => {
     const _allMembers = [...allMembers];
@@ -53,13 +57,15 @@ const SearchModal: FC<SearchModalProps> = ({ show, onClose, account }) => {
     id: string,
     follow: boolean
   ): Promise<void> => {
+    if (!account) return;
+
     try {
-      const { data } = await followUser({
-        variables: { follow: follow, userId: id, asCompanyId: account._id },
+      const { data } = await followCompany({
+        variables: { follow: follow, companyId: account._id },
+        refetchQueries: ["Account"],
       });
-      if (data?.followUser) {
-        refetch();
-      } else {
+
+      if (!data?.followCompany) {
         console.log("err", data);
       }
     } catch (err) {
@@ -79,9 +85,7 @@ const SearchModal: FC<SearchModalProps> = ({ show, onClose, account }) => {
                   variant="text"
                   onClick={() => setSelectedItem("follower")}
                   className={
-                    selelctedItem === "follower"
-                      ? `border-b border-primary`
-                      : ""
+                    selectedItem === "follower" ? `border-b border-primary` : ""
                   }
                 >
                   <div className="text-xl text-white font-medium">
@@ -92,7 +96,7 @@ const SearchModal: FC<SearchModalProps> = ({ show, onClose, account }) => {
                   variant="text"
                   onClick={() => setSelectedItem("follow")}
                   className={
-                    selelctedItem === "follow"
+                    selectedItem === "follow"
                       ? `border-b border-primary ml-8`
                       : "ml-8"
                   }
@@ -111,8 +115,8 @@ const SearchModal: FC<SearchModalProps> = ({ show, onClose, account }) => {
                 placeholder="Search team members..."
                 className="rounded-full bg-background-DEFAULT"
                 value={search}
-                onChange={(event: InputEvent<HTMLInputElement>) => {
-                  setSearch(event.target.value);
+                onChange={(event) => {
+                  setSearch(event.currentTarget.value);
                 }}
               />
             </div>
@@ -123,7 +127,7 @@ const SearchModal: FC<SearchModalProps> = ({ show, onClose, account }) => {
                   hiddenChat={true}
                   key={index}
                   toggleFollowingUser={toggleFollowingUser}
-                  selelctedItem={selelctedItem}
+                  selectedItem={selectedItem}
                 />
               ))}
             </div>

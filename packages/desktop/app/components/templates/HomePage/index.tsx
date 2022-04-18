@@ -10,14 +10,14 @@ import InviteFriends from "./InviteFriends";
 import WatchList from "./WatchList";
 import Button from "../../common/Button";
 import CreatePostModal from "./AddPost/CreatePostModal";
+
 import { useAccount } from "desktop/app/graphql/queries";
-import type { Company } from "backend/graphql/companies.graphql";
 
 const HomePage: FC = () => {
   const [showPostModal, setShowPostModal] = useState(false);
   const { data: accountData, loading: accountLoading } = useAccount();
   const user = accountData?.account;
-  const companies: Company[] = accountData?.account.companies ?? [];
+  const companies = accountData?.account?.companies ?? [];
   if (!user) {
     return <></>;
   }

@@ -8,7 +8,7 @@ export const Message = () => {
   const { message } = useMessageContext();
   const { client } = useChatContext();
 
-  const isFromMe = client.userID === message.user.id;
+  const isFromMe = client.userID === message.user?.id;
   //const hasAttachments = !!message.attachments;
 
   return (

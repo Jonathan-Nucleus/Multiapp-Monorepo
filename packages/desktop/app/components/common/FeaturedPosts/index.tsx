@@ -3,7 +3,7 @@ import "@splidejs/react-splide/css";
 import { Splide, SplideSlide } from "@splidejs/react-splide";
 import Image from "next/image";
 
-import Post from "../Post";
+import PostCard from "../Post";
 import Card from "../Card";
 import { FetchPostsData } from "desktop/app/graphql/queries";
 
@@ -19,7 +19,7 @@ const FeaturedPosts: FC<PostsProps> = ({ posts }) => {
       <div className="hidden md:block">
         {posts.map((post, index) => (
           <div key={index} className="mt-2 mb-8">
-            <Post post={post} />
+            <PostCard post={post} />
           </div>
         ))}
       </div>
@@ -37,7 +37,7 @@ const FeaturedPosts: FC<PostsProps> = ({ posts }) => {
             {posts.map((post, index) => (
               <SplideSlide key={index}>
                 <div className="mx-2">
-                  <Post post={post} />
+                  <PostCard post={post} />
                 </div>
               </SplideSlide>
             ))}

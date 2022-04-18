@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect, InputEvent } from "react";
+import React, { FC, useState, useEffect } from "react";
 import { Dialog } from "@headlessui/react";
 import { X, Image as ImageIcon } from "phosphor-react";
 
@@ -6,17 +6,18 @@ import Member from "./Member";
 import Card from "../../../common/Card";
 import Button from "../../../common/Button";
 import SearchInput from "../../../common/SearchInput";
-import type { User } from "backend/graphql/users.graphql";
+
+import { FundDetails } from "mobile/src/graphql/query/marketplace";
 
 interface MembersModalProps {
   show: boolean;
   onClose: () => void;
-  members: User[];
+  members: FundDetails["team"];
 }
 
 const MembersModal: FC<MembersModalProps> = ({ show, onClose, members }) => {
   const [search, setSearch] = useState("");
-  const [filteredMembers, setFilteredMembers] = useState<User[]>([]);
+  const [filteredMembers, setFilteredMembers] = useState<typeof members>([]);
 
   useEffect(() => {
     setFilteredMembers(members);
@@ -55,8 +56,8 @@ const MembersModal: FC<MembersModalProps> = ({ show, onClose, members }) => {
                 placeholder="Search team members..."
                 className="rounded-full bg-background-DEFAULT"
                 value={search}
-                onChange={(event: InputEvent<HTMLInputElement>) => {
-                  setSearch(event.target.value);
+                onChange={(event) => {
+                  setSearch(event.currentTarget.value);
                 }}
               />
             </div>

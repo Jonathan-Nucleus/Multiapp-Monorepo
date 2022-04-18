@@ -9,6 +9,7 @@ import {
 
 import { Post, PostCategory } from "backend/graphql/posts.graphql";
 import { User } from "backend/graphql/users.graphql";
+import { Company } from "backend/graphql/companies.graphql";
 
 export const VERIFY_INVITE = gql`
   query VerifyInvite($code: String!) {
@@ -84,9 +85,26 @@ export function useFetchPosts(): QueryResult<
   );
 }
 
+export type FollowUser = Pick<
+  User,
+  "_id" | "firstName" | "lastName" | "avatar" | "position"
+> & {
+  company: Pick<Company, "_id" | "name">;
+};
+export type WatchedFund = Pick<
+  User["watchlist"][number],
+  "_id" | "name" | "avatar" | "companyId" | "managerId"
+> & {
+  company: Pick<User["watchlist"][number]["company"], "name">;
+};
+export type AccountCompany = Pick<
+  User["companies"][number],
+  "_id" | "name" | "avatar" | "followerIds" | "followingIds" | "postIds"
+>;
+
 type AccountVariables = never;
 export type AccountData = {
-  account: Pick<
+  account?: Pick<
     User,
     | "_id"
     | "firstName"
@@ -100,14 +118,14 @@ export type AccountData = {
     | "postIds"
     | "followingIds"
     | "watchlistIds"
+    | "twitter"
+    | "linkedIn"
+    | "website"
   > & {
-    companies: Pick<User["companies"][number], "_id" | "name" | "avatar">[];
-    watchlist: Pick<
-      User["watchlist"][number],
-      "_id" | "name" | "avatar" | "companyId" | "managerId"
-    > & {
-      company: Pick<User["watchlist"][number]["company"], "name">;
-    };
+    followers: FollowUser[];
+    following: FollowUser[];
+    companies: AccountCompany[];
+    watchlist: WatchedFund[];
   };
 };
 

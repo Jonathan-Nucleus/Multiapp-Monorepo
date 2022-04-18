@@ -19,6 +19,8 @@ export namespace Company {
     funds: Fund.GraphQL[];
     fundManagers: User.GraphQL[];
     createdAt: Date;
+    followers: User.GraphQL[];
+    following: User.GraphQL[];
   };
 }
 

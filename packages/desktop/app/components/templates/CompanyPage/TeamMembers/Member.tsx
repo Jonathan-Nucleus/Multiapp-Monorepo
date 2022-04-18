@@ -7,11 +7,18 @@ import Avatar from "desktop/app/components/common/Avatar";
 import Button from "../../../../components/common/Button";
 import Card from "../../../../components/common/Card";
 
-import { useAccount } from "desktop/app/graphql/queries";
+import { FundDetails } from "mobile/src/graphql/query/marketplace";
+import { useAccount } from "mobile/src/graphql/query/account";
 import { useFollowUser } from "mobile/src/graphql/mutation/account";
 
+type TeamMember = FundDetails["team"][number] & {
+  company?: {
+    name: string;
+  };
+};
+
 interface MemberProps {
-  member: User;
+  member: TeamMember;
   hiddenChat?: boolean;
 }
 

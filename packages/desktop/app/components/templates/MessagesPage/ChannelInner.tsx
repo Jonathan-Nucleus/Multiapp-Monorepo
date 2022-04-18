@@ -3,6 +3,7 @@ import { Attachment, logChatPromiseExecution, UserResponse } from "stream-chat";
 import {
   MessageList,
   MessageInput,
+  MessageInputProps,
   Window,
   StreamMessage,
   useChannelActionContext,
@@ -25,12 +26,9 @@ export const ChannelInner: React.FC<ChannelInnerProps> = (props) => {
   const { channel } = useChannelStateContext<StreamType>();
   const { sendMessage } = useChannelActionContext<StreamType>();
 
-  const overrideSubmitHandler = (message: {
-    attachments: Attachment[];
-    mentioned_users: UserResponse[];
-    text: string;
-    parent?: StreamMessage;
-  }) => {
+  const overrideSubmitHandler: MessageInputProps["overrideSubmitHandler"] = (
+    message
+  ) => {
     let updatedMessage;
 
     if (message.attachments?.length && message.text?.startsWith("/giphy")) {

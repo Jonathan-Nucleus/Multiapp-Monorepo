@@ -125,7 +125,7 @@ const Post: FC<PostProps> = ({ post }: PostProps) => {
         <div className="opacity-60 text-white ml-10">
           <div className="flex items-center cursor-pointer">
             <Share weight="light" color="currentColor" size={24} />
-            {post.shareIds?.length > 0 && (
+            {post.shareIds && post.shareIds.length > 0 && (
               <div className="text-white ml-2">{post.shareIds.length}</div>
             )}
           </div>

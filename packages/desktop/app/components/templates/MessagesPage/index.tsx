@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import { ChannelFilters, ChannelSort, StreamChat } from "stream-chat";
 import {
   Chat,
@@ -15,16 +15,16 @@ import MessagingChannelList, {
   MessagingChannelListHeader,
 } from "./MessagingChannelList";
 import MessagingChannelPreview from "./MessagingChannelPreview";
-import { MessagingThreadHeader } from "./MessagingThread";
+import MessagingThreadHeader from "./MessagingThread";
 import { ChannelInner } from "./ChannelInner";
 import { StreamType, GiphyContext } from "./types";
 
-const API_KEY = process.env.NEXT_PUBLIC_GETSTREAM_ACCESS_KEY;
-const TARGET_ORIGIN = process.env.NEXT_PUBLIC_STREAM_TARGET_ORIGIN;
+const API_KEY = process.env.NEXT_PUBLIC_GETSTREAM_ACCESS_KEY as string;
+const TARGET_ORIGIN = process.env.NEXT_PUBLIC_STREAM_TARGET_ORIGIN as string;
 const options = { state: true, watch: true, presence: true, limit: 4 };
 
 const MessagesPage = () => {
-  const [chatClient, setChatClient] = useState<StreamChat | null>(null);
+  const chatClient = useRef<StreamChat | null>(null);
   const [channelFilters, setChannelFilters] = useState<ChannelFilters>();
   const [channelSort, setChannelSort] = useState<ChannelSort>({
     last_message_at: -1,
@@ -37,12 +37,12 @@ const MessagesPage = () => {
   const { data: userData } = useAccount();
   const { data: chatData } = useChatToken();
 
-  useChecklist(chatClient, TARGET_ORIGIN);
+  useChecklist(chatClient.current, TARGET_ORIGIN);
 
   useEffect(() => {
-    if (API_KEY && !chatClient && chatData?.chatToken && userData) {
+    if (API_KEY && !chatClient.current && chatData?.chatToken && userData) {
       const initChat = async () => {
-        const client = StreamChat.getInstance<StreamType>(API_KEY, {
+        const client = StreamChat.getInstance(API_KEY, {
           enableInsights: true,
           enableWSFallback: true,
         });
@@ -54,7 +54,8 @@ const MessagesPage = () => {
           },
           chatData.chatToken
         );
-        setChatClient(client);
+
+        chatClient.current = client;
         setChannelFilters({
           type: "messaging",
           members: { $in: [userData.account._id] },
@@ -64,7 +65,7 @@ const MessagesPage = () => {
       initChat();
 
       return () => {
-        chatClient?.disconnectUser();
+        chatClient.current?.disconnectUser();
       };
     }
   }, [chatData, userData]);
@@ -99,14 +100,16 @@ const MessagesPage = () => {
   const giphyContextValue = { giphyState, setGiphyState };
   const toggleMobile = () => setMobileNav(!isMobileNavVisible);
 
-  const onChannelSearch = (keyword: string) => {
+  const onChannelSearch = (keyword: string): void => {
+    if (!userData) return;
+
     const criteria: ChannelFilters = {
       type: "messaging",
       $and: [{ members: { $in: [userData.account._id] } }],
     };
 
     if (keyword) {
-      criteria.$and.push({
+      criteria.$and?.push({
         $or: [{ members: { $in: [keyword] } }, { name: { $in: [keyword] } }],
       });
     }
@@ -114,10 +117,10 @@ const MessagesPage = () => {
     setChannelFilters(criteria);
   };
 
-  if (!chatClient) return <LoadingIndicator />;
+  if (!chatClient.current) return <LoadingIndicator />;
 
   return (
-    <Chat client={chatClient} theme="prometheus-messages dark">
+    <Chat client={chatClient.current} theme="prometheus-messages dark">
       <div className="flex h-[calc(100vh-78px)] overflow-hidden">
         <div
           id="mobile-channel-list"

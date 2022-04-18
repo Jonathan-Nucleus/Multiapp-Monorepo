@@ -48,14 +48,14 @@ const ManagersTable: FC = () => {
           </header>
           {managers.map((manager, index) => (
             <div key={index} className="mb-4 lg:mb-0">
-              <ManagerItem
-                manager={manager}
-                funds={
-                  manager.managedFundsIds?.map((fundId) =>
-                    funds.find((fund) => fund._id === fundId)
-                  ) ?? []
-                }
-              />
+              {manager.managedFundsIds && (
+                <ManagerItem
+                  manager={manager}
+                  funds={manager.managedFundsIds.map(
+                    (fundId) => funds.find((fund) => fund._id === fundId)!!
+                  )}
+                />
+              )}
             </div>
           ))}
           <footer className="py-5">

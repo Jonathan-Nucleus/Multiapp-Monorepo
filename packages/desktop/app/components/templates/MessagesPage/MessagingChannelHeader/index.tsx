@@ -16,21 +16,20 @@ type Props = {
 const MessagingChannelHeader: React.FC<Props> = (props) => {
   const { toggleMobile } = props;
 
-  const { client } = useChatContext<StreamType>();
-  const { channel } = useChannelStateContext<StreamType>();
+  const { client } = useChatContext();
+  const { channel } = useChannelStateContext();
 
   const [channelName, setChannelName] = useState(channel.data?.name || "");
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState("");
-
   const inputRef = useRef<HTMLInputElement>(null);
 
   const members = Object.values(channel.state?.members).filter(
     (member) => member.user?.id !== client?.user?.id
   );
   const avatarInfo = members.map(({ user }) => ({
-    image: user.image,
-    name: user.name,
+    image: user?.image,
+    name: user?.name,
   }));
 
   const updateChannel = async () => {
@@ -74,7 +73,7 @@ const MessagingChannelHeader: React.FC<Props> = (props) => {
         autoFocus
         className="channel-header__edit-input"
         onBlur={updateChannel}
-        onChange={(event) => setChannelName(event.target.value)}
+        onChange={(event) => setChannelName(event.currentTarget.value)}
         placeholder="Type a new name for the chat"
         ref={inputRef}
         value={channelName}

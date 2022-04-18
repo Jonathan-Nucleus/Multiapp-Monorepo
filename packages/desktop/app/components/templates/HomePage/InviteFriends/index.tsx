@@ -11,7 +11,7 @@ import Field from "../../../common/Field";
 import Button from "../../../common/Button";
 import InvitationCoin from "./InvitationCoin";
 
-import { useInvites } from "mobile/src/graphql/query/account";
+import { useInvites, Invitee } from "mobile/src/graphql/query/account";
 import { INVITE_USER } from "../../../../graphql/mutations/account";
 
 const MAX_INVITES = 5;
@@ -36,7 +36,7 @@ const InviteFriends: FC = () => {
     resolver: yupResolver(schema),
     mode: "onChange",
   });
-  const invitedFriends = accountData?.account.invitees ?? [];
+  const invitedFriends: Invitee[] = accountData?.account?.invitees ?? [];
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     if (MAX_INVITES - invitedFriends.length <= 0) return;

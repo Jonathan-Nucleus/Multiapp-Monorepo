@@ -7,7 +7,7 @@ import Card from "../../../common/Card";
 import type { Company } from "backend/graphql/companies.graphql";
 
 interface Props {
-  company: Company;
+  company: Pick<Company, "_id" | "avatar" | "name" | "followerIds">;
   handleToggleFollowCompany: (id: string, follow: boolean) => void;
   userId?: string;
 }
@@ -17,7 +17,8 @@ const CompanyItem: FC<Props> = ({
   handleToggleFollowCompany,
   userId,
 }) => {
-  const isFollower = company.followerIds?.includes(userId);
+  const isFollower =
+    (!!userId && company.followerIds?.includes(userId)) ?? false;
 
   return (
     <div className="flex items-center py-4">

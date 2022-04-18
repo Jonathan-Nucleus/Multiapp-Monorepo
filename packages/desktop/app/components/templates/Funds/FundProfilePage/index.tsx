@@ -177,8 +177,12 @@ const FundProfile: FC<FundProfileProps> = ({ fundId }) => {
   const [showModal, setShowModal] = useState(false);
 
   const fund = data?.fund;
-  const isWatching = userData?.account?.watchlistIds?.includes(fundId) ?? false;
+  const isWatching =
+    (!!fundId && userData?.account?.watchlistIds?.includes(fundId)) ?? false;
+
   const toggleWatchFund = async (): Promise<void> => {
+    if (!fundId) return;
+
     try {
       const { data } = await watchFund({
         variables: { watch: !isWatching, fundId },
@@ -256,7 +260,7 @@ const FundProfile: FC<FundProfileProps> = ({ fundId }) => {
                   <Button
                     variant="text"
                     className="ml-2"
-                    onClick={() => toggleWatchFund(fund._id, !isWatching)}
+                    onClick={toggleWatchFund}
                   >
                     <Star
                       color={isWatching ? PINK : "white"}

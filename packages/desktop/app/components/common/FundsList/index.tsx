@@ -1,9 +1,9 @@
 import { FC, useState } from "react";
 
-import FundItem, { Fund } from "./FundItem";
+import FundItem, { FundItemProps } from "./FundItem";
 
 interface FundsListProps {
-  funds: Fund[];
+  funds: FundItemProps["fund"][];
   showImages?: boolean;
 }
 

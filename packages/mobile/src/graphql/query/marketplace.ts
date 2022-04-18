@@ -100,7 +100,10 @@ export type FundDetails = Pick<
     '_id' | 'firstName' | 'lastName' | 'avatar' | 'position'
   >[];
   company: Pick<GraphQLFund['company'], '_id' | 'name' | 'avatar'> & {
-    background: Pick<GraphQLFund['company']['background'], 'url'>;
+    background: Pick<
+      Exclude<GraphQLFund['company']['background'], undefined>,
+      'url'
+    >;
   };
 };
 export type FundData = {
@@ -158,7 +161,7 @@ export function useFund(fundId?: string): QueryResult<FundData, FundVariables> {
     `,
     {
       skip: !fundId,
-      variables: { fundId },
+      variables: { fundId: fundId ?? '' },
     },
   );
 }
@@ -174,13 +177,18 @@ export type FundManager = Pick<
   | 'followerIds'
   | 'postIds'
   | 'position'
+  | 'role'
 > & {
-  company: Pick<GraphQLFund['manager']['company'], '_id' | 'name' | 'avatar'>;
+  company: Pick<
+    Exclude<GraphQLFund['manager']['company'], undefined>,
+    '_id' | 'name' | 'avatar'
+  >;
 };
+export type FundList = Pick<Fund, '_id' | 'name' | 'level'>[];
 export type FundManagersData = {
   fundManagers?: {
     managers: FundManager[];
-    funds: Pick<Fund, '_id' | 'name' | 'level'>[];
+    funds: FundList;
   };
 };
 
@@ -207,6 +215,7 @@ export function useFundManagers(): QueryResult<
             firstName
             lastName
             avatar
+            role
             managedFundsIds
             followerIds
             postIds
@@ -228,11 +237,11 @@ export type Company = Pick<
   GraphQLCompany,
   '_id' | 'name' | 'avatar' | 'postIds' | 'followerIds'
 > & {
-  funds: Pick<Fund, '_id' | 'name' | 'managerId'>;
+  funds: Pick<GraphQLCompany['funds'][number], '_id' | 'name' | 'managerId'>[];
   fundManagers: Pick<
     GraphQLCompany['fundManagers'][number],
     '_id' | 'firstName' | 'lastName' | 'avatar'
-  >;
+  >[];
 };
 export type FundCompanyData = {
   fundCompanies: Company[];

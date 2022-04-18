@@ -6,7 +6,8 @@ import MembersModal from "./MembersModal";
 import type { User } from "backend/graphql/users.graphql";
 
 import { useAccount } from "desktop/app/graphql/queries";
-import type { Company } from "backend/graphql/companies.graphql";
+import { Company } from "mobile/src/graphql/query/company";
+
 interface MembersModalProps {
   company: Company;
 }

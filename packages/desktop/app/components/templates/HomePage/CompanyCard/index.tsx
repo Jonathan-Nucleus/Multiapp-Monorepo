@@ -2,10 +2,11 @@ import { FC } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Card from "../../../common/Card";
-import type { Company } from "backend/graphql/companies.graphql";
+
+import { AccountCompany } from "desktop/app/graphql/queries";
 
 interface CompanyProps {
-  company: Company;
+  company: AccountCompany;
 }
 
 const CompanyCard: FC<CompanyProps> = ({ company }) => {

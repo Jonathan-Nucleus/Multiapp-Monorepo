@@ -206,7 +206,7 @@ const CreateChannel: React.FC<CreateChannelProps> = ({
                     onClick={() => removeUser(user)}
                     key={user.id}
                   >
-                    <Avatar image={user.image} size={20} />
+                    <Avatar image={(user.image as string) ?? null} size={20} />
                     <div className="messaging-create-channel__user-text text-white mr-2">
                       {user.name}
                     </div>

@@ -14,7 +14,7 @@ import Card from "desktop/app/components/common/Card";
 
 import { PINK } from "shared/src/colors";
 
-interface FundItemProps {
+export interface FundItemProps {
   fund: Fund;
   showImages?: boolean;
 }
@@ -29,7 +29,6 @@ const FundItem: FC<FundItemProps> = ({
     refetch,
   } = useAccount({ fetchPolicy: "cache-only" });
 
-  const account: User = userData?.account;
   const [followUser] = useFollowUser();
   const [watchFund] = useWatchFund();
 
@@ -94,9 +93,9 @@ const FundItem: FC<FundItemProps> = ({
                   {fund?.company?.background && (
                     <Image
                       loader={() =>
-                        `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund?.company?.background.url}`
+                        `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund?.company?.background?.url}`
                       }
-                      src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund?.company?.background.url}`}
+                      src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund?.company?.background?.url}`}
                       alt=""
                       layout="fill"
                       className="object-cover"

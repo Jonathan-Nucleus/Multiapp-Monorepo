@@ -6,15 +6,23 @@ import type { User } from "backend/graphql/users.graphql";
 import Button from "../../../../components/common/Button";
 import Card from "../../../../components/common/Card";
 
+import { FollowUser } from "mobile/src/graphql/query/company";
+
+type Member = FollowUser & {
+  company?: {
+    name: string;
+  };
+};
+
 interface MemberProps {
-  member: User;
+  member: Member;
   hiddenChat?: boolean;
-  selelctedItem?: string;
+  selectedItem?: string;
   toggleFollowingUser: (id: string, follow: boolean) => void;
 }
 const Member: FC<MemberProps> = (props) => {
-  const { member, hiddenChat, selelctedItem, toggleFollowingUser } = props;
-  const isFollower = selelctedItem === "follower" ? true : false;
+  const { member, hiddenChat, selectedItem, toggleFollowingUser } = props;
+  const isFollower = selectedItem === "follower" ? true : false;
   return (
     <div className="flex items-center justify-between py-4 w-full">
       <div className="flex items-center w-full">

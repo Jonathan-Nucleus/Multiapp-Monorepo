@@ -10,10 +10,7 @@ import AvatarGroup from "../AvatarGroup";
 import { StreamType } from "../types";
 
 type MessagingChannelPreviewProps = ChannelPreviewUIComponentProps & {
-  channel: Channel;
   setIsCreating: React.Dispatch<React.SetStateAction<boolean>>;
-  latestMessage?: string | Element;
-  setActiveChannel?: ChatContextValue["setActiveChannel"];
 };
 
 const MessagingChannelPreview: React.FC<MessagingChannelPreviewProps> = ({
@@ -26,11 +23,9 @@ const MessagingChannelPreview: React.FC<MessagingChannelPreviewProps> = ({
   const members = Object.values(channel.state.members)
     .filter(({ user }) => user?.id !== client.userID)
     .map(({ user }) => ({
-      name: user.name,
-      image: user.image,
+      name: user?.name,
+      image: user?.image,
     }));
-
-  console.log("lastMessage", lastMessage);
 
   return (
     <div

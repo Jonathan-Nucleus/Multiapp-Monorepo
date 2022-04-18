@@ -19,30 +19,28 @@ import Avatar from "desktop/app/components/common/Avatar";
 
 import { useFollowCompany } from "mobile/src/graphql/mutation/account";
 import { useAccount } from "mobile/src/graphql/query/account";
-import type { Company } from "backend/graphql/companies.graphql";
-import type { User } from "backend/graphql/users.graphql";
+import { Company } from "mobile/src/graphql/query/company";
 
 interface AccountProps {
-  account: Company;
-  members: User[];
+  company: Company;
 }
 
-const Profile: FC<AccountProps> = ({ account, members }) => {
+const Profile: FC<AccountProps> = ({ company }) => {
   const [isVisible, setVisible] = useState(false);
-  const { data: accountData } = useAccount({ fetchPolicy: "cache-only " });
+  const { data: accountData } = useAccount({ fetchPolicy: "cache-only" });
   const [followCompany] = useFollowCompany();
 
-  const isFollowing = accountData?.account?.companyFollowingIds?.includes(
-    account._id
-  );
+  const { members } = company;
+  const account = accountData?.account;
+  const isFollowing =
+    (!!accountData &&
+      accountData.account?.companyFollowingIds?.includes(company._id)) ??
+    false;
 
-  const toggleFollowCompany = async (
-    id: string,
-    follow: boolean
-  ): Promise<void> => {
+  const toggleFollowCompany = async (): Promise<void> => {
     try {
       const { data } = await followCompany({
-        variables: { follow, companyId: id },
+        variables: { follow: !isFollowing, companyId: company._id },
         refetchQueries: ["Account"],
       });
 
@@ -61,9 +59,9 @@ const Profile: FC<AccountProps> = ({ account, members }) => {
           <div className="w-full h-32 relative">
             <Image
               loader={() =>
-                `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${account.background?.url}`
+                `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${company.background?.url}`
               }
-              src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${account.background?.url}`}
+              src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${company.background?.url}`}
               alt=""
               layout="fill"
               objectFit="cover"
@@ -79,11 +77,11 @@ const Profile: FC<AccountProps> = ({ account, members }) => {
                 className={`w-24 h-24 flex justify-center relative shadow-2xl
                 shadow-black`}
               >
-                <Avatar src={account.avatar} shape="square" size={96} />
+                <Avatar src={company.avatar} shape="square" size={96} />
               </div>
               <div className="ml-5 mt-3">
                 <div className="flex items-center">
-                  <div className="text-white">{account.name}</div>
+                  <div className="text-white">{company.name}</div>
                 </div>
               </div>
             </div>
@@ -91,7 +89,7 @@ const Profile: FC<AccountProps> = ({ account, members }) => {
               variant="gradient-primary"
               className={`w-full h-10	mt-8 uppercase py-0 md:w-44 uppercase
                 font-medium tracking-wider`}
-              onClick={() => toggleFollowCompany(account._id, !isFollowing)}
+              onClick={toggleFollowCompany}
             >
               {isFollowing ? "unfollow" : "follow"}
             </Button>
@@ -99,8 +97,8 @@ const Profile: FC<AccountProps> = ({ account, members }) => {
 
           <div className="flex items-center flex-col-reverse md:flex-row my-4">
             <div className="text-sm text-white opacity-80 px-4 w-full">
-              <p>{account.tagline}</p>
-              <p className="mt-4">{account.overview}</p>
+              <p>{company.tagline}</p>
+              <p className="mt-4">{company.overview}</p>
             </div>
             <div
               className={`w-auto mx-4 my-4 flex flex-row divide-x divide-white
@@ -108,7 +106,7 @@ const Profile: FC<AccountProps> = ({ account, members }) => {
             >
               <div className="text-center px-4">
                 <div className="text-xl font-medium leading-none">
-                  {account.postIds?.length ?? 0}
+                  {company.postIds?.length ?? 0}
                 </div>
                 <div className="text-xs text-white opacity-60 tracking-wider leading-none mt-1">
                   Posts
@@ -119,7 +117,7 @@ const Profile: FC<AccountProps> = ({ account, members }) => {
                 onClick={() => setVisible(true)}
               >
                 <div className="text-xl font-medium leading-none">
-                  {account.followerIds?.length ?? 0}
+                  {company.followerIds?.length ?? 0}
                 </div>
                 <div className="text-xs text-white opacity-60 tracking-wider leading-none mt-1">
                   Followers
@@ -130,7 +128,7 @@ const Profile: FC<AccountProps> = ({ account, members }) => {
                 onClick={() => setVisible(true)}
               >
                 <div className="text-xl font-medium leading-none">
-                  {account.followingIds?.length ?? 0}
+                  {company.followingIds?.length ?? 0}
                 </div>
                 <div className="text-xs text-white opacity-60 tracking-wider leading-none mt-1">
                   Following
@@ -142,7 +140,7 @@ const Profile: FC<AccountProps> = ({ account, members }) => {
           <div className="flex items-center p-4 border-t border-white/[.12]">
             <div className="flex items-center cursor-pointer mr-4">
               <a
-                href={account.linkedIn ?? "http://www.linkedin.com"}
+                href={company.linkedIn ?? "http://www.linkedin.com"}
                 className="flex items-center"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -155,7 +153,7 @@ const Profile: FC<AccountProps> = ({ account, members }) => {
             </div>
             <div className="flex items-center cursor-pointer mr-4">
               <a
-                href={account.twitter ?? "http://www.twitter.com"}
+                href={company.twitter ?? "http://www.twitter.com"}
                 className="flex items-center"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -166,10 +164,10 @@ const Profile: FC<AccountProps> = ({ account, members }) => {
                 </div>
               </a>
             </div>
-            {account.website && (
+            {company.website && (
               <div className="flex items-center cursor-pointer">
                 <a
-                  href={account.website}
+                  href={company.website}
                   className="flex items-center"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -219,7 +217,7 @@ const Profile: FC<AccountProps> = ({ account, members }) => {
       <SearchModal
         show={isVisible}
         onClose={() => setVisible(false)}
-        account={account}
+        company={company}
       />
     </>
   );

@@ -1,5 +1,6 @@
 import { gql, useQuery, QueryResult } from '@apollo/client';
 import { Company as GraphQLCompany } from 'backend/graphql/companies.graphql';
+import { User as GraphQLUser } from 'backend/graphql/users.graphql';
 import { VIEW_POST_FRAGMENT } from './post';
 
 type CompanyVariables = {
@@ -7,13 +8,20 @@ type CompanyVariables = {
 };
 
 export type FundManager = Pick<
-  GraphQLCompany['funds'][number]['mmanager'],
+  GraphQLCompany['funds'][number]['manager'],
   '_id' | 'firstName' | 'lastName' | 'avatar' | 'followerIds' | 'postIds'
 >;
 
 export type Fund = Pick<
   GraphQLCompany['funds'][number],
-  '_id' | 'name' | 'tags' | 'highlights'
+  | '_id'
+  | 'name'
+  | 'tags'
+  | 'highlights'
+  | 'overview'
+  | 'level'
+  | 'status'
+  | 'background'
 > & {
   manager: FundManager;
 };
@@ -23,10 +31,27 @@ export type CompanyMember = Pick<
   '_id' | 'firstName' | 'lastName' | 'avatar' | 'position'
 >;
 
+export type FollowUser = Pick<
+  GraphQLUser,
+  '_id' | 'firstName' | 'lastName' | 'position' | 'avatar'
+>;
 export type Company = Pick<
   GraphQLCompany,
-  '_id' | 'name' | 'tagline' | 'overview' | 'avatar' | 'background'
+  | '_id'
+  | 'name'
+  | 'tagline'
+  | 'overview'
+  | 'avatar'
+  | 'background'
+  | 'postIds'
+  | 'followerIds'
+  | 'followingIds'
+  | 'website'
+  | 'linkedIn'
+  | 'twitter'
 > & {
+  followers: FollowUser[];
+  following: FollowUser[];
   funds: Fund[];
   members: CompanyMember[];
 };
@@ -53,6 +78,22 @@ export function useCompany(
           tagline
           overview
           avatar
+          followerIds
+          followingIds
+          followers {
+            _id
+            firstName
+            lastName
+            avatar
+            position
+          }
+          following {
+            _id
+            firstName
+            lastName
+            avatar
+            position
+          }
           background {
             url
             x
@@ -66,6 +107,12 @@ export function useCompany(
             name
             tags
             highlights
+            overview
+            level
+            status
+            background {
+              url
+            }
             manager {
               _id
               avatar
@@ -90,7 +137,7 @@ export function useCompany(
     `,
     {
       skip: !companyId,
-      variables: { companyId },
+      variables: { companyId: companyId ?? '' },
     },
   );
 }

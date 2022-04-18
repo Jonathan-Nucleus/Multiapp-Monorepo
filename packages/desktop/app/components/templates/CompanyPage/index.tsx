@@ -29,10 +29,12 @@ const CompanyPage: FC<CompanyPageProps> = ({ companyId }) => {
   const posts = data?.posts ?? [];
   const company = companyData?.companyProfile;
   const members = companyData?.companyProfile?.members ?? [];
-  const funds = (companyData?.companyProfile?.funds ?? []).map((fund) => ({
-    ...fund,
-    company, // Inject company data for the fund
-  }));
+  const funds = company
+    ? (companyData?.companyProfile?.funds ?? []).map((fund) => ({
+        ...fund,
+        company, // Inject company data for the fund
+      }))
+    : [];
 
   if (loading || !company || !posts) {
     return <></>;
@@ -45,7 +47,7 @@ const CompanyPage: FC<CompanyPageProps> = ({ companyId }) => {
   return (
     <div className="flex flex-col justify-center p-0 mt-10 md:flex-row md:px-2">
       <div className="min-w-0 max-w-4xl mx-0 md:mx-4">
-        {company && <Profile account={company} members={members} />}
+        {company && <Profile company={company} />}
         <FundsList funds={funds} showImages={false} />
         {posts?.[0] && <FeaturedPosts posts={[posts[0]]} />}
         <PostsList posts={posts} onFilter={filterPosts} />
@@ -90,7 +92,7 @@ const CompanyPage: FC<CompanyPageProps> = ({ companyId }) => {
                             {member.position}
                           </div>
                           <div className="text-white text-xs">
-                            {member.company?.name}
+                            {companyData.companyProfile?.name}
                           </div>
                         </div>
                       </div>
