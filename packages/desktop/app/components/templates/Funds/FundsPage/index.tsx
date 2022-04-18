@@ -1,13 +1,15 @@
-import { FC } from "react";
+import {FC, useState} from "react";
 import Navbar from "../../../modules/funds/Navbar";
 import { Info, Lock } from "phosphor-react";
 import Button from "../../../common/Button";
 import { useFetchFunds } from "mobile/src/graphql/query/marketplace";
 import FundsList from "./FundsList";
 import { useAccount } from "mobile/src/graphql/query/account";
+import AccreditationQuestionnaire from "../AccreditationQuestionnaire";
 
 const FundsPage: FC = () => {
   const { data } = useFetchFunds();
+  const [isVerifying, setIsVerifying] = useState(false);
   const funds = data?.funds ?? [];
   const { data: accountData } = useAccount();
   return (
@@ -33,11 +35,12 @@ const FundsPage: FC = () => {
                 </span>
               </div>
               <div className="mt-24">
-                <Button variant="gradient-primary">
+                <Button variant="gradient-primary" onClick={() => setIsVerifying(true)}>
                   <Lock color="currentColor" size={24} weight="light" />
                   <span className="ml-2">VERIFY ACCREDITATION STATUS</span>
                 </Button>
               </div>
+              <AccreditationQuestionnaire show={isVerifying} onClose={() => setIsVerifying(false)} />
             </div>
           ) : (
             <>{funds.length > 0 && <FundsList funds={funds} />}</>
