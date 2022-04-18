@@ -24,7 +24,7 @@ import {
 } from 'shared/src/colors';
 
 import pStyles from '../../../theme/pStyles';
-import { Body2, Body3, H6 } from '../../../theme/fonts';
+import { Body2Bold, Body3, H6 } from '../../../theme/fonts';
 import MainHeader from '../../../components/main/Header';
 import PAppContainer from '../../../components/common/PAppContainer';
 import PostItem, { PostItemProps } from '../../../components/main/PostItem';
@@ -45,7 +45,7 @@ interface RouterProps {
 const CompanySettings: FC<RouterProps> = ({ navigation, route }) => {
   const { data, refetch } = useFetchPosts();
   const { data: accountData } = useAccount();
-  const postData = data?.posts;
+  const postData = data?.posts ?? [];
   const isFocused = useIsFocused();
   const [focusState, setFocusState] = useState(isFocused);
   const companyLists: Company[] = accountData?.account.companies ?? [];
@@ -84,8 +84,8 @@ const CompanySettings: FC<RouterProps> = ({ navigation, route }) => {
         onPressLeft={() => navigation.goBack()}
       />
       <PAppContainer style={styles.container}>
-        <CompanyProfile company={company} key={company._id} />
-        <Funds />
+        <CompanyProfile company={company} />
+        <Funds accredited={accountData?.account.accreditation} />
         <View style={styles.posts}>
           <Members members={company.members || []} key={company._id} />
           {postData.length > 0 && (
@@ -122,10 +122,8 @@ export default CompanySettings;
 
 const styles = StyleSheet.create({
   backIcon: {
-    backgroundColor: BLUE300,
     width: 32,
     height: 32,
-    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -192,7 +190,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: WHITE,
-    ...Body2,
+    ...Body2Bold,
     marginTop: 2,
     marginBottom: 8,
   },

@@ -143,7 +143,7 @@ const ProfileSettings: FC<RouterProps> = ({ navigation }) => {
           <View style={styles.row}>
             <TouchableOpacity
               onPress={() =>
-                Linking.openURL(account.twitter ?? 'www.linkedin.com')
+                Linking.openURL(account.linkedIn ?? 'www.linkedin.com')
               }>
               <LinkedinSvg />
             </TouchableOpacity>
@@ -170,7 +170,7 @@ const ProfileSettings: FC<RouterProps> = ({ navigation }) => {
             <DotsThreeVerticalSvg />
           </TouchableOpacity>
         </View>
-        <Funds />
+        <Funds accredited={accountData?.account.accreditation} />
         <View style={styles.posts}>
           {postData.length > 0 && (
             <View>

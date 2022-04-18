@@ -99,7 +99,17 @@ export type AccountData = {
     | 'companyFollowingIds'
     | 'postIds'
   > & {
-    companies: Pick<User['companies'][number], '_id' | 'name' | 'avatar'>[];
+    companies: Pick<
+      User['companies'][number],
+      | '_id'
+      | 'name'
+      | 'avatar'
+      | 'members'
+      | 'background'
+      | 'followerIds'
+      | 'postIds'
+      | 'followingIds'
+    >[];
   };
 };
 

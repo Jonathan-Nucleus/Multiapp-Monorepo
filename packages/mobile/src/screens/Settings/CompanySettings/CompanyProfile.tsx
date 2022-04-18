@@ -8,30 +8,37 @@ import {
   Linking,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
+import Modal from 'react-native-modal';
+import { Chats, CopySimple, Share } from 'phosphor-react-native';
+import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
+import type { Company } from 'backend/graphql/companies.graphql';
 import {
   WHITE,
   WHITE12,
   BLUE300,
-  BGHEADER,
+  WHITE87,
   GRAY100,
   PRIMARY,
+  BGDARK,
 } from 'shared/src/colors';
-import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
-import type { Company } from 'backend/graphql/companies.graphql';
 
 import { Body2, Body3, H6Bold } from '../../../theme/fonts';
 import PGradientButton from '../../../components/common/PGradientButton';
 import PGradientOutlineButton from '../../../components/common/PGradientOutlineButton';
+import { useAccount } from '../../../graphql/query/account';
+import { useFollowCompany } from '../../../graphql/mutation/account';
 import LinkedinSvg from 'shared/assets/images/linkedin.svg';
 import TwitterSvg from 'shared/assets/images/twitter.svg';
 import DotsThreeVerticalSvg from 'shared/assets/images/dotsThreeVertical.svg';
-import { useAccount } from '../../../graphql/query/account';
-import { useFollowCompany } from '../../../graphql/mutation/account';
+import FollowModal from './FollowModal';
 
 interface CompanyProp {
   company: Company;
 }
+
 const CompanyProfile: FC<CompanyProp> = ({ company }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [visibleFollow, setVisibleFollow] = useState(false);
   const { data: accountData, refetch } = useAccount();
   const [followCompany] = useFollowCompany();
   const userId = accountData?.account._id;
@@ -83,14 +90,26 @@ const CompanyProfile: FC<CompanyProp> = ({ company }) => {
         </View>
         <Text style={styles.val}>{company.name}</Text>
         <View style={styles.row}>
-          <View style={styles.follow}>
-            <Text style={styles.val}>{company.followerIds?.length ?? 0}</Text>
-            <Text style={styles.comment}>Followers</Text>
-          </View>
-          <View style={styles.follow}>
-            <Text style={styles.val}>{company.followingIds?.length ?? 0}</Text>
-            <Text style={styles.comment}>Following</Text>
-          </View>
+          <TouchableOpacity
+            onPress={() =>
+              company.followerIds?.length > 0 && setVisibleFollow(true)
+            }>
+            <View style={styles.follow}>
+              <Text style={styles.val}>{company.followerIds?.length ?? 0}</Text>
+              <Text style={styles.comment}>Followers</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() =>
+              company.followingIds?.length > 0 && setVisibleFollow(true)
+            }>
+            <View style={styles.follow}>
+              <Text style={styles.val}>
+                {company.followingIds?.length ?? 0}
+              </Text>
+              <Text style={styles.comment}>Following</Text>
+            </View>
+          </TouchableOpacity>
           <View style={styles.follow}>
             <Text style={styles.val}>{company.postIds?.length ?? 0}</Text>
             <Text style={styles.comment}>Posts</Text>
@@ -141,10 +160,53 @@ const CompanyProfile: FC<CompanyProp> = ({ company }) => {
             </>
           )}
         </View>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => setIsVisible(true)}>
           <DotsThreeVerticalSvg />
         </TouchableOpacity>
       </View>
+      <Modal
+        isVisible={isVisible}
+        swipeDirection="down"
+        onBackdropPress={() => setIsVisible(false)}
+        style={styles.bottomHalfModal}>
+        <View style={styles.modalContent}>
+          <TouchableOpacity onPress={() => setIsVisible(false)}>
+            <View style={styles.item}>
+              <Chats color={WHITE} size={28} />
+              <View style={styles.commentWrap}>
+                <Text style={styles.modalLabel}>Message {company.name}</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setIsVisible(false)}>
+            <View style={styles.item}>
+              <Share color={WHITE} size={28} />
+              <View style={styles.commentWrap}>
+                <Text style={styles.modalLabel}>Share as Post</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setIsVisible(false)}>
+            <View style={styles.item}>
+              <CopySimple color={WHITE} size={28} />
+              <View style={styles.commentWrap}>
+                <Text style={styles.modalLabel}>Copy Link</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+
+          <PGradientOutlineButton
+            label="Cancel"
+            onPress={() => setIsVisible(false)}
+          />
+        </View>
+      </Modal>
+      <FollowModal
+        onClose={() => setVisibleFollow(false)}
+        following={accountData?.account.following ?? []}
+        followers={accountData?.account.followers ?? []}
+        isVisible={visibleFollow}
+      />
     </>
   );
 };
@@ -208,12 +270,11 @@ const styles = StyleSheet.create({
   social: {
     paddingVertical: 8,
     paddingLeft: 16,
-    borderTopColor: GRAY100,
-    borderBottomColor: GRAY100,
+    borderTopColor: WHITE12,
+    borderBottomColor: WHITE12,
     borderBottomWidth: 1,
     borderTopWidth: 1,
     marginBottom: 24,
-    backgroundColor: BGHEADER,
     alignItems: 'center',
     justifyContent: 'space-between',
   },
@@ -236,5 +297,27 @@ const styles = StyleSheet.create({
   },
   socialItem: {
     marginHorizontal: 16,
+  },
+  bottomHalfModal: {
+    justifyContent: 'flex-end',
+    margin: 0,
+  },
+  modalContent: {
+    backgroundColor: BGDARK,
+    padding: 20,
+    borderRadius: 32,
+  },
+  commentWrap: {
+    marginLeft: 15,
+    flex: 1,
+  },
+  modalLabel: {
+    color: WHITE,
+    ...Body2,
+  },
+  item: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 24,
   },
 });

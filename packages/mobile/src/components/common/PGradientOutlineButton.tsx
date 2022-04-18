@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
   txtWrap: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: '98%',
+    width: '99%',
     paddingVertical: 12,
     borderRadius: 80,
     height: 38,

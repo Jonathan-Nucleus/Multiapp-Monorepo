@@ -1,7 +1,9 @@
 export const WHITE = "#FFFFFF";
 export const WHITE60 = "#FFFFFF99";
 export const WHITE12 = "#FFFFFF1F";
+export const WHITE87 = "##FFFFFFDE";
 export const BLACK = "#000000";
+export const BLACK75 = "#0C0C0CBF";
 export const BGDARK = "#121212";
 export const BGDARK100 = "#171622";
 export const BGDARK200 = "#15151E";

@@ -26,7 +26,7 @@ const Members: React.FC<MemberProps> = ({ members }) => {
   const renderItem = ({ item }: RenderProps) => {
     return (
       <TouchableOpacity>
-        <View style={styles.member}>
+        <View style={[styles.member, members.length === 1 && styles.fullWidth]}>
           <FastImage
             style={styles.avatar}
             source={{
@@ -77,6 +77,9 @@ const styles = StyleSheet.create({
     marginRight: 8,
     borderRadius: 8,
     alignSelf: 'center',
+  },
+  fullWidth: {
+    width: Dimensions.get('screen').width - 32,
   },
   avatar: {
     width: 80,
