@@ -9,8 +9,8 @@ import { User } from "../../schemas/user";
 const COLLECTION = "companies";
 
 // The number of users to seed
-const NUM_COMPANIES = 7;
-const MAX_MEMBERS_PER_COMPANY = 3;
+const NUM_COMPANIES = 15;
+const MAX_MEMBERS_PER_COMPANY = 7;
 
 const avatars = [
   "8debfc0c-8da0-4508-9124-2916e708e254.png",
@@ -57,7 +57,7 @@ export default async function (
       memberIds: randomArray(
         0,
         userIds.length - 1,
-        randomInt(1, MAX_MEMBERS_PER_COMPANY)
+        randomInt(3, MAX_MEMBERS_PER_COMPANY)
       ).map((index) => userIds[index]),
       avatar: avatars[index % avatars.length],
       background: {
