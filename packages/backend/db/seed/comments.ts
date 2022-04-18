@@ -3,6 +3,7 @@ import { faker } from "@faker-js/faker";
 
 import { randomInt } from "./helpers";
 import { Comment } from "../../schemas/comment";
+import { Post } from "../../schemas/post";
 
 // The name of the mongo collection
 const COLLECTION = "comments";
@@ -22,14 +23,27 @@ export default async function (
     .catch(() => {});
 
   // Generate comment data
+  const commentsByPost: Record<string, ObjectId[]> = {};
   const comments = userIds
     .map<Comment.Mongo[]>((userId) => {
-      return [...Array(randomInt(0, MAX_COMMENTS))].map<Comment.Mongo>(() => ({
-        _id: new ObjectId(),
-        userId,
-        postId: postIds[randomInt(0, postIds.length - 1)],
-        body: faker.lorem.paragraph(),
-      }));
+      return [...Array(randomInt(0, MAX_COMMENTS))].map<Comment.Mongo>(() => {
+        const commentId = new ObjectId();
+        const postId = postIds[randomInt(0, postIds.length - 1)];
+        const postKey = postId.toString();
+
+        if (!commentsByPost[postKey]) {
+          commentsByPost[postKey] = [];
+        }
+
+        commentsByPost[postKey].push(commentId);
+
+        return {
+          _id: commentId,
+          userId,
+          postId,
+          body: faker.lorem.paragraph(),
+        };
+      });
     })
     .flat();
 
@@ -38,6 +52,17 @@ export default async function (
       COLLECTION
     );
     await commentsCollection.insertMany(comments);
+
+    // Update all user records
+    const postsCollection = db.collection<Post.Mongo>("posts");
+    await Promise.all(
+      Object.keys(commentsByPost).map((postId) => {
+        return postsCollection.updateOne(
+          { _id: new ObjectId(postId) },
+          { $set: { commentIds: commentsByPost[postId] } }
+        );
+      })
+    );
 
     return comments.map((comment) => comment._id);
   } catch (err) {

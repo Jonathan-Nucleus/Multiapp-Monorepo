@@ -25,16 +25,17 @@ const avatars = [
 ];
 
 const backgrounds = [
-  "00664562-0251-4296-aee5-b2091667c088.jpg",
-  "3aee8b1a-5fc5-4640-877b-681a3906cd12.jpg",
-  "00fe6b0b-f8e4-4860-97a4-60af8d122a07.jpg",
-  "8d283ba2-e153-4ab1-acdb-d24b81c0ee15.jpg",
-  "fbaac7ff-0b53-4f89-829c-addaf07a6c40.jpg",
-  "fc0e4ccb-6c03-4592-88b7-c1b371d19970.jpg",
-  "2065f06b-7f07-48f5-87d6-cf5e34950ff1.jpg",
-  "15a9e96c-cd80-4215-9b78-3c1d7d33478c.jpg",
-  "fd131d1c-316e-4384-aa98-4a34af62984e.jpg",
-  "85e76d51-2432-48a6-9cc2-865c75b4f810.jpg",
+  "6d0960eb-fc83-499b-a5e3-93b30939faf2.jpg",
+  "a7d061b2-900b-4305-b233-904c7e4ad7d5.jpg",
+  "cd4720bc-14f2-40e3-85ea-73e6fde430f9.jpg",
+  "fdd02869-1286-4c9d-8038-489461ee8082.jpg",
+  "a2e8381f-9333-4541-a6ab-c5cb9e5a40cb.jpg",
+  "a28036bc-1a91-4014-ae34-ecd260c2e2fc.jpg",
+  "9e3f6e58-3560-40f9-90c2-1d996efe6255.jpg",
+  "0d7acb26-c6c3-4967-a066-751675d7603f.jpg",
+  "ff5c115b-ddd5-49b2-b096-f88e65e44893.jpg",
+  "f38b60f9-783a-4317-beed-d1becfb0a590.jpg",
+  "d5fa5b2a-fd2c-4143-8612-5d3030ad9b0c.jpg",
 ];
 
 export default async function (

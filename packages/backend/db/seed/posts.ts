@@ -3,6 +3,7 @@ import { faker } from "@faker-js/faker";
 
 import { randomInt, randomArray } from "./helpers";
 import { Post, AudienceOptions, PostCategoryOptions } from "../../schemas/post";
+import { User } from "../../schemas/user";
 
 // The name of the mongo collection
 const COLLECTION = "posts";
@@ -48,40 +49,63 @@ export default async function (
     .catch(() => {});
 
   // Generate post data
+  const postsByUser: Record<string, ObjectId[]> = {};
   const posts = userIds
     .map<Post.Mongo[]>((userId) => {
-      return [...Array(randomInt(1, MAX_POSTS))].map<Post.Mongo>(() => ({
-        _id: new ObjectId(),
-        userId,
-        visible: true,
-        body: faker.lorem.paragraph(),
-        mediaUrl: stockImages[randomInt(0, stockImages.length - 1)],
-        audience: audienceValues[randomInt(0, audienceValues.length - 1)],
-        categories: Array.from(
-          new Set(
-            randomArray(
-              0,
-              categoryValues.length - 1,
-              randomInt(0, MAX_CATEGORIES_PER_POST)
+      const userIdKey = userId.toString();
+
+      if (!postsByUser[userIdKey]) {
+        postsByUser[userIdKey] = [];
+      }
+
+      return [...Array(randomInt(1, MAX_POSTS))].map<Post.Mongo>(() => {
+        const postId = new ObjectId();
+        postsByUser[userIdKey].push(postId);
+
+        return {
+          _id: postId,
+          userId,
+          visible: true,
+          body: faker.lorem.paragraph(),
+          mediaUrl: stockImages[randomInt(0, stockImages.length - 1)],
+          audience: audienceValues[randomInt(0, audienceValues.length - 1)],
+          categories: Array.from(
+            new Set(
+              randomArray(
+                0,
+                categoryValues.length - 1,
+                randomInt(0, MAX_CATEGORIES_PER_POST)
+              )
             )
-          )
-        ).map((index) => categoryValues[index]),
-        mentionIds: Array.from(
-          new Set(
-            randomArray(
-              0,
-              userIds.length - 1,
-              randomInt(0, MAX_MENTIONS_PER_POST)
+          ).map((index) => categoryValues[index]),
+          mentionIds: Array.from(
+            new Set(
+              randomArray(
+                0,
+                userIds.length - 1,
+                randomInt(0, MAX_MENTIONS_PER_POST)
+              )
             )
-          )
-        ).map((index) => userIds[index]),
-      }));
+          ).map((index) => userIds[index]),
+        };
+      });
     })
     .flat();
 
   try {
     const postsCollection = await db.createCollection<Post.Mongo>(COLLECTION);
     await postsCollection.insertMany(posts);
+
+    // Update all user records
+    const usersCollection = db.collection<User.Mongo>("users");
+    await Promise.all(
+      Object.keys(postsByUser).map((userId) => {
+        return usersCollection.updateOne(
+          { _id: new ObjectId(userId) },
+          { $set: { postIds: postsByUser[userId] } }
+        );
+      })
+    );
 
     return posts.map((post) => post._id);
   } catch (err) {
