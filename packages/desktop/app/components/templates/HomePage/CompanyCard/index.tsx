@@ -22,7 +22,7 @@ const CompanyCard: FC<CompanyProps> = ({ company }) => {
             alt=""
             width={88}
             height={88}
-            className="bg-white object-cover rounded-xl"
+            className="object-cover rounded-xl"
             unoptimized={true}
           />
         )}

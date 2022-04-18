@@ -2,6 +2,7 @@ import { FC, useState } from "react";
 import Image from "next/image";
 import { Star } from "phosphor-react";
 
+import Avatar from "../../../common/Avatar";
 import Card from "../../../common/Card";
 import Button from "../../../common/Button";
 
@@ -34,17 +35,7 @@ const WatchList: FC = () => {
       {watchList.map((item) => (
         <div key={item._id} className="flex items-center p-4">
           <div className="flex-shrink-0">
-            <Image
-              loader={() =>
-                `${process.env.NEXT_PUBLIC_AVATAR_URL}/${item.avatar}`
-              }
-              src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${item.avatar}`}
-              alt=""
-              width={48}
-              height={48}
-              className="bg-white object-cover rounded"
-              unoptimized={true}
-            />
+            <Avatar src={item.company.avatar} size={48} shape="square" />
           </div>
           <div className="ml-3">
             <div className="text-white leading-4">{item.name}</div>

@@ -35,7 +35,7 @@ const WatchList: React.FC<RouterProps> = ({ navigation }) => {
   const [watchFund] = useWatchFund();
   const watchList: Fund[] = accountData?.account.watchlist ?? [];
 
-  const handleRemoveWahchList = async (id: string): Promise<void> => {
+  const handleRemoveWatchList = async (id: string): Promise<void> => {
     try {
       const { data } = await watchFund({
         variables: { watch: false, fundId: id },
@@ -50,25 +50,30 @@ const WatchList: React.FC<RouterProps> = ({ navigation }) => {
     }
   };
 
+  const navigateToFund = async (id: string): Promise<void> => {
+    console.log('navigate to fund');
+  };
+
   const renderListItem = ({ item }) => {
     return (
-      <View style={styles.item}>
-        <FastImage
-          style={styles.companyAvatar}
-          source={{ uri: `${AVATAR_URL}/${item.company.avatar}` }}
-          resizeMode={FastImage.resizeMode.contain}
-        />
-        <View style={styles.flex}>
-          <View style={styles.company}>
-            <View style={styles.leftItem}>
-              <Text style={styles.title}>{item.name}</Text>
-              <Text style={styles.type}>{item.company.name}</Text>
+      <TouchableOpacity onPress={() => navigateToFund(item._id)}>
+        <View style={styles.item}>
+          <FastImage
+            style={styles.companyAvatar}
+            source={{ uri: `${AVATAR_URL}/${item.company.avatar}` }}
+            resizeMode={FastImage.resizeMode.contain}
+          />
+          <View style={styles.flex}>
+            <View style={styles.company}>
+              <View style={styles.leftItem}>
+                <Text style={styles.title}>{item.name}</Text>
+                <Text style={styles.type}>{item.company.name}</Text>
+              </View>
+              <TouchableOpacity onPress={() => handleRemoveWatchList(item._id)}>
+                <Star size={24} color={PRIMARYSOLID} weight="fill" />
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity onPress={() => handleRemoveWahchList(item._id)}>
-              <Star size={24} color={PRIMARYSOLID} weight="fill" />
-            </TouchableOpacity>
-          </View>
-          {/* <View style={styles.user}>
+            {/* <View style={styles.user}>
             <FastImage
               style={styles.userAvatar}
               source={{ uri: `${AVATAR_URL}/${item.avatar}` }}
@@ -85,8 +90,9 @@ const WatchList: React.FC<RouterProps> = ({ navigation }) => {
               </Text>
             </View>
           </View> */}
+          </View>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
   return (
@@ -106,10 +112,10 @@ export default WatchList;
 const styles = StyleSheet.create({
   item: {
     flexDirection: 'row',
-    marginVertical: 8,
     paddingHorizontal: 16,
     borderBottomColor: WHITE60,
     borderBottomWidth: 1,
+    alignItems: 'center',
   },
   company: {
     flexDirection: 'row',
@@ -119,6 +125,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 8,
+    marginVertical: 16,
   },
   userAvatar: {
     width: 24,
@@ -126,7 +133,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginRight: 10,
   },
-  flex: { flex: 1 },
+  flex: {
+    flex: 1,
+  },
   leftItem: {
     flex: 1,
     marginRight: 8,

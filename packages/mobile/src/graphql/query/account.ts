@@ -184,6 +184,7 @@ export function useAccount(
               website
               linkedIn
               twitter
+              avatar
             }
           }
           watchlistIds

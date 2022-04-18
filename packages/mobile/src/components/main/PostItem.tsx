@@ -64,7 +64,7 @@ const PostItem: React.FC<FeedItemProps> = ({ post, userId }) => {
       <FastImage
         style={styles.postImage}
         source={{ uri: `${POST_URL}/${post.mediaUrl}` }}
-        resizeMode={FastImage.resizeMode.contain}
+        resizeMode={FastImage.resizeMode.cover}
       />
       <View style={styles.postInfo}>
         <View style={styles.tagWrapper}>
@@ -79,19 +79,25 @@ const PostItem: React.FC<FeedItemProps> = ({ post, userId }) => {
         <View style={styles.otherInfo}>
           {post.likeIds && post.likeIds.length > 0 && (
             <PLabel
-              label={`${post.likeIds.length} Likes`}
+              label={`${post.likeIds.length} ${
+                post.likeIds.length === 1 ? 'Like' : 'Likes'
+              }`}
               textStyle={styles.smallLabel}
             />
           )}
           {post.commentIds && post.commentIds.length > 0 && (
             <PLabel
-              label={`${post.commentIds.length} Comments`}
+              label={`${post.commentIds.length} ${
+                post.commentIds.length === 1 ? 'Comment' : 'Comments'
+              }`}
               textStyle={styles.smallLabel}
             />
           )}
           {post.shareIds && post.shareIds.length > 0 && (
             <PLabel
-              label={`${post.shareIds.length} Comments`}
+              label={`${post.shareIds.length} ${
+                post.shareIds.length === 1 ? 'Share' : 'Shares'
+              }`}
               textStyle={styles.smallLabel}
             />
           )}
@@ -125,7 +131,7 @@ const PostItem: React.FC<FeedItemProps> = ({ post, userId }) => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 0,
+    paddingHorizontal: 4,
     paddingVertical: 14,
     flexDirection: 'column',
     marginVertical: 8,
@@ -144,19 +150,21 @@ const styles = StyleSheet.create({
   smallLabel: {
     ...Body3,
     color: WHITE60,
+    marginLeft: 4,
   },
   postImage: {
     width: '100%',
     height: 224,
-    marginVertical: 20,
+    marginVertical: 16,
     borderRadius: 16,
+    overflow: 'hidden',
   },
   body: {
     lineHeight: 20,
   },
   postInfo: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   tagWrapper: {
     flexDirection: 'row',
@@ -170,7 +178,7 @@ const styles = StyleSheet.create({
   otherInfo: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginVertical: 10,
+    marginTop: 2,
   },
   divider: {
     borderBottomColor: GRAY10,

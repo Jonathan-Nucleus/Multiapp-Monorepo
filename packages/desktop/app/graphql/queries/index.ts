@@ -32,7 +32,9 @@ export type FetchPostsData = {
     | "commentIds"
     | "createdAt"
     | "categories"
+    | "likes"
     | "shareIds"
+    | "comments"
   > & {
     user: Pick<
       Post["user"],
@@ -59,6 +61,41 @@ export const VIEW_POST_FRAGMENT = gql`
       avatar
       position
       role
+    }
+    likes {
+      _id
+      firstName
+      lastName
+      avatar
+      position
+      role
+      company {
+        _id
+        name
+        avatar
+      }
+    }
+    comments {
+      _id
+      body
+      createdAt
+      likeIds
+      mentions {
+        _id
+        firstName
+        lastName
+        avatar
+        role
+        position
+      }
+      user {
+        _id
+        firstName
+        lastName
+        avatar
+        role
+        position
+      }
     }
   }
 `;
@@ -192,6 +229,7 @@ export function useAccount(
             managerId
             company {
               name
+              avatar
             }
           }
           watchlistIds

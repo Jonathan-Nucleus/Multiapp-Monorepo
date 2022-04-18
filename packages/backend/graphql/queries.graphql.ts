@@ -47,17 +47,7 @@ const resolvers = {
       args: { code: string },
       { db }: ApolloServerContext
     ): Promise<boolean> => {
-      const validator = yup
-        .object()
-        .shape({
-          code: yup.string().uuid().required(),
-        })
-        .required();
-
-      validateArgs(validator, args);
-
       const { code } = args;
-
       return db.users.verifyInvite(code);
     },
 

@@ -27,11 +27,11 @@ const HomePage: FC = () => {
       <div className="flex flex-row px-2 mt-10">
         <div className="w-80 hidden lg:block flex-shrink-0 mx-4">
           <ProfileCard user={user} />
-          {companies.map((company) => (
-            <div className="mt-12" key={company._id}>
-              <CompanyCard company={company} />
+          {companies[0] && (
+            <div className="mt-12" key={companies[0]._id}>
+              <CompanyCard company={companies[0]} />
             </div>
-          ))}
+          )}
         </div>
         <div className="min-w-0 mx-4">
           <FeaturedProfessionals />

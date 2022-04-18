@@ -56,7 +56,12 @@ const MainHeader: React.FC<HeaderProps> = (props) => {
             </TouchableOpacity>
             <TouchableOpacity>
               <RoundImageView
-                image={{ uri: `${AVATAR_URL}/${data?.account.avatar}` }}
+                image={{
+                  uri: `${AVATAR_URL}/${
+                    data?.account.avatar ??
+                    '7d9d80b7-90dd-42e8-b3e2-a7a37d6cd1ba.png'
+                  }`,
+                }}
                 size={32}
                 imageStyle={styles.avatarImage}
               />

@@ -8,6 +8,9 @@ import {
 import type { Comment } from "../schemas/comment";
 import { CommentSchema } from "../schemas/comment";
 
+type GraphQLComment = Comment.GraphQL;
+export type { GraphQLComment as Comment };
+
 const schema = gql`
   ${CommentSchema}
 `;

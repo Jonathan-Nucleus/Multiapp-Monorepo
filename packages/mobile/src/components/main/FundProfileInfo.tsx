@@ -27,13 +27,13 @@ const FundProfileInfo: FC<FundItemProps> = ({
       <View style={styles.imagesContainer}>
         <FastImage
           style={styles.backgroundImage}
-          source={{ uri: `${BACKGROUND_URL}/${fund.background.url}` }}
+          source={{ uri: `${BACKGROUND_URL}/${fund.company.background.url}` }}
           resizeMode={FastImage.resizeMode.cover}
         />
         <Image
           style={styles.avatarImage}
           source={{
-            uri: `${AVATAR_URL}/5b2809ef-cba3-4dca-bb2e-64861926df61.png`,
+            uri: `${AVATAR_URL}/${fund.company.avatar}`,
           }}
         />
       </View>

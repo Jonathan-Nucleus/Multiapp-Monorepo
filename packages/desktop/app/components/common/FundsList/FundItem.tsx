@@ -119,13 +119,16 @@ const FundItem: FC<FundItemProps> = ({
                 <div className="text-xs text-success ml-1">{fund.status}</div>
               </div>
             </div>
-            <div className="min-h-0 flex-grow text-sm text-white py-3 flex">
-              <ul className="self-center list-disc ml-4">
-                {fund.highlights.map((highlight) => (
-                  <li key={highlight}>{highlight}</li>
-                ))}
-              </ul>
-            </div>
+            {fund.highlights && (
+              <div className="min-h-0 flex-grow text-sm text-white py-3 flex">
+                <ul className="self-center list-disc ml-4">
+                  {fund.highlights.map((highlight) => (
+                    <li key={highlight}>{highlight}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             <div className="flex flex-wrap -mx-1 py-2">
               {fund.tags.map((tag) => (
                 <div
