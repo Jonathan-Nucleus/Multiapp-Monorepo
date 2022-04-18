@@ -12,12 +12,12 @@ import Tag from '../common/Tag';
 import { PRIMARYSTATE, GRAY10, WHITE60 } from 'shared/src/colors';
 import { Body1, Body3 } from '../../theme/fonts';
 import { PostDataType } from '../../graphql/post';
-
+import * as NavigationService from '../../services/navigation/NavigationService';
 import { FetchPostsData } from 'mobile/src/hooks/queries';
 import { PostCategories } from 'backend/graphql/enumerations.graphql';
 import { useLikePost } from '../../graphql/mutation/posts';
 
-type Post = Exclude<FetchPostsData['posts'], undefined>[number];
+export type Post = Exclude<FetchPostsData['posts'], undefined>[number];
 interface FeedItemProps {
   post: Post;
   userId: string;
@@ -113,6 +113,9 @@ const PostItem: React.FC<FeedItemProps> = ({ post, userId }) => {
         <IconButton
           icon={<ChatCenteredText color={WHITE60} size={20} />}
           label="Comment"
+          onPress={() =>
+            NavigationService.navigate('PostDetail', { post, userId })
+          }
         />
         <IconButton icon={<Share color={WHITE60} size={20} />} label="Share" />
       </View>

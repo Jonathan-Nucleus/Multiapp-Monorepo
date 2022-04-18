@@ -8,6 +8,7 @@ import "@splidejs/react-splide/css";
 import Avatar from "desktop/app/components/common/Avatar";
 import Button from "desktop/app/components/common/Button";
 import Card from "desktop/app/components/common/Card";
+
 import FeaturedManager from "./FeaturedManager";
 
 import { useFundManagers } from "mobile/src/graphql/query/marketplace";

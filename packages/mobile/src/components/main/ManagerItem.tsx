@@ -4,15 +4,12 @@ import { PRIMARY, WHITE, WHITE12, BLACK } from 'shared/src/colors';
 import { Body1Bold, Body2, Body3, Body3Bold } from 'mobile/src/theme/fonts';
 import { FundManagersData } from 'mobile/src/graphql/query/marketplace';
 
-import FundUserInfo from './FundUserInfo';
+import FundUserInfo from '../../screens/Marketplace/Managers/FundUserInfo';
 import PLabel from '../common/PLabel';
 
 import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 
-export type Fund = Exclude<
-  FundManagersData['fundManagers'],
-  undefined
->[number];
+export type Fund = Exclude<FundManagersData['fundManagers'], undefined>[number];
 interface ManagerItemProps {
   manager: Fund;
 }

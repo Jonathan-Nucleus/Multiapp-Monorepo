@@ -73,6 +73,17 @@ const FundOverview: FC<FundItemProps> = ({ fund }) => {
         <View style={styles.infoContainer}>
           <PTitle title="liquidity" subTitle="Quarterly w/30 days notice" />
         </View>
+        <View style={styles.infoContainer}>
+          <PLabel textStyle={[H6Bold, styles.fund]} label="Highlights" />
+        </View>
+        <View style={styles.infoContainer}>
+          <PTitle title="annualized volatility" subTitle="2.8%" />
+          <PTitle title="ARSI" subTitle="2.8%" />
+        </View>
+        <View style={styles.infoContainer}>
+          <PTitle title="MTD Return" subTitle="3.2%" />
+          <PTitle title="YTD Return" subTitle="3.1%" />
+        </View>
       </View>
     </View>
   );

@@ -129,7 +129,37 @@ export function useLikePost(): MutationTuple<LikePostData, LikePostVariables> {
   return useMutation<LikePostData, LikePostVariables>(LIKE_POST);
 }
 
-// TODO
-// delete
-// comment
-// Report
+type CommentPostVariables = {
+  _id: string;
+  likeIds: string[];
+  mentions: string[];
+};
+
+type CommentPostData = {
+  comment: any;
+};
+
+/**
+ * GraphQL mutation that resets a user's password
+ *
+ * @returns   GraphQL mutation.
+ */
+export function useCommentPost(): MutationTuple<
+  CommentPostData,
+  CommentPostVariables
+> {
+  return useMutation<CommentPostData, CommentPostVariables>(gql`
+    mutation Comment($comment: CommentInput!) {
+      comment(comment: $comment) {
+        _id
+        body
+        likeIds
+        mentions {
+          _id
+          firstName
+          lastName
+        }
+      }
+    }
+  `);
+}

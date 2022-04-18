@@ -5,8 +5,8 @@ import { WHITE, BLACK } from 'shared/src/colors';
 import { Body1Bold, Body3 } from 'mobile/src/theme/fonts';
 
 import { AVATAR_URL } from 'react-native-dotenv';
-import PLabel from '../common/PLabel';
-import PGradientButton from '../common/PGradientButton';
+import PLabel from '../../../components/common/PLabel';
+import PGradientButton from '../../../components/common/PGradientButton';
 
 interface FundUserInfoProps {
   item: any;

@@ -1,49 +1,54 @@
 import React, { FC } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { PRIMARY, WHITE, WHITE12, BLACK } from 'shared/src/colors';
-import { Body1Bold, Body2, Body3, Body3Bold } from 'mobile/src/theme/fonts';
-import { FetchFundsData } from 'mobile/src/graphql/query/marketplace';
+import {
+  Body1,
+  Body1Bold,
+  Body2,
+  Body3,
+  Body3Bold,
+} from 'mobile/src/theme/fonts';
+import { FundCompanyData } from 'mobile/src/graphql/query/marketplace';
 
-import FundUserInfo from './FundUserInfo';
+import FundCompanyInfo from '../../screens/Marketplace/Companies/FundCompanyInfo';
 import RoundImageView from '../common/RoundImageView';
 import PLabel from '../common/PLabel';
 import { AVATAR_URL } from 'react-native-dotenv';
 
 import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 
-export type Fund = Exclude<FetchFundsData['funds'], undefined>[number];
+export type Fund = Exclude<FundCompanyData['fundCompanies'], undefined>[number];
 interface CompanyItemProps {
-  fund: Fund;
+  company: Fund;
 }
 
-const CompanyItem: FC<CompanyItemProps> = ({ fund }) => {
+const CompanyItem: FC<CompanyItemProps> = ({ company }) => {
+  const { name, fundManagers } = company;
   return (
     <View style={styles.companyItem}>
-      <FundUserInfo item={fund.manager} />
-      <PLabel label="Good Soil Initiatives" textStyle={styles.nameLabel} />
+      <FundCompanyInfo item={company} />
+      <PLabel label={name} textStyle={styles.nameLabel} />
       <View style={styles.separator} />
-      <PLabel label="FUNDS MANAGED" textStyle={styles.titleLabel} />
-      <PLabel
-        label="Accelerated Opportunities LP Concentrated Growth Fund"
-        textStyle={styles.desLabel}
-      />
       <View style={styles.userInfo}>
         <RoundImageView
-          image={{ uri: `${AVATAR_URL}/${fund.manager.avatar}` }}
+          image={{ uri: `${AVATAR_URL}/${fundManagers[0].avatar}` }}
           size={24}
         />
         <View style={{ marginLeft: 8 }}>
           <View style={styles.nameWrapper}>
             <PLabel
-              label={`${fund.manager.firstName} ${fund.manager.lastName}`}
-              textStyle={styles.nameLabel}
+              label={`${fundManagers[0].firstName} ${fundManagers[0].lastName}`}
+              textStyle={Body1}
             />
             <View style={styles.proWrapper}>
               <ShieldCheckSvg />
               <PLabel label="PRO" textStyle={styles.proLabel} />
             </View>
           </View>
-          <PLabel label="CEO" textStyle={styles.titleLabel} />
+          <PLabel
+            label={fundManagers[0].position}
+            textStyle={styles.titleLabel}
+          />
         </View>
       </View>
     </View>
@@ -56,7 +61,7 @@ const styles = StyleSheet.create({
   companyItem: {
     marginBottom: 16,
     paddingHorizontal: 23,
-    paddingVertical: 16,
+    paddingBottom: 16,
     backgroundColor: BLACK,
     borderBottomColor: WHITE12,
     borderBottomWidth: 1,

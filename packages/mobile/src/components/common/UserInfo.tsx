@@ -17,8 +17,8 @@ import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 interface UserInfoProps {
   avatar: ImageURISource;
   name: string;
-  role: string;
-  company: string;
+  role?: string;
+  company?: string;
   isPro?: boolean;
   viewStyle?: object;
   avatarStyle?: object;
@@ -43,7 +43,8 @@ const UserInfo: React.FC<UserInfoProps> = (props) => {
             </View>
           )}
         </View>
-        <PLabel label={`${role} @ ${company}`} textStyle={styles.smallLabel} />
+        {role && <PLabel label={role} textStyle={styles.smallLabel} />}
+        {company && <PLabel label={company} textStyle={styles.smallLabel} />}
         <View style={styles.auxInfo}>
           {auxInfo && (
             <>

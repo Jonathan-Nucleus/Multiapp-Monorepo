@@ -34,6 +34,7 @@ import {
   PRIMARYSOLID,
   WHITE,
   WHITE12,
+  BGDARK,
 } from 'shared/src/colors';
 import { CreatePostScreen } from 'mobile/src/navigations/HomeStack';
 import PostHeader from './PostHeader';
@@ -346,7 +347,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   mentionList: {
-    backgroundColor: PRIMARYSOLID7,
+    backgroundColor: BGDARK,
     padding: 16,
     borderRadius: 16,
     marginTop: 8,

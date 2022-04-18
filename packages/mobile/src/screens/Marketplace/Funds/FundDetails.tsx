@@ -7,12 +7,14 @@ import {
   DotsThreeOutlineVertical,
   Star,
 } from 'phosphor-react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import MainHeader from '../../../components/main/Header';
+import PHeader from '../../../components/common/PHeader';
 import { FundDetailsScreen } from '../../../navigations/FundsStack';
 import FundProfileInfo from '../../../components/main/FundProfileInfo';
 import FundOverview from './FundOverview';
-
+import * as NavigationService from '../../../services/navigation/NavigationService';
 import {
   BLACK,
   PRIMARYSTATE,
@@ -28,48 +30,58 @@ const Tab = createMaterialTopTabNavigator();
 const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
   const { fund } = route.params;
   return (
-    <ScrollView style={pStyles.globalContainer}>
-      <MainHeader
+    <SafeAreaView
+      style={pStyles.globalContainer}
+      edges={['right', 'top', 'left']}>
+      {/* <MainHeader
         leftIcon={<CaretLeft size={32} color={WHITE} />}
         onPressLeft={() => navigation.goBack()}
+      /> */}
+      <PHeader
+        leftIcon={<CaretLeft size={32} color={WHITE} />}
+        leftStyle={styles.sideStyle}
+        onPressLeft={() => NavigationService.goBack()}
+        containerStyle={styles.headerContainer}
       />
-      <FundProfileInfo fund={fund} />
-      <View style={styles.actionBar}>
-        <Star size={24} color={WHITE} style={styles.favorite} />
-        <DotsThreeOutlineVertical size={24} color={WHITE} />
-      </View>
-      {/* TODO: use ohter lib for tab bar like react-native-tab-view */}
-      <View style={{ height: 1000 }}>
-        <Tab.Navigator
-          screenOptions={({ route }) => ({
-            tabBarStyle: styles.tabBar,
-            tabBarIndicatorStyle: styles.tabBarIndicator,
-            tabBarActiveTintColor: WHITE,
-            tabBarInactiveTintColor: WHITE60,
-            tabBarLabel: ({ focused, color }) => (
-              <Text
-                style={[
-                  styles.tabBarLabel,
-                  Body2,
-                  { color },
-                  focused ? styles.bold : {},
-                ]}>
-                {route.name}
-              </Text>
-            ),
-          })}
-          initialRouteName="FundOverview">
-          <Tab.Screen
-            name="Overview"
-            component={() => <FundOverview fund={fund} />}
-          />
-          <Tab.Screen
-            name="Documents"
-            component={() => <FundOverview fund={fund} />}
-          />
-        </Tab.Navigator>
-      </View>
-    </ScrollView>
+      <ScrollView>
+        <FundProfileInfo fund={fund} />
+        <View style={styles.actionBar}>
+          <Star size={24} color={WHITE} style={styles.favorite} />
+          <DotsThreeOutlineVertical size={24} color={WHITE} />
+        </View>
+        {/* TODO: use ohter lib for tab bar like react-native-tab-view */}
+        <View style={{ height: 1200 }}>
+          <Tab.Navigator
+            screenOptions={({ route }) => ({
+              tabBarStyle: styles.tabBar,
+              tabBarIndicatorStyle: styles.tabBarIndicator,
+              tabBarActiveTintColor: WHITE,
+              tabBarInactiveTintColor: WHITE60,
+              tabBarLabel: ({ focused, color }) => (
+                <Text
+                  style={[
+                    styles.tabBarLabel,
+                    Body2,
+                    { color },
+                    focused ? styles.bold : {},
+                  ]}>
+                  {route.name}
+                </Text>
+              ),
+            })}
+            initialRouteName="FundOverview">
+            <Tab.Screen
+              name="Overview"
+              component={() => <FundOverview fund={fund} />}
+            />
+            <Tab.Screen
+              name="Documents"
+              component={() => <FundOverview fund={fund} />}
+            />
+          </Tab.Navigator>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -83,6 +95,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderBottomColor: WHITE12,
     borderBottomWidth: 1,
+  },
+  headerContainer: {
+    backgroundColor: BLACK,
+    marginBottom: 0,
+    height: 62,
+  },
+  sideStyle: {
+    top: 16,
   },
   favorite: {},
   tabBar: {
