@@ -34,7 +34,7 @@ COPY --from=build /ignite/packages/desktop/public ./
 COPY --from=build /ignite/packages/desktop/package.json ./
 
 COPY --from=build --chown=nextjs:nodejs /ignite/packages/desktop/.next/standalone ./
-COPY --from=build --chown=nextjs:nodejs /ignite/packages/desktop/.next/static ./.next/static
+COPY --from=build --chown=nextjs:nodejs /ignite/packages/desktop/.next/static ./packages/desktop/.next/static
 
 USER nextjs
 
