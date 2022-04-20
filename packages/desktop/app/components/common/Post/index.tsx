@@ -17,6 +17,7 @@ import LikeModal from "./LikeModal";
 import { FetchPostsData } from "desktop/app/graphql/queries";
 import { useLikePost } from "desktop/app/graphql/mutations/posts";
 import CommentPost from "../Comment";
+import moment from "moment";
 
 type Post = Exclude<FetchPostsData["posts"], undefined>[number];
 
@@ -73,7 +74,7 @@ const Post: FC<PostProps> = ({ post }: PostProps) => {
             </div>
             <div className="text-xs text-white opacity-60">{user.position}</div>
             <div className="text-xs text-white opacity-60">
-              {post.createdAt}
+              {moment(post.createdAt).format("MMM DD")}
             </div>
           </div>
         </div>

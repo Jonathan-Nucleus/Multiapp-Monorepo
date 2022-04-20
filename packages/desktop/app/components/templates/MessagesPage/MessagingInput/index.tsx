@@ -39,9 +39,7 @@ const MessagingInput: React.FC<MessageInputProps> = () => {
 
       const deletePressed =
         event.nativeEvent instanceof InputEvent &&
-        event.nativeEvent.inputType === "deleteContentBackward"
-          ? true
-          : false;
+        event.nativeEvent.inputType === "deleteContentBackward";
 
       if (messageInput.text.length === 1 && deletePressed) {
         setGiphyState(false);

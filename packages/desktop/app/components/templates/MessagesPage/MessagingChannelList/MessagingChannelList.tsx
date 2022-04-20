@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
-import { ChannelListMessengerProps, useChatContext } from "stream-chat-react";
+import { FC, memo, PropsWithChildren } from "react";
+import { ChannelListMessengerProps } from "stream-chat-react";
 import { SkeletonLoader } from "./SkeletonLoader";
-import { StreamType } from "../types";
 
-const MessagingChannelList: React.FC<ChannelListMessengerProps> = ({
+type MessagingChannelListProps = ChannelListMessengerProps & PropsWithChildren<unknown>;
+
+const MessagingChannelList: FC<MessagingChannelListProps> = ({
   children,
   error = false,
   loading,
@@ -27,4 +28,4 @@ const MessagingChannelList: React.FC<ChannelListMessengerProps> = ({
   return <>{children}</>;
 };
 
-export default React.memo(MessagingChannelList);
+export default memo(MessagingChannelList);

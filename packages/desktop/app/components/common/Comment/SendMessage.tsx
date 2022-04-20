@@ -1,11 +1,6 @@
 import React, { FC, useState, useRef } from "react";
 import { PaperPlaneRight, Image as PhotoImage, Smiley } from "phosphor-react";
-import Picker, { SKIN_TONE_MEDIUM_DARK } from "emoji-picker-react";
 import {
-  useLikePost,
-  useDeleteComment,
-  useEditCommentPost,
-  useCommentPost,
   useFetchUploadLink,
 } from "desktop/app/graphql/mutations/posts";
 
@@ -123,11 +118,11 @@ const SendMessage: FC<SendMessageProps> = ({
       </div>
       {visibleEmoji && (
         <div className="absolute right-0 w-full z-50">
-          <Picker
-            onEmojiClick={onEmojiClick}
-            skinTone={SKIN_TONE_MEDIUM_DARK}
-            pickerStyle={{ width: "100%" }}
-          />
+          {/*<Picker*/}
+          {/*  onEmojiClick={onEmojiClick}*/}
+          {/*  skinTone={SKIN_TONE_MEDIUM_DARK}*/}
+          {/*  pickerStyle={{ width: "100%" }}*/}
+          {/*/>*/}
         </div>
       )}
     </div>

@@ -27,7 +27,7 @@ const CommentsList: FC<CommentDetailProps> = ({
           <div key={comment._id}>
             <CommentCard comment={comment} postId={postId}>
               <CommentsList
-                comments={commentsByCommentID[comment._id]}
+                comments={commentsByCommentID?.[comment._id]}
                 commentsByCommentID={commentsByCommentID}
                 parentId={comment._id}
                 postId={postId}

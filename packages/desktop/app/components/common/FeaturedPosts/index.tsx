@@ -1,7 +1,6 @@
-import { FC, useState } from "react";
+import { FC } from "react";
 import "@splidejs/react-splide/css";
 import { Splide, SplideSlide } from "@splidejs/react-splide";
-import Image from "next/image";
 
 import PostCard from "../Post";
 import Card from "../Card";

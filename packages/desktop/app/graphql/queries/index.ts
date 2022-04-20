@@ -2,7 +2,6 @@ import { gql, useQuery, QueryHookOptions, QueryResult } from "@apollo/client";
 
 import { Post, PostCategory } from "backend/graphql/posts.graphql";
 import { User } from "backend/graphql/users.graphql";
-import { Company } from "backend/graphql/companies.graphql";
 
 type FetchPostsVariables = {
   categories?: PostCategory[];
@@ -110,12 +109,6 @@ export function useFetchPosts(): QueryResult<
   );
 }
 
-export type FollowUser = Pick<
-  User,
-  "_id" | "firstName" | "lastName" | "avatar" | "position"
-> & {
-  company: Pick<Company, "_id" | "name">;
-};
 export type WatchedFund = Pick<
   User["watchlist"][number],
   "_id" | "name" | "avatar" | "companyId" | "managerId"

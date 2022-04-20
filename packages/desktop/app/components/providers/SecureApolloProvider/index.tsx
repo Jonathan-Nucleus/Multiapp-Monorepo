@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, PropsWithChildren } from "react";
 import { SessionProvider, useSession } from "next-auth/react";
 import { ApolloProvider } from "@apollo/client";
 import {
@@ -6,7 +6,7 @@ import {
   ApolloPageProps,
 } from "desktop/app/lib/apolloClient";
 
-interface SecureApolloProviderProps {
+interface SecureApolloProviderProps extends PropsWithChildren<unknown> {
   apolloProps?: ApolloPageProps;
 }
 

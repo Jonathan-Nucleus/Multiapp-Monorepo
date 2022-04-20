@@ -1,8 +1,10 @@
-import { FC } from "react";
+import { FC, PropsWithChildren } from "react";
 import Logo from "shared/assets/images/logo.svg";
 import Image from "next/image";
 
-const AuthLayout: FC = ({ children }) => {
+type AuthLayoutProps = PropsWithChildren<unknown>;
+
+const AuthLayout: FC<AuthLayoutProps> = ({ children }) => {
   return (
     <div className="container mx-auto">
       <div className="py-16 text-center">
