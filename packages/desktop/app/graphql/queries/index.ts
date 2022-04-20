@@ -132,7 +132,7 @@ export type WatchedFund = Pick<
   User["watchlist"][number],
   "_id" | "name" | "avatar" | "companyId" | "managerId"
 > & {
-  company: Pick<User["watchlist"][number]["company"], "name">;
+  company: Pick<User["watchlist"][number]["company"], "name" | "avatar">;
 };
 export type AccountCompany = Pick<
   User["companies"][number],

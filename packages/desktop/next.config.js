@@ -18,6 +18,10 @@ const nextConfig = withTM({
     };
     return config;
   },
+  experimental: {
+    outputStandalone: true,
+    outputFileTracingRoot: path.join(__dirname, "../../"),
+  },
 });
 
 module.exports = nextConfig;

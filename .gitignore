@@ -1,5 +1,6 @@
 # local env files
 .env
+!packages/desktop/.env
 
 # yarn
 .yarn/
