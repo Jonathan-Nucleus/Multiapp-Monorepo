@@ -67,6 +67,7 @@ export const VIEW_POST_FRAGMENT = gql`
       body
       createdAt
       likeIds
+      commentId
       mentions {
         _id
         firstName

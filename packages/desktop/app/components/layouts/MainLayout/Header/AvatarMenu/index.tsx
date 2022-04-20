@@ -11,11 +11,16 @@ import {
   Lifebuoy,
   FileText,
   SignOut,
+  Headset,
 } from "phosphor-react";
 import MenuItem from "./MenuItem";
 import Avatar from "desktop/app/components/common/Avatar";
+import { useAccount } from "desktop/app/graphql/queries";
 
 const AvatarMenu: FC = () => {
+  const { data: accountData } = useAccount();
+  const account = accountData?.account;
+
   const items = [
     {
       icon: (
@@ -59,6 +64,19 @@ const AvatarMenu: FC = () => {
       path: "/",
     },
   ];
+
+  if (account?.accreditation === "ACCREDITED") {
+    items[1] = {
+      icon: (
+        <div className="text-success">
+          <Headset color="white" weight="light" size={24} />
+        </div>
+      ),
+      title: "Contact Fund Specialist",
+      path: "/",
+    };
+  }
+
   return (
     <Menu as="div" className="relative">
       <Menu.Button>

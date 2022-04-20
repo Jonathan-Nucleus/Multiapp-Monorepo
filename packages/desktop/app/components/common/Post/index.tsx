@@ -129,7 +129,7 @@ const Post: FC<PostProps> = ({ post }: PostProps) => {
           <div className="opacity-60 text-white ml-10">
             <div
               className="flex items-center cursor-pointer"
-              onClick={() => setVisibleComment(true)}
+              onClick={() => setVisibleComment(!visibleComment)}
             >
               <ChatCenteredText weight="light" color="currentColor" size={24} />
               {post.commentIds && (

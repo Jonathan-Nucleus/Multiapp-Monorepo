@@ -139,6 +139,7 @@ type CommentPostVariables = {
     body: string;
     postId: string;
     mentionIds: string[];
+    commentId?: string;
   };
 };
 
