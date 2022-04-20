@@ -30,13 +30,13 @@ const resolvers = {
       parent: Company.Mongo,
       argsIgnored: NoArgs,
       { db }: ApolloServerContext
-    ) => db.users.findAll(parent.memberIds),
+    ) => (parent.memberIds ? db.users.findAll(parent.memberIds) : []),
 
     funds: async (
       parent: Company.Mongo,
       argsIgnored: NoArgs,
       { db }: ApolloServerContext
-    ) => db.funds.findAll(parent.fundIds),
+    ) => (parent.fundIds ? db.funds.findAll(parent.fundIds) : []),
 
     fundManagers: async (
       parent: Company.Mongo,

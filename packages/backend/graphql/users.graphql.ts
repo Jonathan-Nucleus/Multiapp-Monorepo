@@ -36,31 +36,37 @@ export const contentCreatorResolvers = {
     parent: User.Mongo | Company.Mongo,
     argsIgnored: NoArgs,
     { db }: ApolloServerContext
-  ) => db.comments.findAll(parent.commentIds),
+  ) => (parent.commentIds ? db.comments.findAll(parent.commentIds) : []),
 
   followers: async (
     parent: User.Mongo | Company.Mongo,
     argsIgnored: NoArgs,
     { db }: ApolloServerContext
-  ) => db.users.findAll(parent.followerIds),
+  ) => (parent.followerIds ? db.users.findAll(parent.followerIds) : []),
 
   following: async (
     parent: User.Mongo | Company.Mongo,
     argsIgnored: NoArgs,
     { db }: ApolloServerContext
-  ) => db.users.findAll(parent.followingIds),
+  ) => (parent.followingIds ? db.users.findAll(parent.followingIds) : []),
 
   companyFollowers: async (
     parent: User.Mongo | Company.Mongo,
     argsIgnored: NoArgs,
     { db }: ApolloServerContext
-  ) => db.users.findAll(parent.companyFollowerIds),
+  ) =>
+    parent.companyFollowerIds
+      ? db.users.findAll(parent.companyFollowerIds)
+      : [],
 
   companyFollowing: async (
     parent: User.Mongo | Company.Mongo,
     argsIgnored: NoArgs,
     { db }: ApolloServerContext
-  ) => db.users.findAll(parent.companyFollowingIds),
+  ) =>
+    parent.companyFollowingIds
+      ? db.users.findAll(parent.companyFollowingIds)
+      : [],
 };
 
 export const publicUserResolvers = {

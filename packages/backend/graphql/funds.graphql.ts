@@ -46,7 +46,7 @@ const resolvers = {
       parent: Fund.Mongo,
       argsIgnored: NoArgs,
       { db }: ApolloServerContext
-    ) => db.users.findAll(parent.teamIds),
+    ) => (parent.teamIds ? db.users.findAll(parent.teamIds) : []),
   },
 };
 
