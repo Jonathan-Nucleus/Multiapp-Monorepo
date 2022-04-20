@@ -15,27 +15,10 @@ import { useWatchFund } from "mobile/src/graphql/mutation/funds";
 import { PINK } from "shared/src/colors";
 
 const fundData = {
-  background: "",
-  name: "Good Soil Accelerated Opportunities",
-  overview:
-    "Concetrated growth in disruptive tech\n" +
-    "Looks in to invest in early stages of growth\n" +
-    "Seeks to genearte substantial multiples over a long-term horizon\n" +
-    "50% of all fees are donated to Charities",
-  strategyOverView:
-    "Renewable energy production is no longer the future. It is the present. The Climate Action portfolio, built in collaboration with Etho Capital, seeks long-term capital appreciation and allows everyone to positvely affect climate change by investing in companies that exceed leading climate investment standards, are net climate positive on the Etho Global Climate Positive Index, and dedicate resources not only to reducing pollution, but to implementing real solutions.\n" +
-    "\n" +
-    "\n",
-  status: "OPEN",
-  tags: ["concetrated", "charitable", "natural resources", "consumer"],
   mtd: "3.2%",
   ytd: "3.1%",
   annualVolatility: "2.8%",
   arsi: "2.8%",
-  company: {
-    avatar: "",
-    name: "Good Soil Investment Management",
-  },
   netData: {
     2012: [0.5, -0.5, -0.1, 0.5, 0.5, 0.5, 0.5, -0.1, -0.1, -0.1, 0.5, -0.1],
     2013: [0.5, -0.5, -0.1, 0.5, 0.5, 0.5, 0.5, -0.1, -0.1, -0.1, 0.5, -0.1],
@@ -137,58 +120,28 @@ const fundData = {
       created: "July 1, 2021 5:59PM",
     },
   ],
-  specialist: {
-    avatar: "",
-    firstName: "Emmet",
-    lastName: "Peppers",
-    followerIds: [],
-    postIds: [],
-  },
-  members: [
-    {
-      avatar: "",
-      firstName: "Emmet",
-      lastName: "Peppers",
-      position: "CEO",
-    },
-    {
-      avatar: "",
-      firstName: "Valeria",
-      lastName: "Caza",
-      position: "Fund Manager",
-    },
-    {
-      avatar: "",
-      firstName: "Michelle",
-      lastName: "Mendiola",
-      position: "Portfolio Manager",
-    },
-  ],
 };
 
 interface FundProfileProps {
   fundId?: string;
 }
 
-const FundProfile: FC<FundProfileProps> = ({ fundId }) => {
+const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
   const [watchFund] = useWatchFund();
   const { data } = useFund(fundId);
   const { data: userData } = useAccount({ fetchPolicy: "cache-only" });
   const [showModal, setShowModal] = useState(false);
-
   const fund = data?.fund;
   const isWatching =
     (!!fundId && userData?.account?.watchlistIds?.includes(fundId)) ?? false;
 
   const toggleWatchFund = async (): Promise<void> => {
     if (!fundId) return;
-
     try {
       const { data } = await watchFund({
         variables: { watch: !isWatching, fundId },
         refetchQueries: ["Account"],
       });
-
       if (!data?.watchFund) {
         console.log("err", data);
       }
@@ -201,8 +154,8 @@ const FundProfile: FC<FundProfileProps> = ({ fundId }) => {
     <div className="container mx-auto mt-5 lg:px-4 max-w-screen-xl">
       <div className="lg:grid grid-cols-3">
         <div className="col-span-2">
-          <Card className="bg-secondary/[.27] rounded p-0 border border-t-0">
-            <div className="flex flex-row bg-secondary/[.27]">
+          <Card className="bg-secondary/[.27] overflow-visible rounded p-0">
+            <div className="flex flex-row bg-secondary/[.27] rounded overflow-hidden -m-px">
               <div className="flex-shrink-0 w-72 h-72 bg-white relative">
                 {fund?.company?.background && (
                   <Image
@@ -219,7 +172,7 @@ const FundProfile: FC<FundProfileProps> = ({ fundId }) => {
               </div>
               <div className="flex flex-col flex-grow">
                 <div className="flex px-5">
-                  <div className="w-24 h-24 flex-shrink-0 bg-purple-secondary rounded-b relative">
+                  <div className="w-24 h-24 flex-shrink-0 bg-purple-secondary rounded-b relative overflow-hidden">
                     {fund?.company?.avatar && (
                       <Image
                         loader={() =>
@@ -284,14 +237,13 @@ const FundProfile: FC<FundProfileProps> = ({ fundId }) => {
                           : "border-white/[.12]"
                       }`}
                     >
-                      <Button
-                        variant="text"
+                      <div
                         className={`text-sm ${
                           selected ? "text-white/[.87]" : "text-primary"
                         } font-medium py-4`}
                       >
                         OVERVIEW
-                      </Button>
+                      </div>
                     </div>
                   )}
                 </Tab>
@@ -304,14 +256,13 @@ const FundProfile: FC<FundProfileProps> = ({ fundId }) => {
                           : "border-white/[.12]"
                       }`}
                     >
-                      <Button
-                        variant="text"
+                      <div
                         className={`text-sm ${
                           selected ? "text-white/[.87]" : "text-primary"
                         } font-medium py-4`}
                       >
                         DOCUMENTS
-                      </Button>
+                      </div>
                     </div>
                   )}
                 </Tab>
@@ -601,7 +552,7 @@ const FundProfile: FC<FundProfileProps> = ({ fundId }) => {
                   <Avatar size={128} src={fund?.manager?.avatar} />
                   <div className="flex items-center mt-2">
                     <div className="text-sm text-white tracking-wider">
-                      {`${fund?.manager?.firstName} ${fund?.manager?.lastName}`}
+                      {fund?.manager?.firstName} {fund?.manager?.lastName}
                     </div>
                     <div className="text-white opacity-60 mx-2">•</div>
                     <div>
@@ -614,9 +565,9 @@ const FundProfile: FC<FundProfileProps> = ({ fundId }) => {
                     </div>
                   </div>
                   <div className="text-xs text-white opacity-60 tracking-wide">
-                    {fundData.specialist.followerIds.length} Followers
+                    {fund?.manager?.followerIds?.length ?? 0} Followers
                     {" • "}
-                    {fundData.specialist.postIds.length} Posts
+                    {fund?.manager?.followerIds?.length ?? 0} Posts
                   </div>
                 </div>
                 <div className="my-2">
@@ -752,4 +703,4 @@ const FundProfile: FC<FundProfileProps> = ({ fundId }) => {
   );
 };
 
-export default FundProfile;
+export default FundProfilePage;

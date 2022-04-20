@@ -6,7 +6,7 @@ import Label from "desktop/app/components/common/Label";
 import Radio from "desktop/app/components/common/Radio";
 import Button from "desktop/app/components/common/Button";
 
-import type { PostCategory, Audience } from "backend/graphql/posts.graphql";
+import type { PostCategory } from "backend/graphql/posts.graphql";
 import { PostCategories } from "backend/graphql/enumerations.graphql";
 
 const allTopics = { ALL: "All", ...PostCategories };
@@ -20,6 +20,7 @@ const fromItems = [
 ];
 
 export type FilterCategory = PostCategory | "ALL";
+
 interface FilterDropdownProps {
   initialTopics: FilterCategory[];
   from: string;

@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from "react";
+import { FC, useState } from "react";
 import { Plus } from "phosphor-react";
 
 import ProfileCard from "./ProfileCard";
@@ -15,7 +15,7 @@ import { useAccount } from "desktop/app/graphql/queries";
 
 const HomePage: FC = () => {
   const [showPostModal, setShowPostModal] = useState(false);
-  const { data: accountData, loading: accountLoading } = useAccount();
+  const { data: accountData } = useAccount();
   const user = accountData?.account;
   const companies = accountData?.account?.companies ?? [];
   if (!user) {

@@ -20,5 +20,8 @@ export type StreamType = {
 };
 
 export const GiphyContext = React.createContext(
-  {} as { giphyState: boolean; setGiphyState: React.Dispatch<React.SetStateAction<boolean>> },
+  {} as {
+    giphyState: boolean;
+    setGiphyState: React.Dispatch<React.SetStateAction<boolean>>;
+  }
 );

@@ -1,6 +1,5 @@
 import { FC, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import {
   DotsThreeOutlineVertical,
   Share,
@@ -29,9 +28,6 @@ const Profile: FC<AccountProps> = ({ company }) => {
   const [isVisible, setVisible] = useState(false);
   const { data: accountData } = useAccount({ fetchPolicy: "cache-only" });
   const [followCompany] = useFollowCompany();
-
-  const { members } = company;
-  const account = accountData?.account;
   const isFollowing =
     (!!accountData &&
       accountData.account?.companyFollowingIds?.includes(company._id)) ??

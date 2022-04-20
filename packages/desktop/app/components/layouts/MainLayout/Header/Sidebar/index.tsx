@@ -37,7 +37,7 @@ const sidebarItems = [
     activeIcon: <UserCircle color="white" weight="fill" size={24} />,
     inactiveIcon: <UserCircle color="white" weight="light" size={24} />,
     title: "My Profile",
-    path: "/profile",
+    path: "/profile/me",
     notifications: 0,
   },
   {

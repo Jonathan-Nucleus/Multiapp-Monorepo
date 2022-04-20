@@ -1,9 +1,6 @@
 import { FC, useState } from "react";
-import { PostCategory } from "backend/graphql/posts.graphql";
 import FilterDropdown, { FilterCategory } from "./FilterDropdown";
 import Post from "desktop/app/components/common/Post";
-
-import { useFetchPosts } from "desktop/app/graphql/queries";
 
 export interface PostsListProps {
   posts: Post[];
@@ -15,20 +12,12 @@ const PostsList: FC<PostsListProps> = ({ posts, onFilter }) => {
     "ALL",
   ]);
   const [selectedFrom, setSelectedFrom] = useState("Everyone");
-  const { data, refetch } = useFetchPosts();
-
   const updateFilter = (topics: FilterCategory[], audience: string): void => {
     if (topics.length == 0) {
       topics.push("ALL");
     }
-
     setSelectedTopics(topics);
     setSelectedFrom(audience);
-
-    const postCategories = (
-      topics.includes("ALL") ? [] : topics
-    ) as PostCategory[];
-
     onFilter?.(topics, audience);
   };
 

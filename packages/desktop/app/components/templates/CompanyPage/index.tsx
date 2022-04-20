@@ -1,5 +1,4 @@
-import { FC, useState, useEffect } from "react";
-import { Plus } from "phosphor-react";
+import { FC } from "react";
 import "@splidejs/react-splide/css";
 import { Splide, SplideSlide } from "@splidejs/react-splide";
 import Image from "next/image";
@@ -7,16 +6,11 @@ import Image from "next/image";
 import TeamMembersList from "./TeamMembers";
 import PostsList, { PostsListProps } from "../../common/PostsList";
 import FeaturedPosts from "../../common/FeaturedPosts";
-import FundsList from "../../common/FundsList";
 import Card from "../../common/Card";
-import Button from "../../common/Button";
 import Profile from "./Profile";
 import { useFetchPosts } from "desktop/app/graphql/queries";
-import { useFetchFunds } from "desktop/app/graphql/queries/marketplace";
-import { useAccount } from "desktop/app/graphql/queries";
 import { useCompany } from "mobile/src/graphql/query/company";
-import type { Company } from "backend/graphql/companies.graphql";
-import type { User } from "backend/graphql/users.graphql";
+import FundCard from "../../modules/funds/FundCard";
 
 interface CompanyPageProps {
   companyId: string;
@@ -48,7 +42,14 @@ const CompanyPage: FC<CompanyPageProps> = ({ companyId }) => {
     <div className="flex flex-col justify-center p-0 mt-10 md:flex-row md:px-2">
       <div className="min-w-0 max-w-4xl mx-0 md:mx-4">
         {company && <Profile company={company} />}
-        <FundsList funds={funds} showImages={false} />
+        <>
+          <div className="text-white mt-8 mb-2 ml-2 font-medium">Funds</div>
+          {funds.map((fund, index) => (
+            <div key={index} className="mb-4">
+              <FundCard fund={fund} showImages={false} />
+            </div>
+          ))}
+        </>
         {posts?.[0] && <FeaturedPosts posts={[posts[0]]} />}
         <PostsList posts={posts} onFilter={filterPosts} />
       </div>

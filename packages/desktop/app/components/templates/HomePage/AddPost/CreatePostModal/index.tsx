@@ -379,4 +379,4 @@ const CreatePostModal: FC<CreatePostModalProps> = ({ show, onClose }) => {
   );
 };
 
-export default CreatePostModal
+export default CreatePostModal;

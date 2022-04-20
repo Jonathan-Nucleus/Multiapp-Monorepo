@@ -1,12 +1,8 @@
 import { FC } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { CircleWavy } from "phosphor-react";
-
 import Card from "../../../common/Card";
 import Avatar from "desktop/app/components/common/Avatar";
-
-import type { User } from "backend/graphql/users.graphql";
 import { AccreditationOptions } from "backend/schemas/user";
 import { AccountData } from "desktop/app/graphql/queries";
 
@@ -57,7 +53,7 @@ const ProfileCard: FC<ProfileProps> = ({ user }) => {
           </div>
         </div>
         <div className="mt-5 mb-3">
-          <Link href="/profile">
+          <Link href="/profile/me">
             <a className="text-primary text-sm">See Your Profile</a>
           </Link>
         </div>

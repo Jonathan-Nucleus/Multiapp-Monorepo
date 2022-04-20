@@ -7,8 +7,8 @@ const FundManagersPage: FC = () => {
   return (
     <>
       <Navbar />
-      <div className="container mx-auto my-6 max-w-screen-xl">
-        <header className="hidden lg:flex items-center px-4">
+      <div className="container mx-auto my-6 max-w-screen-xl lg:px-4">
+        <header className="hidden lg:flex items-center px-4 lg:px-0">
           <h1 className="text-2xl text-white">Browse by Fund Manager</h1>
         </header>
         <div className="hidden lg:block mt-4">

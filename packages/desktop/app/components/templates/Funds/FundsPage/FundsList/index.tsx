@@ -1,5 +1,5 @@
 import { FC } from "react";
-import FundItem from "desktop/app/components/common/FundsList/FundItem";
+import FundCard from "desktop/app/components/modules/funds/FundCard";
 import { Fund } from "mobile/src/graphql/query/marketplace";
 
 interface FundsListProps {
@@ -11,7 +11,7 @@ const FundsList: FC<FundsListProps> = ({ funds }: FundsListProps) => {
     <>
       {funds!.map((fund, index) => (
         <div key={index} className="mb-6">
-          <FundItem fund={fund} />
+          <FundCard fund={fund} />
         </div>
       ))}
     </>

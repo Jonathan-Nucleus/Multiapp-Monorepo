@@ -2,32 +2,24 @@ import React, { FC } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Share, Star } from "phosphor-react";
-
 import { useAccount } from "desktop/app/graphql/queries";
 import { useWatchFund } from "mobile/src/graphql/mutation/funds";
 import { useFollowUser } from "desktop/app/graphql/mutations/profiles";
-import type { User } from "backend/graphql/users.graphql";
-import type { Fund } from "mobile/src/graphql/query/marketplace";
-
+import { Fund } from "mobile/src/graphql/query/marketplace";
 import Button from "desktop/app/components/common/Button";
 import Card from "desktop/app/components/common/Card";
-
 import { PINK } from "shared/src/colors";
 
-export interface FundItemProps {
+export interface FundCardProps {
   fund: Fund;
   showImages?: boolean;
 }
 
-const FundItem: FC<FundItemProps> = ({
+const FundCard: FC<FundCardProps> = ({
   fund,
   showImages = true,
-}: FundItemProps) => {
-  const {
-    data: userData,
-    loading: userLoading,
-    refetch,
-  } = useAccount({ fetchPolicy: "cache-only" });
+}: FundCardProps) => {
+  const { data: userData, refetch } = useAccount({ fetchPolicy: "cache-only" });
 
   const [followUser] = useFollowUser();
   const [watchFund] = useWatchFund();
@@ -45,7 +37,7 @@ const FundItem: FC<FundItemProps> = ({
       const { data } = await followUser({
         variables: { follow: follow, userId: id },
       });
-      data?.followUser ? refetch() : console.log("err", data);
+      data?.followUser ? await refetch() : console.log("err", data);
     } catch (err) {
       console.log("err", err);
     }
@@ -89,7 +81,7 @@ const FundItem: FC<FundItemProps> = ({
           <div className="flex flex-col flex-grow px-5">
             <div className="flex">
               {showImages && (
-                <div className="w-24 h-24 bg-purple-secondary rounded-b relative mr-4">
+                <div className="w-24 h-24 bg-purple-secondary rounded-b relative overflow-hidden mr-4">
                   {fund?.company?.background && (
                     <Image
                       loader={() =>
@@ -177,12 +169,14 @@ const FundItem: FC<FundItemProps> = ({
               </Button>
             </div>
             <Link href={`/funds/${fund._id}`}>
-              <Button
-                variant="gradient-primary"
-                className="w-full text-sm uppercase font-medium"
-              >
-                view fund details
-              </Button>
+              <a>
+                <Button
+                  variant="gradient-primary"
+                  className="w-full text-sm uppercase font-medium"
+                >
+                  view fund details
+                </Button>
+              </a>
             </Link>
           </div>
         </div>
@@ -237,8 +231,10 @@ const FundItem: FC<FundItemProps> = ({
         <div className="h-20 bg-white relative">
           {fund.background && (
             <Image
-              loader={() => fund.background.url}
-              src={fund.background.url}
+              loader={() =>
+                `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund.background.url}`
+              }
+              src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund.background.url}`}
               alt=""
               layout="fill"
               className="object-cover"
@@ -247,11 +243,13 @@ const FundItem: FC<FundItemProps> = ({
           )}
         </div>
         <div className="relative px-4 pt-8 bg-secondary/[.27]">
-          <div className="w-16 h-16 bg-purple-secondary rounded relative -mt-16">
-            {fund.background && (
+          <div className="w-16 h-16 bg-purple-secondary rounded relative overflow-hidden -mt-16">
+            {fund?.company?.background && (
               <Image
-                loader={() => fund.background.url}
-                src={fund.background.url}
+                loader={() =>
+                  `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund?.company?.background?.url}`
+                }
+                src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund?.company?.background?.url}`}
                 alt=""
                 layout="fill"
                 className="object-cover"
@@ -351,4 +349,4 @@ const FundItem: FC<FundItemProps> = ({
   );
 };
 
-export default FundItem;
+export default FundCard;

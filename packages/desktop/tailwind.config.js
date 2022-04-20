@@ -49,6 +49,9 @@ module.exports = {
           DEFAULT: "#121212",
           600: "#747474",
         },
+        brand: {
+          overlay: "#CDA786",
+        },
       },
     },
   },

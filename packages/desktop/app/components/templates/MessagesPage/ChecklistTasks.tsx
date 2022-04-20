@@ -8,7 +8,14 @@ const notifyParent = (parent: string) => (message: any) => {
 const YOUTUBE_LINK = "https://youtu.be/Ujvy-DEA-UM";
 
 // We have to keep this task list up-to-date with the website"s checklist
-const [REACT_TO_MESSAGE, RUN_GIPHY, SEND_YOUTUBE, DRAG_DROP, START_THREAD, SEND_MESSAGE] = [
+const [
+  REACT_TO_MESSAGE,
+  RUN_GIPHY,
+  SEND_YOUTUBE,
+  DRAG_DROP,
+  START_THREAD,
+  SEND_MESSAGE,
+] = [
   "react-to-message",
   "run-giphy",
   "send-youtube",
@@ -17,13 +24,14 @@ const [REACT_TO_MESSAGE, RUN_GIPHY, SEND_YOUTUBE, DRAG_DROP, START_THREAD, SEND_
   "send-message",
 ];
 
-export const useChecklist = (chatClient: StreamChat | null, targetOrigin: string) => {
+export const useChecklist = (
+  chatClient: StreamChat | null,
+  targetOrigin: string
+) => {
   useEffect(() => {
     const notify = notifyParent(targetOrigin);
 
-    const handleNewEvent = (
-      props: Event,
-    ) => {
+    const handleNewEvent = (props: Event) => {
       const { message, type } = props;
 
       switch (type) {

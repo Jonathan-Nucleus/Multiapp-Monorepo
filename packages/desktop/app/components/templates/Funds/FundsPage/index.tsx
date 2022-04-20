@@ -1,4 +1,4 @@
-import {FC, useState} from "react";
+import { FC, useState } from "react";
 import Navbar from "../../../modules/funds/Navbar";
 import { Info, Lock } from "phosphor-react";
 import Button from "../../../common/Button";
@@ -15,7 +15,7 @@ const FundsPage: FC = () => {
   return (
     <>
       <Navbar />
-      <div className="container mx-auto my-6 max-w-screen-xl">
+      <div className="container mx-auto my-6 max-w-screen-xl lg:px-4">
         <header className="flex items-center px-4 lg:px-0">
           <h1 className="text-2xl text-white">Browse by Fund</h1>
           <div className="text-xs text-white opacity-60 ml-2 mt-2">
@@ -35,12 +35,18 @@ const FundsPage: FC = () => {
                 </span>
               </div>
               <div className="mt-24">
-                <Button variant="gradient-primary" onClick={() => setIsVerifying(true)}>
+                <Button
+                  variant="gradient-primary"
+                  onClick={() => setIsVerifying(true)}
+                >
                   <Lock color="currentColor" size={24} weight="light" />
                   <span className="ml-2">VERIFY ACCREDITATION STATUS</span>
                 </Button>
               </div>
-              <AccreditationQuestionnaire show={isVerifying} onClose={() => setIsVerifying(false)} />
+              <AccreditationQuestionnaire
+                show={isVerifying}
+                onClose={() => setIsVerifying(false)}
+              />
             </div>
           ) : (
             <>{funds.length > 0 && <FundsList funds={funds} />}</>

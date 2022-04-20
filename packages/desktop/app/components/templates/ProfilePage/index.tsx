@@ -1,44 +1,53 @@
-import { FC, useState, useEffect } from "react";
-
-import Button from "../../common/Button";
-import CompanyList from "./Companies";
-import Profile from "./Profile";
+import { FC } from "react";
+import ProfileCard from "./ProfileCard";
+import { AccountData, useFetchPosts } from "desktop/app/graphql/queries";
+import CompaniesList from "./CompaniesList";
 import PostsList from "../../common/PostsList";
-import FeaturedPosts from "../../common/FeaturedPosts";
-import FundsList from "../../common/FundsList";
-import Card from "../../common/Card";
-import { useFetchPosts } from "desktop/app/graphql/queries";
-import { useFetchFunds } from "desktop/app/graphql/queries/marketplace";
+import FundCard from "../../modules/funds/FundCard";
+import { useFetchFunds } from "../../../graphql/queries/marketplace";
 
-const UserProfile: FC = () => {
-  const { data, refetch, loading: postsLoading } = useFetchPosts();
-  const { data: fundsData, loading: fundsLoading } = useFetchFunds();
-  const posts = data?.posts ?? [];
-  const funds = fundsData?.funds ?? [];
+export interface ProfilePageProps {
+  account: Exclude<AccountData["account"], undefined>;
+}
 
-  if (fundsLoading) {
-    return null;
-  }
-
+const ProfilePage: FC<ProfilePageProps> = ({ account }: ProfilePageProps) => {
+  const { data: fundsData } = useFetchFunds();
+  const { data: postsData } = useFetchPosts();
   return (
     <>
-      <div className="flex flex-col p-0 mt-10 md:flex-row md:px-2">
-        <div className="min-w-0 mx-0 md:mx-4">
-          <Profile />
-
-          <div className="w-full block lg:hidden">
-            <CompanyList />
+      <div className="lg:mt-12 mb-12 lg:px-14">
+        <div className="lg:grid grid-cols-6 gap-8">
+          <div className="col-span-4">
+            <div className="divide-y divide-inherit border-white/[.12]">
+              <div className="pb-5">
+                <ProfileCard account={account} />
+              </div>
+              <div className="lg:hidden mb-5 pt-5">
+                <CompaniesList companies={account.companies} />
+              </div>
+              {fundsData?.funds && fundsData.funds.length > 0 && (
+                <div className="py-5">
+                  {fundsData.funds.map((fund) => (
+                    <div key={fund._id} className="mb-5">
+                      <FundCard fund={fund} showImages={false} />
+                    </div>
+                  ))}
+                </div>
+              )}
+              {postsData?.posts && (
+                <div className="py-5">
+                  <PostsList posts={postsData.posts} />
+                </div>
+              )}
+            </div>
           </div>
-          {funds.length > 0 && <FundsList funds={funds} />}
-          {posts.length > 0 && <FeaturedPosts posts={posts} />}
-          <PostsList posts={posts} />
-        </div>
-        <div className="w-96 hidden lg:block flex-shrink-0 mx-4">
-          <CompanyList />
+          <div className="col-span-2 hidden lg:block">
+            <CompaniesList companies={account.companies} />
+          </div>
         </div>
       </div>
     </>
   );
 };
 
-export default UserProfile;
+export default ProfilePage;

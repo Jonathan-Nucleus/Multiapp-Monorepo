@@ -1,21 +1,8 @@
-import {
-  gql,
-  useMutation,
-  useQuery,
-  QueryHookOptions,
-  QueryResult,
-  MutationTuple,
-} from "@apollo/client";
+import { gql, useQuery, QueryHookOptions, QueryResult } from "@apollo/client";
 
 import { Post, PostCategory } from "backend/graphql/posts.graphql";
 import { User } from "backend/graphql/users.graphql";
 import { Company } from "backend/graphql/companies.graphql";
-
-export const VERIFY_INVITE = gql`
-  query VerifyInvite($code: String!) {
-    verifyInvite(code: $code)
-  }
-`;
 
 type FetchPostsVariables = {
   categories?: PostCategory[];
@@ -134,12 +121,9 @@ export type WatchedFund = Pick<
 > & {
   company: Pick<User["watchlist"][number]["company"], "name" | "avatar">;
 };
-export type AccountCompany = Pick<
-  User["companies"][number],
-  "_id" | "name" | "avatar" | "followerIds" | "followingIds" | "postIds"
->;
 
 type AccountVariables = never;
+
 export type AccountData = {
   account?: Pick<
     User,
@@ -153,15 +137,18 @@ export type AccountData = {
     | "background"
     | "followerIds"
     | "postIds"
+    | "company"
+    | "companies"
     | "followingIds"
     | "watchlistIds"
     | "twitter"
     | "linkedIn"
     | "website"
+    | "tagline"
+    | "overview"
+    | "followers"
+    | "following"
   > & {
-    followers: FollowUser[];
-    following: FollowUser[];
-    companies: AccountCompany[];
     watchlist: WatchedFund[];
   };
 };
