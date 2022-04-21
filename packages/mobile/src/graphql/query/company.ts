@@ -128,6 +128,13 @@ export function useCompany(
             lastName
             position
             avatar
+            company {
+              _id
+              name
+              website
+              linkedIn
+              twitter
+            }
           }
           posts {
             ...ViewPostFields

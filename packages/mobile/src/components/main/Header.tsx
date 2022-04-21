@@ -54,7 +54,8 @@ const MainHeader: React.FC<HeaderProps> = (props) => {
               onPress={() => NavigationService.navigate('Notification')}>
               <BellSvg style={styles.headerIcon} />
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => NavigationService.navigate('UserProfile')}>
               <RoundImageView
                 image={{
                   uri: `${AVATAR_URL}/${

@@ -5,50 +5,38 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Dimensions,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import FastImage from 'react-native-fast-image';
 import { NavigationProp } from '@react-navigation/native';
 import { clearToken } from 'mobile/src/utils/auth-token';
 import {
   CaretRight,
-  CircleWavy,
   SlidersHorizontal,
   Gear,
   ShieldWarning,
   EnvelopeSimple,
   Lifebuoy,
+  Headset,
+  ShieldCheck,
 } from 'phosphor-react-native';
 import { AVATAR_URL, POST_URL } from 'react-native-dotenv';
 
-import {
-  GRAY2,
-  GRAY100,
-  WHITE,
-  WHITE12,
-  PRIMARYSOLID7,
-  BGHEADER,
-} from 'shared/src/colors';
-import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
+import { GRAY100, WHITE, WHITE12, SUCCESS } from 'shared/src/colors';
 
 import MainHeader from '../../components/main/Header';
 import PLabel from '../../components/common/PLabel';
 import pStyles from '../../theme/pStyles';
-import {
-  Body1,
-  Body2,
-  Body3,
-  H6,
-  H6Bold,
-  Body4Bold,
-  Body2Bold,
-} from '../../theme/fonts';
+import { Body3, H6Bold, Body4Bold, Body2Bold } from '../../theme/fonts';
 import { useAccount } from '../../graphql/query/account';
-import Alsvg from 'shared/assets/images/al.svg';
+import AIProSvg from 'shared/assets/images/al.svg';
+import AIUserSvg from 'shared/assets/images/ai-user.svg';
+
 interface RenderItemProps {
   item: {
     label: string;
+    comment?: string;
+    id: string;
+    icon: any;
     onPress: () => void;
   };
 }
@@ -64,9 +52,13 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
     {
       id: '21',
       label: 'Accreditation',
-      comment: 'You are accredited',
+      comment:
+        account?.accreditation === 'ACCREDITED'
+          ? 'You are accredited'
+          : 'Verify Accreditation',
       onPress: () => navigation.navigate('AccountAdmin'),
-      icon: <Alsvg />,
+      icon:
+        account?.accreditation === 'ACCREDITED' ? <AIProSvg /> : <AIUserSvg />,
     },
     {
       id: '212',
@@ -99,6 +91,22 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
       icon: <EnvelopeSimple size={26} color={WHITE} />,
     },
   ];
+
+  if (account?.role === 'PROFESSIONAL') {
+    MENU_ITEMS.push({
+      id: '1231235',
+      label: 'Contact Fund Specialist',
+      onPress: () => navigation.navigate('Contact'),
+      icon: <Headset size={26} color={WHITE} />,
+    });
+  } else {
+    MENU_ITEMS.push({
+      id: '1231235',
+      label: 'Become a Verified Pro',
+      onPress: () => navigation.navigate('BecomePro'),
+      icon: <ShieldCheck size={26} color={WHITE} />,
+    });
+  }
 
   const handleLogout = async () => {
     try {
@@ -134,8 +142,7 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
   const renderListHeaderComponent = () => {
     return (
       <>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('ProfileSettings')}>
+        <TouchableOpacity onPress={() => navigation.navigate('UserProfile')}>
           <View style={styles.item}>
             <FastImage
               style={styles.avatar}
@@ -149,10 +156,12 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
                 <Text style={styles.name}>
                   {account?.firstName} {account?.lastName}
                 </Text>
-                <View style={styles.proWrapper}>
-                  <ShieldCheckSvg />
-                  <PLabel label="PRO" textStyle={styles.proLabel} />
-                </View>
+                {account?.role === 'PROFESSIONAL' && (
+                  <View style={styles.proWrapper}>
+                    <ShieldCheck color={SUCCESS} weight="fill" />
+                    <PLabel label="PRO" textStyle={styles.proLabel} />
+                  </View>
+                )}
               </View>
               <Text style={styles.comment}>See your profile</Text>
             </View>
@@ -161,12 +170,12 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
         {account?.companies.map((company) => (
           <TouchableOpacity
             onPress={() =>
-              navigation.navigate('CompanySettings', { companyId: company._id })
+              navigation.navigate('CompanyProfile', { companyId: company._id })
             }
             key={company._id}>
             <View style={[styles.item, styles.border]}>
               <FastImage
-                style={styles.avatar}
+                style={styles.companyAvatar}
                 source={{
                   uri: `${AVATAR_URL}/${company?.avatar}`,
                 }}
@@ -242,9 +251,14 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+  },
+  companyAvatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 4,
   },
   between: {
     justifyContent: 'space-between',

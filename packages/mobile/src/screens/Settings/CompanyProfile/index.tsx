@@ -32,36 +32,30 @@ import FeaturedItem from '../../../components/main/settings/FeaturedItem';
 import Funds from '../../../components/main/settings/Funds';
 import Members from '../../../components/main/settings/Members';
 import { useAccount } from '../../../graphql/query/account';
-import CompanyProfile from './CompanyProfile';
+import CompanyDetail from './CompanyDetail';
 import type { Company } from 'backend/graphql/companies.graphql';
 import type { User } from 'backend/graphql/users.graphql';
 import { useFetchPosts } from '../../../hooks/queries';
+import { useCompany } from '../../../graphql/query/company';
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
   route: RouteProp<any, any>;
 }
 
-const CompanySettings: FC<RouterProps> = ({ navigation, route }) => {
+const CompanyProfile: FC<RouterProps> = ({ navigation, route }) => {
   const { data, refetch } = useFetchPosts();
   const { data: accountData } = useAccount();
+  const { data: companyData } = useCompany(route.params?.companyId);
   const postData = data?.posts ?? [];
   const isFocused = useIsFocused();
   const [focusState, setFocusState] = useState(isFocused);
-  const companyLists: Company[] = accountData?.account.companies ?? [];
-
+  const company: Company = companyData?.companyProfile;
   if (isFocused !== focusState) {
     console.log('refetching...');
     refetch();
     setFocusState(isFocused);
   }
-
-  const company = useMemo<Company>(() => {
-    if (route.params?.companyId && companyLists) {
-      return companyLists.find((v) => v._id === route.params?.companyId);
-    }
-    return null;
-  }, [route, companyLists]);
 
   const renderItem = ({ item }: { item: PostItemProps }) => (
     <TouchableOpacity>
@@ -70,7 +64,7 @@ const CompanySettings: FC<RouterProps> = ({ navigation, route }) => {
   );
 
   if (!company) {
-    return null;
+    return <View style={pStyles.globalContainer} />;
   }
 
   return (
@@ -84,7 +78,7 @@ const CompanySettings: FC<RouterProps> = ({ navigation, route }) => {
         onPressLeft={() => navigation.goBack()}
       />
       <PAppContainer style={styles.container}>
-        <CompanyProfile company={company} />
+        <CompanyDetail company={company} />
         <Funds accredited={accountData?.account.accreditation} />
         <View style={styles.posts}>
           <Members members={company.members || []} key={company._id} />
@@ -118,7 +112,7 @@ const CompanySettings: FC<RouterProps> = ({ navigation, route }) => {
   );
 };
 
-export default CompanySettings;
+export default CompanyProfile;
 
 const styles = StyleSheet.create({
   backIcon: {

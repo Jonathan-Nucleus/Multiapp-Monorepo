@@ -13,7 +13,7 @@ import {
 
 import PHeader from '../../../components/common/PHeader';
 import pStyles from '../../../theme/pStyles';
-import { Body1, Body2, Body3 } from '../../../theme/fonts';
+import { Body1, Body1Bold, Body2, Body3 } from '../../../theme/fonts';
 import PAppContainer from '../../../components/common/PAppContainer';
 import PTextInput from '../../../components/common/PTextInput';
 import PLabel from '../../../components/common/PLabel';
@@ -89,15 +89,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   container: {
-    backgroundColor: BGDARK100,
-    elevation: 1,
-    shadowColor: 'rgba(0, 0, 0, 0.5)',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.3,
-    borderRadius: 8,
     marginTop: 20,
   },
   content: {
@@ -111,7 +102,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    ...Body1,
+    ...Body1Bold,
   },
   description: {
     ...Body3,

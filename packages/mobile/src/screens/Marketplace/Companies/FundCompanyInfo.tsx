@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import RoundImageView from 'mobile/src/components/common/RoundImageView';
 import { WHITE, BLACK } from 'shared/src/colors';
 import { Body1Bold, Body3 } from 'mobile/src/theme/fonts';
@@ -7,6 +7,7 @@ import { Body1Bold, Body3 } from 'mobile/src/theme/fonts';
 import { AVATAR_URL } from 'react-native-dotenv';
 import PLabel from '../../../components/common/PLabel';
 import PGradientButton from '../../../components/common/PGradientButton';
+import * as NavigationService from '../../../services/navigation/NavigationService';
 
 interface FundCompanyInfoProps {
   item: any;
@@ -14,39 +15,50 @@ interface FundCompanyInfoProps {
 
 const FundCompanyInfo: React.FC<FundCompanyInfoProps> = ({ item }) => {
   return (
-    <View style={styles.userInfoContainer}>
-      <RoundImageView
-        size={48}
-        image={{ uri: `${AVATAR_URL}/${item.avatar}` }}
-        imageStyle={styles.managerAvatar}
-      />
-      <View style={styles.managerInfo}>
-        <View>
-          <PLabel
-            textStyle={Body1Bold}
-            label={`${item.postIds?.length ?? 0}`}
-          />
-          <PLabel textStyle={Body3} viewStyle={styles.postView} label="Posts" />
-        </View>
-        <View>
-          <PLabel
-            textStyle={Body1Bold}
-            label={`${item.followerIds?.length ?? 0}`}
-          />
-          <PLabel
-            textStyle={Body3}
-            viewStyle={styles.postView}
-            label="Followers"
-          />
-        </View>
-        <PGradientButton
-          label="Follow"
-          textStyle={styles.buttonText}
-          btnContainer={styles.buttonContainer}
-          onPress={() => console.log(111)}
+    <TouchableOpacity
+      onPress={() => {
+        NavigationService.navigate('CompanyProfile', {
+          companyId: item._id,
+        });
+      }}>
+      <View style={styles.userInfoContainer}>
+        <RoundImageView
+          size={48}
+          image={{ uri: `${AVATAR_URL}/${item.avatar}` }}
+          imageStyle={styles.managerAvatar}
         />
+        <View style={styles.managerInfo}>
+          <View>
+            <PLabel
+              textStyle={Body1Bold}
+              label={`${item.postIds?.length ?? 0}`}
+            />
+            <PLabel
+              textStyle={Body3}
+              viewStyle={styles.postView}
+              label="Posts"
+            />
+          </View>
+          <View>
+            <PLabel
+              textStyle={Body1Bold}
+              label={`${item.followerIds?.length ?? 0}`}
+            />
+            <PLabel
+              textStyle={Body3}
+              viewStyle={styles.postView}
+              label="Followers"
+            />
+          </View>
+          <PGradientButton
+            label="Follow"
+            textStyle={styles.buttonText}
+            btnContainer={styles.buttonContainer}
+            onPress={() => console.log(111)}
+          />
+        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

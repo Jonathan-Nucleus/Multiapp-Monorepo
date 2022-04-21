@@ -15,6 +15,8 @@ import {
   detachTokenObserver,
   TokenAction,
 } from 'mobile/src/utils/auth-token';
+import UserProfile from '../screens/Settings/UserProfile';
+import CompanyProfile from '../screens/Settings/CompanyProfile';
 
 type NavigationParamList = {};
 
@@ -79,6 +81,8 @@ const AppNavigator = () => {
           options={{ gestureEnabled: false }}
         />
         <Stack.Screen name="Main" component={BottomTabNavigator} />
+        <Stack.Screen name="UserProfile" component={UserProfile} />
+        <Stack.Screen name="CompanyProfile" component={CompanyProfile} />
       </Stack.Navigator>
     </NavigationContainer>
   );

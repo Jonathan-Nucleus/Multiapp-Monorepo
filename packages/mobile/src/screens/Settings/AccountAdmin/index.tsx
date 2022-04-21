@@ -16,16 +16,7 @@ import {
   Key,
   Trash,
 } from 'phosphor-react-native';
-import {
-  BGDARK,
-  GRAY2,
-  GRAY100,
-  WHITE,
-  BGDARK100,
-  PRIMARYSOLID7,
-  DANGER,
-  BLUE100,
-} from 'shared/src/colors';
+import { WHITE, DANGER, BLUE100 } from 'shared/src/colors';
 
 import pStyles from '../../../theme/pStyles';
 import {
@@ -43,6 +34,7 @@ interface RenderItemProps {
     id: string;
     label: string;
     onPress: () => void;
+    icon: string;
   };
 }
 
@@ -68,7 +60,7 @@ const AccountAdmin: FC<RouterProps> = ({ navigation }) => {
       id: 'delete',
       label: 'Delete Account',
       onPress: () => setIsVisible(true),
-      icon: <Trash size={28} color={WHITE} />,
+      icon: <Trash size={28} color={DANGER} />,
     },
   ];
 
@@ -85,7 +77,7 @@ const AccountAdmin: FC<RouterProps> = ({ navigation }) => {
             </Text>
           </View>
 
-          <CaretRight size={28} color={WHITE} />
+          <CaretRight size={28} color={item.id === 'delete' ? DANGER : WHITE} />
         </View>
       </TouchableOpacity>
     );

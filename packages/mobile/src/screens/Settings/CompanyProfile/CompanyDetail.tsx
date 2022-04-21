@@ -36,7 +36,7 @@ interface CompanyProp {
   company: Company;
 }
 
-const CompanyProfile: FC<CompanyProp> = ({ company }) => {
+const CompanyDetail: FC<CompanyProp> = ({ company }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [visibleFollow, setVisibleFollow] = useState(false);
   const { data: accountData, refetch } = useAccount();
@@ -211,7 +211,7 @@ const CompanyProfile: FC<CompanyProp> = ({ company }) => {
   );
 };
 
-export default CompanyProfile;
+export default CompanyDetail;
 
 const styles = StyleSheet.create({
   backIcon: {

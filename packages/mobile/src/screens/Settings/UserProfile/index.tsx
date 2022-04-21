@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import {
   StyleSheet,
   FlatList,
@@ -45,7 +45,7 @@ interface RouterProps {
   navigation: NavigationProp<any, any>;
 }
 
-const ProfileSettings: FC<RouterProps> = ({ navigation }) => {
+const UserProfile: FC<RouterProps> = ({ navigation }) => {
   const { data, refetch } = useFetchPosts();
   const { data: accountData } = useAccount();
   const postData = data?.posts;
@@ -202,7 +202,7 @@ const ProfileSettings: FC<RouterProps> = ({ navigation }) => {
   );
 };
 
-export default ProfileSettings;
+export default UserProfile;
 
 const styles = StyleSheet.create({
   backIcon: {
