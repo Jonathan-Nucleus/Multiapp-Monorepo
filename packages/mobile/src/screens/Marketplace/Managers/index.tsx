@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet, FlatList, ListRenderItem } from 'react-native';
 
 import { BLACK } from 'shared/src/colors';
-import ManagerItem, { Fund } from '../../../components/main/ManagerItem';
+import ManagerItem, { Fund } from './ManagerItem';
 import { useFundManagers } from '../../../graphql/query/marketplace';
 import { FundManagersScreen } from '../../../navigations/MarketplaceStack';
 

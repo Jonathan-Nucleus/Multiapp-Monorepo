@@ -6,8 +6,8 @@ import PTitle from './PTitle';
 import { GRAY3 } from 'shared/src/colors';
 
 interface PModalProps {
-  title: string;
-  subTitle: string;
+  title?: string;
+  subTitle?: string;
   isVisible: boolean;
   modalStyle?: object;
   onPressDone?: () => void;
@@ -23,11 +23,13 @@ const PModal: React.FC<PModalProps> = (props) => {
       style={[styles.bottomHalfModal, modalStyle]}
       onBackdropPress={onPressDone}>
       <View style={styles.modalWrapper}>
-        <PTitle
-          title={title}
-          subTitle={subTitle}
-          textStyle={{ marginBottom: 20 }}
-        />
+        {title && subTitle && (
+          <PTitle
+            title={title}
+            subTitle={subTitle}
+            textStyle={{ marginBottom: 20 }}
+          />
+        )}
         {children}
       </View>
     </Modal>

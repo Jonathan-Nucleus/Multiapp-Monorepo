@@ -17,7 +17,7 @@ const Funds: FundsScreen = ({ navigation }) => {
       <FundItem
         fund={item}
         onClickFundDetails={() =>
-          navigation.navigate('FundDetails', { fund: item })
+          navigation.navigate('FundDetails', { fundId: item._id })
         }
       />
     );

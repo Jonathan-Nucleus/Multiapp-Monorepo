@@ -4,8 +4,8 @@ import { PRIMARY, WHITE, WHITE12, BLACK } from 'shared/src/colors';
 import { Body1Bold, Body2, Body3, Body3Bold } from 'mobile/src/theme/fonts';
 import { FundManagersData } from 'mobile/src/graphql/query/marketplace';
 
-import FundUserInfo from '../../screens/Marketplace/Managers/FundUserInfo';
-import PLabel from '../common/PLabel';
+import FundUserInfo from './FundUserInfo';
+import PLabel from '../../../components/common/PLabel';
 
 import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 

@@ -64,7 +64,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
       });
 
       if (!data || !data.uploadLink) {
-        showMessage('Error', 'Image upload failed', 'error');
+        showMessage('error', 'Image upload failed');
         return;
       }
 
@@ -99,10 +99,10 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
         })
       ).data.createPost;
       console.log('success', result);
-      showMessage('Success', 'Successfully posted!', 'success');
+      showMessage('success', 'Successfully posted!');
     } catch (e) {
       console.log('error', e);
-      showMessage('Error', SOMETHING_WRONG, 'error');
+      showMessage('error', SOMETHING_WRONG);
     }
   };
 

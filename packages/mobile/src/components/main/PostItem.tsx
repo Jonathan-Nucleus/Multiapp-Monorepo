@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Image } from 'react-native';
+import { View, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import dayjs from 'dayjs';
-import { ThumbsUp, ChatCenteredText, Share } from 'phosphor-react-native';
+import {
+  ThumbsUp,
+  ChatCenteredText,
+  Share,
+  DotsThreeVertical,
+} from 'phosphor-react-native';
 import { AVATAR_URL, POST_URL } from 'react-native-dotenv';
 
 import PLabel from '../common/PLabel';
 import IconButton from '../common/IconButton';
 import UserInfo from '../common/UserInfo';
 import Tag from '../common/Tag';
-import { PRIMARYSTATE, GRAY10, WHITE60 } from 'shared/src/colors';
+import { PRIMARYSTATE, GRAY10, WHITE60, WHITE } from 'shared/src/colors';
 import { Body1, Body3 } from '../../theme/fonts';
-import { PostDataType } from '../../graphql/post';
 import * as NavigationService from '../../services/navigation/NavigationService';
 import { FetchPostsData } from 'mobile/src/hooks/queries';
 import { PostCategories } from 'backend/graphql/enumerations.graphql';
@@ -21,9 +25,10 @@ export type Post = Exclude<FetchPostsData['posts'], undefined>[number];
 interface FeedItemProps {
   post: Post;
   userId: string;
+  onPressMenu?: () => void;
 }
 
-const PostItem: React.FC<FeedItemProps> = ({ post, userId }) => {
+const PostItem: React.FC<FeedItemProps> = ({ post, userId, onPressMenu }) => {
   const { user } = post;
   const [liked, setLiked] = useState(false);
   const [likePost] = useLikePost();
@@ -59,6 +64,11 @@ const PostItem: React.FC<FeedItemProps> = ({ post, userId }) => {
           auxInfo={dayjs(post.createdAt).format('MMM D')}
           isPro
         />
+        <TouchableOpacity
+          style={styles.menuContainer}
+          onPress={() => onPressMenu && onPressMenu()}>
+          <DotsThreeVertical size={24} color={WHITE} />
+        </TouchableOpacity>
       </View>
       <PLabel label={post.body} textStyle={styles.body} />
       <FastImage
@@ -139,7 +149,10 @@ const styles = StyleSheet.create({
   headerWrapper: {
     flexDirection: 'row',
     marginVertical: 16,
-    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  menuContainer: {
+    marginTop: 12,
   },
   userInfo: {
     marginLeft: 8,

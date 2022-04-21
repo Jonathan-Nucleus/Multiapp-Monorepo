@@ -11,7 +11,7 @@ const Stack = createStackNavigator();
 
 type FundsStackParamList = {
   Marketplace: undefined;
-  FundDetails: { fund: any };
+  FundDetails: { fundId: string };
 };
 
 export type FundDetailsScreen = (

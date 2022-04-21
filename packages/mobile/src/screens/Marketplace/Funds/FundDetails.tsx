@@ -25,10 +25,19 @@ import {
 import pStyles from 'mobile/src/theme/pStyles';
 import { Body2 } from '../../../theme/fonts';
 
+import { useFund } from 'mobile/src/graphql/query/marketplace';
+
 const Tab = createMaterialTopTabNavigator();
 
 const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
-  const { fund } = route.params;
+  const { fundId } = route.params;
+  const { data } = useFund(fundId);
+  const fund = data?.fund;
+
+  if (!fund) {
+    return null;
+  }
+
   return (
     <SafeAreaView
       style={pStyles.globalContainer}
@@ -50,7 +59,7 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
           <DotsThreeOutlineVertical size={24} color={WHITE} />
         </View>
         {/* TODO: use ohter lib for tab bar like react-native-tab-view */}
-        <View style={{ height: 1200 }}>
+        <View style={{ height: 1400 }}>
           <Tab.Navigator
             screenOptions={({ route }) => ({
               tabBarStyle: styles.tabBar,
@@ -74,10 +83,7 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
               name="Overview"
               component={() => <FundOverview fund={fund} />}
             />
-            <Tab.Screen
-              name="Documents"
-              component={() => <FundOverview fund={fund} />}
-            />
+            <Tab.Screen name="Documents" component={() => <></>} />
           </Tab.Navigator>
         </View>
       </ScrollView>

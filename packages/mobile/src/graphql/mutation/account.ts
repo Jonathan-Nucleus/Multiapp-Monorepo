@@ -53,6 +53,28 @@ export function useFollowUser(): MutationTuple<
   `);
 }
 
+type HideUserVariables = {
+  hide: boolean;
+  userId: string;
+};
+
+type HideUserData = {
+  hideUser: boolean;
+};
+
+/**
+ * GraphQL mutation that hides user
+ *
+ * @returns   GraphQL mutation.
+ */
+export function useHideUser(): MutationTuple<HideUserData, HideUserVariables> {
+  return useMutation<HideUserData, HideUserVariables>(gql`
+    mutation HideUser($hide: Boolean!, $userId: ID!) {
+      hideUser(hide: $hide, userId: $userId)
+    }
+  `);
+}
+
 type FollowCompanyVariables = {
   companyId: string;
   follow: boolean;

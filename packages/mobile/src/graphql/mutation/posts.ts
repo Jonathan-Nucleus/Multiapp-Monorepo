@@ -163,3 +163,79 @@ export function useCommentPost(): MutationTuple<
     }
   `);
 }
+
+type DeleteCommentVariables = {
+  commentId: string;
+};
+
+type DeleteCommentData = {
+  deleteComment: boolean;
+};
+
+/**
+ * GraphQL mutation that deletes comment
+ *
+ * @returns   GraphQL mutation.
+ */
+export function useDeleteComment(): MutationTuple<
+  DeleteCommentData,
+  DeleteCommentVariables
+> {
+  return useMutation<DeleteCommentData, DeleteCommentVariables>(gql`
+    mutation DeleteComment($commentId: ID!) {
+      deleteComment(commentId: $commentId)
+    }
+  `);
+}
+
+type HidePostVariables = {
+  hide: boolean;
+  postId: string;
+};
+
+type HidePostData = {
+  hidePost: boolean;
+};
+
+/**
+ * GraphQL mutation that hides post
+ *
+ * @returns   GraphQL mutation.
+ */
+export function useHidePost(): MutationTuple<HidePostData, HidePostVariables> {
+  return useMutation<HidePostData, HidePostVariables>(gql`
+    mutation HidePost($hide: Boolean!, $postId: ID!) {
+      hidePost(hide: $hide, postId: $postId)
+    }
+  `);
+}
+
+interface ReportedPost {
+  violations: string[];
+  comments: string;
+  postId: string;
+}
+
+type ReportPostVariables = {
+  report: ReportedPost;
+};
+
+type ReportPostData = {
+  reportPost: boolean;
+};
+
+/**
+ * GraphQL mutation that reports post
+ *
+ * @returns   GraphQL mutation.
+ */
+export function useReportPost(): MutationTuple<
+  ReportPostData,
+  ReportPostVariables
+> {
+  return useMutation<ReportPostData, ReportPostVariables>(gql`
+    mutation ReportPost($report: ReportedPostInput!) {
+      reportPost(report: $report)
+    }
+  `);
+}

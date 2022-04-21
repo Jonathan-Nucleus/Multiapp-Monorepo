@@ -126,6 +126,9 @@ export function useFund(fundId?: string): QueryResult<FundData, FundVariables> {
           overview
           tags
           status
+          background {
+            url
+          }
           documents {
             title
             url

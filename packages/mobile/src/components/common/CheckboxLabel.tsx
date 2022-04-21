@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 
-import PLabel from '../../components/common/PLabel';
+import PLabel from './PLabel';
 import { PRIMARYOVERLAY, PRIMARY, BLACK } from 'shared/src/colors';
 
 interface PostCategoryProps {
@@ -13,7 +13,7 @@ interface PostCategoryProps {
   handleChange: (v: number) => void;
 }
 
-const PostCategory: React.FC<PostCategoryProps> = (props) => {
+const CheckboxLabel: React.FC<PostCategoryProps> = (props) => {
   const { id, category, value, viewStyle, handleChange } = props;
 
   return (
@@ -34,7 +34,7 @@ const PostCategory: React.FC<PostCategoryProps> = (props) => {
   );
 };
 
-export default PostCategory;
+export default CheckboxLabel;
 
 const styles = StyleSheet.create({
   wrapper: {

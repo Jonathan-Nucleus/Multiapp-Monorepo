@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import PLabel from '../../components/common/PLabel';
 import { WHITE60 } from 'shared/src/colors';
 import pStyles from '../../theme/pStyles';
-import PostCategory from './PostCategory';
+import CheckboxLabel from '../../components/common/CheckboxLabel';
 import PostHeader from './PostHeader';
 import PAppContainer from '../../components/common/PAppContainer';
 import { ChooseCategoryScreen } from 'mobile/src/navigations/HomeStack';
@@ -52,7 +52,7 @@ const ChooseCategory: ChooseCategoryScreen = ({ route, navigation }) => {
   };
 
   const renderItem = ({ item }: { item: CategoryItem }) => (
-    <PostCategory
+    <CheckboxLabel
       id={item.id}
       category={item.txt}
       value={item.isChecked}

@@ -10,9 +10,9 @@ import {
 } from 'mobile/src/theme/fonts';
 import { FundCompanyData } from 'mobile/src/graphql/query/marketplace';
 
-import FundCompanyInfo from '../../screens/Marketplace/Companies/FundCompanyInfo';
-import RoundImageView from '../common/RoundImageView';
-import PLabel from '../common/PLabel';
+import FundCompanyInfo from './FundCompanyInfo';
+import RoundImageView from '../../../components/common/RoundImageView';
+import PLabel from '../../../components/common/PLabel';
 import { AVATAR_URL } from 'react-native-dotenv';
 
 import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';

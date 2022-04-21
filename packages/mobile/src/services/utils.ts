@@ -5,7 +5,7 @@ import Toast from 'react-native-toast-message';
  * @param description   The description of alert
  * @param type          The type of alert, one of success, error and info
  */
-export function showMessage(title: string, description: string, type: string) {
+export function showMessage(type: string, title: string, description?: string) {
   Toast.show({
     type,
     text1: title,

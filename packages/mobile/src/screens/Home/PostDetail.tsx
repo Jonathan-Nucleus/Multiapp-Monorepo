@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   FlatList,
   StyleSheet,
@@ -11,41 +11,106 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import PAppContainer from '../../components/common/PAppContainer';
 import PLabel from '../../components/common/PLabel';
+import SelectionModal, {
+  MenuDataItemProps,
+} from '../../components/common/SelectionModal';
 import PostItem from '../../components/main/PostItem';
 import { PostDetailScreen } from '../../navigations/HomeStack';
 import UserInfo from '../../components/common/UserInfo';
-import { CaretLeft, PaperPlaneRight } from 'phosphor-react-native';
+import LikesModal from './LikesModal';
+import {
+  CaretLeft,
+  DotsThreeVertical,
+  EyeClosed,
+  PaperPlaneRight,
+  Pencil,
+  Trash,
+  UserCirclePlus,
+  WarningOctagon,
+} from 'phosphor-react-native';
 import PHeader from '../../components/common/PHeader';
 import * as NavigationService from '../../services/navigation/NavigationService';
+import { showMessage } from '../../services/utils';
+import { SOMETHING_WRONG } from 'shared/src/constants';
 
 import { BLACK, WHITE } from 'shared/src/colors';
 import pStyles from '../../theme/pStyles';
 
-import { useCommentPost } from '../../graphql/mutation/posts';
+import { useCommentPost, useDeleteComment } from '../../graphql/mutation/posts';
 import { usePost } from '../../graphql/query/post';
+import { useFollowUser, useHideUser } from '../../graphql/mutation/account';
+import type { User } from 'backend/graphql/users.graphql';
+
+interface CommentItemProps {
+  user: User;
+  body: string;
+}
+
+const LIKES = [
+  {
+    firstName: 'sss',
+    lastName: 'ddddd',
+    avatar: '3333.png',
+    position: 'test',
+    company: 'cccc',
+  },
+  {
+    firstName: 'sss',
+    lastName: 'ddddd',
+    avatar: '3333.png',
+    position: 'test',
+    company: 'cccc',
+  },
+];
+
+const CommentMenuDataArray = [
+  {
+    label: 'Edit Comment',
+    icon: <Pencil size={26} color={WHITE} />,
+    key: 'edit',
+  },
+  {
+    label: 'Delete Comment',
+    icon: <Trash size={26} color={WHITE} />,
+    key: 'delete',
+  },
+];
 
 const PostDetail: PostDetailScreen = ({ route }) => {
   const [comment, setComment] = useState('');
+  const [kebobMenuVisible, setKebobMenuVisible] = useState(false);
+  const [commentMenuVisible, setCommentMenuVisible] = useState(false);
+  const [selectedUser, setSelectedUser] = useState({});
+  const [likesModalVisible, setLikesModalVisible] = useState(false);
   const { post, userId } = route.params;
   const { data, refetch } = usePost(post._id);
   const [commentPost] = useCommentPost();
+  const [deleteComment] = useDeleteComment();
+  const [followUser] = useFollowUser();
+  const [hideUser] = useHideUser();
   const comments = data?.post?.comments;
 
-  const CommentItem = ({ item }) => {
-    const { user, body } = item;
-    return (
-      <View>
-        <UserInfo
-          avatar={{ uri: `${AVATAR_URL}/${user.avatar}` }}
-          name={`${user.firstName} ${user.lastName}`}
-          company={user.company?.name}
-          avatarSize={32}
-          isPro
-        />
-        <PLabel label={body} viewStyle={styles.sendBtn} />
-      </View>
-    );
-  };
+  const getKebobMenuData = useMemo(() => {
+    const KebobMenuDataArray = [
+      {
+        label: `Follow ${selectedUser.firstName} ${selectedUser.lastName}`,
+        icon: <UserCirclePlus size={32} color={WHITE} />,
+        key: 'follow',
+      },
+      {
+        label: 'Report comment',
+        icon: <WarningOctagon size={32} color={WHITE} />,
+        key: 'report',
+      },
+      {
+        label: `Hide ${selectedUser.firstName} ${selectedUser.lastName}`,
+        icon: <EyeClosed size={32} color={WHITE} />,
+        key: 'hide',
+      },
+    ];
+
+    return KebobMenuDataArray;
+  }, [selectedUser]);
 
   const addComment = async () => {
     try {
@@ -68,7 +133,80 @@ const PostDetail: PostDetailScreen = ({ route }) => {
     }
   };
 
-  const renderItem = ({ item }) => <CommentItem item={item} />;
+  const handleDeleteComment = async () => {
+    try {
+      const { data } = await deleteComment({
+        variables: { commentId: selectedUser._id },
+      });
+      if (data?.deleteComment) {
+        showMessage('success', 'Successfully deleted!');
+      } else {
+        showMessage('error', SOMETHING_WRONG);
+      }
+    } catch (err) {
+      showMessage('error', SOMETHING_WRONG);
+    }
+  };
+
+  const handleFollowUser = async () => {
+    try {
+      const { data } = await followUser({
+        variables: { follow: true, userId: selectedUser._id },
+      });
+      if (data?.followUser) {
+        showMessage('success', 'Successfully followed user!');
+      } else {
+        showMessage('error', SOMETHING_WRONG);
+      }
+    } catch (err) {
+      showMessage('error', SOMETHING_WRONG);
+    }
+  };
+
+  const handleHideUser = async () => {
+    try {
+      const { data } = await hideUser({
+        variables: { hide: true, userId: selectedUser._id },
+      });
+      if (data?.hideUser) {
+        showMessage('success', 'Successfully hided user!');
+      } else {
+        showMessage('error', SOMETHING_WRONG);
+      }
+    } catch (err) {
+      showMessage('error', SOMETHING_WRONG);
+    }
+  };
+
+  const CommentItem = ({ item }: { item: CommentItemProps }) => {
+    const { user, body } = item;
+    return (
+      <View>
+        <View style={styles.userItemContainer}>
+          <UserInfo
+            avatar={{ uri: `${AVATAR_URL}/${user.avatar}` }}
+            name={`${user.firstName} ${user.lastName}`}
+            company={user.company?.name}
+            avatarSize={32}
+            isPro
+          />
+          <TouchableOpacity
+            onPress={() => {
+              setSelectedUser(user);
+              setKebobMenuVisible(true);
+            }}>
+            <DotsThreeVertical size={24} color={WHITE} />
+          </TouchableOpacity>
+        </View>
+        <PLabel label={body} viewStyle={styles.sendBtn} />
+      </View>
+    );
+  };
+
+  const renderItem = useCallback(
+    ({ item }) => <CommentItem item={item} />,
+    [comments?.length],
+  );
 
   return (
     <SafeAreaView
@@ -95,6 +233,39 @@ const PostDetail: PostDetailScreen = ({ route }) => {
           </TouchableOpacity>
         </View>
       </PAppContainer>
+      <SelectionModal
+        isVisible={kebobMenuVisible}
+        dataArray={getKebobMenuData}
+        buttonLabel="Cancel"
+        onPressCancel={() => setKebobMenuVisible(false)}
+        onPressItem={(key) => {
+          setKebobMenuVisible(false);
+          if (key === 'follow') {
+            handleFollowUser();
+          } else if (key === 'hide') {
+            handleHideUser();
+          }
+        }}
+      />
+      <LikesModal
+        likes={LIKES}
+        isVisible={likesModalVisible}
+        onClose={() => setLikesModalVisible(false)}
+      />
+      <SelectionModal
+        isVisible={commentMenuVisible}
+        dataArray={CommentMenuDataArray}
+        buttonLabel="Cancel"
+        onPressCancel={() => setCommentMenuVisible(false)}
+        onPressItem={(key) => {
+          setCommentMenuVisible(false);
+          if (key === 'edit') {
+            // handleEditComment();
+          } else if (key === 'delete') {
+            handleDeleteComment();
+          }
+        }}
+      />
     </SafeAreaView>
   );
 };
@@ -112,6 +283,11 @@ const styles = StyleSheet.create({
   },
   sideStyle: {
     top: 16,
+  },
+  userItemContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   inputContainer: {
     flexDirection: 'row',
