@@ -11,6 +11,7 @@ interface FieldProps<TFieldValues>
   register: UseFormReturn<TFieldValues>["register"];
   state: UseFormReturn<TFieldValues>["formState"];
   label?: string;
+  shape?: "pill" | "rounded";
 }
 
 function Field<TFieldValues = FieldValues>({
@@ -18,6 +19,7 @@ function Field<TFieldValues = FieldValues>({
   register,
   state,
   label,
+  shape = "rounded",
   ref: refIgnored, // Remove ref definition from HTMLInputElement
   className,
   children,

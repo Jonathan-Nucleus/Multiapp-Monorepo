@@ -14,14 +14,7 @@ export type FundManager = Pick<
 
 export type Fund = Pick<
   GraphQLCompany['funds'][number],
-  | '_id'
-  | 'name'
-  | 'tags'
-  | 'highlights'
-  | 'overview'
-  | 'level'
-  | 'status'
-  | 'background'
+  '_id' | 'name' | 'tags' | 'highlights' | 'overview' | 'level' | 'status'
 > & {
   manager: FundManager;
 };

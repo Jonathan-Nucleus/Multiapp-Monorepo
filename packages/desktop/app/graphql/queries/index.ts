@@ -111,7 +111,7 @@ export function useFetchPosts(): QueryResult<
 
 export type WatchedFund = Pick<
   User["watchlist"][number],
-  "_id" | "name" | "avatar" | "companyId" | "managerId"
+  "_id" | "name" | "companyId" | "managerId"
 > & {
   company: Pick<User["watchlist"][number]["company"], "name" | "avatar">;
 };

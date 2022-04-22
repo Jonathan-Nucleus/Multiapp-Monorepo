@@ -200,7 +200,7 @@ const CommentCard: FC<CommentCardProps> = ({
                 </div>
               </Button>
             </div>
-            {comment.likesIds?.length > 0 && (
+            {comment.likeIds && comment.likeIds.length > 0 && (
               <div className="text text-xs text-white opacity-60">
                 {comment.likeIds?.length ?? 0}{" "}
                 {comment.likeIds?.length === 1 ? "Like" : "Likes"}
