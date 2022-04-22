@@ -1,12 +1,12 @@
 import { FC } from "react";
 import Button from "../../../../../common/Button";
-import { User } from "backend/graphql/users.graphql";
+import { UserProfile } from "backend/graphql/users.graphql";
 import Avatar from "../../../../../common/Avatar";
 import { useAccount } from "../../../../../../graphql/queries";
 import { useFollowUser } from "../../../../../../graphql/mutations/profiles";
 
 interface UserItemProps {
-  user: User;
+  user: UserProfile;
 }
 
 const UserItem: FC<UserItemProps> = ({ user }) => {
@@ -16,10 +16,9 @@ const UserItem: FC<UserItemProps> = ({ user }) => {
   const toggleFollowing = async () => {
     try {
       await followUser({
-        variables: { follow: !isFollowing, userId: user._id }
+        variables: { follow: !isFollowing, userId: user._id },
       });
-    } catch (error) {
-    }
+    } catch (error) {}
   };
   return (
     <div className="flex items-center px-4 py-3">

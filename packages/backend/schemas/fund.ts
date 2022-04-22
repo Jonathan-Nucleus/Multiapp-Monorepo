@@ -9,10 +9,8 @@ import type {
 } from "./user";
 import type { Company } from "./company";
 
-type UserCommonFields = Pick<User.Mongo, "avatar" | "background">;
-
 export namespace Fund {
-  export interface Mongo extends UserCommonFields {
+  export interface Mongo {
     _id: ObjectId;
     name: string;
     level: Accreditation;

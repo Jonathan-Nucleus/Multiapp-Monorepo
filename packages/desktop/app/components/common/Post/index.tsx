@@ -55,19 +55,24 @@ const Post: FC<PostProps> = ({ post }: PostProps) => {
           </div>
           <div className="ml-2">
             <div className="flex items-center">
-              <div className="text-white">{`${user.firstName} ${user.lastName}`}</div>
-              <ShieldCheck
-                className="text-success ml-2"
-                color="currentColor"
-                weight="fill"
-                size={16}
-              />
+              <div className="text-white mr-1">{`${user.firstName} ${user.lastName}`}</div>
+              {(user.role === "VERIFIED" || user.role === "PROFESSIONAL") && (
+                <ShieldCheck
+                  className="text-success"
+                  color="currentColor"
+                  weight="fill"
+                  size={16}
+                />
+              )}
               {user.role === "PROFESSIONAL" && (
-                <div className="text-white mx-1">{user.role} •</div>
+                <>
+                  <div className="text-white mx-0.5 text-tiny">{user.role}</div>
+                  <span className="mx-1 text-white/[0.6]">•</span>
+                </>
               )}
               <Button
                 variant="text"
-                className="text-xs text-primary tracking-normal font-normal py-0"
+                className="text-tiny text-primary tracking-wider font-medium py-0 pl-0.5"
               >
                 FOLLOW
               </Button>
@@ -112,44 +117,48 @@ const Post: FC<PostProps> = ({ post }: PostProps) => {
         <div className="flex items-center p-4">
           <div className="opacity-60 text-white">
             <div
-              className="flex items-center cursor-pointer"
+              className="flex w-10 items-center cursor-pointer text-primary-medium"
               onClick={toggleLike}
             >
               <ThumbsUp
                 weight={liked ? "fill" : "light"}
-                color={liked ? "#00AAE0" : "currentColor"}
+                color={liked ? "currentColor" : "white"}
                 size={24}
               />
               {post.likeIds && post.likeIds.length > 0 && (
-                <div className="text-white opacity-60 ml-2">
+                <div className="text-white text-xs ml-2">
                   {post.likeIds.length}
                 </div>
               )}
             </div>
           </div>
-          <div className="opacity-60 text-white ml-10">
+          <div className="w-10 opacity-60 text-white ml-10">
             <div
               className="flex items-center cursor-pointer"
               onClick={() => setVisibleComment(!visibleComment)}
             >
               <ChatCenteredText weight="light" color="currentColor" size={24} />
               {post.commentIds && (
-                <div className="text-white ml-2">{post.commentIds.length}</div>
+                <div className="text-white ml-2 text-xs">
+                  {post.commentIds.length}
+                </div>
               )}
             </div>
           </div>
-          <div className="opacity-60 text-white ml-10">
+          <div className="w-10 opacity-60 text-white ml-10">
             <div className="flex items-center cursor-pointer">
               <Share weight="light" color="currentColor" size={24} />
               {post.shareIds && post.shareIds.length > 0 && (
-                <div className="text-white ml-2">{post.shareIds.length}</div>
+                <div className="text-white ml-2 text-xs">
+                  {post.shareIds.length}
+                </div>
               )}
             </div>
           </div>
           <div className="ml-auto flex items-center opacity-60">
             {post.likeIds && post.likeIds.length > 0 && (
               <div
-                className="text-white cursor-pointer"
+                className="text-white cursor-pointer text-xs"
                 onClick={() => setVisiblePostLikeModal(true)}
               >
                 {post.likeIds.length}{" "}

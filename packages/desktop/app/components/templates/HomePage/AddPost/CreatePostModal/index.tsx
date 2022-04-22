@@ -130,7 +130,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({ show, onClose }) => {
     ? [
         {
           icon: <User color="currentColor" weight="fill" size={24} />,
-          title: "Richard Branson",
+          title: `${account.firstName} ${account.lastName}`,
           value: account._id,
         },
         ...account?.companies.map((company) => ({
@@ -226,7 +226,12 @@ const CreatePostModal: FC<CreatePostModalProps> = ({ show, onClose }) => {
   const closeModal = () => {
     onClose();
     setLocalFileUrl(null);
-    reset(schema.cast({}, { assert: false }) as DefaultValues<FormValues>);
+    reset(
+      schema.cast(
+        { user: account?._id },
+        { assert: false }
+      ) as DefaultValues<FormValues>
+    );
   };
 
   return (

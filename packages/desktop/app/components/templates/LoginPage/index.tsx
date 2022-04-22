@@ -22,7 +22,7 @@ const PROVIDER_ICONS: Record<string, ReactElement> = {
 };
 
 interface LoginPageProps {
-  providers: ReturnType<typeof getProviders>;
+  providers: UnwrapPromise<ReturnType<typeof getProviders>>;
 }
 
 type FormValues = {

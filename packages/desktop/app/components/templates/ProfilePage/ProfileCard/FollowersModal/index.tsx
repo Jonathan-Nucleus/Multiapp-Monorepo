@@ -4,14 +4,14 @@ import { X } from "phosphor-react";
 import Card from "../../../../common/Card";
 import Button from "../../../../common/Button";
 import Input from "../../../../common/Input";
-import { User } from "backend/graphql/users.graphql";
+import { UserProfile } from "backend/graphql/users.graphql";
 import UserItem from "./UserItem";
 
 interface FollowersModalProps {
   show: boolean;
   onClose: () => void;
-  followers: User[];
-  following: User[];
+  followers: UserProfile[];
+  following: UserProfile[];
 }
 
 const FollowersModal: FC<FollowersModalProps> = ({

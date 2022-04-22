@@ -1,8 +1,6 @@
 import React, { FC, useState, useRef } from "react";
 import { PaperPlaneRight, Image as PhotoImage, Smiley } from "phosphor-react";
-import {
-  useFetchUploadLink,
-} from "desktop/app/graphql/mutations/posts";
+import { useFetchUploadLink } from "desktop/app/graphql/mutations/posts";
 
 import Button from "../Button";
 import Avatar from "../Avatar";
@@ -73,10 +71,11 @@ const SendMessage: FC<SendMessageProps> = ({
     <div className="relative">
       <div className="flex items-center">
         <Avatar src={avatar} size={size} />
-        <div className="flex items-center justify-between p-4 flex-1 relative">
+        <div className="flex items-center justify-between p-4 ml-2 flex-1 relative">
           <Input
             placeholder={placeholder}
-            className="rounded-full bg-background-DEFAULT pr-16"
+            className="bg-background-DEFAULT pl-4 pr-16 text-sm tracking-wide font-light"
+            shape="pill"
             value={comment}
             onChange={(event) => {
               setComment(event.currentTarget.value);

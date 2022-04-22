@@ -6,14 +6,7 @@ type FetchFundsVariables = never;
 export type FetchFundsData = {
   funds?: (Pick<
     Fund,
-    | "_id"
-    | "name"
-    | "level"
-    | "status"
-    | "overview"
-    | "tags"
-    | "background"
-    | "highlights"
+    "_id" | "name" | "level" | "status" | "overview" | "tags" | "highlights"
   > & {
     manager: Pick<
       Fund["manager"],
@@ -46,14 +39,6 @@ export function useFetchFunds(): QueryResult<
         highlights
         overview
         tags
-        background {
-          url
-          x
-          y
-          width
-          height
-          scale
-        }
         manager {
           _id
           firstName

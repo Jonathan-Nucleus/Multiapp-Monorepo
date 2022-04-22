@@ -115,15 +115,19 @@ const CommentCard: FC<CommentCardProps> = ({
     <>
       <div className="flex">
         <Avatar src={comment.user.avatar} size={size ? size : 36} />
-        <div className="ml-2 w-full">
+        <div className="ml-4 w-full">
           <div className="p-2 rounded-lg bg-background-popover">
             <div className="flex justify-between">
               <div>
-                <div className="text text-xs text-white opacity-60">
+                <div className="text text-sm text-white opacity-60">
                   {comment.user.firstName} {comment.user.lastName}
                 </div>
                 <div className="text text-xs text-white opacity-60">
-                  {comment.user.role} @ {comment.user.position} •{" "}
+                  {comment.user.position}
+                  {comment.user.company?.name &&
+                    `@ ${comment.user.company.name}`}
+                  {(!!comment.user.position || comment.user.company?.name) &&
+                    " • "}
                   {moment(comment.createdAt).fromNow()}
                 </div>
               </div>
@@ -176,26 +180,32 @@ const CommentCard: FC<CommentCardProps> = ({
                 message={comment.body}
               />
             ) : (
-              <div className="text text-xs text-white mt-4">{comment.body}</div>
+              <div className="text text-sm text-white mt-4">{comment.body}</div>
             )}
           </div>
-          <div className="flex items-center justify-between mt-4">
+          <div className="flex items-center justify-between mb-4 ml-2">
             <div className="flex items-center">
               <Button variant="text" onClick={toggleLike}>
-                <div className="text text-xs text-white">Like</div>
+                <div className="text text-xs text-white font-medium tracking-wide">
+                  Like
+                </div>
               </Button>
               <Button
                 variant="text"
                 className="ml-4"
                 onClick={() => setVisibleReply(true)}
               >
-                <div className="text text-xs text-white">Reply</div>
+                <div className="text text-xs text-white font-medium tracking-wide">
+                  Reply
+                </div>
               </Button>
             </div>
-            <div className="text text-xs text-white opacity-60">
-              {comment.likeIds?.length ?? 0}{" "}
-              {comment.likeIds?.length === 1 ? "Like" : "Likes"}
-            </div>
+            {comment.likesIds?.length > 0 && (
+              <div className="text text-xs text-white opacity-60">
+                {comment.likeIds?.length ?? 0}{" "}
+                {comment.likeIds?.length === 1 ? "Like" : "Likes"}
+              </div>
+            )}
           </div>
           <div className="child-list">{children}</div>
         </div>

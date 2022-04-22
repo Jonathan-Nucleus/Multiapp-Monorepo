@@ -44,7 +44,9 @@ function Dropdown<
                           {selectedItem?.icon && (
                             <span>{selectedItem?.icon}</span>
                           )}
-                          <span className="ml-2">{selectedItem?.title}</span>
+                          <span className="ml-2 capitalize">
+                            {selectedItem?.title}
+                          </span>
                         </div>
                         <div className="ml-2">
                           {open ? (
@@ -65,7 +67,11 @@ function Dropdown<
                     </div>
                   </div>
                 </Menu.Button>
-                <Menu.Items className="absolute w-48 left-0 mt-2 bg-background-popover shadow-md shadow-black rounded z-10 overflow-hidden py-3">
+                <Menu.Items
+                  className={`absolute w-48 left-0 mt-2
+                    bg-background-popover shadow-md shadow-black rounded z-10
+                    overflow-hidden py-3`}
+                >
                   {items.map((item) => (
                     <Menu.Item
                       key={item.value}
@@ -78,9 +84,12 @@ function Dropdown<
                             : ""
                         }
                       >
-                        <div className="text-white text-sm flex items-center px-4 py-3 cursor-pointer">
+                        <div
+                          className={`text-white text-sm flex items-center
+                            px-4 py-3 cursor-pointer`}
+                        >
                           {item.icon && <span>{item.icon}</span>}
-                          <span className="ml-2">{item.title}</span>
+                          <span className="ml-2 capitalize">{item.title}</span>
                         </div>
                       </div>
                     </Menu.Item>

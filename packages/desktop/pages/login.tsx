@@ -5,7 +5,7 @@ import { NextPageWithLayout } from "../app/types/next-page";
 import { getProviders } from "next-auth/react";
 
 interface LoginProps {
-  providers: ReturnType<typeof getProviders>;
+  providers: UnwrapPromise<ReturnType<typeof getProviders>>;
 }
 
 const Login: NextPageWithLayout<LoginProps> = ({ providers }) => {

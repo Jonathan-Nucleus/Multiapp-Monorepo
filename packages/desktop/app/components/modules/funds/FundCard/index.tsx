@@ -60,16 +60,16 @@ const FundCard: FC<FundCardProps> = ({
 
   return (
     <>
-      <Card className="hidden lg:block rounded-xl p-0">
+      <Card className="hidden lg:block rounded-xl p-0 border-0">
         <div className="flex flex-row bg-secondary/[.27]">
           {showImages && (
             <div className="flex-shrink-0 w-72 h-72 bg-white relative">
-              {fund.background && (
+              {fund.company?.background && (
                 <Image
                   loader={() =>
-                    `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund.background.url}`
+                    `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund?.company?.background?.url}`
                   }
-                  src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund.background.url}`}
+                  src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund?.company?.background?.url}`}
                   alt=""
                   layout="fill"
                   className="object-cover"
@@ -82,12 +82,12 @@ const FundCard: FC<FundCardProps> = ({
             <div className="flex">
               {showImages && (
                 <div className="w-24 h-24 bg-purple-secondary rounded-b relative overflow-hidden mr-4">
-                  {fund?.company?.background && (
+                  {fund?.company?.avatar && (
                     <Image
                       loader={() =>
-                        `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund?.company?.background?.url}`
+                        `${process.env.NEXT_PUBLIC_AVATAR_URL}/${fund?.company?.avatar}`
                       }
-                      src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund?.company?.background?.url}`}
+                      src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${fund?.company?.avatar}`}
                       alt=""
                       layout="fill"
                       className="object-cover"
@@ -229,12 +229,12 @@ const FundCard: FC<FundCardProps> = ({
       </Card>
       <Card className="block lg:hidden rounded-none p-0">
         <div className="h-20 bg-white relative">
-          {fund.background && (
+          {fund.company?.background && (
             <Image
               loader={() =>
-                `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund.background.url}`
+                `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund?.company?.background?.url}`
               }
-              src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund.background.url}`}
+              src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund?.company?.background?.url}`}
               alt=""
               layout="fill"
               className="object-cover"

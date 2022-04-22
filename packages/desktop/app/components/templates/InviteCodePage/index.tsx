@@ -25,9 +25,10 @@ const InviteCodePage: FC = () => {
     resolver: yupResolver(schema),
     mode: "onChange",
   });
-  const onSubmit: SubmitHandler<FormValues> = async ({ code }) => {
+  const onSubmit: SubmitHandler<FormValues> = async (formData) => {
     setLoading(true);
 
+    const code = formData.code.trim();
     const { data } = await verifyInvite({ variables: { code } });
     data?.verifyInvite
       ? router.push(`/signup/${code}`)

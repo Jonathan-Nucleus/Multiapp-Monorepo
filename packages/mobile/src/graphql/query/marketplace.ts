@@ -6,14 +6,7 @@ type FetchFundsVariables = never;
 
 export type Fund = Pick<
   GraphQLFund,
-  | '_id'
-  | 'name'
-  | 'level'
-  | 'status'
-  | 'highlights'
-  | 'overview'
-  | 'tags'
-  | 'background'
+  '_id' | 'name' | 'level' | 'status' | 'highlights' | 'overview' | 'tags'
 > & {
   manager: Pick<
     GraphQLFund['manager'],
@@ -49,14 +42,6 @@ export function useFetchFunds(): QueryResult<
         highlights
         overview
         tags
-        background {
-          url
-          x
-          y
-          width
-          height
-          scale
-        }
         manager {
           _id
           firstName
@@ -126,9 +111,6 @@ export function useFund(fundId?: string): QueryResult<FundData, FundVariables> {
           overview
           tags
           status
-          background {
-            url
-          }
           documents {
             title
             url

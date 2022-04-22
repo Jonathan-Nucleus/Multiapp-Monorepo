@@ -21,7 +21,7 @@ const CommentPost: FC<CommentPostProps> = ({ post }: CommentPostProps) => {
     mediaUrl?: string
   ): Promise<void> => {
     if (!messsage || messsage === "") return;
-    console.log("mediaUrl", mediaUrl);
+
     try {
       await commentPost({
         variables: {
@@ -58,7 +58,6 @@ const CommentPost: FC<CommentPostProps> = ({ post }: CommentPostProps) => {
         onSend={(val, mediaUrl) => sendMessage(val, mediaUrl)}
         placeholder="Add a comment..."
       />
-
       <CommentsList
         comments={post.comments}
         commentsByCommentID={commentsByCommentID}

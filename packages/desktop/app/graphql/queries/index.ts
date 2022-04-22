@@ -205,7 +205,6 @@ export function useAccount(
           watchlist {
             _id
             name
-            avatar
             companyId
             managerId
             company {

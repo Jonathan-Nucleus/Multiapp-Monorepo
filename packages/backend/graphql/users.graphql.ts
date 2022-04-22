@@ -22,7 +22,9 @@ import type { Comment } from "../schemas/comment";
 import type { Company } from "../schemas/company";
 
 type GraphQLUser = User.GraphQL;
+type GraphQLProfile = User.Profile;
 export type { GraphQLUser as User };
+export type { GraphQLProfile as UserProfile };
 
 const schema = gql`
   ${UserSchema}
