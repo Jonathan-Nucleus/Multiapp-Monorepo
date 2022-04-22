@@ -35,7 +35,7 @@ import { useAccount } from "mobile/src/graphql/query/account";
 import {
   useCreatePost,
   useFetchUploadLink,
-} from "desktop/app/graphql/mutations/posts";
+} from "mobile/src/graphql/mutation/posts";
 import { Audience, PostCategory } from "backend/graphql/posts.graphql";
 import { Audiences } from "backend/graphql/enumerations.graphql";
 

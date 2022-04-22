@@ -3,11 +3,9 @@ import PostsList from "../../common/PostsList";
 import FundCard from "../../modules/funds/FundCard";
 import { CompanyProfileProps } from "../../../types/common-props";
 import ProfileCard from "./ProfileCard";
-import { useFetchPosts } from "mobile/src/graphql/query/account";
 import TeamMembersList from "../../modules/teams/TeamMembersList";
 
 const CompanyPage: FC<CompanyProfileProps> = ({ company }: CompanyProfileProps) => {
-  const { data: postsData } = useFetchPosts();
   const funds = company.funds.map(fund => ({ ...fund, company }));
   const members = company.members.map(member => ({ ...member, company }));
   return (
@@ -29,11 +27,9 @@ const CompanyPage: FC<CompanyProfileProps> = ({ company }: CompanyProfileProps) 
                   </div>
                 ))}
               </div>
-              {postsData?.posts && (
-                <div className="py-5">
-                  <PostsList posts={postsData.posts} />
-                </div>
-              )}
+              <div className="py-5">
+                <PostsList posts={company.posts} />
+              </div>
             </div>
           </div>
           <div className="col-span-2 hidden lg:block">

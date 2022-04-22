@@ -20,6 +20,19 @@ export const VIEW_POST_FRAGMENT = gql`
       position
       role
     }
+    likes {
+      _id
+      firstName
+      lastName
+      avatar
+      position
+      role
+      company {
+        _id
+        name
+        avatar
+      }
+    }
   }
 `;
 

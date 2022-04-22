@@ -12,7 +12,7 @@ import { useSession } from "next-auth/react";
 import Button from "../Button";
 import Avatar from "../Avatar";
 import LikeModal from "./LikeModal";
-import { useLikePost } from "desktop/app/graphql/mutations/posts";
+import { useLikePost } from "mobile/src/graphql/mutation/posts";
 import CommentPost from "../Comment";
 import moment from "moment";
 import { PostType } from "desktop/app/types/common-props";

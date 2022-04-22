@@ -1,10 +1,9 @@
 import { gql, useMutation, MutationTuple } from '@apollo/client';
 import { MediaUpload, MediaType } from 'backend/graphql/mutations.graphql';
 import { Post, PostInput } from 'backend/graphql/posts.graphql';
-import {
-  VIEW_POST_FRAGMENT,
-  FetchPostsData,
-} from 'mobile/src/graphql/query/account';
+import { FetchPostsData } from 'mobile/src/graphql/query/account';
+import { VIEW_POST_FRAGMENT } from 'mobile/src/graphql/query/post';
+import { Comment } from "backend/graphql/comments.graphql";
 
 export const CREATE_POST = gql`
   mutation CreatePost($post: PostInput!) {
@@ -130,9 +129,12 @@ export function useLikePost(): MutationTuple<LikePostData, LikePostVariables> {
 }
 
 type CommentPostVariables = {
-  _id: string;
-  likeIds: string[];
-  mentions: string[];
+  comment: {
+    body: string;
+    postId: string;
+    mentionIds: string[];
+    commentId?: string;
+  };
 };
 
 type CommentPostData = {
@@ -159,6 +161,34 @@ export function useCommentPost(): MutationTuple<
           firstName
           lastName
         }
+      }
+    }
+  `);
+}
+
+type EditCommentPostVariables = {
+  comment: {
+    _id: string;
+    body: string;
+    mentionIds: string[];
+  };
+};
+
+type EditCommentPostData = {
+  editComment: Comment;
+};
+
+export function useEditCommentPost(): MutationTuple<
+  EditCommentPostData,
+  EditCommentPostVariables
+> {
+  return useMutation<EditCommentPostData, EditCommentPostVariables>(gql`
+    mutation EditComment($comment: CommentUpdate!) {
+      editComment(comment: $comment) {
+        _id
+        body
+        postId
+        createdAt
       }
     }
   `);

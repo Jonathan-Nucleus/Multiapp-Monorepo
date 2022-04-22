@@ -1,6 +1,6 @@
 import React, { FC, useState, useRef } from "react";
 import { PaperPlaneRight, Image as PhotoImage, Smiley } from "phosphor-react";
-import { useFetchUploadLink } from "desktop/app/graphql/mutations/posts";
+import { useFetchUploadLink } from "mobile/src/graphql/mutation/posts";
 
 import Button from "../Button";
 import Avatar from "../Avatar";

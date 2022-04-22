@@ -11,7 +11,7 @@ import {
   useDeleteComment,
   useEditCommentPost,
   useCommentPost,
-} from "desktop/app/graphql/mutations/posts";
+} from "mobile/src/graphql/mutation/posts";
 import { useAccount } from "mobile/src/graphql/query/account";
 import Avatar from "../Avatar";
 

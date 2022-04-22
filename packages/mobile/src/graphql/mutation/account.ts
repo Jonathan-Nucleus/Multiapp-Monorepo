@@ -1,10 +1,14 @@
 import { gql, useMutation, MutationTuple } from '@apollo/client';
-import { MediaUpload, MediaType } from 'backend/graphql/mutations.graphql';
-import { Post, PostInput } from 'backend/graphql/posts.graphql';
 
 export const UPDATE_SETTINGS = gql`
   mutation UpdateSettings($settings: SettingsInput!) {
     updateSettings(settings: $settings)
+  }
+`;
+
+export const INVITE_USER = gql`
+  mutation Invite($email: String!) {
+    inviteUser(email: $email)
   }
 `;
 

@@ -66,6 +66,36 @@ export function useFetchProfile(
             avatar
             position
           }
+          managedFunds {
+            _id
+            name
+            level
+            status
+            highlights
+            overview
+            tags
+            manager {
+              _id
+              firstName
+              lastName
+              avatar
+              followerIds
+              postIds
+            }
+            company {
+              _id
+              name
+              avatar
+              background {
+                url
+                x
+                y
+                width
+                height
+                scale
+              }
+            }
+          }
           posts {
             ...ViewPostFields
           }

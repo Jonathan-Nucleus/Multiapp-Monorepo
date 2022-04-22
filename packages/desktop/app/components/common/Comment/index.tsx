@@ -1,5 +1,5 @@
 import { FC, useMemo } from "react";
-import { useCommentPost } from "desktop/app/graphql/mutations/posts";
+import { useCommentPost } from "mobile/src/graphql/mutation/posts";
 import type { Comment } from "backend/graphql/comments.graphql";
 import SendMessage from "./SendMessage";
 import CommentsList from "./CommentsList";

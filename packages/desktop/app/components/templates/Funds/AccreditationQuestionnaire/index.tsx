@@ -16,7 +16,6 @@ import {
 } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useAccount } from "mobile/src/graphql/query/account";
 import ArrowLeft from "shared/assets/images/arrow-left.svg";
 import ArrowRight from "shared/assets/images/arrow-right.svg";
 import IndividualIcon from "shared/assets/images/individual.svg";
@@ -93,8 +92,6 @@ const AccreditationQuestionnaire: FC<AccreditationQuestionnaireProps> = ({
   show,
   onClose,
 }) => {
-  const { data: userData } = useAccount();
-  const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
 
   const {
@@ -193,7 +190,7 @@ const AccreditationQuestionnaire: FC<AccreditationQuestionnaireProps> = ({
                               }
                             `}
                           >
-                            <Image src={item.icon} height="24" />
+                            <Image src={item.icon} height="24" alt="" />
                             <span className="ml-2">{item.title}</span>
                           </Label>
                         </div>
@@ -266,7 +263,7 @@ const AccreditationQuestionnaire: FC<AccreditationQuestionnaireProps> = ({
                       <h5 className="text-center text-white mt-3 text-lg tracking-wide font-medium">
                         Welcome!
                         <br />
-                        You're an Accredited Investor!
+                        You&apos;re an Accredited Investor!
                       </h5>
                     </div>
                     <div className="py-4">
@@ -377,7 +374,7 @@ const AccreditationQuestionnaire: FC<AccreditationQuestionnaireProps> = ({
                       <h5 className="text-center text-white mt-3 text-lg medium tracking-wide">
                         Welcome!
                         <br />
-                        You're a Qualified Purchaser!
+                        You&apos;re a Qualified Purchaser!
                       </h5>
                     </div>
                     <div className="pb-4">
@@ -407,6 +404,7 @@ const AccreditationQuestionnaire: FC<AccreditationQuestionnaireProps> = ({
               <div className="flex items-center justify-center w-1/3">
                 {[...Array(STEP_COUNT)].map((_, stepIndex) => (
                   <span
+                    key={stepIndex}
                     className={`rounded-full mx-1 w-[10px] h-[10px] ${
                       currentStep === stepIndex + 1
                         ? "bg-info"
@@ -431,7 +429,6 @@ const AccreditationQuestionnaire: FC<AccreditationQuestionnaireProps> = ({
                     type="submit"
                     variant="outline-primary"
                     className="w-36 uppercase border border-info text-white bg-info/[.2] hover:bg-info/[.7]"
-                    loading={loading}
                   >
                     Close
                   </Button>

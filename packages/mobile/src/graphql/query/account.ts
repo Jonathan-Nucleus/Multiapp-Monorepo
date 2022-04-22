@@ -1,20 +1,7 @@
-import {
-  gql,
-  useMutation,
-  useQuery,
-  QueryHookOptions,
-  QueryResult,
-  MutationTuple,
-} from '@apollo/client';
-
+import { gql, useQuery, QueryHookOptions, QueryResult } from '@apollo/client';
 import { Post, PostCategory } from 'backend/graphql/posts.graphql';
 import { User } from 'backend/graphql/users.graphql';
-
-export const VERIFY_INVITE = gql`
-  query VerifyInvite($code: String!) {
-    verifyInvite(code: $code)
-  }
-`;
+import { VIEW_POST_FRAGMENT } from 'mobile/src/graphql/query/post';
 
 type FetchPostsVariables = {
   categories?: PostCategory[];
@@ -41,40 +28,6 @@ export type FetchPostsData = {
     >;
   })[];
 };
-
-export const VIEW_POST_FRAGMENT = gql`
-  fragment ViewPostFields on Post {
-    _id
-    body
-    categories
-    mediaUrl
-    mentionIds
-    likeIds
-    commentIds
-    createdAt
-    user {
-      _id
-      firstName
-      lastName
-      avatar
-      position
-      role
-    }
-    likes {
-      _id
-      firstName
-      lastName
-      avatar
-      position
-      role
-      company {
-        _id
-        name
-        avatar
-      }
-    }
-  }
-`;
 
 /**
  * GraphQL query that fetches posts for the current users home feed.
@@ -123,6 +76,8 @@ export type AccountData = {
     | 'linkedIn'
     | 'twitter'
     | 'website'
+    | 'posts'
+    | 'managedFunds'
   > & {
     company: Pick<
       User['companies'][number],

@@ -3,16 +3,12 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useMutation } from "@apollo/client";
-import Image from "next/image";
-
 import Card from "../../../common/Card";
-import Label from "../../../common/Label";
 import Field from "../../../common/Field";
 import Button from "../../../common/Button";
 import InvitationCoin from "./InvitationCoin";
-
 import { useInvites, Invitee } from "mobile/src/graphql/query/account";
-import { INVITE_USER } from "../../../../graphql/mutations/account";
+import { INVITE_USER } from "mobile/src/graphql/mutation/account";
 
 const MAX_INVITES = 5;
 const variants = ["primary", "error", "secondary", "info", "success"];

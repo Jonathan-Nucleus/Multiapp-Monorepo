@@ -16,7 +16,12 @@ import {
   FinancialStatusOptions,
   InvestmentLevelOptions,
 } from "../schemas/user";
-import { User, ReportedPost, isUser } from "../schemas/user";
+import {
+  User,
+  ReportedPost,
+  isUser,
+  compareAccreditation,
+} from "../schemas/user";
 import type { Post } from "../schemas/post";
 import type { Comment } from "../schemas/comment";
 import type { Company } from "../schemas/company";
@@ -97,8 +102,13 @@ export const publicUserResolvers = {
   managedFunds: async (
     parent: User.Mongo,
     argsIgnored: NoArgs,
-    { db }: ApolloServerContext
-  ) => (parent.managedFundsIds ? db.funds.findAll(parent.managedFundsIds) : []),
+    { db, user }: ApolloServerContext
+  ) =>
+    user && parent.managedFundsIds
+      ? (await db.funds.findAll(parent.managedFundsIds)).filter(
+          (fund) => compareAccreditation(user.accreditation, fund.level) >= 0
+        )
+      : [],
 };
 
 const resolvers = {
