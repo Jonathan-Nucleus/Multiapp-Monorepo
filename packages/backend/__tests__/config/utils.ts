@@ -20,6 +20,7 @@ import { MongoId, toObjectId } from "../../lib/mongo-helper";
 import { Comment } from "../../schemas/comment";
 import { Company } from "../../schemas/company";
 import { Fund } from "../../schemas/fund";
+import { InternalServerError } from "../../lib/validate";
 
 export const getFieldError = (response: GraphQLResponse, field: string) =>
   (response.errors?.[0].extensions?.errors as any)[field];
@@ -39,7 +40,7 @@ export const createUser = async (
   role: UserRole = "user",
   accreditation: Accreditation = "none",
   featured: boolean = false
-): Promise<User.Mongo | null> => {
+): Promise<User.Mongo> => {
   const { db } = await getIgniteDb();
   const firstName = faker.name.firstName();
   const lastName = faker.name.lastName();
@@ -67,12 +68,11 @@ export const createUser = async (
     return user;
   } catch (err) {
     console.log(`Error: `, err);
+    throw new InternalServerError("Error creating user");
   }
-
-  return null;
 };
 
-export const createStub = async (): Promise<User.Stub | null> => {
+export const createStub = async (): Promise<User.Stub> => {
   const { db } = await getIgniteDb();
 
   const user = {
@@ -88,16 +88,15 @@ export const createStub = async (): Promise<User.Stub | null> => {
     return user;
   } catch (err) {
     console.log(`Error: `, err);
+    throw new InternalServerError("Error creating stub user");
   }
-
-  return null;
 };
 
 export const createPost = async (
   userId?: MongoId,
   categories?: PostCategory[],
   audience?: Audience
-): Promise<Post.Mongo | null> => {
+): Promise<Post.Mongo> => {
   const { db } = await getIgniteDb();
 
   const post: Post.Mongo = {
@@ -133,15 +132,14 @@ export const createPost = async (
     return post;
   } catch (err) {
     console.log(`Error: `, err);
+    throw new InternalServerError("Error creating post");
   }
-
-  return null;
 };
 
 export const createComment = async (
   userId?: MongoId,
   postId?: MongoId
-): Promise<Comment.Mongo | null> => {
+): Promise<Comment.Mongo> => {
   const { db } = await getIgniteDb();
 
   const comment: Comment.Mongo = {
@@ -164,14 +162,13 @@ export const createComment = async (
     return comment;
   } catch (err) {
     console.log(`Error: `, err);
+    throw new InternalServerError("Error creating comment");
   }
-
-  return null;
 };
 
 export const createCompany = async (
   userId?: MongoId
-): Promise<Company.Mongo | null> => {
+): Promise<Company.Mongo> => {
   const { db } = await getIgniteDb();
 
   const company: Company.Mongo = {
@@ -192,16 +189,15 @@ export const createCompany = async (
     return company;
   } catch (err) {
     console.log(`Error: `, err);
+    throw new InternalServerError("Error creating company");
   }
-
-  return null;
 };
 
 export const createFund = async (
   userId?: MongoId,
   companyId?: MongoId,
   level: Accreditation = "none"
-): Promise<Fund.Mongo | null> => {
+): Promise<Fund.Mongo> => {
   const { db } = await getIgniteDb();
 
   const fund: Fund.Mongo = {
@@ -239,9 +235,8 @@ export const createFund = async (
     return fund;
   } catch (err) {
     console.log(`Error: `, err);
+    throw new InternalServerError("Error creating fund");
   }
-
-  return null;
 };
 
 export const deserializeUser = (user: User.Mongo): DeserializedUser => {

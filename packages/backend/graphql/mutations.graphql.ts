@@ -316,14 +316,16 @@ const resolvers = {
                 lastName: yup.string(),
                 position: yup.string(),
                 avatar: yup.string(),
-                background: yup.object({
-                  url: yup.string().required(),
-                  x: yup.number().required(),
-                  y: yup.number().required(),
-                  width: yup.number().required(),
-                  height: yup.number().required(),
-                  scale: yup.number().required(),
-                }),
+                background: yup
+                  .object({
+                    url: yup.string().required(),
+                    x: yup.number().required(),
+                    y: yup.number().required(),
+                    width: yup.number().required(),
+                    height: yup.number().required(),
+                    scale: yup.number().required(),
+                  })
+                  .default(undefined),
                 tagline: yup.string(),
                 overview: yup.string(),
                 website: yup.string().url(),
@@ -361,14 +363,16 @@ const resolvers = {
                 }),
                 name: yup.string(),
                 avatar: yup.string(),
-                background: yup.object({
-                  url: yup.string().required(),
-                  x: yup.number().required(),
-                  y: yup.number().required(),
-                  width: yup.number().required(),
-                  height: yup.number().required(),
-                  scale: yup.number().required(),
-                }),
+                background: yup
+                  .object({
+                    url: yup.string().required(),
+                    x: yup.number().required(),
+                    y: yup.number().required(),
+                    width: yup.number().required(),
+                    height: yup.number().required(),
+                    scale: yup.number().required(),
+                  })
+                  .default(undefined),
                 tagline: yup.string(),
                 overview: yup.string(),
                 website: yup.string().url(),
