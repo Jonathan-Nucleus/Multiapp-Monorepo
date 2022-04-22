@@ -1,18 +1,15 @@
-import { FC, useState } from "react";
+import { FC } from "react";
 import Card from "../../../common/Card";
 import Image from "next/image";
 import Button from "../../../common/Button";
 import { File, Info, Share, Star, TelevisionSimple } from "phosphor-react";
 import { Tab } from "@headlessui/react";
 import Avatar from "../../../common/Avatar";
-import TeamMember from "desktop/app/components/templates/CompanyPage/TeamMembers/Member";
-import MembersModal from "desktop/app/components/templates/CompanyPage/TeamMembers/MembersModal";
-
-import { useAccount } from "desktop/app/graphql/queries";
+import { useAccount } from "mobile/src/graphql/query/account";
 import { useFund } from "mobile/src/graphql/query/marketplace";
 import { useWatchFund } from "mobile/src/graphql/mutation/funds";
-
 import { PINK } from "shared/src/colors";
+import TeamMembersList from "desktop/app/components/modules/teams/TeamMembersList";
 
 const fundData = {
   mtd: "3.2%",
@@ -130,7 +127,6 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
   const [watchFund] = useWatchFund();
   const { data } = useFund(fundId);
   const { data: userData } = useAccount({ fetchPolicy: "cache-only" });
-  const [showModal, setShowModal] = useState(false);
   const fund = data?.fund;
   const isWatching =
     (!!fundId && userData?.account?.watchlistIds?.includes(fundId)) ?? false;
@@ -667,38 +663,10 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
             </div>
           </Card>
           <div className="mt-9">
-            <div className="flex items-center">
-              <div className="text-xl text-white font-medium">Team Members</div>
-              <div className="text-sm text-primary font-medium mx-2">•</div>
-              <div>
-                <Button
-                  variant="text"
-                  className="text-sm text-primary font-medium tracking-normal py-0"
-                  onClick={() => setShowModal(true)}
-                >
-                  VIEW ALL
-                </Button>
-              </div>
-            </div>
-            <div className="mt-3 flex flex-col -space-y-4">
-              {fund?.team.map((member, index) => (
-                <TeamMember
-                  key={member._id}
-                  member={member}
-                  hiddenChat={true}
-                />
-              ))}
-            </div>
+            {fund?.team && <TeamMembersList members={fund?.team} />}
           </div>
         </div>
       </div>
-      {fund?.team && (
-        <MembersModal
-          members={fund.team}
-          show={showModal}
-          onClose={() => setShowModal(false)}
-        />
-      )}
     </div>
   );
 };

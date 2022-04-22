@@ -2,9 +2,9 @@ import React, { FC } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Share, Star } from "phosphor-react";
-import { useAccount } from "desktop/app/graphql/queries";
+import { useAccount } from "mobile/src/graphql/query/account";
 import { useWatchFund } from "mobile/src/graphql/mutation/funds";
-import { useFollowUser } from "desktop/app/graphql/mutations/profiles";
+import { useFollowUser } from "mobile/src/graphql/mutation/account";
 import { Fund } from "mobile/src/graphql/query/marketplace";
 import Button from "desktop/app/components/common/Button";
 import Card from "desktop/app/components/common/Card";
@@ -19,42 +19,32 @@ const FundCard: FC<FundCardProps> = ({
   fund,
   showImages = true,
 }: FundCardProps) => {
-  const { data: userData, refetch } = useAccount({ fetchPolicy: "cache-only" });
-
+  const { data: userData } = useAccount();
   const [followUser] = useFollowUser();
   const [watchFund] = useWatchFund();
-
   const isFollower =
     userData?.account?.followingIds?.includes(fund.manager._id) ?? false;
   const isWatching =
     userData?.account?.watchlistIds?.includes(fund._id) ?? false;
-
   const toggleFollowingUser = async (
     id: string,
     follow: boolean
   ): Promise<void> => {
     try {
-      const { data } = await followUser({
+      await followUser({
         variables: { follow: follow, userId: id },
+        refetchQueries: ["Account"],
       });
-      data?.followUser ? await refetch() : console.log("err", data);
     } catch (err) {
-      console.log("err", err);
     }
   };
-
   const toggleWatchFund = async (id: string, watch: boolean): Promise<void> => {
     try {
-      const { data } = await watchFund({
+      await watchFund({
         variables: { watch, fundId: id },
         refetchQueries: ["Account"],
       });
-
-      if (!data?.watchFund) {
-        console.log("err", data);
-      }
     } catch (err) {
-      console.log("err", err);
     }
   };
 

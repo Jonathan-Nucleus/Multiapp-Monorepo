@@ -1,7 +1,5 @@
 import { FC, useState } from "react";
 import { Plus } from "phosphor-react";
-
-import ProfileCard from "./ProfileCard";
 import CompanyCard from "./CompanyCard";
 import FeaturedProfessionals from "./FeaturedProfessionals";
 import AddPost from "./AddPost";
@@ -10,8 +8,8 @@ import InviteFriends from "./InviteFriends";
 import WatchList from "./WatchList";
 import Button from "../../common/Button";
 import CreatePostModal from "./AddPost/CreatePostModal";
-
-import { useAccount } from "desktop/app/graphql/queries";
+import { useAccount } from "mobile/src/graphql/query/account";
+import ProfileCardSmall from "../../modules/users/ProfileCardSmall";
 
 const HomePage: FC = () => {
   const [showPostModal, setShowPostModal] = useState(false);
@@ -26,7 +24,7 @@ const HomePage: FC = () => {
     <>
       <div className="flex flex-row px-2 mt-10">
         <div className="w-80 hidden lg:block flex-shrink-0 mx-4">
-          <ProfileCard user={user} />
+          <ProfileCardSmall user={user} />
           {companies[0] && (
             <div className="mt-12" key={companies[0]._id}>
               <CompanyCard company={companies[0]} />

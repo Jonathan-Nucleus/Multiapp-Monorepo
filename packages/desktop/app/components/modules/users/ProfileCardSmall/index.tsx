@@ -1,16 +1,15 @@
 import { FC } from "react";
-import Link from "next/link";
-import { CircleWavy } from "phosphor-react";
+import Avatar from "../../../common/Avatar";
 import Card from "../../../common/Card";
-import Avatar from "desktop/app/components/common/Avatar";
+import { CircleWavy } from "phosphor-react";
 import { AccreditationOptions } from "backend/schemas/user";
-import { AccountData } from "desktop/app/graphql/queries";
+import Link from "next/link";
+import { UserProfileProps } from "desktop/app/types/common-props";
+import { useSession } from "next-auth/react";
 
-interface ProfileProps {
-  user: AccountData["account"];
-}
-
-const ProfileCard: FC<ProfileProps> = ({ user }) => {
+const ProfileCardSmall: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
+  const { data: session } = useSession();
+  const isMyProfile = user._id == session?.user?._id;
   return (
     <div>
       <div className="h-24 flex items-center justify-center">
@@ -24,7 +23,8 @@ const ProfileCard: FC<ProfileProps> = ({ user }) => {
         <div className="flex items-center justify-center mt-3">
           <div className="relative text-success">
             <CircleWavy color="currentColor" weight="fill" size={24} />
-            <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-xs font-bold scale-75 text-white">
+            <div
+              className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-xs font-bold scale-75 text-white">
               AI
             </div>
           </div>
@@ -53,8 +53,14 @@ const ProfileCard: FC<ProfileProps> = ({ user }) => {
           </div>
         </div>
         <div className="mt-5 mb-3">
-          <Link href="/profile/me">
-            <a className="text-primary text-sm">See Your Profile</a>
+          <Link href={isMyProfile ? "/profile/me" : `/profile/${user._id}`}>
+            <a className="text-primary text-sm">
+              {isMyProfile ?
+                <>See Your Profile</>
+                :
+                <>See Profile</>
+              }
+            </a>
           </Link>
         </div>
       </Card>
@@ -62,4 +68,4 @@ const ProfileCard: FC<ProfileProps> = ({ user }) => {
   );
 };
 
-export default ProfileCard;
+export default ProfileCardSmall;

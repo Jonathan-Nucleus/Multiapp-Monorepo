@@ -11,7 +11,7 @@ const ResetPassword: NextPageWithLayout = () => {
       <Head>
         <title>Reset Password</title>
         <meta name="description" content="" />
-        <link rel="icon" href="/favicon.png" />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
       <ResetPasswordPage token={token} />
     </div>

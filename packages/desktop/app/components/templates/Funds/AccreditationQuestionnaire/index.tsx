@@ -1,9 +1,6 @@
 import {
   FC,
   useState,
-  useEffect,
-  useRef,
-  ChangeEvent,
   MouseEventHandler,
 } from "react";
 import { Dialog } from "@headlessui/react";
@@ -15,16 +12,13 @@ import Label from "desktop/app/components/common/Label";
 import {
   SubmitHandler,
   useForm,
-  Controller,
   DefaultValues,
 } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useAccount } from "desktop/app/graphql/queries";
+import { useAccount } from "mobile/src/graphql/query/account";
 import ArrowLeft from "shared/assets/images/arrow-left.svg";
 import ArrowRight from "shared/assets/images/arrow-right.svg";
-import AI from "shared/assets/images/ai-large.svg";
-import QP from "shared/assets/images/qp-large.svg";
 import IndividualIcon from "shared/assets/images/individual.svg";
 import EntityIcon from "shared/assets/images/entity.svg";
 import AdvisorIcon from "shared/assets/images/advisor.svg";

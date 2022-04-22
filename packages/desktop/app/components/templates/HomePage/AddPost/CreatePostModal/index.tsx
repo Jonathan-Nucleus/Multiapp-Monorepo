@@ -31,7 +31,7 @@ import {
 } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useAccount } from "desktop/app/graphql/queries";
+import { useAccount } from "mobile/src/graphql/query/account";
 import {
   useCreatePost,
   useFetchUploadLink,

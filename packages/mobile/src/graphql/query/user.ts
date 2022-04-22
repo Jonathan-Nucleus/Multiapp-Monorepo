@@ -1,5 +1,6 @@
 import { gql, QueryResult, useQuery } from "@apollo/client";
-import { AccountData } from "../index";
+import { VIEW_POST_FRAGMENT } from "./post";
+import { AccountData } from "./account";
 
 type UserProfileData = {
   userProfile: AccountData["account"];
@@ -10,12 +11,14 @@ type UserProfileVariables = {
 };
 
 export function useFetchProfile(
-  userId: string
+  userId: string,
 ): QueryResult<UserProfileData, UserProfileVariables> {
   return useQuery<UserProfileData, UserProfileVariables>(
     gql`
+      ${VIEW_POST_FRAGMENT}
       query UserProfile($userId: ID!) {
         userProfile(userId: $userId) {
+          _id
           firstName
           lastName
           avatar
@@ -63,12 +66,15 @@ export function useFetchProfile(
             avatar
             position
           }
+          posts {
+            ...ViewPostFields
+          }
           linkedIn
           website
           twitter
         }
       }
     `,
-    { variables: { userId } }
+    { variables: { userId } },
   );
 }

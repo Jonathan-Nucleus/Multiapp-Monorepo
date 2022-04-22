@@ -8,7 +8,7 @@ const InviteCode: NextPageWithLayout = () => {
       <Head>
         <title>Invite Code</title>
         <meta name="description" content="" />
-        <link rel="icon" href="/favicon.png" />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
       <InviteCodePage />
     </div>

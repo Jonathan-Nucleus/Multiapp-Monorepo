@@ -4,7 +4,7 @@ import { Post, PostInput } from 'backend/graphql/posts.graphql';
 import {
   VIEW_POST_FRAGMENT,
   FetchPostsData,
-} from 'desktop/app/graphql/queries';
+} from 'mobile/src/graphql/query/account';
 
 export const CREATE_POST = gql`
   mutation CreatePost($post: PostInput!) {

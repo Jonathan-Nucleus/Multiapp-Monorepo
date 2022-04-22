@@ -1,14 +1,12 @@
 import { FC } from "react";
 import "@splidejs/react-splide/css";
 import { Splide, SplideSlide } from "@splidejs/react-splide";
-
 import PostCard from "../Post";
 import Card from "../Card";
-import { FetchPostsData } from "desktop/app/graphql/queries";
+import { PostType } from "desktop/app/types/common-props";
 
-type Post = Exclude<FetchPostsData["posts"], undefined>[number];
 interface PostsProps {
-  posts: Post[];
+  posts: PostType[];
 }
 
 const FeaturedPosts: FC<PostsProps> = ({ posts }) => {

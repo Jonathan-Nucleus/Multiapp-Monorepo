@@ -1,13 +1,12 @@
 import React, { FC } from "react";
 import { Dialog } from "@headlessui/react";
-import { X, Image as ImageIcon } from "phosphor-react";
+import { X } from "phosphor-react";
 
 import Member from "../Member";
 import Card from "../Card";
 import Button from "../Button";
 import type { User } from "backend/graphql/users.graphql";
-import { useAccount } from "desktop/app/graphql/queries";
-import { useFollowUser } from "desktop/app/graphql/mutations/profiles";
+import { useFollowUser } from "mobile/src/graphql/mutation/account";
 
 interface LikeModalProps {
   show: boolean;
@@ -16,24 +15,17 @@ interface LikeModalProps {
 }
 
 const LikeModal: FC<LikeModalProps> = ({ show, onClose, members }) => {
-  const { data: userData, loading: userLoading, refetch } = useAccount();
   const [followUser] = useFollowUser();
-
   const toggleFollowingUser = async (
     id: string,
     follow: boolean
   ): Promise<void> => {
     try {
-      const { data } = await followUser({
+      await followUser({
         variables: { follow: follow, userId: id },
+        refetchQueries: ["Account"],
       });
-      if (data?.followUser) {
-        refetch();
-      } else {
-        console.log("err", data);
-      }
     } catch (err) {
-      console.log("err", err);
     }
   };
 

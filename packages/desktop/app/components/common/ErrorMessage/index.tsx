@@ -27,8 +27,8 @@ function ErrorMessage<TFieldValues = FieldValues>({
       {...props}
       className={`font-normal text-error text-sm mt-1 ${props.className ?? ""}`}
     >
-      {error.message?.split("\n").map((line) => (
-        <span>
+      {error.message?.split("\n").map((line, index) => (
+        <span key={index}>
           {line}
           <br />
         </span>

@@ -8,7 +8,7 @@ const Funds: NextPageWithLayout = () => {
       <Head>
         <title>Funds - Prometheus</title>
         <meta name="description" content="" />
-        <link rel="icon" href="/favicon.png" />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
       <FundsPage />
     </div>

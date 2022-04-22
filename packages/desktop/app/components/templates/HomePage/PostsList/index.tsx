@@ -2,8 +2,7 @@ import { FC, useState } from "react";
 import { PostCategory } from "backend/graphql/posts.graphql";
 import FilterDropdown, { FilterCategory } from "./FilterDropdown";
 import Post from "../../../common/Post";
-
-import { useFetchPosts } from "desktop/app/graphql/queries";
+import { useFetchPosts } from "mobile/src/graphql/query/account";
 
 const PostsList: FC = () => {
   const [selectedTopics, setSelectedTopics] = useState<FilterCategory[]>([
@@ -11,7 +10,6 @@ const PostsList: FC = () => {
   ]);
   const [selectedFrom, setSelectedFrom] = useState("Everyone");
   const { data, refetch } = useFetchPosts();
-
   const posts = data?.posts ?? [];
   return (
     <>

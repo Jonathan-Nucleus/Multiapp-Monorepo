@@ -1,16 +1,13 @@
 import { FC } from "react";
 import ProfileCard from "./ProfileCard";
-import { AccountData, useFetchPosts } from "desktop/app/graphql/queries";
+import { useFetchPosts } from "mobile/src/graphql/query/account";
 import CompaniesList from "./CompaniesList";
 import PostsList from "../../common/PostsList";
 import FundCard from "../../modules/funds/FundCard";
-import { useFetchFunds } from "../../../graphql/queries/marketplace";
+import { useFetchFunds } from "mobile/src/graphql/query/marketplace";
+import { UserProfileProps } from "../../../types/common-props";
 
-export interface ProfilePageProps {
-  account: Exclude<AccountData["account"], undefined>;
-}
-
-const ProfilePage: FC<ProfilePageProps> = ({ account }: ProfilePageProps) => {
+const ProfilePage: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
   const { data: fundsData } = useFetchFunds();
   const { data: postsData } = useFetchPosts();
   return (
@@ -20,10 +17,10 @@ const ProfilePage: FC<ProfilePageProps> = ({ account }: ProfilePageProps) => {
           <div className="col-span-4">
             <div className="divide-y divide-inherit border-white/[.12]">
               <div className="pb-5">
-                <ProfileCard account={account} />
+                <ProfileCard user={user} />
               </div>
               <div className="lg:hidden mb-5 pt-5">
-                <CompaniesList companies={account.companies} />
+                <CompaniesList companies={user.companies} />
               </div>
               {fundsData?.funds && fundsData.funds.length > 0 && (
                 <div className="py-5">
@@ -42,7 +39,7 @@ const ProfilePage: FC<ProfilePageProps> = ({ account }: ProfilePageProps) => {
             </div>
           </div>
           <div className="col-span-2 hidden lg:block">
-            <CompaniesList companies={account.companies} />
+            <CompaniesList companies={user.companies} />
           </div>
         </div>
       </div>

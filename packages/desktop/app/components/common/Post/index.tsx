@@ -9,20 +9,16 @@ import {
   ThumbsUp,
 } from "phosphor-react";
 import { useSession } from "next-auth/react";
-
 import Button from "../Button";
 import Avatar from "../Avatar";
 import LikeModal from "./LikeModal";
-
-import { FetchPostsData } from "desktop/app/graphql/queries";
 import { useLikePost } from "desktop/app/graphql/mutations/posts";
 import CommentPost from "../Comment";
 import moment from "moment";
-
-type Post = Exclude<FetchPostsData["posts"], undefined>[number];
+import { PostType } from "desktop/app/types/common-props";
 
 interface PostProps {
-  post: Post;
+  post: PostType;
 }
 
 const Post: FC<PostProps> = ({ post }: PostProps) => {
@@ -31,7 +27,7 @@ const Post: FC<PostProps> = ({ post }: PostProps) => {
 
   const { user } = post;
   const [liked, setLiked] = useState(
-    (session?.user && post.likeIds?.includes(session.user._id)) ?? false
+    (session?.user && post.likeIds?.includes(session.user._id)) ?? false,
   );
   const [visiblePostLikeModal, setVisiblePostLikeModal] = useState(false);
   const [visibleComment, setVisibleComment] = useState(false);
@@ -87,7 +83,7 @@ const Post: FC<PostProps> = ({ post }: PostProps) => {
           {post.body}
         </div>
         <div className="flex flex-wrap -mx-1 mt-4 px-4">
-          {post.categories.map((category, index) => (
+          {post.categories.map((category) => (
             <div
               key={category}
               className={`bg-white/[.25] uppercase rounded-full text-xs text-white

@@ -1,31 +1,22 @@
-import { FC, useState } from "react";
-import Image from "next/image";
+import { FC } from "react";
 import { Star } from "phosphor-react";
-
 import Avatar from "../../../common/Avatar";
 import Card from "../../../common/Card";
 import Button from "../../../common/Button";
-
-import { useWatchFund } from "desktop/app/graphql/mutations/account";
-import { useAccount, WatchedFund } from "desktop/app/graphql/queries";
+import { useWatchFund } from "mobile/src/graphql/mutation/funds";
+import { useAccount } from "mobile/src/graphql/query/account";
 
 const WatchList: FC = () => {
   const [watchFund] = useWatchFund();
-  const { data: accountData, loading: accountLoading, refetch } = useAccount();
-  const watchList: WatchedFund[] = accountData?.account?.watchlist ?? [];
-
-  const handleRemoveWatchList = async (id: string): Promise<void> => {
+  const { data: accountData } = useAccount();
+  const watchList = accountData?.account?.watchlist ?? [];
+  const handleRemoveWatchList = async (id: string) => {
     try {
-      const { data } = await watchFund({
+      await watchFund({
         variables: { watch: false, fundId: id },
+        refetchQueries: ["Account"],
       });
-      if (data?.watchFund) {
-        refetch();
-      } else {
-        console.log("err", data);
-      }
     } catch (err) {
-      console.log("err", err);
     }
   };
 

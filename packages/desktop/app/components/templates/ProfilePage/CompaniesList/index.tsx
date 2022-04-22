@@ -1,9 +1,9 @@
 import { FC } from "react";
-import { Company } from "backend/graphql/companies.graphql";
 import CompanyItem from "./CompanyItem";
+import { CompanyType } from "desktop/app/types/common-props";
 
 interface CompaniesListProps {
-  companies: Company[];
+  companies: CompanyType[];
 }
 
 const CompaniesList: FC<CompaniesListProps> = ({

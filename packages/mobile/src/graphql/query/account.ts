@@ -27,8 +27,11 @@ export type FetchPostsData = {
     | 'body'
     | 'mediaUrl'
     | 'likeIds'
+    | 'likes'
     | 'mentionIds'
     | 'commentIds'
+    | 'comments'
+    | 'shareIds'
     | 'createdAt'
     | 'categories'
   > & {
@@ -56,6 +59,19 @@ export const VIEW_POST_FRAGMENT = gql`
       avatar
       position
       role
+    }
+    likes {
+      _id
+      firstName
+      lastName
+      avatar
+      position
+      role
+      company {
+        _id
+        name
+        avatar
+      }
     }
   }
 `;
@@ -93,12 +109,32 @@ export type AccountData = {
     | 'role'
     | 'accreditation'
     | 'position'
+    | 'tagline'
+    | 'overview'
     | 'background'
     | 'followerIds'
+    | 'followers'
     | 'followingIds'
+    | 'following'
+    | 'watchlistIds'
+    | 'watchlist'
     | 'companyFollowingIds'
     | 'postIds'
+    | 'linkedIn'
+    | 'twitter'
+    | 'website'
   > & {
+    company: Pick<
+      User['companies'][number],
+      | '_id'
+      | 'name'
+      | 'avatar'
+      | 'members'
+      | 'background'
+      | 'followerIds'
+      | 'postIds'
+      | 'followingIds'
+    >;
     companies: Pick<
       User['companies'][number],
       | '_id'

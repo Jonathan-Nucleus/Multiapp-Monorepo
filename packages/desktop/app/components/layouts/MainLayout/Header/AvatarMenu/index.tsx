@@ -1,9 +1,8 @@
-import { Menu } from "@headlessui/react";
+import { Popover } from "@headlessui/react";
 import { FC } from "react";
 import { signOut } from "next-auth/react";
 import {
   CaretDown,
-  User,
   CircleWavy,
   ShieldCheck,
   Gear,
@@ -15,12 +14,12 @@ import {
 } from "phosphor-react";
 import MenuItem from "./MenuItem";
 import Avatar from "desktop/app/components/common/Avatar";
-import { useAccount } from "desktop/app/graphql/queries";
+import { useAccount } from "mobile/src/graphql/query/account";
+import Link from "next/link";
 
 const AvatarMenu: FC = () => {
   const { data: accountData } = useAccount();
   const account = accountData?.account;
-
   const items = [
     {
       icon: (
@@ -64,7 +63,6 @@ const AvatarMenu: FC = () => {
       path: "/",
     },
   ];
-
   if (account?.accreditation === "ACCREDITED") {
     items[1] = {
       icon: (
@@ -78,8 +76,8 @@ const AvatarMenu: FC = () => {
   }
 
   return (
-    <Menu as="div" className="relative">
-      <Menu.Button>
+    <Popover as="div" className="relative">
+      <Popover.Button>
         <div className="flex flex-row items-center cursor-pointer">
           <div className="w-8 h-8 flex items-center justify-center">
             <Avatar size={32} />
@@ -88,18 +86,26 @@ const AvatarMenu: FC = () => {
             <CaretDown color="white" weight="bold" size={16} />
           </div>
         </div>
-      </Menu.Button>
-      <Menu.Items className="absolute right-0 w-64 mt-6 bg-surface-light10 shadow-md shadow-black rounded">
+      </Popover.Button>
+      <Popover.Panel className="absolute right-0 w-64 mt-6 bg-surface-light10 shadow-md shadow-black rounded">
         <div className="divide-y border-white/[.12] divide-inherit pb-2">
-          <div className="flex flex-row items-center p-4">
-            <div className="w-16 h-16 flex items-center justify-center">
-              <Avatar size={64} />
-            </div>
-            <div className="ml-3">
-              <div className="text-xl text-white">Richard Branson</div>
-              <div className="text-sm text-white opacity-60">Virgin Group</div>
-            </div>
-          </div>
+          <Popover.Button>
+            <Link href={"/profile/me"}>
+              <a>
+                <div className="flex flex-row items-center p-4">
+                  <Avatar size={64} src={account?.avatar} />
+                  <div className="text-left ml-3">
+                    <div className="text-xl text-white">
+                      {account?.firstName} {account?.lastName}
+                    </div>
+                    <div className="text-sm text-white opacity-60">
+                      See your profile
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </Link>
+          </Popover.Button>
           {items.map((item, index) => (
             <MenuItem
               key={index}
@@ -111,12 +117,7 @@ const AvatarMenu: FC = () => {
           <div>
             <a
               className="cursor-pointer px-4 py-3 flex flex-row items-center"
-              onClick={() =>
-                signOut({
-                  redirect: false,
-                  callbackUrl: process.env.NEXTAUTH_URL,
-                })
-              }
+              onClick={() => signOut()}
             >
               <span className="flex-shrink-0 flex items-center">
                 <SignOut color="white" weight="light" size={24} />
@@ -125,8 +126,8 @@ const AvatarMenu: FC = () => {
             </a>
           </div>
         </div>
-      </Menu.Items>
-    </Menu>
+      </Popover.Panel>
+    </Popover>
   );
 };
 

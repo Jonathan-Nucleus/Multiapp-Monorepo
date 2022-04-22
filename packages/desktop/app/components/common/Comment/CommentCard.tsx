@@ -12,7 +12,7 @@ import {
   useEditCommentPost,
   useCommentPost,
 } from "desktop/app/graphql/mutations/posts";
-import { useAccount } from "desktop/app/graphql/queries";
+import { useAccount } from "mobile/src/graphql/query/account";
 import Avatar from "../Avatar";
 
 interface CommentCardProps {

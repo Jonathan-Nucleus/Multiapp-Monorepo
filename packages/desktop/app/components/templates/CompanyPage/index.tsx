@@ -1,111 +1,47 @@
 import { FC } from "react";
-import "@splidejs/react-splide/css";
-import { Splide, SplideSlide } from "@splidejs/react-splide";
-import Image from "next/image";
-
-import TeamMembersList from "./TeamMembers";
-import PostsList, { PostsListProps } from "../../common/PostsList";
-import FeaturedPosts from "../../common/FeaturedPosts";
-import Card from "../../common/Card";
-import Profile from "./Profile";
-import { useFetchPosts } from "desktop/app/graphql/queries";
-import { useCompany } from "mobile/src/graphql/query/company";
+import PostsList from "../../common/PostsList";
 import FundCard from "../../modules/funds/FundCard";
+import { CompanyProfileProps } from "../../../types/common-props";
+import ProfileCard from "./ProfileCard";
+import { useFetchPosts } from "mobile/src/graphql/query/account";
+import TeamMembersList from "../../modules/teams/TeamMembersList";
 
-interface CompanyPageProps {
-  companyId: string;
-}
-
-const CompanyPage: FC<CompanyPageProps> = ({ companyId }) => {
-  const { data, loading: postsLoading, refetch } = useFetchPosts(); // Temporarily show all posts
-  const { data: companyData, loading } = useCompany(companyId);
-
-  const posts = data?.posts ?? [];
-  const company = companyData?.companyProfile;
-  const members = companyData?.companyProfile?.members ?? [];
-  const funds = company
-    ? (companyData?.companyProfile?.funds ?? []).map((fund) => ({
-        ...fund,
-        company, // Inject company data for the fund
-      }))
-    : [];
-
-  if (loading || !company || !posts) {
-    return <></>;
-  }
-
-  const filterPosts: PostsListProps["onFilter"] = (topics, audience) => {
-    console.log("filter by", topics, audience);
-  };
-
+const CompanyPage: FC<CompanyProfileProps> = ({ company }: CompanyProfileProps) => {
+  const { data: postsData } = useFetchPosts();
+  const funds = company.funds.map(fund => ({ ...fund, company }));
+  const members = company.members.map(member => ({ ...member, company }));
   return (
-    <div className="flex flex-col justify-center p-0 mt-10 md:flex-row md:px-2">
-      <div className="min-w-0 max-w-4xl mx-0 md:mx-4">
-        {company && <Profile company={company} />}
-        <>
-          <div className="text-white mt-8 mb-2 ml-2 font-medium">Funds</div>
-          {funds.map((fund, index) => (
-            <div key={index} className="mb-4">
-              <FundCard fund={fund} showImages={false} />
-            </div>
-          ))}
-        </>
-        {posts?.[0] && <FeaturedPosts posts={[posts[0]]} />}
-        <PostsList posts={posts} onFilter={filterPosts} />
-      </div>
-      <div className="w-96 hidden md:block flex-shrink-0 mx-4">
-        <TeamMembersList company={company} />
-      </div>
-      <div className="w-full block lg:hidden">
-        <div className="font-medium text-white ml-4 md:m-0">Team Members</div>
-        <Card className="border-0 mt-5 bg-transparent	shadow-none">
-          <Splide
-            options={{
-              autoWidth: true,
-              rewind: true,
-              lazyLoad: "nearby",
-              cover: true,
-              pagination: false,
-            }}
-          >
-            {members.map((member, index) => (
-              <SplideSlide key={index}>
-                <div className="mx-2">
-                  <div className="w-40 h-40 relative">
-                    <Image
-                      loader={() =>
-                        `${process.env.NEXT_PUBLIC_AVATAR_URL}/${member.avatar}`
-                      }
-                      src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${member.avatar}`}
-                      alt=""
-                      width={56}
-                      height={56}
-                      className="object-cover rounded-full"
-                      unoptimized={true}
-                    />
-                    <div className="absolute top-0 left-0 right-0 bottom-0">
-                      <div className="bg-gradient-to-b from-transparent to-black w-full h-full flex flex-col justify-end rounded-lg">
-                        <div className="p-3 text-center">
-                          <div className="text-white">
-                            {member.firstName} {member.lastName}
-                          </div>
-                          <div className="text-white text-xs font-semibold">
-                            {member.position}
-                          </div>
-                          <div className="text-white text-xs">
-                            {companyData.companyProfile?.name}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+    <>
+      <div className="lg:mt-12 mb-12 lg:px-14">
+        <div className="lg:grid grid-cols-6 gap-8">
+          <div className="col-span-4">
+            <div className="divide-y divide-inherit border-white/[.12]">
+              <div className="pb-5">
+                <ProfileCard company={company} />
+              </div>
+              <div className="lg:hidden mb-5 pt-5 px-3">
+                <TeamMembersList members={members} showChat={true} />
+              </div>
+              <div className="py-5">
+                {funds.map((fund) => (
+                  <div key={fund._id} className="mb-5">
+                    <FundCard fund={fund} showImages={false} />
                   </div>
+                ))}
+              </div>
+              {postsData?.posts && (
+                <div className="py-5">
+                  <PostsList posts={postsData.posts} />
                 </div>
-              </SplideSlide>
-            ))}
-          </Splide>
-        </Card>
+              )}
+            </div>
+          </div>
+          <div className="col-span-2 hidden lg:block">
+            <TeamMembersList members={members} showChat={true} />
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

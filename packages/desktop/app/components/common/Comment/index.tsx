@@ -1,32 +1,28 @@
 import { FC, useMemo } from "react";
-
-import { FetchPostsData } from "desktop/app/graphql/queries";
 import { useCommentPost } from "desktop/app/graphql/mutations/posts";
 import type { Comment } from "backend/graphql/comments.graphql";
 import SendMessage from "./SendMessage";
 import CommentsList from "./CommentsList";
 import Card from "../Card";
-
-type Post = Exclude<FetchPostsData["posts"], undefined>[number];
+import { PostType } from "desktop/app/types/common-props";
 
 interface CommentPostProps {
-  post: Post;
+  post: PostType;
 }
 
 const CommentPost: FC<CommentPostProps> = ({ post }: CommentPostProps) => {
   const [commentPost] = useCommentPost();
 
   const sendMessage = async (
-    messsage: string,
+    message: string,
     mediaUrl?: string
   ): Promise<void> => {
-    if (!messsage || messsage === "") return;
-
+    if (!message || message === "") return;
     try {
       await commentPost({
         variables: {
           comment: {
-            body: messsage,
+            body: message,
             postId: post._id,
             mentionIds: [], // Update to add mentions
           },
@@ -34,7 +30,6 @@ const CommentPost: FC<CommentPostProps> = ({ post }: CommentPostProps) => {
         refetchQueries: ["Posts"],
       });
     } catch (err) {
-      console.log("send mesage error", err);
     }
   };
 

@@ -50,7 +50,7 @@ export type Company = Pick<
 };
 
 export type CompanyData = {
-  companyProfile?: Company;
+  companyProfile?: GraphQLCompany;
 };
 
 /**
@@ -103,9 +103,6 @@ export function useCompany(
             overview
             level
             status
-            background {
-              url
-            }
             manager {
               _id
               avatar

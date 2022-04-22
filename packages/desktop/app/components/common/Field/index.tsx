@@ -1,7 +1,7 @@
 import { ReactElement, HTMLProps, PropsWithChildren } from "react";
 import { FieldValues, Path, UseFormReturn, FieldError } from "react-hook-form";
 
-import Input from "../Input";
+import Input, { InputProps } from "../Input";
 import Label from "../Label";
 import ErrorMessage from "../ErrorMessage";
 
@@ -11,7 +11,7 @@ interface FieldProps<TFieldValues>
   register: UseFormReturn<TFieldValues>["register"];
   state: UseFormReturn<TFieldValues>["formState"];
   label?: string;
-  shape?: "pill" | "rounded";
+  shape?: InputProps["shape"];
 }
 
 function Field<TFieldValues = FieldValues>({

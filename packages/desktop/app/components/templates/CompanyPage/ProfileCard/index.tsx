@@ -7,49 +7,46 @@ import {
   TwitterLogo,
   Globe,
   Copy,
-  Users,
-  WarningCircle,
-  MinusCircle,
   Chats,
+  Share,
 } from "phosphor-react";
 import { Menu } from "@headlessui/react";
 import Button from "../../../../components/common/Button";
 import Card from "../../../../components/common/Card";
-import Avatar from "../../../common/Avatar";
-import FollowersModal from "../../../modules/users/FollowersModal";
-import { useFollowUser } from "mobile/src/graphql/mutation/account";
+import { CompanyProfileProps } from "../../../../types/common-props";
+import FollowersModal from "desktop/app/components/modules/users/FollowersModal";
+import { useFollowCompany } from "mobile/src/graphql/mutation/account";
 import { useAccount } from "mobile/src/graphql/query/account";
-import { UserProfileProps } from "../../../../types/common-props";
 
-const ProfileCard: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
+const ProfileCard: FC<CompanyProfileProps> = ({ company }: CompanyProfileProps) => {
+  const { data: accountData } = useAccount({ fetchPolicy: "cache-only" });
   const [isVisible, setVisible] = useState(false);
   let overviewShort: string | undefined = undefined;
   const [showFullOverView, setShowFullOverView] = useState(false);
   {
     const regexpSpace = /\s/g;
-    const result = user.overview?.matchAll(regexpSpace);
+    const result = company.overview?.matchAll(regexpSpace);
     if (result) {
       const matches = Array.from(result);
       const wordsToSplit = 20;
       if (matches.length > wordsToSplit) {
-        overviewShort = user.overview?.substring(
+        overviewShort = company.overview?.substring(
           0,
-          matches[wordsToSplit].index!
+          matches[wordsToSplit].index!,
         );
       }
     }
   }
-  const { data: accountData } = useAccount();
-  const [followUser] = useFollowUser();
-  const isFollowing = accountData?.account?.followingIds?.includes(user._id);
-  const isMyProfile = accountData?.account?._id == user._id
-  const toggleFollowing = async () => {
+  const [followCompany] = useFollowCompany();
+  const isFollowing =
+    accountData?.account?.companyFollowingIds?.includes(company._id) ?? false;
+  const toggleFollowCompany = async () => {
     try {
-      await followUser({
-        variables: { follow: !isFollowing, userId: user._id },
-        refetchQueries: ["Account", "UserProfile"]
+      await followCompany({
+        variables: { follow: !isFollowing, companyId: company._id },
+        refetchQueries: ["Account"],
       });
-    } catch (error) {
+    } catch (err) {
     }
   };
   return (
@@ -58,12 +55,12 @@ const ProfileCard: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
         <Card className="rounded-none lg:rounded-2xl border-brand-overlay/[.1] p-0">
           <div>
             <div className="w-full h-16 lg:h-32 bg-white/[.25] relative">
-              {user.company?.background && (
+              {company.background && (
                 <Image
                   loader={() =>
-                    `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${user.company?.background?.url}`
+                    `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${company.background?.url}`
                   }
-                  src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${user.company.background?.url}`}
+                  src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${company.background?.url}`}
                   alt=""
                   layout="fill"
                   objectFit="cover"
@@ -71,42 +68,57 @@ const ProfileCard: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
                 />
               )}
             </div>
-            <div className="hidden lg:flex items-center relative mx-5 -mt-6">
-              <Avatar src={user.avatar} size={120} />
-              <div className="flex flex-grow items-center justify-between ml-3 mt-8">
+            <div className="hidden lg:flex relative mx-5">
+              <div className="w-[120px] h-[120px] bg-background rounded-2xl relative overflow-hidden -mt-12">
+                {company.avatar && (
+                  <Image
+                    loader={() =>
+                      `${process.env.NEXT_PUBLIC_AVATAR_URL}/${company.avatar}`
+                    }
+                    src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${company.avatar}`}
+                    alt=""
+                    layout="fill"
+                    objectFit="cover"
+                    unoptimized={true}
+                  />
+                )}
+              </div>
+              <div className="flex flex-grow justify-between ml-4 mt-4">
                 <div>
                   <div className="text-xl text-white font-medium">
-                    {user.firstName} {user.lastName}
-                  </div>
-                  <div className="text-sm text-white">{user.position}</div>
-                  <div className="text-sm text-primary">
-                    {user.company?.name}
+                    {company.name}
                   </div>
                 </div>
-                {!isMyProfile &&
-                  <>
-                    <div className="flex items-center">
-                      <Button variant="text" className="text-primary mr-5 py-0">
-                        <Chats color="currentColor" size={24} />
-                      </Button>
-                      <Button
-                        variant="gradient-primary"
-                        className="w-40 text-sm font-medium"
-                        onClick={toggleFollowing}
-                      >
-                        {isFollowing ? "UNFOLLOW" : "FOLLOW"}
-                      </Button>
-                    </div>
-                  </>
-                }
+                <div className="flex items-center">
+                  <Button
+                    variant="gradient-primary"
+                    className="w-40 text-sm font-medium"
+                    onClick={() => toggleFollowCompany()}
+                  >
+                    {isFollowing ? "UNFOLLOW" : "FOLLOW"}
+                  </Button>
+                </div>
               </div>
             </div>
             <div className="flex lg:hidden items-center p-4">
-              <Avatar src={user.avatar} size={80} />
+              <div className="w-20 h-20 bg-background rounded-2xl relative overflow-hidden -mt-12">
+                {company.avatar && (
+                  <Image
+                    loader={() =>
+                      `${process.env.NEXT_PUBLIC_AVATAR_URL}/${company.avatar}`
+                    }
+                    src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${company.avatar}`}
+                    alt=""
+                    layout="fill"
+                    objectFit="cover"
+                    unoptimized={true}
+                  />
+                )}
+              </div>
               <div className="flex-grow grid grid-cols-3 divide-x divide-inherit">
                 <div className="flex flex-wrap items-center justify-center text-center cursor-pointer px-4">
                   <div className="text-xl text-white font-medium mx-1">
-                    {user.postIds?.length ?? 0}
+                    {company.postIds?.length ?? 0}
                   </div>
                   <div className="text-xs text-white opacity-60 mx-1">Posts</div>
                 </div>
@@ -115,7 +127,7 @@ const ProfileCard: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
                   onClick={() => setVisible(true)}
                 >
                   <div className="text-xl text-white font-medium mx-1">
-                    {user.followerIds?.length ?? 0}
+                    {company.followerIds?.length ?? 0}
                   </div>
                   <div className="text-xs text-white opacity-60 mx-1">Followers</div>
                 </div>
@@ -124,28 +136,22 @@ const ProfileCard: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
                   onClick={() => setVisible(true)}
                 >
                   <div className="text-xl text-white font-medium mx-1">
-                    {user.followingIds?.length ?? 0}
+                    {company.followingIds?.length ?? 0}
                   </div>
                   <div className="text-xs text-white opacity-60 mx-1">Following</div>
                 </div>
               </div>
             </div>
-            <div className="lg:hidden mt-4 mx-4">
+            <div className="lg:hidden mt-1 mx-4">
               <div className="text-white">
-                {user.firstName} {user.lastName}
-              </div>
-              <div className="text-sm text-white opacity-60">
-                {user.position}
-              </div>
-              <div className="text-sm text-white opacity-60">
-                {user.company?.name}
+                {company.name}
               </div>
             </div>
-            <div className="lg:grid grid-cols-2 mx-4 mt-4 lg:mt-2 mb-5">
+            <div className="lg:grid grid-cols-2 mx-4 mt-5 lg:mt-5 mb-5">
               <div className="text-sm text-white">
-                <div>{user.tagline}</div>
+                <div>{company.tagline}</div>
                 <div className="mt-3">
-                  {!overviewShort && <div>{user.overview}</div>}
+                  {!overviewShort && <div>{company.overview}</div>}
                   {overviewShort && !showFullOverView && (
                     <div>
                       {overviewShort} ...
@@ -159,7 +165,7 @@ const ProfileCard: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
                   )}
                   {overviewShort && showFullOverView && (
                     <div>
-                      <div>{user.overview}</div>
+                      <div>{company.overview}</div>
                       <div>
                         <span
                           className="text-primary cursor-pointer"
@@ -176,7 +182,7 @@ const ProfileCard: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
                 <div className="flex items-center divide-x divide-inherit border-white/[.12]">
                   <div className="text-center px-4">
                     <div className="text-xl text-white font-medium">
-                      {user.postIds?.length ?? 0}
+                      {company.postIds?.length ?? 0}
                     </div>
                     <div className="text-xs text-white opacity-60">Posts</div>
                   </div>
@@ -185,7 +191,7 @@ const ProfileCard: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
                     onClick={() => setVisible(true)}
                   >
                     <div className="text-xl text-white font-medium">
-                      {user.followerIds?.length ?? 0}
+                      {company.followerIds?.length ?? 0}
                     </div>
                     <div className="text-xs text-white opacity-60">
                       Followers
@@ -196,7 +202,7 @@ const ProfileCard: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
                     onClick={() => setVisible(true)}
                   >
                     <div className="text-xl text-white font-medium">
-                      {user.followingIds?.length ?? 0}
+                      {company.followingIds?.length ?? 0}
                     </div>
                     <div className="text-xs text-white opacity-60">
                       Following
@@ -205,20 +211,18 @@ const ProfileCard: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
                 </div>
               </div>
             </div>
-            {!isMyProfile &&
-              <div className="lg:hidden mt-3 mb-5 px-4">
-                <Button
-                  variant="gradient-primary"
-                  className="w-full text-sm font-medium"
-                  onClick={toggleFollowing}
-                >
-                  {isFollowing ? "UNFOLLOW" : "FOLLOW"}
-                </Button>
-              </div>
-            }
+            <div className="lg:hidden mt-3 mb-5 px-4">
+              <Button
+                variant="gradient-primary"
+                className="w-full text-sm font-medium"
+                onClick={() => toggleFollowCompany()}
+              >
+                {isFollowing ? "UNFOLLOW" : "FOLLOW"}
+              </Button>
+            </div>
             <div className="flex items-center p-4 border-t border-white/[.12]">
               <div className="flex items-center cursor-pointer">
-                <Link href={user.linkedIn ?? "/"}>
+                <Link href={company.linkedIn ?? "/"}>
                   <a className="flex items-center text-white">
                     <LinkedinLogo
                       color="currentColor"
@@ -232,7 +236,7 @@ const ProfileCard: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
                 </Link>
               </div>
               <div className="flex items-center cursor-pointer ml-8">
-                <Link href={user.twitter ?? "/"}>
+                <Link href={company.twitter ?? "/"}>
                   <a className="flex items-center text-white">
                     <TwitterLogo color="currentColor" size={24} weight="fill" />
                     <div className="text-sm text-primary ml-1 hidden md:block">
@@ -242,7 +246,7 @@ const ProfileCard: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
                 </Link>
               </div>
               <div className="flex items-center cursor-pointer ml-8">
-                <Link href={user.website ?? "/"}>
+                <Link href={company.website ?? "/"}>
                   <a className="flex items-center text-white">
                     <Globe color="currentColor" size={24} weight="fill" />
                     <div className="text-sm text-primary ml-2">Website</div>
@@ -260,24 +264,20 @@ const ProfileCard: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
                       />
                     </div>
                   </Menu.Button>
-                  <Menu.Items className="z-10	absolute right-0 w-64 bg-surface-light10 shadow-md shadow-black rounded">
+                  <Menu.Items className="z-10	absolute right-0 w-44 bg-surface-light10 shadow-md shadow-black rounded">
                     <Menu.Item>
-                      <div className="divide-y border-white/[.12] divide-inherit pb-2">
-                        <div className="flex items-center text-sm text-white cursor-pointer p-4">
-                          <Users color="currentColor" size={24} />
-                          <span className="ml-4">View All Followers</span>
+                      <div className="divide-y border-white/[.12] divide-inherit py-2">
+                        <div className="flex items-center text-sm text-white cursor-pointer px-2.5 py-1.5">
+                          <Chats color="currentColor" size={24} />
+                          <span className="ml-4">Message</span>
                         </div>
-                        <div className="flex items-center text-sm text-white cursor-pointer p-4">
-                          <MinusCircle color="currentColor" size={24} />
-                          <span className="ml-4">Hide User</span>
+                        <div className="flex items-center text-sm text-white cursor-pointer px-2.5 py-1.5">
+                          <Share color="currentColor" size={24} />
+                          <span className="ml-4">Share</span>
                         </div>
-                        <div className="flex items-center text-sm text-white cursor-pointer p-4">
-                          <WarningCircle color="currentColor" size={24} />
-                          <span className="ml-4">Report Profile</span>
-                        </div>
-                        <div className="flex items-center text-sm text-white cursor-pointer p-4">
+                        <div className="flex items-center text-sm text-white cursor-pointer px-2.5 py-1.5">
                           <Copy color="currentColor" size={24} />
-                          <span className="ml-4">Copy Profile Link</span>
+                          <span className="ml-4">Copy Link</span>
                         </div>
                       </div>
                     </Menu.Item>
@@ -291,8 +291,8 @@ const ProfileCard: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
       <FollowersModal
         show={isVisible}
         onClose={() => setVisible(false)}
-        followers={user.followers}
-        following={user.following}
+        followers={company.followers}
+        following={company.following}
       />
     </>
   );

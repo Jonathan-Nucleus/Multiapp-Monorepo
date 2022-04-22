@@ -1,19 +1,17 @@
 import { FC } from "react";
-import { Company } from "backend/graphql/companies.graphql";
 import Image from "next/image";
 import Button from "../../../../common/Button";
 import { useSession } from "next-auth/react";
-import { useFollowCompany } from "../../../../../graphql/mutations/profiles";
-import { useProfileDispatch } from "../../../../../contexts/ProfileContext";
+import { useFollowCompany } from "mobile/src/graphql/mutation/account";
+import { CompanyType } from "desktop/app/types/common-props";
 
 interface CompanyItemProps {
-  company: Company;
+  company: CompanyType;
 }
 
 const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
   const { data: session } = useSession();
   const [followCompany] = useFollowCompany();
-  const { dispatch } = useProfileDispatch();
   const userId = session?.user?._id;
   if (!userId) {
     return <></>;
@@ -21,12 +19,10 @@ const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
   const isFollowing = company.followerIds?.includes(userId) ?? false;
   const toggleFollowing = async () => {
     try {
-      const { data } = await followCompany({
+      await followCompany({
         variables: { follow: !isFollowing, companyId: company._id },
+        refetchQueries: ["Account", "UserProfile"]
       });
-      if (data?.followCompany) {
-        dispatch("reload");
-      }
     } catch (err) {}
   };
   return (

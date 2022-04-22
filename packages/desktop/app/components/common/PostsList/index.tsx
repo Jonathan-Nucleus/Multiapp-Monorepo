@@ -1,9 +1,10 @@
 import { FC, useState } from "react";
 import FilterDropdown, { FilterCategory } from "./FilterDropdown";
 import Post from "desktop/app/components/common/Post";
+import { PostType } from "desktop/app/types/common-props";
 
 export interface PostsListProps {
-  posts: Post[];
+  posts: PostType[];
   onFilter?: (topics: FilterCategory[], audience: string) => void;
 }
 

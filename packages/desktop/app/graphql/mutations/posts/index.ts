@@ -2,52 +2,8 @@ import { gql, useMutation, MutationTuple } from "@apollo/client";
 import { MediaUpload, MediaType } from "backend/graphql/mutations.graphql";
 import { Post, PostInput } from "backend/graphql/posts.graphql";
 import type { Comment } from "backend/graphql/comments.graphql";
-import {
-  VIEW_POST_FRAGMENT,
-  FetchPostsData,
-} from "desktop/app/graphql/queries";
-
-export const CREATE_POST = gql`
-  mutation CreatePost($post: PostInput!) {
-    createPost(post: $post) {
-      _id
-      categories
-      audience
-      body
-      mediaUrl
-      mentionIds
-    }
-  }
-`;
-
-export const LIKE_POST = gql`
-  mutation LikePost($like: Boolean!, $postId: ID!) {
-    likePost(like: $like, postId: $postId)
-  }
-`;
-
-export const HIDE_POST = gql`
-  mutation HidePost($postId: ID!) {
-    hidePost(postId: $postId)
-  }
-`;
-
-export const MUTE_POST = gql`
-  mutation MutePost($mute: Boolean!, $postId: ID!) {
-    mutePost(mute: $mute, postId: $postId)
-  }
-`;
-
-export const EDIT_COMMENT = gql`
-  mutation EditComment($comment: CommentUpdate!) {
-    editComment(comment: $comment) {
-      _id
-      body
-      postId
-      createdAt
-    }
-  }
-`;
+import { VIEW_POST_FRAGMENT } from "mobile/src/graphql/query/account";
+import { PostType } from "desktop/app/types/common-props";
 
 type UploadLinkVariables = {
   localFilename: string;
@@ -82,7 +38,7 @@ type CreatePostVariables = {
 };
 
 type CreatePostData = {
-  createPost?: Exclude<FetchPostsData["posts"], undefined>[number];
+  createPost?: PostType;
 };
 
 /**

@@ -1,6 +1,6 @@
 import { forwardRef, HTMLProps } from "react";
 
-interface InputProps extends HTMLProps<HTMLInputElement> {
+export interface InputProps extends HTMLProps<HTMLInputElement> {
   isInvalid?: boolean;
   shape?: "pill" | "rounded";
 }

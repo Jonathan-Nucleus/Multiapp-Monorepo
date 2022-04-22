@@ -1,11 +1,11 @@
 import React, { ChangeEvent, FC, useMemo, useState } from "react";
 import { Dialog, Tab } from "@headlessui/react";
 import { X } from "phosphor-react";
-import Card from "../../../../common/Card";
-import Button from "../../../../common/Button";
-import Input from "../../../../common/Input";
+import Card from "desktop/app/components/common/Card";
+import Button from "desktop/app/components/common/Button";
+import Input from "desktop/app/components/common/Input";
+import UserItem from "../UserItem";
 import { UserProfile } from "backend/graphql/users.graphql";
-import UserItem from "./UserItem";
 
 interface FollowersModalProps {
   show: boolean;

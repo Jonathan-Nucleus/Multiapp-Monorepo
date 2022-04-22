@@ -5,7 +5,7 @@ import { Splide, SplideSlide } from "@splidejs/react-splide";
 import Image from "next/image";
 import Link from "next/link";
 
-import { useFollowUser } from "desktop/app/graphql/mutations/profiles";
+import { useFollowUser } from "mobile/src/graphql/mutation/account";
 
 const items = [
   {

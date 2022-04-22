@@ -12,7 +12,7 @@ const Signup: NextPageWithLayout = () => {
       <Head>
         <title>Signup - Prometheus</title>
         <meta name="description" content="" />
-        <link rel="icon" href="/favicon.png" />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
       <SignupPage />
     </div>
