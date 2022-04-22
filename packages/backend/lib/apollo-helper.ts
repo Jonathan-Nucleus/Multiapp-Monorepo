@@ -1,10 +1,11 @@
-import type { DocumentNode, GraphQLFieldResolver } from "graphql";
-import type { GraphQLFieldResolverParams } from "apollo-server-types";
+import type { DocumentNode, GraphQLError, GraphQLFieldResolver } from "graphql";
+import { MongoError } from "mongodb";
 import { AuthenticationError } from "apollo-server-errors";
 import type { IResolvers } from "@graphql-tools/utils";
 
 import type { IgniteDb } from "../db";
 import type { User } from "../schemas/user";
+import { InternalServerError } from "./validate";
 
 export type PartialSchema = {
   schema: DocumentNode;
@@ -74,3 +75,17 @@ export function secureEndpoint<
 
   return secureResolver;
 }
+
+export const formatError = (error: GraphQLError) => {
+  console.error(error);
+
+  // Format mongodb errors
+  if (
+    error instanceof MongoError ||
+    error.originalError instanceof MongoError
+  ) {
+    return new InternalServerError(error.message);
+  }
+
+  return error;
+};

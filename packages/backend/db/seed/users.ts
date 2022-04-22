@@ -40,9 +40,12 @@ export default async function (db: Db): Promise<ObjectId[]> {
       _id: new ObjectId(),
       firstName,
       lastName,
-      email: faker.internet.email(firstName, lastName),
+      email:
+        index === 0
+          ? "darash.desai+test@gmail.com"
+          : faker.internet.email(firstName, lastName),
       salt,
-      password: hashPassword("test-pass", salt),
+      password: hashPassword(index === 0 ? "TestPass123!" : "test-pass", salt),
       role: "user",
       accreditation: "none",
       website: faker.internet.url(),

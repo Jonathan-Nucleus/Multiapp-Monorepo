@@ -6,7 +6,12 @@ import {
   ApolloServerContext,
   secureEndpoint,
 } from "../lib/apollo-helper";
-import { NotFoundError, validateArgs } from "../lib/validate";
+import {
+  isObjectId,
+  NotFoundError,
+  UnprocessableEntityError,
+  validateArgs,
+} from "../lib/validate";
 
 import { User, isUser, compareAccreditation } from "../schemas/user";
 import type { Company } from "../schemas/company";
@@ -47,6 +52,15 @@ const resolvers = {
       args: { code: string },
       { db }: ApolloServerContext
     ): Promise<boolean> => {
+      const validator = yup
+        .object()
+        .shape({
+          code: yup.string().required(),
+        })
+        .required();
+
+      validateArgs(validator, args);
+
       const { code } = args;
       return db.users.verifyInvite(code);
     },
@@ -59,9 +73,30 @@ const resolvers = {
     post: secureEndpoint(
       async (
         parentIgnored,
-        { postId }: { postId: string },
+        args: { postId: string },
         { db, user }
-      ): Promise<Post.Mongo | null> => db.posts.find(postId)
+      ): Promise<Post.Mongo | null> => {
+        const validator = yup
+          .object()
+          .shape({
+            postId: yup.string().required().test({
+              test: isObjectId,
+              message: "Invalid post id",
+            }),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { postId } = args;
+
+        const postData = await db.posts.find(postId);
+        if (!postData) {
+          throw new NotFoundError("Post");
+        }
+
+        return postData;
+      }
     ),
 
     posts: secureEndpoint(
@@ -132,7 +167,10 @@ const resolvers = {
         const validator = yup
           .object()
           .shape({
-            fundId: yup.string().length(24, "Invalid fund id").required(),
+            fundId: yup.string().required().test({
+              test: isObjectId,
+              message: "Invalid fund id",
+            }),
           })
           .required();
 
@@ -144,10 +182,11 @@ const resolvers = {
         if (!fund) {
           throw new NotFoundError("Fund");
         }
+        if (compareAccreditation(user.accreditation, fund.level) < 0) {
+          throw new UnprocessableEntityError("Not able to get a fund.");
+        }
 
-        return compareAccreditation(user.accreditation, fund.level) >= 0
-          ? fund
-          : null;
+        return fund;
       }
     ),
 
@@ -157,9 +196,12 @@ const resolvers = {
         args: { featured?: boolean },
         { db, user }
       ): Promise<FundManagers> => {
-        const validator = yup.object().shape({
-          featured: yup.bool(),
-        });
+        const validator = yup
+          .object()
+          .shape({
+            featured: yup.bool(),
+          })
+          .required();
 
         validateArgs(validator, args);
 
@@ -201,9 +243,22 @@ const resolvers = {
     professionals: secureEndpoint(
       async (
         parentIgnored,
-        { featured = false }: { featured?: boolean },
+        args: { featured?: boolean },
         { db, user }
-      ): Promise<User.Mongo[]> => db.users.professionals(featured)
+      ): Promise<User.Mongo[]> => {
+        const validator = yup
+          .object()
+          .shape({
+            featured: yup.bool(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { featured = false } = args;
+
+        return db.users.professionals(featured);
+      }
     ),
 
     userProfile: secureEndpoint(
@@ -215,7 +270,10 @@ const resolvers = {
         const validator = yup
           .object()
           .shape({
-            userId: yup.string().length(24, "Invalid user id").required(),
+            userId: yup.string().required().test({
+              test: isObjectId,
+              message: "Invalid user id",
+            }),
           })
           .required();
 
@@ -242,7 +300,10 @@ const resolvers = {
         const validator = yup
           .object()
           .shape({
-            companyId: yup.string().length(24, "Invalid company id").required(),
+            companyId: yup.string().required().test({
+              test: isObjectId,
+              message: "Invalid company id",
+            }),
           })
           .required();
 

@@ -12,7 +12,11 @@ import {
 } from "../../lib/mongo-helper";
 import type { Post, PostCategory, Audience } from "../../schemas/post";
 import type { Comment } from "../../schemas/comment";
-import { NotFoundError } from "../../lib/validate";
+import {
+  InternalServerError,
+  NotFoundError,
+  UnprocessableEntityError,
+} from "../../lib/validate";
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 const createPostsCollection = (postsCollection: Collection<Post.Mongo>) => {
@@ -131,7 +135,7 @@ const createPostsCollection = (postsCollection: Collection<Post.Mongo>) => {
         { returnDocument: "after" }
       );
 
-      if (!result.value) {
+      if (!result.ok || !result.value) {
         throw new NotFoundError("Post");
       }
 
@@ -194,17 +198,19 @@ const createPostsCollection = (postsCollection: Collection<Post.Mongo>) => {
      * @returns   Whether report was successfully logged.
      */
     logReport: async (postId: MongoId, userId: MongoId): Promise<boolean> => {
-      try {
-        const result = await postsCollection.updateOne(
-          { _id: toObjectId(postId) },
-          { $addToSet: { reporterIds: toObjectId(userId) } }
-        );
+      const result = await postsCollection.updateOne(
+        { _id: toObjectId(postId) },
+        { $addToSet: { reporterIds: toObjectId(userId) } }
+      );
 
-        return result.acknowledged;
-      } catch (err) {
-        console.log("Error creating new post:", err);
-        return false;
+      if (!result.acknowledged) {
+        throw new InternalServerError("Not able to report a post.");
       }
+      if (result.modifiedCount === 0) {
+        throw new UnprocessableEntityError("Invalid post id.");
+      }
+
+      return true;
     },
 
     // TODO: Outstanding endpoints to implement

@@ -3,7 +3,7 @@ import { ObjectId } from "mongodb";
 export type MongoId = ObjectId | string;
 
 // Utility function that guarantees an id as a mongo ObjectId
-export const toObjectId = (id: MongoId): ObjectId =>
+export const toObjectId = (id?: MongoId): ObjectId =>
   id instanceof ObjectId ? id : new ObjectId(id);
 
 export const toObjectIds = (ids: MongoId[]): ObjectId[] => {

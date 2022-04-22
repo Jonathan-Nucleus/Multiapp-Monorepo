@@ -1,6 +1,7 @@
 import { ApolloError, UserInputError } from "apollo-server";
 import * as yup from "yup";
-import * as _ from "lodash";
+import _ from "lodash";
+import { ObjectId } from "mongodb";
 
 export enum ErrorCode {
   BAD_REQUEST = "BAD_REQUEST",
@@ -8,11 +9,12 @@ export enum ErrorCode {
   BAD_USER_INPUT = "BAD_USER_INPUT",
   UNPROCESSABLE_ENTITY = "UNPROCESSABLE_ENTITY",
   INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR",
+  UNAUTHENTICATED = "UNAUTHENTICATED",
 }
 
 export class NotFoundError extends ApolloError {
   constructor(resource: string = "User") {
-    super(`${resource} not found`, ErrorCode.BAD_REQUEST);
+    super(`${resource} not found`, ErrorCode.NOT_FOUND);
 
     Object.defineProperty(this, "name", { value: "NotFoundError" });
   }
@@ -73,3 +75,11 @@ export function validateArgs<T>(schema: yup.BaseSchema<T>, args: Object): T {
 
   return schema.cast(args);
 }
+
+export const isObjectId = (value?: string | ObjectId): boolean => {
+  if (!value) {
+    return true;
+  }
+
+  return ObjectId.isValid(value);
+};

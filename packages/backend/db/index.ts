@@ -20,6 +20,7 @@ import "dotenv/config";
 
 export type IgniteDb = {
   db: Db;
+  client: MongoClient;
   users: ReturnType<typeof users>;
   companies: ReturnType<typeof companies>;
   funds: ReturnType<typeof funds>;
@@ -27,8 +28,8 @@ export type IgniteDb = {
   comments: ReturnType<typeof comments>;
 };
 
-let connectionPromise: Promise<IgniteDb>;
-let instance: IgniteDb;
+let connectionPromise: Promise<IgniteDb> | null;
+let instance: IgniteDb | null;
 
 /**
  * Initiates a connection to the MongoDB database and returns an instance of
@@ -39,29 +40,33 @@ let instance: IgniteDb;
  *
  * @returns The MongoDB database instance
  */
-function connect(connectionUrl?: string): Promise<Db> {
+function connect(
+  connectionUrl?: string
+): Promise<{ db: Db; client: MongoClient }> {
   const mongoUrl = connectionUrl ?? process.env.MONGO_URI;
 
-  return new Promise<Db>((resolve, reject): void => {
-    if (!mongoUrl) {
-      return reject(new Error("No database provided"));
-    }
-
-    MongoClient.connect(mongoUrl, (err, client) => {
-      if (err) return reject(err);
-      if (!client) return reject(new Error("Unable to connect to database."));
-
-      const path = mongoUrl.split("/").pop();
-      const dbName = path?.split("?").shift();
-
-      if (dbName) {
-        const db = client.db(dbName);
-        return resolve(db);
+  return new Promise<{ db: Db; client: MongoClient }>(
+    (resolve, reject): void => {
+      if (!mongoUrl) {
+        return reject(new Error("No database provided"));
       }
 
-      return reject(new Error("No database provided"));
-    });
-  });
+      MongoClient.connect(mongoUrl, (err, client) => {
+        if (err) return reject(err);
+        if (!client) return reject(new Error("Unable to connect to database."));
+
+        const path = mongoUrl.split("/").pop();
+        const dbName = path?.split("?").shift();
+
+        if (dbName) {
+          const db = client.db(dbName);
+          return resolve({ db, client });
+        }
+
+        return reject(new Error("No database provided"));
+      });
+    }
+  );
 }
 
 /**
@@ -70,11 +75,12 @@ function connect(connectionUrl?: string): Promise<Db> {
  * MongoDB database instance is initiated and fetched using `connect()`, and used
  * to construct collection objects on a IgniteDb object instance.
  */
-async function createInstance(): Promise<IgniteDb> {
-  const db = await connect();
+async function createInstance(connectionUrl?: string): Promise<IgniteDb> {
+  const { db, client } = await connect(connectionUrl);
 
   instance = {
     db,
+    client,
     users: users(db.collection("users")),
     companies: companies(db.collection("companies")),
     funds: funds(db.collection("funds")),
@@ -92,12 +98,21 @@ async function createInstance(): Promise<IgniteDb> {
  * is already pending, the existing promise is returned. Otherwise, a new
  * connection is initiated.
  */
-export function getIgniteDb(): Promise<IgniteDb> {
+export function getIgniteDb(connectionUrl?: string): Promise<IgniteDb> {
   if (instance) return Promise.resolve(instance);
 
   if (!connectionPromise) {
-    connectionPromise = createInstance();
+    connectionPromise = createInstance(connectionUrl);
   }
 
   return connectionPromise;
 }
+
+export const disconnectDb = async () => {
+  if (instance) {
+    await instance.db.dropDatabase();
+    await instance.client.close();
+  }
+  instance = null;
+  connectionPromise = null;
+};

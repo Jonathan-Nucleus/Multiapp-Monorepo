@@ -1,5 +1,6 @@
 import { gql } from "apollo-server";
 import * as yup from "yup";
+import _ from "lodash";
 import { PrometheusMailer } from "../email";
 
 import {
@@ -16,7 +17,7 @@ import {
 } from "../lib/tokens";
 import { getUploadUrl, RemoteUpload } from "../lib/s3-helper";
 import {
-  InternalServerError,
+  isObjectId,
   NotFoundError,
   UnprocessableEntityError,
   validateArgs,
@@ -27,8 +28,9 @@ import {
   Settings,
   ReportedPost,
   compareAccreditation,
+  PostViolationOptions,
 } from "../schemas/user";
-import { AudienceOptions } from "../schemas/post";
+import { AudienceOptions, PostCategoryOptions } from "../schemas/post";
 import type { Post } from "../schemas/post";
 import type { Comment } from "../schemas/comment";
 
@@ -92,6 +94,7 @@ const resolvers = {
               firstName: yup.string().required(),
               lastName: yup.string().required(),
               password: yup.string().required(),
+              inviteCode: yup.string().required(),
             })
             .required(),
         })
@@ -180,11 +183,10 @@ const resolvers = {
 
       const stubUser = await db.users.requestInvite(email);
 
-      if (!stubUser.emailToken) {
-        throw new UnprocessableEntityError("Email token not found.");
-      }
-
-      return PrometheusMailer.sendInviteCode(email, stubUser.emailToken);
+      return PrometheusMailer.sendInviteCode(
+        email,
+        stubUser.emailToken as string
+      );
     },
 
     requestPasswordReset: async (
@@ -253,11 +255,11 @@ const resolvers = {
         const { email } = args;
 
         const stubUser = await db.users.invite(user._id, email);
-        if (!stubUser.emailToken) {
-          throw new UnprocessableEntityError("Email token not found.");
-        }
 
-        return PrometheusMailer.sendInviteCode(email, stubUser.emailToken);
+        return PrometheusMailer.sendInviteCode(
+          email,
+          stubUser.emailToken as string
+        );
       }
     ),
 
@@ -303,12 +305,23 @@ const resolvers = {
                   .string()
                   .oneOf(Object.values(AudienceOptions))
                   .required(),
-                categories: yup.array().of(yup.string().required()).required(),
+                categories: yup
+                  .array()
+                  .of(
+                    yup
+                      .string()
+                      .oneOf(_.map(Object.values(PostCategoryOptions), "value"))
+                      .required()
+                  )
+                  .required(),
                 body: yup.string(),
                 mediaUrl: yup.string().url(),
-                mentionIds: yup
-                  .array()
-                  .of(yup.string().length(24, "Invalid mention id")),
+                mentionIds: yup.array().of(
+                  yup.string().test({
+                    test: isObjectId,
+                    message: "Invalid mention id",
+                  })
+                ),
               })
               .required(),
           })
@@ -319,10 +332,7 @@ const resolvers = {
         const { post } = args;
         const postData = await db.posts.create(post, user._id);
 
-        const wasAdded = await db.users.addPost(postData._id, user._id);
-        if (!wasAdded) {
-          throw new InternalServerError("Not able to create a post");
-        }
+        await db.users.addPost(postData._id, user._id);
 
         return postData;
       }
@@ -337,7 +347,10 @@ const resolvers = {
         const validator = yup
           .object()
           .shape({
-            postId: yup.string().length(24, "Invalid post id").required(),
+            postId: yup.string().required().test({
+              test: isObjectId,
+              message: "Invalid post id",
+            }),
             feature: yup.bool().required(),
           })
           .required();
@@ -359,7 +372,10 @@ const resolvers = {
         const validator = yup
           .object()
           .shape({
-            postId: yup.string().length(24, "Invalid post id").required(),
+            postId: yup.string().required().test({
+              test: isObjectId,
+              message: "Invalid post id",
+            }),
             like: yup.bool().required(),
           })
           .required();
@@ -386,9 +402,23 @@ const resolvers = {
             report: yup
               .object()
               .shape({
-                postId: yup.string().length(24, "Invalid post id").required(),
+                postId: yup.string().required().test({
+                  test: isObjectId,
+                  message: "Invalid post id",
+                }),
                 comments: yup.string().required(),
-                violations: yup.array().of(yup.string().required()).required(),
+                violations: yup
+                  .array()
+                  .of(
+                    yup
+                      .string()
+                      .oneOf(
+                        _.map(Object.values(PostViolationOptions), "value")
+                      )
+                      .required()
+                  )
+                  .min(1)
+                  .required(),
               })
               .required(),
           })
@@ -403,10 +433,10 @@ const resolvers = {
           throw new NotFoundError("Post");
         }
 
-        return (
-          (await db.users.reportPost(report, user._id)) &&
-          (await db.posts.logReport(report.postId, user._id))
-        );
+        await db.users.reportPost(report, user._id);
+        await db.posts.logReport(report.postId, user._id);
+
+        return true;
       }
     ),
 
@@ -419,7 +449,10 @@ const resolvers = {
         const validator = yup
           .object()
           .shape({
-            postId: yup.string().length(24, "Invalid post id").required(),
+            postId: yup.string().required().test({
+              test: isObjectId,
+              message: "Invalid post id",
+            }),
             hide: yup.bool().required(),
           })
           .required();
@@ -446,7 +479,10 @@ const resolvers = {
         const validator = yup
           .object()
           .shape({
-            postId: yup.string().length(24, "Invalid post id").required(),
+            postId: yup.string().required().test({
+              test: isObjectId,
+              message: "Invalid post id",
+            }),
             mute: yup.bool().required(),
           })
           .required();
@@ -476,12 +512,21 @@ const resolvers = {
             comment: yup
               .object()
               .shape({
-                postId: yup.string().length(24, "Invalid post id").required(),
+                postId: yup.string().required().test({
+                  test: isObjectId,
+                  message: "Invalid post id",
+                }),
                 body: yup.string().required(),
-                mentionIds: yup
-                  .array()
-                  .of(yup.string().length(24, "Invalid mention id")),
-                commentId: yup.string().length(24, "Invalid comment id"),
+                mentionIds: yup.array().of(
+                  yup.string().test({
+                    test: isObjectId,
+                    message: "Invalid mention id",
+                  })
+                ),
+                commentId: yup.string().test({
+                  test: isObjectId,
+                  message: "Invalid comment id",
+                }),
               })
               .required(),
           })
@@ -512,11 +557,17 @@ const resolvers = {
             comment: yup
               .object()
               .shape({
-                _id: yup.string().length(24, "Invalid comment id"),
+                _id: yup.string().required().test({
+                  test: isObjectId,
+                  message: "Invalid comment id",
+                }),
                 body: yup.string().required(),
-                mentionIds: yup
-                  .array()
-                  .of(yup.string().length(24, "Invalid mention id")),
+                mentionIds: yup.array().of(
+                  yup.string().test({
+                    test: isObjectId,
+                    message: "Invalid mention id",
+                  })
+                ),
               })
               .required(),
           })
@@ -539,7 +590,10 @@ const resolvers = {
         const validator = yup
           .object()
           .shape({
-            commentId: yup.string().length(24, "Invalid comment id").required(),
+            commentId: yup.string().required().test({
+              test: isObjectId,
+              message: "Invalid comment id",
+            }),
           })
           .required();
 
@@ -594,7 +648,10 @@ const resolvers = {
           .object()
           .shape({
             watch: yup.bool().required(),
-            fundId: yup.string().length(24, "Invalid fund id").required(),
+            fundId: yup.string().required().test({
+              test: isObjectId,
+              message: "Invalid fund id",
+            }),
           })
           .required();
 
@@ -602,20 +659,17 @@ const resolvers = {
 
         const { fundId, watch } = args;
 
-        if (!watch) {
-          return db.users.setOnWatchlist(false, fundId, user._id);
-        }
-
-        // Check that the user has access to this fund if adding to watclist
         const fund = await db.funds.find(fundId);
         if (!fund) {
           throw new NotFoundError("Fund");
         }
+
+        // Check that the user has access to this fund if adding to watchlist
         if (compareAccreditation(user.accreditation, fund.level) < 0) {
-          return false;
+          throw new UnprocessableEntityError("Not able to update watch list.");
         }
 
-        return db.users.setOnWatchlist(true, fundId, user._id);
+        return db.users.setOnWatchlist(watch, fundId, user._id);
       }
     ),
 
@@ -629,8 +683,14 @@ const resolvers = {
           .object()
           .shape({
             follow: yup.bool().required(),
-            userId: yup.string().length(24, "Invalid user id").required(),
-            asCompanyId: yup.string().length(24, "Invalid company id"),
+            userId: yup.string().required().test({
+              test: isObjectId,
+              message: "Invalid user id",
+            }),
+            asCompanyId: yup.string().test({
+              test: isObjectId,
+              message: "Invalid company id",
+            }),
           })
           .required();
 
@@ -639,7 +699,13 @@ const resolvers = {
         const { follow, userId, asCompanyId } = args;
 
         if (userId === user._id.toString()) {
-          throw new UnprocessableEntityError("Invalid user");
+          throw new UnprocessableEntityError("Invalid user.");
+        }
+
+        // Check user exists
+        const userData = await db.users.find({ _id: userId });
+        if (!userData) {
+          throw new NotFoundError();
         }
 
         if (asCompanyId) {
@@ -653,12 +719,6 @@ const resolvers = {
             (await db.users.setFollowerCompany(follow, asCompanyId, userId)) &&
             (await db.companies.setFollowingUser(follow, userId, asCompanyId))
           );
-        }
-
-        // Check company exists
-        const userData = await db.users.find({ _id: userId });
-        if (!userData) {
-          throw new NotFoundError();
         }
 
         return (
@@ -678,8 +738,14 @@ const resolvers = {
           .object()
           .shape({
             follow: yup.bool().required(),
-            companyId: yup.string().length(24, "Invalid company id").required(),
-            asCompanyId: yup.string().length(24, "Invalid company id"),
+            companyId: yup.string().required().test({
+              test: isObjectId,
+              message: "Invalid company id",
+            }),
+            asCompanyId: yup.string().test({
+              test: isObjectId,
+              message: "Invalid company id",
+            }),
           })
           .required();
 
@@ -688,7 +754,7 @@ const resolvers = {
         const { follow, companyId, asCompanyId } = args;
 
         if (companyId === asCompanyId) {
-          throw new UnprocessableEntityError("Invalid company");
+          throw new UnprocessableEntityError("Invalid company.");
         }
 
         const companyData = await db.companies.find(companyId);
@@ -733,7 +799,10 @@ const resolvers = {
           .object()
           .shape({
             hide: yup.bool().required(),
-            userId: yup.string().length(24, "Invalid user id").required(),
+            userId: yup.string().required().test({
+              test: isObjectId,
+              message: "Invalid user id",
+            }),
           })
           .required();
 

@@ -1,59 +1,63 @@
-import { ApolloError, ApolloServer } from "apollo-server";
-import { makeExecutableSchema } from "@graphql-tools/schema";
+import { ApolloServer } from "apollo-server";
 import jwt from "jsonwebtoken";
-import { MongoError } from "mongodb";
 
-import type { ApolloServerContext } from "./apollo-helper";
+import { ApolloServerContext, formatError } from "./apollo-helper";
 import type { DeserializedUser } from "../db/collections/users";
-import { isUser } from "../schemas/user";
+import { isUser, User } from "../schemas/user";
 
 import { getIgniteDb } from "../db";
 import schema from "../graphql";
-import { InternalServerError } from "./validate";
 
 import "dotenv/config";
 
 const IGNITE_SECRET = process.env.IGNITE_SECRET;
 if (!IGNITE_SECRET) throw new Error("IGNITE_SECRET env var undefined");
 
-export const apolloServer = new ApolloServer({
-  schema,
-  context: async (context): Promise<ApolloServerContext> => {
-    const request = context.req;
-    const db = await getIgniteDb();
+export const createApolloServer = (mongoUrl?: string) =>
+  new ApolloServer({
+    schema,
+    context: async (context): Promise<ApolloServerContext> => {
+      const db = await getIgniteDb(mongoUrl);
 
-    const token = request.headers?.authorization?.split(" ")?.[1].trim() || "";
-    if (token) {
-      try {
-        // Verify the token
-        jwt.verify(token, IGNITE_SECRET);
+      const request = context.req;
+      const token =
+        request?.headers?.authorization?.split(" ")?.[1].trim() || "";
+      if (token) {
+        try {
+          // Verify the token
+          jwt.verify(token, IGNITE_SECRET);
 
-        // Decode user data from payload to check if user exists and pass data
-        // on to resolvers
-        const user: DeserializedUser = jwt.decode(token) as DeserializedUser;
-        const userData = await db.users.find({ _id: user._id });
-        if (userData && isUser(userData)) {
-          return { db, user: userData };
+          // Decode user data from payload to check if user exists and pass data
+          // on to resolvers
+          const user: DeserializedUser = jwt.decode(token) as DeserializedUser;
+          const userData = await db.users.find({ _id: user._id });
+          if (userData && isUser(userData)) {
+            return { db, user: userData };
+          }
+        } catch (e) {
+          console.log("Invalid token", e);
         }
-      } catch (e) {
-        console.log("Invalid token", e);
       }
-    }
 
-    return { db };
-  },
-  formatError: (error) => {
-    console.error(error);
+      return { db };
+    },
+    formatError,
+    introspection: false,
+  });
 
-    // Format mongodb errors
-    if (
-      error instanceof MongoError ||
-      error.originalError instanceof MongoError
-    ) {
-      return new InternalServerError(error.message);
-    }
+export const createTestApolloServer = (user?: User.Mongo | null) =>
+  new ApolloServer({
+    schema,
+    context: async (): Promise<ApolloServerContext> => {
+      const db = await getIgniteDb();
+      if (!user) {
+        return { db };
+      }
 
-    return error;
-  },
-  introspection: false,
-});
+      const userData = (await db.users.find({ _id: user._id })) as User.Mongo;
+
+      return { db, user: userData };
+    },
+    formatError,
+    introspection: false,
+  });

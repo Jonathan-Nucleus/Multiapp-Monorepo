@@ -104,7 +104,7 @@ const createCommentsCollection = (
         { returnDocument: "after" }
       );
 
-      if (!result.value) {
+      if (!result.ok || !result.value) {
         throw new NotFoundError("Comment");
       }
 
@@ -126,18 +126,16 @@ const createCommentsCollection = (
         userId: toObjectId(userId),
       });
 
-      if (!result.value) {
+      if (!result.ok || !result.value) {
         throw new NotFoundError("Comment");
       }
 
-      if (result.ok) {
-        await postsCollection.updateOne(
-          { _id: result.value.postId },
-          { $pull: { commentIds: result.value._id } }
-        );
-      }
+      await postsCollection.updateOne(
+        { _id: result.value.postId },
+        { $pull: { commentIds: result.value._id } }
+      );
 
-      return !!result.ok;
+      return true;
     },
   };
 };

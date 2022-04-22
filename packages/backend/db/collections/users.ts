@@ -24,6 +24,7 @@ import {
 } from "../../schemas/user";
 import {
   BadRequestError,
+  InternalServerError,
   InvalidateError,
   NotFoundError,
   UnprocessableEntityError,
@@ -233,11 +234,17 @@ const createUsersCollection = (
 
       // Ensure user already already exists as a stub
       const userData = await collection.find({ email });
-      if (!userData || isUser(userData)) {
+      if (!userData) {
         throw new NotFoundError();
       }
+      if (isUser(userData)) {
+        throw new UnprocessableEntityError("User already exists.");
+      }
       if (userData.emailToken !== inviteCode) {
-        throw new InvalidateError("inviteCode", "invite code is not valid");
+        throw new InvalidateError(
+          "user.inviteCode",
+          "invite code is not valid"
+        );
       }
 
       const salt = generateSalt();
@@ -297,8 +304,11 @@ const createUsersCollection = (
      */
     requestPasswordReset: async (email: string): Promise<string> => {
       const user = await usersCollection.findOne({ email });
-      if (!user || !isUser(user) || !user.salt) {
+      if (!user) {
         throw new NotFoundError();
+      }
+      if (!isUser(user) || !user.salt) {
+        throw new UnprocessableEntityError("Invalid user.");
       }
 
       const token = uuid();
@@ -314,7 +324,7 @@ const createUsersCollection = (
      * Sets a new password for the user.
      *
      * @param password  The new password.
-     * @param emailT    The email address of the user.
+     * @param email     The email address of the user.
      * @param token     A security token to authenticate the request.
      *
      * @returns   The user record if the password could successfully be reset
@@ -326,10 +336,12 @@ const createUsersCollection = (
       token: string
     ): Promise<User.Mongo> => {
       const user = await usersCollection.findOne({ email });
-      if (!user || !isUser(user) || !user.salt) {
+      if (!user) {
         throw new NotFoundError();
       }
-
+      if (!isUser(user) || !user.salt) {
+        throw new UnprocessableEntityError("Invalid user.");
+      }
       if (user.emailToken !== token) {
         throw new BadRequestError("Token is invalid.");
       }
@@ -359,9 +371,12 @@ const createUsersCollection = (
     verifyInvite: async (code: string): Promise<boolean> => {
       try {
         const user = await usersCollection.findOne({ emailToken: code });
-        return !!user;
+        if (!user) {
+          throw new NotFoundError();
+        }
+        return true;
       } catch (err) {
-        throw new InvalidateError("code", "Invalid verification code");
+        throw new InvalidateError("code", "Invalid verification code.");
       }
     },
 
@@ -394,17 +409,16 @@ const createUsersCollection = (
      * @returns   Whether or not the post was successfully add.
      */
     addPost: async (postId: MongoId, userId: MongoId): Promise<boolean> => {
-      try {
-        const result = await usersCollection.updateOne(
-          { _id: toObjectId(userId) },
-          { $addToSet: { postIds: toObjectId(postId) } }
-        );
+      const result = await usersCollection.updateOne(
+        { _id: toObjectId(userId) },
+        { $addToSet: { postIds: toObjectId(postId) } }
+      );
 
-        return result.acknowledged;
-      } catch (err) {
-        console.log(`Error reporting post ${postId} user ${userId}: ${err}`);
-        return false;
+      if (!result.acknowledged || result.modifiedCount === 0) {
+        throw new InternalServerError("Not able to add a post.");
       }
+
+      return true;
     },
 
     /**
@@ -421,19 +435,16 @@ const createUsersCollection = (
       report: ReportedPost,
       userId: MongoId
     ): Promise<boolean> => {
-      try {
-        const result = await usersCollection.updateOne(
-          { _id: toObjectId(userId) },
-          { $addToSet: { reportedPost: report } }
-        );
+      const result = await usersCollection.updateOne(
+        { _id: toObjectId(userId) },
+        { $addToSet: { reportedPosts: report } }
+      );
 
-        return result.acknowledged;
-      } catch (err) {
-        console.log(
-          `Error reporting post ${report.postId} user ${userId}: ${err}`
-        );
-        return false;
+      if (!result.acknowledged || result.modifiedCount === 0) {
+        throw new InternalServerError("Not able to report a post.");
       }
+
+      return true;
     },
 
     /**
@@ -451,22 +462,23 @@ const createUsersCollection = (
       postId: MongoId,
       userId: MongoId
     ): Promise<boolean> => {
-      try {
-        const result = hide
-          ? await usersCollection.updateOne(
-              { _id: toObjectId(userId) },
-              { $addToSet: { hiddenPostIds: toObjectId(postId) } }
-            )
-          : await usersCollection.updateOne(
-              { _id: toObjectId(userId) },
-              { $pull: { hiddenPostIds: toObjectId(postId) } }
-            );
+      const result = hide
+        ? await usersCollection.updateOne(
+            { _id: toObjectId(userId) },
+            { $addToSet: { hiddenPostIds: toObjectId(postId) } }
+          )
+        : await usersCollection.updateOne(
+            { _id: toObjectId(userId) },
+            { $pull: { hiddenPostIds: toObjectId(postId) } }
+          );
 
-        return result.acknowledged;
-      } catch (err) {
-        console.log(`Error hiding post ${postId} user ${userId}: ${err}`);
-        return false;
+      if (!result.acknowledged || result.modifiedCount === 0) {
+        throw new InternalServerError(
+          `Not able to ${hide ? "" : "un"}hide a post.`
+        );
       }
+
+      return true;
     },
 
     /**
@@ -485,22 +497,23 @@ const createUsersCollection = (
       postId: MongoId,
       userId: MongoId
     ): Promise<boolean> => {
-      try {
-        const result = mute
-          ? await usersCollection.updateOne(
-              { _id: toObjectId(userId) },
-              { $addToSet: { mutedPostIds: toObjectId(postId) } }
-            )
-          : await usersCollection.updateOne(
-              { _id: toObjectId(userId) },
-              { $pull: { mutedPostIds: toObjectId(postId) } }
-            );
+      const result = mute
+        ? await usersCollection.updateOne(
+            { _id: toObjectId(userId) },
+            { $addToSet: { mutedPostIds: toObjectId(postId) } }
+          )
+        : await usersCollection.updateOne(
+            { _id: toObjectId(userId) },
+            { $pull: { mutedPostIds: toObjectId(postId) } }
+          );
 
-        return result.acknowledged;
-      } catch (err) {
-        console.log(`Error muting post ${postId} for user ${userId}: ${err}`);
-        return false;
+      if (!result.acknowledged || result.modifiedCount === 0) {
+        throw new InternalServerError(
+          `Not able to ${mute ? "" : "un"}mute a post.`
+        );
       }
+
+      return true;
     },
 
     /**
@@ -549,22 +562,21 @@ const createUsersCollection = (
       fundId: MongoId,
       userId: MongoId
     ): Promise<boolean> => {
-      try {
-        const result = add
-          ? await usersCollection.updateOne(
-              { _id: toObjectId(userId) },
-              { $addToSet: { watchlistIds: toObjectId(fundId) } }
-            )
-          : await usersCollection.updateOne(
-              { _id: toObjectId(userId) },
-              { $pull: { watchlistIds: toObjectId(fundId) } }
-            );
+      const result = add
+        ? await usersCollection.updateOne(
+            { _id: toObjectId(userId) },
+            { $addToSet: { watchlistIds: toObjectId(fundId) } }
+          )
+        : await usersCollection.updateOne(
+            { _id: toObjectId(userId) },
+            { $pull: { watchlistIds: toObjectId(fundId) } }
+          );
 
-        return result.acknowledged;
-      } catch (err) {
-        console.log(`Error updating watchlist for user ${userId}: ${err}`);
-        return false;
+      if (!result.acknowledged || result.modifiedCount === 0) {
+        throw new InternalServerError(`Not able to update watch list.`);
       }
+
+      return true;
     },
 
     /**

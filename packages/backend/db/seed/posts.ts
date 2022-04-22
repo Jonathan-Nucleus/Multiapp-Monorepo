@@ -9,14 +9,14 @@ import { User } from "../../schemas/user";
 const COLLECTION = "posts";
 
 // The number of users to seed
-const MAX_POSTS = 5;
-const MAX_CATEGORIES_PER_POST = 5;
-const MAX_MENTIONS_PER_POST = 2;
+export const MAX_POSTS = 5;
+export const MAX_CATEGORIES_PER_POST = 5;
+export const MAX_MENTIONS_PER_POST = 2;
 
-const audienceValues = Object.keys(AudienceOptions).map(
+export const audienceValues = Object.keys(AudienceOptions).map(
   (key) => AudienceOptions[key]
 );
-const categoryValues = Object.keys(PostCategoryOptions).map(
+export const categoryValues = Object.keys(PostCategoryOptions).map(
   (key) => PostCategoryOptions[key].value
 );
 

@@ -51,6 +51,7 @@ export async function getUploadUrl(
       uploadUrl: url,
     };
   } catch (err) {
+    console.error(err);
     throw new InternalServerError("Not able to generate signed url.");
   }
 }

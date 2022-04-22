@@ -4,6 +4,6 @@
     "module": "commonjs",
     "target": "es6"
   },
-  "include": ["additional.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["additional.d.ts", "**/*.ts", "**/*.tsx", "jest.config.ts"],
   "exclude": ["node_modules"]
 }
