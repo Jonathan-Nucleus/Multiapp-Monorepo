@@ -5,7 +5,6 @@ import {
 } from '@react-navigation/stack';
 
 import { Home } from '../screens/Home';
-import CreatePost from '../screens/Home/CreatePost';
 import Notification from '../screens/Notification';
 import NotificationDetail from '../screens/Notification/Details';
 import ChooseCategory from '../screens/Home/ChooseCategory';
@@ -58,7 +57,6 @@ const HomeStack = () => {
       screenOptions={{ headerShown: false, gestureEnabled: true }}
       initialRouteName="Home">
       <Stack.Screen name="Home" component={Home} />
-      <Stack.Screen name="CreatePost" component={CreatePost} />
       <Stack.Screen name="Notification" component={Notification} />
       <Stack.Screen name="NotificationDetail" component={NotificationDetail} />
       <Stack.Screen name="ChooseCategory" component={ChooseCategory} />

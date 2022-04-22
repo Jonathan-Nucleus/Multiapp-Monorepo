@@ -45,19 +45,19 @@ interface RouterProps {
 const AccountAdmin: FC<RouterProps> = ({ navigation }) => {
   const DATA = [
     {
-      id: '11',
+      id: 'edit_profile',
       label: 'Edit your profile',
-      onPress: () => console.log(123),
+      onPress: () => navigation.navigate('EditUserProfile'),
       icon: <UserCircle size={28} color={WHITE} />,
     },
     {
-      id: '21',
+      id: 'change_pass',
       label: 'Change your password',
       onPress: () => navigation.navigate('ChangePass'),
       icon: <Key size={28} color={WHITE} />,
     },
     {
-      id: 'delete',
+      id: 'delete_account',
       label: 'Delete Account',
       onPress: () => setIsVisible(true),
       icon: <Trash size={28} color={DANGER} />,
@@ -72,12 +72,19 @@ const AccountAdmin: FC<RouterProps> = ({ navigation }) => {
         <View style={[styles.item, styles.between]}>
           <View style={styles.row}>
             {item.icon}
-            <Text style={[styles.label, item.id === 'delete' && styles.delete]}>
+            <Text
+              style={[
+                styles.label,
+                item.id === 'delete_account' && styles.delete,
+              ]}>
               {item.label}
             </Text>
           </View>
 
-          <CaretRight size={28} color={item.id === 'delete' ? DANGER : WHITE} />
+          <CaretRight
+            size={28}
+            color={item.id === 'delete_account' ? DANGER : WHITE}
+          />
         </View>
       </TouchableOpacity>
     );

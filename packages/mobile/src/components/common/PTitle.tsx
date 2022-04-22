@@ -5,7 +5,7 @@ import { H5, Body2 } from '../../theme/fonts';
 import { WHITE } from 'shared/src/colors';
 
 interface TitleProps {
-  style?: ViewStyle;
+  style?: ViewStyle | TextStyle;
   textStyle?: TextStyle;
   title?: string;
   subTitle?: string;

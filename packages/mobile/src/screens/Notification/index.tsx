@@ -35,7 +35,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import moment from 'moment';
 
 import pStyles from '../../theme/pStyles';
-import { Body1, Body2, Body3, H5GothamBold } from '../../theme/fonts';
+import { Body1, Body2, Body3, H5Bold } from '../../theme/fonts';
 import Avatar from '../../assets/avatar.png';
 
 import type { NotificationScreen } from 'mobile/src/navigations/NotificationStack';
@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
     backgroundColor: BLUE500,
   },
   title: {
-    ...H5GothamBold,
+    ...H5Bold,
     color: WHITE,
   },
   between: {

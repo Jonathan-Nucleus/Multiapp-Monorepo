@@ -1,30 +1,45 @@
 import React, { FC, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { NavigationProp } from '@react-navigation/native';
-import { CaretLeft, MagnifyingGlass } from 'phosphor-react-native';
-import {
-  WHITE,
-  BGDARK,
-  GRAY1,
-  PRIMARY,
-  BGDARK100,
-  BLUE300,
-} from 'shared/src/colors';
+import { CaretLeft, Check } from 'phosphor-react-native';
+import { WHITE, BLUE300, PINK } from 'shared/src/colors';
+import Share from 'react-native-share';
 
-import PHeader from '../../../components/common/PHeader';
 import pStyles from '../../../theme/pStyles';
-import { Body1, Body1Bold, Body2, Body3 } from '../../../theme/fonts';
+import {
+  Body1,
+  Body1Bold,
+  Body2,
+  Body2Bold,
+  Body3,
+} from '../../../theme/fonts';
 import PAppContainer from '../../../components/common/PAppContainer';
-import PTextInput from '../../../components/common/PTextInput';
-import PLabel from '../../../components/common/PLabel';
 import MainHeader from '../../../components/main/Header';
+import PGradientButton from '../../../components/common/PGradientButton';
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
 }
 
 const InviteFriends: FC<RouterProps> = ({ navigation }) => {
-  const [email, setEmail] = useState('');
+  const [code, setCode] = useState<number[]>([]);
+
+  const shareCode = () => {
+    Share.open({
+      title: 'Join me on Prometheus Alts!',
+      message: `Share code ${code.join('')}`,
+      url: 'prometheusalts.com',
+    })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        err && console.log(err);
+      });
+  };
+
+  console.log('code======>', code);
+
   return (
     <View style={pStyles.globalContainer}>
       <MainHeader
@@ -39,30 +54,50 @@ const InviteFriends: FC<RouterProps> = ({ navigation }) => {
         }
       />
       <PAppContainer>
-        <View style={styles.container}>
-          <PLabel
-            viewStyle={styles.titleView}
-            textStyle={styles.title}
-            label="Invite Your Friends"
-          />
-          <View style={styles.content}>
-            <PTextInput
-              label="Email Address to Invite (up to 2 more)"
-              keyboardType="email-address"
-              onChangeText={(val: string) => setEmail(val)}
-              text={email}
-            />
-            <PLabel
-              label="We want to seed this platform with those who really have a passion for financial markets, economics and great ideas."
-              textStyle={styles.description}
-            />
-            <TouchableOpacity>
-              <View style={styles.btnView}>
-                <PLabel label="invite" textStyle={styles.btnTxt} />
+        <Text style={styles.description}>
+          The power of Prometheus ratchets up with every intelligent, curious,
+          thoughtful new voice in the conversation. So bring in a few contacts
+          who'll bring their A-game. You’ll be their first contact.
+        </Text>
+        <Text style={styles.body1}>You have 10 invites left!</Text>
+        <Text style={styles.body2}>Each code can only be used once.</Text>
+        <View style={styles.codeContainer}>
+          {[1, 2, 3, 4, 5].map((v) => (
+            <TouchableOpacity
+              key={`key_${v}`}
+              onPress={() => setCode([...code, v])}
+              disabled={code.includes(v)}>
+              <View style={styles.codeWrap}>
+                {code.includes(v) ? (
+                  <Check size={14} color={WHITE} />
+                ) : (
+                  <Text style={styles.code}>{v}</Text>
+                )}
               </View>
             </TouchableOpacity>
-          </View>
+          ))}
         </View>
+        <View style={styles.codeContainer}>
+          {[6, 7, 8, 9, 10].map((v) => (
+            <TouchableOpacity
+              key={`key_${v}`}
+              onPress={() => setCode([...code, v])}
+              disabled={code.includes(v)}>
+              <View style={styles.codeWrap}>
+                {code.includes(v) ? (
+                  <Check size={14} color={WHITE} />
+                ) : (
+                  <Text style={styles.code}>{v}</Text>
+                )}
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+        <PGradientButton
+          onPress={shareCode}
+          label="Share a Code"
+          btnContainer={styles.btn}
+        />
       </PAppContainer>
     </View>
   );
@@ -75,49 +110,10 @@ const styles = StyleSheet.create({
     ...Body1,
     color: WHITE,
   },
-  headerContainer: {
-    backgroundColor: BGDARK,
-    elevation: 5,
-    shadowColor: 'rgba(0, 0, 0, 0.5)',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.3,
-    paddingTop: 0,
-    marginBottom: 0,
-    justifyContent: 'space-between',
-  },
-  container: {
-    marginTop: 20,
-  },
-  content: {
-    padding: 20,
-  },
-  titleView: {
-    borderBottomColor: GRAY1,
-    borderBottomWidth: 1,
-    paddingBottom: 13,
-    marginBottom: 17,
-    padding: 20,
-  },
-  title: {
-    ...Body1Bold,
-  },
   description: {
-    ...Body3,
-  },
-  btnView: {
-    backgroundColor: PRIMARY,
-    borderRadius: 32,
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 9,
-    marginTop: 18,
-  },
-  btnTxt: {
-    textTransform: 'uppercase',
+    ...Body2,
+    color: WHITE,
+    marginTop: 30,
   },
   row: {
     flexDirection: 'row',
@@ -129,7 +125,37 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 16,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     marginRight: 8,
+  },
+  body1: {
+    ...Body1Bold,
+    marginVertical: 12,
+    color: WHITE,
+  },
+  body2: {
+    ...Body2Bold,
+    color: WHITE,
+    marginBottom: 24,
+  },
+  codeContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  codeWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: PINK,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  code: {
+    color: WHITE,
+    ...Body2Bold,
+  },
+  btn: {
+    marginTop: 35,
   },
 });

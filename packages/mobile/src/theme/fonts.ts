@@ -7,11 +7,6 @@ export const H5 = {
   fontFamily: Gotham,
 };
 
-export const H5GothamBold = {
-  fontSize: 24,
-  fontFamily: GothamBold,
-};
-
 export const H5Thin = {
   fontSize: 24,
   fontFamily: GothamThin,

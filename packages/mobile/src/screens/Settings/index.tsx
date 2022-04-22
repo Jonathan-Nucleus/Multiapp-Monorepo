@@ -50,7 +50,7 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
   const account = data?.account;
   const MENU_ITEMS = [
     {
-      id: '21',
+      id: 'accreditation',
       label: 'Accreditation',
       comment:
         account?.accreditation === 'ACCREDITED'
@@ -61,47 +61,46 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
         account?.accreditation === 'ACCREDITED' ? <AIProSvg /> : <AIUserSvg />,
     },
     {
-      id: '212',
+      id: 'Admin',
       label: 'Account Admin',
       onPress: () => navigation.navigate('AccountAdmin'),
       icon: <Gear size={26} color={WHITE} />,
     },
     {
-      id: '11',
+      id: 'Preferences',
       label: 'Preferences',
       onPress: () => navigation.navigate('Preferences'),
       icon: <SlidersHorizontal size={26} color={WHITE} />,
     },
     {
-      id: '3',
+      id: 'Support',
       label: 'Help & Support',
       onPress: () => navigation.navigate('Help'),
       icon: <Lifebuoy size={26} color={WHITE} />,
     },
     {
-      id: '2',
+      id: 'Terms',
       label: 'Terms and Disclosures',
       onPress: () => navigation.navigate('Terms'),
       icon: <ShieldWarning size={26} color={WHITE} />,
     },
     {
-      id: '12312',
+      id: 'Invite',
       label: 'Invite Your Friends',
       onPress: () => navigation.navigate('InviteFriends'),
       icon: <EnvelopeSimple size={26} color={WHITE} />,
     },
   ];
-
   if (account?.role === 'PROFESSIONAL') {
     MENU_ITEMS.push({
-      id: '1231235',
+      id: 'Contact',
       label: 'Contact Fund Specialist',
       onPress: () => navigation.navigate('Contact'),
       icon: <Headset size={26} color={WHITE} />,
     });
   } else {
     MENU_ITEMS.push({
-      id: '1231235',
+      id: 'Become',
       label: 'Become a Verified Pro',
       onPress: () => navigation.navigate('BecomePro'),
       icon: <ShieldCheck size={26} color={WHITE} />,

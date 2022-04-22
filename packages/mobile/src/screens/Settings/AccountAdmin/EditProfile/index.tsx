@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useIsFocused, NavigationProp } from '@react-navigation/native';
-import { CaretLeft } from 'phosphor-react-native';
+import { CaretLeft, Pencil } from 'phosphor-react-native';
 import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
 
 import {
@@ -22,34 +22,34 @@ import {
   PRIMARY,
   PRIMARYSOLID,
 } from 'shared/src/colors';
-
-import pStyles from '../../../theme/pStyles';
-import { Body2, Body3, H6Bold, H5Bold } from '../../../theme/fonts';
-import MainHeader from '../../../components/main/Header';
-import PAppContainer from '../../../components/common/PAppContainer';
-import PGradientButton from '../../../components/common/PGradientButton';
-import PLabel from '../../../components/common/PLabel';
-import PostItem, { PostItemProps } from '../../../components/main/PostItem';
-import FeaturedItem from '../../../components/main/settings/FeaturedItem';
-import Funds from '../../../components/main/settings/Funds';
-import { useAccount } from '../../../graphql/query/account';
-import { useFetchPosts } from '../../../hooks/queries';
+import pStyles from '../../../../theme/pStyles';
+import { Body2, Body3, H5Bold, H6Bold } from '../../../../theme/fonts';
+import MainHeader from '../../../../components/main/Header';
+import PAppContainer from '../../../../components/common/PAppContainer';
+import PGradientButton from '../../../../components/common/PGradientButton';
+import PLabel from '../../../../components/common/PLabel';
+import PostItem, { PostItemProps } from '../../../../components/main/PostItem';
+import FeaturedItem from '../../../../components/main/settings/FeaturedItem';
+import Funds from '../../../../components/main/settings/Funds';
+import { useAccount } from '../../../../graphql/query/account';
+import { useFetchPosts } from '../../../../hooks/queries';
+import PGradientOutlineButton from '../../../../components/common/PGradientOutlineButton';
 import type { User } from 'backend/graphql/users.graphql';
 
 import LinkedinSvg from 'shared/assets/images/linkedin.svg';
 import TwitterSvg from 'shared/assets/images/twitter.svg';
 import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 import DotsThreeVerticalSvg from 'shared/assets/images/dotsThreeVertical.svg';
-import PGradientOutlineButton from '../../../components/common/PGradientOutlineButton';
+import NoPostSvg from 'shared/assets/images/no-post.svg';
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
 }
 
-const UserProfile: FC<RouterProps> = ({ navigation }) => {
+const EditUserProfile: FC<RouterProps> = ({ navigation }) => {
   const { data, refetch } = useFetchPosts();
   const { data: accountData } = useAccount();
-  const postData = data?.posts;
+  const postData = data?.posts ?? [];
   const account: User = accountData?.account;
   const isFocused = useIsFocused();
   const [focusState, setFocusState] = useState(isFocused);
@@ -93,6 +93,11 @@ const UserProfile: FC<RouterProps> = ({ navigation }) => {
               gradientContainer={styles.gradientContainer}
             />
           )}
+          <TouchableOpacity
+            onPress={() => console.log(111)}
+            style={styles.pencil}>
+            <Pencil color={WHITE} size={18} />
+          </TouchableOpacity>
         </View>
         <View style={styles.content}>
           <View style={styles.companyDetail}>
@@ -113,6 +118,11 @@ const UserProfile: FC<RouterProps> = ({ navigation }) => {
                   </Text>
                 </View>
               )}
+              <TouchableOpacity
+                onPress={() => console.log(111)}
+                style={styles.pencil}>
+                <Pencil color={WHITE} size={18} />
+              </TouchableOpacity>
             </View>
           </View>
           <View style={styles.row}>
@@ -144,18 +154,11 @@ const UserProfile: FC<RouterProps> = ({ navigation }) => {
             </View>
           </View>
           <Text style={styles.decription}>{account.overview}</Text>
-          <View style={[styles.row, styles.between]}>
-            <PGradientOutlineButton
-              label="Message"
-              onPress={() => console.log(11)}
-              gradientContainer={styles.button}
-            />
-            <PGradientButton
-              label="follow"
-              onPress={() => console.log(11)}
-              gradientContainer={styles.button}
-            />
-          </View>
+          <PGradientOutlineButton
+            label="Edit Profile"
+            onPress={() => console.log(11)}
+            gradientContainer={styles.button}
+          />
         </View>
         <View style={[styles.row, styles.social]}>
           <View style={styles.row}>
@@ -190,7 +193,7 @@ const UserProfile: FC<RouterProps> = ({ navigation }) => {
         </View>
         <Funds accredited={accountData?.account.accreditation} />
         <View style={styles.posts}>
-          {postData.length > 0 && (
+          {postData.length > 0 ? (
             <View>
               <Text style={styles.text}>Featured Posts</Text>
               <FlatList
@@ -201,9 +204,12 @@ const UserProfile: FC<RouterProps> = ({ navigation }) => {
                 horizontal
               />
             </View>
+          ) : (
+            <View style={styles.noPostContainer}>
+              <Text style={styles.val}>You don’t have any posts, yet.</Text>
+            </View>
           )}
-
-          {postData.length > 0 && (
+          {postData.length > 0 ? (
             <FlatList
               data={postData || []}
               renderItem={({ item }) => (
@@ -213,6 +219,18 @@ const UserProfile: FC<RouterProps> = ({ navigation }) => {
               listKey="post"
               ListHeaderComponent={<Text style={styles.text}>All Posts</Text>}
             />
+          ) : (
+            <View style={styles.noPostContainer}>
+              <View style={styles.noPostContainer}>
+                <NoPostSvg />
+              </View>
+              <Text style={styles.val}>You don’t have any posts, yet.</Text>
+              <PGradientButton
+                label="Create a Post"
+                btnContainer={styles.createPostBtn}
+                onPress={() => navigation.navigate('CreatePost')}
+              />
+            </View>
           )}
         </View>
       </PAppContainer>
@@ -220,7 +238,7 @@ const UserProfile: FC<RouterProps> = ({ navigation }) => {
   );
 };
 
-export default UserProfile;
+export default EditUserProfile;
 
 const styles = StyleSheet.create({
   backIcon: {
@@ -330,17 +348,13 @@ const styles = StyleSheet.create({
     ...Body3,
   },
   button: {
-    width: Dimensions.get('screen').width / 2 - 24,
+    width: Dimensions.get('screen').width - 32,
   },
-  relative: {
-    position: 'relative',
+  noPostContainer: {
+    alignSelf: 'center',
   },
-  noBackground: {
-    height: 65,
-  },
-  gradientContainer: {
-    borderRadius: 0,
-    height: 65,
+  createPostBtn: {
+    marginTop: 25,
   },
   noAvatarContainer: {
     width: 80,
@@ -353,5 +367,26 @@ const styles = StyleSheet.create({
   noAvatar: {
     color: PRIMARYSOLID,
     ...H5Bold,
+  },
+  relative: {
+    position: 'relative',
+  },
+  pencil: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    backgroundColor: PRIMARYSOLID,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noBackground: {
+    height: 65,
+  },
+  gradientContainer: {
+    borderRadius: 0,
+    height: 65,
   },
 });

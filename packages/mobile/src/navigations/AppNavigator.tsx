@@ -17,6 +17,7 @@ import {
 } from 'mobile/src/utils/auth-token';
 import UserProfile from '../screens/Settings/UserProfile';
 import CompanyProfile from '../screens/Settings/CompanyProfile';
+import CreatePost from '../screens/Home/CreatePost';
 
 type NavigationParamList = {};
 
@@ -83,6 +84,7 @@ const AppNavigator = () => {
         <Stack.Screen name="Main" component={BottomTabNavigator} />
         <Stack.Screen name="UserProfile" component={UserProfile} />
         <Stack.Screen name="CompanyProfile" component={CompanyProfile} />
+        <Stack.Screen name="CreatePost" component={CreatePost} />
       </Stack.Navigator>
     </NavigationContainer>
   );

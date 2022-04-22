@@ -17,7 +17,7 @@ interface ButtonProps {
   btnContainer?: ViewStyle;
   gradientContainer?: ViewStyle;
   textStyle?: TextStyle;
-  label: string;
+  label?: string;
   onPress?: () => void;
   disabled?: boolean;
   isLoading?: boolean;
