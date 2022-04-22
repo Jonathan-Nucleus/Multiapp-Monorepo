@@ -74,6 +74,42 @@
 					"response": []
 				},
 				{
+					"name": "Post",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjVjMDMwYzBmNDMwNmJiNWUzMWQ4M2IiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NTAxOTcyNjB9.RpKH9Zp3-yOvGyxj4HL9jgex0fErbtYRp81B0dbyIes",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query Post($postId: ID!) {\n  post(postId: $postId) {\n      _id\n      body\n      mediaUrl\n      mentions {\n          _id\n          firstName\n          lastName\n      }\n      likes {\n          _id\n          firstName\n          lastName\n          avatar\n      }\n      comments {\n          body\n          user {\n              _id\n              firstName\n              lastName\n              avatar\n          }\n          comment {\n              body\n              user {\n                _id\n                firstName\n                lastName\n                avatar\n              }\n              likes {\n                  _id\n                  firstName\n                  lastName\n                  avatar\n              }\n          }\n          likes {\n              _id\n              firstName\n              lastName\n              avatar\n          }\n      }\n      createdAt\n      user {\n          _id\n          firstName\n          lastName\n          avatar\n      }\n  }\n}",
+								"variables": "{\n    \"postId\": \"625c02fe6838ddfb66c17ffa\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Funds",
 					"request": {
 						"auth": {
@@ -153,7 +189,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4YTZjMjg5ZTAxN2YzYmVjNjUxNDciLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk5NzcxMDR9.2lITm_YcEXUwbojZUPnkJSNyN-mm2-0v4Jdao544nDc",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4YTZjMjg5ZTAxN2YzYmVjNjUxNDciLCJyb2xlIjoidXNlciIsImFjYyI6ImFjY3JlZGl0ZWQiLCJpYXQiOjE2NTAwMDEwNjd9.0BwK98mEz5cwZ4CEtkReECvwI4YW_fAG2wYf0IGjvHE",
 									"type": "string"
 								}
 							]
@@ -189,7 +225,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4YTZjMjg5ZTAxN2YzYmVjNjUxNDciLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk5NzcxMDR9.2lITm_YcEXUwbojZUPnkJSNyN-mm2-0v4Jdao544nDc",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjVjMDMwYzBmNDMwNmJiNWUzMWQ4M2IiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NTAxOTcyNjB9.RpKH9Zp3-yOvGyxj4HL9jgex0fErbtYRp81B0dbyIes",
 									"type": "string"
 								}
 							]
@@ -199,7 +235,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query FundCompanies {\n  fundCompanies {\n    _id\n    name\n    avatar\n    funds {\n        _id\n        name\n    }\n  }\n}",
+								"query": "query FundCompanies {\n    fundCompanies {\n        _id\n        name\n        avatar\n        postIds\n        followerIds\n        funds {\n            _id\n            name\n        }\n        fundManagers {\n            _id\n            firstName\n            lastName\n            avatar\n        }\n    }\n}",
 								"variables": ""
 							}
 						},
@@ -297,7 +333,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4YTZjMjg5ZTAxN2YzYmVjNjUxNDciLCJyb2xlIjoidXNlciIsImFjYyI6ImFjY3JlZGl0ZWQiLCJpYXQiOjE2NDk5ODQ0Mzh9.vDYRBkQP9k3oT3HeNFYFqmF1VzCCQ8P1GDfEV3iXahE",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4YTZjMjg5ZTAxN2YzYmVjNjUxNDciLCJyb2xlIjoidXNlciIsImFjYyI6ImFjY3JlZGl0ZWQiLCJpYXQiOjE2NTAxNTkwMjl9.5WRkWa_8dauC8q4PWEVjhH9fji6WSiQ1SeNkKKH5Mfw",
 									"type": "string"
 								}
 							]
@@ -307,7 +343,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query Account($featured: Boolean) {\n    account {\n        firstName\n        lastName\n        avatar\n        role\n        accreditation\n        position\n        companies {\n            _id\n            name\n            avatar\n        }\n        posts(featured: $featured) {\n            _id\n        }\n    }\n}",
+								"query": "query Account($featured: Boolean) {\n    account {\n        firstName\n        lastName\n        avatar\n        role\n        accreditation\n        position\n        companies {\n            _id\n            name\n            avatar\n        }\n        posts(featured: $featured) {\n            _id\n        }\n        invitees {\n            __typename\n            ... on User {\n                email\n            }\n            ... on UserStub {\n                email\n            }\n        }\n    }\n}",
 								"variables": "{\n    \"featured\": true\n}"
 							}
 						},
@@ -748,6 +784,150 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Chat Token",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4YTZjMjg5ZTAxN2YzYmVjNjUxNDciLCJyb2xlIjoidXNlciIsImFjYyI6ImFjY3JlZGl0ZWQiLCJpYXQiOjE2NDk5ODQ0Mzh9.vDYRBkQP9k3oT3HeNFYFqmF1VzCCQ8P1GDfEV3iXahE",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query ChatToken {\n    chatToken\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Accreditation Questionnaire",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjVjYjc5Zjc0NmNiNmM5ODE3ODE3M2EiLCJyb2xlIjoidXNlciIsImFjYyI6ImFjY3JlZGl0ZWQiLCJpYXQiOjE2NTA0MzQxMjd9.5CpyL8lLiElFC2YsMIu9v9PgN5GvmNy6Umoa7Cy4Wis",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation SaveQuestionnaire($questionnaire: QuestionnaireInput!) {\n    saveQuestionnaire(questionnaire: $questionnaire) {\n        _id\n    }\n}",
+										"variables": "{\n    \"questionnaire\": {\n        \"class\": \"INDIVIDUAL\",\n        \"status\": \"MIN_INCOME\",\n        \"level\": \"TIER2\",\n        \"date\": \"01 Jan 1970 00:00:00 GMT\"\n    }\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update User Profile",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjVjYjc4YzJhNTRkNjQyNWZjMjhjOWYiLCJyb2xlIjoidXNlciIsImFjYyI6ImFjY3JlZGl0ZWQiLCJpYXQiOjE2NTA1OTczMTd9.Tbe3I2Lps3cHOA-YlK_INaYHMXtK929IRbkWmY5KoP0",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation UpdateUserProfile($profile: UserProfileInput!) {\n    updateUserProfile(profile: $profile) {\n        _id\n        firstName\n        lastName\n        position\n        avatar\n        background {\n            url\n            x\n            y\n            width\n            height\n            scale\n        }\n        tagline\n        overview\n        website\n        linkedIn\n        twitter\n    }\n}",
+										"variables": "{\n    \"profile\": {\n        \"_id\": \"625cb78c2a54d6425fc28c9f\",\n        \"firstName\": \"New first name\",\n        \"lastName\": \"New last name\",\n        \"position\": \"New position\",\n        \"avatar\": \"new_avatar.png\",\n        \"background\": {\n            \"url\": \"new_background.png\",\n            \"x\": 0,\n            \"y\": 0,\n            \"width\": 100,\n            \"height\": 100,\n            \"scale\": 2\n        },\n        \"tagline\": \"new tagline\",\n        \"overview\": \"new overview\",\n        \"website\": \"http://newwebsite.com\",\n        \"linkedIn\": \"http://newwebsite.com\",\n        \"twitter\": \"http://newwebsite.com\"\n    }\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Company Profile",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjVjYjc4YzJhNTRkNjQyNWZjMjhjOWYiLCJyb2xlIjoidXNlciIsImFjYyI6ImFjY3JlZGl0ZWQiLCJpYXQiOjE2NTA1OTczMTd9.Tbe3I2Lps3cHOA-YlK_INaYHMXtK929IRbkWmY5KoP0",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation UpdateCompanyProfile($profile: CompanyProfileInput!) {\n    updateCompanyProfile(profile: $profile) {\n        _id\n        name\n        avatar\n        background {\n            url\n            x\n            y\n            width\n            height\n            scale\n        }\n        tagline\n        overview\n        website\n        linkedIn\n        twitter\n    }\n}",
+										"variables": "{\n    \"profile\": {\n        \"_id\": \"625cb78c2a54d6425fc28cca\",\n        \"name\": \"New first name\",\n        \"avatar\": \"new_avatar.png\",\n        \"background\": {\n            \"url\": \"new_background.png\",\n            \"x\": 0,\n            \"y\": 0,\n            \"width\": 100,\n            \"height\": 100,\n            \"scale\": 2\n        },\n        \"tagline\": \"new tagline\",\n        \"overview\": \"new overview\",\n        \"website\": \"http://www.test.com\",\n        \"linkedIn\": \"http://www.test.com\",\n        \"twitter\": \"http://www.test.com\"\n    }\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},
@@ -798,7 +978,7 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRhNjYzZmZiZDVmZmJlODcxNjAzNTAiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkwNDM2Mjd9.8sUii0pTi2PnVu_-rWIRHx1hmBfMG26OV-Gen5Ne-QM",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjVjYWUyODc0NmNiNmM5ODE3ODE3MzciLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NTAyNDEwNjR9.S7rxbCKLZ9Cedz22ZxUHMZiRIZXsiJKlhCQW4GhJAhY",
 											"type": "string"
 										}
 									]
@@ -809,7 +989,7 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "mutation UploadLink($localFilename: String!, $type: MediaType!) {\n    uploadLink(localFilename: $localFilename, type: $type) {\n        remoteName\n        uploadUrl\n    }\n}",
-										"variables": "{\n    \"localFilename\": \"test.png\",\n    \"type\": \"BACKGROUND\"\n}"
+										"variables": "{\n    \"localFilename\": \"test.jpg\",\n    \"type\": \"BACKGROUND\"\n}"
 									}
 								},
 								"url": {
@@ -978,7 +1158,7 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRhNjYzZmZiZDVmZmJlODcxNjAzNTAiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkwNDM2Mjd9.8sUii0pTi2PnVu_-rWIRHx1hmBfMG26OV-Gen5Ne-QM",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjVjYjc5Zjc0NmNiNmM5ODE3ODE3M2EiLCJyb2xlIjoidXNlciIsImFjYyI6ImFjY3JlZGl0ZWQiLCJpYXQiOjE2NTA0MzQxMjd9.5CpyL8lLiElFC2YsMIu9v9PgN5GvmNy6Umoa7Cy4Wis",
 											"type": "string"
 										}
 									]
@@ -988,8 +1168,8 @@
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "mutation Comment($comment: CommentInput!) {\n  comment(comment: $comment) {\n      _id\n      body\n      likeIds\n      mentions {\n          _id\n          firstName\n          lastName\n      }\n  }\n}",
-										"variables": "{\n  \"comment\": {\n      \"body\": \"This is my comment\",\n      \"postId\": \"624f1a2eed55addaea6b449c\",\n      \"mentionIds\": [\n          \"624f1a2ded55addaea6b4492\"\n      ]\n  }\n}"
+										"query": "mutation Comment($comment: CommentInput!) {\n  comment(comment: $comment) {\n      _id\n      body\n      likeIds\n      mentions {\n          _id\n          firstName\n          lastName\n      }\n      mediaUrl\n  }\n}",
+										"variables": "{\n  \"comment\": {\n      \"body\": \"This is my comment\",\n      \"postId\": \"625cb78c2a54d6425fc28ca9\",\n      \"mentionIds\": [],\n      \"mediaUrl\": \"625cb78c2a54d6425fc28ca9.png\"\n  }\n}"
 									}
 								},
 								"url": {

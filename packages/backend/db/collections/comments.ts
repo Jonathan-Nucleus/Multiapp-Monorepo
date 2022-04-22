@@ -55,7 +55,7 @@ const createCommentsCollection = (
       comment: Comment.Input,
       userId: MongoId
     ): Promise<Comment.Mongo> => {
-      const { body, postId, commentId, mentionIds } = comment;
+      const { body, postId, commentId, mentionIds, mediaUrl } = comment;
       const commentData = {
         _id: new ObjectId(),
         body,
@@ -63,6 +63,7 @@ const createCommentsCollection = (
         commentId: commentId ? toObjectId(commentId) : undefined,
         mentionIds: mentionIds ? toObjectIds(mentionIds) : undefined,
         userId: toObjectId(userId),
+        mediaUrl,
       };
       await commentsCollection.insertOne(commentData);
       await postsCollection.updateOne(

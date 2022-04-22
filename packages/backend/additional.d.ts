@@ -1,4 +1,4 @@
-type ObjectKeys<T> = T extends Record<string, unknown> ? (keyof T)[] : string[];
+type ObjectKeys<T> = T extends object ? (keyof T)[] : string[];
 interface ObjectConstructor {
   keys<T>(o: T): ObjectKeys<T>;
 }

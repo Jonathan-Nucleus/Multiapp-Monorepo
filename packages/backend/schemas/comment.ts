@@ -13,6 +13,7 @@ export namespace Comment {
     commentId?: ObjectId;
     likeIds?: ObjectId[];
     mentionIds?: ObjectId[];
+    mediaUrl?: string;
     updatedAt?: Date;
   }
 
@@ -27,10 +28,13 @@ export namespace Comment {
 
   export type Input = Pick<
     GraphQL,
-    "body" | "postId" | "commentId" | "mentionIds"
+    "body" | "postId" | "commentId" | "mentionIds" | "mediaUrl"
   >;
 
-  export type Update = Pick<GraphQL, "_id" | "body" | "mentionIds">;
+  export type Update = Pick<
+    GraphQL,
+    "_id" | "body" | "mentionIds" | "mediaUrl"
+  >;
 }
 
 export const CommentSchema = `
@@ -42,6 +46,7 @@ export const CommentSchema = `
     commentId: ID
     likeIds: [ID!]
     mentionIds: [ID!]
+    mediaUrl: String
     createdAt: Date!
     updatedAt: Date
 
@@ -57,11 +62,13 @@ export const CommentSchema = `
     postId: ID!
     commentId: ID
     mentionIds: [ID!]
+    mediaUrl: String
   }
 
   input CommentUpdate {
     _id: ID!
     body: String!
     mentionIds: [ID!]
+    mediaUrl: String
   }
 `;

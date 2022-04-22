@@ -12,6 +12,9 @@ import {
   AccreditationOptions,
   PostViolationOptions,
   PostViolationEnum,
+  InvestorClassOptions,
+  FinancialStatusOptions,
+  InvestmentLevelOptions,
 } from "../schemas/user";
 import { User, ReportedPost, isUser } from "../schemas/user";
 import type { Post } from "../schemas/post";
@@ -88,6 +91,12 @@ export const publicUserResolvers = {
     argsIgnored: NoArgs,
     { db }: ApolloServerContext
   ) => (parent.watchlistIds ? db.funds.findAll(parent.watchlistIds) : []),
+
+  managedFunds: async (
+    parent: User.Mongo,
+    argsIgnored: NoArgs,
+    { db }: ApolloServerContext
+  ) => (parent.managedFundsIds ? db.funds.findAll(parent.managedFundsIds) : []),
 };
 
 const resolvers = {
@@ -104,6 +113,19 @@ const resolvers = {
     acc[option] = PostViolationOptions[option].value;
     return acc;
   }, {}),
+  InvestorClass: Object.keys(InvestorClassOptions).reduce<{
+    [key: string]: string;
+  }>((acc, option) => {
+    acc[option] = InvestorClassOptions[option].value;
+    return acc;
+  }, {}),
+  FinancialStatus: Object.keys(FinancialStatusOptions).reduce<{
+    [key: string]: string;
+  }>((acc, option) => {
+    acc[option] = FinancialStatusOptions[option].value;
+    return acc;
+  }, {}),
+  InvestmentLevel: InvestmentLevelOptions,
   UserProfile: {
     ...contentCreatorResolvers,
     ...publicUserResolvers,
@@ -122,13 +144,6 @@ const resolvers = {
       argsIgnored: NoArgs,
       { db }: ApolloServerContext
     ) => parent._id.getTimestamp(),
-
-    managedFunds: async (
-      parent: User.Mongo,
-      argsIgnored: NoArgs,
-      { db }: ApolloServerContext
-    ) =>
-      parent.managedFundsIds ? db.funds.findAll(parent.managedFundsIds) : [],
 
     mutedPosts: async (
       parent: User.Mongo,

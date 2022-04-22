@@ -11,6 +11,7 @@ import {
   GraphQLEntity,
 } from "../../lib/mongo-helper";
 import type { Company } from "../../schemas/company";
+import { InternalServerError, NotFoundError } from "../../lib/validate";
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 const createCompaniesCollection = (
@@ -42,6 +43,40 @@ const createCompaniesCollection = (
 
     fundCompanies: async (): Promise<Company.Mongo[]> =>
       companiesCollection.find({ "fundIds.0": { $exists: true } }).toArray(),
+
+    /**
+     * Updates a company's profile data.
+     *
+     * @param profile The updated profile data
+     *
+     * @returns   The updated user record.
+     */
+    updateProfile: async (
+      profile: Company.ProfileInput
+    ): Promise<Company.Mongo> => {
+      const { _id, ...profileData } = profile;
+      const keys = Object.keys(profileData);
+
+      // Remove properties that are undefined
+      keys.forEach(
+        (key) => profileData[key] === undefined && delete profileData[key]
+      );
+
+      const company = await companiesCollection.findOneAndUpdate(
+        { _id: toObjectId(_id) },
+        { $set: { ...profileData, updatedAt: new Date() } },
+        { returnDocument: "after" }
+      );
+
+      if (!company.ok) {
+        throw new InternalServerError("Unable to update company profile");
+      }
+      if (!company.value) {
+        throw new NotFoundError("Company");
+      }
+
+      return company.value as Company.Mongo;
+    },
 
     /**
      * Set whether this company is following another user.

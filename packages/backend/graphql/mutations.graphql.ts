@@ -20,6 +20,7 @@ import {
   isObjectId,
   NotFoundError,
   UnprocessableEntityError,
+  BadRequestError,
   validateArgs,
 } from "../lib/validate";
 
@@ -27,9 +28,14 @@ import {
   User,
   Settings,
   ReportedPost,
+  Questionnaire,
+  InvestorClassOptions,
+  FinancialStatusOptions,
+  InvestmentLevelOptions,
   compareAccreditation,
   PostViolationOptions,
 } from "../schemas/user";
+import type { Company } from "../schemas/company";
 import { AudienceOptions, PostCategoryOptions } from "../schemas/post";
 import type { Post } from "../schemas/post";
 import type { Comment } from "../schemas/comment";
@@ -44,6 +50,8 @@ const schema = gql`
     requestInvite(email: String!): Boolean
     inviteUser(email: String!): Boolean!
     updateSettings(settings: SettingsInput!): Boolean
+    updateUserProfile(profile: UserProfileInput): UserProfile
+    updateCompanyProfile(profile: CompanyProfileInput): Company
 
     createPost(post: PostInput!): Post
     featurePost(postId: ID!, feature: Boolean!): Post
@@ -55,6 +63,7 @@ const schema = gql`
     editComment(comment: CommentUpdate!): Comment
     deleteComment(commentId: ID!): Boolean!
     uploadLink(localFilename: String!, type: MediaType!): MediaUpload
+    saveQuestionnaire(questionnaire: QuestionnaireInput!): User
 
     watchFund(watch: Boolean!, fundId: ID!): Boolean
     followUser(follow: Boolean!, userId: ID!, asCompanyId: ID): Boolean
@@ -286,6 +295,146 @@ const resolvers = {
         const { settings } = args;
 
         return db.users.updateSettings(user._id, settings);
+      }
+    ),
+
+    updateUserProfile: secureEndpoint(
+      async (
+        parentIgnored,
+        args: { profile: User.ProfileInput },
+        { db, user }
+      ): Promise<User.Mongo> => {
+        const validator = yup
+          .object({
+            profile: yup
+              .object({
+                _id: yup.string().required().test({
+                  test: isObjectId,
+                  message: "Invalid user id",
+                }),
+                firstName: yup.string(),
+                lastName: yup.string(),
+                position: yup.string(),
+                avatar: yup.string(),
+                background: yup.object({
+                  url: yup.string().required(),
+                  x: yup.number().required(),
+                  y: yup.number().required(),
+                  width: yup.number().required(),
+                  height: yup.number().required(),
+                  scale: yup.number().required(),
+                }),
+                tagline: yup.string(),
+                overview: yup.string(),
+                website: yup.string().url(),
+                linkedIn: yup.string().url(),
+                twitter: yup.string().url(),
+              })
+              .required(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { profile } = args;
+        if (profile._id !== user._id.toString()) {
+          throw new BadRequestError("Not authorized");
+        }
+
+        return db.users.updateProfile(profile);
+      }
+    ),
+
+    updateCompanyProfile: secureEndpoint(
+      async (
+        parentIgnored,
+        args: { profile: Company.ProfileInput },
+        { db, user }
+      ): Promise<Company.Mongo> => {
+        const validator = yup
+          .object({
+            profile: yup
+              .object({
+                _id: yup.string().required().test({
+                  test: isObjectId,
+                  message: "Invalid company id",
+                }),
+                name: yup.string(),
+                avatar: yup.string(),
+                background: yup.object({
+                  url: yup.string().required(),
+                  x: yup.number().required(),
+                  y: yup.number().required(),
+                  width: yup.number().required(),
+                  height: yup.number().required(),
+                  scale: yup.number().required(),
+                }),
+                tagline: yup.string(),
+                overview: yup.string(),
+                website: yup.string().url(),
+                linkedIn: yup.string().url(),
+                twitter: yup.string().url(),
+              })
+              .required(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { profile } = args;
+        const company = await db.companies.find(profile._id);
+
+        if (!company) {
+          throw new NotFoundError("Company");
+        }
+        if (!company.memberIds.some((memberId) => memberId.equals(user._id))) {
+          throw new BadRequestError("Not authorized");
+        }
+
+        return db.companies.updateProfile(profile);
+      }
+    ),
+
+    saveQuestionnaire: secureEndpoint(
+      async (
+        parentIgnored,
+        args: { questionnaire: Questionnaire },
+        { db, user }
+      ): Promise<User.Mongo | null> => {
+        const validator = yup
+          .object({
+            questionnaire: yup
+              .object({
+                class: yup
+                  .string()
+                  .oneOf(
+                    Object.values(InvestorClassOptions).map(
+                      (option) => option.value
+                    )
+                  )
+                  .required(),
+                status: yup
+                  .string()
+                  .oneOf(
+                    Object.values(FinancialStatusOptions).map(
+                      (option) => option.value
+                    )
+                  )
+                  .required(),
+                level: yup
+                  .string()
+                  .oneOf(Object.values(InvestmentLevelOptions))
+                  .required(),
+                date: yup.date().required(),
+              })
+              .required(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { questionnaire } = args;
+        return db.users.saveQuestionnaire(user._id, questionnaire);
       }
     ),
 
@@ -535,7 +684,6 @@ const resolvers = {
         validateArgs(validator, args);
 
         const { comment } = args;
-
         const postData = await db.posts.find(comment.postId);
         if (!postData) {
           throw new NotFoundError("Post");

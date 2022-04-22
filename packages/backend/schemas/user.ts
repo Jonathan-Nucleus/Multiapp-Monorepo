@@ -4,21 +4,33 @@ import { ValueOf, GraphQLEntity } from "../lib/mongo-helper";
 import { Post, PostCategory, PostCategoryEnum } from "./post";
 import { Company } from "./company";
 import { Fund } from "./fund";
+import { Comment } from "./comment";
 
-export interface ContentCreatorProps {
-  avatar?: string;
-  background?: AdjustableImage;
-  tagline?: string;
-  overview?: string;
-  postIds?: ObjectId[];
-  commentIds?: ObjectId[];
-  followerIds?: ObjectId[];
-  followingIds?: ObjectId[];
-  companyFollowerIds?: ObjectId[];
-  companyFollowingIds?: ObjectId[];
-  website?: string;
-  linkedIn?: string;
-  twitter?: string;
+export namespace ContentCreator {
+  export interface Mongo {
+    avatar?: string;
+    background?: AdjustableImage;
+    tagline?: string;
+    overview?: string;
+    postIds?: ObjectId[];
+    commentIds?: ObjectId[];
+    followerIds?: ObjectId[];
+    followingIds?: ObjectId[];
+    companyFollowerIds?: ObjectId[];
+    companyFollowingIds?: ObjectId[];
+    website?: string;
+    linkedIn?: string;
+    twitter?: string;
+  }
+
+  export type GraphQL = GraphQLEntity<Mongo> & {
+    posts: Post.GraphQL[];
+    comments: Comment.GraphQL[];
+    followers: User.Profile[];
+    following: User.Profile[];
+    companyFollowers: User.Profile[];
+    companyFollowing: User.Profile[];
+  };
 }
 
 export function isUser(user: User.Mongo | User.Stub): user is User.Mongo {
@@ -26,7 +38,7 @@ export function isUser(user: User.Mongo | User.Stub): user is User.Mongo {
 }
 
 export namespace User {
-  export interface Mongo extends ContentCreatorProps {
+  export interface Mongo extends ContentCreator.Mongo {
     _id: ObjectId;
     email: string;
     password?: string; // Hashed password
@@ -36,6 +48,7 @@ export namespace User {
     lastName: string;
     role: UserRole;
     accreditation: Accreditation;
+    questionnaire?: Questionnaire;
     position?: string;
     companyIds?: ObjectId[];
     watchlistIds?: ObjectId[];
@@ -64,39 +77,67 @@ export namespace User {
     managedFundsIds: ObjectId[];
   };
 
-  export type GraphQL = GraphQLEntity<
-    Omit<
+  export type Profile = GraphQLEntity<
+    Pick<
       Mongo,
-      | "password"
-      | "salt"
-      | "emailToken"
-      | "authProvider"
-      | "role"
-      | "accreditation"
-      | "reportedPost"
-      | "settings"
+      | "_id"
+      | "firstName"
+      | "lastName"
+      | "position"
+      | "companyIds"
+      | "watchlistIds"
+      | "avatar"
+      | "background"
+      | "tagline"
+      | "overview"
+      | "managedFundsIds"
+      | "postIds"
+      | "commentIds"
+      | "followerIds"
+      | "followingIds"
+      | "companyFollowerIds"
+      | "companyFollowingIds"
+      | "website"
+      | "linkedIn"
+      | "twitter"
     >
   > & {
-    role: UserRoleEnum;
-    accreditation: AccreditationEnum;
-    reportedPosts: Omit<GraphQLEntity<ReportedPost>, "violations"> & {
-      violations: PostViolationEnum;
-    };
-    settings: Omit<Settings, "interests"> & {
-      interests?: PostCategoryEnum[];
-    };
     createdAt: Date;
-    companies: Company.GraphQL[];
-    managedFunds: Fund.GraphQL[];
-    mutedPosts: Post.GraphQL[];
-    hiddenPosts: Post.GraphQL[];
-    hiddenUsers: User.GraphQL[];
-    invitees: (User.Stub | User.GraphQL)[];
     company?: Company.GraphQL;
+    companies: Company.GraphQL[];
     watchlist: Fund.GraphQL[];
-    followers: User.GraphQL[];
-    following: User.GraphQL[];
+    managedFunds: Fund.GraphQL[];
   };
+
+  export type GraphQL = Profile &
+    ContentCreator.GraphQL &
+    GraphQLEntity<
+      Omit<
+        Mongo,
+        | "password"
+        | "salt"
+        | "emailToken"
+        | "authProvider"
+        | "role"
+        | "accreditation"
+        | "reportedPost"
+        | "settings"
+        | "questionnaire"
+      >
+    > & {
+      role: UserRoleEnum;
+      accreditation: AccreditationEnum;
+      reportedPosts: Omit<GraphQLEntity<ReportedPost>, "violations"> & {
+        violations: PostViolationEnum;
+      };
+      settings: Omit<Settings, "interests"> & {
+        interests?: PostCategoryEnum[];
+      };
+      mutedPosts: Post.GraphQL[];
+      hiddenPosts: Post.GraphQL[];
+      hiddenUsers: User.GraphQL[];
+      invitees: (User.Stub | User.GraphQL)[];
+    };
 
   export type Input = Required<
     Pick<GraphQL, "email" | "firstName" | "lastName"> & {
@@ -109,6 +150,23 @@ export namespace User {
     provider: string;
     tokenId: string;
   };
+
+  export type ProfileInput = Required<Pick<GraphQL, "_id">> &
+    Partial<
+      Pick<
+        GraphQL,
+        | "firstName"
+        | "lastName"
+        | "position"
+        | "avatar"
+        | "background"
+        | "tagline"
+        | "overview"
+        | "website"
+        | "linkedIn"
+        | "twitter"
+      >
+    >;
 }
 
 export interface Settings {
@@ -128,6 +186,13 @@ export interface ReportedPost {
   violations: PostViolation[];
   comments: string;
   postId: ObjectId;
+}
+
+export interface Questionnaire {
+  class: InvestorClass;
+  status: FinancialStatus;
+  level: InvestmentLevel;
+  date: Date;
 }
 
 /** Enumeration describing the role of the user. */
@@ -161,6 +226,58 @@ export const AccreditationOptions = {
 } as const;
 export type Accreditation = ValueOf<typeof AccreditationOptions>["value"];
 export type AccreditationEnum = keyof typeof AccreditationOptions;
+
+export const InvestorClassOptions = {
+  INDIVIDUAL: {
+    value: "individual",
+    label: "Individual",
+  },
+  ENTITY: {
+    value: "entity",
+    label: "Entity",
+  },
+  ADVISOR: {
+    value: "advisor",
+    label: "Financial Advisor",
+  },
+} as const;
+export type InvestorClass = ValueOf<typeof InvestorClassOptions>["value"];
+export type InvestorClassEnum = keyof typeof InvestorClassOptions;
+
+export const FinancialStatusOptions = {
+  MIN_INCOME: {
+    value: "200K+",
+    title: "Income",
+    description:
+      "I earn $200K+ per year, or with my spousal equivalent, $300K+ per year.",
+  },
+  NET_WORTH: {
+    value: "net-worth",
+    title: "Personal Net Worth",
+    description: "I/we have $1M+ in assets excluding primary residence.",
+  },
+  LICENSED: {
+    value: "licensed",
+    title: "License Holder",
+    description:
+      "I hold an active Series 7, 65, or 82 license in good standing.",
+  },
+  AFFILIATED: {
+    value: "affliated",
+    title: "Affiliation",
+    description:
+      "I am a knowledgeable employee, executive officer, trustee, general partner, or advisory board member of a private fund.",
+  },
+} as const;
+export type FinancialStatus = ValueOf<typeof FinancialStatusOptions>["value"];
+export type FinancialStatusEnum = keyof typeof FinancialStatusOptions;
+
+export const InvestmentLevelOptions = {
+  TIER1: "$2.2M",
+  TIER2: "$5M",
+} as const;
+export type InvestmentLevel = ValueOf<typeof InvestmentLevelOptions>;
+export type InvestmentLevelEnum = keyof typeof InvestmentLevelOptions;
 
 export function compareAccreditation(
   a: Accreditation,
@@ -229,11 +346,13 @@ const UserProfileSchema = `
   position: String
   companyIds: [ID!]
   watchlistIds : [ID!]
+  managedFundsIds: [ID!]
   ${ContentCreatorSchema}
 
   company: Company
   companies: [Company!]
   watchlist: [Fund!]
+  managedFunds: [Fund!]
 `;
 
 export const UserSchema = `
@@ -243,7 +362,6 @@ export const UserSchema = `
     email: String!
     role: UserRole!
     accreditation: Accreditation!
-    managedFundsIds: [ID!]
     mutedPostIds: [ID!]
     hiddenPostIds: [ID!]
     reportedPosts: [ReportedPost!]
@@ -254,7 +372,6 @@ export const UserSchema = `
     createdAt: Date!
     updatedAt: Date
 
-    managedFunds: [Fund!]
     mutedPosts: [Post!]
     hiddenPosts: [Post!]
     hiddenUsers: [User!]
@@ -289,7 +406,37 @@ export const UserSchema = `
     tokenId: String!
   }
 
+  input UserProfileInput {
+    _id: ID!
+    firstName: String
+    lastName: String
+    position: String
+    avatar: String
+    background: AdjustableImageInput
+    tagline: String
+    overview: String
+    website: String
+    linkedIn: String
+    twitter: String
+  }
+
+  input QuestionnaireInput {
+    class: InvestorClass!
+    status: FinancialStatus!
+    level: InvestmentLevel!
+    date: Date!
+  }
+
   type AdjustableImage {
+    url: String!
+    x: Int!
+    y: Int!
+    width: Int!
+    height: Int!
+    scale: Float!
+  }
+
+  input AdjustableImageInput {
     url: String!
     x: Int!
     y: Int!
@@ -329,5 +476,17 @@ export const UserSchema = `
 
   enum PostViolation {
     ${Object.keys(PostViolationOptions).map((key) => key)}
+  }
+
+  enum InvestorClass {
+    ${Object.keys(InvestorClassOptions).map((key) => key)}
+  }
+
+  enum FinancialStatus {
+    ${Object.keys(FinancialStatusOptions).map((key) => key)}
+  }
+
+  enum InvestmentLevel {
+    ${Object.keys(InvestmentLevelOptions).map((key) => key)}
   }
 `;

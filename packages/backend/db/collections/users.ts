@@ -20,6 +20,7 @@ import {
   AccreditationOptions,
   Settings,
   ReportedPost,
+  Questionnaire,
   isUser,
 } from "../../schemas/user";
 import {
@@ -401,6 +402,39 @@ const createUsersCollection = (
     },
 
     /**
+     * Updates a user's profile data.
+     *
+     * @param profile The updated profile data
+     *
+     * @returns   The updated user record.
+     */
+    updateProfile: async (profile: User.ProfileInput): Promise<User.Mongo> => {
+      const { _id, ...profileData } = profile;
+      const keys = Object.keys(profileData);
+
+      // Remove properties that are undefined
+      keys.forEach(
+        (key) => profileData[key] === undefined && delete profileData[key]
+      );
+
+      const user = await usersCollection.findOneAndUpdate(
+        { _id: toObjectId(_id), role: { $ne: "stub" } },
+        { $set: { ...profileData, updatedAt: new Date() } },
+        { returnDocument: "after" }
+      );
+
+      if (!user.ok) {
+        throw new InternalServerError("Unable to update user profile");
+      }
+
+      if (!user.value) {
+        throw new NotFoundError("User");
+      }
+
+      return user.value as User.Mongo;
+    },
+
+    /**
      * Adds a post to the user's list of post.
      *
      * @param postId  The id of the post.
@@ -754,6 +788,34 @@ const createUsersCollection = (
         console.log(`Error hiding user ${hiddenUserId}: ${err}`);
         return false;
       }
+    },
+
+    /**
+     * Saves an accreditation questionnaire response to the user record.
+     *
+     * @param userId  The ID of the user record to deserialize.
+     *
+     * @returns A deserialized object contains the _id, user role, and
+     *          accreditation status for the user.
+     */
+    saveQuestionnaire: async (
+      userId: MongoId,
+      questionnaire: Questionnaire
+    ): Promise<User.Mongo | null> => {
+      const user = await usersCollection.findOneAndUpdate(
+        { _id: toObjectId(userId), role: { $ne: "stub" } },
+        {
+          $set: {
+            questionnaire: {
+              ...questionnaire,
+              date: new Date(),
+            },
+          },
+        },
+        { returnDocument: "after" }
+      );
+
+      return user.value as User.Mongo | null;
     },
 
     /**

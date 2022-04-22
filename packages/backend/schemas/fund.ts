@@ -15,8 +15,6 @@ export namespace Fund {
   export interface Mongo extends UserCommonFields {
     _id: ObjectId;
     name: string;
-    avatar?: string;
-    background: AdjustableImage;
     level: Accreditation;
     managerId: ObjectId;
     companyId: ObjectId;
@@ -84,8 +82,6 @@ export const FundSchema = `
   type Fund {
     _id: ID!
     name: String!
-    avatar: String
-    background: AdjustableImage
     level: Accreditation!
     managerId: ID!
     companyId: ID!
