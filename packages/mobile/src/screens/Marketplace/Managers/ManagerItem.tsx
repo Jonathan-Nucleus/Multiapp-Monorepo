@@ -9,9 +9,13 @@ import PLabel from '../../../components/common/PLabel';
 
 import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 
-export type Fund = Exclude<FundManagersData['fundManagers'], undefined>[number];
+export type FundManager = Exclude<
+  FundManagersData['fundManagers'],
+  undefined
+>['managers'][number];
+
 interface ManagerItemProps {
-  manager: Fund;
+  manager: FundManager;
 }
 
 const ManagerItem: FC<ManagerItemProps> = ({ manager }) => {

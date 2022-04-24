@@ -8,7 +8,7 @@ import {
   Body3,
   Body3Bold,
 } from 'mobile/src/theme/fonts';
-import { FundCompanyData } from 'mobile/src/graphql/query/marketplace';
+import { Company } from 'mobile/src/graphql/query/marketplace';
 
 import FundCompanyInfo from './FundCompanyInfo';
 import RoundImageView from '../../../components/common/RoundImageView';
@@ -17,38 +17,33 @@ import { AVATAR_URL } from 'react-native-dotenv';
 
 import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 
-export type Fund = Exclude<FundCompanyData['fundCompanies'], undefined>[number];
 interface CompanyItemProps {
-  company: Fund;
+  company: Company;
 }
 
 const CompanyItem: FC<CompanyItemProps> = ({ company }) => {
   const { name, fundManagers } = company;
+
+  // Only show data for first fund manager
+  const { _id, firstName, lastName, avatar, position } = fundManagers[0];
   return (
     <View style={styles.companyItem}>
       <FundCompanyInfo item={company} />
       <PLabel label={name} textStyle={styles.nameLabel} />
       <View style={styles.separator} />
       <View style={styles.userInfo}>
-        <RoundImageView
-          image={{ uri: `${AVATAR_URL}/${fundManagers[0].avatar}` }}
-          size={24}
-        />
+        <RoundImageView image={{ uri: `${AVATAR_URL}/${avatar}` }} size={24} />
         <View style={{ marginLeft: 8 }}>
           <View style={styles.nameWrapper}>
-            <PLabel
-              label={`${fundManagers[0].firstName} ${fundManagers[0].lastName}`}
-              textStyle={Body1}
-            />
+            <PLabel label={`${firstName} ${lastName}`} textStyle={Body1} />
             <View style={styles.proWrapper}>
               <ShieldCheckSvg />
               <PLabel label="PRO" textStyle={styles.proLabel} />
             </View>
           </View>
-          <PLabel
-            label={fundManagers[0].position}
-            textStyle={styles.titleLabel}
-          />
+          {position && (
+            <PLabel label={position} textStyle={styles.titleLabel} />
+          )}
         </View>
       </View>
     </View>

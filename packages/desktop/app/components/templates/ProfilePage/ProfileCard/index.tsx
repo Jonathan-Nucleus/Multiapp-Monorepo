@@ -19,9 +19,13 @@ import Avatar from "../../../common/Avatar";
 import FollowersModal from "../../../modules/users/FollowersModal";
 import { useFollowUser } from "mobile/src/graphql/mutation/account";
 import { useAccount } from "mobile/src/graphql/query/account";
-import { UserProfileProps } from "../../../../types/common-props";
+import { UserProfile } from "mobile/src/graphql/query/user/useProfile";
 
-const ProfileCard: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
+interface ProfileCardProps {
+  user: UserProfile;
+}
+
+const ProfileCard: FC<ProfileCardProps> = ({ user }) => {
   const [isVisible, setVisible] = useState(false);
   let overviewShort: string | undefined = undefined;
   const [showFullOverView, setShowFullOverView] = useState(false);
@@ -39,31 +43,33 @@ const ProfileCard: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
       }
     }
   }
+
   const { data: accountData } = useAccount();
   const [followUser] = useFollowUser();
   const isFollowing = accountData?.account?.followingIds?.includes(user._id);
-  const isMyProfile = accountData?.account?._id == user._id
+  const isMyProfile = accountData?.account?._id == user._id;
   const toggleFollowing = async () => {
     try {
       await followUser({
         variables: { follow: !isFollowing, userId: user._id },
-        refetchQueries: ["Account", "UserProfile"]
+        refetchQueries: ["Account", "UserProfile"],
       });
-    } catch (error) {
-    }
+    } catch (error) {}
   };
+
+  const { background: companyBackground } = user.company ?? {};
   return (
     <>
       <div className="relative">
         <Card className="rounded-none lg:rounded-2xl border-brand-overlay/[.1] p-0">
           <div>
             <div className="w-full h-16 lg:h-32 bg-white/[.25] relative">
-              {user.company?.background && (
+              {companyBackground && (
                 <Image
                   loader={() =>
-                    `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${user.company?.background?.url}`
+                    `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${companyBackground.url}`
                   }
-                  src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${user.company.background?.url}`}
+                  src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${companyBackground.url}`}
                   alt=""
                   layout="fill"
                   objectFit="cover"
@@ -83,7 +89,7 @@ const ProfileCard: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
                     {user.company?.name}
                   </div>
                 </div>
-                {!isMyProfile &&
+                {!isMyProfile && (
                   <>
                     <div className="flex items-center">
                       <Button variant="text" className="text-primary mr-5 py-0">
@@ -98,7 +104,7 @@ const ProfileCard: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
                       </Button>
                     </div>
                   </>
-                }
+                )}
               </div>
             </div>
             <div className="flex lg:hidden items-center p-4">
@@ -108,7 +114,9 @@ const ProfileCard: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
                   <div className="text-xl text-white font-medium mx-1">
                     {user.postIds?.length ?? 0}
                   </div>
-                  <div className="text-xs text-white opacity-60 mx-1">Posts</div>
+                  <div className="text-xs text-white opacity-60 mx-1">
+                    Posts
+                  </div>
                 </div>
                 <div
                   className="flex flex-wrap items-center justify-center text-center cursor-pointer px-4"
@@ -117,7 +125,9 @@ const ProfileCard: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
                   <div className="text-xl text-white font-medium mx-1">
                     {user.followerIds?.length ?? 0}
                   </div>
-                  <div className="text-xs text-white opacity-60 mx-1">Followers</div>
+                  <div className="text-xs text-white opacity-60 mx-1">
+                    Followers
+                  </div>
                 </div>
                 <div
                   className="flex flex-wrap items-center justify-center text-center cursor-pointer px-4"
@@ -126,7 +136,9 @@ const ProfileCard: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
                   <div className="text-xl text-white font-medium mx-1">
                     {user.followingIds?.length ?? 0}
                   </div>
-                  <div className="text-xs text-white opacity-60 mx-1">Following</div>
+                  <div className="text-xs text-white opacity-60 mx-1">
+                    Following
+                  </div>
                 </div>
               </div>
             </div>
@@ -205,7 +217,7 @@ const ProfileCard: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
                 </div>
               </div>
             </div>
-            {!isMyProfile &&
+            {!isMyProfile && (
               <div className="lg:hidden mt-3 mb-5 px-4">
                 <Button
                   variant="gradient-primary"
@@ -215,7 +227,7 @@ const ProfileCard: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
                   {isFollowing ? "UNFOLLOW" : "FOLLOW"}
                 </Button>
               </div>
-            }
+            )}
             <div className="flex items-center p-4 border-t border-white/[.12]">
               <div className="flex items-center cursor-pointer">
                 <Link href={user.linkedIn ?? "/"}>

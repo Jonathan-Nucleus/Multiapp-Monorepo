@@ -1,32 +1,18 @@
 import { gql, useQuery, QueryHookOptions, QueryResult } from '@apollo/client';
-import { Post, PostCategory } from 'backend/graphql/posts.graphql';
+import { PostCategory } from 'backend/graphql/posts.graphql';
 import { User } from 'backend/graphql/users.graphql';
-import { VIEW_POST_FRAGMENT } from 'mobile/src/graphql/query/post';
+import {
+  POST_SUMMARY_FRAGMENT,
+  PostSummary,
+} from 'mobile/src/graphql/fragments/post';
 
 type FetchPostsVariables = {
   categories?: PostCategory[];
 };
 
+type Post = PostSummary;
 export type FetchPostsData = {
-  posts?: (Pick<
-    Post,
-    | '_id'
-    | 'body'
-    | 'mediaUrl'
-    | 'likeIds'
-    | 'likes'
-    | 'mentionIds'
-    | 'commentIds'
-    | 'comments'
-    | 'shareIds'
-    | 'createdAt'
-    | 'categories'
-  > & {
-    user: Pick<
-      Post['user'],
-      '_id' | 'firstName' | 'lastName' | 'avatar' | 'role' | 'position'
-    >;
-  })[];
+  posts?: Post[];
 };
 
 /**
@@ -40,10 +26,10 @@ export function useFetchPosts(): QueryResult<
 > {
   return useQuery<FetchPostsData, FetchPostsVariables>(
     gql`
-      ${VIEW_POST_FRAGMENT}
+      ${POST_SUMMARY_FRAGMENT}
       query Posts($categories: [PostCategory!]) {
         posts(categories: $categories) {
-          ...ViewPostFields
+          ...PostSummaryFields
         }
       }
     `,
@@ -52,6 +38,15 @@ export function useFetchPosts(): QueryResult<
 }
 
 type AccountVariables = never;
+export type WatchlistFund = Pick<
+  User['watchlist'][number],
+  '_id' | 'name' | 'companyId' | 'managerId'
+> & {
+  company: Pick<
+    User['watchlist'][number]['company'],
+    '_id' | 'name' | 'website' | 'linkedIn' | 'twitter' | 'avatar'
+  >;
+};
 export type AccountData = {
   account: Pick<
     User,
@@ -70,7 +65,6 @@ export type AccountData = {
     | 'followingIds'
     | 'following'
     | 'watchlistIds'
-    | 'watchlist'
     | 'companyFollowingIds'
     | 'postIds'
     | 'linkedIn'
@@ -79,6 +73,7 @@ export type AccountData = {
     | 'posts'
     | 'managedFunds'
   > & {
+    watchlist: WatchlistFund[];
     company: Pick<
       User['companies'][number],
       | '_id'

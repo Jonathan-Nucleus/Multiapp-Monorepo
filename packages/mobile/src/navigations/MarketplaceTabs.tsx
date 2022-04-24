@@ -1,7 +1,11 @@
 import React, { ReactElement } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import {
+  createMaterialTopTabNavigator,
+  MaterialTopTabScreenProps,
+} from '@react-navigation/material-top-tabs';
 import { StackScreenProps } from '@react-navigation/stack';
+import { CompositeScreenProps } from '@react-navigation/native';
 
 const Tab = createMaterialTopTabNavigator();
 import { BLACK, WHITE, PRIMARYSTATE, WHITE60 } from 'shared/src/colors';
@@ -11,27 +15,36 @@ import Managers from '../screens/Marketplace/Managers';
 import Companies from '../screens/Marketplace/Companies';
 import MainHeader from '../components/main/Header';
 import { Body2 } from '../theme/fonts';
-import { MarketplaceScreen } from './FundsStack';
+import { MarketplaceScreen, FundsStackScreenProps } from './FundsStack';
 
-type MarketplaceStackParamList = {
+type MarketplaceTabsParamList = {
   Funds: undefined;
   Managers: undefined;
   Companies: undefined;
 };
 
 export type FundsScreen = (
-  props: StackScreenProps<MarketplaceStackParamList, 'Funds'>,
+  props: CompositeScreenProps<
+    MaterialTopTabScreenProps<MarketplaceTabsParamList, 'Funds'>,
+    FundsStackScreenProps
+  >,
 ) => ReactElement;
 
 export type FundManagersScreen = (
-  props: StackScreenProps<MarketplaceStackParamList, 'Managers'>,
+  props: CompositeScreenProps<
+    MaterialTopTabScreenProps<MarketplaceTabsParamList, 'Managers'>,
+    FundsStackScreenProps
+  >,
 ) => ReactElement;
 
 export type FundCompaniesScreen = (
-  props: StackScreenProps<MarketplaceStackParamList, 'Companies'>,
+  props: CompositeScreenProps<
+    MaterialTopTabScreenProps<MarketplaceTabsParamList, 'Companies'>,
+    FundsStackScreenProps
+  >,
 ) => ReactElement;
 
-const MarketplaceStack: MarketplaceScreen = () => {
+const MarketplaceTabs: MarketplaceScreen = () => {
   return (
     <View style={styles.globalContainer}>
       <MainHeader />
@@ -62,7 +75,7 @@ const MarketplaceStack: MarketplaceScreen = () => {
   );
 };
 
-export default MarketplaceStack;
+export default MarketplaceTabs;
 
 const styles = StyleSheet.create({
   globalContainer: {

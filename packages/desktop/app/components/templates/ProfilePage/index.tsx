@@ -3,9 +3,22 @@ import ProfileCard from "./ProfileCard";
 import CompaniesList from "./CompaniesList";
 import PostsList from "../../common/PostsList";
 import FundCard from "../../modules/funds/FundCard";
-import { UserProfileProps } from "../../../types/common-props";
+import { UserProfile } from "mobile/src/graphql/query/user/useProfile";
+import { usePosts } from "mobile/src/graphql/query/user/usePosts";
+import { useManagedFunds } from "mobile/src/graphql/query/user/useManagedFunds";
 
-const ProfilePage: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
+interface ProfilePageProps {
+  user: UserProfile;
+}
+
+const ProfilePage: FC<ProfilePageProps> = ({ user }) => {
+  const { data: postData } = usePosts(user._id);
+  const { data: fundsData } = useManagedFunds(user._id);
+
+  const companies = user?.companies;
+  const funds = fundsData?.userProfile?.managedFunds;
+  const posts = postData?.userProfile?.posts;
+
   return (
     <>
       <div className="lg:mt-12 mb-12 lg:px-14">
@@ -18,24 +31,24 @@ const ProfilePage: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
               <div className="lg:hidden mb-5 pt-5">
                 <CompaniesList companies={user.companies} />
               </div>
-              {user.managedFunds.length > 0 && (
+              {funds && funds.length > 0 && (
                 <div className="py-5">
-                  {user.managedFunds.map((fund) => (
+                  {funds.map((fund) => (
                     <div key={fund._id} className="mb-5">
                       <FundCard fund={fund} showImages={false} />
                     </div>
                   ))}
                 </div>
               )}
-              {user.posts.length > 0 && (
+              {posts && posts.length > 0 && (
                 <div className="py-5">
-                  <PostsList posts={user.posts} />
+                  <PostsList posts={posts} />
                 </div>
               )}
             </div>
           </div>
           <div className="col-span-2 hidden lg:block">
-            <CompaniesList companies={user.companies} />
+            {companies && <CompaniesList companies={companies} />}
           </div>
         </div>
       </div>

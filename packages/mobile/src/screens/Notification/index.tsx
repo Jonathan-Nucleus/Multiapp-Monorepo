@@ -38,7 +38,7 @@ import pStyles from '../../theme/pStyles';
 import { Body1, Body2, Body3, H5Bold } from '../../theme/fonts';
 import Avatar from '../../assets/avatar.png';
 
-import type { NotificationScreen } from 'mobile/src/navigations/NotificationStack';
+import type { NotificationScreen } from 'mobile/src/navigations/HomeStack';
 import MainHeader from '../../components/main/Header';
 
 const Items = [
@@ -133,7 +133,7 @@ interface Notification {
   createdAt: Date;
 }
 
-const Notification: NotificationScreen = ({ navigation }) => {
+const Notification: NotificationScreen = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   const title = (val: Notification) => {

@@ -1,11 +1,18 @@
 import React from 'react';
-import { StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TextStyle,
+  View,
+  ViewStyle,
+  StyleProp,
+} from 'react-native';
 import { Body2 } from '../../theme/fonts';
 import { WHITE } from 'shared/src/colors';
 
 interface PLabelProps {
-  viewStyle?: ViewStyle;
-  textStyle?: TextStyle;
+  viewStyle?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
   label: string;
   numberOfLines?: number;
 }

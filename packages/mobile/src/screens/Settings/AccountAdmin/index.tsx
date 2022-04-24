@@ -1,5 +1,6 @@
 import React, { FC, useState } from 'react';
 import {
+  ListRenderItem,
   StyleSheet,
   FlatList,
   View,
@@ -29,21 +30,14 @@ import {
 import PHeader from '../../../components/common/PHeader';
 import MainHeader from '../../../components/main/Header';
 
-interface RenderItemProps {
-  item: {
-    id: string;
-    label: string;
-    onPress: () => void;
-    icon: string;
-  };
-}
-
 interface RouterProps {
   navigation: NavigationProp<any, any>;
 }
 
 const AccountAdmin: FC<RouterProps> = ({ navigation }) => {
-  const DATA = [
+  const [isVisible, setIsVisible] = useState(false);
+
+  const ACCOUNT_MENU_OPTIONS = [
     {
       id: 'edit_profile',
       label: 'Edit your profile',
@@ -63,10 +57,9 @@ const AccountAdmin: FC<RouterProps> = ({ navigation }) => {
       icon: <Trash size={28} color={DANGER} />,
     },
   ];
+  type AccountMenuOption = typeof ACCOUNT_MENU_OPTIONS[number];
 
-  const [isVisible, setIsVisible] = useState(false);
-
-  const renderListItem = ({ item }: RenderItemProps) => {
+  const renderListItem: ListRenderItem<AccountMenuOption> = ({ item }) => {
     return (
       <TouchableOpacity onPress={item.onPress}>
         <View style={[styles.item, styles.between]}>
@@ -102,7 +95,7 @@ const AccountAdmin: FC<RouterProps> = ({ navigation }) => {
         onPressLeft={() => navigation.goBack()}
       />
       <FlatList
-        data={DATA}
+        data={ACCOUNT_MENU_OPTIONS}
         renderItem={renderListItem}
         keyExtractor={(item) => item.id}
         style={styles.flatList}

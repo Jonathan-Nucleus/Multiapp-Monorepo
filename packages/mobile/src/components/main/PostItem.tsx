@@ -17,24 +17,24 @@ import Tag from '../common/Tag';
 import { PRIMARYSTATE, GRAY10, WHITE60, WHITE } from 'shared/src/colors';
 import { Body1, Body3 } from '../../theme/fonts';
 import * as NavigationService from '../../services/navigation/NavigationService';
-import { FetchPostsData } from 'mobile/src/hooks/queries';
+import { PostSummary } from 'mobile/src/graphql/fragments/post';
 import { PostCategories } from 'backend/graphql/enumerations.graphql';
 import { useLikePost } from '../../graphql/mutation/posts';
 
-export type Post = Exclude<FetchPostsData['posts'], undefined>[number];
-interface FeedItemProps {
+export type Post = PostSummary;
+export interface PostItemProps {
   post: Post;
   userId: string;
   onPressMenu?: () => void;
 }
 
-const PostItem: React.FC<FeedItemProps> = ({ post, userId, onPressMenu }) => {
-  const { user } = post;
+const PostItem: React.FC<PostItemProps> = ({ post, userId, onPressMenu }) => {
+  const { user, body, mediaUrl } = post;
   const [liked, setLiked] = useState(false);
   const [likePost] = useLikePost();
 
   useEffect(() => {
-    setLiked(post.likeIds?.includes(userId));
+    setLiked(post.likeIds?.includes(userId) ?? false);
   }, [post]);
 
   const toggleLike = async (): Promise<void> => {
@@ -70,19 +70,21 @@ const PostItem: React.FC<FeedItemProps> = ({ post, userId, onPressMenu }) => {
           <DotsThreeVertical size={24} color={WHITE} />
         </TouchableOpacity>
       </View>
-      <PLabel label={post.body} textStyle={styles.body} />
-      <FastImage
-        style={styles.postImage}
-        source={{ uri: `${POST_URL}/${post.mediaUrl}` }}
-        resizeMode={FastImage.resizeMode.cover}
-      />
+      {body && <PLabel label={body} textStyle={styles.body} />}
+      {mediaUrl && (
+        <FastImage
+          style={styles.postImage}
+          source={{ uri: `${POST_URL}/${mediaUrl}` }}
+          resizeMode={FastImage.resizeMode.cover}
+        />
+      )}
       <View style={styles.postInfo}>
         <View style={styles.tagWrapper}>
-          {post.categories.map((item: string, index: number) => (
+          {post.categories.map((item) => (
             <Tag
               label={PostCategories[item]}
               viewStyle={styles.tagStyle}
-              key={index}
+              key={item}
             />
           ))}
         </View>

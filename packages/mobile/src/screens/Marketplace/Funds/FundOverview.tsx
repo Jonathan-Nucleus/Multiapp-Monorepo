@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 import {
+  ListRenderItem,
   View,
   StyleSheet,
   FlatList,
@@ -7,6 +8,7 @@ import {
   Dimensions,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
+import { Presentation } from 'phosphor-react-native';
 import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
 
 import {
@@ -22,29 +24,19 @@ import {
 } from 'shared/src/colors';
 import { Body2Bold, Body3, H6Bold } from 'mobile/src/theme/fonts';
 import Tag from '../../../components/common/Tag';
+import PTitle from '../../../components/common/PTitle';
 import PLabel from '../../../components/common/PLabel';
-import { FundItemProps } from '../../../components/main/FundItem';
-import { Presentation } from 'phosphor-react-native';
 
-import type { User } from 'backend/graphql/users.graphql';
+import { FundDetails } from 'mobile/src/graphql/query/marketplace';
 
-interface MemberProps {
-  item: User;
+interface FundOverviewProps {
+  fund: FundDetails;
 }
 
-const PTitle = (props) => {
-  const { title, subTitle } = props;
-
-  return (
-    <View>
-      <PLabel textStyle={styles.title} label={title} />
-      <PLabel label={subTitle} />
-    </View>
-  );
-};
-
-const FundOverview: FC<FundItemProps> = ({ fund }) => {
-  const renderTeamMemberItem = ({ item }: MemberProps) => {
+const FundOverview: FC<FundOverviewProps> = ({ fund }) => {
+  const renderTeamMemberItem: ListRenderItem<FundDetails['team'][number]> = ({
+    item,
+  }) => {
     return (
       <TouchableOpacity>
         <View
@@ -69,14 +61,18 @@ const FundOverview: FC<FundItemProps> = ({ fund }) => {
     );
   };
 
+  const { background, avatar } = fund.company;
+
   return (
     <View style={styles.overviewContainer}>
       <View style={styles.imagesContainer}>
-        <FastImage
-          style={styles.backgroundImage}
-          source={{ uri: `${BACKGROUND_URL}/${fund.background.url}` }}
-          resizeMode={FastImage.resizeMode.cover}
-        />
+        {background && (
+          <FastImage
+            style={styles.backgroundImage}
+            source={{ uri: `${BACKGROUND_URL}/${background.url}` }}
+            resizeMode={FastImage.resizeMode.cover}
+          />
+        )}
       </View>
       <View style={styles.fundDetailsContainer}>
         <PLabel textStyle={styles.fund} label="Strategy Overview" />

@@ -1,5 +1,6 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
 import {
+  ListRenderItem,
   StyleSheet,
   FlatList,
   View,
@@ -27,16 +28,15 @@ import pStyles from '../../../theme/pStyles';
 import { Body2Bold, Body3, H6 } from '../../../theme/fonts';
 import MainHeader from '../../../components/main/Header';
 import PAppContainer from '../../../components/common/PAppContainer';
-import PostItem, { PostItemProps } from '../../../components/main/PostItem';
+import PostItem, { Post } from '../../../components/main/PostItem';
 import FeaturedItem from '../../../components/main/settings/FeaturedItem';
 import Funds from '../../../components/main/settings/Funds';
 import Members from '../../../components/main/settings/Members';
-import { useAccount } from '../../../graphql/query/account';
 import CompanyDetail from './CompanyDetail';
-import type { Company } from 'backend/graphql/companies.graphql';
-import type { User } from 'backend/graphql/users.graphql';
-import { useFetchPosts } from '../../../hooks/queries';
-import { useCompany } from '../../../graphql/query/company';
+
+import { useAccount } from '../../../graphql/query/account';
+import { usePosts } from '../../../graphql/query/post/usePosts';
+import { useCompany } from '../../../graphql/query/company/useCompany';
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
@@ -44,26 +44,28 @@ interface RouterProps {
 }
 
 const CompanyProfile: FC<RouterProps> = ({ navigation, route }) => {
-  const { data, refetch } = useFetchPosts();
+  const { data, refetch } = usePosts();
   const { data: accountData } = useAccount();
   const { data: companyData } = useCompany(route.params?.companyId);
-  const postData = data?.posts ?? [];
   const isFocused = useIsFocused();
   const [focusState, setFocusState] = useState(isFocused);
-  const company: Company = companyData?.companyProfile;
+
+  const postData = data?.posts ?? [];
+  const company = companyData?.companyProfile;
+
   if (isFocused !== focusState) {
     console.log('refetching...');
     refetch();
     setFocusState(isFocused);
   }
 
-  const renderItem = ({ item }: { item: PostItemProps }) => (
+  const renderItem: ListRenderItem<Post> = ({ item }) => (
     <TouchableOpacity>
       <FeaturedItem post={item} />
     </TouchableOpacity>
   );
 
-  if (!company) {
+  if (!company || !accountData) {
     return <View style={pStyles.globalContainer} />;
   }
 
@@ -88,7 +90,7 @@ const CompanyProfile: FC<RouterProps> = ({ navigation, route }) => {
               <FlatList
                 data={postData || []}
                 renderItem={renderItem}
-                keyExtractor={(item: PostItemProps) => `${item._id}`}
+                keyExtractor={(item) => `${item._id}`}
                 listKey="post"
                 horizontal
               />
@@ -99,9 +101,9 @@ const CompanyProfile: FC<RouterProps> = ({ navigation, route }) => {
             <FlatList
               data={postData || []}
               renderItem={({ item }) => (
-                <PostItem post={item} userId={accountData?.account._id} />
+                <PostItem post={item} userId={accountData.account._id} />
               )}
-              keyExtractor={(item: PostItemProps) => `${item._id}`}
+              keyExtractor={(item) => `${item._id}`}
               listKey="post"
               ListHeaderComponent={<Text style={styles.text}>All Posts</Text>}
             />

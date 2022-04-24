@@ -1,16 +1,16 @@
 import { FC, useMemo } from "react";
-import { useCommentPost } from "mobile/src/graphql/mutation/posts";
-import type { Comment } from "backend/graphql/comments.graphql";
 import SendMessage from "./SendMessage";
 import CommentsList from "./CommentsList";
 import Card from "../Card";
-import { PostType } from "desktop/app/types/common-props";
+
+import { useCommentPost } from "mobile/src/graphql/mutation/posts";
+import { Post, Comment } from "mobile/src/graphql/query/post";
 
 interface CommentPostProps {
-  post: PostType;
+  post: Post;
 }
 
-const CommentPost: FC<CommentPostProps> = ({ post }: CommentPostProps) => {
+const CommentPost: FC<CommentPostProps> = ({ post }) => {
   const [commentPost] = useCommentPost();
 
   const sendMessage = async (
@@ -29,8 +29,7 @@ const CommentPost: FC<CommentPostProps> = ({ post }: CommentPostProps) => {
         },
         refetchQueries: ["Posts"],
       });
-    } catch (err) {
-    }
+    } catch (err) {}
   };
 
   const commentsByCommentID: Record<string, Comment[]> = useMemo(() => {

@@ -1,27 +1,32 @@
 import React, { useState } from 'react';
-import { StyleSheet, FlatList, View, Text, Switch } from 'react-native';
+import {
+  ListRenderItem,
+  StyleSheet,
+  FlatList,
+  View,
+  Text,
+  Switch,
+} from 'react-native';
 
 import { GRAY20, WHITE, GREEN, WHITE60, WHITE12 } from 'shared/src/colors';
 
 import { Body1Bold, Body2, Body2Bold, Body3 } from '../../../theme/fonts';
 
-interface renderItemProps {
-  item: {
-    label1: string;
-    label2?: string;
-    toggleSwitch?: () => void;
-    isEnabled?: boolean;
-    id: string;
-    value: boolean;
-  };
-}
-
-interface selectedItemProps {
+interface MessagingSetting {
+  label1: string;
+  label2?: string;
+  toggleSwitch?: () => void;
+  isEnabled?: boolean;
   id: string;
   value: boolean;
 }
 
-const Messaging = [
+interface SelectedMessagingSetting {
+  id: string;
+  value: boolean;
+}
+
+const MessagingSettings = [
   {
     label1: 'Allow Messages',
     label2: 'If allowed, users may message you within Prometheus Alts',
@@ -36,9 +41,11 @@ const Messaging = [
 ];
 
 const Messages: React.FC = () => {
-  const [enabledList, setEnabledList] = useState<selectedItemProps[]>([]);
+  const [enabledList, setEnabledList] = useState<SelectedMessagingSetting[]>(
+    [],
+  );
 
-  const handleToggleSelect = (val: boolean, item: renderItemProps) => {
+  const handleToggleSelect = (val: boolean, item: MessagingSetting) => {
     const _enabledList = [...enabledList];
     const objIndex = _enabledList.findIndex((v) => v.id === item.id);
     if (objIndex > -1) {
@@ -53,7 +60,7 @@ const Messages: React.FC = () => {
     setEnabledList(_enabledList);
   };
 
-  const renderListItem = ({ item }: renderItemProps) => {
+  const renderListItem: ListRenderItem<MessagingSetting> = ({ item }) => {
     return (
       <View style={[styles.item, item.id === 'message' && styles.border]}>
         <View style={styles.leftItem}>
@@ -76,7 +83,7 @@ const Messages: React.FC = () => {
         <Text style={styles.title}>Messaging</Text>
       </View>
       <FlatList
-        data={Messaging}
+        data={MessagingSettings}
         renderItem={renderListItem}
         keyExtractor={(item, index) => `messaging${index}`}
         style={styles.flatList}

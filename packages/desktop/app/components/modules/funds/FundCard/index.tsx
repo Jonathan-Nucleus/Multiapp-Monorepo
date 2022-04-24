@@ -5,7 +5,7 @@ import { Share, Star } from "phosphor-react";
 import { useAccount } from "mobile/src/graphql/query/account";
 import { useWatchFund } from "mobile/src/graphql/mutation/funds";
 import { useFollowUser } from "mobile/src/graphql/mutation/account";
-import { Fund } from "mobile/src/graphql/query/marketplace";
+import { Fund } from "mobile/src/graphql/query/marketplace/useFunds";
 import Button from "desktop/app/components/common/Button";
 import Card from "desktop/app/components/common/Card";
 import { PINK } from "shared/src/colors";
@@ -35,8 +35,7 @@ const FundCard: FC<FundCardProps> = ({
         variables: { follow: follow, userId: id },
         refetchQueries: ["Account"],
       });
-    } catch (err) {
-    }
+    } catch (err) {}
   };
   const toggleWatchFund = async (id: string, watch: boolean): Promise<void> => {
     try {
@@ -44,8 +43,7 @@ const FundCard: FC<FundCardProps> = ({
         variables: { watch, fundId: id },
         refetchQueries: ["Account"],
       });
-    } catch (err) {
-    }
+    } catch (err) {}
   };
 
   return (

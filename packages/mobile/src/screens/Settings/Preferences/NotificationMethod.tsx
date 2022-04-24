@@ -1,5 +1,12 @@
-import React, { useState } from 'react';
-import { StyleSheet, FlatList, View, Text, Switch } from 'react-native';
+import React, { ReactElement, useState } from 'react';
+import {
+  ListRenderItem,
+  StyleSheet,
+  FlatList,
+  View,
+  Text,
+  Switch,
+} from 'react-native';
 
 import { GRAY20, WHITE, GREEN, WHITE60, WHITE12 } from 'shared/src/colors';
 
@@ -7,24 +14,21 @@ import { Body1Bold, Body2, Body2Bold, Body3 } from '../../../theme/fonts';
 import PhoneSvg from '../../../assets/icons/phone.svg';
 import EmailSvg from '../../../assets/icons/email.svg';
 
-interface renderItemProps {
-  item: {
-    label1: string;
-    label2?: string;
-    toggleSwitch?: () => void;
-    isEnabled?: boolean;
-    id: string;
-    value: boolean;
-    icon: string;
-  };
+interface NotificationMethod {
+  label1: string;
+  toggleSwitch?: () => void;
+  isEnabled?: boolean;
+  id: string;
+  value: boolean;
+  icon: ReactElement;
 }
 
-interface selectedItemProps {
+interface SelectedNotificationMethod {
   id: string;
   value: boolean;
 }
 
-const NotificationsMethods = [
+const NotificationMethods = [
   {
     icon: <PhoneSvg />,
     label1: 'Mobile Push',
@@ -39,10 +43,12 @@ const NotificationsMethods = [
   },
 ];
 
-const NotificationMethod: React.FC = () => {
-  const [enabledList, setEnabledList] = useState<selectedItemProps[]>([]);
+const NotificationMethodChooser: React.FC = () => {
+  const [enabledList, setEnabledList] = useState<SelectedNotificationMethod[]>(
+    [],
+  );
 
-  const handleToggleSelect = (val: boolean, item: renderItemProps) => {
+  const handleToggleSelect = (val: boolean, item: NotificationMethod) => {
     const _enabledList = [...enabledList];
     const objIndex = _enabledList.findIndex((v) => v.id === item.id);
     if (objIndex > -1) {
@@ -57,7 +63,9 @@ const NotificationMethod: React.FC = () => {
     setEnabledList(_enabledList);
   };
 
-  const renderListNotificationItem = ({ item }: renderItemProps) => {
+  const renderListNotificationItem: ListRenderItem<NotificationMethod> = ({
+    item,
+  }) => {
     return (
       <View
         style={[
@@ -82,10 +90,10 @@ const NotificationMethod: React.FC = () => {
   return (
     <>
       <View style={styles.listHeader}>
-        <Text style={styles.title}>Notifications Methods</Text>
+        <Text style={styles.title}>Notification Methods</Text>
       </View>
       <FlatList
-        data={NotificationsMethods}
+        data={NotificationMethods}
         renderItem={renderListNotificationItem}
         keyExtractor={(item, index) => `notificationsMethods${index}`}
         style={styles.flatList}
@@ -97,7 +105,7 @@ const NotificationMethod: React.FC = () => {
   );
 };
 
-export default NotificationMethod;
+export default NotificationMethodChooser;
 
 const styles = StyleSheet.create({
   headerTitle: {

@@ -59,7 +59,7 @@ const EmailContact: React.FC = () => {
       />
       <PFormLabel label="Fund of Interest" textStyle={styles.label} />
       <RNPickerSelect
-        onValueChange={(val) => setInterest(val)}
+        onValueChange={(val: string) => setInterest(val)}
         items={FUND}
         value={interest}
         style={{

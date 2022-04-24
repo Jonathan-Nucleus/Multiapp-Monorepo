@@ -1,6 +1,6 @@
 import { FC } from "react";
 import FundCard from "desktop/app/components/modules/funds/FundCard";
-import { Fund } from "mobile/src/graphql/query/marketplace";
+import { Fund } from "mobile/src/graphql/query/marketplace/useFunds";
 
 interface FundsListProps {
   funds: Fund[];

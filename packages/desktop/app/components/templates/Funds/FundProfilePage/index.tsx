@@ -146,6 +146,9 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
     }
   };
 
+  const { background: companyBackground, avatar: companyAvatar } =
+    fund?.company ?? {};
+
   return (
     <div className="container mx-auto mt-5 lg:px-4 max-w-screen-xl">
       <div className="lg:grid grid-cols-3">
@@ -153,12 +156,12 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
           <Card className="bg-secondary/[.27] overflow-visible rounded p-0">
             <div className="flex flex-row bg-secondary/[.27] rounded overflow-hidden -m-px">
               <div className="flex-shrink-0 w-72 h-72 bg-white relative">
-                {fund?.company?.background && (
+                {companyBackground && (
                   <Image
                     loader={() =>
-                      `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund.company.background.url}`
+                      `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${companyBackground.url}`
                     }
-                    src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund.company.background.url}`}
+                    src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${companyBackground.url}`}
                     alt=""
                     layout="fill"
                     className="object-cover"
@@ -168,13 +171,16 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
               </div>
               <div className="flex flex-col flex-grow">
                 <div className="flex px-5">
-                  <div className="w-24 h-24 flex-shrink-0 bg-purple-secondary rounded-b relative overflow-hidden">
-                    {fund?.company?.avatar && (
+                  <div
+                    className={`w-24 h-24 flex-shrink-0 bg-purple-secondary
+                    rounded-b relative overflow-hidden`}
+                  >
+                    {companyAvatar && (
                       <Image
                         loader={() =>
-                          `${process.env.NEXT_PUBLIC_AVATAR_URL}/${fund.company.avatar}`
+                          `${process.env.NEXT_PUBLIC_AVATAR_URL}/${companyAvatar}`
                         }
-                        src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${fund.company.avatar}`}
+                        src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${companyAvatar}`}
                         alt=""
                         layout="fill"
                         className="object-cover"

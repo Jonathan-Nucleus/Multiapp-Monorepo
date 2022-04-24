@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
-import { NavigationProp } from '@react-navigation/native';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
 
 import { GRAY800, WHITE } from 'shared/src/colors';
 import PLabel from '../../components/common/PLabel';
@@ -13,13 +13,12 @@ interface PostHeaderProps {
   centerLabel: string;
   rightLabel: string;
   rightValidation: boolean;
-  navigation: NavigationProp<any, any>;
   handleNext?: () => void;
 }
 
 const PostHeader: React.FC<PostHeaderProps> = (props) => {
-  const { centerLabel, rightLabel, rightValidation, navigation, handleNext } =
-    props;
+  const { centerLabel, rightLabel, rightValidation, handleNext } = props;
+  const navigation = useNavigation();
 
   return (
     <PHeader

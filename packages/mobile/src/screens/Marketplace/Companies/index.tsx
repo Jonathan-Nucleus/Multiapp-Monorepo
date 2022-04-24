@@ -2,16 +2,16 @@ import React from 'react';
 import { View, StyleSheet, FlatList, ListRenderItem } from 'react-native';
 
 import { BLACK } from 'shared/src/colors';
-import CompanyItem, { Fund } from './CompanyItem';
-import { useFundCompanies } from '../../../graphql/query/marketplace';
-import { FundCompaniesScreen } from '../../../navigations/MarketplaceStack';
+import CompanyItem from './CompanyItem';
+import { useFundCompanies, Company } from '../../../graphql/query/marketplace';
+import { FundCompaniesScreen } from '../../../navigations/MarketplaceTabs';
 
 const Companies: FundCompaniesScreen = () => {
   const { data } = useFundCompanies();
   const companies = data?.fundCompanies ?? [];
 
-  const keyExtractor = (item: Fund): string => item._id;
-  const renderItem: ListRenderItem<Fund> = ({ item }) => {
+  const keyExtractor = (item: Company): string => item._id;
+  const renderItem: ListRenderItem<Company> = ({ item }) => {
     return <CompanyItem company={item} />;
   };
 

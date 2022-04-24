@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import {
+  ListRenderItem,
   FlatList,
   StyleSheet,
   TextInput,
@@ -37,32 +38,10 @@ import { BLACK, WHITE } from 'shared/src/colors';
 import pStyles from '../../theme/pStyles';
 
 import { useCommentPost, useDeleteComment } from '../../graphql/mutation/posts';
-import { usePost } from '../../graphql/query/post';
+import { usePost, Post } from '../../graphql/query/post';
 import { useFollowUser, useHideUser } from '../../graphql/mutation/account';
-import type { User } from 'backend/graphql/users.graphql';
 
-interface CommentItemProps {
-  user: User;
-  body: string;
-}
-
-const LIKES = [
-  {
-    firstName: 'sss',
-    lastName: 'ddddd',
-    avatar: '3333.png',
-    position: 'test',
-    company: 'cccc',
-  },
-  {
-    firstName: 'sss',
-    lastName: 'ddddd',
-    avatar: '3333.png',
-    position: 'test',
-    company: 'cccc',
-  },
-];
-
+type CommentUser = Post['comments'][number]['user'];
 const CommentMenuDataArray = [
   {
     label: 'Edit Comment',
@@ -77,23 +56,30 @@ const CommentMenuDataArray = [
 ];
 
 const PostDetail: PostDetailScreen = ({ route }) => {
+  const { post, userId } = route.params;
+
   const [comment, setComment] = useState('');
   const [kebobMenuVisible, setKebobMenuVisible] = useState(false);
   const [commentMenuVisible, setCommentMenuVisible] = useState(false);
-  const [selectedUser, setSelectedUser] = useState({});
+  const [selectedUser, setSelectedUser] = useState<CommentUser | undefined>(
+    undefined,
+  );
   const [likesModalVisible, setLikesModalVisible] = useState(false);
-  const { post, userId } = route.params;
+
   const { data, refetch } = usePost(post._id);
   const [commentPost] = useCommentPost();
   const [deleteComment] = useDeleteComment();
   const [followUser] = useFollowUser();
   const [hideUser] = useHideUser();
-  const comments = data?.post?.comments;
+
+  if (!data || !data.post) return <></>;
+
+  const { comments, likes } = data.post;
 
   const getKebobMenuData = useMemo(() => {
     const KebobMenuDataArray = [
       {
-        label: `Follow ${selectedUser.firstName} ${selectedUser.lastName}`,
+        label: `Follow ${selectedUser?.firstName} ${selectedUser?.lastName}`,
         icon: <UserCirclePlus size={32} color={WHITE} />,
         key: 'follow',
       },
@@ -103,7 +89,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
         key: 'report',
       },
       {
-        label: `Hide ${selectedUser.firstName} ${selectedUser.lastName}`,
+        label: `Hide ${selectedUser?.firstName} ${selectedUser?.lastName}`,
         icon: <EyeClosed size={32} color={WHITE} />,
         key: 'hide',
       },
@@ -134,6 +120,8 @@ const PostDetail: PostDetailScreen = ({ route }) => {
   };
 
   const handleDeleteComment = async () => {
+    if (!selectedUser) return;
+
     try {
       const { data } = await deleteComment({
         variables: { commentId: selectedUser._id },
@@ -149,6 +137,8 @@ const PostDetail: PostDetailScreen = ({ route }) => {
   };
 
   const handleFollowUser = async () => {
+    if (!selectedUser) return;
+
     try {
       const { data } = await followUser({
         variables: { follow: true, userId: selectedUser._id },
@@ -164,6 +154,8 @@ const PostDetail: PostDetailScreen = ({ route }) => {
   };
 
   const handleHideUser = async () => {
+    if (!selectedUser) return;
+
     try {
       const { data } = await hideUser({
         variables: { hide: true, userId: selectedUser._id },
@@ -178,7 +170,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
     }
   };
 
-  const CommentItem = ({ item }: { item: CommentItemProps }) => {
+  const renderItem: ListRenderItem<typeof comments[number]> = ({ item }) => {
     const { user, body } = item;
     return (
       <View>
@@ -202,11 +194,6 @@ const PostDetail: PostDetailScreen = ({ route }) => {
       </View>
     );
   };
-
-  const renderItem = useCallback(
-    ({ item }) => <CommentItem item={item} />,
-    [comments?.length],
-  );
 
   return (
     <SafeAreaView
@@ -248,7 +235,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
         }}
       />
       <LikesModal
-        likes={LIKES}
+        likes={likes}
         isVisible={likesModalVisible}
         onClose={() => setLikesModalVisible(false)}
       />

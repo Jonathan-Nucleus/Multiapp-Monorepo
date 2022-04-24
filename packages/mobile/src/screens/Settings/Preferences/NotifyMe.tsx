@@ -1,5 +1,12 @@
 import React, { FC, useState } from 'react';
-import { StyleSheet, FlatList, View, Text, Switch } from 'react-native';
+import {
+  ListRenderItem,
+  StyleSheet,
+  FlatList,
+  View,
+  Text,
+  Switch,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NavigationProp } from '@react-navigation/native';
 
@@ -26,17 +33,15 @@ import {
   Body3,
 } from '../../../theme/fonts';
 
-interface renderItemProps {
-  item: {
-    label1: string;
-    toggleSwitch?: () => void;
-    isEnabled?: boolean;
-    id: string;
-    value: boolean;
-  };
+interface NotificationSetting {
+  label1: string;
+  toggleSwitch?: () => void;
+  isEnabled?: boolean;
+  id: string;
+  value: boolean;
 }
 
-interface selectedItemProps {
+interface SelectedNotification {
   id: string;
   value: boolean;
 }
@@ -70,9 +75,9 @@ const Notifications = [
 ];
 
 const NotifyMe: React.FC = () => {
-  const [enabledList, setEnabledList] = useState<selectedItemProps[]>([]);
+  const [enabledList, setEnabledList] = useState<SelectedNotification[]>([]);
 
-  const handleToggleSelect = (val: boolean, item: renderItemProps) => {
+  const handleToggleSelect = (val: boolean, item: NotificationSetting) => {
     const _enabledList = [...enabledList];
     const objIndex = _enabledList.findIndex((v) => v.id === item.id);
     if (objIndex > -1) {
@@ -87,7 +92,7 @@ const NotifyMe: React.FC = () => {
     setEnabledList(_enabledList);
   };
 
-  const renderListItem = ({ item }: renderItemProps) => {
+  const renderListItem: ListRenderItem<NotificationSetting> = ({ item }) => {
     return (
       <View>
         <Text style={styles.title}>{item.label1}</Text>
@@ -96,7 +101,7 @@ const NotifyMe: React.FC = () => {
             <Switch
               trackColor={{ false: GRAY20, true: GREEN }}
               ios_backgroundColor={GRAY20}
-              onValueChange={(val) => handleToggleSelect(val, item)}
+              onValueChange={(selected) => handleToggleSelect(selected, item)}
               value={
                 enabledList.findIndex((v) => v.id === item.id && v.value) > -1
               }

@@ -1,13 +1,13 @@
 import React, { FC } from "react";
 
 import CommentCard from "./CommentCard";
-import type { Comment } from "backend/graphql/comments.graphql";
+import type { Comment } from "mobile/src/graphql/query/post";
 
 interface CommentDetailProps {
-  comments: Comment[] | undefined;
+  comments: Comment[];
   postId: string;
   parentId: string | null;
-  commentsByCommentID?: Record<string, Comment[]> | undefined;
+  commentsByCommentID: Record<string, Comment[]>;
 }
 
 const CommentsList: FC<CommentDetailProps> = ({

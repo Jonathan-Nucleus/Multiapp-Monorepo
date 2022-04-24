@@ -5,14 +5,15 @@ import {
 } from '@react-navigation/stack';
 
 import FundDetails from '../screens/Marketplace/Funds/FundDetails';
-import MarketplaceStack from './MarketplaceStack';
+import MarketplaceTabs from './MarketplaceTabs';
 
 const Stack = createStackNavigator();
 
-type FundsStackParamList = {
+export type FundsStackParamList = {
   Marketplace: undefined;
   FundDetails: { fundId: string };
 };
+export type FundsStackScreenProps = StackScreenProps<FundsStackParamList>;
 
 export type FundDetailsScreen = (
   props: StackScreenProps<FundsStackParamList, 'FundDetails'>,
@@ -27,7 +28,7 @@ const FundsStack = () => {
     <Stack.Navigator
       screenOptions={{ headerShown: false, gestureEnabled: true }}
       initialRouteName="Marketplace">
-      <Stack.Screen name="Marketplace" component={MarketplaceStack} />
+      <Stack.Screen name="Marketplace" component={MarketplaceTabs} />
       <Stack.Screen name="FundDetails" component={FundDetails} />
     </Stack.Navigator>
   );

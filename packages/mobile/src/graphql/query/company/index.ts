@@ -1,7 +1,10 @@
 import { gql, useQuery, QueryResult } from '@apollo/client';
 import { Company as GraphQLCompany } from 'backend/graphql/companies.graphql';
 import { User as GraphQLUser } from 'backend/graphql/users.graphql';
-import { VIEW_POST_FRAGMENT } from './post';
+import {
+  POST_SUMMARY_FRAGMENT,
+  PostSummary,
+} from 'mobile/src/graphql/fragments/post';
 
 type CompanyVariables = {
   companyId: string;
@@ -47,10 +50,11 @@ export type Company = Pick<
   following: FollowUser[];
   funds: Fund[];
   members: CompanyMember[];
+  posts: PostSummary[];
 };
 
 export type CompanyData = {
-  companyProfile?: GraphQLCompany;
+  companyProfile?: Company;
 };
 
 /**
@@ -63,7 +67,7 @@ export function useCompany(
 ): QueryResult<CompanyData, CompanyVariables> {
   return useQuery<CompanyData, CompanyVariables>(
     gql`
-      ${VIEW_POST_FRAGMENT}
+      ${POST_SUMMARY_FRAGMENT}
       query CompanyProfile($companyId: ID!) {
         companyProfile(companyId: $companyId) {
           _id
@@ -127,7 +131,7 @@ export function useCompany(
             }
           }
           posts {
-            ...ViewPostFields
+            ...PostSummaryFields
           }
         }
       }

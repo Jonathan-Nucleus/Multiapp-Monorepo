@@ -29,6 +29,8 @@ type HomeStackParamList = {
     categories: string[];
   };
   PostDetail: { post: Post; userId: string };
+  Notification: undefined;
+  NotificationDetail: { postId: string; userId: string };
 };
 
 export type HomeScreen = (
@@ -49,6 +51,14 @@ export type ReviewPostScreen = (
 
 export type PostDetailScreen = (
   props: StackScreenProps<HomeStackParamList, 'PostDetail'>,
+) => ReactElement;
+
+export type NotificationScreen = (
+  props: StackScreenProps<HomeStackParamList, 'Notification'>,
+) => ReactElement;
+
+export type NotificationDetailsScreen = (
+  props: StackScreenProps<HomeStackParamList, 'NotificationDetail'>,
 ) => ReactElement;
 
 const HomeStack = () => {

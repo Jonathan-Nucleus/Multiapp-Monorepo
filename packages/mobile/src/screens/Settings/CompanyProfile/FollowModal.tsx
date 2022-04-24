@@ -1,5 +1,6 @@
 import React, { FC, useMemo, useState } from 'react';
 import {
+  ListRenderItem,
   StyleSheet,
   View,
   Text,
@@ -14,13 +15,13 @@ import { AVATAR_URL } from 'react-native-dotenv';
 import UserInfo from '../../../components/common/UserInfo';
 import { Body2Bold } from '../../../theme/fonts';
 import { WHITE, WHITE60, PRIMARYSTATE, BLACK } from 'shared/src/colors';
-import type { User } from 'backend/graphql/users.graphql';
+import type { UserProfile } from 'backend/graphql/users.graphql';
 
 interface ModalProps {
   isVisible: boolean;
   onClose: () => void;
-  following: User[];
-  followers: User[];
+  following: UserProfile[];
+  followers: UserProfile[];
 }
 
 const FollowModal: FC<ModalProps> = ({
@@ -38,13 +39,13 @@ const FollowModal: FC<ModalProps> = ({
     return following;
   }, [currentTab, followers, following]);
 
-  const renderItem = (user: User) => {
+  const renderItem: ListRenderItem<typeof members[number]> = ({ item }) => {
     return (
       <UserInfo
-        avatar={{ uri: `${AVATAR_URL}/${user.avatar}` }}
-        name={`${user.firstName} ${user.lastName}`}
-        role={user.position}
-        company={user.company?.name}
+        avatar={{ uri: `${AVATAR_URL}/${item.avatar}` }}
+        name={`${item.firstName} ${item.lastName}`}
+        role={item.position}
+        company={item.company?.name}
         avatarSize={32}
         isPro
       />
@@ -98,7 +99,7 @@ const FollowModal: FC<ModalProps> = ({
               <FlatList
                 data={members}
                 keyExtractor={(item) => item._id}
-                renderItem={({ item }) => renderItem(item)}
+                renderItem={renderItem}
                 horizontal={false}
                 keyboardShouldPersistTaps="always"
                 nestedScrollEnabled

@@ -1,5 +1,12 @@
 import React, { FC, useState } from 'react';
-import { StyleSheet, FlatList, View, Text, Switch } from 'react-native';
+import {
+  ListRenderItem,
+  StyleSheet,
+  FlatList,
+  View,
+  Text,
+  Switch,
+} from 'react-native';
 import { NavigationProp } from '@react-navigation/native';
 
 import { CaretLeft } from 'phosphor-react-native';
@@ -14,18 +21,16 @@ import NotificationMethod from './NotificationMethod';
 import Messages from './Messages';
 import NotifyMe from './NotifyMe';
 
-interface renderItemProps {
-  item: {
-    label1: string;
-    label2?: string;
-    toggleSwitch?: () => void;
-    isEnabled?: boolean;
-    id: number;
-    value: boolean;
-  };
+interface GeneralSetting {
+  label1: string;
+  label2?: string;
+  toggleSwitch?: () => void;
+  isEnabled?: boolean;
+  id: number;
+  value: boolean;
 }
 
-interface selectedItemProps {
+interface SelectedSetting {
   id: number;
   value: boolean;
 }
@@ -34,7 +39,7 @@ interface RouterProps {
   navigation: NavigationProp<any, any>;
 }
 
-const Gnerals = [
+const GeneralSettings = [
   {
     label1: 'Allow tagging',
     label2:
@@ -45,9 +50,9 @@ const Gnerals = [
 ];
 
 const Preferences: FC<RouterProps> = ({ navigation }) => {
-  const [enabledList, setEnabledList] = useState<selectedItemProps[]>([]);
+  const [enabledList, setEnabledList] = useState<SelectedSetting[]>([]);
 
-  const handleToggleSelect = (val: boolean, item: renderItemProps) => {
+  const handleToggleSelect = (val: boolean, item: GeneralSetting) => {
     const _enabledList = [...enabledList];
     const objIndex = _enabledList.findIndex((v) => v.id === item.id);
     if (objIndex > -1) {
@@ -62,7 +67,7 @@ const Preferences: FC<RouterProps> = ({ navigation }) => {
     setEnabledList(_enabledList);
   };
 
-  const renderListItem = ({ item }: renderItemProps) => {
+  const renderListItem: ListRenderItem<GeneralSetting> = ({ item }) => {
     return (
       <View style={styles.item}>
         <View style={styles.leftItem}>
@@ -95,7 +100,7 @@ const Preferences: FC<RouterProps> = ({ navigation }) => {
           <Text style={styles.title}>General</Text>
         </View>
         <FlatList
-          data={Gnerals}
+          data={GeneralSettings}
           renderItem={renderListItem}
           keyExtractor={(item, index) => `general${index}`}
           style={styles.flatList}

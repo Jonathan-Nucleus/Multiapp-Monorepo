@@ -24,18 +24,18 @@ interface RouterProps {
 const InviteFriends: FC<RouterProps> = ({ navigation }) => {
   const [code, setCode] = useState<number[]>([]);
 
-  const shareCode = () => {
-    Share.open({
-      title: 'Join me on Prometheus Alts!',
-      message: `Share code ${code.join('')}`,
-      url: 'prometheusalts.com',
-    })
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        err && console.log(err);
+  const shareCode = async () => {
+    try {
+      const result = await Share.open({
+        title: 'Join me on Prometheus Alts!',
+        message: `Share code ${code.join('')}`,
+        url: 'prometheusalts.com',
       });
+
+      console.log('result', result);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   console.log('code======>', code);

@@ -1,11 +1,12 @@
 import { FC, useState } from "react";
 import { DotsThreeOutlineVertical, Trash, Pen } from "phosphor-react";
-import moment from "moment";
 import { Menu } from "@headlessui/react";
+import moment from "moment";
 
 import SendMessage from "./SendMessage";
 import Button from "../Button";
-import type { Comment } from "backend/graphql/comments.graphql";
+import Avatar from "../Avatar";
+
 import {
   useLikePost,
   useDeleteComment,
@@ -13,7 +14,7 @@ import {
   useCommentPost,
 } from "mobile/src/graphql/mutation/posts";
 import { useAccount } from "mobile/src/graphql/query/account";
-import Avatar from "../Avatar";
+import type { Comment } from "mobile/src/graphql/query/post";
 
 interface CommentCardProps {
   comment: Comment;

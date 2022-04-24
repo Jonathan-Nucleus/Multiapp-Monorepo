@@ -1,5 +1,5 @@
 import React, { useState, useEffect, memo, useMemo } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { ListRenderItem, FlatList, StyleSheet, View } from 'react-native';
 import isEqual from 'react-fast-compare';
 import SplashScreen from 'react-native-splash-screen';
 import { useIsFocused } from '@react-navigation/native';
@@ -22,7 +22,7 @@ import ReportPostModal from './ReportPostModal';
 import { HomeScreen } from 'mobile/src/navigations/HomeStack';
 import { WHITE } from 'shared/src/colors';
 
-import { useFetchPosts } from 'mobile/src/hooks/queries';
+import { usePosts, Post } from 'mobile/src/graphql/query/post/usePosts';
 import { useAccount } from '../../graphql/query/account';
 import { useFollowUser, useHideUser } from '../../graphql/mutation/account';
 import { showMessage } from '../../services/utils';
@@ -34,10 +34,10 @@ const CategoryList = ['All', 'Investment Ideas', 'World News', 'Politics'];
 const HomeComponent: HomeScreen = ({ navigation }) => {
   const [category, setCategory] = useState('All');
   const [kebobMenuVisible, setKebobMenuVisible] = useState(false);
-  const [selectedPost, setSelectedPost] = useState({});
+  const [selectedPost, setSelectedPost] = useState<Post | undefined>(undefined);
   const [reportPostModalVisible, setReportPostModalVisible] = useState(false);
 
-  const { data, error, loading, refetch } = useFetchPosts();
+  const { data, error, loading, refetch } = usePosts();
   const { data: userData } = useAccount();
   const [followUser] = useFollowUser();
   const [hideUser] = useHideUser();
@@ -45,7 +45,7 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
   const [reportPost] = useReportPost();
 
   const account = userData?.account;
-  const postData = data?.posts;
+  const postData = data?.posts ?? [];
 
   const getKebobMenuData = useMemo(() => {
     const KebobMenuDataArray = [
@@ -93,11 +93,21 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
     SplashScreen.hide();
   }, []);
 
+  if (!account) {
+    return (
+      <View style={pStyles.globalContainer}>
+        <MainHeader />
+      </View>
+    );
+  }
+
   const handleCreatePost = () => {
     navigation.navigate('CreatePost');
   };
 
   const handleFollowUser = async () => {
+    if (!selectedPost) return;
+
     try {
       const { data } = await followUser({
         variables: { follow: true, userId: selectedPost.user._id },
@@ -105,7 +115,7 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
       if (data?.followUser) {
         showMessage(
           'success',
-          `You’re following ${selectedPost?.user?.firstName} ${selectedPost?.user?.lastName}`,
+          `You’re following ${selectedPost.user.firstName} ${selectedPost.user.lastName}`,
         );
       } else {
         showMessage('error', SOMETHING_WRONG);
@@ -116,6 +126,8 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
   };
 
   const handleHideUser = async () => {
+    if (!selectedPost) return;
+
     try {
       const { data } = await hideUser({
         variables: { hide: true, userId: selectedPost.user._id },
@@ -123,7 +135,7 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
       if (data?.hideUser) {
         showMessage(
           'success',
-          `You will not be able to see posts from ${selectedPost?.user?.firstName} ${selectedPost?.user?.lastName} anymore`,
+          `You will not be able to see posts from ${selectedPost.user.firstName} ${selectedPost.user.lastName} anymore`,
         );
       } else {
         showMessage('error', SOMETHING_WRONG);
@@ -134,6 +146,8 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
   };
 
   const handleHidePost = async () => {
+    if (!selectedPost) return;
+
     try {
       const { data } = await hidePost({
         variables: { hide: true, postId: selectedPost._id },
@@ -150,6 +164,8 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
   };
 
   const handleReportPost = async (violations: string[], comment: string) => {
+    if (!selectedPost) return;
+
     try {
       const { data } = await reportPost({
         variables: {
@@ -171,10 +187,10 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
     }
   };
 
-  const renderItem = ({ item }: { item: PostItemProps }) => (
+  const renderItem: ListRenderItem<Post> = ({ item }) => (
     <PostItem
       post={item}
-      userId={account?._id}
+      userId={account._id}
       onPressMenu={() => {
         setSelectedPost(item);
         setKebobMenuVisible(true);
@@ -201,9 +217,9 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
           listKey="category"
         />
         <FlatList
-          data={postData || []}
+          data={postData}
           renderItem={renderItem}
-          keyExtractor={(item: PostItemProps) => `${item._id}`}
+          keyExtractor={(item) => `${item._id}`}
           listKey="post"
         />
       </PAppContainer>

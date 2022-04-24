@@ -3,20 +3,27 @@ import ProfilePage from "../../app/components/templates/ProfilePage";
 import { NextPageWithLayout } from "../../app/types/next-page";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
-import { useFetchProfile } from "mobile/src/graphql/query/user";
+import { useProfile } from "mobile/src/graphql/query/user/useProfile";
 
 const Profile: NextPageWithLayout = () => {
   const router = useRouter();
   const { data: session } = useSession();
-  const { userId } = router.query as Record<string, string>;
-  const { data: profileData } = useFetchProfile(
-    userId != "me" ? userId : session?.user!._id!
-  );
+  if (!session) return null;
+
+  let { userId } = router.query as Record<string, string>;
+  if (userId === "me") {
+    userId = session.user!._id;
+  }
+
+  const { data: profileData } = useProfile(userId);
   const user = profileData?.userProfile;
   const title =
     userId == "me"
       ? "My Profile - Prometheus"
-      : `${user ? `${user.firstName} ${user.lastName}` : "Profile"} - Prometheus`;
+      : `${
+          user ? `${user.firstName} ${user.lastName}` : "Profile"
+        } - Prometheus`;
+
   return (
     <div>
       <Head>

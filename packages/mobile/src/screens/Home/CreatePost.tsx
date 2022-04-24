@@ -216,7 +216,6 @@ const CreatePost: CreatePostScreen = ({ navigation }) => {
         centerLabel="Create Post"
         rightLabel="NEXT"
         rightValidation={checkValidation()}
-        navigation={navigation}
         handleNext={handleNext}
       />
       <PAppContainer>

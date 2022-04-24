@@ -2,13 +2,13 @@ import { FC, useState } from "react";
 import Navbar from "../../../modules/funds/Navbar";
 import { Info, Lock } from "phosphor-react";
 import Button from "../../../common/Button";
-import { useFetchFunds } from "mobile/src/graphql/query/marketplace";
+import { useFunds } from "mobile/src/graphql/query/marketplace/useFunds";
 import FundsList from "./FundsList";
 import { useAccount } from "mobile/src/graphql/query/account";
 import AccreditationQuestionnaire from "../AccreditationQuestionnaire";
 
 const FundsPage: FC = () => {
-  const { data } = useFetchFunds();
+  const { data } = useFunds();
   const [isVerifying, setIsVerifying] = useState(false);
   const funds = data?.funds ?? [];
   const { data: accountData } = useAccount();

@@ -36,13 +36,17 @@ export async function clearToken(): Promise<void> {
   notify('cleared');
 }
 
-let observers: ((action?: TokenAction) => void)[] = [];
+let observers: ((action: TokenAction) => void)[] = [];
 
-export function attachTokenObserver(observer: () => void): void {
+export function attachTokenObserver(
+  observer: (action: TokenAction) => void,
+): void {
   observers.push(observer);
 }
 
-export function detachTokenObserver(observer: () => void): void {
+export function detachTokenObserver(
+  observer: (action: TokenAction) => void,
+): void {
   observers = observers.filter((ob) => ob !== observer);
 }
 

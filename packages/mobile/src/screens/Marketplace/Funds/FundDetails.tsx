@@ -35,7 +35,7 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
   const fund = data?.fund;
 
   if (!fund) {
-    return null;
+    return <></>;
   }
 
   return (

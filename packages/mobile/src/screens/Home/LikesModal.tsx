@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 import {
+  ListRenderItem,
   StyleSheet,
   View,
   Dimensions,
@@ -14,16 +15,16 @@ import PLabel from '../../components/common/PLabel';
 import { BGDARK, GRAY800, WHITE12 } from 'shared/src/colors';
 import { Body1Bold } from '../../theme/fonts';
 
-import type { User } from 'backend/graphql/users.graphql';
+import type { Like } from 'mobile/src/graphql/query/post';
 
 interface ModalProps {
   isVisible: boolean;
   onClose: () => void;
-  likes: User[];
+  likes: Like[];
 }
 
 const LikesModal: FC<ModalProps> = ({ isVisible, likes, onClose }) => {
-  const renderItem = (user: User) => {
+  const renderItem: ListRenderItem<Like> = ({ item: user }) => {
     return (
       <UserInfo
         avatar={{ uri: `${AVATAR_URL}/${user.avatar}` }}
@@ -52,7 +53,7 @@ const LikesModal: FC<ModalProps> = ({ isVisible, likes, onClose }) => {
             <FlatList
               data={likes}
               keyExtractor={(item) => item._id}
-              renderItem={({ item }) => renderItem(item)}
+              renderItem={renderItem}
               nestedScrollEnabled
               scrollEnabled={false}
               style={styles.flatList}

@@ -1,96 +1,25 @@
 import { gql, useQuery, QueryResult } from '@apollo/client';
 import { Fund as GraphQLFund } from 'backend/graphql/funds.graphql';
 import { Company as GraphQLCompany } from 'backend/graphql/companies.graphql';
-
-type FetchFundsVariables = never;
-
-export type Fund = Pick<
-  GraphQLFund,
-  '_id' | 'name' | 'level' | 'status' | 'highlights' | 'overview' | 'tags'
-> & {
-  manager: Pick<
-    GraphQLFund['manager'],
-    '_id' | 'firstName' | 'lastName' | 'avatar' | 'followerIds' | 'postIds'
-  >;
-  company: Pick<
-    GraphQLFund['company'],
-    '_id' | 'name' | 'avatar' | 'background'
-  >;
-};
-
-export type FetchFundsData = {
-  funds?: Fund[];
-};
-
-/**
- * GraphQL query that fetches funds for the current user. These are
- * automatically filtered by the user's accreditation status.
- *
- * @returns   GraphQL query.
- */
-export function useFetchFunds(): QueryResult<
-  FetchFundsData,
-  FetchFundsVariables
-> {
-  return useQuery<FetchFundsData, FetchFundsVariables>(gql`
-    query Funds {
-      funds {
-        _id
-        name
-        level
-        status
-        highlights
-        overview
-        tags
-        manager {
-          _id
-          firstName
-          lastName
-          avatar
-          followerIds
-          postIds
-        }
-        company {
-          _id
-          name
-          avatar
-          background {
-            url
-            x
-            y
-            width
-            height
-            scale
-          }
-        }
-      }
-    }
-  `);
-}
+import {
+  FUND_SUMMARY_FRAGMENT,
+  FUND_COMPANY_FRAGMENT,
+  FundSummary,
+  FundCompany,
+} from 'mobile/src/graphql/fragments/fund';
 
 type FundVariables = {
   fundId: string;
 };
 
-export type FundDetails = Pick<
-  GraphQLFund,
-  '_id' | 'name' | 'highlights' | 'overview' | 'tags' | 'documents' | 'status'
-> & {
-  manager: Pick<
-    GraphQLFund['manager'],
-    '_id' | 'firstName' | 'lastName' | 'avatar' | 'postIds' | 'followerIds'
-  >;
-  team: Pick<
-    GraphQLFund['team'][number],
-    '_id' | 'firstName' | 'lastName' | 'avatar' | 'position'
-  >[];
-  company: Pick<GraphQLFund['company'], '_id' | 'name' | 'avatar'> & {
-    background: Pick<
-      Exclude<GraphQLFund['company']['background'], undefined>,
-      'url'
-    >;
+export type FundDetails = FundSummary &
+  FundCompany & {
+    documents: GraphQLFund['documents'];
+    team: Pick<
+      GraphQLFund['team'][number],
+      '_id' | 'firstName' | 'lastName' | 'avatar' | 'position'
+    >[];
   };
-};
 export type FundData = {
   fund?: FundDetails;
 };
@@ -103,14 +32,12 @@ export type FundData = {
 export function useFund(fundId?: string): QueryResult<FundData, FundVariables> {
   return useQuery<FundData, FundVariables>(
     gql`
+      ${FUND_SUMMARY_FRAGMENT}
+      ${FUND_COMPANY_FRAGMENT}
       query Fund($fundId: ID!) {
         fund(fundId: $fundId) {
-          _id
-          name
-          highlights
-          overview
-          tags
-          status
+          ...FundSummaryFields
+          ...FundCompanyFields
           documents {
             title
             url
@@ -118,28 +45,12 @@ export function useFund(fundId?: string): QueryResult<FundData, FundVariables> {
             date
             createdAt
           }
-          manager {
-            _id
-            firstName
-            lastName
-            avatar
-            postIds
-            followerIds
-          }
           team {
             _id
             firstName
             lastName
             avatar
             position
-          }
-          company {
-            _id
-            name
-            avatar
-            background {
-              url
-            }
           }
         }
       }
@@ -169,7 +80,7 @@ export type FundManager = Pick<
     '_id' | 'name' | 'avatar'
   >;
 };
-export type FundList = Pick<Fund, '_id' | 'name' | 'level'>[];
+export type FundList = Pick<FundSummary, '_id' | 'name'>[];
 export type FundManagersData = {
   fundManagers?: {
     managers: FundManager[];
@@ -193,7 +104,6 @@ export function useFundManagers(): QueryResult<
           funds {
             _id
             name
-            level
           }
           managers {
             _id
@@ -225,7 +135,7 @@ export type Company = Pick<
   funds: Pick<GraphQLCompany['funds'][number], '_id' | 'name' | 'managerId'>[];
   fundManagers: Pick<
     GraphQLCompany['fundManagers'][number],
-    '_id' | 'firstName' | 'lastName' | 'avatar'
+    '_id' | 'firstName' | 'lastName' | 'avatar' | 'position'
   >[];
 };
 export type FundCompanyData = {
@@ -260,6 +170,7 @@ export function useFundCompanies(): QueryResult<
             firstName
             lastName
             avatar
+            position
           }
         }
       }

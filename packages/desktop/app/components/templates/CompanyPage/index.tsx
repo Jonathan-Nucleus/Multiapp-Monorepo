@@ -1,13 +1,22 @@
 import { FC } from "react";
 import PostsList from "../../common/PostsList";
 import FundCard from "../../modules/funds/FundCard";
-import { CompanyProfileProps } from "../../../types/common-props";
 import ProfileCard from "./ProfileCard";
 import TeamMembersList from "../../modules/teams/TeamMembersList";
+import { CompanyProfile } from "mobile/src/graphql/query/company/useCompany";
+import { usePosts } from "mobile/src/graphql/query/company/usePosts";
 
-const CompanyPage: FC<CompanyProfileProps> = ({ company }: CompanyProfileProps) => {
-  const funds = company.funds.map(fund => ({ ...fund, company }));
-  const members = company.members.map(member => ({ ...member, company }));
+interface CompanyPageProps {
+  company: CompanyProfile;
+}
+
+const CompanyPage: FC<CompanyPageProps> = ({ company }) => {
+  const { data: postsData } = usePosts(company._id);
+
+  const posts = postsData?.companyProfile?.posts;
+  const funds = company.funds.map((fund) => ({ ...fund, company }));
+  const members = company.members.map((member) => ({ ...member, company }));
+
   return (
     <>
       <div className="lg:mt-12 mb-12 lg:px-14">
@@ -27,9 +36,7 @@ const CompanyPage: FC<CompanyProfileProps> = ({ company }: CompanyProfileProps) 
                   </div>
                 ))}
               </div>
-              <div className="py-5">
-                <PostsList posts={company.posts} />
-              </div>
+              <div className="py-5">{posts && <PostsList posts={posts} />}</div>
             </div>
           </div>
           <div className="col-span-2 hidden lg:block">

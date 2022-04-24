@@ -13,29 +13,40 @@ import {
   WHITE12,
 } from 'shared/src/colors';
 import { Body1, Body2 } from 'mobile/src/theme/fonts';
-import { FundItemProps } from './FundItem';
 
 import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
+import { FundSummary } from 'mobile/src/graphql/fragments/fund';
 
-const FundProfileInfo: FC<FundItemProps> = ({
+export interface FundProfileInfo {
+  fund: FundSummary;
+  showOverview?: boolean;
+  showTags?: boolean;
+}
+
+const FundProfileInfo: FC<FundProfileInfo> = ({
   fund,
   showOverview,
   showTags,
 }) => {
+  const { background, avatar } = fund.company;
   return (
     <View>
       <View style={styles.imagesContainer}>
-        <FastImage
-          style={styles.backgroundImage}
-          source={{ uri: `${BACKGROUND_URL}/${fund.company.background.url}` }}
-          resizeMode={FastImage.resizeMode.cover}
-        />
-        <Image
-          style={styles.avatarImage}
-          source={{
-            uri: `${AVATAR_URL}/${fund.company.avatar}`,
-          }}
-        />
+        {background && (
+          <FastImage
+            style={styles.backgroundImage}
+            source={{ uri: `${BACKGROUND_URL}/${background.url}` }}
+            resizeMode={FastImage.resizeMode.cover}
+          />
+        )}
+        {avatar && (
+          <Image
+            style={styles.avatarImage}
+            source={{
+              uri: `${AVATAR_URL}/${avatar}`,
+            }}
+          />
+        )}
       </View>
       <View style={styles.fundDetailsContainer}>
         <View style={styles.statusContainer}>

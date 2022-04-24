@@ -12,7 +12,7 @@ import { WHITE, BLACK75, PRIMARY } from 'shared/src/colors';
 
 import { Body2, Body2Bold } from '../../../theme/fonts';
 import FundItem from './FundItem';
-import { useFetchFunds } from '../../../graphql/query/marketplace';
+import { useFunds } from '../../../graphql/query/marketplace/useFunds';
 import PGradientOutlineButton from '../../common/PGradientOutlineButton';
 
 interface FundProps {
@@ -20,7 +20,7 @@ interface FundProps {
 }
 
 const Funds: React.FC<FundProps> = ({ accredited }) => {
-  const { data } = useFetchFunds();
+  const { data } = useFunds();
   const funds = data?.funds ?? [];
 
   if (funds.length === 0) {

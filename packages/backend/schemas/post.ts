@@ -28,7 +28,11 @@ export namespace Post {
     featured?: boolean;
   }
 
-  export type GraphQL = GraphQLEntity<Omit<Mongo, "visible">> & {
+  export type GraphQL = GraphQLEntity<
+    Omit<Mongo, "audience" | "categories" | "visible">
+  > & {
+    audience: AudienceEnum;
+    categories: PostCategoryEnum[];
     createdAt: Date;
     user: User.GraphQL;
     mentions: User.GraphQL[];
@@ -39,10 +43,10 @@ export namespace Post {
     reporters: User.GraphQL[];
   };
 
-  export type Input = Pick<
-    GraphQL,
-    "audience" | "body" | "mediaUrl" | "categories" | "mentionIds"
-  >;
+  // Defines the server-side input schema for posts after GraphQL enumarations
+  // have been transformed to their Mongo types.
+  export type Input = Pick<GraphQL, "body" | "mediaUrl" | "mentionIds"> &
+    Pick<Mongo, "audience" | "categories">;
 }
 
 /** Enumeration describing the audience targeted by a post. */

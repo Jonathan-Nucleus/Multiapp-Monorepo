@@ -193,7 +193,7 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
 
   return (
     <View style={pStyles.globalContainer}>
-      <MainHeader navigation={navigation} />
+      <MainHeader />
       <FlatList
         data={MENU_ITEMS}
         ListHeaderComponent={renderListHeaderComponent}

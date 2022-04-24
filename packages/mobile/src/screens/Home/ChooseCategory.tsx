@@ -98,7 +98,6 @@ const ChooseCategory: ChooseCategoryScreen = ({ route, navigation }) => {
         centerLabel="Choose Categories"
         rightLabel="NEXT"
         rightValidation={checkValidation()}
-        navigation={navigation}
         handleNext={handleNext}
       />
       <PAppContainer>

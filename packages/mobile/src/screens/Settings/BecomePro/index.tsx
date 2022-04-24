@@ -64,11 +64,11 @@ const BecomePro: React.FC<BecomeProProps> = ({ navigation }) => {
 
   const handleNextPage = async () => {
     Keyboard.dismiss();
-    try {
-    } catch (e) {
+    /*try {
+    } catch (err as Error) {
       console.error('login error', e);
       setError(e.message);
-    }
+    }*/
   };
 
   return (

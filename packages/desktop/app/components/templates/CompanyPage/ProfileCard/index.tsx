@@ -13,12 +13,16 @@ import {
 import { Menu } from "@headlessui/react";
 import Button from "../../../../components/common/Button";
 import Card from "../../../../components/common/Card";
-import { CompanyProfileProps } from "../../../../types/common-props";
 import FollowersModal from "desktop/app/components/modules/users/FollowersModal";
 import { useFollowCompany } from "mobile/src/graphql/mutation/account";
 import { useAccount } from "mobile/src/graphql/query/account";
+import { CompanyProfile } from "mobile/src/graphql/query/company/useCompany";
 
-const ProfileCard: FC<CompanyProfileProps> = ({ company }: CompanyProfileProps) => {
+interface ProfileCard {
+  company: CompanyProfile;
+}
+
+const ProfileCard: FC<ProfileCard> = ({ company }) => {
   const { data: accountData } = useAccount({ fetchPolicy: "cache-only" });
   const [isVisible, setVisible] = useState(false);
   let overviewShort: string | undefined = undefined;
@@ -32,7 +36,7 @@ const ProfileCard: FC<CompanyProfileProps> = ({ company }: CompanyProfileProps) 
       if (matches.length > wordsToSplit) {
         overviewShort = company.overview?.substring(
           0,
-          matches[wordsToSplit].index!,
+          matches[wordsToSplit].index!
         );
       }
     }
@@ -46,8 +50,7 @@ const ProfileCard: FC<CompanyProfileProps> = ({ company }: CompanyProfileProps) 
         variables: { follow: !isFollowing, companyId: company._id },
         refetchQueries: ["Account"],
       });
-    } catch (err) {
-    }
+    } catch (err) {}
   };
   return (
     <>
@@ -120,7 +123,9 @@ const ProfileCard: FC<CompanyProfileProps> = ({ company }: CompanyProfileProps) 
                   <div className="text-xl text-white font-medium mx-1">
                     {company.postIds?.length ?? 0}
                   </div>
-                  <div className="text-xs text-white opacity-60 mx-1">Posts</div>
+                  <div className="text-xs text-white opacity-60 mx-1">
+                    Posts
+                  </div>
                 </div>
                 <div
                   className="flex flex-wrap items-center justify-center text-center cursor-pointer px-4"
@@ -129,7 +134,9 @@ const ProfileCard: FC<CompanyProfileProps> = ({ company }: CompanyProfileProps) 
                   <div className="text-xl text-white font-medium mx-1">
                     {company.followerIds?.length ?? 0}
                   </div>
-                  <div className="text-xs text-white opacity-60 mx-1">Followers</div>
+                  <div className="text-xs text-white opacity-60 mx-1">
+                    Followers
+                  </div>
                 </div>
                 <div
                   className="flex flex-wrap items-center justify-center text-center cursor-pointer px-4"
@@ -138,14 +145,14 @@ const ProfileCard: FC<CompanyProfileProps> = ({ company }: CompanyProfileProps) 
                   <div className="text-xl text-white font-medium mx-1">
                     {company.followingIds?.length ?? 0}
                   </div>
-                  <div className="text-xs text-white opacity-60 mx-1">Following</div>
+                  <div className="text-xs text-white opacity-60 mx-1">
+                    Following
+                  </div>
                 </div>
               </div>
             </div>
             <div className="lg:hidden mt-1 mx-4">
-              <div className="text-white">
-                {company.name}
-              </div>
+              <div className="text-white">{company.name}</div>
             </div>
             <div className="lg:grid grid-cols-2 mx-4 mt-5 lg:mt-5 mb-5">
               <div className="text-sm text-white">
@@ -288,12 +295,14 @@ const ProfileCard: FC<CompanyProfileProps> = ({ company }: CompanyProfileProps) 
           </div>
         </Card>
       </div>
+      {/*
       <FollowersModal
         show={isVisible}
         onClose={() => setVisible(false)}
         followers={company.followers}
         following={company.following}
       />
+      */}
     </>
   );
 };

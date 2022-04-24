@@ -1,9 +1,12 @@
 import { gql, useMutation, MutationTuple } from '@apollo/client';
 import { MediaUpload, MediaType } from 'backend/graphql/mutations.graphql';
-import { Post, PostInput } from 'backend/graphql/posts.graphql';
+import { PostInput } from 'backend/graphql/posts.graphql';
 import { FetchPostsData } from 'mobile/src/graphql/query/account';
-import { VIEW_POST_FRAGMENT } from 'mobile/src/graphql/query/post';
-import { Comment } from "backend/graphql/comments.graphql";
+import {
+  POST_SUMMARY_FRAGMENT,
+  PostSummary,
+} from 'mobile/src/graphql/fragments/post';
+import { Comment } from 'backend/graphql/comments.graphql';
 
 export const CREATE_POST = gql`
   mutation CreatePost($post: PostInput!) {
@@ -14,15 +17,6 @@ export const CREATE_POST = gql`
       body
       mediaUrl
       mentionIds
-    }
-  }
-`;
-
-export const LIKE_POST = gql`
-  mutation LikePost($like: Boolean!, $postId: ID!) {
-    likePost(like: $like, postId: $postId) {
-      _id
-      likeIds
     }
   }
 `;
@@ -82,8 +76,9 @@ type CreatePostVariables = {
   post: PostInput;
 };
 
+type Post = PostSummary;
 type CreatePostData = {
-  createPost?: Exclude<FetchPostsData['posts'], undefined>[number];
+  createPost?: Post;
 };
 
 /**
@@ -97,10 +92,10 @@ export function useCreatePost(): MutationTuple<
 > {
   return useMutation<CreatePostData, CreatePostVariables>(
     gql`
-      ${VIEW_POST_FRAGMENT}
+      ${POST_SUMMARY_FRAGMENT}
       mutation CreatePost($post: PostInput!) {
         createPost(post: $post) {
-          ...ViewPostFields
+          ...PostSummaryFields
         }
       }
     `,
@@ -116,7 +111,7 @@ type LikePostVariables = {
 };
 
 type LikePostData = {
-  likePost: Pick<Post, '_id' | 'likeIds'>;
+  likePost: Pick<PostSummary, '_id' | 'likeIds'>;
 };
 
 /**
@@ -125,7 +120,14 @@ type LikePostData = {
  * @returns   GraphQL mutation.
  */
 export function useLikePost(): MutationTuple<LikePostData, LikePostVariables> {
-  return useMutation<LikePostData, LikePostVariables>(LIKE_POST);
+  return useMutation<LikePostData, LikePostVariables>(gql`
+    mutation LikePost($like: Boolean!, $postId: ID!) {
+      likePost(like: $like, postId: $postId) {
+        _id
+        likeIds
+      }
+    }
+  `);
 }
 
 type CommentPostVariables = {

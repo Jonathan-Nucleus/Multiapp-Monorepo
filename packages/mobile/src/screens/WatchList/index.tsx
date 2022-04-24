@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   FlatList,
+  ListRenderItem,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -33,7 +34,7 @@ interface RouterProps {
 const WatchList: React.FC<RouterProps> = ({ navigation }) => {
   const { data: accountData, refetch } = useAccount();
   const [watchFund] = useWatchFund();
-  const watchList: Fund[] = accountData?.account.watchlist ?? [];
+  const watchList = accountData?.account.watchlist ?? [];
 
   const handleRemoveWatchList = async (id: string): Promise<void> => {
     try {
@@ -54,7 +55,9 @@ const WatchList: React.FC<RouterProps> = ({ navigation }) => {
     console.log('navigate to fund');
   };
 
-  const renderListItem = ({ item }) => {
+  const renderListItem: ListRenderItem<typeof watchList[number]> = ({
+    item,
+  }) => {
     return (
       <TouchableOpacity onPress={() => navigateToFund(item._id)}>
         <View style={styles.item}>
@@ -97,7 +100,7 @@ const WatchList: React.FC<RouterProps> = ({ navigation }) => {
   };
   return (
     <View style={pStyles.globalContainer}>
-      <MainHeader navigation={navigation} />
+      <MainHeader />
       <FlatList
         data={watchList}
         renderItem={renderListItem}

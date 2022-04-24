@@ -12,17 +12,16 @@ import { BGDARK, GRAY10, PRIMARY, WHITE60 } from 'shared/src/colors';
 import { Body1, Body3 } from '../../../theme/fonts';
 import { PostDataType } from '../../../graphql/post';
 
-import { FetchPostsData } from 'mobile/src/hooks/queries';
+import { Post } from 'mobile/src/graphql/query/post/usePosts';
 import { PostCategories } from 'backend/graphql/enumerations.graphql';
 
-type Post = Exclude<FetchPostsData['posts'], undefined>[number];
 interface FeedItemProps {
   post: Post;
   type?: string;
 }
 
 const FeaturedItem: React.FC<FeedItemProps> = ({ post, type }) => {
-  const { user } = post;
+  const { user, body, mediaUrl } = post;
 
   return (
     <View style={[styles.container]}>
@@ -36,16 +35,20 @@ const FeaturedItem: React.FC<FeedItemProps> = ({ post, type }) => {
           auxInfo={dayjs(post.createdAt).format('MMM D')}
         />
       </View>
-      <PLabel
-        label={post.body}
-        viewStyle={styles.labelView}
-        textStyle={styles.body}
-        numberOfLines={2}
-      />
-      <Image
-        style={styles.postImage}
-        source={{ uri: `${POST_URL}/${post.mediaUrl}` }}
-      />
+      {body && (
+        <PLabel
+          label={body}
+          viewStyle={styles.labelView}
+          textStyle={styles.body}
+          numberOfLines={2}
+        />
+      )}
+      {mediaUrl && (
+        <Image
+          style={styles.postImage}
+          source={{ uri: `${POST_URL}/${mediaUrl}` }}
+        />
+      )}
     </View>
   );
 };

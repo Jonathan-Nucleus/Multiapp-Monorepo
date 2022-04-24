@@ -1,21 +1,22 @@
-import { gql, QueryResult, useQuery } from "@apollo/client";
-import { VIEW_POST_FRAGMENT } from "./post";
-import { AccountData } from "./account";
+import { gql, QueryResult, useQuery } from '@apollo/client';
+import { POST_SUMMARY_FRAGMENT } from 'mobile/src/graphql/fragments/post';
+import { AccountData } from '../account';
 
 type UserProfileData = {
-  userProfile: AccountData["account"];
+  userProfile: AccountData['account'];
 };
 
 type UserProfileVariables = {
   userId: string;
 };
 
+// TODO: Remove posts from this fetch and use user/usePosts instead
 export function useFetchProfile(
   userId: string,
 ): QueryResult<UserProfileData, UserProfileVariables> {
   return useQuery<UserProfileData, UserProfileVariables>(
     gql`
-      ${VIEW_POST_FRAGMENT}
+      ${POST_SUMMARY_FRAGMENT}
       query UserProfile($userId: ID!) {
         userProfile(userId: $userId) {
           _id
@@ -97,7 +98,7 @@ export function useFetchProfile(
             }
           }
           posts {
-            ...ViewPostFields
+            ...PostSummaryFields
           }
           linkedIn
           website

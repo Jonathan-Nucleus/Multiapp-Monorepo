@@ -10,8 +10,14 @@ import {
 import FastImage from 'react-native-fast-image';
 import Modal from 'react-native-modal';
 import { Chats, CopySimple, Share } from 'phosphor-react-native';
-import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
-import type { Company } from 'backend/graphql/companies.graphql';
+
+import { Body2, Body3, H6Bold } from '../../../theme/fonts';
+import PGradientButton from '../../../components/common/PGradientButton';
+import PGradientOutlineButton from '../../../components/common/PGradientOutlineButton';
+import LinkedinSvg from 'shared/assets/images/linkedin.svg';
+import TwitterSvg from 'shared/assets/images/twitter.svg';
+import DotsThreeVerticalSvg from 'shared/assets/images/dotsThreeVertical.svg';
+import FollowModal from './FollowModal';
 import {
   WHITE,
   WHITE12,
@@ -22,33 +28,42 @@ import {
   BGDARK,
 } from 'shared/src/colors';
 
-import { Body2, Body3, H6Bold } from '../../../theme/fonts';
-import PGradientButton from '../../../components/common/PGradientButton';
-import PGradientOutlineButton from '../../../components/common/PGradientOutlineButton';
 import { useAccount } from '../../../graphql/query/account';
 import { useFollowCompany } from '../../../graphql/mutation/account';
-import LinkedinSvg from 'shared/assets/images/linkedin.svg';
-import TwitterSvg from 'shared/assets/images/twitter.svg';
-import DotsThreeVerticalSvg from 'shared/assets/images/dotsThreeVertical.svg';
-import FollowModal from './FollowModal';
+import type { CompanyProfile } from 'mobile/src/graphql/query/company/useCompany';
 
-interface CompanyProp {
-  company: Company;
+import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
+
+interface CompanyDetailProps {
+  company: CompanyProfile;
 }
 
-const CompanyDetail: FC<CompanyProp> = ({ company }) => {
+const CompanyDetail: FC<CompanyDetailProps> = ({ company }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [visibleFollow, setVisibleFollow] = useState(false);
   const { data: accountData, refetch } = useAccount();
   const [followCompany] = useFollowCompany();
   const userId = accountData?.account._id;
 
+  const {
+    _id,
+    name,
+    avatar,
+    background,
+    postIds,
+    followerIds,
+    followingIds,
+    website,
+    linkedIn,
+    twitter,
+  } = company;
+
   const isFollower = useMemo(() => {
-    if (company.followerIds && company.followerIds.length > 0) {
-      return company.followerIds.indexOf(userId) > -1 ? true : false;
+    if (followerIds && userId) {
+      return followerIds.indexOf(userId) > -1 ? true : false;
     }
     return false;
-  }, [company]);
+  }, [followerIds]);
 
   const toggleFollowCompany = async (id: string): Promise<void> => {
     try {
@@ -68,11 +83,11 @@ const CompanyDetail: FC<CompanyProp> = ({ company }) => {
 
   return (
     <>
-      {company.background && (
+      {background && (
         <FastImage
           style={styles.backgroundImg}
           source={{
-            uri: `${BACKGROUND_URL}/${company.background}`,
+            uri: `${BACKGROUND_URL}/${background}`,
           }}
           resizeMode={FastImage.resizeMode.cover}
         />
@@ -83,35 +98,33 @@ const CompanyDetail: FC<CompanyProp> = ({ company }) => {
           <FastImage
             style={styles.backgroundImg}
             source={{
-              uri: `${AVATAR_URL}/${company?.avatar}`,
+              uri: `${AVATAR_URL}/${avatar}`,
             }}
             resizeMode={FastImage.resizeMode.cover}
           />
         </View>
-        <Text style={styles.val}>{company.name}</Text>
+        <Text style={styles.val}>{name}</Text>
         <View style={styles.row}>
           <TouchableOpacity
             onPress={() =>
-              company.followerIds?.length > 0 && setVisibleFollow(true)
+              followerIds && followerIds.length > 0 && setVisibleFollow(true)
             }>
             <View style={styles.follow}>
-              <Text style={styles.val}>{company.followerIds?.length ?? 0}</Text>
+              <Text style={styles.val}>{followerIds?.length ?? 0}</Text>
               <Text style={styles.comment}>Followers</Text>
             </View>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() =>
-              company.followingIds?.length > 0 && setVisibleFollow(true)
+              followingIds && followingIds.length > 0 && setVisibleFollow(true)
             }>
             <View style={styles.follow}>
-              <Text style={styles.val}>
-                {company.followingIds?.length ?? 0}
-              </Text>
+              <Text style={styles.val}>{followingIds?.length ?? 0}</Text>
               <Text style={styles.comment}>Following</Text>
             </View>
           </TouchableOpacity>
           <View style={styles.follow}>
-            <Text style={styles.val}>{company.postIds?.length ?? 0}</Text>
+            <Text style={styles.val}>{postIds?.length ?? 0}</Text>
             <Text style={styles.comment}>Posts</Text>
           </View>
         </View>
@@ -134,27 +147,24 @@ const CompanyDetail: FC<CompanyProp> = ({ company }) => {
       </View>
       <View style={[styles.row, styles.social]}>
         <View style={styles.socialView}>
-          <TouchableOpacity
-            onPress={() =>
-              Linking.openURL(company.linkedIn ?? 'www.linkedin.com')
-            }>
-            <LinkedinSvg />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() =>
-              Linking.openURL(company.twitter ?? 'www.twitter.com')
-            }
-            style={styles.socialItem}>
-            <TwitterSvg />
-          </TouchableOpacity>
-
-          {company.website && (
+          {linkedIn && linkedIn !== '' && (
+            <TouchableOpacity onPress={() => Linking.openURL(linkedIn)}>
+              <LinkedinSvg />
+            </TouchableOpacity>
+          )}
+          {twitter && twitter !== '' && (
+            <TouchableOpacity
+              onPress={() => Linking.openURL(twitter)}
+              style={styles.socialItem}>
+              <TwitterSvg />
+            </TouchableOpacity>
+          )}
+          {website && website !== '' && (
             <>
               <View style={styles.verticalLine} />
-              <TouchableOpacity
-                onPress={() => Linking.openURL(company.website)}>
+              <TouchableOpacity onPress={() => Linking.openURL(website)}>
                 <Text style={styles.website} numberOfLines={1}>
-                  {company.website}
+                  {website}
                 </Text>
               </TouchableOpacity>
             </>

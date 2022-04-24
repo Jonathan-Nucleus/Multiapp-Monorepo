@@ -14,22 +14,20 @@ import {
   PRIMARYSOLID,
 } from 'shared/src/colors';
 import { Body1, Body3, Body4 } from 'mobile/src/theme/fonts';
-import type { Fund } from 'backend/graphql/funds.graphql';
-import { useWatchFund } from '../../../graphql/mutation/account';
-import { useAccount } from '../../../graphql/query/account';
-import { FetchFundsData } from '../../../graphql/query/marketplace';
 import * as NavigationService from '../../../services/navigation/NavigationService';
 
-export type Fund = Exclude<FetchFundsData['funds'], undefined>[number];
+import { useWatchFund } from '../../../graphql/mutation/account';
+import { useAccount } from '../../../graphql/query/account';
+import { FundSummary } from '../../../graphql/fragments/fund';
 
 interface FundItemProps {
-  fund: Fund;
+  fund: FundSummary;
 }
 
-const FundItem: React.FC<FundItemProps> = ({ fund }: FundItemProps) => {
+const FundItem: React.FC<FundItemProps> = ({ fund }) => {
   const { data: accountData, refetch } = useAccount();
   const [watchFund] = useWatchFund();
-  const watchList: Fund[] = accountData?.account.watchlist ?? [];
+  const watchList = accountData?.account.watchlist ?? [];
 
   const isWatch = useMemo(() => {
     if (fund && watchList.length) {

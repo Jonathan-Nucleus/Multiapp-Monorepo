@@ -4,12 +4,11 @@ import { Star } from 'phosphor-react-native';
 
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import { WHITE } from 'shared/src/colors';
-import { FetchFundsData } from 'mobile/src/graphql/query/marketplace';
+import { FundSummary } from 'mobile/src/graphql/fragments/fund';
 import FundProfileInfo from './FundProfileInfo';
 
-export type Fund = Exclude<FetchFundsData['funds'], undefined>[number];
 export interface FundItemProps {
-  fund: Fund;
+  fund: FundSummary;
   showOverview?: boolean;
   showTags?: boolean;
   onClickFundDetails?: () => void;

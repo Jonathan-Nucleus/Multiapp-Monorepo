@@ -89,7 +89,7 @@ const ReportPostModal: React.FC<ReportPostModalProps> = (props) => {
       style={styles.bottomHalfModal}
       onBackdropPress={onPressCancel}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'position' : null}>
+        behavior={Platform.OS === 'ios' ? 'position' : undefined}>
         <View style={styles.modalWrapper}>
           <PLabel label="Report post" textStyle={styles.title} />
           <FlatList

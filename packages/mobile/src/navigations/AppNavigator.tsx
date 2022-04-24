@@ -1,7 +1,10 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { NavigationContainerRef } from '@react-navigation/core';
-import { createStackNavigator } from '@react-navigation/stack';
+import {
+  createStackNavigator,
+  StackScreenProps,
+} from '@react-navigation/stack';
 
 const Stack = createStackNavigator();
 
@@ -19,7 +22,14 @@ import UserProfile from '../screens/Settings/UserProfile';
 import CompanyProfile from '../screens/Settings/CompanyProfile';
 import CreatePost from '../screens/Home/CreatePost';
 
-type NavigationParamList = {};
+type AppParamList = {
+  Auth: undefined;
+  Main: undefined;
+  UserProfile: undefined;
+  CompanyProfile: undefined;
+  CreatePost: undefined;
+};
+export type AppStackScreenProps = StackScreenProps<AppParamList>;
 
 const defaultScreenOptions = {
   headerShown: false,
@@ -29,15 +39,16 @@ const defaultScreenOptions = {
 const AppNavigator = () => {
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const routeNameRef = useRef<string | undefined>(undefined);
-  const navigationRef =
-    useRef<NavigationContainerRef<NavigationParamList> | null>(null);
+  const navigationRef = useRef<NavigationContainerRef<AppParamList> | null>(
+    null,
+  );
 
   useEffect(() => {
     NavigationService.setNavigator(navigationRef.current);
     const tokenObserver = (action: TokenAction): void => {
       if (action === 'cleared') {
         setAuthenticated(false);
-        navigationRef.current?.dispatch();
+        navigationRef.current?.navigate('Auth');
       }
     };
 

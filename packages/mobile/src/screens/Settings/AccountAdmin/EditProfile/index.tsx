@@ -1,5 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
 import {
+  ListRenderItem,
   StyleSheet,
   FlatList,
   View,
@@ -28,12 +29,13 @@ import MainHeader from '../../../../components/main/Header';
 import PAppContainer from '../../../../components/common/PAppContainer';
 import PGradientButton from '../../../../components/common/PGradientButton';
 import PLabel from '../../../../components/common/PLabel';
-import PostItem, { PostItemProps } from '../../../../components/main/PostItem';
+import PostItem, { Post } from '../../../../components/main/PostItem';
 import FeaturedItem from '../../../../components/main/settings/FeaturedItem';
 import Funds from '../../../../components/main/settings/Funds';
-import { useAccount } from '../../../../graphql/query/account';
-import { useFetchPosts } from '../../../../hooks/queries';
 import PGradientOutlineButton from '../../../../components/common/PGradientOutlineButton';
+
+import { useAccount } from '../../../../graphql/query/account';
+import { usePosts } from '../../../../graphql/query/account/usePosts';
 import type { User } from 'backend/graphql/users.graphql';
 
 import LinkedinSvg from 'shared/assets/images/linkedin.svg';
@@ -47,12 +49,14 @@ interface RouterProps {
 }
 
 const EditUserProfile: FC<RouterProps> = ({ navigation }) => {
-  const { data, refetch } = useFetchPosts();
+  const { data, refetch } = usePosts();
   const { data: accountData } = useAccount();
-  const postData = data?.posts ?? [];
-  const account: User = accountData?.account;
   const isFocused = useIsFocused();
   const [focusState, setFocusState] = useState(isFocused);
+
+  const postData = data?.account?.posts ?? [];
+  const account = accountData?.account;
+
   if (isFocused !== focusState) {
     // Refetch whenever the focus state changes to avoid refetching during
     // rerender cycles
@@ -61,7 +65,25 @@ const EditUserProfile: FC<RouterProps> = ({ navigation }) => {
     setFocusState(isFocused);
   }
 
-  const renderItem = ({ item }: { item: PostItemProps }) => (
+  if (!account) return null;
+  const {
+    avatar,
+    background,
+    firstName,
+    lastName,
+    overview,
+    accreditation,
+    role,
+    position,
+    website,
+    linkedIn,
+    twitter,
+    followerIds,
+    followingIds,
+    postIds,
+  } = account;
+
+  const renderItem: ListRenderItem<Post> = ({ item }) => (
     <TouchableOpacity>
       <FeaturedItem post={item} />
     </TouchableOpacity>
@@ -79,11 +101,11 @@ const EditUserProfile: FC<RouterProps> = ({ navigation }) => {
       />
       <PAppContainer style={styles.container}>
         <View style={styles.relative}>
-          {account.background ? (
+          {background ? (
             <FastImage
               style={styles.backgroundImg}
               source={{
-                uri: `${BACKGROUND_URL}/${account.background}`,
+                uri: `${BACKGROUND_URL}/${background}`,
               }}
               resizeMode={FastImage.resizeMode.cover}
             />
@@ -102,19 +124,19 @@ const EditUserProfile: FC<RouterProps> = ({ navigation }) => {
         <View style={styles.content}>
           <View style={styles.companyDetail}>
             <View style={styles.relative}>
-              {account?.avatar ? (
+              {avatar ? (
                 <FastImage
                   style={styles.avatar}
                   source={{
-                    uri: `${AVATAR_URL}/${account?.avatar}`,
+                    uri: `${AVATAR_URL}/${avatar}`,
                   }}
                   resizeMode={FastImage.resizeMode.cover}
                 />
               ) : (
                 <View style={styles.noAvatarContainer}>
                   <Text style={styles.noAvatar}>
-                    {account.firstName.charAt(0)}
-                    {account.lastName.charAt(0)}
+                    {firstName.charAt(0)}
+                    {lastName.charAt(0)}
                   </Text>
                 </View>
               )}
@@ -127,33 +149,38 @@ const EditUserProfile: FC<RouterProps> = ({ navigation }) => {
           </View>
           <View style={styles.row}>
             <Text style={styles.val}>
-              {account.firstName} {account?.lastName}
+              {firstName} {lastName}
             </Text>
-            <View style={styles.proWrapper}>
-              <ShieldCheckSvg />
-              <PLabel label="PRO" textStyle={styles.proLabel} />
-            </View>
+            {(role === 'VERIFIED' || role === 'PROFESSIONAL') && (
+              <View style={styles.proWrapper}>
+                <ShieldCheckSvg />
+                <PLabel label="PRO" textStyle={styles.proLabel} />
+              </View>
+            )}
           </View>
           <Text style={styles.comment}>
-            {account.role} - {account?.position}
+            {role}
+            {position && ` - ${position}`}
           </Text>
           <View style={[styles.row, styles.justifyAround]}>
             <View style={styles.follow}>
-              <Text style={styles.val}>{account.followerIds?.length ?? 0}</Text>
-              <Text style={styles.comment}>Followers</Text>
+              <Text style={styles.val}>{followerIds?.length ?? 0}</Text>
+              <Text style={styles.comment}>
+                {followerIds?.length === 1 ? 'Follower' : 'Followers'}
+              </Text>
             </View>
             <View style={styles.follow}>
-              <Text style={styles.val}>
-                {account.followingIds?.length ?? 0}
-              </Text>
+              <Text style={styles.val}>{followingIds?.length ?? 0}</Text>
               <Text style={styles.comment}>Following</Text>
             </View>
             <View style={styles.follow}>
-              <Text style={styles.val}>{account.postIds?.length ?? 0}</Text>
-              <Text style={styles.comment}>Posts</Text>
+              <Text style={styles.val}>{postIds?.length ?? 0}</Text>
+              <Text style={styles.comment}>
+                {postIds?.length === 1 ? 'Post' : 'Posts'}
+              </Text>
             </View>
           </View>
-          <Text style={styles.decription}>{account.overview}</Text>
+          <Text style={styles.decription}>{overview}</Text>
           <PGradientOutlineButton
             label="Edit Profile"
             onPress={() => console.log(11)}
@@ -162,27 +189,25 @@ const EditUserProfile: FC<RouterProps> = ({ navigation }) => {
         </View>
         <View style={[styles.row, styles.social]}>
           <View style={styles.row}>
-            <TouchableOpacity
-              onPress={() =>
-                Linking.openURL(account.linkedIn ?? 'www.linkedin.com')
-              }>
-              <LinkedinSvg />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() =>
-                Linking.openURL(account.twitter ?? 'www.twitter.com')
-              }
-              style={styles.icon}>
-              <TwitterSvg />
-            </TouchableOpacity>
+            {linkedIn && (
+              <TouchableOpacity onPress={() => Linking.openURL(linkedIn)}>
+                <LinkedinSvg />
+              </TouchableOpacity>
+            )}
+            {twitter && (
+              <TouchableOpacity
+                onPress={() => Linking.openURL(twitter)}
+                style={styles.icon}>
+                <TwitterSvg />
+              </TouchableOpacity>
+            )}
           </View>
-          {account.website && (
+          {website && (
             <>
               <View style={styles.verticalLine} />
-              <TouchableOpacity
-                onPress={() => Linking.openURL(account.website)}>
+              <TouchableOpacity onPress={() => Linking.openURL(website)}>
                 <Text style={styles.website} numberOfLines={1}>
-                  {account.website}
+                  {website}
                 </Text>
               </TouchableOpacity>
             </>
@@ -191,7 +216,7 @@ const EditUserProfile: FC<RouterProps> = ({ navigation }) => {
             <DotsThreeVerticalSvg />
           </TouchableOpacity>
         </View>
-        <Funds accredited={accountData?.account.accreditation} />
+        <Funds accredited={accreditation} />
         <View style={styles.posts}>
           {postData.length > 0 ? (
             <View>
@@ -199,7 +224,7 @@ const EditUserProfile: FC<RouterProps> = ({ navigation }) => {
               <FlatList
                 data={postData || []}
                 renderItem={renderItem}
-                keyExtractor={(item: PostItemProps) => `${item._id}`}
+                keyExtractor={(item) => `${item._id}`}
                 listKey="post"
                 horizontal
               />
@@ -215,7 +240,7 @@ const EditUserProfile: FC<RouterProps> = ({ navigation }) => {
               renderItem={({ item }) => (
                 <PostItem post={item} userId={account?._id} />
               )}
-              keyExtractor={(item: PostItemProps) => `${item._id}`}
+              keyExtractor={(item) => `${item._id}`}
               listKey="post"
               ListHeaderComponent={<Text style={styles.text}>All Posts</Text>}
             />

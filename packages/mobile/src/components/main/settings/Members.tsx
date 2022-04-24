@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  ListRenderItem,
   StyleSheet,
   FlatList,
   View,
@@ -10,20 +11,16 @@ import {
 import FastImage from 'react-native-fast-image';
 import { AVATAR_URL } from 'react-native-dotenv';
 import { BGDARK, WHITE, WHITE60 } from 'shared/src/colors';
-import type { User } from 'backend/graphql/users.graphql';
-
 import { Body1, Body2Bold, Body3 } from '../../../theme/fonts';
 
-interface MemberProps {
-  members: User[];
-}
+import { CompanyMember } from '../../../graphql/query/company';
 
-interface RenderProps {
-  item: User;
+interface MemberProps {
+  members: CompanyMember[];
 }
 
 const Members: React.FC<MemberProps> = ({ members }) => {
-  const renderItem = ({ item }: RenderProps) => {
+  const renderItem: ListRenderItem<CompanyMember> = ({ item }) => {
     return (
       <TouchableOpacity>
         <View style={[styles.member, members.length === 1 && styles.fullWidth]}>

@@ -3,7 +3,7 @@ import { Text, StyleSheet, FlatList, ListRenderItem } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BGDARK, WHITE } from 'shared/src/colors';
 
-import PostItem, { PostItemProps } from '../../components/main/PostItem';
+import PostItem, { Post } from '../../components/main/PostItem';
 import PHeader from '../../components/common/PHeader';
 import RoundIcon from '../../components/common/RoundIcon';
 
@@ -12,41 +12,22 @@ import pStyles from '../../theme/pStyles';
 import SearchSvg from '../../assets/icons/search.svg';
 import BackSvg from '../../assets/icons/back.svg';
 
-import type { NotificationDetailsScreen } from 'mobile/src/navigations/NotificationStack';
+import type { NotificationDetailsScreen } from 'mobile/src/navigations/HomeStack';
+import { usePost } from 'mobile/src/graphql/query/post';
 
-const PostItems = [
-  {
-    name: 'Test1',
-    company: 'Test Company',
-    description:
-      'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more Read More..',
-    tags: ['user1', 'consumer1'],
-    commentCounts: 5,
-    shareCounts: 2,
-    date: 'Mar 29',
-  },
-  {
-    name: 'Test2',
-    company: 'Test Company 2',
-    description:
-      'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more Read More..',
-    tags: ['user2', 'consumer2'],
-    commentCounts: 3,
-    shareCounts: 12,
-    date: 'Mar 30',
-  },
-];
+const NotificationDetail: NotificationDetailsScreen = ({
+  navigation,
+  route,
+}) => {
+  const { postId, userId } = route.params;
+  const { data: postData } = usePost(postId);
 
-const NotificationDetail: NotificationDetailsScreen = ({ navigation }) => {
-  const renderItem: ListRenderItem<PostItemProps> = ({ item }) => (
+  const posts = postData?.post ? [postData.post] : [];
+  const renderItem: ListRenderItem<Post> = ({ item }) => (
     <PostItem
-      name={item.name}
-      company={item.company}
-      description={item.description}
-      tags={item.tags}
-      commentCounts={item.commentCounts}
-      shareCounts={item.shareCounts}
-      date={item.date}
+      post={item}
+      userId={userId}
+      onPressMenu={() => console.log('pressed menu')}
     />
   );
 
@@ -64,7 +45,11 @@ const NotificationDetail: NotificationDetailsScreen = ({ navigation }) => {
         }
         containerStyle={styles.headerContainer}
       />
-      <FlatList data={PostItems} renderItem={renderItem} />
+      <FlatList
+        data={posts}
+        renderItem={renderItem}
+        keyExtractor={(item) => item._id}
+      />
     </SafeAreaView>
   );
 };

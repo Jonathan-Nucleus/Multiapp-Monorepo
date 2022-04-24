@@ -58,7 +58,7 @@ const PhoneContact: React.FC = () => {
       {!!error && <ErrorText error={error} />}
       <PMaskTextInput
         label="Phone Number"
-        onChangeText={(val?: string) => setPhone(val)}
+        onChangeText={(val) => setPhone(val ?? '')}
         text={phone}
         keyboardType="number-pad"
         labelTextStyle={styles.label}
@@ -66,7 +66,7 @@ const PhoneContact: React.FC = () => {
       />
       <PFormLabel label="Preferred Time of Day" textStyle={styles.label} />
       <RNPickerSelect
-        onValueChange={(val) => setPreTime(val)}
+        onValueChange={(val: string) => setPreTime(val)}
         items={TimeDAY}
         value={preTime}
         style={{
@@ -81,7 +81,7 @@ const PhoneContact: React.FC = () => {
       />
       <PFormLabel label="Fund of Interest" textStyle={styles.label} />
       <RNPickerSelect
-        onValueChange={(val) => setInterest(val)}
+        onValueChange={(val: string) => setInterest(val)}
         items={FUND}
         value={interest}
         style={{

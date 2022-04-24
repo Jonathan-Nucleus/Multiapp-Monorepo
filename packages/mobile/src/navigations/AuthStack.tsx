@@ -3,8 +3,11 @@ import {
   createStackNavigator,
   StackScreenProps,
 } from '@react-navigation/stack';
+import { CompositeScreenProps } from '@react-navigation/native';
+
 const Stack = createStackNavigator();
 
+import { AppStackScreenProps } from './AppNavigator';
 import Code from '../screens/Auth/Code';
 import Signup from '../screens/Auth/Signup';
 import Login from '../screens/Auth/Login';
@@ -22,22 +25,40 @@ type AuthStackParamList = {
 };
 
 export type LoginScreen = (
-  props: StackScreenProps<AuthStackParamList, 'Login'>,
+  props: CompositeScreenProps<
+    StackScreenProps<AuthStackParamList, 'Login'>,
+    AppStackScreenProps
+  >,
 ) => ReactElement;
 export type CodeScreen = (
-  props: StackScreenProps<AuthStackParamList, 'Code'>,
+  props: CompositeScreenProps<
+    StackScreenProps<AuthStackParamList, 'Code'>,
+    AppStackScreenProps
+  >,
 ) => ReactElement;
 export type SignupScreen = (
-  props: StackScreenProps<AuthStackParamList, 'Signup'>,
+  props: CompositeScreenProps<
+    StackScreenProps<AuthStackParamList, 'Signup'>,
+    AppStackScreenProps
+  >,
 ) => ReactElement;
 export type TopicScreen = (
-  props: StackScreenProps<AuthStackParamList, 'Topic'>,
+  props: CompositeScreenProps<
+    StackScreenProps<AuthStackParamList, 'Topic'>,
+    AppStackScreenProps
+  >,
 ) => ReactElement;
 export type ForgotPassScreen = (
-  props: StackScreenProps<AuthStackParamList, 'ForgotPass'>,
+  props: CompositeScreenProps<
+    StackScreenProps<AuthStackParamList, 'ForgotPass'>,
+    AppStackScreenProps
+  >,
 ) => ReactElement;
 export type ResetPassScreen = (
-  props: StackScreenProps<AuthStackParamList, 'ResetPass'>,
+  props: CompositeScreenProps<
+    StackScreenProps<AuthStackParamList, 'ResetPass'>,
+    AppStackScreenProps
+  >,
 ) => ReactElement;
 
 const AuthStacks = () => {

@@ -16,18 +16,19 @@ import { useLikePost } from "mobile/src/graphql/mutation/posts";
 import CommentPost from "../Comment";
 import moment from "moment";
 import { PostType } from "desktop/app/types/common-props";
+import { PostSummary } from "mobile/src/graphql/fragments/post";
 
 interface PostProps {
-  post: PostType;
+  post: PostSummary;
 }
 
-const Post: FC<PostProps> = ({ post }: PostProps) => {
+const Post: FC<PostProps> = ({ post }) => {
   const { data: session } = useSession();
   const [likePost] = useLikePost();
 
   const { user } = post;
   const [liked, setLiked] = useState(
-    (session?.user && post.likeIds?.includes(session.user._id)) ?? false,
+    (session?.user && post.likeIds?.includes(session.user._id)) ?? false
   );
   const [visiblePostLikeModal, setVisiblePostLikeModal] = useState(false);
   const [visibleComment, setVisibleComment] = useState(false);
@@ -42,6 +43,7 @@ const Post: FC<PostProps> = ({ post }: PostProps) => {
       : console.log("Error liking post");
   };
 
+  const { mediaUrl } = post;
   return (
     <>
       <Card className="border-0 p-0 rounded-none	md:rounded-2xl">
@@ -93,13 +95,11 @@ const Post: FC<PostProps> = ({ post }: PostProps) => {
             </div>
           ))}
         </div>
-        {!!post.mediaUrl && (
+        {mediaUrl && (
           <div className="relative h-auto mt-5 border-b border-white/[.12]">
             <Image
-              loader={() =>
-                `${process.env.NEXT_PUBLIC_POST_URL}/${post.mediaUrl}`
-              }
-              src={`${process.env.NEXT_PUBLIC_POST_URL}/${post.mediaUrl}`}
+              loader={() => `${process.env.NEXT_PUBLIC_POST_URL}/${mediaUrl}`}
+              src={`${process.env.NEXT_PUBLIC_POST_URL}/${mediaUrl}`}
               alt=""
               layout="responsive"
               unoptimized={true}
@@ -109,7 +109,6 @@ const Post: FC<PostProps> = ({ post }: PostProps) => {
             />
           </div>
         )}
-
         <div className="flex items-center p-4">
           <div className="opacity-60 text-white">
             <div
@@ -170,14 +169,15 @@ const Post: FC<PostProps> = ({ post }: PostProps) => {
             </div>
           </div>
         </div>
-        {visibleComment && <CommentPost post={post} />}
+        {/*{visibleComment && <CommentPost post={post} />}*/}
       </Card>
-
+      {/*
       <LikeModal
         show={visiblePostLikeModal}
         onClose={() => setVisiblePostLikeModal(false)}
         members={post.likes}
       />
+      */}
     </>
   );
 };

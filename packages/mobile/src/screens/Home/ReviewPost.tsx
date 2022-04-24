@@ -112,7 +112,6 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
         centerLabel="Preview Post"
         rightLabel="POST"
         rightValidation={checkValidation()}
-        navigation={navigation}
         handleNext={handleNext}
       />
       <PAppContainer>
