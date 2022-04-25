@@ -138,6 +138,56 @@ const createCommentsCollection = (
 
       return true;
     },
+
+    /**
+     * Adds a like to a comment from a specific user.
+     *
+     * @param commentId   The id of the comment.
+     * @param userId      The id of the user liking the comment.
+     *
+     * @returns   The updated comment record or null if it was not found.
+     */
+    likeComment: async (
+      commentId: MongoId,
+      userId: MongoId
+    ): Promise<Comment.Mongo> => {
+      const result = await commentsCollection.findOneAndUpdate(
+        { _id: toObjectId(commentId) },
+        { $addToSet: { likeIds: toObjectId(userId) } },
+        { returnDocument: "after" }
+      );
+
+      if (!result.value) {
+        throw new NotFoundError("Post");
+      }
+
+      return result.value;
+    },
+
+    /**
+     * Removes a like from a comment from a specific user.
+     *
+     * @param commentId   The id of the comment.
+     * @param userId      The id of the user unliking the comment.
+     *
+     * @returns   The updated comment record or null if it was not found.
+     */
+    unlikeComment: async (
+      commentId: MongoId,
+      userId: MongoId
+    ): Promise<Comment.Mongo> => {
+      const result = await commentsCollection.findOneAndUpdate(
+        { _id: toObjectId(commentId) },
+        { $pull: { likeIds: toObjectId(userId) } },
+        { returnDocument: "after" }
+      );
+
+      if (!result.value) {
+        throw new NotFoundError("Post");
+      }
+
+      return result.value;
+    },
   };
 };
 

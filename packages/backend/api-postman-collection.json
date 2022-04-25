@@ -1187,6 +1187,42 @@
 							"response": []
 						},
 						{
+							"name": "Like Comment",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjY1YmQ5NDE4YzFmODY0NzIxNGUxYWQiLCJyb2xlIjoidXNlciIsImFjYyI6InB1cmNoYXNlciIsImlhdCI6MTY1MDkwNzYzOX0.rjKE3Id85naoFa3DXZYRt11c0ptkAYaB21LTKHKNQfs",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation LikeComment($like: Boolean!, $commentId: ID!) {\n  likeComment(like: $like, commentId: $commentId) {\n      _id\n      likeIds\n  }\n}",
+										"variables": "{\n  \"like\": false,\n  \"commentId\": \"6265bd9518c1f8647214e1de\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "Edit Comment",
 							"request": {
 								"auth": {

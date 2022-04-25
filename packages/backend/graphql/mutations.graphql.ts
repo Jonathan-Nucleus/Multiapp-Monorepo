@@ -56,6 +56,7 @@ const schema = gql`
     createPost(post: PostInput!): Post
     featurePost(postId: ID!, feature: Boolean!): Post
     likePost(like: Boolean!, postId: ID!): Post
+    likeComment(like: Boolean!, commentId: ID!): Comment
     reportPost(report: ReportedPostInput!): Boolean
     hidePost(hide: Boolean!, postId: ID!): Boolean
     mutePost(mute: Boolean!, postId: ID!): Boolean
@@ -540,6 +541,33 @@ const resolvers = {
         return like
           ? db.posts.likePost(postId, user._id)
           : db.posts.unlikePost(postId, user._id);
+      }
+    ),
+
+    likeComment: secureEndpoint(
+      async (
+        parentIgnored,
+        args: { commentId: string; like: boolean },
+        { db, user }
+      ): Promise<Comment.Mongo> => {
+        const validator = yup
+          .object()
+          .shape({
+            commentId: yup.string().required().test({
+              test: isObjectId,
+              message: "Invalid comment id",
+            }),
+            like: yup.bool().required(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { like, commentId } = args;
+
+        return like
+          ? db.comments.likeComment(commentId, user._id)
+          : db.comments.unlikeComment(commentId, user._id);
       }
     ),
 
