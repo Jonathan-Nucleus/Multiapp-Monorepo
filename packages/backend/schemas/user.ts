@@ -49,6 +49,7 @@ export namespace User {
     role: UserRole;
     accreditation: Accreditation;
     questionnaire?: Questionnaire;
+    proRequest?: ProRequest;
     position?: string;
     companyIds?: ObjectId[];
     watchlistIds?: ObjectId[];
@@ -195,6 +196,14 @@ export interface Questionnaire {
   date: Date;
 }
 
+export interface ProRequest {
+  role: ProRoleEnum;
+  email: string;
+  organization: string;
+  position: string;
+  info?: string;
+}
+
 /** Enumeration describing the role of the user. */
 export const UserRoleOptions = {
   USER: "user",
@@ -316,6 +325,35 @@ export const PostViolationOptions = {
 export type PostViolation = ValueOf<typeof PostViolationOptions>["value"];
 export type PostViolationEnum = keyof typeof PostViolationOptions;
 
+export const ProRoleOptions = {
+  MANAGER: {
+    value: "manager",
+    label: "Fund manager",
+  },
+  JOURNALIST: {
+    value: "journalist",
+    label: "Journalist",
+  },
+  C_LEVEL: {
+    value: "c-level",
+    label: "C level manager",
+  },
+  FOUNDER: {
+    value: "founder",
+    label: "Promotional content",
+  },
+  EX_MANAGER: {
+    value: "ex-manager",
+    label: "Ex fund manager",
+  },
+  OTHER: {
+    value: "other",
+    label: "Other",
+  },
+} as const;
+export type ProRole = ValueOf<typeof ProRoleOptions>["value"];
+export type ProRoleEnum = keyof typeof ProRoleOptions;
+
 export const ContentCreatorSchema = `
   avatar: String
   background: AdjustableImage
@@ -427,6 +465,14 @@ export const UserSchema = `
     date: Date!
   }
 
+  input ProRequestInput {
+    role: ProRole!
+    email: String!
+    organization: String!
+    position: String!
+    info: String
+  }
+
   type AdjustableImage {
     url: String!
     x: Int!
@@ -488,5 +534,9 @@ export const UserSchema = `
 
   enum InvestmentLevel {
     ${Object.keys(InvestmentLevelOptions).map((key) => key)}
+  }
+
+  enum ProRole {
+    ${Object.keys(ProRoleOptions).map((key) => key)}
   }
 `;

@@ -928,6 +928,42 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Become Pro",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjY1YmQ5NDE4YzFmODY0NzIxNGUxYWQiLCJyb2xlIjoidXNlciIsImFjYyI6InB1cmNoYXNlciIsImlhdCI6MTY1MDkwNzYzOX0.rjKE3Id85naoFa3DXZYRt11c0ptkAYaB21LTKHKNQfs",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation ProRequest($request: ProRequestInput!) {\n    proRequest(request: $request)\n}",
+										"variables": "{\n    \"request\": {\n        \"role\": \"MANAGER\",\n        \"email\": \"darash@test.com\",\n        \"organization\": \"test org\",\n        \"position\": \"tired man\",\n        \"info\": \"other info\"        \n    }\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},

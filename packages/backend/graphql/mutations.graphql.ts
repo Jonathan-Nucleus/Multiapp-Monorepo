@@ -34,6 +34,8 @@ import {
   InvestmentLevelOptions,
   compareAccreditation,
   PostViolationOptions,
+  ProRequest,
+  ProRoleOptions,
 } from "../schemas/user";
 import type { Company } from "../schemas/company";
 import { AudienceOptions, PostCategoryOptions } from "../schemas/post";
@@ -65,6 +67,7 @@ const schema = gql`
     deleteComment(commentId: ID!): Boolean!
     uploadLink(localFilename: String!, type: MediaType!): MediaUpload
     saveQuestionnaire(questionnaire: QuestionnaireInput!): User
+    proRequest(request: ProRequestInput!): Boolean
 
     watchFund(watch: Boolean!, fundId: ID!): Boolean
     followUser(follow: Boolean!, userId: ID!, asCompanyId: ID): Boolean
@@ -440,6 +443,42 @@ const resolvers = {
 
         const { questionnaire } = args;
         return db.users.saveQuestionnaire(user._id, questionnaire);
+      }
+    ),
+
+    proRequest: secureEndpoint(
+      async (
+        parentIgnored,
+        args: { request: ProRequest },
+        { db, user }
+      ): Promise<Boolean> => {
+        const validator = yup
+          .object({
+            request: yup
+              .object({
+                role: yup
+                  .string()
+                  .oneOf(
+                    Object.values(ProRoleOptions).map((option) => option.value)
+                  )
+                  .required(),
+                email: yup.string().email().required(),
+                organization: yup.string().required(),
+                position: yup.string().required(),
+                info: yup.string().notRequired(),
+              })
+              .required(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { request } = args;
+
+        const userData = await db.users.saveProRequest(request, user._id);
+        PrometheusMailer.sendProRequest(userData);
+
+        return true;
       }
     ),
 

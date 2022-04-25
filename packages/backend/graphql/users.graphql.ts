@@ -15,6 +15,7 @@ import {
   InvestorClassOptions,
   FinancialStatusOptions,
   InvestmentLevelOptions,
+  ProRoleOptions,
 } from "../schemas/user";
 import {
   User,
@@ -138,6 +139,12 @@ const resolvers = {
     return acc;
   }, {}),
   InvestmentLevel: InvestmentLevelOptions,
+  ProRole: Object.keys(ProRoleOptions).reduce<{
+    [key: string]: string;
+  }>((acc, option) => {
+    acc[option] = ProRoleOptions[option].value;
+    return acc;
+  }, {}),
   UserProfile: {
     ...contentCreatorResolvers,
     ...publicUserResolvers,

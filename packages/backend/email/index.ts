@@ -4,12 +4,14 @@ import { promises as fs } from "fs";
 import { promisify } from "util";
 import path from "path";
 import ejs, { Data as EjsData } from "ejs";
+import { User } from "backend/schemas/user";
 
 import "dotenv/config";
 
 const SENDER = process.env.EMAIL_SENDER as string;
 const PROMETHEUS_URL = process.env.PROMETHEUS_URL as string;
 const MAILER_TEMPLATE_PATH: string = path.join(__dirname, "./templates");
+const CS_EMAIL = process.env.CS_EMAIL as string;
 
 const sesInstance = new SES({
   region: process.env.REGION,
@@ -124,6 +126,33 @@ export const PrometheusMailer = {
       throw new ApolloError(
         `Error sending password reset email to ${recipient}`
       );
+    }
+  },
+
+  /**
+   * Sends an email to the business team whenever a user requests to become
+   * a professional.
+   *
+   * @param user        User record associated with the request including the
+   *                    request information.
+   */
+  sendProRequest: async function (user: User.Mongo): Promise<boolean> {
+    if (!user.proRequest) {
+      throw new ApolloError(`Invalid request information for user ${user._id}`);
+    }
+
+    try {
+      await sendEmail(CS_EMAIL, "pro-request", {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        ...user.proRequest,
+      });
+
+      return true;
+    } catch (err) {
+      console.log("err", err);
+      throw new ApolloError(`Error sending pro request email`);
     }
   },
 };

@@ -21,6 +21,7 @@ import {
   Settings,
   ReportedPost,
   Questionnaire,
+  ProRequest,
   isUser,
 } from "../../schemas/user";
 import {
@@ -816,6 +817,32 @@ const createUsersCollection = (
       );
 
       return user.value as User.Mongo | null;
+    },
+
+    /**
+     * Saves request information sent by the user to become a professional
+     * within the application.
+     *
+     * @param request   The request information.
+     * @param userId    The ID of the user making the request.
+     *
+     * @returns   The updated user record, if found.
+     */
+    saveProRequest: async (
+      request: ProRequest,
+      userId: MongoId
+    ): Promise<User.Mongo> => {
+      const user = await usersCollection.findOneAndUpdate(
+        { _id: toObjectId(userId), role: { $ne: "stub" } },
+        { $set: { proRequest: request } },
+        { returnDocument: "after" }
+      );
+
+      if (!user.value) {
+        throw new NotFoundError();
+      }
+
+      return user.value as User.Mongo;
     },
 
     /**
