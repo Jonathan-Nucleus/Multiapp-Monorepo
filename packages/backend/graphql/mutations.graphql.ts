@@ -521,7 +521,7 @@ const resolvers = {
                   )
                   .required(),
                 body: yup.string(),
-                mediaUrl: yup.string().url(),
+                mediaUrl: yup.string(),
                 mentionIds: yup.array().of(
                   yup.string().test({
                     test: isObjectId,

@@ -33,7 +33,7 @@ describe("Mutations - createPost", () => {
     audience: Object.keys(AudienceOptions)[0],
     categories: [Object.keys(PostCategoryOptions)[0]],
     body: "test post body",
-    mediaUrl: "http://test.com",
+    mediaUrl: "test.png",
     mentionIds: [toObjectId().toString()],
   };
 
@@ -68,21 +68,6 @@ describe("Mutations - createPost", () => {
     });
 
     expect(getErrorCode(res)).toBe(ErrorCode.BAD_USER_INPUT);
-  });
-
-  it("fails with invalid media url", async () => {
-    const res = await server.executeOperation({
-      query,
-      variables: {
-        post: {
-          ...postData,
-          mediaUrl: "test",
-        },
-      },
-    });
-
-    expect(getErrorCode(res)).toBe(ErrorCode.BAD_USER_INPUT);
-    expect(getFieldError(res, "post.mediaUrl")).toBeDefined();
   });
 
   it("fails with invalid mention ids", async () => {
