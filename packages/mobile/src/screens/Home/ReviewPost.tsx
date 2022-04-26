@@ -5,13 +5,13 @@ import {
   MentionInput,
   replaceMentionValues,
 } from 'react-native-controlled-mentions';
-import { useMutation } from '@apollo/client';
 import _ from 'lodash';
 
 import PAppContainer from '../../components/common/PAppContainer';
 import RoundImageView from '../../components/common/RoundImageView';
 import PostSelection from './PostSelection';
 import pStyles from '../../theme/pStyles';
+
 import { ReviewPostScreen } from 'mobile/src/navigations/HomeStack';
 import { showMessage } from '../../services/utils';
 import { SECONDARY } from 'shared/src/colors';
@@ -102,8 +102,10 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
         },
       });
 
-      console.log('success', result);
-      showMessage('success', 'Successfully posted!');
+      if (result && result.data && result.data.createPost) {
+        console.log('success', result);
+        showMessage('success', 'Successfully posted!');
+      }
     } catch (e) {
       console.log('error', e);
       showMessage('error', SOMETHING_WRONG);
