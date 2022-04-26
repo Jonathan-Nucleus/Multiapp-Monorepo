@@ -1,4 +1,5 @@
 import { FC } from "react";
+
 import CompanyItem from "./CompanyItem";
 import { CompanyType } from "desktop/app/types/common-props";
 

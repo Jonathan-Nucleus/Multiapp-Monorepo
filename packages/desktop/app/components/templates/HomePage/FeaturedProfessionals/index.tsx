@@ -1,73 +1,39 @@
 import { FC } from "react";
-import Card from "../../../common/Card";
 import "@splidejs/react-splide/css";
 import { Splide, SplideSlide } from "@splidejs/react-splide";
 import Image from "next/image";
 import Link from "next/link";
 
 import { useFollowUser } from "mobile/src/graphql/mutation/account";
-
-const items = [
-  {
-    image:
-      "https://media.istockphoto.com/photos/smiling-man-outdoors-in-the-city-picture-id1179420343?k=20&m=1179420343&s=612x612&w=0&h=G2UGMVSzAXGAQs3pFZpvWlHNRAzwPIWIVtSOxZHsEuc=",
-    name: "Mike Wang",
-    position: "Founder, Investor",
-    company: "Prometheus",
-  },
-  {
-    image:
-      "https://media.istockphoto.com/photos/smiling-man-outdoors-in-the-city-picture-id1179420343?k=20&m=1179420343&s=612x612&w=0&h=G2UGMVSzAXGAQs3pFZpvWlHNRAzwPIWIVtSOxZHsEuc=",
-    name: "Peter Avellone",
-    position: "CIO & Founder",
-    company: "Cartenna Capital",
-  },
-  {
-    image:
-      "https://media.istockphoto.com/photos/smiling-man-outdoors-in-the-city-picture-id1179420343?k=20&m=1179420343&s=612x612&w=0&h=G2UGMVSzAXGAQs3pFZpvWlHNRAzwPIWIVtSOxZHsEuc=",
-    name: "Mike Wang",
-    position: "Founder, Investor",
-    company: "Prometheus",
-  },
-  {
-    image:
-      "https://media.istockphoto.com/photos/smiling-man-outdoors-in-the-city-picture-id1179420343?k=20&m=1179420343&s=612x612&w=0&h=G2UGMVSzAXGAQs3pFZpvWlHNRAzwPIWIVtSOxZHsEuc=",
-    name: "Mike Wang",
-    position: "Founder, Investor",
-    company: "Prometheus",
-  },
-  {
-    image:
-      "https://media.istockphoto.com/photos/smiling-man-outdoors-in-the-city-picture-id1179420343?k=20&m=1179420343&s=612x612&w=0&h=G2UGMVSzAXGAQs3pFZpvWlHNRAzwPIWIVtSOxZHsEuc=",
-    name: "Mike Wang",
-    position: "Founder, Investor",
-    company: "Prometheus",
-  },
-  {
-    image:
-      "https://media.istockphoto.com/photos/smiling-man-outdoors-in-the-city-picture-id1179420343?k=20&m=1179420343&s=612x612&w=0&h=G2UGMVSzAXGAQs3pFZpvWlHNRAzwPIWIVtSOxZHsEuc=",
-    name: "Mike Wang",
-    position: "Founder, Investor",
-    company: "Prometheus",
-  },
-  {
-    image:
-      "https://media.istockphoto.com/photos/smiling-man-outdoors-in-the-city-picture-id1179420343?k=20&m=1179420343&s=612x612&w=0&h=G2UGMVSzAXGAQs3pFZpvWlHNRAzwPIWIVtSOxZHsEuc=",
-    name: "Mike Wang",
-    position: "Founder, Investor",
-    company: "Prometheus",
-  },
-];
+import { useAccount } from "mobile/src/graphql/query/account";
+import { useProfessionals } from "mobile/src/graphql/query/professional";
+import Button from "desktop/app/components/common/Button";
+import type { User } from "backend/graphql/users.graphql";
+import Card from "../../../common/Card";
 
 const FeaturedProfessionals: FC = () => {
   const [followUser] = useFollowUser();
+  const { data: featuredData } = useProfessionals();
+  const { data: userData } = useAccount({ fetchPolicy: "cache-only" });
 
   const handleFollowUser = async (id: string): Promise<void> => {
-    // TODO
-    const { data } = await followUser({
-      variables: { follow: true, userId: id },
-    });
+    try {
+      const { data } = await followUser({
+        variables: { follow: true, userId: id },
+        refetchQueries: ["Account"],
+      });
+
+      if (!data || data.followUser) {
+        console.log("err", data);
+      }
+    } catch (err) {
+      console.log("err", err);
+    }
   };
+
+  if (featuredData?.professionals.length === 0) {
+    return null;
+  }
 
   return (
     <>
@@ -84,13 +50,15 @@ const FeaturedProfessionals: FC = () => {
             pagination: false,
           }}
         >
-          {items.map((item, index) => (
+          {featuredData?.professionals.map((item, index) => (
             <SplideSlide key={index}>
               <div className="mx-2">
                 <div className="w-40 h-40 relative">
                   <Image
-                    loader={() => item.image}
-                    src={item.image}
+                    loader={() =>
+                      `${process.env.NEXT_PUBLIC_AVATAR_URL}/${item.avatar}`
+                    }
+                    src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${item.avatar}`}
                     alt=""
                     width={160}
                     height={160}
@@ -100,19 +68,27 @@ const FeaturedProfessionals: FC = () => {
                   <div className="absolute top-0 left-0 right-0 bottom-0">
                     <div className="bg-gradient-to-b from-transparent to-black w-full h-full flex flex-col justify-end rounded-lg">
                       <div className="p-3">
-                        <div className="text-white">{item.name}</div>
+                        <div className="text-white">
+                          {item.firstName} {item.lastName}
+                        </div>
                         <div className="text-white text-xs font-semibold">
                           {item.position}
                         </div>
-                        <div className="text-white text-xs">{item.company}</div>
+                        <div className="text-white text-xs">
+                          {item.company?.name}
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div className="text-center mt-2">
-                  <Link href="/">
-                    <a className="text-xs text-primary font-normal">FOLLOW</a>
-                  </Link>
+                  <Button
+                    variant="text"
+                    className="text-sm text-primary tracking-normal font-normal"
+                    onClick={() => handleFollowUser(item._id)}
+                  >
+                    FOLLOW
+                  </Button>
                 </div>
               </div>
             </SplideSlide>

@@ -449,7 +449,7 @@ const resolvers = {
         const { questionnaire } = args;
         return db.users.saveQuestionnaire(user._id, {
           ...questionnaire,
-          status: [...new Set(questionnaire.status)], // Ensure unique values
+          status: Array.from(new Set(questionnaire.status)), // Ensure unique values
         });
       }
     ),

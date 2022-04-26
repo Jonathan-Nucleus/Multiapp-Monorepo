@@ -33,7 +33,7 @@ const HomePage: FC = () => {
         </div>
         <div className="min-w-0 mx-4">
           <FeaturedProfessionals />
-          <div className="mt-10 hidden md:block">
+          <div className="mt-12 hidden md:block">
             <AddPost setShowPostModal={() => setShowPostModal(true)} />
           </div>
           <div className="mt-5">

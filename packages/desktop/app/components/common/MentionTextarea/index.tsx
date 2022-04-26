@@ -1,8 +1,9 @@
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 import {
   DataFunc,
   Mention,
-  MentionsInput,
+  MentionsInput as MentionsInputReact17,
+  MentionsInputProps,
   OnChangeHandlerFunc,
 } from "react-mentions";
 import styles from "./index.module.scss";
@@ -17,6 +18,11 @@ import {
   Path,
 } from "react-hook-form";
 import * as yup from "yup";
+
+// TODO: Stopgap measure to address breaking type changes for fragments ({})
+// in React 18.
+const MentionsInput =
+  MentionsInputReact17 as unknown as React.FC<MentionsInputProps>;
 
 const users = [
   {
@@ -103,6 +109,7 @@ function MentionTextarea<
       }));
     callback(items);
   };
+
   return (
     <div className="text-sm text-white h-full">
       <Controller
@@ -150,7 +157,9 @@ function MentionTextarea<
                       </div>
                       <div className="ml-2">
                         <div className="flex items-center">
-                          <div className="text-base">{highlightedDisplay}</div>
+                          <div className="text-base">
+                            {highlightedDisplay as unknown as ReactNode}
+                          </div>
                           <div className="text-success ml-2">
                             <ShieldCheck
                               color="currentColor"

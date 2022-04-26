@@ -5,6 +5,7 @@ import { FetchPostsData } from "mobile/src/graphql/query/account";
 
 export interface UserProfileProps extends PropsWithChildren<unknown> {
   user: Exclude<AccountData["account"], undefined>;
+  isEditable?: boolean;
 }
 
 export interface CompanyProfileProps extends PropsWithChildren<unknown> {

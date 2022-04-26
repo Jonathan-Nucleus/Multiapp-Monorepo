@@ -117,7 +117,12 @@ const AvatarMenu: FC = () => {
           <div>
             <a
               className="cursor-pointer px-4 py-3 flex flex-row items-center"
-              onClick={() => signOut()}
+              onClick={() =>
+                signOut({
+                  redirect: false,
+                  callbackUrl: process.env.NEXTAUTH_URL,
+                })
+              }
             >
               <span className="flex-shrink-0 flex items-center">
                 <SignOut color="white" weight="light" size={24} />

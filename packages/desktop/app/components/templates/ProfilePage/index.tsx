@@ -1,4 +1,5 @@
 import { FC } from "react";
+
 import ProfileCard from "./ProfileCard";
 import CompaniesList from "./CompaniesList";
 import PostsList from "../../common/PostsList";
@@ -9,9 +10,10 @@ import { useManagedFunds } from "mobile/src/graphql/query/user/useManagedFunds";
 
 interface ProfilePageProps {
   user: UserProfile;
+  isEditable?: boolean;
 }
 
-const ProfilePage: FC<ProfilePageProps> = ({ user }) => {
+const ProfilePage: FC<ProfilePageProps> = ({ user, isEditable = false }) => {
   const { data: postData } = usePosts(user._id);
   const { data: fundsData } = useManagedFunds(user._id);
 
@@ -26,7 +28,7 @@ const ProfilePage: FC<ProfilePageProps> = ({ user }) => {
           <div className="col-span-4">
             <div className="divide-y divide-inherit border-white/[.12]">
               <div className="pb-5">
-                <ProfileCard user={user} />
+                <ProfileCard user={user} isEditable={isEditable} />
               </div>
               <div className="lg:hidden mb-5 pt-5">
                 <CompaniesList companies={user.companies} />

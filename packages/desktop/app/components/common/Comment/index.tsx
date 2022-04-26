@@ -1,6 +1,6 @@
 import { FC, useMemo } from "react";
 import SendMessage from "./SendMessage";
-import CommentsList from "./CommentsList";
+import CommentCard from "./CommentCard";
 import Card from "../Card";
 
 import { useCommentPost } from "mobile/src/graphql/mutation/posts";
@@ -45,6 +45,10 @@ const CommentPost: FC<CommentPostProps> = ({ post }) => {
     return temp;
   }, [post.comments]);
 
+  const comments: Comment[] = useMemo(() => {
+    return post.comments.filter((v) => !v.commentId);
+  }, [post.comments]);
+
   return (
     <Card className="border-0 p-0 px-4 rounded-none relative">
       <SendMessage
@@ -52,12 +56,23 @@ const CommentPost: FC<CommentPostProps> = ({ post }) => {
         onSend={(val, mediaUrl) => sendMessage(val, mediaUrl)}
         placeholder="Add a comment..."
       />
-      <CommentsList
-        comments={post.comments}
-        commentsByCommentID={commentsByCommentID}
-        parentId={null}
-        postId={post._id}
-      />
+      {comments.map((comment) => (
+        <CommentCard
+          comment={comment}
+          key={comment._id}
+          parentId={comment._id}
+          postId={post._id}
+        >
+          {commentsByCommentID[comment._id]?.map((v) => (
+            <CommentCard
+              comment={v}
+              key={v._id}
+              parentId={comment._id}
+              postId={post._id}
+            />
+          ))}
+        </CommentCard>
+      ))}
     </Card>
   );
 };

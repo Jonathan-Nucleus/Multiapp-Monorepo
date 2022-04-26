@@ -1,6 +1,8 @@
 import React, { FC, useState, useRef } from "react";
 import { PaperPlaneRight, Image as PhotoImage, Smiley } from "phosphor-react";
+import { Picker } from "emoji-mart";
 import { useFetchUploadLink } from "mobile/src/graphql/mutation/posts";
+import "emoji-mart/css/emoji-mart.css";
 
 import Button from "../Button";
 import Avatar from "../Avatar";
@@ -35,8 +37,8 @@ const SendMessage: FC<SendMessageProps> = ({
     setComment("");
   };
 
-  const onEmojiClick = (event: any, emojiObject: any) => {
-    setComment(comment + " " + emojiObject.emoji + " ");
+  const onEmojiClick = (emojiObject: any) => {
+    setComment(comment + " " + emojiObject.native + " ");
   };
 
   const uploadMedia = async (file: File): Promise<string | undefined> => {
@@ -71,11 +73,10 @@ const SendMessage: FC<SendMessageProps> = ({
     <div className="relative">
       <div className="flex items-center">
         <Avatar src={avatar} size={size} />
-        <div className="flex items-center justify-between p-4 ml-2 flex-1 relative">
+        <div className="flex items-center justify-between p-4 flex-1 relative">
           <Input
             placeholder={placeholder}
-            className="bg-background-DEFAULT pl-4 pr-16 text-sm tracking-wide font-light"
-            shape="pill"
+            className="rounded-full bg-background-DEFAULT pr-16"
             value={comment}
             onChange={(event) => {
               setComment(event.currentTarget.value);
@@ -117,11 +118,7 @@ const SendMessage: FC<SendMessageProps> = ({
       </div>
       {visibleEmoji && (
         <div className="absolute right-0 w-full z-50">
-          {/*<Picker*/}
-          {/*  onEmojiClick={onEmojiClick}*/}
-          {/*  skinTone={SKIN_TONE_MEDIUM_DARK}*/}
-          {/*  pickerStyle={{ width: "100%" }}*/}
-          {/*/>*/}
+          <Picker onSelect={onEmojiClick} style={{ width: "100%" }} />
         </div>
       )}
     </div>

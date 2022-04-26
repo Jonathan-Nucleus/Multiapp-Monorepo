@@ -12,6 +12,9 @@ import {
   XCircle,
 } from "phosphor-react";
 import Image from "next/image";
+import { Picker } from "emoji-mart";
+import "emoji-mart/css/emoji-mart.css";
+
 import CategorySelector, { categoriesSchema } from "./CategorySelector";
 import Avatar from "desktop/app/components/common/Avatar";
 import Card from "desktop/app/components/common/Card";
@@ -124,6 +127,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({ show, onClose }) => {
   const [createPost] = useCreatePost();
   const [fetchUploadLink] = useFetchUploadLink();
   const [loading, setLoading] = useState(false);
+  const [visibleEmoji, setVisibleEmoji] = useState(false);
 
   const account = userData?.account;
   const userOptions = account?._id
@@ -147,6 +151,8 @@ const CreatePostModal: FC<CreatePostModalProps> = ({ show, onClose }) => {
     control,
     formState: { isValid, errors },
     reset,
+    getValues,
+    setValue,
   } = useForm<yup.InferType<typeof schema>>({
     resolver: yupResolver(schema),
     defaultValues: schema.cast(
@@ -165,6 +171,12 @@ const CreatePostModal: FC<CreatePostModalProps> = ({ show, onClose }) => {
       ) as DefaultValues<FormValues>
     );
   }, [account]);
+
+  const onEmojiClick = (emojiObject: any) => {
+    const body = getValues("mentionInput.body");
+    setValue("mentionInput.body", body + emojiObject.native);
+    setVisibleEmoji(false);
+  };
 
   const onSubmit: SubmitHandler<FormValues> = async ({
     user,
@@ -247,7 +259,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({ show, onClose }) => {
               </Button>
             </div>
             <div className="flex flex-col md:flex-row flex-grow md:min-h-0">
-              <div className="flex flex-col md:w-[40rem]">
+              <div className="flex flex-col md:w-[40rem] relative">
                 <div className="flex flex-wrap items-center p-4">
                   <Avatar size={56} />
                   <div className="ml-2">
@@ -338,7 +350,10 @@ const CreatePostModal: FC<CreatePostModalProps> = ({ show, onClose }) => {
                         Photo/Video
                       </div>
                     </Label>
-                    <div className="flex items-center text-white/[.6] ml-4 cursor-pointer hover:opacity-80 transition">
+                    <div
+                      className="flex items-center text-white/[.6] ml-4 cursor-pointer hover:opacity-80 transition"
+                      onClick={() => setVisibleEmoji(!visibleEmoji)}
+                    >
                       <div className="text-success">
                         <Smiley color="currentColor" weight="light" size={24} />
                       </div>
@@ -352,6 +367,12 @@ const CreatePostModal: FC<CreatePostModalProps> = ({ show, onClose }) => {
                     </div>
                   </div>
                 </div>
+
+                {visibleEmoji && (
+                  <div className="absolute bottom-8 z-50">
+                    <Picker onSelect={onEmojiClick} style={{ width: "100%" }} />
+                  </div>
+                )}
               </div>
               {showCategories && (
                 <div className="w-full md:border-l border-white/[.12] md:w-80">

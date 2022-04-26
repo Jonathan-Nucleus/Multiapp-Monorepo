@@ -16,17 +16,18 @@ import {
 import { useAccount } from "mobile/src/graphql/query/account";
 import type { Comment } from "mobile/src/graphql/query/post";
 
-interface CommentCardProps {
+interface CommentCardProps extends React.PropsWithChildren<unknown> {
   comment: Comment;
   postId: string;
+  parentId?: string;
   size?: number;
-  children: any;
 }
 
 const CommentCard: FC<CommentCardProps> = ({
   comment,
   postId,
   size,
+  parentId,
   children,
 }: CommentCardProps) => {
   const { data: accountData } = useAccount();
@@ -97,12 +98,14 @@ const CommentCard: FC<CommentCardProps> = ({
   ): Promise<void> => {
     if (!reply || reply.trim() === "") return;
     try {
+      setVisibleReply(false);
+
       await commentPost({
         variables: {
           comment: {
             body: reply,
             postId: postId,
-            commentId: comment._id,
+            commentId: parentId,
             mentionIds: [], // Update to add mentions
           },
         },

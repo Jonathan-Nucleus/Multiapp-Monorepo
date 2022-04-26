@@ -118,6 +118,8 @@ export function useAccount(
           role
           accreditation
           position
+          tagline
+          overview
           postIds
           website
           linkedIn

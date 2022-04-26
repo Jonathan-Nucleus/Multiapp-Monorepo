@@ -11,11 +11,13 @@ import {
   WarningCircle,
   MinusCircle,
   Chats,
+  Pencil,
 } from "phosphor-react";
 import { Menu } from "@headlessui/react";
 import Button from "../../../../components/common/Button";
 import Card from "../../../../components/common/Card";
 import Avatar from "../../../common/Avatar";
+import EditModal from "./EditModal";
 import FollowersModal from "../../../modules/users/FollowersModal";
 import { useFollowUser } from "mobile/src/graphql/mutation/account";
 import { useAccount } from "mobile/src/graphql/query/account";
@@ -23,10 +25,12 @@ import { UserProfile } from "mobile/src/graphql/query/user/useProfile";
 
 interface ProfileCardProps {
   user: UserProfile;
+  isEditable?: boolean;
 }
 
-const ProfileCard: FC<ProfileCardProps> = ({ user }) => {
+const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
   const [isVisible, setVisible] = useState(false);
+  const [editableModal, setEditableModal] = useState(false);
   let overviewShort: string | undefined = undefined;
   const [showFullOverView, setShowFullOverView] = useState(false);
   {
@@ -76,9 +80,27 @@ const ProfileCard: FC<ProfileCardProps> = ({ user }) => {
                   unoptimized={true}
                 />
               )}
+              {isEditable && isMyProfile && (
+                <div
+                  onClick={() => setEditableModal(true)}
+                  className="rounded-full border border-primary flex-shrink-0 w-10 h-10 bg-surface-light10 flex items-center justify-center cursor-pointer absolute right-4 top-4"
+                >
+                  <Pencil size={24} color="white" />
+                </div>
+              )}
             </div>
             <div className="hidden lg:flex items-center relative mx-5 -mt-6">
-              <Avatar src={user.avatar} size={120} />
+              <div className="relative">
+                <Avatar src={user.avatar} size={120} />
+                {isEditable && isMyProfile && (
+                  <div
+                    onClick={() => setEditableModal(true)}
+                    className="rounded-full border border-primary flex-shrink-0 w-10 h-10 bg-surface-light10 flex items-center justify-center cursor-pointer absolute right-0 bottom-0"
+                  >
+                    <Pencil size={24} color="white" />
+                  </div>
+                )}
+              </div>
               <div className="flex flex-grow items-center justify-between ml-3 mt-8">
                 <div>
                   <div className="text-xl text-white font-medium">
@@ -105,10 +127,31 @@ const ProfileCard: FC<ProfileCardProps> = ({ user }) => {
                     </div>
                   </>
                 )}
+                {isEditable && isMyProfile && (
+                  <Button
+                    variant="outline-primary"
+                    onClick={() => setEditableModal(true)}
+                    className="px-4"
+                  >
+                    <Pencil size={24} color="white" />
+                    <div className="text-white ml-2">Edit Profile</div>
+                  </Button>
+                )}
               </div>
             </div>
             <div className="flex lg:hidden items-center p-4">
-              <Avatar src={user.avatar} size={80} />
+              <div className="relative">
+                <Avatar src={user.avatar} size={80} />
+                {isEditable && isMyProfile && (
+                  <div
+                    onClick={() => setEditableModal(true)}
+                    className="rounded-full border border-primary flex-shrink-0 w-8 h-8 bg-surface-light10 flex items-center justify-center cursor-pointer absolute right-0 bottom-0"
+                  >
+                    <Pencil size={20} color="white" />
+                  </div>
+                )}
+              </div>
+
               <div className="flex-grow grid grid-cols-3 divide-x divide-inherit">
                 <div className="flex flex-wrap items-center justify-center text-center cursor-pointer px-4">
                   <div className="text-xl text-white font-medium mx-1">
@@ -306,6 +349,7 @@ const ProfileCard: FC<ProfileCardProps> = ({ user }) => {
         followers={user.followers}
         following={user.following}
       />
+      <EditModal show={editableModal} onClose={() => setEditableModal(false)} />
     </>
   );
 };

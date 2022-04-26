@@ -370,7 +370,7 @@ export const ContentCreatorSchema = `
   linkedIn: String
   twitter: String
 
-  posts(featured: Boolean): [Post!]!
+  posts(featured: Boolean, categories: [PostCategory!]): [Post!]!
   comments: [Comment!]!
   followers: [UserProfile!]!
   following: [UserProfile!]!
