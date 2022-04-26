@@ -9,21 +9,23 @@ import CheckboxLabel from '../../components/common/CheckboxLabel';
 import PostHeader from './PostHeader';
 import PAppContainer from '../../components/common/PAppContainer';
 import { ChooseCategoryScreen } from 'mobile/src/navigations/HomeStack';
+import { PostCategory } from 'mobile/src/graphql/mutation/posts';
 
 interface CategoryItem {
   id: number;
   txt: string;
   isChecked: boolean;
+  value: PostCategory;
 }
 
 const CategoryList: CategoryItem[] = [
-  { id: 1, txt: 'News', isChecked: false },
-  { id: 2, txt: 'Tech', isChecked: false },
-  { id: 3, txt: 'Politics', isChecked: false },
-  { id: 4, txt: 'Energy', isChecked: false },
-  { id: 5, txt: 'Ideas', isChecked: false },
-  { id: 6, txt: 'Crypto', isChecked: false },
-  { id: 7, txt: 'Education', isChecked: false },
+  { id: 1, txt: 'News', isChecked: false, value: 'NEWS' },
+  { id: 2, txt: 'Tech', isChecked: false, value: 'TECH' },
+  { id: 3, txt: 'Politics', isChecked: false, value: 'POLITICS' },
+  { id: 4, txt: 'Energy', isChecked: false, value: 'ENERGY' },
+  { id: 5, txt: 'Ideas', isChecked: false, value: 'IDEAS' },
+  { id: 6, txt: 'Crypto', isChecked: false, value: 'CRYPTO' },
+  { id: 7, txt: 'Education', isChecked: false, value: 'EDUCATION' },
 ];
 
 const ChooseCategory: ChooseCategoryScreen = ({ route, navigation }) => {
@@ -78,10 +80,10 @@ const ChooseCategory: ChooseCategoryScreen = ({ route, navigation }) => {
     if (!checkValidation()) {
       return;
     }
-    let updatedCategories: string[] = [];
+    let updatedCategories: PostCategory[] = [];
     categories.map((category) => {
       if (category.isChecked) {
-        updatedCategories.push(category.txt.toUpperCase());
+        updatedCategories.push(category.value);
       }
     });
     navigation.navigate('ReviewPost', {

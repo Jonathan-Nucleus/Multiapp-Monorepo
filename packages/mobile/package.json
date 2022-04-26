@@ -29,6 +29,7 @@
     "@types/react-native-indicators": "^0.16.2",
     "@types/react-native-snap-carousel": "^3.8.5",
     "apollo3-cache-persist": "^0.14.0",
+    "axios": "^0.26.1",
     "dayjs": "^1.11.0",
     "graphql": "^16.3.0",
     "moment": "^2.29.2",

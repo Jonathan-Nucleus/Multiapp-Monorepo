@@ -9,9 +9,10 @@ import {
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Modal from 'react-native-modal';
-import { Chats, CopySimple, Share } from 'phosphor-react-native';
+import { Chats, CopySimple, Pencil, Share } from 'phosphor-react-native';
+import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
 
-import { Body2, Body3, H6Bold } from '../../../theme/fonts';
+import { Body2, Body3, H5Bold, H6Bold } from '../../../theme/fonts';
 import PGradientButton from '../../../components/common/PGradientButton';
 import PGradientOutlineButton from '../../../components/common/PGradientOutlineButton';
 import LinkedinSvg from 'shared/assets/images/linkedin.svg';
@@ -26,19 +27,20 @@ import {
   GRAY100,
   PRIMARY,
   BGDARK,
+  PRIMARYSOLID,
 } from 'shared/src/colors';
 
 import { useAccount } from '../../../graphql/query/account';
 import { useFollowCompany } from '../../../graphql/mutation/account';
 import type { CompanyProfile } from 'mobile/src/graphql/query/company/useCompany';
-
-import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
+import * as NavigationService from '../../../services/navigation/NavigationService';
 
 interface CompanyDetailProps {
   company: CompanyProfile;
+  isMyCompany?: boolean;
 }
 
-const CompanyDetail: FC<CompanyDetailProps> = ({ company }) => {
+const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [visibleFollow, setVisibleFollow] = useState(false);
   const { data: accountData, refetch } = useAccount();
@@ -83,25 +85,62 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company }) => {
 
   return (
     <>
-      {background && (
-        <FastImage
-          style={styles.backgroundImg}
-          source={{
-            uri: `${BACKGROUND_URL}/${background}`,
-          }}
-          resizeMode={FastImage.resizeMode.cover}
-        />
-      )}
-
-      <View style={styles.content}>
-        <View style={styles.companyDetail}>
+      <View style={styles.relative}>
+        {background ? (
           <FastImage
             style={styles.backgroundImg}
             source={{
-              uri: `${AVATAR_URL}/${avatar}`,
+              uri: `${BACKGROUND_URL}/${background}`,
             }}
             resizeMode={FastImage.resizeMode.cover}
           />
+        ) : (
+          <PGradientButton
+            btnContainer={styles.noBackground}
+            gradientContainer={styles.gradientContainer}
+          />
+        )}
+        {isMyCompany && (
+          <TouchableOpacity
+            onPress={() =>
+              NavigationService.navigate('EditPhoto', {
+                company: company,
+                type: 'BACKGROUND',
+              })
+            }
+            style={styles.pencil}>
+            <Pencil color={WHITE} size={18} />
+          </TouchableOpacity>
+        )}
+      </View>
+
+      <View style={styles.content}>
+        <View style={styles.companyDetail}>
+          <View style={styles.relative}>
+            {avatar ? (
+              <FastImage
+                style={styles.avatar}
+                source={{
+                  uri: `${AVATAR_URL}/${avatar}`,
+                }}
+                resizeMode={FastImage.resizeMode.cover}
+              />
+            ) : (
+              <View style={styles.noAvatarContainer}>
+                <Text style={styles.noAvatar}>{name.charAt(0)}</Text>
+              </View>
+            )}
+            <TouchableOpacity
+              onPress={() =>
+                NavigationService.navigate('EditPhoto', {
+                  company: company,
+                  type: 'AVATAR',
+                })
+              }
+              style={styles.pencil}>
+              <Pencil color={WHITE} size={18} />
+            </TouchableOpacity>
+          </View>
         </View>
         <Text style={styles.val}>{name}</Text>
         <View style={styles.row}>
@@ -128,22 +167,29 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company }) => {
             <Text style={styles.comment}>Posts</Text>
           </View>
         </View>
-        <Text style={styles.decription}>
-          Virgin is a leading international investment group and one of the
-          world's most recognised and respected brands. Read More...
-        </Text>
-        <View style={styles.row}>
+        <Text style={styles.decription}>{company.overview}</Text>
+        {isMyCompany ? (
           <PGradientOutlineButton
-            label="Message"
-            onPress={() => console.log(11)}
-            gradientContainer={styles.button}
+            label="Edit Profile"
+            onPress={() =>
+              NavigationService.navigate('EditProfile', { company: company })
+            }
+            gradientContainer={styles.editButton}
           />
-          <PGradientButton
-            label={isFollower ? 'unfollow' : 'follow'}
-            onPress={() => toggleFollowCompany(company._id)}
-            gradientContainer={styles.button}
-          />
-        </View>
+        ) : (
+          <View style={styles.row}>
+            <PGradientOutlineButton
+              label="Message"
+              onPress={() => console.log(11)}
+              gradientContainer={styles.button}
+            />
+            <PGradientButton
+              label={isFollower ? 'unfollow' : 'follow'}
+              onPress={() => toggleFollowCompany(company._id)}
+              gradientContainer={styles.button}
+            />
+          </View>
+        )}
       </View>
       <View style={[styles.row, styles.social]}>
         <View style={styles.socialView}>
@@ -329,5 +375,47 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 24,
+  },
+  relative: {
+    position: 'relative',
+  },
+  noAvatarContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: WHITE,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noAvatar: {
+    color: PRIMARYSOLID,
+    ...H5Bold,
+    textAlign: 'center',
+  },
+  noBackground: {
+    height: 65,
+  },
+  gradientContainer: {
+    borderRadius: 0,
+    height: 65,
+  },
+  pencil: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    backgroundColor: PRIMARYSOLID,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+  },
+  editButton: {
+    width: Dimensions.get('screen').width - 32,
   },
 });

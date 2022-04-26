@@ -22,21 +22,25 @@ import {
   BGHEADER,
   GRAY100,
   PRIMARY,
+  PRIMARYSOLID,
 } from 'shared/src/colors';
 
 import pStyles from '../../../theme/pStyles';
-import { Body2Bold, Body3, H6 } from '../../../theme/fonts';
+import { Body2Bold, Body3, H5Bold, H6 } from '../../../theme/fonts';
 import MainHeader from '../../../components/main/Header';
 import PAppContainer from '../../../components/common/PAppContainer';
-import PostItem, { Post } from '../../../components/main/PostItem';
+import PostItem from '../../../components/main/PostItem';
 import FeaturedItem from '../../../components/main/settings/FeaturedItem';
 import Funds from '../../../components/main/settings/Funds';
 import Members from '../../../components/main/settings/Members';
+import PGradientOutlineButton from '../../../components/common/PGradientOutlineButton';
 import CompanyDetail from './CompanyDetail';
+import { Post } from 'mobile/src/graphql/query/post/usePosts';
 
 import { useAccount } from '../../../graphql/query/account';
 import { usePosts } from '../../../graphql/query/post/usePosts';
 import { useCompany } from '../../../graphql/query/company/useCompany';
+import NoPostSvg from 'shared/assets/images/no-post.svg';
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
@@ -52,6 +56,16 @@ const CompanyProfile: FC<RouterProps> = ({ navigation, route }) => {
 
   const postData = data?.posts ?? [];
   const company = companyData?.companyProfile;
+
+  const isMyCompany = useMemo(() => {
+    if (route.params?.companyId && accountData?.account.companies) {
+      const index = accountData?.account.companies.findIndex(
+        (v) => v._id === route.params?.companyId,
+      );
+      return index > -1 ? true : false;
+    }
+    return false;
+  }, [accountData, route.params]);
 
   if (isFocused !== focusState) {
     console.log('refetching...');
@@ -80,11 +94,11 @@ const CompanyProfile: FC<RouterProps> = ({ navigation, route }) => {
         onPressLeft={() => navigation.goBack()}
       />
       <PAppContainer style={styles.container}>
-        <CompanyDetail company={company} />
+        <CompanyDetail company={company} isMyCompany={isMyCompany} />
         <Funds accredited={accountData?.account.accreditation} />
         <View style={styles.posts}>
           <Members members={company.members || []} key={company._id} />
-          {postData.length > 0 && (
+          {postData.length > 0 ? (
             <View>
               <Text style={styles.text}>Featured Posts</Text>
               <FlatList
@@ -95,9 +109,15 @@ const CompanyProfile: FC<RouterProps> = ({ navigation, route }) => {
                 horizontal
               />
             </View>
+          ) : (
+            isMyCompany && (
+              <View style={styles.noPostContainer}>
+                <Text style={styles.val}>You don’t have any posts, yet.</Text>
+              </View>
+            )
           )}
 
-          {postData.length > 0 && (
+          {postData.length > 0 ? (
             <FlatList
               data={postData || []}
               renderItem={({ item }) => (
@@ -107,6 +127,20 @@ const CompanyProfile: FC<RouterProps> = ({ navigation, route }) => {
               listKey="post"
               ListHeaderComponent={<Text style={styles.text}>All Posts</Text>}
             />
+          ) : (
+            isMyCompany && (
+              <View style={styles.noPostContainer}>
+                <View style={styles.noPostContainer}>
+                  <NoPostSvg />
+                </View>
+                <Text style={styles.val}>You don’t have any posts, yet.</Text>
+                <PGradientOutlineButton
+                  label="Create a Post"
+                  btnContainer={styles.createPostBtn}
+                  onPress={() => navigation.navigate('CreatePost')}
+                />
+              </View>
+            )
           )}
         </View>
       </PAppContainer>
@@ -192,5 +226,23 @@ const styles = StyleSheet.create({
   },
   posts: {
     paddingHorizontal: 16,
+  },
+  noPostContainer: {
+    alignSelf: 'center',
+  },
+  createPostBtn: {
+    marginTop: 25,
+  },
+  noAvatarContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: WHITE,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noAvatar: {
+    color: PRIMARYSOLID,
+    ...H5Bold,
   },
 });

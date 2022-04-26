@@ -63,8 +63,12 @@ export const AudienceOptions = {
   EVERYONE: "everyone",
   ...relevantAccrediationOptions,
 } as const;
-export type Audience = ValueOf<typeof AudienceOptions> | Accreditation;
-export type AudienceEnum = keyof typeof AudienceOptions | AccreditationEnum;
+export type Audience =
+  | ValueOf<typeof AudienceOptions>
+  | Exclude<Accreditation, "none">;
+export type AudienceEnum =
+  | keyof typeof AudienceOptions
+  | Exclude<AccreditationEnum, "NONE">;
 
 /** Enumeration describing the possible cateogories of a post. */
 export const PostCategoryOptions = {
@@ -84,7 +88,7 @@ export const PostCategoryOptions = {
     value: "politics",
     label: "Politics",
   },
-  CRYTPO: {
+  CRYPTO: {
     value: "crypto",
     label: "Crypto",
   },

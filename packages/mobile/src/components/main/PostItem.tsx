@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import dayjs from 'dayjs';
 import {
@@ -17,11 +17,10 @@ import Tag from '../common/Tag';
 import { PRIMARYSTATE, GRAY10, WHITE60, WHITE } from 'shared/src/colors';
 import { Body1, Body3 } from '../../theme/fonts';
 import * as NavigationService from '../../services/navigation/NavigationService';
-import { PostSummary } from 'mobile/src/graphql/fragments/post';
+import { Post } from 'mobile/src/graphql/query/post/usePosts';
 import { PostCategories } from 'backend/graphql/enumerations.graphql';
 import { useLikePost } from '../../graphql/mutation/posts';
 
-export type Post = PostSummary;
 export interface PostItemProps {
   post: Post;
   userId: string;
@@ -35,7 +34,7 @@ const PostItem: React.FC<PostItemProps> = ({ post, userId, onPressMenu }) => {
 
   useEffect(() => {
     setLiked(post.likeIds?.includes(userId) ?? false);
-  }, [post]);
+  }, [post, userId]);
 
   const toggleLike = async (): Promise<void> => {
     const toggled = !liked;

@@ -69,7 +69,7 @@ const EmailContact: React.FC = () => {
             right: 16,
           },
         }}
-        Icon={() => <CaretDown size={14} color={WHITE} weight="fill" />}
+        Icon={<CaretDown size={14} color={WHITE} weight="fill" />}
         placeholder={{ label: null, value: null }}
       />
       <PTextInput

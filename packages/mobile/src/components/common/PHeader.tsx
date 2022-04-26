@@ -1,15 +1,21 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  ViewStyle,
+  StyleProp,
+} from 'react-native';
 
 interface HeaderProps {
   onPressLeft?: () => void;
   onPressRight?: () => void;
-  rightIcon?: any;
-  leftIcon?: any;
-  centerIcon?: any;
-  containerStyle?: ViewStyle;
-  leftStyle?: ViewStyle;
-  rightStyle?: ViewStyle;
+  rightIcon?: React.ReactNode;
+  leftIcon?: React.ReactNode;
+  centerIcon?: React.ReactNode;
+  containerStyle?: StyleProp<ViewStyle>;
+  leftStyle?: StyleProp<ViewStyle>;
+  rightStyle?: StyleProp<ViewStyle>;
 }
 const PHeader: React.FC<HeaderProps> = (props) => {
   const {

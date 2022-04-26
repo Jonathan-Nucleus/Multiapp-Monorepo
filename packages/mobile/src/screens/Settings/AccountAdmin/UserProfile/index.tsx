@@ -1,6 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
 import {
-  ListRenderItem,
   StyleSheet,
   FlatList,
   View,
@@ -29,14 +28,13 @@ import MainHeader from '../../../../components/main/Header';
 import PAppContainer from '../../../../components/common/PAppContainer';
 import PGradientButton from '../../../../components/common/PGradientButton';
 import PLabel from '../../../../components/common/PLabel';
-import PostItem, { Post } from '../../../../components/main/PostItem';
+import PostItem from '../../../../components/main/PostItem';
 import FeaturedItem from '../../../../components/main/settings/FeaturedItem';
 import Funds from '../../../../components/main/settings/Funds';
-import PGradientOutlineButton from '../../../../components/common/PGradientOutlineButton';
-
 import { useAccount } from '../../../../graphql/query/account';
-import { usePosts } from '../../../../graphql/query/account/usePosts';
-import type { User } from 'backend/graphql/users.graphql';
+import { usePosts, Post } from 'mobile/src/graphql/query/post/usePosts';
+import PGradientOutlineButton from '../../../../components/common/PGradientOutlineButton';
+import { UserProfile as UserProfileProps } from 'mobile/src/graphql/query/user/useProfile';
 
 import LinkedinSvg from 'shared/assets/images/linkedin.svg';
 import TwitterSvg from 'shared/assets/images/twitter.svg';
@@ -48,14 +46,13 @@ interface RouterProps {
   navigation: NavigationProp<any, any>;
 }
 
-const EditUserProfile: FC<RouterProps> = ({ navigation }) => {
+const UserProfile: FC<RouterProps> = ({ navigation }) => {
   const { data, refetch } = usePosts();
   const { data: accountData } = useAccount();
+  const postData = data?.posts ?? [];
+  const account = accountData?.account;
   const isFocused = useIsFocused();
   const [focusState, setFocusState] = useState(isFocused);
-
-  const postData = data?.account?.posts ?? [];
-  const account = accountData?.account;
 
   if (isFocused !== focusState) {
     // Refetch whenever the focus state changes to avoid refetching during
@@ -65,29 +62,26 @@ const EditUserProfile: FC<RouterProps> = ({ navigation }) => {
     setFocusState(isFocused);
   }
 
-  if (!account) return null;
-  const {
-    avatar,
-    background,
-    firstName,
-    lastName,
-    overview,
-    accreditation,
-    role,
-    position,
-    website,
-    linkedIn,
-    twitter,
-    followerIds,
-    followingIds,
-    postIds,
-  } = account;
-
-  const renderItem: ListRenderItem<Post> = ({ item }) => (
+  const renderItem = ({ item }: { item: Post }) => (
     <TouchableOpacity>
       <FeaturedItem post={item} />
     </TouchableOpacity>
   );
+
+  if (!account) {
+    return (
+      <View style={pStyles.globalContainer}>
+        <MainHeader
+          leftIcon={
+            <View style={styles.backIcon}>
+              <CaretLeft color={WHITE} />
+            </View>
+          }
+          onPressLeft={() => navigation.goBack()}
+        />
+      </View>
+    );
+  }
 
   return (
     <View style={pStyles.globalContainer}>
@@ -101,11 +95,11 @@ const EditUserProfile: FC<RouterProps> = ({ navigation }) => {
       />
       <PAppContainer style={styles.container}>
         <View style={styles.relative}>
-          {background ? (
+          {account.background ? (
             <FastImage
               style={styles.backgroundImg}
               source={{
-                uri: `${BACKGROUND_URL}/${background}`,
+                uri: `${BACKGROUND_URL}/${account.background}`,
               }}
               resizeMode={FastImage.resizeMode.cover}
             />
@@ -116,7 +110,12 @@ const EditUserProfile: FC<RouterProps> = ({ navigation }) => {
             />
           )}
           <TouchableOpacity
-            onPress={() => console.log(111)}
+            onPress={() =>
+              navigation.navigate('EditPhoto', {
+                user: account,
+                type: 'BACKGROUND',
+              })
+            }
             style={styles.pencil}>
             <Pencil color={WHITE} size={18} />
           </TouchableOpacity>
@@ -124,24 +123,29 @@ const EditUserProfile: FC<RouterProps> = ({ navigation }) => {
         <View style={styles.content}>
           <View style={styles.companyDetail}>
             <View style={styles.relative}>
-              {avatar ? (
+              {account.avatar ? (
                 <FastImage
                   style={styles.avatar}
                   source={{
-                    uri: `${AVATAR_URL}/${avatar}`,
+                    uri: `${AVATAR_URL}/${account.avatar}`,
                   }}
                   resizeMode={FastImage.resizeMode.cover}
                 />
               ) : (
                 <View style={styles.noAvatarContainer}>
                   <Text style={styles.noAvatar}>
-                    {firstName.charAt(0)}
-                    {lastName.charAt(0)}
+                    {account.firstName.charAt(0)}
+                    {account.lastName.charAt(0)}
                   </Text>
                 </View>
               )}
               <TouchableOpacity
-                onPress={() => console.log(111)}
+                onPress={() =>
+                  navigation.navigate('EditPhoto', {
+                    user: account,
+                    type: 'AVATAR',
+                  })
+                }
                 style={styles.pencil}>
                 <Pencil color={WHITE} size={18} />
               </TouchableOpacity>
@@ -149,65 +153,64 @@ const EditUserProfile: FC<RouterProps> = ({ navigation }) => {
           </View>
           <View style={styles.row}>
             <Text style={styles.val}>
-              {firstName} {lastName}
+              {account.firstName} {account?.lastName}
             </Text>
-            {(role === 'VERIFIED' || role === 'PROFESSIONAL') && (
-              <View style={styles.proWrapper}>
-                <ShieldCheckSvg />
-                <PLabel label="PRO" textStyle={styles.proLabel} />
-              </View>
-            )}
+            <View style={styles.proWrapper}>
+              <ShieldCheckSvg />
+              <PLabel label="PRO" textStyle={styles.proLabel} />
+            </View>
           </View>
           <Text style={styles.comment}>
-            {role}
-            {position && ` - ${position}`}
+            {account.role} - {account.position}
           </Text>
           <View style={[styles.row, styles.justifyAround]}>
             <View style={styles.follow}>
-              <Text style={styles.val}>{followerIds?.length ?? 0}</Text>
-              <Text style={styles.comment}>
-                {followerIds?.length === 1 ? 'Follower' : 'Followers'}
-              </Text>
+              <Text style={styles.val}>{account.followerIds?.length ?? 0}</Text>
+              <Text style={styles.comment}>Followers</Text>
             </View>
             <View style={styles.follow}>
-              <Text style={styles.val}>{followingIds?.length ?? 0}</Text>
+              <Text style={styles.val}>
+                {account.followingIds?.length ?? 0}
+              </Text>
               <Text style={styles.comment}>Following</Text>
             </View>
             <View style={styles.follow}>
-              <Text style={styles.val}>{postIds?.length ?? 0}</Text>
-              <Text style={styles.comment}>
-                {postIds?.length === 1 ? 'Post' : 'Posts'}
-              </Text>
+              <Text style={styles.val}>{account.postIds?.length ?? 0}</Text>
+              <Text style={styles.comment}>Posts</Text>
             </View>
           </View>
-          <Text style={styles.decription}>{overview}</Text>
+          <Text style={styles.decription}>{account.overview}</Text>
           <PGradientOutlineButton
             label="Edit Profile"
-            onPress={() => console.log(11)}
+            onPress={() =>
+              navigation.navigate('EditProfile', { user: account })
+            }
             gradientContainer={styles.button}
           />
         </View>
         <View style={[styles.row, styles.social]}>
           <View style={styles.row}>
-            {linkedIn && (
-              <TouchableOpacity onPress={() => Linking.openURL(linkedIn)}>
-                <LinkedinSvg />
-              </TouchableOpacity>
-            )}
-            {twitter && (
-              <TouchableOpacity
-                onPress={() => Linking.openURL(twitter)}
-                style={styles.icon}>
-                <TwitterSvg />
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity
+              onPress={() =>
+                Linking.openURL(account.linkedIn ?? 'www.linkedin.com')
+              }>
+              <LinkedinSvg />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                Linking.openURL(account.twitter ?? 'www.twitter.com')
+              }
+              style={styles.icon}>
+              <TwitterSvg />
+            </TouchableOpacity>
           </View>
-          {website && (
+          {account.website && (
             <>
               <View style={styles.verticalLine} />
-              <TouchableOpacity onPress={() => Linking.openURL(website)}>
+              <TouchableOpacity
+                onPress={() => Linking.openURL(account.website ?? '')}>
                 <Text style={styles.website} numberOfLines={1}>
-                  {website}
+                  {account.website}
                 </Text>
               </TouchableOpacity>
             </>
@@ -216,7 +219,7 @@ const EditUserProfile: FC<RouterProps> = ({ navigation }) => {
             <DotsThreeVerticalSvg />
           </TouchableOpacity>
         </View>
-        <Funds accredited={accreditation} />
+        <Funds accredited={accountData?.account.accreditation} />
         <View style={styles.posts}>
           {postData.length > 0 ? (
             <View>
@@ -238,9 +241,9 @@ const EditUserProfile: FC<RouterProps> = ({ navigation }) => {
             <FlatList
               data={postData || []}
               renderItem={({ item }) => (
-                <PostItem post={item} userId={account?._id} />
+                <PostItem post={item} userId={account._id} />
               )}
-              keyExtractor={(item) => `${item._id}`}
+              keyExtractor={(item: Post) => `${item._id}`}
               listKey="post"
               ListHeaderComponent={<Text style={styles.text}>All Posts</Text>}
             />
@@ -263,7 +266,7 @@ const EditUserProfile: FC<RouterProps> = ({ navigation }) => {
   );
 };
 
-export default EditUserProfile;
+export default UserProfile;
 
 const styles = StyleSheet.create({
   backIcon: {

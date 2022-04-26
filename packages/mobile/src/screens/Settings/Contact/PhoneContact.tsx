@@ -76,7 +76,7 @@ const PhoneContact: React.FC = () => {
             right: 16,
           },
         }}
-        Icon={() => <CaretDown size={14} color={WHITE} weight="fill" />}
+        Icon={<CaretDown size={14} color={WHITE} weight="fill" />}
         placeholder={{ label: null, value: null }}
       />
       <PFormLabel label="Fund of Interest" textStyle={styles.label} />
@@ -91,7 +91,7 @@ const PhoneContact: React.FC = () => {
             right: 16,
           },
         }}
-        Icon={() => <CaretDown size={14} color={WHITE} weight="fill" />}
+        Icon={<CaretDown size={14} color={WHITE} weight="fill" />}
         placeholder={{ label: null, value: null }}
       />
       <PTextInput

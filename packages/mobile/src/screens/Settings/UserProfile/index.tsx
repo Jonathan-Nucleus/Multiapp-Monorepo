@@ -30,12 +30,12 @@ import MainHeader from '../../../components/main/Header';
 import PAppContainer from '../../../components/common/PAppContainer';
 import PGradientButton from '../../../components/common/PGradientButton';
 import PLabel from '../../../components/common/PLabel';
-import PostItem, { Post } from '../../../components/main/PostItem';
+import PostItem from '../../../components/main/PostItem';
+import { Post } from 'mobile/src/graphql/query/post/usePosts';
 import FeaturedItem from '../../../components/main/settings/FeaturedItem';
 import Funds from '../../../components/main/settings/Funds';
 import { useAccount } from '../../../graphql/query/account';
 import { usePosts } from '../../../graphql/query/account/usePosts';
-import type { User } from 'backend/graphql/users.graphql';
 
 import LinkedinSvg from 'shared/assets/images/linkedin.svg';
 import TwitterSvg from 'shared/assets/images/twitter.svg';
@@ -69,7 +69,9 @@ const UserProfile: FC<RouterProps> = ({ navigation }) => {
     </TouchableOpacity>
   );
 
-  if (!account) return null;
+  if (!account) {
+    return null;
+  }
   const {
     avatar,
     background,
@@ -186,15 +188,13 @@ const UserProfile: FC<RouterProps> = ({ navigation }) => {
               <TwitterSvg />
             </TouchableOpacity>
           </View>
-          {account.website && (
+          {website && (
             <>
               <View style={styles.verticalLine} />
               <TouchableOpacity
-                onPress={() =>
-                  account.website && Linking.openURL(account.website)
-                }>
+                onPress={() => website && Linking.openURL(website)}>
                 <Text style={styles.website} numberOfLines={1}>
-                  {account.website}
+                  {website}
                 </Text>
               </TouchableOpacity>
             </>

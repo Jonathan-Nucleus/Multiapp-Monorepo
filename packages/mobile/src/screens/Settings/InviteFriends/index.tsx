@@ -2,7 +2,7 @@ import React, { FC, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { NavigationProp } from '@react-navigation/native';
 import { CaretLeft, Check } from 'phosphor-react-native';
-import { WHITE, BLUE300, PINK } from 'shared/src/colors';
+import { WHITE, BLUE300, PINK, GRAY600 } from 'shared/src/colors';
 import Share from 'react-native-share';
 
 import pStyles from '../../../theme/pStyles';
@@ -16,6 +16,7 @@ import {
 import PAppContainer from '../../../components/common/PAppContainer';
 import MainHeader from '../../../components/main/Header';
 import PGradientButton from '../../../components/common/PGradientButton';
+import { showMessage } from '../../../services/utils';
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
@@ -33,12 +34,11 @@ const InviteFriends: FC<RouterProps> = ({ navigation }) => {
       });
 
       console.log('result', result);
+      showMessage('success', 'Invitation Sent!');
     } catch (err) {
       console.log(err);
     }
   };
-
-  console.log('code======>', code);
 
   return (
     <View style={pStyles.globalContainer}>
@@ -46,9 +46,7 @@ const InviteFriends: FC<RouterProps> = ({ navigation }) => {
         onPressLeft={() => navigation.goBack()}
         leftIcon={
           <View style={styles.row}>
-            <View style={styles.backIcon}>
-              <CaretLeft size={28} color={WHITE} />
-            </View>
+            <CaretLeft size={28} color={WHITE} />
             <Text style={styles.headerTitle}>Invite Friends</Text>
           </View>
         }
@@ -59,7 +57,9 @@ const InviteFriends: FC<RouterProps> = ({ navigation }) => {
           thoughtful new voice in the conversation. So bring in a few contacts
           who'll bring their A-game. You’ll be their first contact.
         </Text>
-        <Text style={styles.body1}>You have 10 invites left!</Text>
+        <Text style={styles.body1}>
+          You have {10 - code.length} invites left!
+        </Text>
         <Text style={styles.body2}>Each code can only be used once.</Text>
         <View style={styles.codeContainer}>
           {[1, 2, 3, 4, 5].map((v) => (
@@ -67,7 +67,11 @@ const InviteFriends: FC<RouterProps> = ({ navigation }) => {
               key={`key_${v}`}
               onPress={() => setCode([...code, v])}
               disabled={code.includes(v)}>
-              <View style={styles.codeWrap}>
+              <View
+                style={[
+                  styles.codeWrap,
+                  code.includes(v) && styles.selectedCode,
+                ]}>
                 {code.includes(v) ? (
                   <Check size={14} color={WHITE} />
                 ) : (
@@ -150,6 +154,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
+  },
+  selectedCode: {
+    backgroundColor: GRAY600,
   },
   code: {
     color: WHITE,

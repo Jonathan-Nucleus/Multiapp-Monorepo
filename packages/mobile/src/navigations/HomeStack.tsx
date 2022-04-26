@@ -10,7 +10,7 @@ import NotificationDetail from '../screens/Notification/Details';
 import ChooseCategory from '../screens/Home/ChooseCategory';
 import ReviewPost from '../screens/Home/ReviewPost';
 import PostDetail from '../screens/Home/PostDetail';
-import { Post } from '../components/main/PostItem';
+import { Post, PostCategory } from 'mobile/src/graphql/query/post/usePosts';
 
 const Stack = createStackNavigator();
 
@@ -26,7 +26,7 @@ type HomeStackParamList = {
     description: string;
     mentions: string[];
     imageData: object;
-    categories: string[];
+    categories: PostCategory[];
   };
   PostDetail: { postId: string; userId: string };
   Notification: undefined;

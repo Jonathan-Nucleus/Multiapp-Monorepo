@@ -5,7 +5,7 @@ import Modal from 'react-native-modal';
 import PTitle from './PTitle';
 import { GRAY3 } from 'shared/src/colors';
 
-interface PModalProps {
+interface PModalProps extends React.PropsWithChildren<unknown> {
   title?: string;
   subTitle?: string;
   isVisible: boolean;

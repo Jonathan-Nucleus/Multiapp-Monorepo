@@ -49,6 +49,7 @@ import {
   Image as GalleryImage,
   CirclesFour,
 } from 'phosphor-react-native';
+import { Audience } from 'mobile/src/graphql/query/post/usePosts';
 
 const RadioBodyView = (props: any) => {
   const { icon, label } = props;
@@ -60,9 +61,9 @@ const RadioBodyView = (props: any) => {
   );
 };
 
-export interface OptionProps {
+export interface OptionProps<T = string> {
   id: number;
-  val: string;
+  val: T;
   labelView: React.ReactNode;
 }
 
@@ -89,25 +90,25 @@ export const postAsData: OptionProps[] = [
   },
 ];
 
-export const audienceData: OptionProps[] = [
+export const audienceData: OptionProps<Audience>[] = [
   {
     id: 1,
-    val: 'Everyone',
+    val: 'EVERYONE',
     labelView: <RadioBodyView icon={<AISvg />} label="Everyone" />,
   },
   {
     id: 2,
-    val: 'Accredited Investors',
+    val: 'ACCREDITED',
     labelView: <RadioBodyView icon={<AISvg />} label="Accredited Investors" />,
   },
   {
     id: 3,
-    val: 'Qualified Purchasers',
+    val: 'QUALIFIED_PURCHASER',
     labelView: <RadioBodyView icon={<AISvg />} label="Qualified Purchasers" />,
   },
   {
     id: 4,
-    val: 'Qualified Clients',
+    val: 'QUALIFIED_CLIENT',
     labelView: <RadioBodyView icon={<AISvg />} label="Qualified Clients" />,
   },
 ];

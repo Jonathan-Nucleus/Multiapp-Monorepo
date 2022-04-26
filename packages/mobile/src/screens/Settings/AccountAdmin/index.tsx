@@ -41,7 +41,7 @@ const AccountAdmin: FC<RouterProps> = ({ navigation }) => {
     {
       id: 'edit_profile',
       label: 'Edit your profile',
-      onPress: () => navigation.navigate('EditUserProfile'),
+      onPress: () => navigation.navigate('UserProfile'),
       icon: <UserCircle size={28} color={WHITE} />,
     },
     {

@@ -14,7 +14,7 @@ import InviteFriends from '../screens/Settings/InviteFriends';
 import ChangePass from '../screens/Settings/AccountAdmin/ChangePass';
 import BecomePro from '../screens/Settings/BecomePro';
 import Contact from '../screens/Settings/Contact';
-import EditUserProfile from '../screens/Settings/AccountAdmin/EditProfile';
+import UserProfile from '../screens/Settings/AccountAdmin/UserProfile';
 import Accreditation from '../screens/Settings/Accreditation';
 import AccreditationResult from '../screens/Settings/Accreditation/AccreditationResult';
 
@@ -48,7 +48,7 @@ const SettingsStacks = () => {
       <Stack.Screen name="InviteFriends" component={InviteFriends} />
       <Stack.Screen name="Terms" component={Terms} />
       <Stack.Screen name="ChangePass" component={ChangePass} />
-      <Stack.Screen name="EditUserProfile" component={EditUserProfile} />
+      <Stack.Screen name="UserProfile" component={UserProfile} />
       <Stack.Screen name="BecomePro" component={BecomePro} />
       <Stack.Screen name="Contact" component={Contact} />
     </Stack.Navigator>

@@ -1,12 +1,14 @@
 import { gql, useMutation, MutationTuple } from '@apollo/client';
 import { MediaUpload, MediaType } from 'backend/graphql/mutations.graphql';
-import { PostInput } from 'backend/graphql/posts.graphql';
+import { PostInput, PostCategory } from 'backend/graphql/posts.graphql';
 import { FetchPostsData } from 'mobile/src/graphql/query/account';
 import {
   POST_SUMMARY_FRAGMENT,
   PostSummary,
 } from 'mobile/src/graphql/fragments/post';
 import { Comment } from 'backend/graphql/comments.graphql';
+
+export type { PostCategory };
 
 export const CREATE_POST = gql`
   mutation CreatePost($post: PostInput!) {

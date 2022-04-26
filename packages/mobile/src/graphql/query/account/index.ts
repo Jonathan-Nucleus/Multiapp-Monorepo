@@ -124,6 +124,8 @@ export function useAccount(
           website
           linkedIn
           twitter
+          tagline
+          overview
           followerIds
           followingIds
           following {

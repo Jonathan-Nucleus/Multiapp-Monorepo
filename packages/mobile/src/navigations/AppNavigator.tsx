@@ -21,6 +21,10 @@ import {
 import UserProfile from '../screens/Settings/UserProfile';
 import CompanyProfile from '../screens/Settings/CompanyProfile';
 import CreatePost from '../screens/Home/CreatePost';
+import BecomePro from '../screens/Settings/BecomePro';
+import Contact from '../screens/Settings/Contact';
+import EditPhoto from '../screens/Settings/AccountAdmin/UserProfile/EditPhoto';
+import EditProfile from '../screens/Settings/AccountAdmin/UserProfile/EditProfile';
 
 type AppParamList = {
   Auth: undefined;
@@ -96,6 +100,10 @@ const AppNavigator = () => {
         <Stack.Screen name="UserProfile" component={UserProfile} />
         <Stack.Screen name="CompanyProfile" component={CompanyProfile} />
         <Stack.Screen name="CreatePost" component={CreatePost} />
+        <Stack.Screen name="EditPhoto" component={EditPhoto} />
+        <Stack.Screen name="EditProfile" component={EditProfile} />
+        <Stack.Screen name="BecomePro" component={BecomePro} />
+        <Stack.Screen name="Contact" component={Contact} />
       </Stack.Navigator>
     </NavigationContainer>
   );

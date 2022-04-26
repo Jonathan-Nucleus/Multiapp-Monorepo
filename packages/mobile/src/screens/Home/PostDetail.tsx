@@ -136,7 +136,9 @@ const PostDetail: PostDetailScreen = ({ route }) => {
   };
 
   const handleDeleteComment = async () => {
-    if (!selectedUser) return;
+    if (!selectedUser) {
+      return;
+    }
 
     try {
       const { data } = await deleteComment({
@@ -153,7 +155,9 @@ const PostDetail: PostDetailScreen = ({ route }) => {
   };
 
   const handleFollowUser = async () => {
-    if (!selectedUser) return;
+    if (!selectedUser) {
+      return;
+    }
 
     try {
       const { data } = await followUser({
@@ -170,7 +174,9 @@ const PostDetail: PostDetailScreen = ({ route }) => {
   };
 
   const handleHideUser = async () => {
-    if (!selectedUser) return;
+    if (!selectedUser) {
+      return;
+    }
 
     try {
       const { data } = await hideUser({
@@ -252,7 +258,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
     );
   };
 
-  const renderCommentItem: ListRenderItem<typeof comments[number]> =
+  const renderCommentItem: ListRenderItem<typeof getComments[number]> =
     useCallback(({ item }) => <CommentItem item={item} />, [comments]);
 
   return (

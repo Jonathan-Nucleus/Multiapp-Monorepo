@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { AVATAR_URL } from 'react-native-dotenv';
 
 import RoundImageView from '../common/RoundImageView';
@@ -15,7 +15,7 @@ import { H6 } from '../../theme/fonts';
 import { useAccount } from '../../graphql/query/account';
 
 interface HeaderProps {
-  containerStyle?: object;
+  containerStyle?: ViewStyle;
   rightIcon?: any;
   leftIcon?: any;
   centerIcon?: any;
@@ -34,7 +34,7 @@ const MainHeader: React.FC<HeaderProps> = (props) => {
         leftIcon ? (
           leftIcon
         ) : (
-          <View style={[styles.headerLogoContainer, containerStyle]}>
+          <View style={styles.headerLogoContainer}>
             <LogoSvg />
             <PLabel
               label="Prometheus"
@@ -71,7 +71,7 @@ const MainHeader: React.FC<HeaderProps> = (props) => {
         )
       }
       centerIcon={centerIcon}
-      containerStyle={styles.headerContainer}
+      containerStyle={[styles.headerContainer, containerStyle]}
       onPressLeft={onPressLeft}
     />
   );

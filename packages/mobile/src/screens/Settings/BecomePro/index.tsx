@@ -6,11 +6,10 @@ import {
   Text,
   TouchableOpacity,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useMutation } from '@apollo/client';
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import SplashScreen from 'react-native-splash-screen';
 import RNPickerSelect from 'react-native-picker-select';
+import { CaretLeft, ShieldCheck, CaretDown } from 'phosphor-react-native';
 
 import PAppContainer from '../../../components/common/PAppContainer';
 import PTitle from '../../../components/common/PTitle';
@@ -34,20 +33,20 @@ import {
   GRAY700,
 } from 'shared/src/colors';
 import MainHeader from '../../../components/main/Header';
-import { CaretLeft, ShieldCheck, CaretDown } from 'phosphor-react-native';
 import PFormLabel from '../../../components/common/PFormLabel';
+import { useProRequest } from 'mobile/src/graphql/mutation/account';
 
 interface BecomeProProps {
   navigation: NavigationProp<ParamListBase>;
 }
 
 const DATA = [
-  { label: 'Fund Manager', value: 'manager' },
-  { label: 'Journalist', value: 'journalist' },
-  { label: 'C level manager', value: 'cManager' },
-  { label: 'Founder', value: 'founder' },
-  { label: 'Ex fund manager', value: 'exManager' },
-  { label: 'Other', value: 'other' },
+  { label: 'Fund Manager', value: 'MANAGER' },
+  { label: 'Journalist', value: 'JOURNALIST' },
+  { label: 'C level manager', value: 'C_LEVEL' },
+  { label: 'Founder', value: 'FOUNDER' },
+  { label: 'Ex fund manager', value: 'EX_MANAGER' },
+  { label: 'Other', value: 'OTHER' },
 ];
 
 const BecomePro: React.FC<BecomeProProps> = ({ navigation }) => {
@@ -58,17 +57,31 @@ const BecomePro: React.FC<BecomeProProps> = ({ navigation }) => {
   const [info, setInfo] = useState('');
   const [organization, setOrganization] = useState('');
 
+  const [proRequest] = useProRequest();
+
   useEffect(() => {
     SplashScreen.hide();
   }, []);
 
   const handleNextPage = async () => {
+    setError('');
     Keyboard.dismiss();
-    /*try {
-    } catch (err as Error) {
-      console.error('login error', e);
-      setError(e.message);
-    }*/
+    try {
+      await proRequest({
+        variables: {
+          request: {
+            role,
+            email,
+            organization,
+            position,
+            info,
+          },
+        },
+      });
+    } catch (err) {
+      console.error('login error', err);
+      setError((err as Error).message);
+    }
   };
 
   return (
@@ -92,9 +105,9 @@ const BecomePro: React.FC<BecomeProProps> = ({ navigation }) => {
         {!!error && <ErrorText error={error} />}
         <PFormLabel label="I am a " textStyle={styles.label} />
         <RNPickerSelect
-          onValueChange={(val) => setPosition(val)}
+          onValueChange={(val) => setRole(val)}
           items={DATA}
-          value={position}
+          value={role}
           style={{
             ...pickerSelectStyles,
             iconContainer: {
@@ -102,7 +115,7 @@ const BecomePro: React.FC<BecomeProProps> = ({ navigation }) => {
               right: 16,
             },
           }}
-          Icon={() => <CaretDown size={14} color={WHITE} weight="fill" />}
+          Icon={<CaretDown size={14} color={WHITE} weight="fill" />}
           placeholder={{ label: null, value: null }}
         />
         <PTextInput
@@ -120,8 +133,8 @@ const BecomePro: React.FC<BecomeProProps> = ({ navigation }) => {
         />
         <PTextInput
           label="Job Title / Role"
-          onChangeText={(val: string) => setRole(val)}
-          text={role}
+          onChangeText={(val: string) => setPosition(val)}
+          text={position}
           labelTextStyle={styles.label}
         />
         <PTextInput

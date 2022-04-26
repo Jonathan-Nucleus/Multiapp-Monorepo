@@ -12,10 +12,9 @@ import PAppContainer from '../../components/common/PAppContainer';
 import RoundImageView from '../../components/common/RoundImageView';
 import PostSelection from './PostSelection';
 import pStyles from '../../theme/pStyles';
-import { SECONDARY } from 'shared/src/colors';
-import { CREATE_POST, PostDataType, UPLOAD_LINK } from '../../graphql/post';
 import { ReviewPostScreen } from 'mobile/src/navigations/HomeStack';
 import { showMessage } from '../../services/utils';
+import { SECONDARY } from 'shared/src/colors';
 import { SOMETHING_WRONG } from 'shared/src/constants';
 
 import UserSvg from 'shared/assets/images/user.svg';
@@ -25,15 +24,21 @@ import Tag from '../../components/common/Tag';
 import PostHeader from './PostHeader';
 import { audienceData, OptionProps, postAsData } from './CreatePost';
 
+import type { PostCategory } from 'mobile/src/graphql/query/post/usePosts';
+import {
+  useFetchUploadLink,
+  useCreatePost,
+} from '../../graphql/mutation/posts';
+
 const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
-  const [selectedPostAs] = useState<OptionProps>(postAsData[0]);
-  const [selectedAudience] = useState<OptionProps>(audienceData[0]);
+  const [selectedPostAs] = useState(postAsData[0]);
+  const [selectedAudience] = useState(audienceData[0]);
   const [imageData, setImageData] = useState<any>({});
   const [description, setDescription] = useState('');
-  const [categories, setCategories] = useState<string[]>([]);
+  const [categories, setCategories] = useState<PostCategory[]>([]);
   const [mentions, setMentions] = useState<string[]>([]);
-  const [createPost] = useMutation(CREATE_POST);
-  const [uploadLink] = useMutation(UPLOAD_LINK);
+  const [createPost] = useCreatePost();
+  const [fetchUploadLink] = useFetchUploadLink();
 
   useEffect(() => {
     const { categories, description, mentions, imageData } = route.params;
@@ -56,7 +61,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
     }
 
     try {
-      const { data } = await uploadLink({
+      const { data } = await fetchUploadLink({
         variables: {
           localFilename: imageData?.filename,
           type: 'POST',
@@ -78,26 +83,25 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
         formdata.append('name', imageData.filename);
       }
 
-      const response = await fetch(uploadUrl, {
+      await fetch(uploadUrl, {
         method: 'PUT',
         body: formdata,
       });
 
-      const postData: PostDataType = {
+      const postData = {
         categories,
-        audience: selectedAudience.val.toUpperCase(),
+        audience: selectedAudience.val,
         body: replaceMentionValues(description, ({ name }) => `@${name}`),
         mediaUrl: remoteName,
         mentionIds: mentions,
       };
 
-      const result = (
-        await createPost({
-          variables: {
-            post: postData,
-          },
-        })
-      ).data.createPost;
+      const result = await createPost({
+        variables: {
+          post: postData,
+        },
+      });
+
       console.log('success', result);
       showMessage('success', 'Successfully posted!');
     } catch (e) {

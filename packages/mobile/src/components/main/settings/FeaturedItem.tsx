@@ -5,15 +5,11 @@ import dayjs from 'dayjs';
 import { AVATAR_URL, POST_URL } from 'react-native-dotenv';
 
 import PLabel from '../../common/PLabel';
-import IconButton from '../../common/IconButton';
 import UserInfo from '../../common/UserInfo';
 import Tag from '../../common/Tag';
-import { BGDARK, GRAY10, PRIMARY, WHITE60 } from 'shared/src/colors';
-import { Body1, Body3 } from '../../../theme/fonts';
-import { PostDataType } from '../../../graphql/post';
+import { PRIMARY } from 'shared/src/colors';
 
 import { Post } from 'mobile/src/graphql/query/post/usePosts';
-import { PostCategories } from 'backend/graphql/enumerations.graphql';
 
 interface FeedItemProps {
   post: Post;

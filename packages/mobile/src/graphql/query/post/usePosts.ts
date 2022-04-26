@@ -1,17 +1,18 @@
 import { gql, useQuery, QueryResult } from '@apollo/client';
-import { PostCategory } from 'backend/graphql/posts.graphql';
+import { PostCategory, Audience } from 'backend/graphql/posts.graphql';
 import {
   POST_SUMMARY_FRAGMENT,
   PostSummary,
 } from 'mobile/src/graphql/fragments/post';
 
-type PostsVariables = {
-  categories?: PostCategory[];
-};
+export type { Audience, PostCategory };
 
 export type Post = PostSummary;
 export type PostsData = {
   posts?: Post[];
+};
+type PostsVariables = {
+  categories?: PostCategory[];
 };
 
 /**
