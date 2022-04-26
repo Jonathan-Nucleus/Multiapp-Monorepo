@@ -21,6 +21,11 @@ import { Comment } from "../../schemas/comment";
 import { Company } from "../../schemas/company";
 import { Fund } from "../../schemas/fund";
 import { InternalServerError } from "../../lib/validate";
+import {
+  NotificationType,
+  Notification,
+  NotificationTypeOptions,
+} from "../../schemas/notification";
 
 export const getFieldError = (response: GraphQLResponse, field: string) =>
   (response.errors?.[0].extensions?.errors as any)[field];
@@ -34,6 +39,7 @@ export enum DbCollection {
   COMMENTS = "comments",
   COMPANIES = "companies",
   FUNDS = "funds",
+  NOTIFICATIONS = "notifications",
 }
 
 export const createUser = async (
@@ -67,7 +73,6 @@ export const createUser = async (
 
     return user;
   } catch (err) {
-    console.log(`Error: `, err);
     throw new InternalServerError("Error creating user");
   }
 };
@@ -87,7 +92,6 @@ export const createStub = async (): Promise<User.Stub> => {
 
     return user;
   } catch (err) {
-    console.log(`Error: `, err);
     throw new InternalServerError("Error creating stub user");
   }
 };
@@ -131,7 +135,6 @@ export const createPost = async (
 
     return post;
   } catch (err) {
-    console.log(`Error: `, err);
     throw new InternalServerError("Error creating post");
   }
 };
@@ -161,7 +164,6 @@ export const createComment = async (
 
     return comment;
   } catch (err) {
-    console.log(`Error: `, err);
     throw new InternalServerError("Error creating comment");
   }
 };
@@ -188,7 +190,6 @@ export const createCompany = async (
 
     return company;
   } catch (err) {
-    console.log(`Error: `, err);
     throw new InternalServerError("Error creating company");
   }
 };
@@ -234,8 +235,44 @@ export const createFund = async (
 
     return fund;
   } catch (err) {
-    console.log(`Error: `, err);
     throw new InternalServerError("Error creating fund");
+  }
+};
+
+export const createNotification = async (
+  fromUserId: MongoId,
+  toUserId: MongoId,
+  isNew: boolean = true,
+  type: NotificationType = "followed-by-user"
+): Promise<Notification.Mongo> => {
+  const { db } = await getIgniteDb();
+
+  const notification: Notification.Mongo = {
+    _id: toObjectId(),
+    userId: toObjectId(toUserId),
+    title: faker.lorem.sentence(),
+    body: faker.lorem.sentence(),
+    type,
+    data: {
+      userId: toObjectId(fromUserId),
+    },
+    isNew,
+  };
+
+  try {
+    await db.collection(DbCollection.NOTIFICATIONS).insertOne(notification);
+    if (toUserId && isNew) {
+      await db
+        .collection(DbCollection.USERS)
+        .updateOne(
+          { _id: toObjectId(toUserId) },
+          { $inc: { notificationBadge: 1 } }
+        );
+    }
+
+    return notification;
+  } catch (err) {
+    throw new InternalServerError("Error creating notification");
   }
 };
 

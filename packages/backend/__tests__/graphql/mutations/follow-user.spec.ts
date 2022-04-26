@@ -1,12 +1,14 @@
 import { ApolloServer, gql } from "apollo-server";
 import _ from "lodash";
+import * as FirebaseModule from "../../../lib/firebase-helper";
 import { createTestApolloServer } from "../../../lib/server";
 import { ErrorCode } from "../../../lib/validate";
 import { User } from "../../../schemas/user";
 import { createUser, getErrorCode, getFieldError } from "../../config/utils";
-
 import { getIgniteDb } from "../../../db";
 import { toObjectId } from "../../../lib/mongo-helper";
+
+jest.mock("firebase-admin");
 
 describe("Mutations - followUser", () => {
   const query = gql`
@@ -63,6 +65,10 @@ describe("Mutations - followUser", () => {
   });
 
   it("succeeds to follow a user", async () => {
+    const spy = jest
+      .spyOn(FirebaseModule, "sendPushNotification")
+      .mockResolvedValueOnce(undefined);
+
     const res = await server.executeOperation({
       query,
       variables: {
@@ -85,9 +91,17 @@ describe("Mutations - followUser", () => {
     expect(_.map(newUser2.followerIds, (item) => item.toString())).toContain(
       authUser?._id.toString()
     );
+
+    spy.mockRestore();
   });
 
   it("succeeds to unfollow a user", async () => {
+    const spy = jest
+      .spyOn(FirebaseModule, "sendPushNotification")
+      .mockResolvedValueOnce(undefined);
+
+    const { users } = await getIgniteDb();
+
     const res = await server.executeOperation({
       query,
       variables: {
@@ -97,8 +111,6 @@ describe("Mutations - followUser", () => {
     });
 
     expect(res.data?.followUser).toBeTruthy();
-
-    const { users } = await getIgniteDb();
 
     const [newUser1, newUser2] = (await users.findAll([
       toObjectId(authUser?._id),
@@ -110,5 +122,7 @@ describe("Mutations - followUser", () => {
     expect(
       _.map(newUser2.followerIds, (item) => item.toString())
     ).not.toContain(authUser?._id.toString());
+
+    spy.mockRestore();
   });
 });

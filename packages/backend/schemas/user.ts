@@ -55,6 +55,9 @@ export namespace User {
     watchlistIds?: ObjectId[];
     settings?: Settings;
     featured?: boolean;
+    fcmToken?: string;
+    fcmTokenCreated?: Date;
+    notificationBadge?: number;
 
     // TODO: still needs to finalized
     //settings: Settings;
@@ -101,6 +104,7 @@ export namespace User {
       | "website"
       | "linkedIn"
       | "twitter"
+      | "notificationBadge"
     >
   > & {
     role: UserRoleEnum;
@@ -410,6 +414,7 @@ export const UserSchema = `
     inviteeIds: [ID!]
     createdAt: Date!
     updatedAt: Date
+    notificationBadge: Int
 
     mutedPosts: [Post!]
     hiddenPosts: [Post!]

@@ -1,4 +1,5 @@
 import { ApolloServer, gql } from "apollo-server";
+import * as FirebaseModule from "../../../lib/firebase-helper";
 import { createTestApolloServer } from "../../../lib/server";
 import { ErrorCode } from "../../../lib/validate";
 import { User } from "../../../schemas/user";
@@ -12,6 +13,8 @@ import {
 import { getIgniteDb } from "../../../db";
 import { Post } from "../../../schemas/post";
 import { toObjectId } from "../../../lib/mongo-helper";
+
+jest.mock("firebase-admin");
 
 describe("Mutations - comment", () => {
   const query = gql`
@@ -105,6 +108,10 @@ describe("Mutations - comment", () => {
   });
 
   it("returns new comment data", async () => {
+    const spy = jest
+      .spyOn(FirebaseModule, "sendPushNotification")
+      .mockResolvedValueOnce(undefined);
+
     const { posts, db } = await getIgniteDb();
     const oldCommentCount = await db
       .collection(DbCollection.COMMENTS)
@@ -138,5 +145,7 @@ describe("Mutations - comment", () => {
       res.data?.comment._id
     );
     expect(newCommentCount).toBe(oldCommentCount + 1);
+
+    spy.mockRestore();
   });
 });

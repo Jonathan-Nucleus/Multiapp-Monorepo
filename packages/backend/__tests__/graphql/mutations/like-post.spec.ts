@@ -1,5 +1,6 @@
 import { ApolloServer, gql } from "apollo-server";
 import _ from "lodash";
+import * as FirebaseModule from "../../../lib/firebase-helper";
 import { createTestApolloServer } from "../../../lib/server";
 import { ErrorCode } from "../../../lib/validate";
 import { User } from "../../../schemas/user";
@@ -11,6 +12,8 @@ import {
   getFieldError,
 } from "../../config/utils";
 import { toObjectId } from "../../../lib/mongo-helper";
+
+jest.mock("firebase-admin");
 
 describe("Mutations - likePost", () => {
   const query = gql`
@@ -63,6 +66,10 @@ describe("Mutations - likePost", () => {
   });
 
   it("succeeds to like a post", async () => {
+    const spy = jest
+      .spyOn(FirebaseModule, "sendPushNotification")
+      .mockResolvedValueOnce(undefined);
+
     const res = await server.executeOperation({
       query,
       variables: {
@@ -73,9 +80,15 @@ describe("Mutations - likePost", () => {
 
     expect(res.data?.likePost._id).toBe(post1?._id.toString());
     expect(res.data?.likePost.likeIds).toContain(authUser?._id.toString());
+
+    spy.mockRestore();
   });
 
   it("succeeds to unlike a post", async () => {
+    const spy = jest
+      .spyOn(FirebaseModule, "sendPushNotification")
+      .mockResolvedValueOnce(undefined);
+
     const res = await server.executeOperation({
       query,
       variables: {
@@ -86,5 +99,7 @@ describe("Mutations - likePost", () => {
 
     expect(res.data?.likePost._id).toBe(post1?._id.toString());
     expect(res.data?.likePost.likeIds).not.toContain(authUser?._id.toString());
+
+    spy.mockRestore();
   });
 });

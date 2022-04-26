@@ -77,7 +77,9 @@ export function secureEndpoint<
 }
 
 export const formatError = (error: GraphQLError) => {
-  console.error(error);
+  if (process.env.NODE_ENV === "development") {
+    console.error(error);
+  }
 
   // Format mongodb errors
   if (

@@ -22,6 +22,7 @@ import {
   UnprocessableEntityError,
   BadRequestError,
   validateArgs,
+  InternalServerError,
 } from "../lib/validate";
 
 import {
@@ -41,6 +42,7 @@ import type { Company } from "../schemas/company";
 import { AudienceOptions, PostCategoryOptions } from "../schemas/post";
 import type { Post } from "../schemas/post";
 import type { Comment } from "../schemas/comment";
+import { NotificationTypeOptions } from "../schemas/notification";
 
 const schema = gql`
   type Mutation {
@@ -73,6 +75,9 @@ const schema = gql`
     followUser(follow: Boolean!, userId: ID!, asCompanyId: ID): Boolean
     followCompany(follow: Boolean!, companyId: ID!, asCompanyId: ID): Boolean
     hideUser(hide: Boolean!, userId: ID!): Boolean!
+
+    readNotification(notificationId: ID): Boolean
+    updateFcmToken(fcmToken: String): Boolean
   }
 
   type MediaUpload {
@@ -585,9 +590,28 @@ const resolvers = {
 
         const { like, postId } = args;
 
-        return like
+        const postData = await db.posts.find(postId);
+        if (!postData) {
+          throw new NotFoundError("Post");
+        }
+
+        const newPostData = like
           ? db.posts.likePost(postId, user._id)
           : db.posts.unlikePost(postId, user._id);
+
+        // Send Notification
+        if (
+          like &&
+          !_.map(postData.likeIds, (item) => item.toString()).includes(
+            user._id.toString()
+          )
+        ) {
+          db.notifications.create(user, "like-post", postData.userId, {
+            postId: postData._id,
+          });
+        }
+
+        return newPostData;
       }
     ),
 
@@ -768,7 +792,17 @@ const resolvers = {
           throw new NotFoundError("Post");
         }
 
-        return db.comments.create(comment, user._id);
+        const newComment = await db.comments.create(comment, user._id);
+
+        // Send notification
+        if (newComment) {
+          db.notifications.create(user, "comment-post", postData.userId, {
+            postId: postData._id,
+            commentId: newComment._id,
+          });
+        }
+
+        return newComment;
       }
     ),
 
@@ -948,10 +982,20 @@ const resolvers = {
           );
         }
 
-        return (
+        const followed =
           (await db.users.setFollowingUser(follow, userId, user._id)) &&
-          (await db.users.setFollower(follow, user._id, userId))
-        );
+          (await db.users.setFollower(follow, user._id, userId));
+
+        if (!followed) {
+          throw new InternalServerError("Not able to follow.");
+        }
+
+        // Send notification
+        if (follow && followed) {
+          db.notifications.create(user, "followed-by-user", userId);
+        }
+
+        return true;
       }
     ),
 
@@ -1043,6 +1087,51 @@ const resolvers = {
         }
 
         return db.users.setHideUser(hide, userId, user._id);
+      }
+    ),
+
+    readNotification: secureEndpoint(
+      async (
+        parentIgnored,
+        args: { notificationId?: string },
+        { db, user }
+      ): Promise<boolean> => {
+        const validator = yup
+          .object()
+          .shape({
+            notificationId: yup.string().test({
+              test: isObjectId,
+              message: "Invalid notification id",
+            }),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { notificationId } = args;
+
+        return db.notifications.read(user._id, notificationId);
+      }
+    ),
+
+    updateFcmToken: secureEndpoint(
+      async (
+        parentIgnored,
+        args: { fcmToken: string },
+        { db, user }
+      ): Promise<boolean> => {
+        const validator = yup
+          .object()
+          .shape({
+            fcmToken: yup.string().required(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { fcmToken } = args;
+
+        return db.users.updateFcmToken(user._id, fcmToken);
       }
     ),
   },

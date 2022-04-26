@@ -15,6 +15,7 @@ import companies from "./collections/companies";
 import funds from "./collections/funds";
 import posts from "./collections/posts";
 import comments from "./collections/comments";
+import notifications from "./collections/notifications";
 
 import "dotenv/config";
 
@@ -26,6 +27,7 @@ export type IgniteDb = {
   funds: ReturnType<typeof funds>;
   posts: ReturnType<typeof posts>;
   comments: ReturnType<typeof comments>;
+  notifications: ReturnType<typeof notifications>;
 };
 
 let connectionPromise: Promise<IgniteDb> | null;
@@ -86,6 +88,10 @@ async function createInstance(connectionUrl?: string): Promise<IgniteDb> {
     funds: funds(db.collection("funds")),
     posts: posts(db.collection("posts")),
     comments: comments(db.collection("comments"), db.collection("posts")),
+    notifications: notifications(
+      db.collection("notifications"),
+      db.collection("users")
+    ),
   } as IgniteDb;
   return instance;
 }

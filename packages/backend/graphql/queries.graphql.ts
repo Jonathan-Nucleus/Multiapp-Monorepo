@@ -17,6 +17,7 @@ import { User, isUser, compareAccreditation } from "../schemas/user";
 import type { Company } from "../schemas/company";
 import type { Post, PostCategory } from "../schemas/post";
 import type { Fund } from "../schemas/fund";
+import type { Notification } from "../schemas/notification";
 
 const schema = gql`
   type Query {
@@ -32,6 +33,7 @@ const schema = gql`
     professionals(featured: Boolean): [UserProfile!]
     userProfile(userId: ID!): UserProfile
     companyProfile(companyId: ID!): Company
+    notifications: [Notification!]
   }
 
   type FundManagers {
@@ -318,6 +320,15 @@ const resolvers = {
 
         return companyData;
       }
+    ),
+
+    notifications: secureEndpoint(
+      async (
+        parentIgnored,
+        argsIgnored,
+        { db, user }
+      ): Promise<Notification.Mongo[]> =>
+        db.notifications.findAllByUser(user._id)
     ),
   },
 };

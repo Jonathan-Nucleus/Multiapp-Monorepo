@@ -154,6 +154,7 @@ const createUsersCollection = (
       if (hashPassword(password, user.salt) != user.password) {
         throw new InvalidateError("password", "password is not correct");
       }
+
       return user;
     },
 
@@ -867,6 +868,41 @@ const createUsersCollection = (
         role,
         acc: accreditation,
       };
+    },
+
+    /**
+     * Updates a fcm token.
+     *
+     * @param userId    The ID the existing user.
+     * @param fcmToken  The new fcm token
+     *
+     * @returns         true
+     */
+    updateFcmToken: async (
+      userId: MongoId,
+      fcmToken: string
+    ): Promise<boolean> => {
+      const user = await usersCollection.findOneAndUpdate(
+        { _id: toObjectId(userId), role: { $ne: "stub" } },
+        {
+          $set: {
+            fcmToken,
+            fcmTokenCreated: new Date(),
+            updatedAt: new Date(),
+          },
+        },
+        { returnDocument: "after" }
+      );
+
+      if (!user.ok) {
+        throw new InternalServerError("Unable to update fcm token");
+      }
+
+      if (!user.value) {
+        throw new NotFoundError("User");
+      }
+
+      return true;
     },
   };
 
