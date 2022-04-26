@@ -1,22 +1,28 @@
-import { FC, useState } from "react";
+import { FC, Fragment, useState } from "react";
 import Card from "../Card";
 import Image from "next/image";
 import {
+  Bell, BellSlash,
   ChatCenteredText,
-  DotsThreeOutlineVertical,
+  DotsThreeOutlineVertical, EyeClosed, Pencil,
   Share,
   ShieldCheck,
-  ThumbsUp,
+  ThumbsUp, Trash,
+  UserCircleMinus,
+  UserCirclePlus, WarningOctagon, XSquare,
 } from "phosphor-react";
 import Button from "../Button";
 import Avatar from "../Avatar";
-import { useLikePost } from "mobile/src/graphql/mutation/posts";
+import { useHidePost, useLikePost, useMutePost } from "mobile/src/graphql/mutation/posts";
 import moment from "moment";
 import LikeModal from "./LikeModal";
 import CommentPost from "../Comment";
 import { PostSummary } from "mobile/src/graphql/fragments/post";
 import { useAccount } from "mobile/src/graphql/query/account";
 import { useFollowUser } from "mobile/src/graphql/mutation/account";
+import { Menu, Transition } from "@headlessui/react";
+import ConfirmHideUserModal from "./ConfirmHideUserModal";
+import ReportPostModal from "./ReportPostModal";
 
 interface PostProps {
   post: PostSummary;
@@ -24,31 +30,45 @@ interface PostProps {
 
 const Post: FC<PostProps> = ({ post }) => {
   const { data: accountData } = useAccount();
+  const account = accountData?.account;
   const [likePost] = useLikePost();
+  const [followUser] = useFollowUser();
+  const [mutePost] = useMutePost();
+  const [hidePost] = useHidePost();
   const { user, mediaUrl } = post;
-  const [liked, setLiked] = useState(
-    (accountData?.account && post.likeIds?.includes(accountData.account._id)) ?? false,
-  );
   const [visiblePostLikeModal, setVisiblePostLikeModal] = useState(false);
   const [visibleComment, setVisibleComment] = useState(false);
-  const toggleLike = async (): Promise<void> => {
-    const toggled = !liked;
-    const { data } = await likePost({
-      variables: { like: toggled, postId: post._id },
-    });
-
-    data && data.likePost
-      ? setLiked(toggled)
-      : console.log("Error liking post");
-  };
-  const [followUser] = useFollowUser();
+  const [showHidePost, setShowHidePost] = useState(false);
+  const [showReportPost, setShowReportPost] = useState(false);
   const isMyPost = user._id == accountData?.account._id;
   const isFollowingUser = accountData?.account.followingIds?.includes(user._id) ?? false;
+  const isLiked = account ? post.likeIds?.includes(account._id) : false;
+  const isMuted = accountData?.account.mutedPostIds?.includes(post._id) ?? false;
   const toggleFollowingUser = async () => {
     await followUser({
       variables: { follow: !isFollowingUser, userId: user._id },
       refetchQueries: ["Account"],
     });
+  };
+  const toggleLike = async () => {
+    await likePost({
+      variables: { like: !isLiked, postId: post._id },
+      refetchQueries: ["Posts"],
+    });
+  };
+  const toggleMutePost = async () => {
+    await mutePost({
+      variables: { mute: !isMuted, postId: post._id },
+      refetchQueries: ["Account"],
+    });
+  };
+  const hidePostCallback = async () => {
+    await hidePost({
+      variables: { hide: true, postId: post._id },
+      refetchQueries: ["Posts"],
+    });
+  };
+  const deletePostCallback = async () => {
   };
   return (
     <>
@@ -95,6 +115,204 @@ const Post: FC<PostProps> = ({ post }) => {
               {moment(post.createdAt).format("MMM DD")}
             </div>
           </div>
+          <div className="self-start ml-auto">
+            <Menu as="div" className="relative">
+              <Menu.Button className="opacity-60 text-white">
+                <DotsThreeOutlineVertical size={24} weight="fill" />
+              </Menu.Button>
+              <Transition
+                as={Fragment}
+                enter="transition ease-out duration-100"
+                enterFrom="transform opacity-0 scale-95"
+                enterTo="transform opacity-100 scale-100"
+                leave="transition ease-in duration-75"
+                leaveFrom="transform opacity-100 scale-100"
+                leaveTo="transform opacity-0 scale-95"
+              >
+                <Menu.Items className="absolute top-8 -right-1 w-60 md:w-96 text-sm text-white/[.87] bg-background-popover shadow-md shadow-black rounded z-10">
+                  {!isMyPost ?
+                    <>
+                      <Menu.Item>
+                        <div
+                          className="flex items-center px-4 py-3 cursor-pointer"
+                          onClick={() => toggleFollowingUser()}
+                        >
+                          {isFollowingUser ?
+                            <UserCircleMinus
+                              fill="currentColor"
+                              weight="light"
+                              size={24}
+                            />
+                            :
+                            <UserCirclePlus
+                              fill="currentColor"
+                              weight="light"
+                              size={24}
+                            />
+                          }
+                          {isFollowingUser ?
+                            <div className="ml-4">
+                              Unfollow {user.firstName} {user.lastName}
+                            </div>
+                            :
+                            <div className="ml-4">
+                              Follow {user.firstName} {user.lastName}
+                            </div>
+                          }
+                        </div>
+                      </Menu.Item>
+                      <Menu.Item>
+                        <div
+                          className="flex items-center px-4 py-3 cursor-pointer"
+                          onClick={() => toggleMutePost()}
+                        >
+                          {isMuted ?
+                            <Bell
+                              fill="currentColor"
+                              weight="light"
+                              size={24}
+                            />
+                            :
+                            <BellSlash
+                              fill="currentColor"
+                              weight="light"
+                              size={24}
+                            />
+                          }
+                          {isMuted ?
+                            <div className="ml-4">
+                              Turn on notifications
+                            </div>
+                            :
+                            <div className="ml-4">
+                              Turn off notifications
+                            </div>
+                          }
+                        </div>
+                      </Menu.Item>
+                      <Menu.Item>
+                        <div
+                          className="flex items-center px-4 py-3 cursor-pointer"
+                          onClick={() => hidePostCallback()}
+                        >
+                          <XSquare
+                            fill="currentColor"
+                            weight="light"
+                            size={24}
+                          />
+                          <div className="ml-4">
+                            Hide post
+                          </div>
+                        </div>
+                      </Menu.Item>
+                      <Menu.Item>
+                        <div
+                          className="flex items-center px-4 py-3 cursor-pointer"
+                          onClick={() => setShowReportPost(true)}
+                        >
+                          <WarningOctagon
+                            fill="currentColor"
+                            weight="light"
+                            size={24}
+                          />
+                          <div className="ml-4">
+                            Report post
+                          </div>
+                        </div>
+                      </Menu.Item>
+                      <Menu.Item>
+                        <div
+                          className="flex items-center px-4 py-3 cursor-pointer"
+                          onClick={() => setShowHidePost(true)}
+                        >
+                          <EyeClosed
+                            fill="currentColor"
+                            weight="light"
+                            size={24}
+                          />
+                          <div className="ml-4">
+                            Hide {post.user.firstName} {post.user.lastName}
+                          </div>
+                        </div>
+                      </Menu.Item>
+                    </>
+                    :
+                    <>
+                      <Menu.Item>
+                        <div
+                          className="flex items-center px-4 py-3 cursor-pointer"
+                          onClick={() => {}}
+                        >
+                          <Pencil
+                            fill="currentColor"
+                            weight="light"
+                            size={24}
+                          />
+                          <div className="ml-4">
+                            Edit post
+                          </div>
+                        </div>
+                      </Menu.Item>
+                      <Menu.Item>
+                        <div
+                          className="flex items-center px-4 py-3 cursor-pointer"
+                          onClick={() => toggleMutePost()}
+                        >
+                          {isMuted ?
+                            <Bell
+                              fill="currentColor"
+                              weight="light"
+                              size={24}
+                            />
+                            :
+                            <BellSlash
+                              fill="currentColor"
+                              weight="light"
+                              size={24}
+                            />
+                          }
+                          {isMuted ?
+                            <div className="ml-4">
+                              Turn on notifications
+                            </div>
+                            :
+                            <div className="ml-4">
+                              Turn off notifications
+                            </div>
+                          }
+                        </div>
+                      </Menu.Item>
+                      <Menu.Item>
+                        <div
+                          className="flex items-center px-4 py-3 cursor-pointer"
+                          onClick={() => deletePostCallback()}
+                        >
+                          <Trash
+                            fill="currentColor"
+                            weight="light"
+                            size={24}
+                          />
+                          <div className="ml-4">
+                            Delete post
+                          </div>
+                        </div>
+                      </Menu.Item>
+                    </>
+                  }
+                </Menu.Items>
+              </Transition>
+            </Menu>
+            <ConfirmHideUserModal
+              post={post}
+              show={showHidePost}
+              onClose={() => setShowHidePost(false)}
+            />
+            <ReportPostModal
+              post={post}
+              show={showReportPost}
+              onClose={() => setShowReportPost(false)}
+            />
+          </div>
         </div>
         <div className="text-sm text-white opacity-90 px-4 mt-4">
           {post.body}
@@ -131,8 +349,8 @@ const Post: FC<PostProps> = ({ post }) => {
               onClick={toggleLike}
             >
               <ThumbsUp
-                weight={liked ? "fill" : "light"}
-                color={liked ? "currentColor" : "white"}
+                weight={isLiked ? "fill" : "light"}
+                color={isLiked ? "currentColor" : "white"}
                 size={24}
               />
               {post.likeIds && post.likeIds.length > 0 && (
@@ -175,18 +393,10 @@ const Post: FC<PostProps> = ({ post }) => {
                 {post.likeIds.length === 1 ? "Like" : "Likes"}
               </div>
             )}
-            <div className="ml-3">
-              <DotsThreeOutlineVertical
-                color="white"
-                weight="light"
-                size={24}
-              />
-            </div>
           </div>
         </div>
         {visibleComment && <CommentPost postId={post._id} />}
       </Card>
-
       <LikeModal
         show={visiblePostLikeModal}
         onClose={() => setVisiblePostLikeModal(false)}

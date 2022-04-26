@@ -72,6 +72,7 @@ export type AccountData = {
     | 'website'
     | 'posts'
     | 'managedFunds'
+    | 'mutedPostIds'
   > & {
     watchlist: WatchlistFund[];
     company: Pick<
@@ -220,6 +221,7 @@ export function useAccount(
               scale
             }
           }
+          mutedPostIds
         }
       }
     `,
