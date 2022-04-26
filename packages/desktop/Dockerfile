@@ -4,7 +4,7 @@ WORKDIR /ignite
 # Copy all relevant package.json files to the new the image
 RUN apt -y update && apt install -y git
 COPY ./package.json yarn.lock ./
-COPY ./packages/desktop/package.json ./packages/desktop/yarn.lock ./packages/desktop/
+COPY ./packages/desktop/package.json ./packages/desktop/
 COPY ./packages/backend/package.json ./packages/backend/package.json
 COPY ./packages/mobile/package.json ./packages/backend/package.json
 COPY ./lerna.json ./
