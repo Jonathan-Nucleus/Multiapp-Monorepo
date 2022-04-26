@@ -37,7 +37,7 @@ const Avatar: FC<AvatarProps> = ({
         alt=""
         width={size}
         height={size}
-        className={`object-cover shadow ${
+        className={`object-cover shadow bg-background ${
           shape === "circle" ? "rounded-full" : "rounded-lg"
         }`}
         unoptimized={true}

@@ -1,12 +1,11 @@
+import { User } from "backend/graphql/users.graphql";
 import React, { FC } from "react";
-import { Dialog } from "@headlessui/react";
-import { X } from "phosphor-react";
-
-import Member from "../Member";
-import Card from "../Card";
-import Button from "../Button";
-import type { User } from "backend/graphql/users.graphql";
 import { useFollowUser } from "mobile/src/graphql/mutation/account";
+import { Dialog } from "@headlessui/react";
+import Card from "../../Card";
+import Button from "../../Button";
+import { X } from "phosphor-react";
+import Member from "../../Member";
 
 interface LikeModalProps {
   show: boolean;

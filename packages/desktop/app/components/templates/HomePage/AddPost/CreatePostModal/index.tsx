@@ -25,7 +25,6 @@ import Label from "desktop/app/components/common/Label";
 import MentionTextarea, {
   mentionTextSchema,
 } from "desktop/app/components/common/MentionTextarea";
-
 import {
   SubmitHandler,
   useForm,
@@ -132,24 +131,22 @@ const CreatePostModal: FC<CreatePostModalProps> = ({ show, onClose }) => {
   const account = userData?.account;
   const userOptions = account?._id
     ? [
-        {
-          icon: <User color="currentColor" weight="fill" size={24} />,
-          title: `${account.firstName} ${account.lastName}`,
-          value: account._id,
-        },
-        ...account?.companies.map((company) => ({
-          icon: <Buildings color="currentColor" weight="fill" size={24} />,
-          title: company.name,
-          value: company._id,
-        })),
-      ]
+      {
+        icon: <User color="currentColor" weight="fill" size={24} />,
+        title: `${account.firstName} ${account.lastName}`,
+        value: account._id,
+      },
+      ...account?.companies.map((company) => ({
+        icon: <Buildings color="currentColor" weight="fill" size={24} />,
+        title: company.name,
+        value: company._id,
+      })),
+    ]
     : [];
 
   const {
-    register,
     handleSubmit,
     control,
-    formState: { isValid, errors },
     reset,
     getValues,
     setValue,
@@ -157,7 +154,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({ show, onClose }) => {
     resolver: yupResolver(schema),
     defaultValues: schema.cast(
       { user: account?._id },
-      { assert: false }
+      { assert: false },
     ) as DefaultValues<FormValues>,
     mode: "onChange",
   });
@@ -167,10 +164,10 @@ const CreatePostModal: FC<CreatePostModalProps> = ({ show, onClose }) => {
     reset(
       schema.cast(
         { user: account?._id },
-        { assert: false }
-      ) as DefaultValues<FormValues>
+        { assert: false },
+      ) as DefaultValues<FormValues>,
     );
-  }, [account]);
+  }, [account, reset]);
 
   const onEmojiClick = (emojiObject: any) => {
     const body = getValues("mentionInput.body");
@@ -179,7 +176,6 @@ const CreatePostModal: FC<CreatePostModalProps> = ({ show, onClose }) => {
   };
 
   const onSubmit: SubmitHandler<FormValues> = async ({
-    user,
     audience,
     mediaUrl,
     categories,
@@ -197,15 +193,11 @@ const CreatePostModal: FC<CreatePostModalProps> = ({ show, onClose }) => {
           },
         },
       });
-
       if (data && data.createPost) {
         closeModal();
         return;
       }
-
-      console.log("Unable to create post");
     } catch (err) {
-      console.log("Error creating post", err);
     }
   };
 
@@ -241,8 +233,8 @@ const CreatePostModal: FC<CreatePostModalProps> = ({ show, onClose }) => {
     reset(
       schema.cast(
         { user: account?._id },
-        { assert: false }
-      ) as DefaultValues<FormValues>
+        { assert: false },
+      ) as DefaultValues<FormValues>,
     );
   };
 

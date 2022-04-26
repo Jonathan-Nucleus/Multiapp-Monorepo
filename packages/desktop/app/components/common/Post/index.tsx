@@ -8,28 +8,26 @@ import {
   ShieldCheck,
   ThumbsUp,
 } from "phosphor-react";
-import { useSession } from "next-auth/react";
-import moment from "moment";
-
 import Button from "../Button";
 import Avatar from "../Avatar";
+import { useLikePost } from "mobile/src/graphql/mutation/posts";
+import moment from "moment";
 import LikeModal from "./LikeModal";
 import CommentPost from "../Comment";
-
-import { useLikePost } from "mobile/src/graphql/mutation/posts";
 import { PostSummary } from "mobile/src/graphql/fragments/post";
+import { useAccount } from "mobile/src/graphql/query/account";
+import { useFollowUser } from "mobile/src/graphql/mutation/account";
 
 interface PostProps {
   post: PostSummary;
 }
 
 const Post: FC<PostProps> = ({ post }) => {
-  const { data: session } = useSession();
+  const { data: accountData } = useAccount();
   const [likePost] = useLikePost();
-
-  const { user } = post;
+  const { user, mediaUrl } = post;
   const [liked, setLiked] = useState(
-    (session?.user && post.likeIds?.includes(session.user._id)) ?? false
+    (accountData?.account && post.likeIds?.includes(accountData.account._id)) ?? false,
   );
   const [visiblePostLikeModal, setVisiblePostLikeModal] = useState(false);
   const [visibleComment, setVisibleComment] = useState(false);
@@ -43,8 +41,15 @@ const Post: FC<PostProps> = ({ post }) => {
       ? setLiked(toggled)
       : console.log("Error liking post");
   };
-
-  const { mediaUrl } = post;
+  const [followUser] = useFollowUser();
+  const isMyPost = user._id == accountData?.account._id;
+  const isFollowingUser = accountData?.account.followingIds?.includes(user._id) ?? false;
+  const toggleFollowingUser = async () => {
+    await followUser({
+      variables: { follow: !isFollowingUser, userId: user._id },
+      refetchQueries: ["Account"],
+    });
+  };
   return (
     <>
       <Card className="border-0 p-0 rounded-none	md:rounded-2xl">
@@ -54,27 +59,36 @@ const Post: FC<PostProps> = ({ post }) => {
           </div>
           <div className="ml-2">
             <div className="flex items-center">
-              <div className="text-white mr-1">{`${user.firstName} ${user.lastName}`}</div>
-              {(user.role === "VERIFIED" || user.role === "PROFESSIONAL") && (
+              <div className="text-white">
+                {`${user.firstName} ${user.lastName}`}
+              </div>
+              {(user.role == "VERIFIED" || user.role == "PROFESSIONAL") && (
                 <ShieldCheck
-                  className="text-success"
+                  className="text-success ml-1.5"
                   color="currentColor"
                   weight="fill"
                   size={16}
                 />
               )}
-              {user.role === "PROFESSIONAL" && (
-                <>
-                  <div className="text-white mx-0.5 text-tiny">{user.role}</div>
-                  <span className="mx-1 text-white/[0.6]">•</span>
-                </>
-              )}
-              <Button
-                variant="text"
-                className="text-tiny text-primary tracking-wider font-medium py-0 pl-0.5"
-              >
-                FOLLOW
-              </Button>
+              {user.role == "PROFESSIONAL" &&
+                <div className="text-white text-tiny ml-1.5 text-tiny">
+                  PRO
+                </div>
+              }
+              {!isMyPost &&
+                <div className="flex items-center">
+                  <div className="mx-1 text-white opacity-60">•</div>
+                  <div className="flex">
+                    <Button
+                      variant="text"
+                      className="text-tiny text-primary tracking-wider font-medium py-0"
+                      onClick={() => toggleFollowingUser()}
+                    >
+                      {isFollowingUser ? "UNFOLLOW" : "FOLLOW"}
+                    </Button>
+                  </div>
+                </div>
+              }
             </div>
             <div className="text-xs text-white opacity-60">{user.position}</div>
             <div className="text-xs text-white opacity-60">

@@ -10,12 +10,13 @@ import Button from "../../common/Button";
 import CreatePostModal from "./AddPost/CreatePostModal";
 import { useAccount } from "mobile/src/graphql/query/account";
 import ProfileCardSmall from "../../modules/users/ProfileCardSmall";
+import { useProfessionals } from "mobile/src/graphql/query/user/useProfessionals";
 
 const HomePage: FC = () => {
   const [showPostModal, setShowPostModal] = useState(false);
   const { data: accountData } = useAccount();
+  const { data: professionalsData } = useProfessionals(true);
   const user = accountData?.account;
-  const companies = accountData?.account?.companies ?? [];
   if (!user) {
     return <></>;
   }
@@ -25,15 +26,17 @@ const HomePage: FC = () => {
       <div className="flex flex-row px-2 mt-10">
         <div className="w-80 hidden lg:block flex-shrink-0 mx-4">
           <ProfileCardSmall user={user} />
-          {companies[0] && (
-            <div className="mt-12" key={companies[0]._id}>
-              <CompanyCard company={companies[0]} />
+          {user.companies.length > 0 && (
+            <div className="mt-12" key={user.companies[0]._id}>
+              <CompanyCard company={user.companies[0]} />
             </div>
           )}
         </div>
         <div className="min-w-0 mx-4">
-          <FeaturedProfessionals />
-          <div className="mt-12 hidden md:block">
+          <FeaturedProfessionals
+            professionals={professionalsData?.professionals ?? []}
+          />
+          <div className="mt-10 hidden md:block">
             <AddPost setShowPostModal={() => setShowPostModal(true)} />
           </div>
           <div className="mt-5">

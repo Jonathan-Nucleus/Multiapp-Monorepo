@@ -67,7 +67,7 @@ type UserProfileData = {
 };
 
 export function useProfile(
-  userId: string,
+  userId?: string,
 ): QueryResult<UserProfileData, UserProfileVariables> {
   return useQuery<UserProfileData, UserProfileVariables>(
     gql`
@@ -157,6 +157,9 @@ export function useProfile(
         }
       }
     `,
-    { variables: { userId } },
+    {
+      skip: !userId,
+      variables: { userId: userId ?? '' },
+    },
   );
 }
