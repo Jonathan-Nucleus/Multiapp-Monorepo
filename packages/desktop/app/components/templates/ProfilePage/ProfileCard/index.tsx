@@ -14,14 +14,23 @@ import {
   Pencil,
 } from "phosphor-react";
 import { Menu } from "@headlessui/react";
+
 import Button from "../../../../components/common/Button";
 import Card from "../../../../components/common/Card";
 import Avatar from "../../../common/Avatar";
 import EditModal from "./EditModal";
 import FollowersModal from "../../../modules/users/FollowersModal";
+import PhotoUploadModal from "./EditModal/PhotoUpload";
+
 import { useFollowUser } from "mobile/src/graphql/mutation/account";
 import { useAccount } from "mobile/src/graphql/query/account";
 import { UserProfile } from "mobile/src/graphql/query/user/useProfile";
+import { MediaType } from "backend/graphql/mutations.graphql";
+
+interface PhotoProps {
+  type: MediaType;
+  visible: boolean;
+}
 
 interface ProfileCardProps {
   user: UserProfile;
@@ -31,6 +40,11 @@ interface ProfileCardProps {
 const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
   const [isVisible, setVisible] = useState(false);
   const [editableModal, setEditableModal] = useState(false);
+  const [editablePhoto, setEditablePhoto] = useState<PhotoProps>({
+    type: "AVATAR",
+    visible: false,
+  });
+
   let overviewShort: string | undefined = undefined;
   const [showFullOverView, setShowFullOverView] = useState(false);
   {
@@ -61,19 +75,18 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
     } catch (error) {}
   };
 
-  const { background: companyBackground } = user.company ?? {};
   return (
     <>
       <div className="relative">
         <Card className="rounded-none lg:rounded-2xl border-brand-overlay/[.1] p-0">
           <div>
             <div className="w-full h-16 lg:h-32 bg-white/[.25] relative">
-              {companyBackground && (
+              {user.background && (
                 <Image
                   loader={() =>
-                    `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${companyBackground.url}`
+                    `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${user.background?.url}`
                   }
-                  src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${companyBackground.url}`}
+                  src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${user.background?.url}`}
                   alt=""
                   layout="fill"
                   objectFit="cover"
@@ -82,7 +95,12 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
               )}
               {isEditable && isMyProfile && (
                 <div
-                  onClick={() => setEditableModal(true)}
+                  onClick={() =>
+                    setEditablePhoto({
+                      type: "BACKGROUND",
+                      visible: true,
+                    })
+                  }
                   className="rounded-full border border-primary flex-shrink-0 w-10 h-10 bg-surface-light10 flex items-center justify-center cursor-pointer absolute right-4 top-4"
                 >
                   <Pencil size={24} color="white" />
@@ -94,7 +112,12 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
                 <Avatar src={user.avatar} size={120} />
                 {isEditable && isMyProfile && (
                   <div
-                    onClick={() => setEditableModal(true)}
+                    onClick={() =>
+                      setEditablePhoto({
+                        type: "AVATAR",
+                        visible: true,
+                      })
+                    }
                     className="rounded-full border border-primary flex-shrink-0 w-10 h-10 bg-surface-light10 flex items-center justify-center cursor-pointer absolute right-0 bottom-0"
                   >
                     <Pencil size={24} color="white" />
@@ -144,7 +167,12 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
                 <Avatar src={user.avatar} size={80} />
                 {isEditable && isMyProfile && (
                   <div
-                    onClick={() => setEditableModal(true)}
+                    onClick={() =>
+                      setEditablePhoto({
+                        type: "AVATAR",
+                        visible: true,
+                      })
+                    }
                     className="rounded-full border border-primary flex-shrink-0 w-8 h-8 bg-surface-light10 flex items-center justify-center cursor-pointer absolute right-0 bottom-0"
                   >
                     <Pencil size={20} color="white" />
@@ -350,6 +378,17 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
         following={user.following}
       />
       <EditModal show={editableModal} onClose={() => setEditableModal(false)} />
+      <PhotoUploadModal
+        show={editablePhoto.visible}
+        onClose={() => {
+          setEditablePhoto({
+            type: "AVATAR",
+            visible: false,
+          });
+        }}
+        type={editablePhoto.type}
+        user={user}
+      />
     </>
   );
 };

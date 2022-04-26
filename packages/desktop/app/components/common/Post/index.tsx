@@ -9,13 +9,14 @@ import {
   ThumbsUp,
 } from "phosphor-react";
 import { useSession } from "next-auth/react";
+import moment from "moment";
+
 import Button from "../Button";
 import Avatar from "../Avatar";
 import LikeModal from "./LikeModal";
-import { useLikePost } from "mobile/src/graphql/mutation/posts";
 import CommentPost from "../Comment";
-import moment from "moment";
-import { PostType } from "desktop/app/types/common-props";
+
+import { useLikePost } from "mobile/src/graphql/mutation/posts";
 import { PostSummary } from "mobile/src/graphql/fragments/post";
 
 interface PostProps {
@@ -169,15 +170,14 @@ const Post: FC<PostProps> = ({ post }) => {
             </div>
           </div>
         </div>
-        {/*{visibleComment && <CommentPost post={post} />}*/}
+        {visibleComment && <CommentPost postId={post._id} />}
       </Card>
-      {/*
+
       <LikeModal
         show={visiblePostLikeModal}
         onClose={() => setVisiblePostLikeModal(false)}
         members={post.likes}
       />
-      */}
     </>
   );
 };

@@ -10,6 +10,7 @@ export interface UserProfileProps extends PropsWithChildren<unknown> {
 
 export interface CompanyProfileProps extends PropsWithChildren<unknown> {
   company: Company;
+  isEditable?: boolean;
 }
 
 export type PostType = Exclude<FetchPostsData["posts"], undefined>[number];

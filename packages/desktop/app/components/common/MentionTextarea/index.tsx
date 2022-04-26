@@ -4,7 +4,6 @@ import {
   Mention,
   MentionsInput as MentionsInputReact17,
   MentionsInputProps,
-  OnChangeHandlerFunc,
 } from "react-mentions";
 import styles from "./index.module.scss";
 import Image from "next/image";
@@ -124,62 +123,60 @@ function MentionTextarea<
             }
             classNames={styles}
           >
-            <>
-              <Mention
-                trigger="@"
-                data={dataFunc}
-                appendSpaceOnAdd
-                onAdd={(id, display) => {
-                  mentionsController.field.onChange([
-                    ...mentionsController.field.value,
-                    {
-                      id,
-                      name: display,
-                    },
-                  ]);
-                }}
-                renderSuggestion={(suggestion, search, highlightedDisplay) => {
-                  const user = users.find((item) => item.id == suggestion.id);
-                  return (
-                    <div className="flex items-center p-2">
+            <Mention
+              trigger="@"
+              data={dataFunc}
+              appendSpaceOnAdd
+              onAdd={(id, display) => {
+                mentionsController.field.onChange([
+                  ...mentionsController.field.value,
+                  {
+                    id,
+                    name: display,
+                  },
+                ]);
+              }}
+              renderSuggestion={(suggestion, search, highlightedDisplay) => {
+                const user = users.find((item) => item.id == suggestion.id);
+                return (
+                  <div className="flex items-center p-2">
+                    <div className="flex items-center">
+                      <Image
+                        loader={() =>
+                          `${process.env.NEXT_PUBLIC_AVATAR_URL}/${user?.avatar}`
+                        }
+                        src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${user?.avatar}`}
+                        alt=""
+                        width={56}
+                        height={56}
+                        className="object-cover rounded-full"
+                        unoptimized={true}
+                      />
+                    </div>
+                    <div className="ml-2">
                       <div className="flex items-center">
-                        <Image
-                          loader={() =>
-                            `${process.env.NEXT_PUBLIC_AVATAR_URL}/${user?.avatar}`
-                          }
-                          src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${user?.avatar}`}
-                          alt=""
-                          width={56}
-                          height={56}
-                          className="object-cover rounded-full"
-                          unoptimized={true}
-                        />
+                        <div className="text-base">
+                          {highlightedDisplay as unknown as ReactNode}
+                        </div>
+                        <div className="text-success ml-2">
+                          <ShieldCheck
+                            color="currentColor"
+                            weight="fill"
+                            size={16}
+                          />
+                        </div>
+                        <div className="text-xs text-white ml-1">
+                          {user?.type}
+                        </div>
                       </div>
-                      <div className="ml-2">
-                        <div className="flex items-center">
-                          <div className="text-base">
-                            {highlightedDisplay as unknown as ReactNode}
-                          </div>
-                          <div className="text-success ml-2">
-                            <ShieldCheck
-                              color="currentColor"
-                              weight="fill"
-                              size={16}
-                            />
-                          </div>
-                          <div className="text-xs text-white ml-1">
-                            {user?.type}
-                          </div>
-                        </div>
-                        <div className="text-white text-xs opacity-60">
-                          {user?.position}
-                        </div>
+                      <div className="text-white text-xs opacity-60">
+                        {user?.position}
                       </div>
                     </div>
-                  );
-                }}
-              />
-            </>
+                  </div>
+                );
+              }}
+            />
           </MentionsInput>
         )}
       />

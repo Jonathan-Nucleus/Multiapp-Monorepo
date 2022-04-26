@@ -35,11 +35,15 @@ export type CompanyProfile = Pick<
   | 'website'
   | 'linkedIn'
   | 'twitter'
+  | 'posts'
+  | 'followers'
+  | 'following'
 > & {
   followers: FollowUser[];
   following: FollowUser[];
   funds: Fund[];
   members: CompanyMember[];
+  posts: PostSummary[];
 };
 
 export type CompanyData = {

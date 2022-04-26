@@ -31,6 +31,7 @@ export type UserProfile = Pick<
   | 'twitter'
   | 'website'
   | 'managedFunds'
+  | 'createdAt'
 > & {
   watchlist: WatchlistFund[];
   company?: Pick<

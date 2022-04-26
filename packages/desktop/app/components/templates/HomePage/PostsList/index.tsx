@@ -11,6 +11,7 @@ const PostsList: FC = () => {
   const [selectedFrom, setSelectedFrom] = useState("Everyone");
   const { data, refetch } = useFetchPosts();
   const posts = data?.posts ?? [];
+
   return (
     <>
       <FilterDropdown

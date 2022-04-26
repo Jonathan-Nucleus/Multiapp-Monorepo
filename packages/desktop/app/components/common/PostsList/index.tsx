@@ -1,10 +1,10 @@
 import { FC, useState } from "react";
 import FilterDropdown, { FilterCategory } from "./FilterDropdown";
 import Post from "desktop/app/components/common/Post";
-import { PostType } from "desktop/app/types/common-props";
+import { PostSummary } from "mobile/src/graphql/fragments/post";
 
 export interface PostsListProps {
-  posts: PostType[];
+  posts: PostSummary[];
   onFilter?: (topics: FilterCategory[], audience: string) => void;
 }
 

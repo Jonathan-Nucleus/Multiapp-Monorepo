@@ -4,85 +4,86 @@ import { X } from "phosphor-react";
 import Image from "next/image";
 import * as yup from "yup";
 import "yup-phone";
-import _omitBy from "lodash/omitBy";
-import _isNil from "lodash/isNil";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-import Card from "../../../../common/Card";
-import Button from "../../../../common/Button";
-import Field from "../../../../common/Field";
-import Alert from "../../../../common/Alert";
+import Card from "../../../common/Card";
+import Button from "../../../common/Button";
+import Field from "../../../common/Field";
+import Alert from "../../../common/Alert";
 import { useAccount } from "mobile/src/graphql/query/account";
 import WarningIcon from "shared/assets/images/warning-red.svg";
-import { useUpdateUserProfile } from "mobile/src/graphql/mutation/account";
+import { CompanyProfile } from "mobile/src/graphql/query/company/useCompany";
+import { useUpdateCompanyProfile } from "mobile/src/graphql/mutation/account";
+
+interface CompanyEditModalProps {
+  show: boolean;
+  onClose: () => void;
+  company: CompanyProfile;
+}
 
 type FormValues = {
-  firstName: string;
-  lastName: string;
-  tagline?: string;
-  overview?: string;
-  website?: string;
-  twitter?: string;
-  linkedIn?: string;
+  name: string;
+  about: string;
+  website: string;
+  twitter: string;
+  linkedIn: string;
 };
 
 const schema = yup.object({
-  firstName: yup.string().default("").required("Required"),
-  lastName: yup.string().default("").required("Required"),
-  tagline: yup.string().default("").notRequired(),
-  overview: yup.string().default("").notRequired(),
-  website: yup.string().url().notRequired(),
-  twitter: yup.string().url().notRequired(),
-  linkedIn: yup.string().url().notRequired(),
+  name: yup.string().default("").required("Required"),
+  about: yup.string().default(""),
+  website: yup.string().url().default(""),
+  twitter: yup.string().url().default(""),
+  linkedIn: yup.string().url().default(""),
 });
 
-interface EditModalProps {
-  show: boolean;
-  onClose: () => void;
-}
-
-const EditModal: FC<EditModalProps> = ({ show, onClose }) => {
-  const { data: accountData } = useAccount();
-
+const CompanyEdit: FC<CompanyEditModalProps> = ({
+  show,
+  onClose,
+  company,
+}: CompanyEditModalProps) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [updateUserProfile] = useUpdateUserProfile();
+  const [updateCompanyProfile] = useUpdateCompanyProfile();
 
-  const account = accountData?.account;
   const { register, handleSubmit, reset, formState } = useForm<
     yup.InferType<typeof schema>
   >({
     resolver: yupResolver(schema),
     mode: "onChange",
-    defaultValues: schema.cast(account ?? {}, { assert: false }),
   });
+
   const { isValid } = formState;
 
   useEffect(() => {
-    if (account) {
-      reset(
-        _omitBy(
-          schema.cast(account, { assert: false, stripUnknown: true }),
-          _isNil
-        )
-      );
+    if (company) {
+      reset({
+        name: company.name,
+        about: company.overview,
+        website: company.website,
+        linkedIn: company.linkedIn,
+        twitter: company.twitter,
+      });
     }
-  }, [account]);
+  }, [company]);
 
   const onSubmit: SubmitHandler<FormValues> = async (values) => {
-    if (!account) return;
-
+    const { name, about, website, twitter, linkedIn } = values;
     try {
-      setLoading(true);
-      await updateUserProfile({
+      await updateCompanyProfile({
         variables: {
           profile: {
-            _id: account._id,
-            ...values,
+            _id: company._id,
+            name: name,
+            overview: about,
+            website,
+            twitter,
+            linkedIn,
           },
         },
       });
+      setLoading(true);
     } catch (err) {
       console.log(err);
     } finally {
@@ -99,7 +100,7 @@ const EditModal: FC<EditModalProps> = ({ show, onClose }) => {
           <Card className="flex flex-col border-0 mx-auto p-0 z-10 w-full max-w-md">
             <div className="flex justify-between items-center border-b-2  px-4 py-2">
               <div className="text-sm text-white opacity-60 font-medium tracking-widest">
-                Edit Profile
+                Edit Company
               </div>
               <Button
                 variant="text"
@@ -127,37 +128,26 @@ const EditModal: FC<EditModalProps> = ({ show, onClose }) => {
                   <Field
                     register={register}
                     state={formState}
-                    name="firstName"
-                    label="First Name"
-                    autoComplete="firstName"
+                    name="name"
+                    label="Name"
+                    autoComplete="name"
                   />
                   <Field
                     register={register}
                     state={formState}
-                    name="lastName"
-                    label="Last Name"
-                    autoComplete="lastName"
+                    name="about"
+                    label="About"
+                    autoComplete="about"
                   />
-                  <Field
-                    register={register}
-                    state={formState}
-                    name="tagline"
-                    label="Tagline"
-                    autoComplete="tagline"
-                  />
-                  <Field
-                    register={register}
-                    state={formState}
-                    name="overview"
-                    label="overview"
-                    autoComplete="overview"
-                  />
+                </div>
+                <div className="border-t p-4">
                   <Field
                     register={register}
                     state={formState}
                     name="website"
                     label="Website"
                     autoComplete="website"
+                    placeholder="https://"
                   />
                   <Field
                     register={register}
@@ -165,6 +155,7 @@ const EditModal: FC<EditModalProps> = ({ show, onClose }) => {
                     name="twitter"
                     label="twitter"
                     autoComplete="twitter"
+                    placeholder="https://"
                   />
                   <Field
                     register={register}
@@ -172,6 +163,7 @@ const EditModal: FC<EditModalProps> = ({ show, onClose }) => {
                     name="linkedIn"
                     label="LinkedIn"
                     autoComplete="linkedIn"
+                    placeholder="https://"
                   />
                 </div>
                 <div className="flex justify-between border-t p-4">
@@ -202,4 +194,4 @@ const EditModal: FC<EditModalProps> = ({ show, onClose }) => {
   );
 };
 
-export default EditModal;
+export default CompanyEdit;

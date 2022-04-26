@@ -5,13 +5,13 @@ import Card from "desktop/app/components/common/Card";
 import Button from "desktop/app/components/common/Button";
 import Input from "desktop/app/components/common/Input";
 import UserItem from "../UserItem";
-import { UserProfile } from "backend/graphql/users.graphql";
+import { Company, FollowUser } from "mobile/src/graphql/query/company";
 
 interface FollowersModalProps {
   show: boolean;
   onClose: () => void;
-  followers: UserProfile[];
-  following: UserProfile[];
+  followers: FollowUser[];
+  following: FollowUser[];
 }
 
 const FollowersModal: FC<FollowersModalProps> = ({

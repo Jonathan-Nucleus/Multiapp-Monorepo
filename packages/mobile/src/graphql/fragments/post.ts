@@ -12,6 +12,8 @@ export type PostSummary = Pick<
   | 'shareIds'
   | 'commentIds'
   | 'createdAt'
+  | 'comments'
+  | 'likes'
 > & {
   user: Pick<
     Post['user'],
@@ -39,8 +41,41 @@ export const POST_SUMMARY_FRAGMENT = gql`
       avatar
       position
       role
+    }
+    likes {
+      _id
+      firstName
+      lastName
+      avatar
+      position
+      role
       company {
+        _id
         name
+        avatar
+      }
+    }
+    comments {
+      _id
+      body
+      createdAt
+      likeIds
+      commentId
+      mentions {
+        _id
+        firstName
+        lastName
+        avatar
+        role
+        position
+      }
+      user {
+        _id
+        firstName
+        lastName
+        avatar
+        role
+        position
       }
     }
   }

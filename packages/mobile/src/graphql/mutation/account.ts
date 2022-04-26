@@ -1,7 +1,8 @@
 import { gql, useMutation, MutationTuple } from '@apollo/client';
 import { MediaUpload, MediaType } from 'backend/graphql/mutations.graphql';
 import { Post, PostInput } from 'backend/graphql/posts.graphql';
-import { UserProfile } from 'backend/graphql/users.graphql';
+import { UserProfile } from '../query/user/useProfile';
+import { CompanyProfile } from '../query/company/useCompany';
 
 export const UPDATE_SETTINGS = gql`
   mutation UpdateSettings($settings: SettingsInput!) {
@@ -207,6 +208,62 @@ export function useUpdateUserProfile(): MutationTuple<
         firstName
         lastName
         position
+        avatar
+        background {
+          url
+          x
+          y
+          width
+          height
+          scale
+        }
+        tagline
+        overview
+        website
+        linkedIn
+        twitter
+      }
+    }
+  `);
+}
+
+type CompanyData = Pick<
+  CompanyProfile,
+  | '_id'
+  | 'name'
+  | 'avatar'
+  | 'background'
+  | 'tagline'
+  | 'overview'
+  | 'website'
+  | 'twitter'
+  | 'linkedIn'
+>;
+type UpdateCompanyProfileVariables = {
+  profile: CompanyData;
+};
+
+type UpdateCompanyProfileData = {
+  updateCompanyProfile: CompanyData;
+};
+
+/**
+ * GraphQL mutation that update user profile
+ *
+ * @returns   GraphQL mutation.
+ */
+export function useUpdateCompanyProfile(): MutationTuple<
+  UpdateCompanyProfileData,
+  UpdateCompanyProfileVariables
+> {
+  return useMutation<
+    UpdateCompanyProfileData,
+    UpdateCompanyProfileVariables
+  >(gql`
+    mutation UpdateCompanyProfile($profile: CompanyProfileInput!) {
+      updateCompanyProfile(profile: $profile) {
+        _id
+        name
         avatar
         background {
           url

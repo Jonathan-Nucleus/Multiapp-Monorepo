@@ -54,7 +54,7 @@ type UploadLinkData = {
 };
 
 /**
- * GraphQL mutation that resets a user's password
+ * GraphQL mutation that upload link
  *
  * @returns   GraphQL mutation.
  */
@@ -115,7 +115,7 @@ type LikePostData = {
 };
 
 /**
- * GraphQL mutation that resets a user's password
+ * GraphQL mutation that like post
  *
  * @returns   GraphQL mutation.
  */
@@ -134,6 +134,7 @@ type CommentPostVariables = {
   comment: {
     postId: string;
     commentId?: string;
+    mediaUrl?: string;
     body: string;
     mentionIds?: string[];
   };
@@ -144,7 +145,7 @@ type CommentPostData = {
 };
 
 /**
- * GraphQL mutation that resets a user's password
+ * GraphQL mutation that  comment post
  *
  * @returns   GraphQL mutation.
  */
@@ -163,6 +164,7 @@ export function useCommentPost(): MutationTuple<
           firstName
           lastName
         }
+        mediaUrl
       }
     }
   `);
@@ -216,6 +218,37 @@ export function useDeleteComment(): MutationTuple<
   return useMutation<DeleteCommentData, DeleteCommentVariables>(gql`
     mutation DeleteComment($commentId: ID!) {
       deleteComment(commentId: $commentId)
+    }
+  `);
+}
+
+type LikeCommentVariables = {
+  like: boolean;
+  commentId: string;
+};
+
+type LikeCommentData = {
+  likeComment: {
+    _id: string;
+    likeIds: string[];
+  };
+};
+
+/**
+ * GraphQL mutation that like comment
+ *
+ * @returns   GraphQL mutation.
+ */
+export function useLikeComment(): MutationTuple<
+  LikeCommentData,
+  LikeCommentVariables
+> {
+  return useMutation<LikeCommentData, LikeCommentVariables>(gql`
+    mutation LikeComment($like: Boolean!, $commentId: ID!) {
+      likeComment(like: $like, commentId: $commentId) {
+        _id
+        likeIds
+      }
     }
   `);
 }

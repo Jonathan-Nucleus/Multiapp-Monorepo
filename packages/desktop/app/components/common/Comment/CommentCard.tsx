@@ -1,4 +1,5 @@
 import { FC, useState } from "react";
+import Image from "next/image";
 import { DotsThreeOutlineVertical, Trash, Pen } from "phosphor-react";
 import { Menu } from "@headlessui/react";
 import moment from "moment";
@@ -12,6 +13,7 @@ import {
   useDeleteComment,
   useEditCommentPost,
   useCommentPost,
+  useLikeComment,
 } from "mobile/src/graphql/mutation/posts";
 import { useAccount } from "mobile/src/graphql/query/account";
 import type { Comment } from "mobile/src/graphql/query/post";
@@ -32,6 +34,7 @@ const CommentCard: FC<CommentCardProps> = ({
 }: CommentCardProps) => {
   const { data: accountData } = useAccount();
   const [likePost] = useLikePost();
+  const [likeComment] = useLikeComment();
   const [deleteComment] = useDeleteComment();
   const [editComment] = useEditCommentPost();
   const [commentPost] = useCommentPost();
@@ -44,15 +47,14 @@ const CommentCard: FC<CommentCardProps> = ({
   const [visibleReply, setVisibleReply] = useState(false);
 
   const toggleLike = async (): Promise<void> => {
-    // TODO Like Comment
     const toggled = !liked;
-    const { data } = await likePost({
-      variables: { like: toggled, postId: comment._id },
+    const { data } = await likeComment({
+      variables: { like: toggled, commentId: comment._id },
     });
 
-    data && data.likePost
+    data && data.likeComment
       ? setLiked(toggled)
-      : console.log("Error liking post");
+      : console.log("Error liking comment");
   };
 
   const handleDeleteComment = async (): Promise<void> => {
@@ -184,7 +186,23 @@ const CommentCard: FC<CommentCardProps> = ({
                 message={comment.body}
               />
             ) : (
-              <div className="text text-sm text-white mt-4">{comment.body}</div>
+              <div className="text text-sm text-white mt-4 flex flex-col">
+                <span>{comment.body}</span>
+                {comment.mediaUrl && (
+                  <div className="overflow-hidden flex h-80 relative mt-4 rounded-xl">
+                    <Image
+                      loader={() =>
+                        `${process.env.NEXT_PUBLIC_POST_URL}/${comment.mediaUrl}`
+                      }
+                      src={`${process.env.NEXT_PUBLIC_POST_URL}/${comment.mediaUrl}`}
+                      alt=""
+                      layout="fill"
+                      objectFit="cover"
+                      unoptimized={true}
+                    />
+                  </div>
+                )}
+              </div>
             )}
           </div>
           <div className="flex items-center justify-between mb-4 ml-2">

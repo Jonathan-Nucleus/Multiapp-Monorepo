@@ -9,22 +9,42 @@ import {
   Copy,
   Chats,
   Share,
+  Pencil,
 } from "phosphor-react";
 import { Menu } from "@headlessui/react";
+
 import Button from "../../../../components/common/Button";
 import Card from "../../../../components/common/Card";
-import FollowersModal from "desktop/app/components/modules/users/FollowersModal";
+import Avatar from "../../../common/Avatar";
+import { CompanyProfile } from "mobile/src/graphql/query/company/useCompany";
+import FollowersModal from "../../../modules/users/FollowersModal";
 import { useFollowCompany } from "mobile/src/graphql/mutation/account";
 import { useAccount } from "mobile/src/graphql/query/account";
-import { CompanyProfile } from "mobile/src/graphql/query/company/useCompany";
+import EditModal from "../EditModal";
+import PhotoUploadModal from "../EditModal/PhotoUpload";
+import { MediaType } from "backend/graphql/mutations.graphql";
 
-interface ProfileCard {
+interface CompanyPageProps {
   company: CompanyProfile;
+  isEditable?: boolean;
 }
 
-const ProfileCard: FC<ProfileCard> = ({ company }) => {
+interface PothoProps {
+  type: MediaType;
+  visible: boolean;
+}
+
+const ProfileCard: FC<CompanyPageProps> = ({
+  company,
+  isEditable,
+}: CompanyPageProps) => {
   const { data: accountData } = useAccount({ fetchPolicy: "cache-only" });
   const [isVisible, setVisible] = useState(false);
+  const [editableModal, setEditableModal] = useState(false);
+  const [editablePhoto, setEditablePhoto] = useState<PothoProps>({
+    type: "AVATAR",
+    visible: false,
+  });
   let overviewShort: string | undefined = undefined;
   const [showFullOverView, setShowFullOverView] = useState(false);
   {
@@ -52,6 +72,7 @@ const ProfileCard: FC<ProfileCard> = ({ company }) => {
       });
     } catch (err) {}
   };
+
   return (
     <>
       <div className="relative">
@@ -70,20 +91,35 @@ const ProfileCard: FC<ProfileCard> = ({ company }) => {
                   unoptimized={true}
                 />
               )}
+              {isEditable && (
+                <div
+                  onClick={() =>
+                    setEditablePhoto({
+                      type: "BACKGROUND",
+                      visible: true,
+                    })
+                  }
+                  className="rounded-full border border-primary flex-shrink-0 w-10 h-10 bg-surface-light10 flex items-center justify-center cursor-pointer absolute right-4 top-4"
+                >
+                  <Pencil size={24} color="white" />
+                </div>
+              )}
             </div>
             <div className="hidden lg:flex relative mx-5">
               <div className="w-[120px] h-[120px] bg-background rounded-2xl relative overflow-hidden -mt-12">
-                {company.avatar && (
-                  <Image
-                    loader={() =>
-                      `${process.env.NEXT_PUBLIC_AVATAR_URL}/${company.avatar}`
+                <Avatar src={company.avatar} size={120} shape="square" />
+                {isEditable && (
+                  <div
+                    onClick={() =>
+                      setEditablePhoto({
+                        type: "AVATAR",
+                        visible: true,
+                      })
                     }
-                    src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${company.avatar}`}
-                    alt=""
-                    layout="fill"
-                    objectFit="cover"
-                    unoptimized={true}
-                  />
+                    className="rounded-full border border-primary flex-shrink-0 w-10 h-10 bg-surface-light10 flex items-center justify-center cursor-pointer absolute right-0 bottom-0"
+                  >
+                    <Pencil size={24} color="white" />
+                  </div>
                 )}
               </div>
               <div className="flex flex-grow justify-between ml-4 mt-4">
@@ -93,30 +129,44 @@ const ProfileCard: FC<ProfileCard> = ({ company }) => {
                   </div>
                 </div>
                 <div className="flex items-center">
-                  <Button
-                    variant="gradient-primary"
-                    className="w-40 text-sm font-medium"
-                    onClick={() => toggleFollowCompany()}
-                  >
-                    {isFollowing ? "UNFOLLOW" : "FOLLOW"}
-                  </Button>
+                  {isEditable ? (
+                    <Button
+                      variant="gradient-primary"
+                      className="w-40 text-sm font-medium"
+                      onClick={() => setEditableModal(true)}
+                    >
+                      Edit Company
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="gradient-primary"
+                      className="w-40 text-sm font-medium"
+                      onClick={() => toggleFollowCompany()}
+                    >
+                      {isFollowing ? "UNFOLLOW" : "FOLLOW"}
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
             <div className="flex lg:hidden items-center p-4">
-              <div className="w-20 h-20 bg-background rounded-2xl relative overflow-hidden -mt-12">
-                {company.avatar && (
-                  <Image
-                    loader={() =>
-                      `${process.env.NEXT_PUBLIC_AVATAR_URL}/${company.avatar}`
-                    }
-                    src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${company.avatar}`}
-                    alt=""
-                    layout="fill"
-                    objectFit="cover"
-                    unoptimized={true}
-                  />
-                )}
+              <div className="w-[80px] h-[80px] bg-background rounded-2xl relative overflow-hidden -mt-12">
+                <div className="relative">
+                  <Avatar src={company.avatar} size={80} shape="square" />
+                  {isEditable && (
+                    <div
+                      onClick={() =>
+                        setEditablePhoto({
+                          type: "AVATAR",
+                          visible: true,
+                        })
+                      }
+                      className="rounded-full border border-primary flex-shrink-0 w-10 h-10 bg-surface-light10 flex items-center justify-center cursor-pointer absolute right-0 bottom-0"
+                    >
+                      <Pencil size={24} color="white" />
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="flex-grow grid grid-cols-3 divide-x divide-inherit">
                 <div className="flex flex-wrap items-center justify-center text-center cursor-pointer px-4">
@@ -295,14 +345,28 @@ const ProfileCard: FC<ProfileCard> = ({ company }) => {
           </div>
         </Card>
       </div>
-      {/*
       <FollowersModal
         show={isVisible}
         onClose={() => setVisible(false)}
         followers={company.followers}
         following={company.following}
       />
-      */}
+      <EditModal
+        show={editableModal}
+        onClose={() => setEditableModal(false)}
+        company={company}
+      />
+      <PhotoUploadModal
+        show={editablePhoto.visible}
+        onClose={() => {
+          setEditablePhoto({
+            type: "AVATAR",
+            visible: false,
+          });
+        }}
+        type={editablePhoto.type}
+        company={company}
+      />
     </>
   );
 };

@@ -4,14 +4,39 @@ import CommentCard from "./CommentCard";
 import Card from "../Card";
 
 import { useCommentPost } from "mobile/src/graphql/mutation/posts";
-import { Post, Comment } from "mobile/src/graphql/query/post";
+import { Comment, usePost } from "mobile/src/graphql/query/post";
 
 interface CommentPostProps {
-  post: Post;
+  postId: string;
 }
 
-const CommentPost: FC<CommentPostProps> = ({ post }) => {
+const CommentPost: FC<CommentPostProps> = ({ postId }) => {
+  const { data: postData } = usePost(postId);
   const [commentPost] = useCommentPost();
+
+  const post = postData?.post;
+  const allComments = post?.comments ?? [];
+
+  const commentsById = useMemo(() => {
+    const commentMap: Record<string, Comment[]> = {};
+    allComments.forEach((comment) => {
+      if (comment.commentId) {
+        if (!commentMap[comment.commentId]) {
+          commentMap[comment.commentId] = [];
+        }
+
+        commentMap[comment.commentId].push(comment);
+      }
+    });
+
+    return commentMap;
+  }, [allComments]);
+
+  const comments = useMemo(() => {
+    return allComments?.filter((comment) => !comment.commentId) || [];
+  }, [allComments]);
+
+  if (!post) return <></>;
 
   const sendMessage = async (
     message: string,
@@ -25,29 +50,13 @@ const CommentPost: FC<CommentPostProps> = ({ post }) => {
             body: message,
             postId: post._id,
             mentionIds: [], // Update to add mentions
+            mediaUrl: mediaUrl ?? "",
           },
         },
         refetchQueries: ["Posts"],
       });
     } catch (err) {}
   };
-
-  const commentsByCommentID: Record<string, Comment[]> = useMemo(() => {
-    const temp: Record<string, Comment[]> = {};
-    post.comments.forEach((comment) => {
-      if (comment.commentId) {
-        if (!temp[comment.commentId]) {
-          temp[comment.commentId] = [];
-        }
-        temp[comment.commentId].push(comment);
-      }
-    });
-    return temp;
-  }, [post.comments]);
-
-  const comments: Comment[] = useMemo(() => {
-    return post.comments.filter((v) => !v.commentId);
-  }, [post.comments]);
 
   return (
     <Card className="border-0 p-0 px-4 rounded-none relative">
@@ -63,10 +72,10 @@ const CommentPost: FC<CommentPostProps> = ({ post }) => {
           parentId={comment._id}
           postId={post._id}
         >
-          {commentsByCommentID[comment._id]?.map((v) => (
+          {commentsById[comment._id]?.map((nestedComment) => (
             <CommentCard
-              comment={v}
-              key={v._id}
+              comment={nestedComment}
+              key={nestedComment._id}
               parentId={comment._id}
               postId={post._id}
             />
