@@ -4,11 +4,16 @@ import { Star } from 'phosphor-react-native';
 
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import { WHITE } from 'shared/src/colors';
-import { FundSummary } from 'mobile/src/graphql/fragments/fund';
+import {
+  FundSummary,
+  FundCompany,
+  FundManager,
+} from 'mobile/src/graphql/fragments/fund';
 import FundProfileInfo from './FundProfileInfo';
 
+type Fund = FundSummary & FundCompany & FundManager;
 export interface FundItemProps {
-  fund: FundSummary;
+  fund: Fund;
   showOverview?: boolean;
   showTags?: boolean;
   onClickFundDetails?: () => void;

@@ -1,15 +1,17 @@
 import { FC } from "react";
-import Card from "../../../common/Card";
 import Image from "next/image";
-import Button from "../../../common/Button";
 import { File, Info, Share, Star, TelevisionSimple } from "phosphor-react";
 import { Tab } from "@headlessui/react";
+
 import Avatar from "../../../common/Avatar";
-import { useAccount } from "mobile/src/graphql/query/account";
-import { useFund } from "mobile/src/graphql/query/marketplace";
-import { useWatchFund } from "mobile/src/graphql/mutation/funds";
+import Button from "../../../common/Button";
+import Card from "../../../common/Card";
+import TeamMembersList from "../../../modules/teams/TeamMembersList";
 import { PINK } from "shared/src/colors";
-import TeamMembersList from "desktop/app/components/modules/teams/TeamMembersList";
+
+import { useAccount } from "mobile/src/graphql/query/account";
+import { useFund } from "mobile/src/graphql/query/marketplace/useFund";
+import { useWatchFund } from "mobile/src/graphql/mutation/funds";
 
 const fundData = {
   mtd: "3.2%",
@@ -120,7 +122,7 @@ const fundData = {
 };
 
 interface FundProfileProps {
-  fundId?: string;
+  fundId: string;
 }
 
 const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
@@ -128,8 +130,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
   const { data } = useFund(fundId);
   const { data: userData } = useAccount({ fetchPolicy: "cache-only" });
   const fund = data?.fund;
-  const isWatching =
-    (!!fundId && userData?.account?.watchlistIds?.includes(fundId)) ?? false;
+  const isWatching = userData?.account?.watchlistIds?.includes(fundId) ?? false;
 
   const toggleWatchFund = async (): Promise<void> => {
     if (!fundId) return;

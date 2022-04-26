@@ -37,7 +37,7 @@ export function usePosts(
         companyProfile(companyId: $companyId) {
           _id
           posts(categories: $categories) {
-            ...PostSummaryFragment
+            ...PostSummaryFields
           }
         }
       }

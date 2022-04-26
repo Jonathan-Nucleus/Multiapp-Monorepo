@@ -4,13 +4,7 @@ import { Fund } from 'backend/graphql/funds.graphql';
 export type FundSummary = Pick<
   Fund,
   '_id' | 'name' | 'status' | 'highlights' | 'overview' | 'tags'
-> & {
-  manager: Pick<
-    Fund['manager'],
-    '_id' | 'firstName' | 'lastName' | 'avatar' | 'followerIds' | 'postIds'
-  >;
-  company: Pick<Fund['company'], '_id' | 'name' | 'avatar' | 'background'>;
-};
+>;
 
 export const FUND_SUMMARY_FRAGMENT = gql`
   fragment FundSummaryFields on Fund {

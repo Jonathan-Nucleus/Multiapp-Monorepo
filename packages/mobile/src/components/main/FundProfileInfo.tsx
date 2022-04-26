@@ -15,10 +15,15 @@ import {
 import { Body1, Body2 } from 'mobile/src/theme/fonts';
 
 import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
-import { FundSummary } from 'mobile/src/graphql/fragments/fund';
+import {
+  FundSummary,
+  FundManager,
+  FundCompany,
+} from 'mobile/src/graphql/fragments/fund';
 
+export type Fund = FundSummary & FundManager & FundCompany;
 export interface FundProfileInfo {
-  fund: FundSummary;
+  fund: Fund;
   showOverview?: boolean;
   showTags?: boolean;
 }
@@ -78,33 +83,35 @@ const FundProfileInfo: FC<FundProfileInfo> = ({
             ))}
           </View>
         )}
-        <View style={styles.managerContainer}>
-          <RoundImageView
-            size={48}
-            image={{ uri: `${AVATAR_URL}/${fund.manager.avatar}` }}
-            imageStyle={styles.managerAvatar}
-          />
-          <View>
-            <View style={styles.manager}>
-              <Text style={[styles.whiteText, Body2]}>
-                {`${fund.manager.firstName} ${fund.manager.lastName}`}
-              </Text>
-              <View style={styles.separator} />
-              <TouchableOpacity>
-                <Text style={styles.follow}>Follow</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.managerInfo}>
-              <Text style={[styles.grayText, Body2]}>
-                {`${fund.manager.followerIds?.length ?? 0} Followers`}
-              </Text>
-              <View style={styles.separator} />
-              <Text style={[styles.grayText, Body2]}>
-                {`${fund.manager.postIds?.length ?? 0} Posts`}
-              </Text>
+        {fund && fund.manager && (
+          <View style={styles.managerContainer}>
+            <RoundImageView
+              size={48}
+              image={{ uri: `${AVATAR_URL}/${fund.manager.avatar}` }}
+              imageStyle={styles.managerAvatar}
+            />
+            <View>
+              <View style={styles.manager}>
+                <Text style={[styles.whiteText, Body2]}>
+                  {`${fund.manager.firstName} ${fund.manager.lastName}`}
+                </Text>
+                <View style={styles.separator} />
+                <TouchableOpacity>
+                  <Text style={styles.follow}>Follow</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.managerInfo}>
+                <Text style={[styles.grayText, Body2]}>
+                  {`${fund.manager.followerIds?.length ?? 0} Followers`}
+                </Text>
+                <View style={styles.separator} />
+                <Text style={[styles.grayText, Body2]}>
+                  {`${fund.manager.postIds?.length ?? 0} Posts`}
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
+        )}
       </View>
       <View style={styles.fundSummaryContainer}>
         <View style={[styles.fundDescriptorContainer, styles.rightSeparator]}>

@@ -79,6 +79,39 @@ export function useHideUser(): MutationTuple<HideUserData, HideUserVariables> {
   `);
 }
 
+type SaveQuestionnaireVariables = {
+  questionnaire: {
+    class: string;
+    status: string;
+    level: string;
+    date: Date;
+  };
+};
+
+type SaveQuestionnaireData = {
+  saveQuestionnaire: {
+    _id: string;
+  };
+};
+
+/**
+ * GraphQL mutation that saves questionnarie
+ *
+ * @returns   GraphQL mutation.
+ */
+export function useSaveQuestionnaire(): MutationTuple<
+  SaveQuestionnaireData,
+  SaveQuestionnaireVariables
+> {
+  return useMutation<SaveQuestionnaireData, SaveQuestionnaireVariables>(gql`
+    mutation SaveQuestionnaire($questionnaire: QuestionnaireInput!) {
+      saveQuestionnaire(questionnaire: $questionnaire) {
+        _id
+      }
+    }
+  `);
+}
+
 type FollowCompanyVariables = {
   companyId: string;
   follow: boolean;

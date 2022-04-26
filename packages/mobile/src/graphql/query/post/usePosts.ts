@@ -27,7 +27,7 @@ export function usePosts(
       ${POST_SUMMARY_FRAGMENT}
       query Posts($categories: [PostCategory!]) {
         posts(categories: $categories) {
-          ...PostSummaryFragment
+          ...PostSummaryFields
         }
       }
     `,

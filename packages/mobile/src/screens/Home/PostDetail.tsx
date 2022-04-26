@@ -1,8 +1,11 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import {
   ListRenderItem,
   FlatList,
+  KeyboardAvoidingView,
+  Platform,
   StyleSheet,
+  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -36,12 +39,13 @@ import { SOMETHING_WRONG } from 'shared/src/constants';
 
 import { BLACK, WHITE } from 'shared/src/colors';
 import pStyles from '../../theme/pStyles';
+import { Body2Bold, Body3 } from '../../theme/fonts';
 
 import { useCommentPost, useDeleteComment } from '../../graphql/mutation/posts';
-import { usePost, Post } from '../../graphql/query/post';
+import { usePost, Post, Comment } from '../../graphql/query/post';
 import { useFollowUser, useHideUser } from '../../graphql/mutation/account';
 
-type CommentUser = Post['comments'][number]['user'];
+type CommentUser = Comment['user'];
 const CommentMenuDataArray = [
   {
     label: 'Edit Comment',
@@ -56,7 +60,7 @@ const CommentMenuDataArray = [
 ];
 
 const PostDetail: PostDetailScreen = ({ route }) => {
-  const { post, userId } = route.params;
+  const { postId, userId } = route.params;
 
   const [comment, setComment] = useState('');
   const [kebobMenuVisible, setKebobMenuVisible] = useState(false);
@@ -65,16 +69,14 @@ const PostDetail: PostDetailScreen = ({ route }) => {
     undefined,
   );
   const [likesModalVisible, setLikesModalVisible] = useState(false);
+  const [focusCommentId, setFocusCommentId] = useState<string | null>(null);
+  const inputRef = useRef<TextInput | null>(null);
 
-  const { data, refetch } = usePost(post._id);
+  const { data, refetch } = usePost(postId);
   const [commentPost] = useCommentPost();
   const [deleteComment] = useDeleteComment();
   const [followUser] = useFollowUser();
   const [hideUser] = useHideUser();
-
-  if (!data || !data.post) return <></>;
-
-  const { comments, likes } = data.post;
 
   const getKebobMenuData = useMemo(() => {
     const KebobMenuDataArray = [
@@ -98,20 +100,34 @@ const PostDetail: PostDetailScreen = ({ route }) => {
     return KebobMenuDataArray;
   }, [selectedUser]);
 
-  const addComment = async () => {
+  if (!data || !data.post) {
+    return (
+      <SafeAreaView
+        style={pStyles.globalContainer}
+        edges={['right', 'top', 'left']}></SafeAreaView>
+    );
+  }
+
+  const { post } = data;
+  const { comments, likes } = post;
+
+  const handleAddComment = async () => {
     try {
+      let commentData = {
+        body: comment,
+        postId: post._id,
+        mentionIds: [],
+        ...(focusCommentId ? { commentId: focusCommentId } : {}),
+      };
+
       const { data } = await commentPost({
         variables: {
-          comment: {
-            body: comment,
-            postId: post._id,
-            mentionIds: [],
-          },
+          comment: commentData,
         },
       });
 
       if (data?.comment) {
-        setComment('');
+        initInputComment();
         refetch();
       }
     } catch (err) {
@@ -170,10 +186,35 @@ const PostDetail: PostDetailScreen = ({ route }) => {
     }
   };
 
-  const renderItem: ListRenderItem<typeof comments[number]> = ({ item }) => {
-    const { user, body } = item;
+  const initInputComment = () => {
+    setComment('');
+    setFocusCommentId(null);
+    inputRef?.current?.blur();
+  };
+
+  const getComments = useMemo(() => {
+    const parentComments = comments?.filter((item) => !item.commentId);
+    const childComments = comments?.filter((item) => item.commentId !== null);
+    const updatedComments: Comment[] = [];
+    parentComments?.forEach((parentComment) => {
+      updatedComments.push(parentComment);
+      childComments?.forEach((childComment) => {
+        if (childComment.commentId === parentComment._id) {
+          updatedComments.push(childComment);
+        }
+      });
+    });
+    return updatedComments;
+  }, [comments]);
+
+  const CommentItem = ({ item }: { item: Comment }) => {
+    const { _id, commentId, user, body } = item;
+    const commentItemContainer = {
+      marginLeft: commentId ? 32 : 0,
+    };
+
     return (
-      <View>
+      <View style={commentItemContainer}>
         <View style={styles.userItemContainer}>
           <UserInfo
             avatar={{ uri: `${AVATAR_URL}/${user.avatar}` }}
@@ -190,10 +231,29 @@ const PostDetail: PostDetailScreen = ({ route }) => {
             <DotsThreeVertical size={24} color={WHITE} />
           </TouchableOpacity>
         </View>
-        <PLabel label={body} viewStyle={styles.sendBtn} />
+        <PLabel label={body} viewStyle={styles.bodyContent} />
+        <View style={styles.actionContainer}>
+          <PLabel label="3h" textStyle={styles.smallLabel} />
+          <TouchableOpacity>
+            <PLabel label="Like" textStyle={styles.smallLabel} />
+          </TouchableOpacity>
+          {!commentId && (
+            <TouchableOpacity
+              onPress={() => {
+                setFocusCommentId(_id);
+                setSelectedUser(user);
+                inputRef?.current?.focus();
+              }}>
+              <PLabel label="Reply" textStyle={styles.smallLabel} />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
     );
   };
+
+  const renderCommentItem: ListRenderItem<typeof comments[number]> =
+    useCallback(({ item }) => <CommentItem item={item} />, [comments]);
 
   return (
     <SafeAreaView
@@ -207,19 +267,37 @@ const PostDetail: PostDetailScreen = ({ route }) => {
       />
       <PAppContainer style={styles.container}>
         <PostItem post={post} userId={userId} />
-        <FlatList data={comments || []} renderItem={renderItem} />
+        <FlatList data={getComments || []} renderItem={renderCommentItem} />
+      </PAppContainer>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'position' : undefined}>
+        {focusCommentId && (
+          <View style={styles.replyContainer}>
+            <Text style={styles.headerReply}>
+              Replying to
+              <Text
+                style={
+                  styles.nameReply
+                }>{` ${selectedUser?.firstName} ${selectedUser?.lastName}`}</Text>
+            </Text>
+            <TouchableOpacity onPress={initInputComment}>
+              <PLabel label="Cancel" textStyle={styles.cancelReply} />
+            </TouchableOpacity>
+          </View>
+        )}
         <View style={styles.inputContainer}>
           <TextInput
             value={comment}
             onChangeText={setComment}
             multiline
             style={styles.input}
+            ref={inputRef}
           />
-          <TouchableOpacity onPress={addComment}>
+          <TouchableOpacity onPress={handleAddComment}>
             <PaperPlaneRight size={32} color={WHITE} />
           </TouchableOpacity>
         </View>
-      </PAppContainer>
+      </KeyboardAvoidingView>
       <SelectionModal
         isVisible={kebobMenuVisible}
         dataArray={getKebobMenuData}
@@ -276,12 +354,29 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  replyContainer: {
+    flexDirection: 'row',
+    backgroundColor: BLACK,
+    alignItems: 'center',
+    marginLeft: 16,
+  },
+  headerReply: {
+    color: WHITE,
+  },
+  nameReply: {
+    ...Body2Bold,
+  },
+  cancelReply: {
+    marginLeft: 12,
+    padding: 8,
+  },
   inputContainer: {
+    backgroundColor: BLACK,
+    marginHorizontal: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 24,
-    marginBottom: 8,
+    paddingVertical: 8,
   },
   input: {
     backgroundColor: WHITE,
@@ -291,7 +386,17 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     width: '90%',
   },
-  sendBtn: {
+  bodyContent: {
     marginLeft: 40,
+  },
+  actionContainer: {
+    marginLeft: 32,
+    flexDirection: 'row',
+    marginVertical: 8,
+  },
+  smallLabel: {
+    ...Body3,
+    marginRight: 8,
+    padding: 8,
   },
 });

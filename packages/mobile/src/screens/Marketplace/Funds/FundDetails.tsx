@@ -25,7 +25,7 @@ import {
 import pStyles from 'mobile/src/theme/pStyles';
 import { Body2 } from '../../../theme/fonts';
 
-import { useFund } from 'mobile/src/graphql/query/marketplace';
+import { useFund } from 'mobile/src/graphql/query/marketplace/useFund';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -35,7 +35,18 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
   const fund = data?.fund;
 
   if (!fund) {
-    return <></>;
+    return (
+      <SafeAreaView
+        style={pStyles.globalContainer}
+        edges={['right', 'top', 'left']}>
+        <PHeader
+          leftIcon={<CaretLeft size={32} color={WHITE} />}
+          leftStyle={styles.sideStyle}
+          onPressLeft={() => NavigationService.goBack()}
+          containerStyle={styles.headerContainer}
+        />
+      </SafeAreaView>
+    );
   }
 
   return (

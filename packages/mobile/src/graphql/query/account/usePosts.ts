@@ -32,7 +32,7 @@ export function usePosts(
         account {
           _id
           posts(categories: $categories) {
-            ...PostSummaryFragment
+            ...PostSummaryFields
           }
         }
       }

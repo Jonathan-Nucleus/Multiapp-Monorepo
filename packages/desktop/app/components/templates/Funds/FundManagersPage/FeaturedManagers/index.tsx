@@ -11,7 +11,7 @@ import Card from "desktop/app/components/common/Card";
 
 import FeaturedManager from "./FeaturedManager";
 
-import { useFundManagers } from "mobile/src/graphql/query/marketplace";
+import { useFundManagers } from "mobile/src/graphql/query/marketplace/useFundManagers";
 
 const FeaturedManagers: FC = () => {
   const { data: managersData } = useFundManagers(); // Temporarily use all managers

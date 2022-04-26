@@ -11,12 +11,13 @@ import { useAccount } from "mobile/src/graphql/query/account";
 import { useFollowUser } from "mobile/src/graphql/mutation/account";
 import type {
   FundManager,
-  FundList,
-} from "mobile/src/graphql/query/marketplace";
+  FundListItem,
+} from "mobile/src/graphql/query/marketplace/useFundManagers";
 
+type Fund = FundListItem;
 interface ManagerItemProps {
   manager: FundManager;
-  funds: FundList;
+  funds: Fund[];
 }
 
 const ManagerItem: FC<ManagerItemProps> = ({

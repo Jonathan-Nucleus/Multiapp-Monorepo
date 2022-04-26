@@ -2,17 +2,12 @@ import React, { FC } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { PRIMARY, WHITE, WHITE12, BLACK } from 'shared/src/colors';
 import { Body1Bold, Body2, Body3, Body3Bold } from 'mobile/src/theme/fonts';
-import { FundManagersData } from 'mobile/src/graphql/query/marketplace';
 
 import FundUserInfo from './FundUserInfo';
 import PLabel from '../../../components/common/PLabel';
-
 import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 
-export type FundManager = Exclude<
-  FundManagersData['fundManagers'],
-  undefined
->['managers'][number];
+import { FundManager } from 'mobile/src/graphql/query/marketplace/useFundManagers';
 
 interface ManagerItemProps {
   manager: FundManager;

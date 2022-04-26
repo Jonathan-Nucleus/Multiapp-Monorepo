@@ -27,7 +27,11 @@ import { useAccount } from '../../graphql/query/account';
 import { useFollowUser, useHideUser } from '../../graphql/mutation/account';
 import { showMessage } from '../../services/utils';
 import { SOMETHING_WRONG } from 'shared/src/constants';
-import { useHidePost, useReportPost } from '../../graphql/mutation/posts';
+import {
+  useHidePost,
+  useMutePost,
+  useReportPost,
+} from '../../graphql/mutation/posts';
 
 const CategoryList = ['All', 'Investment Ideas', 'World News', 'Politics'];
 
@@ -42,6 +46,7 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
   const [followUser] = useFollowUser();
   const [hideUser] = useHideUser();
   const [hidePost] = useHidePost();
+  const [mutePost] = useMutePost();
   const [reportPost] = useReportPost();
 
   const account = userData?.account;
@@ -57,7 +62,7 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
       {
         label: 'Turn off notifications for this post',
         icon: <BellSlash size={26} color={WHITE} />,
-        key: 'turnOff',
+        key: 'mute',
       },
       {
         label: 'Hide post',
@@ -163,6 +168,23 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
     }
   };
 
+  const handleMutePost = async () => {
+    if (!selectedPost) return;
+
+    try {
+      const { data } = await mutePost({
+        variables: { mute: true, postId: selectedPost._id },
+      });
+      if (data?.mutePost) {
+        showMessage('info', 'You will not be able to see this post anymore.');
+      } else {
+        showMessage('error', SOMETHING_WRONG);
+      }
+    } catch (err) {
+      showMessage('error', SOMETHING_WRONG);
+    }
+  };
+
   const handleReportPost = async (violations: string[], comment: string) => {
     if (!selectedPost) return;
 
@@ -245,6 +267,8 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
             handleHidePost();
           } else if (key === 'report') {
             setTimeout(() => setReportPostModalVisible(true), 500);
+          } else if (key === 'mute') {
+            handleMutePost();
           }
         }}
       />

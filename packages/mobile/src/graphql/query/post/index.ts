@@ -57,7 +57,7 @@ export function usePost(postId?: string): QueryResult<PostData, PostVariables> {
       ${POST_SUMMARY_FRAGMENT}
       query Post($postId: ID!) {
         post(postId: $postId) {
-          ...PostSumaryFragement
+          ...PostSummaryFields
           mentions {
             _id
             firstName

@@ -103,6 +103,7 @@ export namespace User {
       | "twitter"
     >
   > & {
+    role: UserRoleEnum;
     createdAt: Date;
     company?: Company.GraphQL;
     companies: Company.GraphQL[];
@@ -191,7 +192,7 @@ export interface ReportedPost {
 
 export interface Questionnaire {
   class: InvestorClass;
-  status: FinancialStatus;
+  status: FinancialStatus[];
   level: InvestmentLevel;
   date: Date;
 }
@@ -460,7 +461,7 @@ export const UserSchema = `
 
   input QuestionnaireInput {
     class: InvestorClass!
-    status: FinancialStatus!
+    status: [FinancialStatus!]!
     level: InvestmentLevel!
     date: Date!
   }

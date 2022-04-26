@@ -7,7 +7,7 @@ import Card from "desktop/app/components/common/Card";
 
 import { useAccount } from "mobile/src/graphql/query/account";
 import { useFollowUser } from "mobile/src/graphql/mutation/account";
-import type { FundManager } from "mobile/src/graphql/query/marketplace";
+import type { FundManager } from "mobile/src/graphql/query/marketplace/useFundManagers";
 
 interface FeaturedManagerProps {
   manager: FundManager;

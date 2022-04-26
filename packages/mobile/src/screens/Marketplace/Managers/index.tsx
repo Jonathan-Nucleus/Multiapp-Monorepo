@@ -2,8 +2,11 @@ import React from 'react';
 import { View, StyleSheet, FlatList, ListRenderItem } from 'react-native';
 
 import { BLACK } from 'shared/src/colors';
-import ManagerItem, { FundManager } from './ManagerItem';
-import { useFundManagers } from '../../../graphql/query/marketplace';
+import ManagerItem from './ManagerItem';
+import {
+  useFundManagers,
+  FundManager,
+} from 'mobile/src/graphql/query/marketplace/useFundManagers';
 import { FundManagersScreen } from '../../../navigations/MarketplaceTabs';
 
 const Managers: FundManagersScreen = () => {

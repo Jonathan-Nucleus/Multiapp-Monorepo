@@ -29,8 +29,8 @@ import type { Company } from "../schemas/company";
 
 type GraphQLUser = User.GraphQL;
 type GraphQLProfile = User.Profile;
-export type { GraphQLUser as User };
-export type { GraphQLProfile as UserProfile };
+type FundManager = User.FundManager;
+export type { GraphQLUser as User, GraphQLProfile as UserProfile, FundManager };
 
 const schema = gql`
   ${UserSchema}

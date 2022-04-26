@@ -422,11 +422,16 @@ const resolvers = {
                   )
                   .required(),
                 status: yup
-                  .string()
-                  .oneOf(
-                    Object.values(FinancialStatusOptions).map(
-                      (option) => option.value
-                    )
+                  .array()
+                  .of(
+                    yup
+                      .string()
+                      .oneOf(
+                        Object.values(FinancialStatusOptions).map(
+                          (option) => option.value
+                        )
+                      )
+                      .required()
                   )
                   .required(),
                 level: yup
@@ -442,7 +447,10 @@ const resolvers = {
         validateArgs(validator, args);
 
         const { questionnaire } = args;
-        return db.users.saveQuestionnaire(user._id, questionnaire);
+        return db.users.saveQuestionnaire(user._id, {
+          ...questionnaire,
+          status: [...new Set(questionnaire.status)], // Ensure unique values
+        });
       }
     ),
 

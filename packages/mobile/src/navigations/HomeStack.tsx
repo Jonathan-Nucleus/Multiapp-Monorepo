@@ -28,7 +28,7 @@ type HomeStackParamList = {
     imageData: object;
     categories: string[];
   };
-  PostDetail: { post: Post; userId: string };
+  PostDetail: { postId: string; userId: string };
   Notification: undefined;
   NotificationDetail: { postId: string; userId: string };
 };

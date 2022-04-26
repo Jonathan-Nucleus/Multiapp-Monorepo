@@ -56,7 +56,7 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
         account?.accreditation === 'ACCREDITED'
           ? 'You are accredited'
           : 'Verify Accreditation',
-      onPress: () => navigation.navigate('AccountAdmin'),
+      onPress: () => navigation.navigate('Accreditation'),
       icon:
         account?.accreditation === 'ACCREDITED' ? <AIProSvg /> : <AIUserSvg />,
     },

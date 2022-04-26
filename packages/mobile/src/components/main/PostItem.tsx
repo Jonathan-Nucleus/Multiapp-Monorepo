@@ -132,7 +132,10 @@ const PostItem: React.FC<PostItemProps> = ({ post, userId, onPressMenu }) => {
           icon={<ChatCenteredText color={WHITE60} size={20} />}
           label="Comment"
           onPress={() =>
-            NavigationService.navigate('PostDetail', { post, userId })
+            NavigationService.navigate('PostDetail', {
+              postId: post._id,
+              userId,
+            })
           }
         />
         <IconButton icon={<Share color={WHITE60} size={20} />} label="Share" />

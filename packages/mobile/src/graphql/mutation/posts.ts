@@ -132,10 +132,10 @@ export function useLikePost(): MutationTuple<LikePostData, LikePostVariables> {
 
 type CommentPostVariables = {
   comment: {
-    body: string;
     postId: string;
-    mentionIds: string[];
     commentId?: string;
+    body: string;
+    mentionIds?: string[];
   };
 };
 
@@ -238,6 +238,28 @@ export function useHidePost(): MutationTuple<HidePostData, HidePostVariables> {
   return useMutation<HidePostData, HidePostVariables>(gql`
     mutation HidePost($hide: Boolean!, $postId: ID!) {
       hidePost(hide: $hide, postId: $postId)
+    }
+  `);
+}
+
+type MutePostVariables = {
+  mute: boolean;
+  postId: string;
+};
+
+type MutePostData = {
+  mutePost: boolean;
+};
+
+/**
+ * GraphQL mutation that mutes post
+ *
+ * @returns   GraphQL mutation.
+ */
+export function useMutePost(): MutationTuple<MutePostData, MutePostVariables> {
+  return useMutation<MutePostData, MutePostVariables>(gql`
+    mutation MutePost($mute: Boolean!, $postId: ID!) {
+      mutePost(mute: $mute, postId: $postId)
     }
   `);
 }

@@ -11,14 +11,14 @@ import { BLACK } from 'shared/src/colors';
 
 interface AppContainerProps {
   style?: ViewStyle;
-  flatList?: boolean;
+  noScroll?: boolean;
   children: any;
 }
 
 const PAppContainer: React.FC<AppContainerProps> = (props) => {
-  const { children, style, flatList } = props;
+  const { children, style, noScroll } = props;
 
-  if (flatList) {
+  if (noScroll) {
     return <View style={[styles.container, style]}>{children}</View>;
   }
 
