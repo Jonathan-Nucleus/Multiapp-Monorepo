@@ -94,7 +94,7 @@ const ManagerItem: FC<ManagerItemProps> = ({
           >
             {isFollowing ? "unfollow" : "follow"}
           </Button>
-          <Link href={`/company/${manager._id}`}>
+          <Link href={`/profile/${manager._id}`}>
             <a>
               <Button
                 variant="primary"

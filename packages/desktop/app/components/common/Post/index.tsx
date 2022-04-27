@@ -1,4 +1,5 @@
 import { FC, Fragment, useState } from "react";
+import Link from "next/link";
 import Card from "../Card";
 import Image from "next/image";
 import {
@@ -83,23 +84,29 @@ const Post: FC<PostProps> = ({ post }) => {
   const deletePostCallback = async () => {};
   return (
     <>
-      <Card className="border-0 p-0 rounded-none	md:rounded-2xl">
+      <Card className="border-0 p-0 rounded-none	md:rounded-2xl mb-6">
         <div className="flex items-center px-4 pt-4">
           <div className="w-14 h-14 flex items-center justify-center">
-            {user.avatar ? (
-              <Avatar size={56} src={user.avatar} />
-            ) : (
-              <div className="w-[56px] h-[56px] flex items-center justify-center bg-primary w-full h-full text-2xl text-white rounded-full">
-                {user.firstName.charAt(0)}
-                {user.lastName.charAt(0)}
-              </div>
-            )}
+            <Link href={`/profile/${user._id}`}>
+              <a>
+                {user.avatar ? (
+                  <Avatar size={56} src={user.avatar} />
+                ) : (
+                  <div className="w-[56px] h-[56px] flex items-center justify-center bg-primary w-full h-full text-2xl text-white rounded-full">
+                    {user.firstName.charAt(0)}
+                    {user.lastName.charAt(0)}
+                  </div>
+                )}
+              </a>
+            </Link>
           </div>
           <div className="ml-2">
             <div className="flex items-center">
-              <div className="text-white">
-                {`${user.firstName} ${user.lastName}`}
-              </div>
+              <Link href={`/profile/${user._id}`}>
+                <a className="text-white">
+                  {`${user.firstName} ${user.lastName}`}
+                </a>
+              </Link>
               {(user.role == "VERIFIED" || user.role == "PROFESSIONAL") && (
                 <ShieldCheck
                   className="text-success ml-1.5"
@@ -339,7 +346,7 @@ const Post: FC<PostProps> = ({ post }) => {
           </div>
         )}
         <div className="flex items-center p-4">
-          <div className="opacity-60 text-white">
+          <div className="text-white/60">
             <div
               className="flex w-10 items-center cursor-pointer text-primary-medium"
               onClick={toggleLike}
@@ -350,30 +357,30 @@ const Post: FC<PostProps> = ({ post }) => {
                 size={24}
               />
               {post.likeIds && post.likeIds.length > 0 && (
-                <div className="text-white text-xs ml-2">
+                <div className="text-white text-xs ml-2 opacity-60">
                   {post.likeIds.length}
                 </div>
               )}
             </div>
           </div>
-          <div className="w-10 opacity-60 text-white ml-10">
+          <div className="w-10 text-white/60 ml-10">
             <div
               className="flex items-center cursor-pointer"
               onClick={() => setVisibleComment(!visibleComment)}
             >
               <ChatCenteredText weight="light" color="currentColor" size={24} />
               {post.commentIds && (
-                <div className="text-white ml-2 text-xs">
+                <div className="text-white ml-2 text-xs opacity-60">
                   {post.commentIds.length}
                 </div>
               )}
             </div>
           </div>
-          <div className="w-10 opacity-60 text-white ml-10">
+          <div className="w-10 text-white/60 ml-10">
             <div className="flex items-center cursor-pointer">
               <Share weight="light" color="currentColor" size={24} />
               {post.shareIds && post.shareIds.length > 0 && (
-                <div className="text-white ml-2 text-xs">
+                <div className="text-white ml-2 text-xs opacity-60">
                   {post.shareIds.length}
                 </div>
               )}

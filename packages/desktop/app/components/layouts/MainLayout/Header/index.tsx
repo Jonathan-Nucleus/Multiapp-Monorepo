@@ -13,7 +13,7 @@ import {
   List,
 } from "phosphor-react";
 import NavItem from "./NavItem";
-import Input from "../../../common/Input";
+import SearchInput from "../../../common/SearchInput";
 import Sidebar from "./Sidebar";
 import AvatarMenu from "./AvatarMenu";
 
@@ -65,8 +65,8 @@ const Header: FC = () => {
         </div>
         <div className="ml-auto flex flex-row items-center">
           <div className="relative">
-            <Input
-              className="leading-5 rounded-3xl bg-black text-white px-5"
+            <SearchInput
+              className="leading-5 rounded-3xl bg-black text-white px-5 w-72"
               placeholder="Search"
             />
             <MagnifyingGlass
@@ -78,7 +78,11 @@ const Header: FC = () => {
           <Link href="/messages">
             <a className="relative ml-8">
               <ChatCircleDots color="white" size={24} />
-              <span className="bg-error rounded-full w-4 h-4 text-xs text-white absolute -top-1.5 -right-1.5 flex items-center justify-center font-medium">
+              <span
+                className={`bg-error-light rounded-full w-4 h-4 text-tiny
+                  text-white absolute -top-1.5 -right-1.5 flex items-center
+                  justify-center font-medium`}
+              >
                 1
               </span>
             </a>
@@ -86,7 +90,11 @@ const Header: FC = () => {
           <Link href="/notifications">
             <a className="relative ml-4">
               <Bell color="white" size={24} />
-              <span className="bg-error rounded-full w-4 h-4 text-xs text-white absolute -top-1.5 -right-1.5 flex items-center justify-center font-medium">
+              <span
+                className={`bg-error-light rounded-full w-4 h-4 text-tiny
+                  text-white absolute -top-1.5 -right-1.5 flex items-center
+                  justify-center font-medium`}
+              >
                 1
               </span>
             </a>

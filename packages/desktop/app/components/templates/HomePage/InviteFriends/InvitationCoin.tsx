@@ -24,7 +24,7 @@ const InvitationCoin: FC<InvitationCoin> = ({
         justify-center items-center ${
           email
             ? `bg-${variant ? variant : "transparent"}`
-            : "border border-white"
+            : "border border-slate-300"
         }`}
     >
       {email && (

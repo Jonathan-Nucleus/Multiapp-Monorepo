@@ -1,4 +1,5 @@
 import { FC } from "react";
+import Link from "next/link";
 import Image from "next/image";
 import { File, Info, Share, Star, TelevisionSimple } from "phosphor-react";
 import { Tab } from "@headlessui/react";
@@ -310,7 +311,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                     </div>
                     <Card className="mt-5 p-0">
                       <div className="flex border-white/[.12] divide-x divide-inherit">
-                        <div className="flex flex-col items-center p-6">
+                        <div className="flex flex-1 flex-col items-center p-6">
                           <div className="text-xs text-white opacity-60">
                             MTD RETURN
                           </div>
@@ -318,7 +319,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                             {fundData.mtd}
                           </div>
                         </div>
-                        <div className="flex flex-col items-center p-6">
+                        <div className="flex flex-1 flex-col items-center p-6">
                           <div className="text-xs text-white opacity-60">
                             YTD RETURN
                           </div>
@@ -326,8 +327,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                             {fundData.ytd}
                           </div>
                         </div>
-                        <div className="flex-grow" />
-                        <div className="flex flex-col items-center p-6">
+                        <div className="flex flex-1 flex-col items-center p-6">
                           <div className="text-xs text-white opacity-60">
                             ANN. VOLATILITY
                           </div>
@@ -335,7 +335,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                             {fundData.annualVolatility}
                           </div>
                         </div>
-                        <div className="flex flex-col items-center p-6">
+                        <div className="flex flex-1 flex-col items-center p-6">
                           <div className="text-xs text-white opacity-60">
                             ARSI
                           </div>
@@ -552,11 +552,17 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
             <div className="border-white/[.12] divide-y divide-inherit">
               <div className="p-5">
                 <div className="flex flex-col items-center p-5 pt-1">
-                  <Avatar size={128} src={fund?.manager?.avatar} />
+                  <Link href={`/profile/${fund?.manager?._id}`}>
+                    <a>
+                      <Avatar size={128} src={fund?.manager?.avatar} />
+                    </a>
+                  </Link>
                   <div className="flex items-center mt-2">
-                    <div className="text-sm text-white tracking-wider">
-                      {fund?.manager?.firstName} {fund?.manager?.lastName}
-                    </div>
+                    <Link href={`/profile/${fund?.manager?._id}`}>
+                      <a className="text-sm text-white tracking-wider">
+                        {fund?.manager?.firstName} {fund?.manager?.lastName}
+                      </a>
+                    </Link>
                     <div className="text-white opacity-60 mx-2">•</div>
                     <div>
                       <Button

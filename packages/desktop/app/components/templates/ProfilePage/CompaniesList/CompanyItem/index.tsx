@@ -1,5 +1,7 @@
 import { FC } from "react";
+import Link from "next/link";
 import Image from "next/image";
+import Avatar from "../../../../common/Avatar";
 import Button from "../../../../common/Button";
 import { useSession } from "next-auth/react";
 import { useFollowCompany } from "mobile/src/graphql/mutation/account";
@@ -21,7 +23,7 @@ const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
     try {
       await followCompany({
         variables: { follow: !isFollowing, companyId: company._id },
-        refetchQueries: ["Account", "UserProfile"]
+        refetchQueries: ["Account", "UserProfile"],
       });
     } catch (err) {}
   };
@@ -30,19 +32,16 @@ const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
       <div className="flex items-center">
         <div className="w-14 h-14 flex flex-shrink-0 rounded-lg overflow-hidden relative">
           {company.avatar && (
-            <Image
-              loader={() =>
-                `${process.env.NEXT_PUBLIC_AVATAR_URL}/${company.avatar}`
-              }
-              src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${company.avatar}`}
-              alt=""
-              layout="fill"
-              className="object-cover"
-              unoptimized={true}
-            />
+            <Link href={`/company/${company._id}`}>
+              <a>
+                <Avatar src={company.avatar} shape="square" />
+              </a>
+            </Link>
           )}
         </div>
-        <div className="text-white ml-4">{company.name}</div>
+        <Link href={`/company/${company._id}`}>
+          <a className="text-white ml-4">{company.name}</a>
+        </Link>
         <Button
           variant="text"
           className="text-xs text-primary tracking-normal font-normal ml-auto px-2 py-0"

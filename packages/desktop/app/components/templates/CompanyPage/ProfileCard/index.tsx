@@ -73,25 +73,24 @@ const ProfileCard: FC<CompanyPageProps> = ({
     } catch (err) {}
   };
 
+  const { background: companyBackground } = company;
   return (
     <>
       <div className="relative">
         <Card className="rounded-none lg:rounded-2xl border-brand-overlay/[.1] p-0">
           <div>
-            <div className="w-full h-16 lg:h-32 bg-white/[.25] relative">
-              {company.background?.url ? (
+            <div className="w-full h-16 lg:h-32 bg-gradient-to-r from-[#844AFF] to-primary relative">
+              {companyBackground && (
                 <Image
                   loader={() =>
-                    `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${company.background?.url}`
+                    `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${companyBackground.url}`
                   }
-                  src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${company.background?.url}`}
+                  src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${companyBackground.url}`}
                   alt=""
                   layout="fill"
                   objectFit="cover"
                   unoptimized={true}
                 />
-              ) : (
-                <div className="bg-gradient-to-r from-[#844AFF] to-primary w-full h-full bg-white/[.25]" />
               )}
               {isEditable && (
                 <div

@@ -69,7 +69,7 @@ const InviteFriends: FC = () => {
             state={formState}
           />
         </div>
-        <div className="text-xs text-white px-4 -mt-2">
+        <div className="text-xs text-white/80 px-4 -mt-2 tracking-wide">
           We want to seed this platform with those who really have a passion for
           financial markets, economics and great ideas.
         </div>

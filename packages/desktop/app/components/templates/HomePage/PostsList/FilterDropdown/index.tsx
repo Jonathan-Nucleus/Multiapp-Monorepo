@@ -52,7 +52,7 @@ const FilterDropdown: FC<FilterDropdownProps> = ({
           <>
             <div>
               <Popover.Button>
-                <div className="flex items-center bg-primary-overlay/[.08] rounded px-2 py-1">
+                <div className="flex items-centers bg-transparent rounded px-2 py-1">
                   <SlidersHorizontal color="white" size={24} />
                   <div className="text-white ml-2">
                     <span className="font-semibold">

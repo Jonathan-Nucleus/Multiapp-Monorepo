@@ -13,12 +13,12 @@ interface AddPostProps {
 const AddPost: FC<AddPostProps> = ({ setShowPostModal }) => {
   const { data: accountData } = useAccount();
   return (
-    <Card className="bg-background-popover p-4">
+    <Card className="bg-background-blue p-4">
       <div className="flex items-center">
         <Avatar size={56} src={accountData?.account.avatar} />
         <Input
           placeholder="Animated suggestions..."
-          className="text-sm rounded-3xl mx-4 px-5"
+          className="text-sm rounded-3xl mx-4 px-5 h-12"
         />
         <Button
           variant="gradient-primary"

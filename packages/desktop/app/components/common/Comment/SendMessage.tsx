@@ -80,7 +80,8 @@ const SendMessage: FC<SendMessageProps> = ({
         <div className="flex items-center justify-between p-4 flex-1 relative">
           <Input
             placeholder={placeholder}
-            className="rounded-full bg-background-DEFAULT pr-16"
+            className="bg-background-DEFAULT pr-16 pl-4 text-sm font-light tracking-wide"
+            shape="pill"
             value={comment}
             onChange={(event) => {
               setComment(event.currentTarget.value);
@@ -88,12 +89,12 @@ const SendMessage: FC<SendMessageProps> = ({
           />
           <Button
             variant="text"
-            className="absolute right-12"
+            className="absolute right-14"
             onClick={() => setVisibleEmoji(!visibleEmoji)}
           >
             <Smiley size={20} color="#00AAE0" weight="fill" />
           </Button>
-          <div className="absolute right-6 cursor-pointer">
+          <div className="absolute right-8 cursor-pointer">
             <div className="relative">
               <Button variant="text">
                 <PhotoImage size={20} color="#00AAE0" weight="fill" />

@@ -80,8 +80,8 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
       <div className="relative">
         <Card className="rounded-none lg:rounded-2xl border-brand-overlay/[.1] p-0">
           <div>
-            <div className="w-full h-16 lg:h-32 bg-white/[.25] relative">
-              {user.background?.url ? (
+            <div className="w-full h-16 lg:h-32 bg-gradient-to-r from-[#844AFF] to-primary relative">
+              {user.background && (
                 <Image
                   loader={() =>
                     `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${user.background?.url}`
@@ -92,8 +92,6 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
                   objectFit="cover"
                   unoptimized={true}
                 />
-              ) : (
-                <div className="bg-gradient-to-r from-[#844AFF] to-primary w-full h-full bg-white/[.25]" />
               )}
               {isEditable && isMyProfile && (
                 <div

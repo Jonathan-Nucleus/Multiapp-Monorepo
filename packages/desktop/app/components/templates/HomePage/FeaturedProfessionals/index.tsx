@@ -11,13 +11,15 @@ interface FeaturedProfessionalsProps {
   professionals: Professional[];
 }
 
-const FeaturedProfessionals: FC<FeaturedProfessionalsProps> = ({ professionals }) => {
+const FeaturedProfessionals: FC<FeaturedProfessionalsProps> = ({
+  professionals,
+}) => {
   return (
     <>
       <div className="font-medium text-xl text-white">
         Featured Professionals
       </div>
-      <Card className="border-0 overflow-visible mt-5 px-4 pt-4 pb-0">
+      <Card className="border-0 overflow-visible mt-5 px-4 pt-4 pb-0 mb-8">
         <Splide
           options={{
             autoWidth: true,
@@ -42,21 +44,13 @@ const FeaturedProfessionals: FC<FeaturedProfessionalsProps> = ({ professionals }
               variant="text"
               className="splide__arrow--prev text-gray-600 py-0 absolute !-left-8 top-16"
             >
-              <ArrowCircleRight
-                color="currentColor"
-                weight="fill"
-                size={50}
-              />
+              <ArrowCircleRight color="currentColor" weight="fill" size={50} />
             </Button>
             <Button
               variant="text"
               className="splide__arrow--next text-gray-600 py-0 absolute !-right-8 top-16"
             >
-              <ArrowCircleRight
-                color="currentColor"
-                weight="fill"
-                size={50}
-              />
+              <ArrowCircleRight color="currentColor" weight="fill" size={50} />
             </Button>
           </div>
         </Splide>

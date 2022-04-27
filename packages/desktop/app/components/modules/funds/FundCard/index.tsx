@@ -6,6 +6,7 @@ import { useAccount } from "mobile/src/graphql/query/account";
 import { useWatchFund } from "mobile/src/graphql/mutation/funds";
 import { useFollowUser } from "mobile/src/graphql/mutation/account";
 import { Fund } from "mobile/src/graphql/query/marketplace/useFunds";
+import Avatar from "desktop/app/components/common/Avatar";
 import Button from "desktop/app/components/common/Button";
 import Card from "desktop/app/components/common/Card";
 import { PINK } from "shared/src/colors";
@@ -123,23 +124,18 @@ const FundCard: FC<FundCardProps> = ({
           </div>
           <div className="bg-white/[.12] w-px my-5" />
           <div className="w-64 flex-shrink-0 flex flex-col items-center p-4">
-            <div className="w-32 h-32 relative bg-white flex rounded-full overflow-hidden">
-              {fund.manager.avatar && (
-                <Image
-                  loader={() =>
-                    `${process.env.NEXT_PUBLIC_AVATAR_URL}/${fund.manager.avatar}`
-                  }
-                  src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${fund.manager.avatar}`}
-                  alt=""
-                  layout="fill"
-                  className="object-cover"
-                  unoptimized={true}
-                />
-              )}
-            </div>
-            <div className="text-sm text-white mt-2 tracking-wide">
-              {fund.manager.firstName} {fund.manager.lastName}
-            </div>
+            {fund.manager.avatar && (
+              <Link href={`/profile/${fund.manager._id}`}>
+                <a>
+                  <Avatar src={fund.manager.avatar} size={128} />
+                </a>
+              </Link>
+            )}
+            <Link href={`/profile/${fund.manager._id}`}>
+              <a className="text-sm text-white mt-2 tracking-wide">
+                {fund.manager.firstName} {fund.manager.lastName}
+              </a>
+            </Link>
             <div className="text-xs text-white opacity-60 tracking-wider">
               {fund.manager.followerIds?.length ?? 0} Followers
               {" • "}

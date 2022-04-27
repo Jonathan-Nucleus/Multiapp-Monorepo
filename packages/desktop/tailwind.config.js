@@ -36,7 +36,10 @@ module.exports = {
         elevation: {
           overlay: "#1C1B35",
         },
-        error: "#CD403A",
+        error: {
+          DEFAULT: "#CD403A",
+          light: "#FF6565",
+        },
         info: "#544EFD",
         success: "#55C090",
         purple: {

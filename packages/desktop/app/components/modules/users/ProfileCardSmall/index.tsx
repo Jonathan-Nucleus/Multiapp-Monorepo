@@ -29,9 +29,7 @@ const ProfileCardSmall: FC<ProfileProps> = ({ user }: ProfileProps) => {
         <div className="flex items-center justify-center mt-3">
           <div className="relative text-success">
             <CircleWavy color="currentColor" weight="fill" size={24} />
-            <div
-              className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-xs font-bold scale-75 text-white"
-            >
+            <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-xs font-bold scale-75 text-white">
               {getInitials(AccreditationOptions[user.accreditation].label)}
             </div>
           </div>

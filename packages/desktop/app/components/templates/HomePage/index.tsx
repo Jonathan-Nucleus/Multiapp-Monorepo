@@ -26,7 +26,7 @@ const HomePage: FC = () => {
 
   return (
     <>
-      <div className="flex flex-row px-2 mt-10">
+      <div className="flex flex-row px-2 mt-20">
         <div className="w-80 hidden lg:block flex-shrink-0 mx-4">
           <ProfileCardSmall user={user} />
           {user.companies.length > 0 && (
@@ -39,11 +39,10 @@ const HomePage: FC = () => {
           {professionals.length > 0 && (
             <FeaturedProfessionals professionals={professionals} />
           )}
-
-          <div className="mt-10 hidden md:block">
+          <div className="hidden md:block">
             <AddPost setShowPostModal={() => setShowPostModal(true)} />
           </div>
-          <div className="mt-5">
+          <div className="mt-8">
             <PostsList />
           </div>
         </div>
