@@ -20,12 +20,7 @@ export async function getUploadUrl(
   fileExt: string,
   type: "avatar" | "post" | "background"
 ): Promise<RemoteUpload> {
-  if (
-    !AWS_ACCESS_KEY_ID ||
-    !AWS_SECRET_ACCESS_KEY ||
-    !AWS_UPLOAD_REGION ||
-    !S3_BUCKET
-  ) {
+  if (!AWS_UPLOAD_REGION || !S3_BUCKET) {
     throw new InternalServerError("Missing AWS configuration");
   }
 
@@ -34,10 +29,6 @@ export async function getUploadUrl(
 
   const client = new S3Client({
     region: AWS_UPLOAD_REGION,
-    credentials: {
-      accessKeyId: AWS_ACCESS_KEY_ID,
-      secretAccessKey: AWS_SECRET_ACCESS_KEY,
-    },
   });
   const command = new PutObjectCommand({
     Bucket: S3_BUCKET,

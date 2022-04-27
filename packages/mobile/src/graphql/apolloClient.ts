@@ -12,6 +12,7 @@ import {
   attachTokenObserver,
   detachTokenObserver,
 } from 'mobile/src/utils/auth-token';
+import { GRAPHQL_URI } from 'react-native-dotenv';
 
 const typePolicies = {};
 
@@ -23,8 +24,6 @@ const persistor = new CachePersistor({
   cache,
   storage: new AsyncStorageWrapper(EncryptedStorage),
 });
-
-const GQL_GATEWAY_URL = 'http://localhost:4000';
 
 export const useInitializeClient = () => {
   const [reset, setReset] = useState(false); // Toggle to force a restart
@@ -45,7 +44,7 @@ export const useInitializeClient = () => {
       const _client = new ApolloClient({
         link: from([
           createHttpLink({
-            uri: GQL_GATEWAY_URL,
+            uri: GRAPHQL_URI,
             headers: token && {
               authorization: `Bearer ${token}`,
             },

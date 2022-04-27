@@ -17,4 +17,5 @@ declare module 'react-native-dotenv' {
   declare const POST_URL: string;
   declare const AVATAR_URL: string;
   declare const BACKGROUND_URL: string;
+  declare const GRAPHQL_URI: string;
 }
