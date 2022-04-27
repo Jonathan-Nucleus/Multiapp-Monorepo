@@ -54,7 +54,7 @@ const Accreditation: AccreditationScreen = ({ navigation }) => {
       console.log('data', investOption, finalcialOption, level, data);
 
       if (data?.saveQuestionnaire._id) {
-        navigation.goBack();
+        navigation.navigate('AccreditationResult');
       } else {
         showMessage('error', SOMETHING_WRONG);
       }

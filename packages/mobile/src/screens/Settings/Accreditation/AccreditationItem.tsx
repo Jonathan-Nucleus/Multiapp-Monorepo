@@ -13,6 +13,7 @@ import {
   GRAY100,
   PRIMARYSOLID,
   PRIMARYSOLID7,
+  WHITE,
   WHITE60,
 } from 'shared/src/colors';
 import { Body1Bold, Body2Bold, H6Bold } from '../../../theme/fonts';
@@ -97,7 +98,8 @@ const AccreditationItem: React.FC<AccreditationItemProps> = ({
   const [financialStatusOptions, setFinancialStatusOptions] = useState<
     FinancialStatusProps[]
   >(FinancialStatusOptions);
-  const [investLevel, setInvestLevel] = useState('');
+  const [investLevel1, setInvestLevel1] = useState('');
+  const [investLevel2, setInvestLevel2] = useState('');
 
   const renderFirstSlide = () => {
     return (
@@ -262,32 +264,53 @@ const AccreditationItem: React.FC<AccreditationItemProps> = ({
         />
         <View style={styles.selectionContainer}>
           <TouchableOpacity
-            style={styles.selectButton}
-            onPress={() => setInvestLevel('TIER1')}>
-            <PLabel label="Yes" />
+            style={[
+              styles.selectButton,
+              investLevel1 === 'TIER1' && styles.selectedButton,
+            ]}
+            onPress={() => setInvestLevel1('TIER1')}>
+            <PLabel
+              label="Yes"
+              textStyle={investLevel1 === 'TIER1' ? styles.selectedLabel : {}}
+            />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.selectButton}
-            onPress={() => setInvestLevel('')}>
+            onPress={() => {
+              setInvestLevel1('');
+              setInvestLevel2('');
+            }}>
             <PLabel label="No" />
           </TouchableOpacity>
         </View>
-        <PLabel
-          label="Do you have at least $5M in investments?"
-          textStyle={styles.subTtitleLabel}
-        />
-        <View style={styles.selectionContainer}>
-          <TouchableOpacity
-            style={styles.selectButton}
-            onPress={() => setInvestLevel('TIER2')}>
-            <PLabel label="Yes" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.selectButton}
-            onPress={() => setInvestLevel('')}>
-            <PLabel label="No" />
-          </TouchableOpacity>
-        </View>
+        {investLevel1 === 'TIER1' && (
+          <>
+            <PLabel
+              label="Do you have at least $5M in investments?"
+              textStyle={styles.subTtitleLabel}
+            />
+            <View style={styles.selectionContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.selectButton,
+                  investLevel2 === 'TIER2' && styles.selectedButton,
+                ]}
+                onPress={() => setInvestLevel2('TIER2')}>
+                <PLabel
+                  label="Yes"
+                  textStyle={
+                    investLevel2 === 'TIER2' ? styles.selectedLabel : {}
+                  }
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.selectButton}
+                onPress={() => setInvestLevel2('')}>
+                <PLabel label="No" />
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
         <View style={styles.secondBottomWrapper}>
           <TouchableOpacity style={styles.cancelButton} onPress={handleGoBack}>
             <PLabel label="Back" />
@@ -296,7 +319,9 @@ const AccreditationItem: React.FC<AccreditationItemProps> = ({
             label="Next"
             textStyle={styles.nextButtonLabel}
             btnContainer={{ width: '50%' }}
-            onPress={() => updateInvestmentLevelOption(investLevel)}
+            onPress={() =>
+              updateInvestmentLevelOption(investLevel2 || investLevel1)
+            }
           />
         </View>
       </View>
@@ -354,6 +379,17 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     borderColor: WHITE60,
     borderWidth: 1,
+    width: '45%',
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  selectedLabel: {
+    color: BLACK,
+  },
+  selectedButton: {
+    backgroundColor: WHITE,
+    borderRadius: 24,
     width: '45%',
     height: 48,
     alignItems: 'center',

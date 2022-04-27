@@ -20,7 +20,7 @@ const AccreditationResult: AccreditationResultScreen = ({ navigation }) => {
       edges={['right', 'top', 'left']}>
       <AccreditationHeader
         centerLabel="Investor Accreditation"
-        handleBack={() => navigation.goBack()}
+        handleBack={() => navigation.pop(2)}
       />
       <PAppContainer noScroll style={styles.container}>
         <QPSvg />

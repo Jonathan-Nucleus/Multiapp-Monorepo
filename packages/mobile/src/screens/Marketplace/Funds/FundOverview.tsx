@@ -24,14 +24,31 @@ import {
 } from 'shared/src/colors';
 import { Body2Bold, Body3, H6Bold } from 'mobile/src/theme/fonts';
 import Tag from '../../../components/common/Tag';
-import PTitle from '../../../components/common/PTitle';
 import PLabel from '../../../components/common/PLabel';
 
 import { FundDetails } from 'mobile/src/graphql/query/marketplace';
 
+interface PTitleProps {
+  title: string;
+  subTitle: string;
+  flex?: number;
+}
+
 interface FundOverviewProps {
   fund: FundDetails;
 }
+
+const PTitle: FC<PTitleProps> = ({ title, subTitle, flex }) => {
+  return (
+    <View style={{ flex }}>
+      <PLabel textStyle={styles.title} label={title} />
+      <PLabel label={subTitle} />
+    </View>
+  );
+};
+
+const LEFT_FLEX = 0.6;
+const RIGHT_FLEX = 0.4;
 
 const FundOverview: FC<FundOverviewProps> = ({ fund }) => {
   const renderTeamMemberItem: ListRenderItem<FundDetails['team'][number]> = ({
@@ -110,15 +127,15 @@ const FundOverview: FC<FundOverviewProps> = ({ fund }) => {
           <PLabel textStyle={styles.fund} label="Fund Details" />
         </View>
         <View style={styles.infoContainer}>
-          <PTitle title="Asset Class" subTitle={fund.name} />
-          <PTitle title="Strategy" subTitle="L/S Equity" />
+          <PTitle title="Asset Class" subTitle={fund.name} flex={LEFT_FLEX} />
+          <PTitle title="Strategy" subTitle="L/S Equity" flex={RIGHT_FLEX} />
         </View>
         <View style={styles.infoContainer}>
           <PTitle title="AUM" subTitle="$10M" />
         </View>
         <View style={styles.infoContainer}>
-          <PTitle title="Minimum Investment" subTitle="$25K" />
-          <PTitle title="Lockup Period" subTitle="2 years" />
+          <PTitle title="Minimum Investment" subTitle="$25K" flex={LEFT_FLEX} />
+          <PTitle title="Lockup Period" subTitle="2 years" flex={RIGHT_FLEX} />
         </View>
         <View style={styles.infoContainer}>
           <PTitle title="liquidity" subTitle="Quarterly w/30 days notice" />
@@ -137,12 +154,16 @@ const FundOverview: FC<FundOverviewProps> = ({ fund }) => {
           <PLabel textStyle={styles.fund} label="Highlights" />
         </View>
         <View style={styles.infoContainer}>
-          <PTitle title="annualized volatility" subTitle="2.8%" />
-          <PTitle title="ARSI" subTitle="2.8%" />
+          <PTitle
+            title="annualized volatility"
+            subTitle="2.8%"
+            flex={LEFT_FLEX}
+          />
+          <PTitle title="ARSI" subTitle="2.8%" flex={RIGHT_FLEX} />
         </View>
         <View style={styles.infoContainer}>
-          <PTitle title="MTD Return" subTitle="3.2%" />
-          <PTitle title="YTD Return" subTitle="3.1%" />
+          <PTitle title="MTD Return" subTitle="3.2%" flex={LEFT_FLEX} />
+          <PTitle title="YTD Return" subTitle="3.1%" flex={RIGHT_FLEX} />
         </View>
       </View>
     </View>

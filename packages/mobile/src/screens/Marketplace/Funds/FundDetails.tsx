@@ -72,6 +72,7 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
         {/* TODO: use ohter lib for tab bar like react-native-tab-view */}
         <View style={{ height: 1400 }}>
           <Tab.Navigator
+            sceneContainerStyle={styles.tabContainer}
             screenOptions={({ route }) => ({
               tabBarStyle: styles.tabBar,
               tabBarIndicatorStyle: styles.tabBarIndicator,
@@ -122,6 +123,9 @@ const styles = StyleSheet.create({
     top: 16,
   },
   favorite: {},
+  tabContainer: {
+    backgroundColor: BLACK,
+  },
   tabBar: {
     backgroundColor: BLACK,
     marginTop: 0,

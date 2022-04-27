@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { AVATAR_URL } from 'react-native-dotenv';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import moment from 'moment';
 
 import PAppContainer from '../../components/common/PAppContainer';
 import PLabel from '../../components/common/PLabel';
@@ -214,7 +215,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
   }, [comments]);
 
   const CommentItem = ({ item }: { item: Comment }) => {
-    const { _id, commentId, user, body } = item;
+    const { _id, commentId, user, body, createdAt } = item;
     const commentItemContainer = {
       marginLeft: commentId ? 32 : 0,
     };
@@ -239,7 +240,10 @@ const PostDetail: PostDetailScreen = ({ route }) => {
         </View>
         <PLabel label={body} viewStyle={styles.bodyContent} />
         <View style={styles.actionContainer}>
-          <PLabel label="3h" textStyle={styles.smallLabel} />
+          <PLabel
+            label={moment(createdAt).fromNow()}
+            textStyle={styles.smallLabel}
+          />
           <TouchableOpacity>
             <PLabel label="Like" textStyle={styles.smallLabel} />
           </TouchableOpacity>
