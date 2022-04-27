@@ -23,6 +23,8 @@ import {
   Questionnaire,
   ProRequest,
   isUser,
+  Accreditation,
+  InvestmentLevelOptions,
 } from "../../schemas/user";
 import {
   BadRequestError,
@@ -804,14 +806,26 @@ const createUsersCollection = (
       userId: MongoId,
       questionnaire: Questionnaire
     ): Promise<User.Mongo | null> => {
+      let accreditation: Accreditation = "none";
+      if (questionnaire.status && questionnaire.status.length > 0) {
+        accreditation = "accredited";
+
+        if (questionnaire.level === InvestmentLevelOptions.TIER1) {
+          accreditation = "client";
+        } else if (questionnaire.level === InvestmentLevelOptions.TIER2) {
+          accreditation = "purchaser";
+        }
+      }
+
       const user = await usersCollection.findOneAndUpdate(
         { _id: toObjectId(userId), role: { $ne: "stub" } },
         {
           $set: {
             questionnaire: {
               ...questionnaire,
-              date: new Date(),
+              date: new Date(questionnaire.date),
             },
+            accreditation,
           },
         },
         { returnDocument: "after" }

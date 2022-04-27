@@ -197,7 +197,7 @@ export interface ReportedPost {
 export interface Questionnaire {
   class: InvestorClass;
   status: FinancialStatus[];
-  level: InvestmentLevel;
+  level?: InvestmentLevel;
   date: Date;
 }
 
@@ -467,7 +467,7 @@ export const UserSchema = `
   input QuestionnaireInput {
     class: InvestorClass!
     status: [FinancialStatus!]!
-    level: InvestmentLevel!
+    level: InvestmentLevel
     date: Date!
   }
 

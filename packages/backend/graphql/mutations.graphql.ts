@@ -428,6 +428,7 @@ const resolvers = {
                   .required(),
                 status: yup
                   .array()
+                  .min(0)
                   .of(
                     yup
                       .string()
@@ -441,8 +442,7 @@ const resolvers = {
                   .required(),
                 level: yup
                   .string()
-                  .oneOf(Object.values(InvestmentLevelOptions))
-                  .required(),
+                  .oneOf(Object.values(InvestmentLevelOptions)),
                 date: yup.date().required(),
               })
               .required(),
@@ -452,6 +452,7 @@ const resolvers = {
         validateArgs(validator, args);
 
         const { questionnaire } = args;
+
         return db.users.saveQuestionnaire(user._id, {
           ...questionnaire,
           status: Array.from(new Set(questionnaire.status)), // Ensure unique values

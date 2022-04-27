@@ -49,8 +49,6 @@ describe("Query - notifications", () => {
       query,
     });
 
-    console.log(res);
-
     expect(res.data?.notifications).toHaveLength(3);
     const ids = _.map(res.data?.notifications, "_id");
     expect(ids).toContain(notifications[0]._id.toString());
