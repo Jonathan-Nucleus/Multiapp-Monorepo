@@ -5,7 +5,7 @@ import {
   PostCategoryEnum,
 } from "../schemas/post";
 
-export const Audiences = Object.keys(AudienceOptions);
+export const Audiences: AudienceEnum[] = Object.keys(AudienceOptions);
 export const PostCategories = Object.keys(PostCategoryOptions).reduce(
   (acc, category) => {
     acc[category] = PostCategoryOptions[category].label;

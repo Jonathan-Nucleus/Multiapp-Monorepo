@@ -16,7 +16,7 @@ interface ManagerItemProps {
 const ManagerItem: FC<ManagerItemProps> = ({ manager }) => {
   return (
     <View style={styles.managerItem}>
-      <FundUserInfo item={manager} />
+      <FundUserInfo manager={manager} />
       <View style={styles.nameWrapper}>
         <PLabel
           label={`${manager.firstName} ${manager.lastName}`}

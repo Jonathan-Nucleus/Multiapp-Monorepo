@@ -22,113 +22,83 @@ import GlobalSvg from 'shared/assets/images/global.svg';
 import Avatar from '../../assets/avatar.png';
 import Tag from '../../components/common/Tag';
 import PostHeader from './PostHeader';
-import { audienceData, OptionProps, postAsData } from './CreatePost';
+
 import { Post } from 'mobile/src/graphql/query/post/usePosts';
 const Buffer = global.Buffer || require('buffer').Buffer;
 
+import { AUDIENCE_OPTIONS } from './CreatePost';
+import { PostCategories } from 'backend/graphql/enumerations.graphql';
 import type { PostCategory } from 'mobile/src/graphql/query/post/usePosts';
+import { useAccount } from 'mobile/src/graphql/query/account';
 import {
   useFetchUploadLink,
   useCreatePost,
 } from '../../graphql/mutation/posts';
 
 const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
-  const [selectedPostAs] = useState(postAsData[0]);
-  const [selectedAudience] = useState(audienceData[0]);
-  const [imageData, setImageData] = useState<any>({});
-  const [description, setDescription] = useState('');
-  const [categories, setCategories] = useState<PostCategory[]>([]);
-  const [mentions, setMentions] = useState<string[]>([]);
+  const { data: accountData } = useAccount();
   const [createPost] = useCreatePost();
-  const [fetchUploadLink] = useFetchUploadLink();
 
-  useEffect(() => {
-    const { categories, description, mentions, imageData } = route.params;
-    setDescription(description);
-    setMentions(mentions);
-    setCategories(categories);
-    setImageData(imageData);
-  }, [route, route.params]);
+  const account = accountData?.account;
+  const {
+    categories,
+    description,
+    mentions,
+    mediaUrl,
+    audience,
+    user,
+    localMediaPath,
+  } = route.params;
 
-  const checkValidation = () => {
-    if (!description || !imageData || !categories) {
-      return false;
-    }
-    return true;
-  };
+  const handleSubmit = async () => {
+    const postData = {
+      categories,
+      audience,
+      body: description,
+      mediaUrl,
+      mentionIds: mentions,
+      // TODO: Update endpoint to accept company
+    };
 
-  const handleNext = async () => {
-    if (!checkValidation()) {
-      return;
-    }
+    const result = await createPost({
+      variables: {
+        post: postData,
+      },
+    });
 
-    try {
-      const { data } = await fetchUploadLink({
-        variables: {
-          localFilename: imageData?.filename,
-          type: 'POST',
-        },
-      });
-
-      if (!data || !data.uploadLink) {
-        showMessage('error', 'Image upload failed');
-        return;
-      }
-
-      const { remoteName, uploadUrl } = data.uploadLink;
-      const buf = new Buffer(
-        imageData.data.replace(/^data:image\/\w+;base64,/, ''),
-        'base64',
-      );
-      await fetch(uploadUrl, {
-        method: 'PUT',
-        body: buf,
-      });
-
-      const postData = {
-        categories,
-        audience: selectedAudience.val,
-        body: replaceMentionValues(description, ({ name }) => `@${name}`),
-        mediaUrl: remoteName,
-        mentionIds: mentions,
-      };
-
-      const result = await createPost({
-        variables: {
-          post: postData,
-        },
-      });
-
-      if (result && result.data && result.data.createPost) {
-        console.log('success', result);
-        showMessage('success', 'Successfully posted!');
-      }
-    } catch (e) {
-      console.log('error', e);
-      showMessage('error', SOMETHING_WRONG);
+    if (result && result.data && result.data.createPost) {
+      showMessage('success', 'Successfully posted!');
+      navigation.navigate('Home');
     }
   };
+
+  const postAsLabel =
+    account?._id === user
+      ? `${account?.firstName} ${account.lastName}`
+      : account?.companies.find((company) => company._id === user)?.name ?? '';
+  const selectedAudienceLabel =
+    AUDIENCE_OPTIONS.find((option) => option.id === audience)?.value ?? '';
 
   return (
     <SafeAreaView style={pStyles.globalContainer}>
       <PostHeader
         centerLabel="Preview Post"
         rightLabel="POST"
-        rightValidation={checkValidation()}
-        handleNext={handleNext}
+        rightValidation={true}
+        handleNext={handleSubmit}
       />
       <PAppContainer>
         <View style={styles.usersPart}>
           <RoundImageView image={Avatar} imageStyle={styles.avatarImage} />
           <PostSelection
             icon={<UserSvg />}
-            label={selectedPostAs?.val}
+            label={postAsLabel}
             viewStyle={{ marginHorizontal: 8 }}
           />
-          <PostSelection icon={<GlobalSvg />} label={selectedAudience?.val} />
+          <PostSelection icon={<GlobalSvg />} label={selectedAudienceLabel} />
         </View>
         <MentionInput
-          value={description}
+          value={description ?? ''}
           onChange={() => {}}
           editable={false}
           style={styles.mentionInput}
@@ -141,15 +111,15 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
             },
           ]}
         />
-        {!_.isEmpty(imageData) && (
-          <Image source={{ uri: imageData.path }} style={styles.postImage} />
+        {localMediaPath && (
+          <Image source={{ uri: localMediaPath }} style={styles.postImage} />
         )}
         {categories && categories.length > 0 && (
           <FlatList
             horizontal
             data={categories}
             renderItem={({ item }) => (
-              <Tag label={item} viewStyle={styles.tagStyle} />
+              <Tag label={PostCategories[item]} viewStyle={styles.tagStyle} />
             )}
             listKey="category"
           />

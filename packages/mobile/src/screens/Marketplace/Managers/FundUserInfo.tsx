@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import RoundImageView from 'mobile/src/components/common/RoundImageView';
 import { WHITE, BLACK } from 'shared/src/colors';
@@ -8,30 +8,61 @@ import { AVATAR_URL } from 'react-native-dotenv';
 import PLabel from '../../../components/common/PLabel';
 import PGradientButton from '../../../components/common/PGradientButton';
 
+import { useAccount } from 'mobile/src/graphql/query/account';
+import { useFollowUser } from 'mobile/src/graphql/mutation/account';
+import { FundManager } from 'mobile/src/graphql/query/marketplace/useFundManagers';
+
 interface FundUserInfoProps {
-  item: any;
+  manager: FundManager;
 }
 
-const FundUserInfo: React.FC<FundUserInfoProps> = ({ item }) => {
+const FundUserInfo: React.FC<FundUserInfoProps> = ({ manager }) => {
+  const { data: accountData } = useAccount();
+  const [followUser] = useFollowUser();
+
+  const isFollowingManager = !!accountData?.account?.followingIds?.includes(
+    manager._id,
+  );
+  const [following, setFollowing] = useState(isFollowingManager);
+  const toggleFollow = async (): Promise<void> => {
+    if (!accountData) return;
+
+    // Update state immediately for responsiveness
+    setFollowing(!isFollowingManager);
+
+    const result = await followUser({
+      variables: {
+        userId: manager._id,
+        follow: !following,
+      },
+      refetchQueries: ['Account', 'FundManagers'],
+    });
+
+    if (!result.data?.followUser) {
+      // Revert back to original state on error
+      setFollowing(isFollowingManager);
+    }
+  };
+
   return (
     <View style={styles.userInfoContainer}>
       <RoundImageView
         size={48}
-        image={{ uri: `${AVATAR_URL}/${item.avatar}` }}
+        image={{ uri: `${AVATAR_URL}/${manager.avatar}` }}
         imageStyle={styles.managerAvatar}
       />
       <View style={styles.managerInfo}>
         <View>
           <PLabel
             textStyle={Body1Bold}
-            label={`${item.postIds?.length ?? 0}`}
+            label={`${manager.postIds?.length ?? 0}`}
           />
           <PLabel textStyle={Body3} viewStyle={styles.postView} label="Posts" />
         </View>
         <View>
           <PLabel
             textStyle={Body1Bold}
-            label={`${item.followerIds?.length ?? 0}`}
+            label={`${manager.followerIds?.length ?? 0}`}
           />
           <PLabel
             textStyle={Body3}
@@ -40,10 +71,10 @@ const FundUserInfo: React.FC<FundUserInfoProps> = ({ item }) => {
           />
         </View>
         <PGradientButton
-          label="Follow"
+          label={following ? 'Unfollow' : 'Follow'}
           textStyle={styles.buttonText}
           btnContainer={styles.buttonContainer}
-          onPress={() => console.log(111)}
+          onPress={toggleFollow}
         />
       </View>
     </View>

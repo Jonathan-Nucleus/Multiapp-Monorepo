@@ -11,6 +11,7 @@ import ChooseCategory from '../screens/Home/ChooseCategory';
 import ReviewPost from '../screens/Home/ReviewPost';
 import PostDetail from '../screens/Home/PostDetail';
 import { Post, PostCategory } from 'mobile/src/graphql/query/post/usePosts';
+import type { Audience } from 'mobile/src/graphql/query/post/usePosts';
 
 const Stack = createStackNavigator();
 
@@ -18,14 +19,15 @@ type HomeStackParamList = {
   Home: undefined;
   CreatePost: undefined;
   ChooseCategory: {
-    description: string;
+    user: string;
+    audience: Audience;
+    company: boolean;
+    description?: string;
     mentions: string[];
-    imageData: object;
+    mediaUrl?: string;
+    localMediaPath?: string;
   };
-  ReviewPost: {
-    description: string;
-    mentions: string[];
-    imageData: object;
+  ReviewPost: HomeStackParamList['ChooseCategory'] & {
     categories: PostCategory[];
   };
   PostDetail: { postId: string; userId: string };

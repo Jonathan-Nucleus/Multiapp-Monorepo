@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Image,
   Pressable,
@@ -7,14 +7,37 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import ImagePicker from 'react-native-image-crop-picker';
-import RadioGroup from 'react-native-radio-button-group';
+import ImagePicker, {
+  ImageOrVideo,
+  Image as UploadImage,
+} from 'react-native-image-crop-picker';
+import RadioGroup, { Option } from 'react-native-radio-button-group';
 import {
   MentionInput,
   MentionSuggestionsProps,
   Suggestion,
+  replaceMentionValues,
 } from 'react-native-controlled-mentions';
 import _ from 'lodash';
+import { showMessage } from '../../services/utils';
+const Buffer = global.Buffer || require('buffer').Buffer;
+
+import {
+  useForm,
+  DefaultValues,
+  Controller,
+  useController,
+} from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import { useAccount } from 'mobile/src/graphql/query/account';
+import { useFetchUploadLink } from '../../graphql/mutation/posts';
+
+import type {
+  Audience,
+  PostCategory,
+} from 'mobile/src/graphql/query/post/usePosts';
+import { Audiences } from 'backend/graphql/enumerations.graphql';
 
 import PAppContainer from '../../components/common/PAppContainer';
 import PLabel from '../../components/common/PLabel';
@@ -22,6 +45,7 @@ import IconButton from '../../components/common/IconButton';
 import RoundImageView from '../../components/common/RoundImageView';
 import UserInfo from '../../components/common/UserInfo';
 import PModal from '../../components/common/PModal';
+import MentionItem from '../../components/main/MentionItem';
 import PostSelection from './PostSelection';
 import pStyles from '../../theme/pStyles';
 import {
@@ -49,7 +73,6 @@ import {
   Image as GalleryImage,
   CirclesFour,
 } from 'phosphor-react-native';
-import { Audience } from 'mobile/src/graphql/query/post/usePosts';
 
 const RadioBodyView = (props: any) => {
   const { icon, label } = props;
@@ -61,54 +84,25 @@ const RadioBodyView = (props: any) => {
   );
 };
 
-export interface OptionProps<T = string> {
-  id: number;
-  val: T;
-  labelView: React.ReactNode;
-}
-
-export const postAsData: OptionProps[] = [
+export const AUDIENCE_OPTIONS: Option<Audience>[] = [
   {
-    id: 1,
-    val: 'Richard Branson',
-    labelView: (
-      <RadioBodyView
-        icon={<Image source={Avatar} style={{ width: 32, height: 32 }} />}
-        label="Richard Branson"
-      />
-    ),
-  },
-  {
-    id: 2,
-    val: 'Good Soil Investments',
-    labelView: (
-      <RadioBodyView
-        icon={<Image source={Avatar} style={{ width: 32, height: 32 }} />}
-        label="Good Soil Investments"
-      />
-    ),
-  },
-];
-
-export const audienceData: OptionProps<Audience>[] = [
-  {
-    id: 1,
-    val: 'EVERYONE',
+    id: 'EVERYONE',
+    value: 'Everyone',
     labelView: <RadioBodyView icon={<AISvg />} label="Everyone" />,
   },
   {
-    id: 2,
-    val: 'ACCREDITED',
+    id: 'ACCREDITED',
+    value: 'Accredited Investors',
     labelView: <RadioBodyView icon={<AISvg />} label="Accredited Investors" />,
   },
   {
-    id: 3,
-    val: 'QUALIFIED_PURCHASER',
+    id: 'QUALIFIED_PURCHASER',
+    value: 'Qualified Purchasers',
     labelView: <RadioBodyView icon={<AISvg />} label="Qualified Purchasers" />,
   },
   {
-    id: 4,
-    val: 'QUALIFIED_CLIENT',
+    id: 'QUALIFIED_CLIENT',
+    value: 'Qualified Clients',
     labelView: <RadioBodyView icon={<AISvg />} label="Qualified Clients" />,
   },
 ];
@@ -121,55 +115,185 @@ export const users = [
   { id: '624f1a2eed55addaea6b4494', name: 'Alex Beinfeld' },
 ];
 
+type FormValues = {
+  user: string;
+  audience: Audience;
+  mediaUrl?: string;
+  body?: string;
+  mentionIds: string[];
+};
+
+const schema = yup
+  .object({
+    user: yup.string().required('Required'),
+    audience: yup
+      .mixed()
+      .oneOf<Audience>(Audiences)
+      .default('EVERYONE')
+      .required(),
+    mediaUrl: yup.string().notRequired(),
+    body: yup
+      .string()
+      .notRequired()
+      .when('mediaUrl', {
+        is: (mediaUrl?: string) => !mediaUrl || mediaUrl.length === 0,
+        then: yup.string().required('Required'),
+      }),
+    mentionIds: yup
+      .array()
+      .of(yup.string().required().default(''))
+      .ensure()
+      .default([]),
+  })
+  .required();
+
 const CreatePost: CreatePostScreen = ({ navigation }) => {
+  const { data: accountData } = useAccount();
+  const [fetchUploadLink] = useFetchUploadLink();
+
   const [postAsModalVisible, setPostAsModalVisible] = useState(false);
-  const [selectedPostAs, setSelectedPostAs] = useState<OptionProps>(
-    postAsData[0],
-  );
   const [audienceModalVisible, setAudienceModalVisible] = useState(false);
-  const [selectedAudience, setSelectedAudience] = useState<OptionProps>(
-    audienceData[0],
+  const [imageData, setImageData] = useState<ImageOrVideo | undefined>(
+    undefined,
   );
-  const [imageData, setImageData] = useState<any>({});
-  const [description, setDescription] = useState('');
-  const [mentions, setMentions] = useState<string[]>([]);
 
-  const openPicker = () => {
-    ImagePicker.openPicker({
+  const account = accountData?.account;
+  const companies = account?.companies ?? [];
+
+  const {
+    handleSubmit,
+    control,
+    formState: { isValid },
+  } = useForm<yup.InferType<typeof schema>>({
+    resolver: yupResolver(schema),
+    defaultValues: schema.cast(
+      { user: account?._id },
+      { assert: false, stripUnknown: true },
+    ) as DefaultValues<FormValues>,
+    mode: 'onChange',
+  });
+
+  const { field: mediaField } = useController({ name: 'mediaUrl', control });
+  const { field: mentionsField } = useController({
+    name: 'mentionIds',
+    control,
+  });
+
+  const onSubmit = (values: FormValues): void => {
+    if (!account) return;
+
+    const { user, audience, body, mediaUrl } = values;
+    const isCompany = user !== account._id;
+
+    navigation.navigate('ChooseCategory', {
+      user,
+      audience,
+      company: isCompany,
+      // TODO: Remove this and keep original body text. Add components that
+      // automatically parse this text in the post view and add links to
+      // their profile page.
+      description: replaceMentionValues(body ?? '', ({ name }) => `@${name}`),
+      mediaUrl,
+      localMediaPath: imageData?.path,
+      mentions: [], // TODO: Parse from body and add here
+    });
+  };
+
+  const openPicker = async (): Promise<void> => {
+    const imageData = await ImagePicker.openPicker({
       width: 300,
       height: 400,
       cropping: true,
       includeBase64: true,
-    }).then((image) => {
-      setImageData(image);
     });
+
+    await uploadImage(imageData);
   };
 
-  const takePhoto = () => {
-    ImagePicker.openCamera({
+  const takePhoto = async (): Promise<void> => {
+    const imageData = await ImagePicker.openCamera({
       width: 300,
       height: 400,
       cropping: true,
       includeBase64: true,
-    }).then((image) => {
-      setImageData(image);
     });
+
+    await uploadImage(imageData);
   };
 
-  const checkValidation = () => {
-    if (!description || _.isEmpty(imageData)) {
-      return false;
+  const uploadImage = async (imageData: ImageOrVideo): Promise<void> => {
+    const extension = imageData.mime.substring(
+      imageData.mime.lastIndexOf('/') + 1,
+    );
+
+    let { filename = `image.${extension}` } = imageData;
+
+    // Rename file extension if it an HEIC format on iOS
+    filename = filename.toLowerCase();
+    if (filename.endsWith('.heic')) {
+      filename = filename.replace('.heic', '.jpg');
     }
-    return true;
-  };
 
-  const handleNext = async () => {
-    if (!checkValidation()) {
+    const { data } = await fetchUploadLink({
+      variables: {
+        localFilename: filename,
+        type: 'POST',
+      },
+    });
+
+    if (!data || !data.uploadLink) {
+      showMessage('error', 'Image upload failed');
       return;
     }
 
-    navigation.navigate('ChooseCategory', { description, mentions, imageData });
+    const rawData = (imageData as UploadImage).data;
+    if (!rawData) {
+      showMessage('error', 'Only images supported at this time');
+      return;
+    }
+
+    const { remoteName, uploadUrl } = data.uploadLink;
+    const buffer = new Buffer(
+      rawData.replace(/^data:image\/\w+;base64,/, ''),
+      'base64',
+    );
+
+    const result = await fetch(uploadUrl, {
+      method: 'PUT',
+      body: buffer,
+    });
+
+    if (!result.ok) {
+      showMessage('error', 'Image upload failed');
+      return;
+    }
+
+    mediaField.onChange(remoteName);
+    setImageData(imageData);
   };
+
+  const postAsData: Option[] = [
+    {
+      id: account?._id ?? '',
+      value: `${account?.firstName} ${account?.lastName}`,
+      labelView: (
+        <RadioBodyView
+          icon={<Image source={Avatar} style={{ width: 32, height: 32 }} />}
+          label={`${account?.firstName} ${account?.lastName}`}
+        />
+      ),
+    },
+    ...companies.map((company) => ({
+      id: company._id,
+      value: company.name,
+      labelView: (
+        <RadioBodyView
+          icon={<Image source={Avatar} style={{ width: 32, height: 32 }} />}
+          label={company.name}
+        />
+      ),
+    })),
+  ];
 
   const renderSuggestions: (
     suggestions: Suggestion[],
@@ -183,22 +307,26 @@ const CreatePost: CreatePostScreen = ({ navigation }) => {
       return (
         <View style={styles.mentionList}>
           {suggestions
-            .filter((one) =>
-              one.name
+            .filter((suggestion) =>
+              suggestion.name
                 .toLocaleLowerCase()
                 .includes(keyword.toLocaleLowerCase()),
             )
-            .map((one) => (
+            .map((suggestion) => (
               <Pressable
-                key={one.id}
+                key={suggestion.id}
                 onPress={() => {
-                  onSuggestionPress(one);
-                  setMentions([...mentions, one.id]);
+                  onSuggestionPress(suggestion);
+                  mentionsField.onChange(
+                    Array.from(
+                      new Set([...mentionsField.value, suggestion.id]),
+                    ),
+                  );
                 }}
                 style={styles.mentionItem}>
                 <UserInfo
                   avatar={Avatar}
-                  name={one.name}
+                  name={suggestion.name}
                   isPro
                   role="CEO"
                   company="Funds"
@@ -209,50 +337,117 @@ const CreatePost: CreatePostScreen = ({ navigation }) => {
       );
     };
 
-  const renderMentionSuggestions = renderSuggestions(users);
+  const renderMentionSuggestions = useMemo(
+    () => renderSuggestions(users),
+    [users],
+  );
 
   return (
     <SafeAreaView style={pStyles.globalContainer}>
       <PostHeader
         centerLabel="Create Post"
         rightLabel="NEXT"
-        rightValidation={checkValidation()}
-        handleNext={handleNext}
+        rightValidation={isValid}
+        handleNext={handleSubmit(onSubmit)}
       />
       <PAppContainer>
         <View style={styles.usersPart}>
           <RoundImageView image={Avatar} imageStyle={styles.avatarImage} />
-          <PostSelection
-            icon={<UserSvg />}
-            label={selectedPostAs?.val}
-            viewStyle={{ marginHorizontal: 8 }}
-            onPress={() => setPostAsModalVisible(true)}
+          <Controller
+            control={control}
+            name="user"
+            render={({ field }) => (
+              <>
+                <PostSelection
+                  icon={<UserSvg />}
+                  label={
+                    postAsData.find((option) => option.id === field.value)
+                      ?.value ?? ''
+                  }
+                  viewStyle={{ marginHorizontal: 8 }}
+                  onPress={() => setPostAsModalVisible(true)}
+                />
+                <PModal
+                  isVisible={postAsModalVisible}
+                  title="Post As"
+                  subTitle="You can post as yourself or a company you manage.">
+                  <View style={styles.radioGroupStyle}>
+                    <RadioGroup
+                      options={postAsData}
+                      activeButtonId={field.value}
+                      circleStyle={styles.radioCircle}
+                      onChange={(option) => field.onChange(option.id)}
+                    />
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => setPostAsModalVisible(false)}
+                    style={styles.doneBtn}>
+                    <PLabel label="DONE" />
+                  </TouchableOpacity>
+                </PModal>
+              </>
+            )}
           />
-          <PostSelection
-            icon={<GlobalSvg />}
-            label={selectedAudience?.val}
-            onPress={() => setAudienceModalVisible(true)}
+          <Controller
+            control={control}
+            name="audience"
+            render={({ field }) => (
+              <>
+                <PostSelection
+                  icon={<GlobalSvg />}
+                  label={
+                    AUDIENCE_OPTIONS.find((option) => option.id === field.value)
+                      ?.value ?? ''
+                  }
+                  onPress={() => setAudienceModalVisible(true)}
+                />
+                <PModal
+                  isVisible={audienceModalVisible}
+                  title="Audience"
+                  subTitle="Who can see your post?">
+                  <View style={styles.radioGroupStyle}>
+                    <RadioGroup
+                      options={AUDIENCE_OPTIONS}
+                      activeButtonId={field.value}
+                      circleStyle={styles.radioCircle}
+                      onChange={(option) => field.onChange(option.id)}
+                    />
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => setAudienceModalVisible(false)}
+                    style={styles.doneBtn}>
+                    <PLabel label="DONE" />
+                  </TouchableOpacity>
+                </PModal>
+              </>
+            )}
           />
         </View>
-        <MentionInput
-          value={description}
-          onChange={setDescription}
-          placeholder="Create a post"
-          placeholderTextColor={WHITE60}
-          style={styles.mentionInput}
-          partTypes={[
-            {
-              isBottomMentionSuggestionsRender: true,
-              isInsertSpaceAfterMention: true,
-              trigger: '@',
-              renderSuggestions: renderMentionSuggestions,
-              textStyle: {
-                color: SECONDARY,
-              },
-            },
-          ]}
+        <Controller
+          control={control}
+          name="body"
+          render={({ field }) => (
+            <MentionInput
+              value={field.value ?? ''}
+              onChange={field.onChange}
+              placeholder="Create a post"
+              placeholderTextColor={WHITE60}
+              style={styles.mentionInput}
+              partTypes={[
+                {
+                  isBottomMentionSuggestionsRender: true,
+                  isInsertSpaceAfterMention: true,
+                  trigger: '@',
+                  renderSuggestions: renderMentionSuggestions,
+                  textStyle: {
+                    color: SECONDARY,
+                  },
+                },
+              ]}
+            />
+          )}
         />
-        {!_.isEmpty(imageData) && (
+        {imageData && (
           <Image source={{ uri: imageData.path }} style={styles.postImage} />
         )}
       </PAppContainer>
@@ -284,46 +479,6 @@ const CreatePost: CreatePostScreen = ({ navigation }) => {
           viewStyle={styles.iconButton}
         />
       </View>
-      <PModal
-        isVisible={postAsModalVisible}
-        title="Post As"
-        subTitle="You can post as yourself or a company you manage.">
-        <View style={styles.radioGroupStyle}>
-          <RadioGroup
-            options={postAsData}
-            activeButtonId={selectedPostAs?.id}
-            circleStyle={styles.radioCircle}
-            onChange={(options: OptionProps) => {
-              setSelectedPostAs(options);
-            }}
-          />
-        </View>
-        <TouchableOpacity
-          onPress={() => setPostAsModalVisible(false)}
-          style={styles.doneBtn}>
-          <PLabel label="DONE" />
-        </TouchableOpacity>
-      </PModal>
-      <PModal
-        isVisible={audienceModalVisible}
-        title="Audience"
-        subTitle="Who can see your post?">
-        <View style={styles.radioGroupStyle}>
-          <RadioGroup
-            options={audienceData}
-            activeButtonId={selectedAudience?.id}
-            circleStyle={styles.radioCircle}
-            onChange={(options: OptionProps) => {
-              setSelectedAudience(options);
-            }}
-          />
-        </View>
-        <TouchableOpacity
-          onPress={() => setAudienceModalVisible(false)}
-          style={styles.doneBtn}>
-          <PLabel label="DONE" />
-        </TouchableOpacity>
-      </PModal>
     </SafeAreaView>
   );
 };

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { Pressable, StyleSheet, Text, View, ScrollView } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import {
   CaretLeft,
@@ -26,13 +26,40 @@ import pStyles from 'mobile/src/theme/pStyles';
 import { Body2 } from '../../../theme/fonts';
 
 import { useFund } from 'mobile/src/graphql/query/marketplace/useFund';
+import { useAccount } from 'mobile/src/graphql/query/account';
+import { useWatchFund } from 'mobile/src/graphql/mutation/funds';
 
 const Tab = createMaterialTopTabNavigator();
 
 const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
   const { fundId } = route.params;
   const { data } = useFund(fundId);
+  const { data: accountData } = useAccount();
+  const [watchFund] = useWatchFund();
+
   const fund = data?.fund;
+  const isWatched = !!accountData?.account?.watchlistIds?.includes(fundId);
+  const [watching, setWatching] = useState(isWatched);
+
+  const toggleWatchlist = async (): Promise<void> => {
+    if (!accountData) return;
+
+    // Update state immediately for responsiveness
+    setWatching(!isWatched);
+
+    const result = await watchFund({
+      variables: {
+        fundId: fundId,
+        watch: !isWatched,
+      },
+      refetchQueries: ['Account'],
+    });
+
+    if (!result.data?.watchFund) {
+      // Revert back to original state on error
+      setWatching(isWatched);
+    }
+  };
 
   if (!fund) {
     return (
@@ -66,7 +93,16 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
       <ScrollView>
         <FundProfileInfo fund={fund} />
         <View style={styles.actionBar}>
-          <Star size={24} color={WHITE} style={styles.favorite} />
+          <Pressable
+            onPress={toggleWatchlist}
+            style={({ pressed }) => [pressed ? styles.onPress : undefined]}>
+            <Star
+              size={24}
+              color={watching ? PRIMARYSTATE : WHITE}
+              style={styles.favorite}
+              weight={watching ? 'fill' : 'regular'}
+            />
+          </Pressable>
           <DotsThreeOutlineVertical size={24} color={WHITE} />
         </View>
         {/* TODO: use ohter lib for tab bar like react-native-tab-view */}
@@ -139,5 +175,8 @@ const styles = StyleSheet.create({
   },
   bold: {
     fontWeight: 'bold',
+  },
+  onPress: {
+    opacity: 0.5,
   },
 });

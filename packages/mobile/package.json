@@ -18,6 +18,7 @@
   "dependencies": {
     "@apollo/client": "^3.5.10",
     "@apollo/react-hooks": "^4.0.0",
+    "@hookform/resolvers": "^2.8.8",
     "@react-native-async-storage/async-storage": "^1.17.3",
     "@react-native-community/checkbox": "^0.5.12",
     "@react-native-picker/picker": "^2.4.1",
@@ -36,6 +37,7 @@
     "phosphor-react-native": "^1.1.1",
     "react": "17.0.2",
     "react-fast-compare": "^3.2.0",
+    "react-hook-form": "7.29.0",
     "react-native": "0.68.0",
     "react-native-controlled-mentions": "^2.2.5",
     "react-native-dotenv": "^3.3.1",
@@ -63,7 +65,8 @@
     "react-native-swiper": "^1.6.0",
     "react-native-tab-view": "^3.1.1",
     "react-native-text-input-mask": "^3.1.4",
-    "react-native-toast-message": "^2.1.5"
+    "react-native-toast-message": "^2.1.5",
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

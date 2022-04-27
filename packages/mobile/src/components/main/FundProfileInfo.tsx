@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import { TouchableOpacity, Image, Text, View, StyleSheet } from 'react-native';
 import FastImage from 'react-native-fast-image';
 
@@ -12,7 +12,7 @@ import {
   GRAY100,
   WHITE12,
 } from 'shared/src/colors';
-import { Body1, Body2 } from 'mobile/src/theme/fonts';
+import { Body1, Body2, Body3 } from 'mobile/src/theme/fonts';
 
 import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
 import {
@@ -20,6 +20,9 @@ import {
   FundManager,
   FundCompany,
 } from 'mobile/src/graphql/fragments/fund';
+
+import { useAccount } from 'mobile/src/graphql/query/account';
+import { useFollowUser } from 'mobile/src/graphql/mutation/account';
 
 export type Fund = FundSummary & FundManager & FundCompany;
 export interface FundProfileInfo {
@@ -33,6 +36,33 @@ const FundProfileInfo: FC<FundProfileInfo> = ({
   showOverview,
   showTags,
 }) => {
+  const { data: accountData } = useAccount();
+  const [followUser] = useFollowUser();
+
+  const isFollowingManager = !!accountData?.account?.followingIds?.includes(
+    fund.manager._id,
+  );
+  const [following, setFollowing] = useState(isFollowingManager);
+  const toggleFollow = async (): Promise<void> => {
+    if (!accountData) return;
+
+    // Update state immediately for responsiveness
+    setFollowing(!isFollowingManager);
+
+    const result = await followUser({
+      variables: {
+        userId: fund.manager._id,
+        follow: !following,
+      },
+      refetchQueries: ['Account'],
+    });
+
+    if (!result.data?.followUser) {
+      // Revert back to original state on error
+      setFollowing(isFollowingManager);
+    }
+  };
+
   const { background, avatar } = fund.company;
   return (
     <View>
@@ -96,8 +126,10 @@ const FundProfileInfo: FC<FundProfileInfo> = ({
                   {`${fund.manager.firstName} ${fund.manager.lastName}`}
                 </Text>
                 <View style={styles.separator} />
-                <TouchableOpacity>
-                  <Text style={styles.follow}>Follow</Text>
+                <TouchableOpacity onPress={toggleFollow}>
+                  <Text style={[styles.follow, Body3]}>
+                    {following ? 'Unfollow' : 'Follow'}
+                  </Text>
                 </TouchableOpacity>
               </View>
               <View style={styles.managerInfo}>

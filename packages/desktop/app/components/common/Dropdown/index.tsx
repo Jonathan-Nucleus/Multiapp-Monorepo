@@ -73,16 +73,14 @@ function Dropdown<
                     overflow-hidden py-3`}
                 >
                   {items.map((item) => (
-                    <Menu.Item
-                      key={item.value}
-                      onClick={() => field.onChange(item.value)}
-                    >
+                    <Menu.Item key={item.value}>
                       <div
                         className={
                           item.value === selectedItem?.value
                             ? "bg-primary-overlay/[.24]"
                             : ""
                         }
+                        onClick={() => field.onChange(item.value)}
                       >
                         <div
                           className={`text-white text-sm flex items-center

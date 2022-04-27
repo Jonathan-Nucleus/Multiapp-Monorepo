@@ -28,7 +28,7 @@ const CompanyItem: FC<CompanyItemProps> = ({ company }) => {
   const { _id, firstName, lastName, avatar, position } = fundManagers[0];
   return (
     <View style={styles.companyItem}>
-      <FundCompanyInfo item={company} />
+      <FundCompanyInfo company={company} />
       <PLabel label={name} textStyle={styles.nameLabel} />
       <View style={styles.separator} />
       <View style={styles.userInfo}>

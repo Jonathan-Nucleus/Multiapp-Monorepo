@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import RoundImageView from 'mobile/src/components/common/RoundImageView';
 import { WHITE, BLACK } from 'shared/src/colors';
@@ -9,29 +9,59 @@ import PLabel from '../../../components/common/PLabel';
 import PGradientButton from '../../../components/common/PGradientButton';
 import * as NavigationService from '../../../services/navigation/NavigationService';
 
+import { Company } from 'mobile/src/graphql/query/marketplace';
+import { useAccount } from 'mobile/src/graphql/query/account';
+import { useFollowCompany } from 'mobile/src/graphql/mutation/account';
+
 interface FundCompanyInfoProps {
-  item: any;
+  company: Company;
 }
 
-const FundCompanyInfo: React.FC<FundCompanyInfoProps> = ({ item }) => {
+const FundCompanyInfo: React.FC<FundCompanyInfoProps> = ({ company }) => {
+  const { data: accountData } = useAccount();
+  const [followCompany] = useFollowCompany();
+
+  const isFollowingCompany =
+    !!accountData?.account?.companyFollowingIds?.includes(company._id);
+  const [following, setFollowing] = useState(isFollowingCompany);
+  const toggleFollow = async (): Promise<void> => {
+    if (!accountData) return;
+
+    // Update state immediately for responsiveness
+    setFollowing(!isFollowingCompany);
+
+    const result = await followCompany({
+      variables: {
+        companyId: company._id,
+        follow: !following,
+      },
+      refetchQueries: ['Account', 'FundCompanies'],
+    });
+
+    if (!result.data?.followCompany) {
+      // Revert back to original state on error
+      setFollowing(isFollowingCompany);
+    }
+  };
+
   return (
     <TouchableOpacity
       onPress={() => {
         NavigationService.navigate('CompanyProfile', {
-          companyId: item._id,
+          companyId: company._id,
         });
       }}>
       <View style={styles.userInfoContainer}>
         <RoundImageView
           size={48}
-          image={{ uri: `${AVATAR_URL}/${item.avatar}` }}
+          image={{ uri: `${AVATAR_URL}/${company.avatar}` }}
           imageStyle={styles.managerAvatar}
         />
         <View style={styles.managerInfo}>
           <View>
             <PLabel
               textStyle={Body1Bold}
-              label={`${item.postIds?.length ?? 0}`}
+              label={`${company.postIds?.length ?? 0}`}
             />
             <PLabel
               textStyle={Body3}
@@ -42,7 +72,7 @@ const FundCompanyInfo: React.FC<FundCompanyInfoProps> = ({ item }) => {
           <View>
             <PLabel
               textStyle={Body1Bold}
-              label={`${item.followerIds?.length ?? 0}`}
+              label={`${company.followerIds?.length ?? 0}`}
             />
             <PLabel
               textStyle={Body3}
@@ -51,10 +81,10 @@ const FundCompanyInfo: React.FC<FundCompanyInfoProps> = ({ item }) => {
             />
           </View>
           <PGradientButton
-            label="Follow"
+            label={following ? 'Unfollow' : 'Follow'}
             textStyle={styles.buttonText}
             btnContainer={styles.buttonContainer}
-            onPress={() => console.log(111)}
+            onPress={toggleFollow}
           />
         </View>
       </View>

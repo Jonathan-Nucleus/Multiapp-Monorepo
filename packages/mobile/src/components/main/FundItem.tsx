@@ -1,15 +1,18 @@
-import React, { FC } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { FC, useState } from 'react';
+import { View, StyleSheet, Pressable } from 'react-native';
 import { Star } from 'phosphor-react-native';
 
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
-import { WHITE } from 'shared/src/colors';
+import { PRIMARYSTATE, WHITE } from 'shared/src/colors';
 import {
   FundSummary,
   FundCompany,
   FundManager,
 } from 'mobile/src/graphql/fragments/fund';
 import FundProfileInfo from './FundProfileInfo';
+
+import { useAccount } from 'mobile/src/graphql/query/account';
+import { useWatchFund } from 'mobile/src/graphql/mutation/funds';
 
 type Fund = FundSummary & FundCompany & FundManager;
 export interface FundItemProps {
@@ -20,6 +23,32 @@ export interface FundItemProps {
 }
 
 const FundItem: FC<FundItemProps> = ({ fund, onClickFundDetails }) => {
+  const { data: accountData } = useAccount();
+  const [watchFund] = useWatchFund();
+
+  const isWatched = !!accountData?.account?.watchlistIds?.includes(fund._id);
+  const [watching, setWatching] = useState(isWatched);
+
+  const toggleWatchlist = async (): Promise<void> => {
+    if (!accountData) return;
+
+    // Update state immediately for responsiveness
+    setWatching(!isWatched);
+
+    const result = await watchFund({
+      variables: {
+        fundId: fund._id,
+        watch: !isWatched,
+      },
+      refetchQueries: ['Account'],
+    });
+
+    if (!result.data?.watchFund) {
+      // Revert back to original state on error
+      setWatching(isWatched);
+    }
+  };
+
   return (
     <View style={styles.fundItem}>
       <FundProfileInfo fund={fund} showOverview showTags />
@@ -30,7 +59,16 @@ const FundItem: FC<FundItemProps> = ({ fund, onClickFundDetails }) => {
           btnContainer={styles.buttonContainer}
           onPress={onClickFundDetails}
         />
-        <Star size={24} color={WHITE} style={styles.favorite} />
+        <Pressable
+          onPress={toggleWatchlist}
+          style={({ pressed }) => [pressed ? styles.onPress : undefined]}>
+          <Star
+            size={24}
+            color={watching ? PRIMARYSTATE : WHITE}
+            style={styles.favorite}
+            weight={watching ? 'fill' : 'regular'}
+          />
+        </Pressable>
       </View>
     </View>
   );
@@ -56,5 +94,8 @@ const styles = StyleSheet.create({
   },
   favorite: {
     marginLeft: 16,
+  },
+  onPress: {
+    opacity: 0.5,
   },
 });

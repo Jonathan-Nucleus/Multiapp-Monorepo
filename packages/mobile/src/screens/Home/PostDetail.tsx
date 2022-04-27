@@ -101,16 +101,35 @@ const PostDetail: PostDetailScreen = ({ route }) => {
     return KebobMenuDataArray;
   }, [selectedUser]);
 
-  if (!data || !data.post) {
+  const post = data?.post;
+  const comments = post?.comments;
+  const likes = post?.likes;
+
+  const getComments = useMemo(() => {
+    const parentComments = comments?.filter((item) => !item.commentId);
+    const childComments = comments?.filter((item) => item.commentId !== null);
+    const updatedComments: Comment[] = [];
+    parentComments?.forEach((parentComment) => {
+      updatedComments.push(parentComment);
+      childComments?.forEach((childComment) => {
+        if (childComment.commentId === parentComment._id) {
+          updatedComments.push(childComment);
+        }
+      });
+    });
+    return updatedComments;
+  }, [comments]);
+
+  const renderCommentItem: ListRenderItem<typeof getComments[number]> =
+    useCallback(({ item }) => <CommentItem item={item} />, [comments]);
+
+  if (!post || !comments || !likes) {
     return (
       <SafeAreaView
         style={pStyles.globalContainer}
         edges={['right', 'top', 'left']}></SafeAreaView>
     );
   }
-
-  const { post } = data;
-  const { comments, likes } = post;
 
   const handleAddComment = async () => {
     try {
@@ -199,21 +218,6 @@ const PostDetail: PostDetailScreen = ({ route }) => {
     inputRef?.current?.blur();
   };
 
-  const getComments = useMemo(() => {
-    const parentComments = comments?.filter((item) => !item.commentId);
-    const childComments = comments?.filter((item) => item.commentId !== null);
-    const updatedComments: Comment[] = [];
-    parentComments?.forEach((parentComment) => {
-      updatedComments.push(parentComment);
-      childComments?.forEach((childComment) => {
-        if (childComment.commentId === parentComment._id) {
-          updatedComments.push(childComment);
-        }
-      });
-    });
-    return updatedComments;
-  }, [comments]);
-
   const CommentItem = ({ item }: { item: Comment }) => {
     const { _id, commentId, user, body, createdAt } = item;
     const commentItemContainer = {
@@ -261,9 +265,6 @@ const PostDetail: PostDetailScreen = ({ route }) => {
       </View>
     );
   };
-
-  const renderCommentItem: ListRenderItem<typeof getComments[number]> =
-    useCallback(({ item }) => <CommentItem item={item} />, [comments]);
 
   return (
     <SafeAreaView
