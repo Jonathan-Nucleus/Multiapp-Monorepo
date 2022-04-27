@@ -177,6 +177,7 @@ type EditCommentPostVariables = {
     _id: string;
     body: string;
     mentionIds: string[];
+    mediaUrl?: string;
   };
 };
 
@@ -195,6 +196,7 @@ export function useEditCommentPost(): MutationTuple<
         body
         postId
         createdAt
+        mediaUrl
       }
     }
   `);

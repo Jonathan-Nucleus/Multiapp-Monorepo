@@ -16,7 +16,10 @@ const HomePage: FC = () => {
   const [showPostModal, setShowPostModal] = useState(false);
   const { data: accountData } = useAccount();
   const { data: professionalsData } = useProfessionals(true);
+
   const user = accountData?.account;
+  const professionals = professionalsData?.professionals ?? [];
+
   if (!user) {
     return <></>;
   }
@@ -33,9 +36,10 @@ const HomePage: FC = () => {
           )}
         </div>
         <div className="min-w-0 mx-4">
-          <FeaturedProfessionals
-            professionals={professionalsData?.professionals ?? []}
-          />
+          {professionals.length > 0 && (
+            <FeaturedProfessionals professionals={professionals} />
+          )}
+
           <div className="mt-10 hidden md:block">
             <AddPost setShowPostModal={() => setShowPostModal(true)} />
           </div>

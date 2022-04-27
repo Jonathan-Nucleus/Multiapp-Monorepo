@@ -79,7 +79,7 @@ const ProfileCard: FC<CompanyPageProps> = ({
         <Card className="rounded-none lg:rounded-2xl border-brand-overlay/[.1] p-0">
           <div>
             <div className="w-full h-16 lg:h-32 bg-white/[.25] relative">
-              {company.background && (
+              {company.background?.url ? (
                 <Image
                   loader={() =>
                     `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${company.background?.url}`
@@ -90,6 +90,8 @@ const ProfileCard: FC<CompanyPageProps> = ({
                   objectFit="cover"
                   unoptimized={true}
                 />
+              ) : (
+                <div className="bg-gradient-to-r from-[#844AFF] to-primary w-full h-full bg-white/[.25]" />
               )}
               {isEditable && (
                 <div
@@ -107,7 +109,14 @@ const ProfileCard: FC<CompanyPageProps> = ({
             </div>
             <div className="hidden lg:flex relative mx-5">
               <div className="w-[120px] h-[120px] bg-background rounded-2xl relative overflow-hidden -mt-12">
-                <Avatar src={company.avatar} size={120} shape="square" />
+                {company.avatar ? (
+                  <Avatar src={company.avatar} size={120} shape="square" />
+                ) : (
+                  <div className="flex items-center justify-center bg-white w-full h-full text-4xl text-primary">
+                    {company.name.charAt(0)}
+                  </div>
+                )}
+
                 {isEditable && (
                   <div
                     onClick={() =>
@@ -152,7 +161,13 @@ const ProfileCard: FC<CompanyPageProps> = ({
             <div className="flex lg:hidden items-center p-4">
               <div className="w-[80px] h-[80px] bg-background rounded-2xl relative overflow-hidden -mt-12">
                 <div className="relative">
-                  <Avatar src={company.avatar} size={80} shape="square" />
+                  {company.avatar ? (
+                    <Avatar src={company.avatar} size={80} shape="square" />
+                  ) : (
+                    <div className="flex items-center justify-center bg-white w-[80px] h-[80px] text-4xl text-primary overflow-hidden">
+                      {company.name.charAt(0)}
+                    </div>
+                  )}
                   {isEditable && (
                     <div
                       onClick={() =>
@@ -161,9 +176,9 @@ const ProfileCard: FC<CompanyPageProps> = ({
                           visible: true,
                         })
                       }
-                      className="rounded-full border border-primary flex-shrink-0 w-10 h-10 bg-surface-light10 flex items-center justify-center cursor-pointer absolute right-0 bottom-0"
+                      className="rounded-full border border-primary flex-shrink-0 w-8 h-8 bg-surface-light10 flex items-center justify-center cursor-pointer absolute right-0 bottom-0"
                     >
-                      <Pencil size={24} color="white" />
+                      <Pencil size={18} color="white" />
                     </div>
                   )}
                 </div>

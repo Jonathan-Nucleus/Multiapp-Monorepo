@@ -72,7 +72,7 @@ const CommentCard: FC<CommentCardProps> = ({
     message: string,
     mediaUrl?: string
   ): Promise<void> => {
-    if (!message || message.trim() === "") return;
+    if ((!message || message.trim() === "") && !mediaUrl) return;
 
     try {
       const { data } = await editComment({
@@ -81,6 +81,7 @@ const CommentCard: FC<CommentCardProps> = ({
             _id: comment._id,
             body: message,
             mentionIds: [], // Implement mentions
+            mediaUrl: mediaUrl ?? "",
           },
         },
         refetchQueries: ["Posts"],
@@ -93,12 +94,11 @@ const CommentCard: FC<CommentCardProps> = ({
       console.log("send mesage error", err);
     }
   };
-
   const handleReplyComment = async (
     reply: string,
     mediaUrl?: string
   ): Promise<void> => {
-    if (!reply || reply.trim() === "") return;
+    if ((!reply || reply.trim() === "") && !mediaUrl) return;
     try {
       setVisibleReply(false);
 
@@ -109,6 +109,7 @@ const CommentCard: FC<CommentCardProps> = ({
             postId: postId,
             commentId: parentId,
             mentionIds: [], // Update to add mentions
+            mediaUrl: mediaUrl ?? "",
           },
         },
         refetchQueries: ["Posts"],
@@ -119,7 +120,7 @@ const CommentCard: FC<CommentCardProps> = ({
   };
   return (
     <>
-      <div className="flex">
+      <div className="flex items-start">
         <Avatar src={comment.user.avatar} size={size ? size : 36} />
         <div className="ml-4 w-full">
           <div className="p-2 rounded-lg bg-background-popover">

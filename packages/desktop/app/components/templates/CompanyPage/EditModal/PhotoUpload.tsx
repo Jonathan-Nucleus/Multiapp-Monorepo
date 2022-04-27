@@ -43,6 +43,7 @@ const PhotoUploadModal: FC<PhotoUploadProps> = ({
     if (!file) {
       return;
     }
+
     setLoading(true);
     try {
       const { data } = await fetchUploadLink({
@@ -62,6 +63,7 @@ const PhotoUploadModal: FC<PhotoUploadProps> = ({
         method: "PUT",
         body: file,
       });
+
       if (type === "AVATAR") {
         const profile = {
           _id: company._id,
@@ -94,6 +96,7 @@ const PhotoUploadModal: FC<PhotoUploadProps> = ({
           },
         });
       }
+
       setLocalFileUrl(null);
       onClose();
     } catch (err) {
@@ -129,7 +132,7 @@ const PhotoUploadModal: FC<PhotoUploadProps> = ({
                       <Image
                         alt="Mountains"
                         src={localFileUrl}
-                        className="rounded-full object-cover"
+                        className="rounded-lg object-cover"
                         layout="fill"
                         onLoad={() => {
                           if (selectedFile.current) {

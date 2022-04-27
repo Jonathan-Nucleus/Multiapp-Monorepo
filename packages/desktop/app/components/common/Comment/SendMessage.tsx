@@ -27,14 +27,17 @@ const SendMessage: FC<SendMessageProps> = ({
 
   const [comment, setComment] = useState(message);
   const [visibleEmoji, setVisibleEmoji] = useState(false);
-  const [mediaUrl, setMediaUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const selectedFile = useRef<File | undefined>(undefined);
 
   const sendMessage = async (): Promise<void> => {
-    if (!comment || comment === "") return;
-    await onSend(comment, mediaUrl);
-    setComment("");
+    if ((!comment || comment.trim() === "") && !selectedFile.current) return;
+    if (selectedFile.current) {
+      uploadMedia(selectedFile.current);
+    } else {
+      await onSend(comment);
+      setComment("");
+    }
   };
 
   const onEmojiClick = (emojiObject: any) => {
@@ -50,7 +53,6 @@ const SendMessage: FC<SendMessageProps> = ({
           type: "POST",
         },
       });
-
       if (!data || !data.uploadLink) {
         console.log("Error fetching upload link");
         return;
@@ -61,7 +63,9 @@ const SendMessage: FC<SendMessageProps> = ({
         method: "PUT",
         body: file,
       });
-      setMediaUrl(remoteName);
+      await onSend(comment, remoteName);
+      selectedFile.current = undefined;
+      setComment("");
     } catch (err) {
       console.log("Error fetching upload link", err);
     } finally {
@@ -101,10 +105,6 @@ const SendMessage: FC<SendMessageProps> = ({
                 onInput={async (evt) => {
                   const file = evt.currentTarget.files?.[0];
                   selectedFile.current = file;
-
-                  if (file) {
-                    await uploadMedia(file);
-                  }
                 }}
                 accept="image/*, video/*"
                 className="w-2 h-2 absolute right-0 top-3 opacity-0 cursor-pointer"

@@ -31,7 +31,7 @@ export type UserProfile = Pick<
   | 'twitter'
   | 'website'
   | 'managedFunds'
-  | 'createdAt'
+  | 'accreditation'
 > & {
   watchlist: WatchlistFund[];
   company?: Pick<
@@ -66,6 +66,8 @@ type UserProfileData = {
   userProfile?: UserProfile;
 };
 
+// TODO: Update to move followers and following to a separate query and just
+// fetch followerIds and followingIds here
 export function useProfile(
   userId?: string,
 ): QueryResult<UserProfileData, UserProfileVariables> {

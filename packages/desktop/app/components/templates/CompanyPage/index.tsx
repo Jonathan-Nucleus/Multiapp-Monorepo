@@ -3,13 +3,14 @@ import "@splidejs/react-splide/css";
 import { Splide, SplideSlide } from "@splidejs/react-splide";
 import Image from "next/image";
 
-import TeamMembersList from "../../modules/teams/TeamMembersList";
 import PostsList, { PostsListProps } from "../../common/PostsList";
 import FeaturedPosts from "../../common/FeaturedPosts";
 import Card from "../../common/Card";
+import Avatar from "../../common/Avatar";
 import ProfileCard from "./ProfileCard";
-import { useFetchPosts } from "mobile/src/graphql/query/account";
+import TeamMembersList from "../../modules/teams/TeamMembersList";
 import FundCard from "../../modules/funds/FundCard";
+import { useFetchPosts } from "mobile/src/graphql/query/account";
 import { CompanyProfile } from "mobile/src/graphql/query/company/useCompany";
 
 interface CompanyPageProps {
@@ -57,17 +58,7 @@ const CompanyPage: FC<CompanyPageProps> = ({
                   <SplideSlide key={index}>
                     <div className="mx-2">
                       <div className="w-40 h-40 relative">
-                        <Image
-                          loader={() =>
-                            `${process.env.NEXT_PUBLIC_AVATAR_URL}/${member.avatar}`
-                          }
-                          src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${member.avatar}`}
-                          alt=""
-                          width={56}
-                          height={56}
-                          className="object-cover rounded-full"
-                          unoptimized={true}
-                        />
+                        <Avatar src={member.avatar} size={56} shape="circle" />
                         <div className="absolute top-0 left-0 right-0 bottom-0">
                           <div className="bg-gradient-to-b from-transparent to-black w-full h-full flex flex-col justify-end rounded-lg">
                             <div className="p-3 text-center">

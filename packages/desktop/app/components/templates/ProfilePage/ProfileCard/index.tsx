@@ -81,7 +81,7 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
         <Card className="rounded-none lg:rounded-2xl border-brand-overlay/[.1] p-0">
           <div>
             <div className="w-full h-16 lg:h-32 bg-white/[.25] relative">
-              {user.background && (
+              {user.background?.url ? (
                 <Image
                   loader={() =>
                     `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${user.background?.url}`
@@ -92,6 +92,8 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
                   objectFit="cover"
                   unoptimized={true}
                 />
+              ) : (
+                <div className="bg-gradient-to-r from-[#844AFF] to-primary w-full h-full bg-white/[.25]" />
               )}
               {isEditable && isMyProfile && (
                 <div
@@ -109,7 +111,15 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
             </div>
             <div className="hidden lg:flex items-center relative mx-5 -mt-6">
               <div className="relative">
-                <Avatar src={user.avatar} size={120} />
+                {user.avatar ? (
+                  <Avatar src={user.avatar} size={120} />
+                ) : (
+                  <div className="w-[120px] h-[120px] flex items-center justify-center bg-primary w-full h-full text-4xl text-white rounded-full">
+                    {user.firstName.charAt(0)}
+                    {user.lastName.charAt(0)}
+                  </div>
+                )}
+
                 {isEditable && isMyProfile && (
                   <div
                     onClick={() =>
@@ -164,7 +174,14 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
             </div>
             <div className="flex lg:hidden items-center p-4">
               <div className="relative">
-                <Avatar src={user.avatar} size={80} />
+                {user.avatar ? (
+                  <Avatar src={user.avatar} size={80} />
+                ) : (
+                  <div className="w-[80px] h-[80px] flex items-center justify-center bg-primary w-full h-full text-2xl text-white rounded-full">
+                    {user.firstName.charAt(0)}
+                    {user.lastName.charAt(0)}
+                  </div>
+                )}
                 {isEditable && isMyProfile && (
                   <div
                     onClick={() =>

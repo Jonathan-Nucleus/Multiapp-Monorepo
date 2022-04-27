@@ -42,15 +42,15 @@ const CommentPost: FC<CommentPostProps> = ({ postId }) => {
     message: string,
     mediaUrl?: string
   ): Promise<void> => {
-    if (!message || message === "") return;
+    if ((!message || message.trim() === "") && !mediaUrl) return;
     try {
       await commentPost({
         variables: {
           comment: {
             body: message,
             postId: post._id,
-            mentionIds: [], // Update to add mentions
-            mediaUrl: mediaUrl ?? "",
+            mentionIds: [], // TODO: Update to add mentions
+            mediaUrl,
           },
         },
         refetchQueries: ["Posts"],

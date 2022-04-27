@@ -1,9 +1,10 @@
 import { FC } from "react";
+import { Chats } from "phosphor-react";
+
 import Button from "desktop/app/components/common/Button";
 import Avatar from "desktop/app/components/common/Avatar";
 import { useAccount } from "mobile/src/graphql/query/account";
 import { useFollowUser } from "mobile/src/graphql/mutation/account";
-import { Chats } from "phosphor-react";
 
 export type UserType = {
   _id: string;
@@ -13,15 +14,18 @@ export type UserType = {
   position?: string;
   company?: {
     name: string;
-  }
-}
+  };
+};
 
 export interface UserItemProps {
   user: UserType;
   showChat?: boolean;
 }
 
-const UserItem: FC<UserItemProps> = ({ user, showChat = false }: UserItemProps) => {
+const UserItem: FC<UserItemProps> = ({
+  user,
+  showChat = false,
+}: UserItemProps) => {
   const { data: accountData } = useAccount();
   const [followUser] = useFollowUser();
   const isFollowing = accountData?.account?.followingIds?.includes(user._id);
@@ -32,8 +36,7 @@ const UserItem: FC<UserItemProps> = ({ user, showChat = false }: UserItemProps) 
         variables: { follow: !isFollowing, userId: user._id },
         refetchQueries: ["Account", "UserProfile", "CompanyProfile"],
       });
-    } catch (error) {
-    }
+    } catch (error) {}
   };
   return (
     <div className="flex items-center">
@@ -43,7 +46,7 @@ const UserItem: FC<UserItemProps> = ({ user, showChat = false }: UserItemProps) 
           <div className="text-white">
             {user.firstName} {user.lastName}
           </div>
-          {!isMyProfile &&
+          {!isMyProfile && (
             <>
               <div className="flex items-center">
                 <div className="text-white opacity-60 mx-2">•</div>
@@ -56,20 +59,20 @@ const UserItem: FC<UserItemProps> = ({ user, showChat = false }: UserItemProps) 
                 </Button>
               </div>
             </>
-          }
+          )}
         </div>
         <div className="text-xs text-white opacity-60">{user.position}</div>
         <div className="text-xs text-white opacity-60">
           {user.company?.name}
         </div>
       </div>
-      {showChat &&
+      {showChat && (
         <div className="ml-2">
           <Button variant="text" className="text-white">
             <Chats size={24} color="currentColor" />
           </Button>
         </div>
-      }
+      )}
     </div>
   );
 };

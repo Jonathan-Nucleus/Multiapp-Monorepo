@@ -1,14 +1,19 @@
 import { FC } from "react";
-import Avatar from "../../../common/Avatar";
-import Card from "../../../common/Card";
 import { CircleWavy } from "phosphor-react";
-import { AccreditationOptions } from "backend/schemas/user";
 import Link from "next/link";
-import { UserProfileProps } from "desktop/app/types/common-props";
 import { useSession } from "next-auth/react";
 import { getInitials } from "../../../../lib/utilities";
 
-const ProfileCardSmall: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
+import Avatar from "../../../common/Avatar";
+import Card from "../../../common/Card";
+import { AccreditationOptions } from "backend/schemas/user";
+import { UserProfile } from "mobile/src/graphql/query/user/useProfile";
+
+interface ProfileProps {
+  user: UserProfile;
+}
+
+const ProfileCardSmall: FC<ProfileProps> = ({ user }: ProfileProps) => {
   const { data: session } = useSession();
   const isMyProfile = user._id == session?.user?._id;
   return (
@@ -57,11 +62,7 @@ const ProfileCardSmall: FC<UserProfileProps> = ({ user }: UserProfileProps) => {
         <div className="mt-5 mb-3">
           <Link href={isMyProfile ? "/profile/me" : `/profile/${user._id}`}>
             <a className="text-primary text-sm">
-              {isMyProfile ?
-                <>See Your Profile</>
-                :
-                <>See Profile</>
-              }
+              {isMyProfile ? <>See Your Profile</> : <>See Profile</>}
             </a>
           </Link>
         </div>
