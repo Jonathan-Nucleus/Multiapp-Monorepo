@@ -17,7 +17,7 @@ import {
 } from 'phosphor-react-native';
 import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
 import ImagePicker from 'react-native-image-crop-picker';
-import axios from 'axios';
+const Buffer = global.Buffer || require('buffer').Buffer;
 
 import {
   WHITE,
@@ -43,7 +43,7 @@ interface RouterProps {
   route: RouteProp<any, any>;
 }
 
-const EditPhoto: FC<RouterProps> = ({ navigation, route }) => {
+const EditCompanyPhoto: FC<RouterProps> = ({ navigation, route }) => {
   const [imageData, setImageData] = useState<any>({});
   const company: CompanyProfile = useMemo(() => {
     return route.params?.company;
@@ -56,8 +56,8 @@ const EditPhoto: FC<RouterProps> = ({ navigation, route }) => {
       width: 300,
       height: 400,
       cropping: true,
+      includeBase64: true,
     }).then((image) => {
-      console.log(image);
       setImageData(image);
     });
   };
@@ -67,8 +67,8 @@ const EditPhoto: FC<RouterProps> = ({ navigation, route }) => {
       width: 300,
       height: 400,
       cropping: true,
+      includeBase64: true,
     }).then((image) => {
-      console.log(image);
       setImageData(image);
     });
   };
@@ -89,28 +89,15 @@ const EditPhoto: FC<RouterProps> = ({ navigation, route }) => {
       }
 
       const { remoteName, uploadUrl } = data.uploadLink;
-      const formdata = new FormData();
-      if (imageData != null) {
-        formdata.append('file', {
-          uri: imageData.sourceURL,
-          name: imageData.filename,
-          type: imageData.mime,
-        });
-        // const uri =
-        // Platform.OS === 'ios'
-        //   ? `file:///${imageData.sourceURL}`
-        //   : imageData.sourceURL;
-        formdata.append('uri', imageData.sourceURL);
-        formdata.append('type', imageData.mime);
-        formdata.append('name', imageData.filename);
-      }
-      await axios.put(uploadUrl, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Accept: 'application/json',
-        },
-        body: formdata,
+      const buf = new Buffer(
+        imageData.data.replace(/^data:image\/\w+;base64,/, ''),
+        'base64',
+      );
+      await fetch(uploadUrl, {
+        method: 'PUT',
+        body: buf,
       });
+
       if (type === 'AVATAR') {
         const profile = {
           _id: company._id,
@@ -144,9 +131,7 @@ const EditPhoto: FC<RouterProps> = ({ navigation, route }) => {
         });
       }
       showMessage('success', 'Cover photo is updated.');
-      navigation.navigate('More', {
-        screen: 'UserProfile',
-      });
+      navigation.goBack();
     } catch (err) {
       console.log('upload error=====>', err);
       showMessage('error', (err as Error).message);
@@ -163,7 +148,11 @@ const EditPhoto: FC<RouterProps> = ({ navigation, route }) => {
     <View style={pStyles.globalContainer}>
       <MainHeader
         leftIcon={<CaretLeft color={WHITE} />}
-        centerIcon={<Text style={styles.header}>Edit Profile Photo</Text>}
+        centerIcon={
+          <Text style={styles.header}>
+            {route.params?.type === 'AVATAR' ? 'Edit Logo' : 'Edit Cover Photo'}
+          </Text>
+        }
         rightIcon={
           <TouchableOpacity onPress={updatePhoto} disabled={!imageData}>
             <Text style={[styles.save, imageData && styles.active]}>Save</Text>
@@ -204,9 +193,9 @@ const EditPhoto: FC<RouterProps> = ({ navigation, route }) => {
               }}
               resizeMode={FastImage.resizeMode.cover}
             />
-          ) : company?.background ? (
+          ) : company?.background?.url ? (
             <FastImage
-              style={styles.avatar}
+              style={styles.cover}
               source={{
                 uri: `${BACKGROUND_URL}/${company?.background.url}`,
               }}
@@ -244,7 +233,7 @@ const EditPhoto: FC<RouterProps> = ({ navigation, route }) => {
   );
 };
 
-export default EditPhoto;
+export default EditCompanyPhoto;
 
 const styles = StyleSheet.create({
   headerContainer: {
@@ -269,7 +258,7 @@ const styles = StyleSheet.create({
   avatar: {
     width: 200,
     height: 200,
-    borderRadius: 100,
+    borderRadius: 8,
   },
   item: {
     flexDirection: 'row',

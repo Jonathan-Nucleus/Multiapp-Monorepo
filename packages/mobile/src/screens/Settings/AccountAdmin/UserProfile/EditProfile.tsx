@@ -73,9 +73,7 @@ const EditProfile: React.FC<RouterProps> = ({ navigation, route }) => {
         refetchQueries: ['Account'],
       });
       showMessage('success', 'Profile is updated.');
-      navigation.navigate('More', {
-        screen: 'UserProfile',
-      });
+      navigation.goBack();
     } catch (e: any) {
       console.log(e.message);
       showMessage('error', e.message);

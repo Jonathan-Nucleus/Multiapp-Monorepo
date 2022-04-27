@@ -90,7 +90,7 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
           <FastImage
             style={styles.backgroundImg}
             source={{
-              uri: `${BACKGROUND_URL}/${background}`,
+              uri: `${BACKGROUND_URL}/${background.url}`,
             }}
             resizeMode={FastImage.resizeMode.cover}
           />
@@ -103,7 +103,7 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
         {isMyCompany && (
           <TouchableOpacity
             onPress={() =>
-              NavigationService.navigate('EditPhoto', {
+              NavigationService.navigate('EditCompanyPhoto', {
                 company: company,
                 type: 'BACKGROUND',
               })
@@ -132,7 +132,7 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
             )}
             <TouchableOpacity
               onPress={() =>
-                NavigationService.navigate('EditPhoto', {
+                NavigationService.navigate('EditCompanyPhoto', {
                   company: company,
                   type: 'AVATAR',
                 })
@@ -172,7 +172,9 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
           <PGradientOutlineButton
             label="Edit Profile"
             onPress={() =>
-              NavigationService.navigate('EditProfile', { company: company })
+              NavigationService.navigate('EditCompanyProfile', {
+                company: company,
+              })
             }
             gradientContainer={styles.editButton}
           />

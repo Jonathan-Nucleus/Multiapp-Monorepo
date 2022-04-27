@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   Keyboard,
@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
-import SplashScreen from 'react-native-splash-screen';
 import RNPickerSelect from 'react-native-picker-select';
 import { CaretLeft, ShieldCheck, CaretDown } from 'phosphor-react-native';
 
@@ -23,15 +22,7 @@ import {
   Body1Bold,
   Body2Bold,
 } from '../../../theme/fonts';
-import {
-  BLACK,
-  PRIMARY,
-  WHITE,
-  BLUE200,
-  SUCCESS,
-  GRAY800,
-  GRAY700,
-} from 'shared/src/colors';
+import { BLACK, WHITE, SUCCESS, GRAY700 } from 'shared/src/colors';
 import MainHeader from '../../../components/main/Header';
 import PFormLabel from '../../../components/common/PFormLabel';
 import { useProRequest } from 'mobile/src/graphql/mutation/account';
@@ -59,10 +50,6 @@ const BecomePro: React.FC<BecomeProProps> = ({ navigation }) => {
 
   const [proRequest] = useProRequest();
 
-  useEffect(() => {
-    SplashScreen.hide();
-  }, []);
-
   const handleNextPage = async () => {
     setError('');
     Keyboard.dismiss();
@@ -78,6 +65,7 @@ const BecomePro: React.FC<BecomeProProps> = ({ navigation }) => {
           },
         },
       });
+      navigation.navigate('VerificationSuccess');
     } catch (err) {
       console.error('login error', err);
       setError((err as Error).message);

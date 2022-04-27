@@ -64,7 +64,7 @@ const WatchList: React.FC<RouterProps> = ({ navigation }) => {
           <FastImage
             style={styles.companyAvatar}
             source={{ uri: `${AVATAR_URL}/${item.company.avatar}` }}
-            resizeMode={FastImage.resizeMode.contain}
+            resizeMode={FastImage.resizeMode.cover}
           />
           <View style={styles.flex}>
             <View style={styles.company}>
@@ -80,7 +80,7 @@ const WatchList: React.FC<RouterProps> = ({ navigation }) => {
             <FastImage
               style={styles.userAvatar}
               source={{ uri: `${AVATAR_URL}/${item.avatar}` }}
-              resizeMode={FastImage.resizeMode.contain}
+              resizeMode={FastImage.resizeMode.cover}
             />
             <View>
               <Text style={styles.label}>{item.user.name}</Text>

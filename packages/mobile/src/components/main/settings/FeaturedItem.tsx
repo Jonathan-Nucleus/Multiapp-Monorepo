@@ -7,8 +7,7 @@ import { AVATAR_URL, POST_URL } from 'react-native-dotenv';
 import PLabel from '../../common/PLabel';
 import UserInfo from '../../common/UserInfo';
 import Tag from '../../common/Tag';
-import { BGDARK, GRAY10, PRIMARY, WHITE60 } from 'shared/src/colors';
-import { Body1, Body3 } from '../../../theme/fonts';
+import { PRIMARY } from 'shared/src/colors';
 
 import { Post } from 'mobile/src/graphql/query/post/usePosts';
 

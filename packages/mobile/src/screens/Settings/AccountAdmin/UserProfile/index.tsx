@@ -95,11 +95,11 @@ const UserProfile: FC<RouterProps> = ({ navigation }) => {
       />
       <PAppContainer style={styles.container}>
         <View style={styles.relative}>
-          {account.background ? (
+          {account.background?.url ? (
             <FastImage
               style={styles.backgroundImg}
               source={{
-                uri: `${BACKGROUND_URL}/${account.background}`,
+                uri: `${BACKGROUND_URL}/${account.background.url}`,
               }}
               resizeMode={FastImage.resizeMode.cover}
             />
@@ -123,11 +123,11 @@ const UserProfile: FC<RouterProps> = ({ navigation }) => {
         <View style={styles.content}>
           <View style={styles.companyDetail}>
             <View style={styles.relative}>
-              {account.avatar ? (
+              {account?.avatar ? (
                 <FastImage
                   style={styles.avatar}
                   source={{
-                    uri: `${AVATAR_URL}/${account.avatar}`,
+                    uri: `${AVATAR_URL}/${account?.avatar}`,
                   }}
                   resizeMode={FastImage.resizeMode.cover}
                 />
@@ -161,7 +161,7 @@ const UserProfile: FC<RouterProps> = ({ navigation }) => {
             </View>
           </View>
           <Text style={styles.comment}>
-            {account.role} - {account.position}
+            {account.role} - {account?.position}
           </Text>
           <View style={[styles.row, styles.justifyAround]}>
             <View style={styles.follow}>

@@ -100,7 +100,7 @@ const Accreditation: AccreditationScreen = ({ navigation }) => {
           scrollEnabled={false}
           inactiveSlideScale={1}
           inactiveSlideOpacity={1}
-          onSnapToItem={(index) => setActiveSlide(index)}
+          onSnapToItem={(index: number) => setActiveSlide(index)}
           renderItem={({ index }) => (
             <AccreditationItem
               index={index}

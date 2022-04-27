@@ -25,6 +25,9 @@ import BecomePro from '../screens/Settings/BecomePro';
 import Contact from '../screens/Settings/Contact';
 import EditPhoto from '../screens/Settings/AccountAdmin/UserProfile/EditPhoto';
 import EditProfile from '../screens/Settings/AccountAdmin/UserProfile/EditProfile';
+import VerificationSuccess from '../screens/Settings/BecomePro/VerificationSuccess';
+import EditCompanyProfile from '../screens/Settings/CompanyProfile/EditProfile';
+import EditCompanyPhoto from '../screens/Settings/CompanyProfile/EditPhoto';
 
 type AppParamList = {
   Auth: undefined;
@@ -102,8 +105,17 @@ const AppNavigator = () => {
         <Stack.Screen name="CreatePost" component={CreatePost} />
         <Stack.Screen name="EditPhoto" component={EditPhoto} />
         <Stack.Screen name="EditProfile" component={EditProfile} />
+        <Stack.Screen
+          name="EditCompanyProfile"
+          component={EditCompanyProfile}
+        />
+        <Stack.Screen name="EditCompanyPhoto" component={EditCompanyPhoto} />
         <Stack.Screen name="BecomePro" component={BecomePro} />
         <Stack.Screen name="Contact" component={Contact} />
+        <Stack.Screen
+          name="VerificationSuccess"
+          component={VerificationSuccess}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

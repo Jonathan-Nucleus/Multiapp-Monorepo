@@ -23,7 +23,7 @@ interface RouterProps {
   route: RouteProp<any, any>;
 }
 
-const EditProfile: React.FC<RouterProps> = ({ navigation, route }) => {
+const EditCompanyProfile: React.FC<RouterProps> = ({ navigation, route }) => {
   const [name, setName] = useState('');
   const [bio, setBio] = useState('');
   const [website, setWebsite] = useState('');
@@ -67,9 +67,7 @@ const EditProfile: React.FC<RouterProps> = ({ navigation, route }) => {
         refetchQueries: ['Account'],
       });
       showMessage('success', 'Company info is updated.');
-      navigation.navigate('More', {
-        screen: 'UserProfile',
-      });
+      navigation.goBack();
     } catch (e: any) {
       console.log(e.message);
       showMessage('error', e.message);
@@ -140,7 +138,7 @@ const EditProfile: React.FC<RouterProps> = ({ navigation, route }) => {
   );
 };
 
-export default EditProfile;
+export default EditCompanyProfile;
 
 const styles = StyleSheet.create({
   headerContainer: {

@@ -23,6 +23,8 @@ import Avatar from '../../assets/avatar.png';
 import Tag from '../../components/common/Tag';
 import PostHeader from './PostHeader';
 import { audienceData, OptionProps, postAsData } from './CreatePost';
+import { Post } from 'mobile/src/graphql/query/post/usePosts';
+const Buffer = global.Buffer || require('buffer').Buffer;
 
 import type { PostCategory } from 'mobile/src/graphql/query/post/usePosts';
 import {
@@ -74,18 +76,13 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
       }
 
       const { remoteName, uploadUrl } = data.uploadLink;
-      const formdata = new FormData();
-      if (imageData != null) {
-        const uri =
-          Platform.OS === 'ios' ? `file:///${imageData.path}` : imageData.path;
-        formdata.append('uri', uri);
-        formdata.append('type', imageData.mime);
-        formdata.append('name', imageData.filename);
-      }
-
+      const buf = new Buffer(
+        imageData.data.replace(/^data:image\/\w+;base64,/, ''),
+        'base64',
+      );
       await fetch(uploadUrl, {
         method: 'PUT',
-        body: formdata,
+        body: buf,
       });
 
       const postData = {

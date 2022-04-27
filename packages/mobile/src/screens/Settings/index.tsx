@@ -148,7 +148,7 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
               source={{
                 uri: `${AVATAR_URL}/${account?.avatar}`,
               }}
-              resizeMode={FastImage.resizeMode.contain}
+              resizeMode={FastImage.resizeMode.cover}
             />
             <View style={styles.rightItem}>
               <View style={styles.row}>
@@ -166,6 +166,7 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
             </View>
           </View>
         </TouchableOpacity>
+
         {account?.companies.map((company) => (
           <TouchableOpacity
             onPress={() =>
@@ -178,7 +179,7 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
                 source={{
                   uri: `${AVATAR_URL}/${company?.avatar}`,
                 }}
-                resizeMode={FastImage.resizeMode.contain}
+                resizeMode={FastImage.resizeMode.cover}
               />
               <View style={styles.rightItem}>
                 <Text style={styles.name}>{company.name}</Text>

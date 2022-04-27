@@ -139,8 +139,8 @@ const CreatePost: CreatePostScreen = ({ navigation }) => {
       width: 300,
       height: 400,
       cropping: true,
+      includeBase64: true,
     }).then((image) => {
-      console.log(image);
       setImageData(image);
     });
   };
@@ -150,8 +150,8 @@ const CreatePost: CreatePostScreen = ({ navigation }) => {
       width: 300,
       height: 400,
       cropping: true,
+      includeBase64: true,
     }).then((image) => {
-      console.log(image);
       setImageData(image);
     });
   };

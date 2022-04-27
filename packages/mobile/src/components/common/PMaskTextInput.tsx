@@ -80,10 +80,9 @@ const PMaskTextInput: React.FC<PMaskTextInputProps> = (props) => {
   }, [isFocused]);
 
   const handleOnChangeText = (formatted: string, extracted?: string): void => {
-    console.log(12312, formatted, extracted);
     onChangeText(extracted);
   };
-  console.log(12312, mask);
+
   return (
     <View style={[styles.container, containerStyle]}>
       <View style={styles.row}>
