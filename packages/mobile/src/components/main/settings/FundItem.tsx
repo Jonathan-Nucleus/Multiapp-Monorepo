@@ -94,7 +94,7 @@ const FundItem: React.FC<FundItemProps> = ({ fund }) => {
             NavigationService.navigate('Marketplace', {
               screen: 'FundDetails',
               params: {
-                fund: fund,
+                fundId: fund._id,
               },
             })
           }

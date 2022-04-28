@@ -2,8 +2,10 @@ import React, { FC, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { NavigationProp } from '@react-navigation/native';
 import { CaretLeft, Check } from 'phosphor-react-native';
-import { WHITE, BLUE300, PINK, GRAY600 } from 'shared/src/colors';
+import { WHITE, BLUE300, PINK, GRAY600, PRIMARYSOLID } from 'shared/src/colors';
 import Share from 'react-native-share';
+import FastImage from 'react-native-fast-image';
+import { AVATAR_URL } from 'react-native-dotenv';
 
 import pStyles from '../../../theme/pStyles';
 import {
@@ -12,11 +14,18 @@ import {
   Body2,
   Body2Bold,
   Body3,
+  H5Bold,
 } from '../../../theme/fonts';
 import PAppContainer from '../../../components/common/PAppContainer';
 import MainHeader from '../../../components/main/Header';
 import PGradientButton from '../../../components/common/PGradientButton';
 import { showMessage } from '../../../services/utils';
+import { useAccount } from '../../../graphql/query/account';
+import User1Svg from '../../../assets/images/user1.svg';
+import User2Svg from '../../../assets/images/user2.svg';
+import User3Svg from '../../../assets/images/user3.svg';
+import LampSvg from '../../../assets/images/lamp.svg';
+import AddSvg from '../../../assets/images/add.svg';
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
@@ -24,6 +33,8 @@ interface RouterProps {
 
 const InviteFriends: FC<RouterProps> = ({ navigation }) => {
   const [code, setCode] = useState<number[]>([]);
+  const { data: userData } = useAccount();
+  const account = userData?.account;
 
   const shareCode = async () => {
     try {
@@ -52,6 +63,43 @@ const InviteFriends: FC<RouterProps> = ({ navigation }) => {
         }
       />
       <PAppContainer>
+        <View style={styles.avatarSections}>
+          <View style={styles.user1}>
+            <User1Svg />
+          </View>
+          <View style={styles.user2}>
+            <User2Svg />
+          </View>
+          <View style={styles.lamp}>
+            <LampSvg />
+          </View>
+
+          <View style={styles.avatarContainer}>
+            {account?.avatar ? (
+              <FastImage
+                style={styles.avatar}
+                source={{
+                  uri: `${AVATAR_URL}/${account?.avatar}`,
+                }}
+                resizeMode={FastImage.resizeMode.cover}
+              />
+            ) : (
+              <View style={styles.noAvatarContainer}>
+                <Text style={styles.noAvatar}>
+                  {account?.firstName.charAt(0)}
+                  {account?.lastName.charAt(0)}
+                </Text>
+              </View>
+            )}
+          </View>
+          <View style={styles.user3}>
+            <User3Svg />
+          </View>
+          <View style={styles.add}>
+            <AddSvg />
+          </View>
+        </View>
+
         <Text style={styles.description}>
           The power of Prometheus ratchets up with every intelligent, curious,
           thoughtful new voice in the conversation. So bring in a few contacts
@@ -118,6 +166,7 @@ const styles = StyleSheet.create({
     ...Body2,
     color: WHITE,
     marginTop: 30,
+    marginBottom: 10,
   },
   row: {
     flexDirection: 'row',
@@ -164,5 +213,55 @@ const styles = StyleSheet.create({
   },
   btn: {
     marginTop: 35,
+  },
+  avatar: {
+    width: 84,
+    height: 84,
+    borderRadius: 42,
+  },
+  noAvatarContainer: {
+    width: 84,
+    height: 84,
+    borderRadius: 42,
+    backgroundColor: WHITE,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noAvatar: {
+    color: PRIMARYSOLID,
+    ...H5Bold,
+  },
+  avatarSections: {
+    marginBottom: 60,
+    width: '100%',
+  },
+  avatarContainer: {
+    marginTop: 61,
+    alignSelf: 'center',
+  },
+  user1: {
+    position: 'absolute',
+    top: 18,
+    left: 16,
+  },
+  user2: {
+    position: 'absolute',
+    top: 97,
+    left: 58,
+  },
+  lamp: {
+    position: 'absolute',
+    top: 39,
+    left: 90,
+  },
+  user3: {
+    position: 'absolute',
+    top: 42,
+    right: 62,
+  },
+  add: {
+    position: 'absolute',
+    top: 101,
+    right: 14,
   },
 });
