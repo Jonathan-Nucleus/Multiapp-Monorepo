@@ -4,11 +4,9 @@ import Input from "../../common/Input";
 import Label from "../../common/Label";
 import Checkbox from "../../common/Checkbox";
 import Button from "../../common/Button";
-import WarningIcon from "shared/assets/images/warning-red.svg";
-import Image from "next/image";
 import { signIn, getProviders } from "next-auth/react";
 import Alert from "../../common/Alert";
-import { AppleLogo, GoogleLogo, LinkedinLogo } from "phosphor-react";
+import { AppleLogo, GoogleLogo, LinkedinLogo, WarningCircle } from "phosphor-react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -88,8 +86,8 @@ const LoginPage: FC<LoginPageProps> = ({ providers }: LoginPageProps) => {
           <div className={error ? "block" : "hidden"}>
             <Alert variant="error">
               <div className="flex flex-row">
-                <div className="flex-shrink-0 mt-1">
-                  <Image src={WarningIcon} alt="" />
+                <div className="flex-shrink-0 text-error">
+                  <WarningCircle size={24} weight="bold" color="currentColor" />
                 </div>
                 <div className="text-white ml-3">{error}</div>
               </div>
@@ -158,7 +156,7 @@ const LoginPage: FC<LoginPageProps> = ({ providers }: LoginPageProps) => {
                   {provider.toUpperCase()}
                 </span>
               </Button>
-            )
+            ),
           )}
           <Button
             variant="outline-primary"

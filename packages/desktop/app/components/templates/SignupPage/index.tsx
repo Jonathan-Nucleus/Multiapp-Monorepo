@@ -12,17 +12,12 @@ import Input from "../../common/Input";
 import Button from "../../common/Button";
 import Label from "../../common/Label";
 import ErrorMessage from "../../common/ErrorMessage";
-
-import AppleIcon from "shared/assets/images/apple.svg";
-import GoogleIcon from "shared/assets/images/google.svg";
-import LinkedInIcon from "shared/assets/images/linkedin.svg";
-import WarningIcon from "shared/assets/images/warning-red.svg";
-import Image from "next/image";
 import Alert from "../../common/Alert";
 import Checkbox from "../../common/Checkbox";
 
 import { PASSWORD_PATTERN } from "shared/src/patterns";
 import { useRegisterUser } from "desktop/app/queries/authentication.graphql";
+import { AppleLogo, GoogleLogo, LinkedinLogo, WarningCircle } from "phosphor-react";
 
 type FormValues = {
   firstName: string;
@@ -139,8 +134,8 @@ const SignupPage: FC = () => {
           <div className={error ? "block" : "hidden"}>
             <Alert variant="error">
               <div className="flex flex-row">
-                <div className="flex-shrink-0 mt-1">
-                  <Image src={WarningIcon} alt="" />
+                <div className="flex-shrink-0 text-error">
+                  <WarningCircle color="currentColor" size={24} weight="bold" />
                 </div>
                 <div className="text-white ml-3">{error}</div>
               </div>
@@ -284,21 +279,21 @@ const SignupPage: FC = () => {
             variant="outline-primary"
             className="w-12 h-12 md:w-full md:h-auto rounded-lg md:rounded-full border border-gray-400 md:border-primary"
           >
-            <Image src={AppleIcon} alt="" />
+            <AppleLogo color="white" weight="fill" size={20} />
             <span className="ml-2 hidden md:inline-block">APPLE</span>
           </Button>
           <Button
             variant="outline-primary"
             className="w-12 h-12 md:w-full md:h-auto rounded-lg md:rounded-full border border-gray-400 md:border-primary"
           >
-            <Image src={GoogleIcon} alt="" />
+            <GoogleLogo color="white" weight="bold" size={20} />
             <span className="ml-2 hidden md:inline-block">GOOGLE</span>
           </Button>
           <Button
             variant="outline-primary"
             className="w-12 h-12 md:w-full md:h-auto rounded-lg md:rounded-full border border-gray-400 md:border-primary"
           >
-            <Image src={LinkedInIcon} alt="" />
+            <LinkedinLogo color="white" weight="fill" size={20} />
             <span className="ml-2 hidden md:inline-block">LINKEDIN</span>
           </Button>
         </div>

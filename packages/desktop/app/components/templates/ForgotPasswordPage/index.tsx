@@ -1,7 +1,5 @@
 import { FC, useState } from "react";
 import Button from "../../common/Button";
-import ArrowLeft from "shared/assets/images/arrow-left.svg";
-import Image from "next/image";
 import Alert from "../../common/Alert";
 import Field from "../../common/Field";
 import * as yup from "yup";
@@ -10,6 +8,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import AppAuthOptions from "../../../config/auth";
 import { useRouter } from "next/router";
 import { useRequestReset } from "desktop/app/queries/authentication.graphql";
+import { ArrowLeft } from "phosphor-react";
 
 type FormValues = {
   email: string;
@@ -33,9 +32,7 @@ const ForgotPasswordPage: FC = () => {
     variant: "info",
   });
   const [requestReset] = useRequestReset();
-  const { register, handleSubmit, formState } = useForm<
-    yup.InferType<typeof schema>
-  >({
+  const { register, handleSubmit, formState } = useForm<yup.InferType<typeof schema>>({
     resolver: yupResolver(schema),
     mode: "onChange",
   });
@@ -46,13 +43,13 @@ const ForgotPasswordPage: FC = () => {
     setAlert(
       data?.requestPasswordReset
         ? {
-            message: `We sent an email to ${email} with a link to reset your password`,
-            variant: "success",
-          }
+          message: `We sent an email to ${email} with a link to reset your password`,
+          variant: "success",
+        }
         : {
-            message: `Looks like that account doesn't exist. Head to back to our login page to register.`,
-            variant: "error",
-          }
+          message: `Looks like that account doesn't exist. Head to back to our login page to register.`,
+          variant: "error",
+        },
     );
     setLoading(false);
   };
@@ -61,10 +58,11 @@ const ForgotPasswordPage: FC = () => {
       <div className="container mx-auto max-w-xl">
         <Button
           variant="text"
+          className="text-primary font-medium text-primary"
           onClick={() => router.replace(AppAuthOptions.pages?.signIn!!)}
         >
-          <Image src={ArrowLeft} alt="" />
-          <span className="font-medium text-primary uppercase ml-3">
+          <ArrowLeft size={32} weight="light" color="currentColor" />
+          <span className="uppercase ml-3">
             Back to login
           </span>
         </Button>

@@ -20,17 +20,12 @@ const FundCard: FC<FundCardProps> = ({
   fund,
   showImages = true,
 }: FundCardProps) => {
-  const { data: userData } = useAccount();
+  const { data: { account } = {} } = useAccount();
   const [followUser] = useFollowUser();
   const [watchFund] = useWatchFund();
-  const isFollower =
-    userData?.account?.followingIds?.includes(fund.manager._id) ?? false;
-  const isWatching =
-    userData?.account?.watchlistIds?.includes(fund._id) ?? false;
-  const toggleFollowingUser = async (
-    id: string,
-    follow: boolean
-  ): Promise<void> => {
+  const isFollower = account?.followingIds?.includes(fund.manager._id) ?? false;
+  const isWatching = account?.watchlistIds?.includes(fund._id) ?? false;
+  const toggleFollowingUser = async (id: string, follow: boolean) => {
     try {
       await followUser({
         variables: { follow: follow, userId: id },
@@ -38,7 +33,7 @@ const FundCard: FC<FundCardProps> = ({
       });
     } catch (err) {}
   };
-  const toggleWatchFund = async (id: string, watch: boolean): Promise<void> => {
+  const toggleWatchFund = async (id: string, watch: boolean) => {
     try {
       await watchFund({
         variables: { watch, fundId: id },

@@ -128,28 +128,18 @@ interface FundProfileProps {
 
 const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
   const [watchFund] = useWatchFund();
-  const { data } = useFund(fundId);
-  const { data: userData } = useAccount({ fetchPolicy: "cache-only" });
-  const fund = data?.fund;
-  const isWatching = userData?.account?.watchlistIds?.includes(fundId) ?? false;
-
-  const toggleWatchFund = async (): Promise<void> => {
-    if (!fundId) return;
+  const { data: { fund } = {} } = useFund(fundId);
+  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
+  const { background: companyBackground, avatar: companyAvatar } = fund?.company ?? {};
+  const isWatching = account?.watchlistIds?.includes(fundId) ?? false;
+  const toggleWatchFund = async () => {
     try {
-      const { data } = await watchFund({
+      await watchFund({
         variables: { watch: !isWatching, fundId },
         refetchQueries: ["Account"],
       });
-      if (!data?.watchFund) {
-        console.log("err", data);
-      }
-    } catch (err) {
-      console.log("err", err);
-    }
+    } catch (err) {}
   };
-
-  const { background: companyBackground, avatar: companyAvatar } =
-    fund?.company ?? {};
 
   return (
     <div className="container mx-auto mt-5 lg:px-4 max-w-screen-xl">
@@ -576,7 +566,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                   <div className="text-xs text-white opacity-60 tracking-wide">
                     {fund?.manager?.followerIds?.length ?? 0} Followers
                     {" • "}
-                    {fund?.manager?.followerIds?.length ?? 0} Posts
+                    {fund?.manager?.postIds?.length ?? 0} Posts
                   </div>
                 </div>
                 <div className="my-2">
