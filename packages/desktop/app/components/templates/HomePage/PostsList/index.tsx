@@ -3,8 +3,13 @@ import { PostCategory } from "backend/graphql/posts.graphql";
 import FilterDropdown, { FilterCategory } from "./FilterDropdown";
 import Post from "../../../common/Post";
 import { useFetchPosts } from "mobile/src/graphql/query/account";
+import { PostSummary } from "mobile/src/graphql/fragments/post";
 
-const PostsList: FC = () => {
+interface PostsListProps {
+  onSelectPost: (post: PostSummary) => void;
+}
+
+const PostsList: FC<PostsListProps> = ({ onSelectPost }) => {
   const [selectedTopics, setSelectedTopics] = useState<FilterCategory[]>([
     "ALL",
   ]);
@@ -36,7 +41,7 @@ const PostsList: FC = () => {
       <div>
         {posts.map((post, index) => (
           <div key={index} className="mt-4 mb-4">
-            <Post post={post} />
+            <Post post={post} onClickToEdit={() => onSelectPost(post)} />
           </div>
         ))}
       </div>

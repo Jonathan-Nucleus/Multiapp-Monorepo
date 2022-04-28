@@ -1,16 +1,10 @@
 import { FC } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { ArrowCircleLeft, ArrowCircleRight } from "phosphor-react";
-
+import { ArrowCircleRight } from "phosphor-react";
 import { Splide, SplideSlide, SplideTrack } from "@splidejs/react-splide";
 import "@splidejs/react-splide/css";
-import Avatar from "desktop/app/components/common/Avatar";
 import Button from "desktop/app/components/common/Button";
 import Card from "desktop/app/components/common/Card";
-
 import FeaturedManager from "./FeaturedManager";
-
 import { useFundManagers } from "mobile/src/graphql/query/marketplace/useFundManagers";
 
 const FeaturedManagers: FC = () => {

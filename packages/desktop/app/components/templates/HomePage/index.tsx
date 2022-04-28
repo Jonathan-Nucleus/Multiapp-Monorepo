@@ -7,18 +7,19 @@ import PostsList from "./PostsList";
 import InviteFriends from "./InviteFriends";
 import WatchList from "./WatchList";
 import Button from "../../common/Button";
-import CreatePostModal from "./AddPost/CreatePostModal";
 import { useAccount } from "mobile/src/graphql/query/account";
 import ProfileCardSmall from "../../modules/users/ProfileCardSmall";
 import { useProfessionals } from "mobile/src/graphql/query/user/useProfessionals";
+import EditPostModal from "../../modules/posts/EditPostModal";
+import { PostSummary } from "mobile/src/graphql/fragments/post";
 
 const HomePage: FC = () => {
   const [showPostModal, setShowPostModal] = useState(false);
   const { data: accountData } = useAccount();
   const { data: professionalsData } = useProfessionals(true);
-
   const user = accountData?.account;
   const professionals = professionalsData?.professionals ?? [];
+  const [selectedPost, setSelectedPost] = useState<PostSummary | undefined>(undefined);
 
   if (!user) {
     return <></>;
@@ -26,7 +27,7 @@ const HomePage: FC = () => {
 
   return (
     <>
-      <div className="flex flex-row px-2 mt-20">
+      <div className="flex flex-row mt-5 lg:mt-20 px-2">
         <div className="w-80 hidden lg:block flex-shrink-0 mx-4">
           <ProfileCardSmall user={user} />
           {user.companies.length > 0 && (
@@ -40,10 +41,20 @@ const HomePage: FC = () => {
             <FeaturedProfessionals professionals={professionals} />
           )}
           <div className="hidden md:block">
-            <AddPost setShowPostModal={() => setShowPostModal(true)} />
+            <AddPost
+              setShowPostModal={() => {
+                setSelectedPost(undefined);
+                setShowPostModal(true);
+              }}
+            />
           </div>
           <div className="mt-8">
-            <PostsList />
+            <PostsList
+              onSelectPost={(post) => {
+                setSelectedPost(post);
+                setShowPostModal(true);
+              }}
+            />
           </div>
         </div>
         <div className="w-80 hidden lg:block flex-shrink-0 mx-4">
@@ -64,10 +75,13 @@ const HomePage: FC = () => {
           </Button>
         </div>
       </div>
-      <CreatePostModal
-        show={showPostModal}
-        onClose={() => setShowPostModal(false)}
-      />
+      {showPostModal &&
+        <EditPostModal
+          post={selectedPost}
+          show={showPostModal}
+          onClose={() => setShowPostModal(false)}
+        />
+      }
     </>
   );
 };

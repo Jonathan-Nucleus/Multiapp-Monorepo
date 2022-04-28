@@ -385,7 +385,7 @@ PODS:
     - React-Core
     - SDWebImage (~> 5.11.1)
     - SDWebImageWebPCoder (~> 0.8.4)
-  - RNGestureHandler (2.1.3):
+  - RNGestureHandler (2.4.0):
     - React-Core
   - RNImageCropPicker (0.37.3):
     - React-Core
@@ -660,7 +660,7 @@ SPEC CHECKSUMS:
   RNCCheckbox: ed1b4ca295475b41e7251ebae046360a703b6eb5
   RNCPicker: abc646b53a3d28ccfa3232c927a0ca52e0cf024d
   RNFastImage: 1f2cab428712a4baaf78d6169eaec7f622556dd7
-  RNGestureHandler: e1099204721a17a89c81fcd1cc2e92143dc040fb
+  RNGestureHandler: 50e6ffee79932d14ea747d4ea4cc99aac0f24e86
   RNImageCropPicker: 44e2807bc410741f35d4c45b6586aedfe3da39d2
   RNScreens: 40a2cb40a02a609938137a1e0acfbf8fc9eebf19
   RNShare: 807d6f8231b8ebcf6dd839294b877342eb93d4e5

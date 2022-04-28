@@ -20,6 +20,7 @@ import {
 } from "phosphor-react";
 import Button from "../Button";
 import Avatar from "../Avatar";
+import Media from "../Media";
 import {
   useHidePost,
   useLikePost,
@@ -37,9 +38,10 @@ import ReportPostModal from "./ReportPostModal";
 
 interface PostProps {
   post: PostSummary;
+  onClickToEdit?: () => void;
 }
 
-const Post: FC<PostProps> = ({ post }) => {
+const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
   const { data: accountData } = useAccount();
   const account = accountData?.account;
   const [likePost] = useLikePost();
@@ -256,7 +258,7 @@ const Post: FC<PostProps> = ({ post }) => {
                       <Menu.Item>
                         <div
                           className="flex items-center px-4 py-3 cursor-pointer"
-                          onClick={() => {}}
+                          onClick={() => onClickToEdit && onClickToEdit()}
                         >
                           <Pencil
                             fill="currentColor"
@@ -320,12 +322,11 @@ const Post: FC<PostProps> = ({ post }) => {
         <div className="text-sm text-white opacity-90 px-4 mt-4">
           {post.body}
         </div>
-        <div className="flex flex-wrap -mx-1 mt-4 px-4">
+        <div className="flex flex-wrap -mx-1 mt-3 px-4">
           {post.categories.map((category) => (
             <div
               key={category}
-              className={`bg-white/[.25] uppercase rounded-full text-xs text-white
-              font-medium mx-1 px-4 py-1`}
+              className={`bg-white/[.25] uppercase rounded-full text-xs text-white font-medium mx-1 my-1 px-4 py-1`}
             >
               {category}
             </div>
@@ -333,16 +334,7 @@ const Post: FC<PostProps> = ({ post }) => {
         </div>
         {mediaUrl && (
           <div className="relative h-auto mt-5 border-b border-white/[.12]">
-            <Image
-              loader={() => `${process.env.NEXT_PUBLIC_POST_URL}/${mediaUrl}`}
-              src={`${process.env.NEXT_PUBLIC_POST_URL}/${mediaUrl}`}
-              alt=""
-              layout="responsive"
-              unoptimized={true}
-              objectFit="cover"
-              width={300}
-              height={200}
-            />
+            <Media src={mediaUrl} />
           </div>
         )}
         <div className="flex items-center p-4">

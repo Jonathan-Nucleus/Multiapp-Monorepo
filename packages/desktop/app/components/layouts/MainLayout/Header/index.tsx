@@ -5,17 +5,17 @@ import Logo from "shared/assets/images/logo-gradient.svg";
 import FundLogo from "shared/assets/images/logo-icon.svg";
 import {
   House,
-  ChartLineUp,
   MagnifyingGlass,
   ChatCircleDots,
   Bell,
-  User,
   List,
 } from "phosphor-react";
 import NavItem from "./NavItem";
 import SearchInput from "../../../common/SearchInput";
 import Sidebar from "./Sidebar";
 import AvatarMenu from "./AvatarMenu";
+import Avatar from "../../../common/Avatar";
+import { useAccount } from "mobile/src/graphql/query/account";
 
 const navItems = [
   {
@@ -39,6 +39,7 @@ const navItems = [
 
 const Header: FC = () => {
   const [showSidebar, setShowSidebar] = useState(false);
+  const { data: { account } = {} } = useAccount();
   return (
     <header className="bg-surface-light10 shadow shadow-black sticky top-0 z-20">
       <nav className="hidden md:flex flex-row items-center p-5">
@@ -109,8 +110,8 @@ const Header: FC = () => {
           className="flex flex-row items-center cursor-pointer"
           onClick={() => setShowSidebar(true)}
         >
-          <div className="bg-white rounded-full w-8 h-8 flex items-center justify-center relative">
-            <User color="black" size={24} />
+          <div className="w-9 h-9 flex items-center justify-center relative">
+            <Avatar size={36} src={account?.avatar} className="z-10" />
             <span className="bg-error rounded-full w-4 h-4 text-xs text-white absolute -top-1.5 -left-1.5 flex item-center justify-center font-medium">
               2
             </span>
@@ -118,7 +119,7 @@ const Header: FC = () => {
               color="white"
               weight="light"
               size={20}
-              className="absolute -right-3"
+              className="absolute -right-3 opacity-80"
             />
           </div>
         </div>
@@ -137,7 +138,7 @@ const Header: FC = () => {
           </Link>
         </div>
       </nav>
-      {showSidebar && <Sidebar onClose={() => setShowSidebar(false)} />}
+      <Sidebar show={showSidebar} onClose={() => setShowSidebar(false)} />
     </header>
   );
 };

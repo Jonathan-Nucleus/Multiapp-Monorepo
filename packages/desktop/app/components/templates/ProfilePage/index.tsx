@@ -10,9 +10,9 @@ import { UserProfile } from "mobile/src/graphql/query/user/useProfile";
 import { usePosts } from "mobile/src/graphql/query/user/usePosts";
 import { useManagedFunds } from "mobile/src/graphql/query/user/useManagedFunds";
 import { useAccount } from "mobile/src/graphql/query/account";
-import CreatePostModal from "../HomePage/AddPost/CreatePostModal";
 import Button from "../../common/Button";
 import NoPostSvg from "shared/assets/images/no-post.svg";
+import EditPostModal from "../../modules/posts/EditPostModal";
 
 interface ProfilePageProps {
   user: UserProfile;
@@ -86,10 +86,12 @@ const ProfilePage: FC<ProfilePageProps> = ({ user, isEditable = false }) => {
           </div>
         </div>
       </div>
-      <CreatePostModal
-        show={showPostModal}
-        onClose={() => setShowPostModal(false)}
-      />
+      {showPostModal &&
+        <EditPostModal
+          show={showPostModal}
+          onClose={() => setShowPostModal(false)}
+        />
+      }
     </>
   );
 };

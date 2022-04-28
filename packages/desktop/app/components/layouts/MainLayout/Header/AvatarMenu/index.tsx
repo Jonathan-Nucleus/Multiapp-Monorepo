@@ -1,5 +1,5 @@
-import { Popover } from "@headlessui/react";
-import { FC } from "react";
+import { Popover, Transition } from "@headlessui/react";
+import { FC, Fragment } from "react";
 import { signOut } from "next-auth/react";
 import {
   CaretDown,
@@ -87,51 +87,61 @@ const AvatarMenu: FC = () => {
           </div>
         </div>
       </Popover.Button>
-      <Popover.Panel className="absolute right-0 w-64 mt-6 bg-surface-light10 shadow-md shadow-black rounded">
-        <div className="divide-y border-white/[.12] divide-inherit pb-2">
-          <Popover.Button>
-            <Link href={"/profile/me"}>
-              <a>
-                <div className="flex flex-row items-center p-4">
-                  <Avatar size={64} src={account?.avatar} />
-                  <div className="text-left ml-3">
-                    <div className="text-xl text-white">
-                      {account?.firstName} {account?.lastName}
-                    </div>
-                    <div className="text-sm text-white opacity-60">
-                      See your profile
+      <Transition
+        as={Fragment}
+        enter="transition ease-out duration-200"
+        enterFrom="opacity-0 translate-y-1"
+        enterTo="opacity-100 translate-y-0"
+        leave="transition ease-in duration-150"
+        leaveFrom="opacity-100 translate-y-0"
+        leaveTo="opacity-0 translate-y-1"
+      >
+        <Popover.Panel className="absolute right-0 w-64 mt-6 bg-surface-light10 shadow-md shadow-black rounded">
+          <div className="divide-y border-white/[.12] divide-inherit pb-2">
+            <Popover.Button>
+              <Link href={"/profile/me"}>
+                <a>
+                  <div className="flex flex-row items-center p-4">
+                    <Avatar size={64} src={account?.avatar} />
+                    <div className="text-left ml-3">
+                      <div className="text-xl text-white">
+                        {account?.firstName} {account?.lastName}
+                      </div>
+                      <div className="text-sm text-white opacity-60">
+                        See your profile
+                      </div>
                     </div>
                   </div>
-                </div>
-              </a>
-            </Link>
-          </Popover.Button>
-          {items.map((item, index) => (
-            <MenuItem
-              key={index}
-              icon={item.icon}
-              title={item.title}
-              path={item.path}
-            />
-          ))}
-          <div>
-            <a
-              className="cursor-pointer px-4 py-3 flex flex-row items-center"
-              onClick={() =>
-                signOut({
-                  redirect: false,
-                  callbackUrl: process.env.NEXTAUTH_URL,
-                })
-              }
-            >
+                </a>
+              </Link>
+            </Popover.Button>
+            {items.map((item, index) => (
+              <MenuItem
+                key={index}
+                icon={item.icon}
+                title={item.title}
+                path={item.path}
+              />
+            ))}
+            <div>
+              <a
+                className="cursor-pointer px-4 py-3 flex flex-row items-center"
+                onClick={() =>
+                  signOut({
+                    redirect: false,
+                    callbackUrl: process.env.NEXTAUTH_URL,
+                  })
+                }
+              >
               <span className="flex-shrink-0 flex items-center">
                 <SignOut color="white" weight="light" size={24} />
               </span>
-              <span className="text-sm normal text-white ml-4">Sign Out</span>
-            </a>
+                <span className="text-sm normal text-white ml-4">Sign Out</span>
+              </a>
+            </div>
           </div>
-        </div>
-      </Popover.Panel>
+        </Popover.Panel>
+      </Transition>
     </Popover>
   );
 };

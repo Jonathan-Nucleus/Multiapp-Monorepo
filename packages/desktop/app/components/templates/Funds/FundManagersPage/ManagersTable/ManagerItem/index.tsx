@@ -15,6 +15,7 @@ import type {
 } from "mobile/src/graphql/query/marketplace/useFundManagers";
 
 type Fund = FundListItem;
+
 interface ManagerItemProps {
   manager: FundManager;
   funds: Fund[];
@@ -24,24 +25,17 @@ const ManagerItem: FC<ManagerItemProps> = ({
   manager,
   funds,
 }: ManagerItemProps) => {
-  const { data: userData } = useAccount({ fetchPolicy: "cache-only" });
+  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const [followUser] = useFollowUser();
-
-  const isFollowing =
-    userData?.account?.followingIds?.includes(manager._id) ?? false;
-
-  const toggleFollowUser = async (): Promise<void> => {
+  const isMyProfile = account?._id == manager?._id;
+  const isFollowing = account?.followingIds?.includes(manager._id) ?? false;
+  const toggleFollowUser = async () => {
     try {
-      const { data } = await followUser({
+      await followUser({
         variables: { follow: !isFollowing, userId: manager._id },
         refetchQueries: ["Account"],
       });
-
-      if (!data?.followUser) {
-        console.log("err", data);
-      }
     } catch (err) {
-      console.log("err", err);
     }
   };
 
@@ -87,19 +81,20 @@ const ManagerItem: FC<ManagerItemProps> = ({
           )}
         </div>
         <div className="flex items-center justify-end">
-          <Button
-            variant="text"
-            className="text-primary font-medium tracking-normal py-0 uppercase"
-            onClick={toggleFollowUser}
-          >
-            {isFollowing ? "unfollow" : "follow"}
-          </Button>
-          <Link href={`/profile/${manager._id}`}>
+          {!isMyProfile &&
+            <Button
+              variant="text"
+              className="text-sm text-primary font-medium tracking-normal py-0"
+              onClick={toggleFollowUser}
+            >
+              {isFollowing ? "UNFOLLOW" : "FOLLOW"}
+            </Button>
+          }
+          <Link href={isMyProfile ? "/profile/me" : `/profile/${manager._id}`}>
             <a>
               <Button
-                variant="primary"
-                className={`text-primary text-white tracking-normal ml-4
-              bg-purple-dark border border-primary-solid hover:bg-primary-solid`}
+                variant="outline-primary"
+                className="text-sm text-white tracking-normal ml-4"
               >
                 VIEW PROFILE
               </Button>
@@ -127,13 +122,15 @@ const ManagerItem: FC<ManagerItemProps> = ({
             <div className="text-xs text-white">Followers</div>
           </div>
           <div className="ml-auto">
-            <Button
-              variant="outline-primary"
-              className="text-primary text-white tracking-normal uppercase"
-              onClick={toggleFollowUser}
-            >
-              {isFollowing ? "unfollow" : "follow"}
-            </Button>
+            {!isMyProfile &&
+              <Button
+                variant="outline-primary"
+                className="text-sm text-white tracking-normal font-medium"
+                onClick={toggleFollowUser}
+              >
+                {isFollowing ? "Unfollow" : "Follow"}
+              </Button>
+            }
           </div>
         </div>
         <div className="flex items-center mt-4">

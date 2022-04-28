@@ -1,6 +1,3 @@
-import { FC } from "react";
-import Checkbox from "../../../../../common/Checkbox";
-import Label from "../../../../../common/Label";
 import { PostCategory } from "backend/graphql/posts.graphql";
 import { PostCategories } from "backend/graphql/enumerations.graphql";
 import {
@@ -10,6 +7,9 @@ import {
   Path,
 } from "react-hook-form";
 import * as yup from "yup";
+
+import Checkbox from "../../../../common/Checkbox";
+import Label from "../../../../common/Label";
 
 const categories = Object.keys(PostCategories).sort();
 export const categoriesSchema = yup
