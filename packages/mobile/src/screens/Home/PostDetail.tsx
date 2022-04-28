@@ -42,9 +42,14 @@ import { BLACK, WHITE } from 'shared/src/colors';
 import pStyles from '../../theme/pStyles';
 import { Body2Bold, Body3 } from '../../theme/fonts';
 
-import { useCommentPost, useDeleteComment } from '../../graphql/mutation/posts';
+import {
+  useCommentPost,
+  useDeleteComment,
+  useEditCommentPost,
+} from '../../graphql/mutation/posts';
 import { usePost, Post, Comment } from '../../graphql/query/post';
 import { useFollowUser, useHideUser } from '../../graphql/mutation/account';
+import { useAccount } from 'mobile/src/graphql/query/account';
 
 type CommentUser = Comment['user'];
 const CommentMenuDataArray = [
@@ -64,20 +69,24 @@ const PostDetail: PostDetailScreen = ({ route }) => {
   const { postId, userId } = route.params;
 
   const [comment, setComment] = useState('');
-  const [kebobMenuVisible, setKebobMenuVisible] = useState(false);
-  const [commentMenuVisible, setCommentMenuVisible] = useState(false);
+  const [kebobMenuVisible, setKebobMenuVisible] = useState(false); // someone's comment
+  const [commentMenuVisible, setCommentMenuVisible] = useState(false); // own comment
   const [selectedUser, setSelectedUser] = useState<CommentUser | undefined>(
     undefined,
   );
   const [likesModalVisible, setLikesModalVisible] = useState(false);
   const [focusCommentId, setFocusCommentId] = useState<string | null>(null);
   const inputRef = useRef<TextInput | null>(null);
+  const [isReplyComment, setReplyComment] = useState(false);
+  const [isEditComment, setEditComment] = useState(false);
 
   const { data, refetch } = usePost(postId);
   const [commentPost] = useCommentPost();
   const [deleteComment] = useDeleteComment();
+  const [editComment] = useEditCommentPost();
   const [followUser] = useFollowUser();
   const [hideUser] = useHideUser();
+  const { data: accountData } = useAccount();
 
   const getKebobMenuData = useMemo(() => {
     const KebobMenuDataArray = [
@@ -127,7 +136,8 @@ const PostDetail: PostDetailScreen = ({ route }) => {
     return (
       <SafeAreaView
         style={pStyles.globalContainer}
-        edges={['right', 'top', 'left']}></SafeAreaView>
+        edges={['right', 'top', 'left']}
+      />
     );
   }
 
@@ -156,21 +166,49 @@ const PostDetail: PostDetailScreen = ({ route }) => {
   };
 
   const handleDeleteComment = async () => {
-    if (!selectedUser) {
+    if (!focusCommentId) {
       return;
     }
 
     try {
       const { data } = await deleteComment({
-        variables: { commentId: selectedUser._id },
+        variables: { commentId: focusCommentId },
       });
       if (data?.deleteComment) {
-        showMessage('success', 'Successfully deleted!');
+        console.log('delete comment success');
       } else {
-        showMessage('error', SOMETHING_WRONG);
+        console.log('delete comment error');
       }
     } catch (err) {
-      showMessage('error', SOMETHING_WRONG);
+      console.log('delete comment error', err);
+    }
+  };
+
+  const handleEditComment = async () => {
+    if (!focusCommentId) {
+      return;
+    }
+
+    try {
+      const { data } = await editComment({
+        variables: {
+          comment: {
+            _id: focusCommentId,
+            body: comment,
+            mentionIds: [],
+            mediaUrl: '',
+          },
+        },
+        refetchQueries: ['Posts'],
+      });
+
+      if (data?.editComment) {
+        console.log('edit comment success');
+      } else {
+        console.log('edit comment error');
+      }
+    } catch (err) {
+      console.log('edit comment error', err);
     }
   };
 
@@ -215,6 +253,8 @@ const PostDetail: PostDetailScreen = ({ route }) => {
   const initInputComment = () => {
     setComment('');
     setFocusCommentId(null);
+    setReplyComment(false);
+    setEditComment(false);
     inputRef?.current?.blur();
   };
 
@@ -236,8 +276,14 @@ const PostDetail: PostDetailScreen = ({ route }) => {
           />
           <TouchableOpacity
             onPress={() => {
-              setSelectedUser(user);
-              setKebobMenuVisible(true);
+              setFocusCommentId(_id);
+              if (user._id === accountData?.account._id) {
+                setEditComment(true);
+                setCommentMenuVisible(true);
+              } else {
+                setSelectedUser(user);
+                setKebobMenuVisible(true);
+              }
             }}>
             <DotsThreeVertical size={24} color={WHITE} />
           </TouchableOpacity>
@@ -254,6 +300,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
           {!commentId && (
             <TouchableOpacity
               onPress={() => {
+                setReplyComment(true);
                 setFocusCommentId(_id);
                 setSelectedUser(user);
                 inputRef?.current?.focus();
@@ -282,7 +329,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
       </PAppContainer>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'position' : undefined}>
-        {focusCommentId && (
+        {isReplyComment && (
           <View style={styles.replyContainer}>
             <Text style={styles.headerReply}>
               Replying to
@@ -308,6 +355,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
             <PaperPlaneRight size={32} color={WHITE} />
           </TouchableOpacity>
         </View>
+        {isEditComment && <View />}
       </KeyboardAvoidingView>
       <SelectionModal
         isVisible={kebobMenuVisible}
@@ -336,7 +384,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
         onPressItem={(key) => {
           setCommentMenuVisible(false);
           if (key === 'edit') {
-            // handleEditComment();
+            handleEditComment();
           } else if (key === 'delete') {
             handleDeleteComment();
           }
