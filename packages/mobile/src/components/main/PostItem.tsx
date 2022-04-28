@@ -14,6 +14,7 @@ import PLabel from '../common/PLabel';
 import IconButton from '../common/IconButton';
 import UserInfo from '../common/UserInfo';
 import Tag from '../common/Tag';
+import Media from '../common/Media';
 import { PRIMARYSTATE, GRAY10, WHITE60, WHITE } from 'shared/src/colors';
 import { Body1, Body3 } from '../../theme/fonts';
 import * as NavigationService from '../../services/navigation/NavigationService';
@@ -69,14 +70,8 @@ const PostItem: React.FC<PostItemProps> = ({ post, userId, onPressMenu }) => {
           <DotsThreeVertical size={24} color={WHITE} />
         </TouchableOpacity>
       </View>
-      {body && <PLabel label={body} textStyle={styles.body} />}
-      {mediaUrl && (
-        <FastImage
-          style={styles.postImage}
-          source={{ uri: `${POST_URL}/${mediaUrl}` }}
-          resizeMode={FastImage.resizeMode.cover}
-        />
-      )}
+      {body ? <PLabel label={body} textStyle={styles.body} /> : null}
+      {mediaUrl ? <Media src={mediaUrl} /> : null}
       <View style={styles.postInfo}>
         <View style={styles.tagWrapper}>
           {post.categories.map((item) => (
@@ -168,13 +163,6 @@ const styles = StyleSheet.create({
     ...Body3,
     color: WHITE60,
     marginLeft: 4,
-  },
-  postImage: {
-    width: '100%',
-    height: 224,
-    marginVertical: 16,
-    borderRadius: 16,
-    overflow: 'hidden',
   },
   body: {
     lineHeight: 20,
