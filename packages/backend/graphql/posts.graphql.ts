@@ -6,7 +6,7 @@ import {
   secureEndpoint,
 } from "../lib/apollo-helper";
 
-import type { Post } from "../schemas/post";
+import { Post, PostRoleFilterOptions } from "../schemas/post";
 import {
   PostSchema,
   AudienceOptions,
@@ -38,6 +38,12 @@ const resolvers = {
     [key: string]: string;
   }>((acc, option) => {
     acc[option] = PostCategoryOptions[option].value;
+    return acc;
+  }, {}),
+  PostRoleFilter: Object.keys(PostRoleFilterOptions).reduce<{
+    [key: string]: string;
+  }>((acc, option) => {
+    acc[option] = PostRoleFilterOptions[option].value;
     return acc;
   }, {}),
   Post: {

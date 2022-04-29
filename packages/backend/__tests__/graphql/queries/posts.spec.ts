@@ -4,12 +4,18 @@ import { createTestApolloServer } from "../../../lib/server";
 import { ErrorCode } from "../../../lib/validate";
 import { User } from "../../../schemas/user";
 import { Post, PostCategoryOptions } from "../../../schemas/post";
-import { createPost, createUser, getErrorCode } from "../../config/utils";
+import {
+  createPost,
+  createUser,
+  DbCollection,
+  getErrorCode,
+} from "../../config/utils";
+import { getIgniteDb } from "../../../db";
 
 describe("Query - posts", () => {
   const query = gql`
-    query Posts($categories: [PostCategory!]) {
-      posts(categories: $categories) {
+    query Posts($categories: [PostCategory!], $roleFilter: PostRoleFilter) {
+      posts(categories: $categories, roleFilter: $roleFilter) {
         _id
         body
         user {
@@ -25,12 +31,14 @@ describe("Query - posts", () => {
   let authUser: User.Mongo | null;
   let user1: User.Mongo | null;
   let user2: User.Mongo | null;
+  let user3: User.Mongo | null;
   let posts: Post.Mongo[];
 
   beforeAll(async () => {
     authUser = await createUser("user", "client");
     user1 = await createUser("user", "accredited");
     user2 = await createUser("user");
+    user3 = await createUser("professional", "accredited");
     posts = (await Promise.all([
       await createPost(
         authUser?._id,
@@ -72,7 +80,30 @@ describe("Query - posts", () => {
         [PostCategoryOptions.NEWS.value],
         "accredited"
       ),
+      await createPost(
+        user3?._id,
+        [PostCategoryOptions.NEWS.value],
+        "everyone"
+      ),
+      await createPost(
+        user3?._id,
+        [PostCategoryOptions.NEWS.value],
+        "accredited"
+      ),
+      await createPost(
+        user3?._id,
+        [PostCategoryOptions.NEWS.value],
+        "accredited"
+      ),
     ])) as Post.Mongo[];
+
+    const { db } = await getIgniteDb();
+    await db
+      .collection(DbCollection.USERS)
+      .updateOne(
+        { _id: authUser._id },
+        { $addToSet: { followingIds: user2._id } }
+      );
 
     server = createTestApolloServer(authUser);
   });
@@ -93,7 +124,7 @@ describe("Query - posts", () => {
       query,
     });
 
-    expect(res.data?.posts).toHaveLength(7);
+    expect(res.data?.posts).toHaveLength(10);
   });
 
   it("succeeds to get all NEWS posts", async () => {
@@ -104,7 +135,7 @@ describe("Query - posts", () => {
       },
     });
 
-    expect(res.data?.posts).toHaveLength(4);
+    expect(res.data?.posts).toHaveLength(7);
   });
 
   it("succeeds to get all IDEAS posts", async () => {
@@ -137,7 +168,51 @@ describe("Query - posts", () => {
       },
     });
 
-    expect(res.data?.posts).toHaveLength(7);
+    expect(res.data?.posts).toHaveLength(10);
+  });
+
+  it("succeeds to get pros + follow posts", async () => {
+    const res = await server.executeOperation({
+      query,
+      variables: {
+        roleFilter: "PROFESSIONAL_FOLLOW",
+      },
+    });
+
+    expect(res.data?.posts).toHaveLength(5);
+  });
+
+  it("succeeds to get professional's posts", async () => {
+    const res = await server.executeOperation({
+      query,
+      variables: {
+        roleFilter: "PROFESSIONAL_ONLY",
+      },
+    });
+
+    expect(res.data?.posts).toHaveLength(3);
+  });
+
+  it("succeeds to get following's posts", async () => {
+    const res = await server.executeOperation({
+      query,
+      variables: {
+        roleFilter: "FOLLOW_ONLY",
+      },
+    });
+
+    expect(res.data?.posts).toHaveLength(2);
+  });
+
+  it("succeeds to get everyone's posts", async () => {
+    const res = await server.executeOperation({
+      query,
+      variables: {
+        roleFilter: "EVERYONE",
+      },
+    });
+
+    expect(res.data?.posts).toHaveLength(10);
   });
 
   // TODO: hidden posts and hidden users

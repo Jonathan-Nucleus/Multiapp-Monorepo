@@ -4,22 +4,32 @@
  */
 
 import { Collection, ObjectId } from "mongodb";
+import _ from "lodash";
 import {
   MongoId,
   toObjectId,
   toObjectIds,
   GraphQLEntity,
 } from "../../lib/mongo-helper";
-import type { Post, PostCategory, Audience } from "../../schemas/post";
+import type {
+  Post,
+  PostCategory,
+  Audience,
+  PostRoleFilter,
+} from "../../schemas/post";
 import type { Comment } from "../../schemas/comment";
 import {
   InternalServerError,
   NotFoundError,
   UnprocessableEntityError,
 } from "../../lib/validate";
+import { User } from "../../schemas/user";
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
-const createPostsCollection = (postsCollection: Collection<Post.Mongo>) => {
+const createPostsCollection = (
+  postsCollection: Collection<Post.Mongo>,
+  usersCollection: Collection<User.Mongo>
+) => {
   return {
     /**
      * Find a post by the post id.
@@ -53,20 +63,24 @@ const createPostsCollection = (postsCollection: Collection<Post.Mongo>) => {
      * Provides a list of all posts in the DB that match a specific set of
      * categories.
      *
-     * @param audience    Audience level of posts to fetch.
-     * @param categories  Optional list of categories to match.
-     * @param ignorePosts List of post ids that should not be fetched.
-     * @param ignoreUsers List of user ids of whose posts not to fetch.
-     * @param offset      Optional offset for pagination. Defaults to 0.
-     * @param limit       Optional limit for pagination. Defaults to no limit.
+     * @param audience        Audience level of posts to fetch.
+     * @param categories      Optional list of categories to match.
+     * @param ignorePosts     List of post ids that should not be fetched.
+     * @param ignoreUsers     List of user ids of whose posts not to fetch.
+     * @param roleFilter      Role filter to filter the post by user role.
+     * @param followingUsers  List of user ids that user is following.
+     * @param offset          Optional offset for pagination. Defaults to 0.
+     * @param limit           Optional limit for pagination. Defaults to no limit.
      *
      * @returns   An array of matching Post objects.
      */
-    findByCategory: async (
+    findByFilters: async (
       audience: Audience,
       categories?: PostCategory[],
       ignorePosts: MongoId[] = [],
       ignoreUsers: MongoId[] = [],
+      roleFilter: PostRoleFilter = "everyone",
+      followingUsers: MongoId[] = [],
       offset: number = 0,
       limit: number = 0
     ): Promise<Post.Mongo[]> => {
@@ -78,11 +92,35 @@ const createPostsCollection = (postsCollection: Collection<Post.Mongo>) => {
       ];
       audienceLevels.splice(audienceLevels.indexOf(audience) + 1);
 
+      let userIds: MongoId[] = [];
+      if (roleFilter !== "everyone") {
+        if (
+          roleFilter === "professional-follow" ||
+          roleFilter === "professional-only"
+        ) {
+          const proIds = _.map(
+            await usersCollection.find({ role: "professional" }).toArray(),
+            "_id"
+          );
+          userIds = [...proIds];
+        }
+        if (roleFilter === "professional-follow") {
+          userIds = [...userIds, ...followingUsers];
+        } else if (roleFilter === "follow-only") {
+          userIds = [...followingUsers];
+        }
+
+        userIds = _.difference(userIds, ignoreUsers || []);
+      }
+
       return postsCollection
         .find({
           _id: { $nin: toObjectIds(ignorePosts) },
           audience: { $in: audienceLevels },
-          userId: { $nin: toObjectIds(ignoreUsers) },
+          userId: {
+            $nin: toObjectIds(ignoreUsers),
+            ...(roleFilter !== "everyone" ? { $in: toObjectIds(userIds) } : {}),
+          },
           ...(categories !== undefined
             ? { categories: { $in: categories } }
             : {}),

@@ -1,5 +1,6 @@
 import { gql } from "apollo-server";
 import * as yup from "yup";
+import _ from "lodash";
 import { getChatToken } from "../lib/tokens";
 import {
   PartialSchema,
@@ -13,9 +14,15 @@ import {
   validateArgs,
 } from "../lib/validate";
 
-import { User, isUser, compareAccreditation } from "../schemas/user";
+import { User, isUser, compareAccreditation, UserRole } from "../schemas/user";
 import type { Company } from "../schemas/company";
-import type { Post, PostCategory } from "../schemas/post";
+import {
+  Post,
+  PostCategory,
+  PostCategoryOptions,
+  PostRoleFilter,
+  PostRoleFilterOptions,
+} from "../schemas/post";
 import type { Fund } from "../schemas/fund";
 import type { Notification } from "../schemas/notification";
 
@@ -25,7 +32,7 @@ const schema = gql`
     account: User
     chatToken: String
     post(postId: ID!): Post
-    posts(categories: [PostCategory!]): [Post!]
+    posts(categories: [PostCategory!], roleFilter: PostRoleFilter): [Post!]
     funds: [Fund!]
     fund(fundId: ID!): Fund
     fundManagers(featured: Boolean): FundManagers
@@ -104,30 +111,42 @@ const resolvers = {
     posts: secureEndpoint(
       async (
         parentIgnored,
-        args: { categories?: PostCategory[] },
+        args: { categories?: PostCategory[]; roleFilter?: PostRoleFilter },
         { db, user }
       ): Promise<Post.Mongo[]> => {
         const validator = yup
           .object()
           .shape({
-            categories: yup.array().of(yup.string().required()),
+            categories: yup.array().of(
+              yup
+                .string()
+                .oneOf(_.map(Object.values(PostCategoryOptions), "value"))
+                .required()
+            ),
+            roleFilter: yup
+              .string()
+              .oneOf(_.map(Object.values(PostRoleFilterOptions), "value")),
           })
           .required();
 
         validateArgs(validator, args);
 
-        const { categories } = args;
+        const { categories, roleFilter = "everyone" } = args;
 
         const userData = await db.users.find({ _id: user._id });
         if (!userData || !isUser(userData)) {
           throw new NotFoundError();
         }
 
-        return db.posts.findByCategory(
-          user.accreditation === "none" ? "everyone" : user.accreditation,
+        return db.posts.findByFilters(
+          userData.accreditation === "none"
+            ? "everyone"
+            : userData.accreditation,
           categories,
           userData.hiddenPostIds,
-          userData.hiddenUserIds
+          userData.hiddenUserIds,
+          roleFilter,
+          userData.followingIds
         );
       }
     ),

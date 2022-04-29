@@ -156,6 +156,27 @@ export const PostCategoryOptions = {
 export type PostCategory = ValueOf<typeof PostCategoryOptions>["value"];
 export type PostCategoryEnum = keyof typeof PostCategoryOptions;
 
+export const PostRoleFilterOptions = {
+  PROFESSIONAL_FOLLOW: {
+    label: "Pros + people I know",
+    value: "professional-follow",
+  },
+  PROFESSIONAL_ONLY: {
+    label: "Professionals",
+    value: "professional-only",
+  },
+  FOLLOW_ONLY: {
+    label: "People I follow",
+    value: "follow-only",
+  },
+  EVERYONE: {
+    label: "Everyone",
+    value: "everyone",
+  },
+} as const;
+export type PostRoleFilter = ValueOf<typeof PostRoleFilterOptions>["value"];
+export type PostRoleFilterEnum = keyof typeof PostRoleFilterOptions;
+
 export const PostSchema = `
   type Post {
     _id: ID!
@@ -196,5 +217,9 @@ export const PostSchema = `
 
   enum PostCategory {
     ${Object.keys(PostCategoryOptions).map((key) => key)}
+  }
+
+  enum PostRoleFilter {
+    ${Object.keys(PostRoleFilterOptions).map((key) => key)}
   }
 `;
