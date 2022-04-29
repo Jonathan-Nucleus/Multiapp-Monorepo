@@ -29,6 +29,7 @@ import {
 } from '../../../theme/fonts';
 import PHeader from '../../../components/common/PHeader';
 import MainHeader from '../../../components/main/Header';
+import { useAccount } from '../../../graphql/query/account';
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
@@ -36,12 +37,15 @@ interface RouterProps {
 
 const AccountAdmin: FC<RouterProps> = ({ navigation }) => {
   const [isVisible, setIsVisible] = useState(false);
+  const { data } = useAccount();
+  const account = data?.account;
 
   const ACCOUNT_MENU_OPTIONS = [
     {
       id: 'edit_profile',
       label: 'Edit your profile',
-      onPress: () => navigation.navigate('UserProfile'),
+      onPress: () =>
+        navigation.navigate('UserProfile', { userId: account?._id }),
       icon: <UserCircle size={28} color={WHITE} />,
     },
     {

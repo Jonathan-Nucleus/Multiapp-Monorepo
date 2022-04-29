@@ -11,7 +11,7 @@ import SettingsStack from './SettingsStack';
 import FundsSVG from 'shared/assets/images/fund.svg';
 import GreyFundsSVG from 'shared/assets/images/grey-fund.svg';
 import WatchList from '../screens/WatchList';
-import Help from '../screens/Help';
+import Chat from '../screens/Chat';
 
 const Tab = createBottomTabNavigator();
 
@@ -67,7 +67,7 @@ export default function BottomTabNavigator() {
       />
       <Tab.Screen
         name="Chat"
-        component={Help}
+        component={Chat}
         options={{
           tabBarLabel: 'messages',
           tabBarIcon: ({ focused, size }) =>

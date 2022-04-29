@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import {
   ListRenderItem,
   StyleSheet,
@@ -10,15 +10,17 @@ import {
   Linking,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import { useIsFocused, NavigationProp } from '@react-navigation/native';
-import { CaretLeft } from 'phosphor-react-native';
+import {
+  useIsFocused,
+  NavigationProp,
+  RouteProp,
+} from '@react-navigation/native';
+import { CaretLeft, Pencil } from 'phosphor-react-native';
 import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
 
 import {
   WHITE,
-  WHITE60,
   BLUE300,
-  BGHEADER,
   GRAY100,
   PRIMARY,
   PRIMARYSOLID,
@@ -34,6 +36,7 @@ import PostItem from '../../../components/main/PostItem';
 import { Post } from 'mobile/src/graphql/query/post/usePosts';
 import FeaturedItem from '../../../components/main/settings/FeaturedItem';
 import Funds from '../../../components/main/settings/Funds';
+import PGradientOutlineButton from '../../../components/common/PGradientOutlineButton';
 import { useAccount } from '../../../graphql/query/account';
 import { usePosts } from '../../../graphql/query/account/usePosts';
 
@@ -41,13 +44,17 @@ import LinkedinSvg from 'shared/assets/images/linkedin.svg';
 import TwitterSvg from 'shared/assets/images/twitter.svg';
 import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 import DotsThreeVerticalSvg from 'shared/assets/images/dotsThreeVertical.svg';
-import PGradientOutlineButton from '../../../components/common/PGradientOutlineButton';
+import NoPostSvg from 'shared/assets/images/no-post.svg';
 
-interface RouterProps {
+interface UserProfileProps {
   navigation: NavigationProp<any, any>;
+  route: RouteProp<any, any>;
 }
 
-const UserProfile: FC<RouterProps> = ({ navigation }) => {
+const UserProfile: FC<UserProfileProps> = ({
+  navigation,
+  route,
+}: UserProfileProps) => {
   const { data, refetch } = usePosts();
   const { data: accountData } = useAccount();
   const isFocused = useIsFocused();
@@ -63,6 +70,10 @@ const UserProfile: FC<RouterProps> = ({ navigation }) => {
     setFocusState(isFocused);
   }
 
+  const isMyAccount = useMemo(() => {
+    return route.params?.userId === accountData?.account._id ? true : false;
+  }, [route, accountData]);
+
   const renderItem: ListRenderItem<Post> = ({ item }) => (
     <TouchableOpacity>
       <FeaturedItem post={item} />
@@ -70,7 +81,18 @@ const UserProfile: FC<RouterProps> = ({ navigation }) => {
   );
 
   if (!account) {
-    return null;
+    return (
+      <View style={pStyles.globalContainer}>
+        <MainHeader
+          leftIcon={
+            <View style={styles.backIcon}>
+              <CaretLeft color={WHITE} />
+            </View>
+          }
+          onPressLeft={() => navigation.goBack()}
+        />
+      </View>
+    );
   }
   const {
     avatar,
@@ -99,11 +121,11 @@ const UserProfile: FC<RouterProps> = ({ navigation }) => {
       />
       <PAppContainer style={styles.container}>
         <View style={styles.relative}>
-          {background ? (
+          {background?.url ? (
             <FastImage
               style={styles.backgroundImg}
               source={{
-                uri: `${BACKGROUND_URL}/${background}`,
+                uri: `${BACKGROUND_URL}/${background.url}`,
               }}
               resizeMode={FastImage.resizeMode.cover}
             />
@@ -112,6 +134,18 @@ const UserProfile: FC<RouterProps> = ({ navigation }) => {
               btnContainer={styles.noBackground}
               gradientContainer={styles.gradientContainer}
             />
+          )}
+          {isMyAccount && (
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate('EditUserPhoto', {
+                  user: account,
+                  type: 'BACKGROUND',
+                })
+              }
+              style={styles.pencil}>
+              <Pencil color={WHITE} size={18} />
+            </TouchableOpacity>
           )}
         </View>
         <View style={styles.content}>
@@ -132,6 +166,18 @@ const UserProfile: FC<RouterProps> = ({ navigation }) => {
                     {lastName.charAt(0)}
                   </Text>
                 </View>
+              )}
+              {isMyAccount && (
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate('EditUserPhoto', {
+                      user: account,
+                      type: 'AVATAR',
+                    })
+                  }
+                  style={styles.pencil}>
+                  <Pencil color={WHITE} size={18} />
+                </TouchableOpacity>
               )}
             </View>
           </View>
@@ -163,18 +209,28 @@ const UserProfile: FC<RouterProps> = ({ navigation }) => {
             </View>
           </View>
           <Text style={styles.decription}>{account.overview}</Text>
-          <View style={[styles.row, styles.between]}>
+          {isMyAccount ? (
             <PGradientOutlineButton
-              label="Message"
-              onPress={() => console.log(11)}
+              label="Edit Profile"
+              onPress={() =>
+                navigation.navigate('EditUserProfile', { user: account })
+              }
               gradientContainer={styles.button}
             />
-            <PGradientButton
-              label="follow"
-              onPress={() => console.log(11)}
-              gradientContainer={styles.button}
-            />
-          </View>
+          ) : (
+            <View style={[styles.row, styles.between]}>
+              <PGradientOutlineButton
+                label="Message"
+                onPress={() => console.log(11)}
+                gradientContainer={styles.button}
+              />
+              <PGradientButton
+                label="follow"
+                onPress={() => console.log(11)}
+                gradientContainer={styles.button}
+              />
+            </View>
+          )}
         </View>
         <View style={[styles.row, styles.social]}>
           <View style={styles.row}>
@@ -205,7 +261,7 @@ const UserProfile: FC<RouterProps> = ({ navigation }) => {
         </View>
         <Funds accredited={accountData?.account.accreditation} />
         <View style={styles.posts}>
-          {postData && postData.length > 0 && (
+          {postData && postData.length > 0 ? (
             <View>
               <Text style={styles.text}>Featured Posts</Text>
               <FlatList
@@ -216,9 +272,15 @@ const UserProfile: FC<RouterProps> = ({ navigation }) => {
                 horizontal
               />
             </View>
+          ) : (
+            isMyAccount && (
+              <View style={styles.noPostContainer}>
+                <Text style={styles.val}>You don’t have any posts, yet.</Text>
+              </View>
+            )
           )}
 
-          {postData && postData.length > 0 && (
+          {postData && postData.length > 0 ? (
             <FlatList
               data={postData || []}
               renderItem={({ item }) => (
@@ -228,6 +290,20 @@ const UserProfile: FC<RouterProps> = ({ navigation }) => {
               listKey="post"
               ListHeaderComponent={<Text style={styles.text}>All Posts</Text>}
             />
+          ) : (
+            isMyAccount && (
+              <View style={styles.noPostContainer}>
+                <View style={styles.noPostContainer}>
+                  <NoPostSvg />
+                </View>
+                <Text style={styles.val}>You don’t have any posts, yet.</Text>
+                <PGradientButton
+                  label="Create a Post"
+                  btnContainer={styles.createPostBtn}
+                  onPress={() => navigation.navigate('CreatePost')}
+                />
+              </View>
+            )
           )}
         </View>
       </PAppContainer>
@@ -368,5 +444,22 @@ const styles = StyleSheet.create({
   noAvatar: {
     color: PRIMARYSOLID,
     ...H5Bold,
+  },
+  pencil: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    backgroundColor: PRIMARYSOLID,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noPostContainer: {
+    alignSelf: 'center',
+  },
+  createPostBtn: {
+    marginTop: 25,
   },
 });

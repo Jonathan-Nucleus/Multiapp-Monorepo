@@ -23,11 +23,12 @@ import CompanyProfile from '../screens/Settings/CompanyProfile';
 import CreatePost from '../screens/Home/CreatePost';
 import BecomePro from '../screens/Settings/BecomePro';
 import Contact from '../screens/Settings/Contact';
-import EditPhoto from '../screens/Settings/AccountAdmin/UserProfile/EditPhoto';
-import EditProfile from '../screens/Settings/AccountAdmin/UserProfile/EditProfile';
+import EditPhoto from '../screens/Settings/UserProfile/EditPhoto';
+import EditProfile from '../screens/Settings/UserProfile/EditProfile';
 import VerificationSuccess from '../screens/Settings/BecomePro/VerificationSuccess';
 import EditCompanyProfile from '../screens/Settings/CompanyProfile/EditProfile';
 import EditCompanyPhoto from '../screens/Settings/CompanyProfile/EditPhoto';
+import SearchTabs from './SearchTabs';
 
 type AppParamList = {
   Auth: undefined;
@@ -103,8 +104,8 @@ const AppNavigator = () => {
         <Stack.Screen name="UserProfile" component={UserProfile} />
         <Stack.Screen name="CompanyProfile" component={CompanyProfile} />
         <Stack.Screen name="CreatePost" component={CreatePost} />
-        <Stack.Screen name="EditPhoto" component={EditPhoto} />
-        <Stack.Screen name="EditProfile" component={EditProfile} />
+        <Stack.Screen name="EditUserPhoto" component={EditPhoto} />
+        <Stack.Screen name="EditUserProfile" component={EditProfile} />
         <Stack.Screen
           name="EditCompanyProfile"
           component={EditCompanyProfile}
@@ -116,6 +117,7 @@ const AppNavigator = () => {
           name="VerificationSuccess"
           component={VerificationSuccess}
         />
+        <Stack.Screen name="Search" component={SearchTabs} />
       </Stack.Navigator>
     </NavigationContainer>
   );

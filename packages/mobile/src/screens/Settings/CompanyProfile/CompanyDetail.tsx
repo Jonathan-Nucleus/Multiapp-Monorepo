@@ -86,7 +86,7 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
   return (
     <>
       <View style={styles.relative}>
-        {background ? (
+        {background?.url ? (
           <FastImage
             style={styles.backgroundImg}
             source={{

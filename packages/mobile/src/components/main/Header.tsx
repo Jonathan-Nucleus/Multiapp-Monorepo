@@ -49,13 +49,20 @@ const MainHeader: React.FC<HeaderProps> = (props) => {
           rightIcon
         ) : (
           <View style={styles.headerIconContainer}>
-            <SearchSvg />
+            <TouchableOpacity
+              onPress={() => NavigationService.navigate('Search')}>
+              <SearchSvg />
+            </TouchableOpacity>
             <TouchableOpacity
               onPress={() => NavigationService.navigate('Notification')}>
               <BellSvg style={styles.headerIcon} />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => NavigationService.navigate('UserProfile')}>
+              onPress={() =>
+                NavigationService.navigate('UserProfile', {
+                  userId: data?.account._id,
+                })
+              }>
               <RoundImageView
                 image={{
                   uri: `${AVATAR_URL}/${

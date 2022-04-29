@@ -26,15 +26,15 @@ import {
   WHITE60,
   PRIMARY,
 } from 'shared/src/colors';
-import pStyles from '../../../../theme/pStyles';
-import { Body1Bold, Body2, Body2Bold, H5Bold } from '../../../../theme/fonts';
-import MainHeader from '../../../../components/main/Header';
-import PAppContainer from '../../../../components/common/PAppContainer';
+import pStyles from '../../../theme/pStyles';
+import { Body1Bold, Body2, Body2Bold, H5Bold } from '../../../theme/fonts';
+import MainHeader from '../../../components/main/Header';
+import PAppContainer from '../../../components/common/PAppContainer';
 import type { User } from 'backend/graphql/users.graphql';
 import { useUpdateUserProfile } from 'mobile/src/graphql/mutation/account';
 import { useFetchUploadLink } from 'mobile/src/graphql/mutation/posts';
-import { showMessage } from '../../../../services/utils';
-import PGradientButton from '../../../../components/common/PGradientButton';
+import { showMessage } from '../../../services/utils';
+import PGradientButton from '../../../components/common/PGradientButton';
 import { MediaType } from 'backend/graphql/mutations.graphql';
 
 interface RouterProps {

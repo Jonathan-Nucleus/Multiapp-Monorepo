@@ -5,6 +5,7 @@ import {
   View,
   Text,
   TouchableOpacity,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NavigationProp, RouteProp } from '@react-navigation/native';
@@ -133,7 +134,12 @@ const Signup: SignupScreen = ({ navigation, route }) => {
         />
         <View style={styles.wrap}>
           <Text style={styles.txt}>I agree to the Prometheus Alts </Text>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() =>
+              Linking.openURL(
+                'https://prometheusalts.com/legals/disclosure-library',
+              )
+            }>
             <Text style={styles.hyperText}>Terms</Text>
           </TouchableOpacity>
           <Text style={styles.txt}>, </Text>
@@ -141,7 +147,12 @@ const Signup: SignupScreen = ({ navigation, route }) => {
             <Text style={styles.hyperText}>Community</Text>
           </TouchableOpacity>
           <Text style={styles.txt}>and </Text>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() =>
+              Linking.openURL(
+                'https://prometheusalts.com/legals/disclosure-library',
+              )
+            }>
             <Text style={styles.hyperText}>Privacy Policy</Text>
           </TouchableOpacity>
           <Text style={styles.txt}>.</Text>

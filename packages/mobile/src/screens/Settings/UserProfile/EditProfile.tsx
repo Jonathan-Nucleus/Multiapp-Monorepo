@@ -9,14 +9,14 @@ import {
 import { NavigationProp, RouteProp } from '@react-navigation/native';
 import { CaretLeft, LinkedinLogo, TwitterLogo } from 'phosphor-react-native';
 
-import PAppContainer from '../../../../components/common/PAppContainer';
-import PTextInput from '../../../../components/common/PTextInput';
-import { Body1Bold, Body2, Body4 } from '../../../../theme/fonts';
+import PAppContainer from '../../../components/common/PAppContainer';
+import PTextInput from '../../../components/common/PTextInput';
+import { Body1Bold, Body2, Body4 } from '../../../theme/fonts';
 import { PRIMARY, WHITE, WHITE12, WHITE60 } from 'shared/src/colors';
-import MainHeader from '../../../../components/main/Header';
-import pStyles from '../../../../theme/pStyles';
-import { useUpdateUserProfile } from '../../../../graphql/mutation/account';
-import { showMessage } from '../../../../services/utils';
+import MainHeader from '../../../components/main/Header';
+import pStyles from '../../../theme/pStyles';
+import { useUpdateUserProfile } from '../../../graphql/mutation/account';
+import { showMessage } from '../../../services/utils';
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;

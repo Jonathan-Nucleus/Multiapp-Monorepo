@@ -5,15 +5,15 @@ import { NavigationProp } from '@react-navigation/native';
 import { CaretLeft, MagnifyingGlass } from 'phosphor-react-native';
 import { WHITE, BGDARK } from 'shared/src/colors';
 
-import PHeader from '../../../components/common/PHeader';
-import pStyles from '../../../theme/pStyles';
-import { Body1, Body2, Body3 } from '../../../theme/fonts';
-import MainHeader from '../../../components/main/Header';
+import PHeader from '../../components/common/PHeader';
+import pStyles from '../../theme/pStyles';
+import { Body1, Body2, Body3 } from '../../theme/fonts';
+import MainHeader from '../../components/main/Header';
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
 }
-const Terms: FC<RouterProps> = ({ navigation }) => {
+const Chat: FC<RouterProps> = ({ navigation }) => {
   return (
     <View style={pStyles.globalContainer}>
       <MainHeader
@@ -21,7 +21,7 @@ const Terms: FC<RouterProps> = ({ navigation }) => {
           <View style={styles.row}>
             <CaretLeft size={28} color={WHITE} />
             <Text style={styles.headerTitle} numberOfLines={1}>
-              Terms and Disclosures
+              Chat
             </Text>
           </View>
         }
@@ -31,7 +31,7 @@ const Terms: FC<RouterProps> = ({ navigation }) => {
   );
 };
 
-export default Terms;
+export default Chat;
 
 const styles = StyleSheet.create({
   headerTitle: {

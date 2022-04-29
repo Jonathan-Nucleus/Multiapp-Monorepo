@@ -18,6 +18,7 @@ import {
   UserCirclePlus,
   At,
   Share,
+  CaretLeft,
 } from 'phosphor-react-native';
 import {
   PRIMARYSTATE,
@@ -133,7 +134,7 @@ interface Notification {
   createdAt: Date;
 }
 
-const Notification: NotificationScreen = () => {
+const Notification: NotificationScreen = ({ navigation }) => {
   const [isVisible, setIsVisible] = useState(false);
 
   const title = (val: Notification) => {
@@ -212,7 +213,10 @@ const Notification: NotificationScreen = () => {
 
   return (
     <View style={pStyles.globalContainer}>
-      <MainHeader />
+      <MainHeader
+        leftIcon={<CaretLeft size={28} color={WHITE} />}
+        onPressLeft={navigation.goBack}
+      />
       <View style={[styles.row, styles.between]}>
         <Text style={styles.title}>Notifications</Text>
         <TouchableOpacity onPress={() => setIsVisible(true)}>

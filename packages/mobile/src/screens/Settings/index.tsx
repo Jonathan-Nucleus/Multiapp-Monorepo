@@ -5,6 +5,7 @@ import {
   View,
   Text,
   TouchableOpacity,
+  Linking,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { NavigationProp } from '@react-navigation/native';
@@ -75,13 +76,15 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
     {
       id: 'Support',
       label: 'Help & Support',
-      onPress: () => navigation.navigate('Help'),
+      onPress: () =>
+        Linking.openURL('https://help.prometheusalts.com/hc/en-us'),
       icon: <Lifebuoy size={26} color={WHITE} />,
     },
     {
       id: 'Terms',
       label: 'Terms and Disclosures',
-      onPress: () => navigation.navigate('Terms'),
+      onPress: () =>
+        Linking.openURL('https://prometheusalts.com/legals/disclosure-library'),
       icon: <ShieldWarning size={26} color={WHITE} />,
     },
     {
@@ -141,7 +144,10 @@ const Settings: FC<RouterProps> = ({ navigation }) => {
   const renderListHeaderComponent = () => {
     return (
       <>
-        <TouchableOpacity onPress={() => navigation.navigate('UserProfile')}>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate('UserProfile', { userId: data?.account._id })
+          }>
           <View style={styles.item}>
             <FastImage
               style={styles.avatar}

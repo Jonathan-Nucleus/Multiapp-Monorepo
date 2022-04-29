@@ -54,7 +54,7 @@ const BecomePro: React.FC<BecomeProProps> = ({ navigation }) => {
     setError('');
     Keyboard.dismiss();
     try {
-      await proRequest({
+      const { data } = await proRequest({
         variables: {
           request: {
             role,
@@ -65,7 +65,9 @@ const BecomePro: React.FC<BecomeProProps> = ({ navigation }) => {
           },
         },
       });
-      navigation.navigate('VerificationSuccess');
+      if (data?.proRequest) {
+        navigation.navigate('VerificationSuccess');
+      }
     } catch (err) {
       console.error('login error', err);
       setError((err as Error).message);
