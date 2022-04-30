@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import { AVATAR_URL, POST_URL } from 'react-native-dotenv';
 
 import PLabel from '../../common/PLabel';
+import Media from '../../common/Media';
 import UserInfo from '../../common/UserInfo';
 import Tag from '../../common/Tag';
 import { PRIMARY } from 'shared/src/colors';
@@ -23,28 +24,20 @@ const FeaturedItem: React.FC<FeedItemProps> = ({ post, type }) => {
     <View style={[styles.container]}>
       <View style={styles.headerWrapper}>
         <UserInfo
-          avatar={{ uri: `${AVATAR_URL}/${user.avatar}` }}
-          name={`${user.firstName} ${user.lastName}`}
-          role={user.position}
-          company={user.company?.name}
+          user={user}
           avatarSize={56}
           auxInfo={dayjs(post.createdAt).format('MMM D')}
         />
       </View>
-      {body && (
+      {body ? (
         <PLabel
           label={body}
           viewStyle={styles.labelView}
           textStyle={styles.body}
           numberOfLines={2}
         />
-      )}
-      {mediaUrl && (
-        <Image
-          style={styles.postImage}
-          source={{ uri: `${POST_URL}/${mediaUrl}` }}
-        />
-      )}
+      ) : null}
+      {mediaUrl ? <Media style={styles.postImage} src={mediaUrl} /> : null}
     </View>
   );
 };

@@ -1,14 +1,6 @@
 import React, { FC, useState, useRef } from 'react';
-import {
-  StyleProp,
-  StyleSheet,
-  ImageStyle,
-  ViewStyle,
-  Pressable,
-  Text,
-  View,
-} from 'react-native';
-import FastImage from 'react-native-fast-image';
+import { StyleProp, StyleSheet, Pressable, Text, View } from 'react-native';
+import FastImage, { ImageStyle } from 'react-native-fast-image';
 import Video from 'react-native-video';
 import { Play } from 'phosphor-react-native';
 import { POST_URL } from 'react-native-dotenv';
@@ -17,6 +9,7 @@ import { BLACK75, WHITE60 } from 'shared/src/colors';
 
 interface MediaProps {
   src: string;
+  style?: StyleProp<ImageStyle>;
 }
 
 const SUPPORTED_EXTENSION = ['mp4'];
@@ -26,7 +19,7 @@ function isVideo(src: string): boolean {
   return SUPPORTED_EXTENSION.includes(ext);
 }
 
-const Media: FC<MediaProps> = ({ src }) => {
+const Media: FC<MediaProps> = ({ src, style }) => {
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const player = useRef<Video | null>(null);
 
@@ -45,7 +38,7 @@ const Media: FC<MediaProps> = ({ src }) => {
   // react-native-video as an invalid source seems to crash the app
   return isVideo(src) ? (
     <Pressable onPress={playVideo}>
-      <View style={styles.videoContainer}>
+      <View style={[styles.videoContainer, style]}>
         <Video
           ref={(ref) => (player.current = ref)}
           source={{ uri: `${POST_URL}/${src}` }}
@@ -66,7 +59,7 @@ const Media: FC<MediaProps> = ({ src }) => {
     </Pressable>
   ) : (
     <FastImage
-      style={styles.media}
+      style={[styles.media, style]}
       source={{ uri: `${POST_URL}/${src}` }}
       resizeMode={FastImage.resizeMode.cover}
     />

@@ -39,7 +39,10 @@ const createPostsCollection = (
      * @returns   The post or null if it was not found.
      */
     find: async (id: MongoId): Promise<Post.Mongo | null> =>
-      postsCollection.findOne({ _id: toObjectId(id) }),
+      postsCollection.findOne({
+        _id: toObjectId(id),
+        deleted: { $exists: false },
+      }),
 
     /**
      * Provides a list of all posts in the DB.
@@ -55,7 +58,11 @@ const createPostsCollection = (
     ): Promise<Post.Mongo[]> => {
       const query = ids !== undefined ? { _id: { $in: toObjectIds(ids) } } : {};
       return postsCollection
-        .find({ ...query, ...(featured ? { featured } : {}) })
+        .find({
+          ...query,
+          ...(featured ? { featured } : {}),
+          deleted: { $exists: false },
+        })
         .toArray();
     },
 
@@ -116,6 +123,7 @@ const createPostsCollection = (
       return postsCollection
         .find({
           _id: { $nin: toObjectIds(ignorePosts) },
+          deleted: { $exists: false },
           audience: { $in: audienceLevels },
           userId: {
             $nin: toObjectIds(ignoreUsers),
@@ -154,6 +162,31 @@ const createPostsCollection = (
     },
 
     /**
+     * Soft delete an existing post.
+     *
+     * @param postId  The id of the postt.
+     * @param userId  The id of the user that created the post.
+     *
+     * @returns   True if the post was successfully deleted and false
+     *            otherwise.
+     */
+    delete: async (postId: MongoId, userId: MongoId): Promise<boolean> => {
+      const result = await postsCollection.findOneAndUpdate(
+        {
+          _id: toObjectId(postId),
+          userId: toObjectId(userId),
+        },
+        { $set: { deleted: true } }
+      );
+
+      if (!result.ok || !result.value) {
+        throw new NotFoundError("Post");
+      }
+
+      return true;
+    },
+
+    /**
      * Set whether a user's post is flagged as featured.
      *
      * @param postId    The ID of the post.
@@ -168,7 +201,11 @@ const createPostsCollection = (
       feature: boolean
     ): Promise<Post.Mongo> => {
       const result = await postsCollection.findOneAndUpdate(
-        { _id: toObjectId(postId), userId: toObjectId(userId) },
+        {
+          _id: toObjectId(postId),
+          userId: toObjectId(userId),
+          deleted: { $exists: false },
+        },
         { $set: { featured: feature } },
         { returnDocument: "after" }
       );
@@ -190,7 +227,7 @@ const createPostsCollection = (
      */
     likePost: async (postId: MongoId, userId: MongoId): Promise<Post.Mongo> => {
       const result = await postsCollection.findOneAndUpdate(
-        { _id: toObjectId(postId) },
+        { _id: toObjectId(postId), deleted: { $exists: false } },
         { $addToSet: { likeIds: toObjectId(userId) } },
         { returnDocument: "after" }
       );
@@ -215,7 +252,7 @@ const createPostsCollection = (
       userId: MongoId
     ): Promise<Post.Mongo> => {
       const result = await postsCollection.findOneAndUpdate(
-        { _id: toObjectId(postId) },
+        { _id: toObjectId(postId), deleted: { $exists: false } },
         { $pull: { likeIds: toObjectId(userId) } },
         { returnDocument: "after" }
       );

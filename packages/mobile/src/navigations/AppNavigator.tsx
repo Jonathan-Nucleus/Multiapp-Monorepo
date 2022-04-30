@@ -1,49 +1,50 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import React, { ReactElement, useRef, useState, useEffect } from 'react';
+import {
+  NavigationContainer,
+  NavigatorScreenParams,
+} from '@react-navigation/native';
 import { NavigationContainerRef } from '@react-navigation/core';
 import {
   createStackNavigator,
   StackScreenProps,
 } from '@react-navigation/stack';
 
-const Stack = createStackNavigator();
-
-import AuthStack from './AuthStack';
-import BottomTabNavigator from './BottomTabNavigator';
 import * as NavigationService from '../services/navigation/NavigationService';
-
 import {
   getToken,
   attachTokenObserver,
   detachTokenObserver,
   TokenAction,
 } from 'mobile/src/utils/auth-token';
-import UserProfile from '../screens/Settings/UserProfile';
-import CompanyProfile from '../screens/Settings/CompanyProfile';
-import CreatePost from '../screens/Home/CreatePost';
-import BecomePro from '../screens/Settings/BecomePro';
-import Contact from '../screens/Settings/Contact';
-import EditPhoto from '../screens/Settings/UserProfile/EditPhoto';
-import EditProfile from '../screens/Settings/UserProfile/EditProfile';
-import VerificationSuccess from '../screens/Settings/BecomePro/VerificationSuccess';
-import EditCompanyProfile from '../screens/Settings/CompanyProfile/EditProfile';
-import EditCompanyPhoto from '../screens/Settings/CompanyProfile/EditPhoto';
-import SearchTabs from './SearchTabs';
 
-type AppParamList = {
-  Auth: undefined;
-  Main: undefined;
-  UserProfile: undefined;
-  CompanyProfile: undefined;
-  CreatePost: undefined;
-};
-export type AppStackScreenProps = StackScreenProps<AppParamList>;
+import AuthStack from './AuthStack';
+import MainTabNavigator from './MainTabNavigator';
+import UserDetailsStack, {
+  UserDetailsStackParamList,
+} from './UserDetailsStack';
+import CompanyDetailsStack, {
+  CompanyDetailsStackParamList,
+} from './CompanyDetailsStack';
+import PostDetailsStack, {
+  PostDetailsStackParamList,
+} from './PostDetailsStack';
+import Contact from '../screens/Main/Settings/Contact';
+import VerificationSuccess from '../screens/Main/Settings/BecomePro/VerificationSuccess';
+import FundDetails from '../screens/Main/Marketplace/Funds/FundDetails';
+import SearchTabs from './SearchTabs';
+import Accreditation from '../screens/Accreditation';
+import AccreditationResult from '../screens/Accreditation/AccreditationResult';
+import Notification from '../screens/Notification';
+import NotificationDetail from '../screens/Notification/Details';
+
+import { MediaType } from 'backend/graphql/mutations.graphql';
 
 const defaultScreenOptions = {
   headerShown: false,
   gestureEnabled: false,
 };
 
+const Stack = createStackNavigator();
 const AppNavigator = () => {
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const routeNameRef = useRef<string | undefined>(undefined);
@@ -100,27 +101,88 @@ const AppNavigator = () => {
           component={AuthStack}
           options={{ gestureEnabled: false }}
         />
-        <Stack.Screen name="Main" component={BottomTabNavigator} />
-        <Stack.Screen name="UserProfile" component={UserProfile} />
-        <Stack.Screen name="CompanyProfile" component={CompanyProfile} />
-        <Stack.Screen name="CreatePost" component={CreatePost} />
-        <Stack.Screen name="EditUserPhoto" component={EditPhoto} />
-        <Stack.Screen name="EditUserProfile" component={EditProfile} />
-        <Stack.Screen
-          name="EditCompanyProfile"
-          component={EditCompanyProfile}
-        />
-        <Stack.Screen name="EditCompanyPhoto" component={EditCompanyPhoto} />
-        <Stack.Screen name="BecomePro" component={BecomePro} />
+        <Stack.Screen name="Main" component={MainTabNavigator} />
+        <Stack.Screen name="UserDetails" component={UserDetailsStack} />
+        <Stack.Screen name="CompanyDetails" component={CompanyDetailsStack} />
+        <Stack.Screen name="PostDetails" component={PostDetailsStack} />
+        <Stack.Screen name="FundDetails" component={FundDetails} />
         <Stack.Screen name="Contact" component={Contact} />
         <Stack.Screen
           name="VerificationSuccess"
           component={VerificationSuccess}
         />
         <Stack.Screen name="Search" component={SearchTabs} />
+        <Stack.Screen name="Notification" component={Notification} />
+        <Stack.Screen
+          name="NotificationDetail"
+          component={NotificationDetail}
+        />
+        <Stack.Screen name="Accreditation" component={Accreditation} />
+        <Stack.Screen
+          name="AccreditationResult"
+          component={AccreditationResult}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
 };
 
 export default AppNavigator;
+
+type AppParamList = {
+  Auth: undefined;
+  Main: undefined;
+  UserDetails: NavigatorScreenParams<UserDetailsStackParamList>;
+  CompanyDetails: NavigatorScreenParams<CompanyDetailsStackParamList>;
+  PostDetails: NavigatorScreenParams<PostDetailsStackParamList>;
+  FundDetails: {
+    fundId: string;
+  };
+  Contact: undefined;
+  VerificationSuccess: undefined;
+  Search: undefined;
+  Notification: undefined;
+  NotificationDetail: { postId: string; userId: string };
+  Accreditation: undefined;
+  AccreditationResult: undefined;
+};
+
+export type AppScreenProps<
+  RouteName extends keyof AppParamList = keyof AppParamList,
+> = StackScreenProps<AppParamList, RouteName>;
+
+export type AuthScreen = (props: AppScreenProps<'Auth'>) => ReactElement;
+
+export type MainScreen = (props: AppScreenProps<'Main'>) => ReactElement;
+
+export type FundDetailsScreen = (
+  props: AppScreenProps<'FundDetails'>,
+) => ReactElement | null;
+
+export type ContactScreen = (
+  props: AppScreenProps<'Contact'>,
+) => ReactElement | null;
+
+export type VerificationSuccessScreen = (
+  props: AppScreenProps<'VerificationSuccess'>,
+) => ReactElement | null;
+
+export type SearchScreen = (
+  props: AppScreenProps<'Search'>,
+) => ReactElement | null;
+
+export type AccreditationScreen = (
+  props: AppScreenProps<'Accreditation'>,
+) => ReactElement;
+
+export type AccreditationResultScreen = (
+  props: AppScreenProps<'AccreditationResult'>,
+) => ReactElement;
+
+export type NotificationScreen = (
+  props: AppScreenProps<'Notification'>,
+) => ReactElement;
+
+export type NotificationDetailsScreen = (
+  props: AppScreenProps<'NotificationDetail'>,
+) => ReactElement;

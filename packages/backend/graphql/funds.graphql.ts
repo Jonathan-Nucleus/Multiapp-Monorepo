@@ -7,6 +7,7 @@ import {
 } from "../lib/apollo-helper";
 
 import type { Fund } from "../schemas/fund";
+import type { AccreditationEnum } from "../schemas/user";
 import {
   FundSchema,
   FundStatusOptions,
@@ -14,7 +15,7 @@ import {
 } from "../schemas/fund";
 
 type GraphQLFund = Fund.GraphQL;
-export type { GraphQLFund as Fund };
+export type { GraphQLFund as Fund, AccreditationEnum as Accredidation };
 
 const schema = gql`
   ${FundSchema}

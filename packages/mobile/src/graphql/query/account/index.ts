@@ -5,6 +5,10 @@ import {
   POST_SUMMARY_FRAGMENT,
   PostSummary,
 } from 'mobile/src/graphql/fragments/post';
+import {
+  FUND_MANAGER_FRAGMENT,
+  FundManager,
+} from 'mobile/src/graphql/fragments/fund';
 
 type FetchPostsVariables = {
   categories?: PostCategory[];
@@ -38,15 +42,16 @@ export function useFetchPosts(): QueryResult<
 }
 
 type AccountVariables = never;
-export type WatchlistFund = Pick<
-  User['watchlist'][number],
-  '_id' | 'name' | 'companyId' | 'managerId'
-> & {
-  company: Pick<
-    User['watchlist'][number]['company'],
-    '_id' | 'name' | 'website' | 'linkedIn' | 'twitter' | 'avatar'
-  >;
-};
+export type WatchlistFund = FundManager &
+  Pick<
+    User['watchlist'][number],
+    '_id' | 'name' | 'companyId' | 'managerId'
+  > & {
+    company: Pick<
+      User['watchlist'][number]['company'],
+      '_id' | 'name' | 'website' | 'linkedIn' | 'twitter' | 'avatar'
+    >;
+  };
 export type AccountData = {
   account: Pick<
     User,
@@ -168,6 +173,16 @@ export function useAccount(
             name
             companyId
             managerId
+            manager {
+              _id
+              firstName
+              lastName
+              avatar
+              followerIds
+              postIds
+              position
+              role
+            }
             company {
               _id
               name

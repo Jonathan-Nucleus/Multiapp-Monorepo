@@ -5,7 +5,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Image,
   ListRenderItem,
 } from 'react-native';
 import {
@@ -35,15 +34,16 @@ import Modal from 'react-native-modal';
 import LinearGradient from 'react-native-linear-gradient';
 import moment from 'moment';
 
-import pStyles from '../../theme/pStyles';
-import { Body1, Body2, Body3, H5Bold } from '../../theme/fonts';
-import Avatar from '../../assets/avatar.png';
+import pStyles from 'mobile/src/theme/pStyles';
+import { Body1, Body2, Body3, H5Bold } from 'mobile/src/theme/fonts';
 
-import type { NotificationScreen } from 'mobile/src/navigations/HomeStack';
-import MainHeader from '../../components/main/Header';
+import Avatar from 'mobile/src/components/common/Avatar';
+import MainHeader from 'mobile/src/components/main/Header';
 
-const Items = [
-  {
+import type { NotificationScreen } from 'mobile/src/navigations/AppNavigator';
+
+const Items: Notification[] = [
+  /*{
     name: 'Mike Wang',
     description: 'Founder, Investor ',
     company: 'Cartenna Capital',
@@ -116,7 +116,7 @@ const Items = [
     mentioned: true,
     lastMesae: 'Richard Branson - this is what I was talking about.',
     createdAt: new Date('Thu Apr 11 2022 17:30:03 GMT-0600'),
-  },
+  },*/
 ];
 
 interface Notification {
@@ -194,7 +194,7 @@ const Notification: NotificationScreen = ({ navigation }) => {
                 style={styles.dot}
               />
             )}
-            <Image source={Avatar} style={styles.avatar} />
+            <Avatar size={54} />
             <View style={styles.chat}>{renderIcon(item)}</View>
           </View>
           <View style={styles.commentWrap}>

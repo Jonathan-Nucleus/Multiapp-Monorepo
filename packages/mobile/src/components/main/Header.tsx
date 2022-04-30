@@ -1,8 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
-import { AVATAR_URL } from 'react-native-dotenv';
 
-import RoundImageView from '../common/RoundImageView';
+import Avatar from '../common/Avatar';
 import PHeader from '../common/PHeader';
 import PLabel from '../common/PLabel';
 import * as NavigationService from '../../services/navigation/NavigationService';
@@ -13,6 +12,8 @@ import BellSvg from 'shared/assets/images/bell.svg';
 import { GRAY900 } from 'shared/src/colors';
 import { H6 } from '../../theme/fonts';
 import { useAccount } from '../../graphql/query/account';
+
+import { AVATAR_URL } from 'react-native-dotenv';
 
 interface HeaderProps {
   containerStyle?: ViewStyle;
@@ -59,20 +60,14 @@ const MainHeader: React.FC<HeaderProps> = (props) => {
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() =>
-                NavigationService.navigate('UserProfile', {
-                  userId: data?.account._id,
+                NavigationService.navigate('UserDetails', {
+                  screen: 'UserProfile',
+                  params: {
+                    userId: data?.account._id,
+                  },
                 })
               }>
-              <RoundImageView
-                image={{
-                  uri: `${AVATAR_URL}/${
-                    data?.account.avatar ??
-                    '7d9d80b7-90dd-42e8-b3e2-a7a37d6cd1ba.png'
-                  }`,
-                }}
-                size={32}
-                imageStyle={styles.avatarImage}
-              />
+              <Avatar user={data?.account} size={32} />
             </TouchableOpacity>
           </View>
         )
@@ -108,11 +103,6 @@ const styles = StyleSheet.create({
   },
   headerIcon: {
     marginHorizontal: 20,
-  },
-  avatarImage: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
   },
 });
 

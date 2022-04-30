@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   TouchableOpacity,
@@ -8,18 +8,24 @@ import {
   Dimensions,
 } from 'react-native';
 
+import Avatar from './Avatar';
 import PLabel from './PLabel';
-import RoundImageView from './RoundImageView';
-import { Body1Bold, Body3 } from '../../theme/fonts';
+import { Body1Bold, Body3, Body4Bold } from '../../theme/fonts';
 import { WHITE60, PRIMARY, GRAY100 } from 'shared/src/colors';
 import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 
+import { useFollowUser } from 'mobile/src/graphql/mutation/account';
+import { useAccount } from 'mobile/src/graphql/query/account';
+import { UserProfile } from 'backend/graphql/users.graphql';
+
+type User = Partial<
+  Pick<UserProfile, '_id' | 'firstName' | 'lastName' | 'avatar' | 'role'>
+> & {
+  company?: { name: string };
+};
+
 interface UserInfoProps {
-  avatar: ImageURISource;
-  name: string;
-  role?: string;
-  company?: string;
-  isPro?: boolean;
+  user: User;
   viewStyle?: object;
   avatarStyle?: object;
   avatarSize?: number;
@@ -27,15 +33,43 @@ interface UserInfoProps {
 }
 
 const UserInfo: React.FC<UserInfoProps> = (props) => {
-  const { avatar, name, role, company, isPro, viewStyle, avatarSize, auxInfo } =
-    props;
+  const { user, viewStyle, avatarSize, auxInfo } = props;
+
+  const { data: accountData } = useAccount();
+  const [followUser] = useFollowUser();
+
+  const account = accountData?.account;
+  const { role, company } = user;
+  const isPro = user?.role === 'PROFESSIONAL';
+  const isSelf = user?._id === account?._id;
+  const following = account?.followingIds?.includes(user?._id ?? '');
+
+  const [isFollowing, setIsFollowing] = useState(following);
+  const toggleFollow = async () => {
+    if (!user || !user._id) return;
+
+    // Update state immediately for responsiveness
+    setIsFollowing(!isFollowing);
+
+    const result = await followUser({
+      variables: { follow: !following, userId: user._id },
+    });
+
+    if (!result.data?.followUser) {
+      // Revert back to original state on error
+      setIsFollowing(following);
+    }
+  };
 
   return (
     <View style={[styles.wrapper, viewStyle]}>
-      <RoundImageView image={avatar} size={avatarSize} />
+      <Avatar user={user} size={avatarSize} />
       <View style={styles.userInfo}>
         <View style={styles.nameWrapper}>
-          <PLabel label={name} textStyle={styles.nameLabel} />
+          <PLabel
+            label={`${user.firstName} ${user.lastName}`}
+            textStyle={styles.nameLabel}
+          />
           {isPro && (
             <View style={styles.proWrapper}>
               <ShieldCheckSvg />
@@ -43,18 +77,23 @@ const UserInfo: React.FC<UserInfoProps> = (props) => {
             </View>
           )}
         </View>
-        {role && <PLabel label={role} textStyle={styles.smallLabel} />}
-        {company && <PLabel label={company} textStyle={styles.smallLabel} />}
+        {company ? (
+          <PLabel label={company.name} textStyle={styles.smallLabel} />
+        ) : null}
         <View style={styles.auxInfo}>
-          {auxInfo && (
+          {auxInfo ? (
+            <PLabel label={auxInfo} textStyle={styles.smallLabel} />
+          ) : null}
+          {!isSelf && (
             <>
-              <PLabel label={auxInfo} textStyle={styles.smallLabel} />
               <View style={styles.separator} />
+              <TouchableOpacity onPress={toggleFollow}>
+                <Text style={[styles.smallLabel, styles.follow]}>
+                  {isFollowing ? 'Unfollow' : 'Follow'}
+                </Text>
+              </TouchableOpacity>
             </>
           )}
-          <TouchableOpacity onPress={() => console.log('Follow toggle')}>
-            <Text style={[styles.smallLabel, styles.follow]}>Follow</Text>
-          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -114,6 +153,7 @@ const styles = StyleSheet.create({
   follow: {
     textTransform: 'uppercase',
     color: PRIMARY,
-    fontWeight: '600',
+    ...Body4Bold,
+    letterSpacing: 1.25,
   },
 });

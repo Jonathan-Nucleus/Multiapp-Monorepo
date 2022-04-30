@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import dayjs from 'dayjs';
 import {
@@ -15,7 +15,7 @@ import IconButton from '../common/IconButton';
 import UserInfo from '../common/UserInfo';
 import Tag from '../common/Tag';
 import Media from '../common/Media';
-import { PRIMARYSTATE, GRAY10, WHITE60, WHITE } from 'shared/src/colors';
+import { PRIMARYSTATE, WHITE12, WHITE60, WHITE } from 'shared/src/colors';
 import { Body1, Body3 } from '../../theme/fonts';
 import * as NavigationService from '../../services/navigation/NavigationService';
 import { Post } from 'mobile/src/graphql/query/post/usePosts';
@@ -24,7 +24,7 @@ import { useLikePost } from '../../graphql/mutation/posts';
 
 export interface PostItemProps {
   post: Post;
-  userId: string;
+  userId: string; // User id of the currently authenticated user
   onPressMenu?: () => void;
 }
 
@@ -52,106 +52,125 @@ const PostItem: React.FC<PostItemProps> = ({ post, userId, onPressMenu }) => {
     }
   };
 
+  const goToDetails = () => {
+    NavigationService.navigate('PostDetails', {
+      screen: 'PostDetail',
+      params: {
+        postId: post._id,
+        userId,
+      },
+    });
+  };
+
+  const goToProfile = () => {
+    NavigationService.navigate('UserDetails', {
+      screen: 'UserProfile',
+      params: {
+        userId: post.user._id,
+      },
+    });
+  };
+
   return (
-    <View style={styles.container}>
-      <View style={styles.headerWrapper}>
-        <UserInfo
-          avatar={{ uri: `${AVATAR_URL}/${user.avatar}` }}
-          name={`${user.firstName} ${user.lastName}`}
-          role={user.position}
-          company={user.company?.name}
-          avatarSize={56}
-          auxInfo={dayjs(post.createdAt).format('MMM D')}
-          isPro
-        />
-        <TouchableOpacity
-          style={styles.menuContainer}
-          onPress={() => onPressMenu && onPressMenu()}>
-          <DotsThreeVertical size={24} color={WHITE} />
-        </TouchableOpacity>
-      </View>
-      {body ? <PLabel label={body} textStyle={styles.body} /> : null}
-      {mediaUrl ? <Media src={mediaUrl} /> : null}
-      <View style={styles.postInfo}>
-        <View style={styles.tagWrapper}>
-          {post.categories.map((item) => (
-            <Tag
-              label={PostCategories[item]}
-              viewStyle={styles.tagStyle}
-              key={item}
+    <Pressable onPress={goToDetails}>
+      <View style={styles.container}>
+        <View style={[styles.headerWrapper, styles.contentPadding]}>
+          <Pressable onPress={goToProfile}>
+            <UserInfo
+              user={user}
+              avatarSize={56}
+              auxInfo={dayjs(post.createdAt).format('MMM D')}
             />
-          ))}
+          </Pressable>
+          <TouchableOpacity
+            style={styles.menuContainer}
+            onPress={() => onPressMenu?.()}>
+            <DotsThreeVertical size={24} color={WHITE} />
+          </TouchableOpacity>
         </View>
-        <View style={styles.otherInfo}>
-          {post.likeIds && post.likeIds.length > 0 && (
-            <PLabel
-              label={`${post.likeIds.length} ${
-                post.likeIds.length === 1 ? 'Like' : 'Likes'
-              }`}
-              textStyle={styles.smallLabel}
-            />
-          )}
-          {post.commentIds && post.commentIds.length > 0 && (
-            <PLabel
-              label={`${post.commentIds.length} ${
-                post.commentIds.length === 1 ? 'Comment' : 'Comments'
-              }`}
-              textStyle={styles.smallLabel}
-            />
-          )}
-          {post.shareIds && post.shareIds.length > 0 && (
-            <PLabel
-              label={`${post.shareIds.length} ${
-                post.shareIds.length === 1 ? 'Share' : 'Shares'
-              }`}
-              textStyle={styles.smallLabel}
-            />
-          )}
+        <View style={styles.contentPadding}>
+          {body ? <PLabel label={body} textStyle={styles.body} /> : null}
+          {mediaUrl ? <Media src={mediaUrl} /> : null}
         </View>
+        <View style={[styles.postInfo, styles.contentPadding]}>
+          <View style={styles.tagWrapper}>
+            {post.categories.map((item) => (
+              <Tag
+                label={PostCategories[item]}
+                viewStyle={styles.tagStyle}
+                key={item}
+              />
+            ))}
+          </View>
+          <View style={styles.otherInfo}>
+            {post.likeIds && post.likeIds.length > 0 && (
+              <PLabel
+                label={`${post.likeIds.length} ${
+                  post.likeIds.length === 1 ? 'Like' : 'Likes'
+                }`}
+                textStyle={styles.smallLabel}
+              />
+            )}
+            {post.commentIds && post.commentIds.length > 0 && (
+              <PLabel
+                label={`${post.commentIds.length} ${
+                  post.commentIds.length === 1 ? 'Comment' : 'Comments'
+                }`}
+                textStyle={styles.smallLabel}
+              />
+            )}
+            {post.shareIds && post.shareIds.length > 0 && (
+              <PLabel
+                label={`${post.shareIds.length} ${
+                  post.shareIds.length === 1 ? 'Share' : 'Shares'
+                }`}
+                textStyle={styles.smallLabel}
+              />
+            )}
+          </View>
+        </View>
+        <View style={[styles.bottomWrapper, styles.contentPadding]}>
+          <IconButton
+            icon={
+              <ThumbsUp
+                weight={liked ? 'fill' : 'light'}
+                color={liked ? PRIMARYSTATE : WHITE60}
+                size={20}
+              />
+            }
+            label="Like"
+            onPress={() => toggleLike()}
+          />
+          <IconButton
+            icon={<ChatCenteredText color={WHITE60} size={20} />}
+            label="Comment"
+            onPress={goToDetails}
+          />
+          <IconButton
+            icon={<Share color={WHITE60} size={20} />}
+            label="Share"
+          />
+        </View>
+        <View style={styles.divider} />
       </View>
-      <View style={styles.divider} />
-      <View style={styles.bottomWrapper}>
-        <IconButton
-          icon={
-            <ThumbsUp
-              weight={liked ? 'fill' : 'light'}
-              color={liked ? PRIMARYSTATE : WHITE60}
-              size={20}
-            />
-          }
-          label="Like"
-          onPress={() => toggleLike()}
-        />
-        <IconButton
-          icon={<ChatCenteredText color={WHITE60} size={20} />}
-          label="Comment"
-          onPress={() =>
-            NavigationService.navigate('PostDetail', {
-              postId: post._id,
-              userId,
-            })
-          }
-        />
-        <IconButton icon={<Share color={WHITE60} size={20} />} label="Share" />
-      </View>
-    </View>
+    </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 4,
-    paddingVertical: 14,
     flexDirection: 'column',
-    marginVertical: 8,
   },
   headerWrapper: {
     flexDirection: 'row',
-    marginVertical: 16,
     justifyContent: 'space-between',
+    paddingTop: 4,
   },
   menuContainer: {
     marginTop: 12,
+  },
+  contentPadding: {
+    paddingHorizontal: 16,
   },
   userInfo: {
     marginLeft: 8,
@@ -186,11 +205,12 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   divider: {
-    borderBottomColor: GRAY10,
+    borderBottomColor: WHITE12,
     borderBottomWidth: 1,
-    marginVertical: 16,
+    marginTop: 24,
   },
   bottomWrapper: {
+    marginTop: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },

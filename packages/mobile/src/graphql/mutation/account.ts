@@ -54,11 +54,16 @@ export function useFollowUser(): MutationTuple<
   FollowUserData,
   FollowUserVariables
 > {
-  return useMutation<FollowUserData, FollowUserVariables>(gql`
-    mutation FollowUser($follow: Boolean!, $userId: ID!) {
-      followUser(follow: $follow, userId: $userId)
-    }
-  `);
+  return useMutation<FollowUserData, FollowUserVariables>(
+    gql`
+      mutation FollowUser($follow: Boolean!, $userId: ID!) {
+        followUser(follow: $follow, userId: $userId)
+      }
+    `,
+    {
+      refetchQueries: ['Account'],
+    },
+  );
 }
 
 type HideUserVariables = {

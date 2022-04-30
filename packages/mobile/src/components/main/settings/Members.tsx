@@ -8,8 +8,9 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import FastImage from 'react-native-fast-image';
-import { AVATAR_URL } from 'react-native-dotenv';
+
+import Avatar from 'mobile/src/components/common/Avatar';
+import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 import { BGDARK, WHITE, WHITE60 } from 'shared/src/colors';
 import { Body1, Body2Bold, Body3 } from '../../../theme/fonts';
 
@@ -22,15 +23,17 @@ interface MemberProps {
 const Members: React.FC<MemberProps> = ({ members }) => {
   const renderItem: ListRenderItem<CompanyMember> = ({ item }) => {
     return (
-      <TouchableOpacity>
+      <TouchableOpacity
+        onPress={() =>
+          NavigationService.navigate('UserDetails', {
+            screen: 'UserProfile',
+            params: {
+              userId: item._id,
+            },
+          })
+        }>
         <View style={[styles.member, members.length === 1 && styles.fullWidth]}>
-          <FastImage
-            style={styles.avatar}
-            source={{
-              uri: `${AVATAR_URL}/${item?.avatar}`,
-            }}
-            resizeMode={FastImage.resizeMode.cover}
-          />
+          <Avatar user={item} style={styles.avatar} size={80} />
           <Text style={styles.name}>
             {item.firstName} {item.lastName}
           </Text>
@@ -39,6 +42,7 @@ const Members: React.FC<MemberProps> = ({ members }) => {
       </TouchableOpacity>
     );
   };
+
   return (
     <View style={styles.container}>
       <Text style={styles.name}>Team Members</Text>
@@ -79,9 +83,6 @@ const styles = StyleSheet.create({
     width: Dimensions.get('screen').width - 32,
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
     marginBottom: 16,
   },
   name: {

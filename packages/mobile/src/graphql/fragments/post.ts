@@ -41,6 +41,9 @@ export const POST_SUMMARY_FRAGMENT = gql`
       avatar
       position
       role
+      company {
+        name
+      }
     }
     likes {
       _id

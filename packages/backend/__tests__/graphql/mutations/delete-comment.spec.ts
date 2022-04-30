@@ -25,13 +25,17 @@ describe("Mutations - deleteComment", () => {
 
   let server: ApolloServer;
   let authUser: User.Mongo | null;
+  let user1: User.Mongo | null;
   let post1: Post.Mongo | null;
   let comment1: Comment.Mongo | null;
+  let comment2: Comment.Mongo | null;
 
   beforeAll(async () => {
     authUser = await createUser();
+    user1 = await createUser();
     post1 = await createPost(authUser?._id);
     comment1 = await createComment(authUser?._id, post1?._id);
+    comment2 = await createComment(user1?._id, post1?._id);
     server = createTestApolloServer(authUser);
   });
 
@@ -67,6 +71,17 @@ describe("Mutations - deleteComment", () => {
     expect(getErrorCode(res)).toBe(ErrorCode.NOT_FOUND);
   });
 
+  it("fails with wrong user", async () => {
+    const res = await server.executeOperation({
+      query,
+      variables: {
+        commentId: comment2?._id.toString(),
+      },
+    });
+
+    expect(getErrorCode(res)).toBe(ErrorCode.NOT_FOUND);
+  });
+
   it("succeeds to delete a comment", async () => {
     const { posts, db, comments } = await getIgniteDb();
     const oldCommentCount = await db
@@ -88,11 +103,6 @@ describe("Mutations - deleteComment", () => {
     const newCommentCount = await db
       .collection(DbCollection.COMMENTS)
       .countDocuments();
-    expect(newCommentCount).toBe(oldCommentCount - 1);
-
-    const newPost = (await posts.find(toObjectId(post1?._id))) as Post.Mongo;
-    expect(newPost.commentIds?.map((id) => id.toString())).not.toContain(
-      comment1?._id.toString()
-    );
+    expect(newCommentCount).toBe(oldCommentCount); // Soft delete
   });
 });

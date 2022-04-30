@@ -77,6 +77,7 @@
 		8B822B57FE8C40EABE0FAD20 /* GothamMediumItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = GothamMediumItalic.ttf; path = ../src/assets/fonts/GothamMediumItalic.ttf; sourceTree = "<group>"; };
 		A394D22DFB084A9BBF4B2C2B /* GothamBookItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = GothamBookItalic.ttf; path = ../src/assets/fonts/GothamBookItalic.ttf; sourceTree = "<group>"; };
 		A3F1A46AE5CB4DD48FE4C264 /* Gotham-XLight.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Gotham-XLight.otf"; path = "../src/assets/fonts/Gotham-XLight.otf"; sourceTree = "<group>"; };
+		AF994B59281D89020007E252 /* mobile.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = mobile.entitlements; path = mobile/mobile.entitlements; sourceTree = "<group>"; };
 		B3B8263D98924F1AB6BDA7D0 /* Gotham-ThinItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Gotham-ThinItalic.otf"; path = "../src/assets/fonts/Gotham-ThinItalic.otf"; sourceTree = "<group>"; };
 		BC078EBAD36945BA986696BF /* GothamBook.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = GothamBook.ttf; path = ../src/assets/fonts/GothamBook.ttf; sourceTree = "<group>"; };
 		C9FA8CF9CB214B12BFAFFFB8 /* Gotham-Medium.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Gotham-Medium.otf"; path = "../src/assets/fonts/Gotham-Medium.otf"; sourceTree = "<group>"; };
@@ -126,6 +127,7 @@
 		13B07FAE1A68108700A75B9A /* mobile */ = {
 			isa = PBXGroup;
 			children = (
+				AF994B59281D89020007E252 /* mobile.entitlements */,
 				F56963F1281A352100D4F835 /* GoogleService-Info.plist */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
@@ -585,7 +587,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 7;
+				CODE_SIGN_ENTITLEMENTS = mobile/mobile.entitlements;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = 8682NLN3LZ;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = mobile/Info.plist;
@@ -613,8 +616,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = mobile/mobile.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = 8682NLN3LZ;
 				INFOPLIST_FILE = mobile/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

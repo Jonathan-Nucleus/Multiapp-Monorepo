@@ -3,6 +3,7 @@ import {
   PartialSchema,
   ApolloServerContext,
   NoArgs,
+  secureEndpoint,
 } from "../lib/apollo-helper";
 
 import type { Company } from "../schemas/company";
@@ -20,32 +21,30 @@ const resolvers = {
   Company: {
     ...contentCreatorResolvers,
 
-    createdAt: async (
-      parent: Company.Mongo,
-      argsIgnored: NoArgs,
-      { db }: ApolloServerContext
-    ) => parent._id.getTimestamp(),
+    createdAt: secureEndpoint(
+      async (parent: Company.Mongo, argsIgnored, { db }) =>
+        parent._id.getTimestamp()
+    ),
 
-    members: async (
-      parent: Company.Mongo,
-      argsIgnored: NoArgs,
-      { db }: ApolloServerContext
-    ) => (parent.memberIds ? db.users.findAll(parent.memberIds) : []),
+    members: secureEndpoint(
+      async (parent: Company.Mongo, argsIgnored, { db }) =>
+        parent.memberIds ? db.users.findAll(parent.memberIds) : []
+    ),
 
-    funds: async (
-      parent: Company.Mongo,
-      argsIgnored: NoArgs,
-      { db }: ApolloServerContext
-    ) => (parent.fundIds ? db.funds.findAll(parent.fundIds) : []),
+    funds: secureEndpoint(
+      async (parent: Company.Mongo, argsIgnored, { db, user }) =>
+        parent.fundIds
+          ? db.funds.findByAccreditation(user.accreditation, parent.fundIds)
+          : []
+    ),
 
-    fundManagers: async (
-      parent: Company.Mongo,
-      argsIgnored: NoArgs,
-      { db }: ApolloServerContext
-    ) =>
-      (await db.users.findAll(parent.memberIds)).filter(
-        (member) => member.managedFundsIds && member.managedFundsIds.length > 0
-      ),
+    fundManagers: secureEndpoint(
+      async (parent: Company.Mongo, argsIgnored, { db }) =>
+        (await db.users.findAll(parent.memberIds)).filter(
+          (member) =>
+            member.managedFundsIds && member.managedFundsIds.length > 0
+        )
+    ),
   },
 };
 

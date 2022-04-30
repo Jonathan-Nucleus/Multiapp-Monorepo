@@ -28,7 +28,10 @@ const createCommentsCollection = (
      * @returns   The comment or null if it was not found.
      */
     find: async (id: MongoId): Promise<Comment.Mongo | null> =>
-      commentsCollection.findOne({ _id: toObjectId(id) }),
+      commentsCollection.findOne({
+        _id: toObjectId(id),
+        deleted: { $exists: false },
+      }),
 
     /**
      * Provides a list of all comments in the DB.
@@ -40,7 +43,9 @@ const createCommentsCollection = (
     findAll: async (ids?: MongoId[]): Promise<Comment.Mongo[]> => {
       const query =
         ids !== undefined ? { _id: { $in: ids ? toObjectIds(ids) : ids } } : {};
-      return commentsCollection.find(query).toArray();
+      return commentsCollection
+        .find({ ...query, deleted: { $exists: false } })
+        .toArray();
     },
 
     /**
@@ -100,7 +105,11 @@ const createCommentsCollection = (
       };
 
       const result = await commentsCollection.findOneAndUpdate(
-        { _id: toObjectId(_id), userId: toObjectId(userId) },
+        {
+          _id: toObjectId(_id),
+          userId: toObjectId(userId),
+          deleted: { $exists: false },
+        },
         updateFilter,
         { returnDocument: "after" }
       );
@@ -113,28 +122,26 @@ const createCommentsCollection = (
     },
 
     /**
-     * Delete an existing comment.
+     * Soft delete an existing comment.
      *
-     * @param commentId  The id of the comment.
-     * @param userId  The id of the user editing the comment.
+     * @param commentId   The id of the comment.
+     * @param userId      The id of the user that created the comment.
      *
      * @returns   True if the comment was successfully deleted and false
      *            otherwise.
      */
     delete: async (commentId: MongoId, userId: MongoId): Promise<boolean> => {
-      const result = await commentsCollection.findOneAndDelete({
-        _id: toObjectId(commentId),
-        userId: toObjectId(userId),
-      });
+      const result = await commentsCollection.findOneAndUpdate(
+        {
+          _id: toObjectId(commentId),
+          userId: toObjectId(userId),
+        },
+        { $set: { deleted: true } }
+      );
 
       if (!result.ok || !result.value) {
         throw new NotFoundError("Comment");
       }
-
-      await postsCollection.updateOne(
-        { _id: result.value.postId },
-        { $pull: { commentIds: result.value._id } }
-      );
 
       return true;
     },
@@ -152,7 +159,7 @@ const createCommentsCollection = (
       userId: MongoId
     ): Promise<Comment.Mongo> => {
       const result = await commentsCollection.findOneAndUpdate(
-        { _id: toObjectId(commentId) },
+        { _id: toObjectId(commentId), deleted: { $exists: false } },
         { $addToSet: { likeIds: toObjectId(userId) } },
         { returnDocument: "after" }
       );
@@ -177,7 +184,7 @@ const createCommentsCollection = (
       userId: MongoId
     ): Promise<Comment.Mongo> => {
       const result = await commentsCollection.findOneAndUpdate(
-        { _id: toObjectId(commentId) },
+        { _id: toObjectId(commentId), deleted: { $exists: false } },
         { $pull: { likeIds: toObjectId(userId) } },
         { returnDocument: "after" }
       );

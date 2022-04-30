@@ -131,7 +131,6 @@ export namespace User {
         | "questionnaire"
       >
     > & {
-      role: UserRoleEnum;
       accreditation: AccreditationEnum;
       reportedPosts: Omit<GraphQLEntity<ReportedPost>, "violations"> & {
         violations: PostViolationEnum;
@@ -387,6 +386,7 @@ const UserProfileSchema = `
   firstName: String!
   lastName: String!
   position: String
+  role: UserRole!
   companyIds: [ID!]
   watchlistIds : [ID!]
   managedFundsIds: [ID!]
@@ -403,7 +403,6 @@ export const UserSchema = `
     ${UserProfileSchema}
 
     email: String!
-    role: UserRole!
     accreditation: Accreditation!
     mutedPostIds: [ID!]
     hiddenPostIds: [ID!]

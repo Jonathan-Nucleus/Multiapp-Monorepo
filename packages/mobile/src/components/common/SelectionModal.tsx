@@ -1,5 +1,12 @@
-import React from 'react';
-import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { ReactElement } from 'react';
+import {
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  StyleProp,
+  ViewStyle,
+} from 'react-native';
 import Modal from 'react-native-modal';
 
 import IconButton from './IconButton';
@@ -7,22 +14,24 @@ import PLabel from './PLabel';
 
 import { GRAY3, PRIMARYSOLID, PRIMARYSOLID7 } from 'shared/src/colors';
 
-export interface MenuDataItemProps {
+export interface MenuDataItemProps<Key = string> {
   label: string;
-  key: string;
+  key: Key;
   icon: React.ReactNode;
 }
 
-interface SelectionModalProps {
-  dataArray: MenuDataItemProps[];
+interface SelectionModalProps<Key = string> {
+  dataArray: MenuDataItemProps<Key>[];
   isVisible: boolean;
   buttonLabel: string;
-  modalStyle?: object;
+  modalStyle?: StyleProp<ViewStyle>;
   onPressCancel?: () => void;
-  onPressItem?: (key: string) => void;
+  onPressItem?: (key: MenuDataItemProps<Key>['key']) => void;
 }
 
-const SelectionModal: React.FC<SelectionModalProps> = (props) => {
+function SelectionModal<Key = string>(
+  props: SelectionModalProps<Key>,
+): ReactElement | null {
   const {
     dataArray,
     isVisible,
@@ -40,7 +49,7 @@ const SelectionModal: React.FC<SelectionModalProps> = (props) => {
       <View style={styles.modalWrapper}>
         <FlatList
           data={dataArray}
-          keyExtractor={(item) => item.key.toString()}
+          keyExtractor={(item) => `${item.key}`}
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => {
             const { label, icon, key } = item;
@@ -61,7 +70,7 @@ const SelectionModal: React.FC<SelectionModalProps> = (props) => {
       </View>
     </Modal>
   );
-};
+}
 
 export default SelectionModal;
 

@@ -58,6 +58,7 @@ const schema = gql`
     updateCompanyProfile(profile: CompanyProfileInput): Company
 
     createPost(post: PostInput!): Post
+    deletePost(postId: ID!): Boolean
     featurePost(postId: ID!, feature: Boolean!): Post
     likePost(like: Boolean!, postId: ID!): Post
     likeComment(like: Boolean!, commentId: ID!): Comment
@@ -66,7 +67,7 @@ const schema = gql`
     mutePost(mute: Boolean!, postId: ID!): Boolean
     comment(comment: CommentInput!): Comment
     editComment(comment: CommentUpdate!): Comment
-    deleteComment(commentId: ID!): Boolean!
+    deleteComment(commentId: ID!): Boolean
     uploadLink(localFilename: String!, type: MediaType!): MediaUpload
     saveQuestionnaire(questionnaire: QuestionnaireInput!): User
     proRequest(request: ProRequestInput!): Boolean
@@ -542,6 +543,30 @@ const resolvers = {
         await db.users.addPost(postData._id, user._id);
 
         return postData;
+      }
+    ),
+
+    deletePost: secureEndpoint(
+      async (
+        parentIgnored,
+        args: { postId: string },
+        { db, user }
+      ): Promise<boolean> => {
+        const validator = yup
+          .object()
+          .shape({
+            postId: yup.string().required().test({
+              test: isObjectId,
+              message: "Invalid post id",
+            }),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { postId } = args;
+
+        return db.posts.delete(postId, user._id);
       }
     ),
 

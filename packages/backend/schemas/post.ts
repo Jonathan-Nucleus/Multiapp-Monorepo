@@ -26,10 +26,11 @@ export namespace Post {
     reporterIds?: ObjectId[];
     updatedAt?: Date;
     featured?: boolean;
+    deleted?: boolean;
   }
 
   export type GraphQL = GraphQLEntity<
-    Omit<Mongo, "audience" | "categories" | "visible">
+    Omit<Mongo, "audience" | "categories" | "visible" | "deleted">
   > & {
     audience: AudienceEnum;
     categories: PostCategoryEnum[];

@@ -47,7 +47,8 @@ const createFundsCollection = (fundsCollection: Collection<Fund.Mongo>) => {
      * @returns   An array of matching Fund objects.
      */
     findByAccreditation: async (
-      accreditation: Accreditation
+      accreditation: Accreditation,
+      ids?: MongoId[]
     ): Promise<Fund.Mongo[]> => {
       const accreditationLevels: Accreditation[] = [
         "accredited",
@@ -59,7 +60,10 @@ const createFundsCollection = (fundsCollection: Collection<Fund.Mongo>) => {
       );
 
       return fundsCollection
-        .find({ level: { $in: accreditationLevels } })
+        .find({
+          level: { $in: accreditationLevels },
+          ...(ids ? { _id: { $in: toObjectIds(ids) } } : {}),
+        })
         .toArray();
     },
   };

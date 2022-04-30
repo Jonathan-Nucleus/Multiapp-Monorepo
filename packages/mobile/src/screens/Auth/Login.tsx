@@ -104,14 +104,6 @@ const Login: LoginScreen = ({ navigation }) => {
           btnContainer={styles.btnContainer}
           onPress={handleNextPage}
         />
-        {/* <View style={styles.signup}>
-          <TouchableOpacity>
-            <Text style={styles.hyperText}>Sign up for a new account</Text>
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Text style={styles.hyperText}>Request an Invite</Text>
-          </TouchableOpacity>
-        </View> */}
         <PTextLine title="LOG IN WITH" containerStyle={styles.bottom} />
         <View style={styles.row}>
           <TouchableOpacity style={styles.icon}>

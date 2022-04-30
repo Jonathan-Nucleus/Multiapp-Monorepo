@@ -41,6 +41,7 @@ const schema = gql`
     userProfile(userId: ID!): UserProfile
     companyProfile(companyId: ID!): Company
     notifications: [Notification!]
+    users: [UserProfile!]!
   }
 
   type FundManagers {
@@ -348,6 +349,11 @@ const resolvers = {
         { db, user }
       ): Promise<Notification.Mongo[]> =>
         db.notifications.findAllByUser(user._id)
+    ),
+
+    users: secureEndpoint(
+      async (parentIgnored, argsIgnored, { db, user }): Promise<User.Mongo[]> =>
+        db.users.findAll()
     ),
   },
 };

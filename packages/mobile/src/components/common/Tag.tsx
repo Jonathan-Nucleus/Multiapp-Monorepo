@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { GRAY10, PRIMARYLIGHT, PRIMARYSTATE } from 'shared/src/colors';
 import { Body3 } from '../../theme/fonts';
@@ -10,7 +10,7 @@ interface TagProps {
   textStyle?: object;
   label: string;
   isSelected?: boolean;
-  onPress?: (v: string) => void;
+  onPress?: (label: string) => void;
 }
 
 const Tag: React.FC<TagProps> = (props) => {
@@ -28,12 +28,13 @@ const Tag: React.FC<TagProps> = (props) => {
     textStyle,
   ];
 
-  return (
-    <TouchableOpacity
-      style={usedViewStyle}
-      onPress={() => (onPress ? onPress(label) : {})}>
-      <PLabel label={label} textStyle={usedTextStyle} />
+  const child = <PLabel label={label} textStyle={usedTextStyle} />;
+  return onPress ? (
+    <TouchableOpacity style={usedViewStyle} onPress={() => onPress(label)}>
+      {child}
     </TouchableOpacity>
+  ) : (
+    <View style={usedViewStyle}>{child}</View>
   );
 };
 

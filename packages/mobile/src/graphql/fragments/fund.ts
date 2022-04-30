@@ -1,5 +1,7 @@
 import { gql } from '@apollo/client';
-import { Fund } from 'backend/graphql/funds.graphql';
+import { Fund, Accredidation } from 'backend/graphql/funds.graphql';
+
+export type { Accredidation };
 
 export type FundSummary = Pick<
   Fund,
@@ -20,7 +22,14 @@ export const FUND_SUMMARY_FRAGMENT = gql`
 export type FundManager = {
   manager: Pick<
     Fund['manager'],
-    '_id' | 'firstName' | 'lastName' | 'avatar' | 'followerIds' | 'postIds'
+    | '_id'
+    | 'firstName'
+    | 'lastName'
+    | 'avatar'
+    | 'position'
+    | 'role'
+    | 'followerIds'
+    | 'postIds'
   >;
 };
 
@@ -33,6 +42,8 @@ export const FUND_MANAGER_FRAGMENT = gql`
       avatar
       followerIds
       postIds
+      position
+      role
     }
   }
 `;

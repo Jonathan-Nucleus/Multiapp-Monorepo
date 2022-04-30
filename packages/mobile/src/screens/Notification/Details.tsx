@@ -3,18 +3,18 @@ import { Text, StyleSheet, FlatList, ListRenderItem } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BGDARK, WHITE } from 'shared/src/colors';
 
-import PostItem from '../../components/main/PostItem';
-import PHeader from '../../components/common/PHeader';
-import RoundIcon from '../../components/common/RoundIcon';
+import PostItem from 'mobile/src/components/main/PostItem';
+import PHeader from 'mobile/src/components/common/PHeader';
+import RoundIcon from 'mobile/src/components/common/RoundIcon';
+import { Body1 } from 'mobile/src/theme/fonts';
+import pStyles from 'mobile/src/theme/pStyles';
+import SearchSvg from 'mobile/src/assets/icons/search.svg';
+import BackSvg from 'mobile/src/assets/icons/back.svg';
 
-import { Body1 } from '../../theme/fonts';
-import pStyles from '../../theme/pStyles';
-import SearchSvg from '../../assets/icons/search.svg';
-import BackSvg from '../../assets/icons/back.svg';
-
-import type { NotificationDetailsScreen } from 'mobile/src/navigations/HomeStack';
 import { usePost } from 'mobile/src/graphql/query/post';
 import { Post } from 'mobile/src/graphql/query/post/usePosts';
+
+import type { NotificationDetailsScreen } from 'mobile/src/navigations/AppNavigator';
 
 const NotificationDetail: NotificationDetailsScreen = ({
   navigation,

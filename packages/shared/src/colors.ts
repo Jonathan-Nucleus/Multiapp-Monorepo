@@ -18,6 +18,7 @@ export const SECONDARY = "#0067E0";
 export const SUCCESS = "#55C090";
 export const SUCCESS30 = "#55C0904D";
 export const DANGER = "#CD403A";
+export const DANGER30 = "#CD403A4D";
 export const BLUE100 = "#4886FF";
 export const BLUE200 = "#7CBCFA";
 export const BLUE300 = "#22204A";

@@ -7,44 +7,18 @@ import {
 import { StackScreenProps } from '@react-navigation/stack';
 import { CompositeScreenProps } from '@react-navigation/native';
 
-const Tab = createMaterialTopTabNavigator();
+import { Body2 } from '../theme/fonts';
 import { BLACK, WHITE, PRIMARYSTATE, WHITE60 } from 'shared/src/colors';
 
-import Funds from '../screens/Marketplace/Funds';
-import Managers from '../screens/Marketplace/Managers';
-import Companies from '../screens/Marketplace/Companies';
+import Funds from '../screens/Main/Marketplace/Funds';
+import Managers from '../screens/Main/Marketplace/Managers';
+import Companies from '../screens/Main/Marketplace/Companies';
 import MainHeader from '../components/main/Header';
-import { Body2 } from '../theme/fonts';
-import { MarketplaceScreen, FundsStackScreenProps } from './FundsStack';
 
-type MarketplaceTabsParamList = {
-  Funds: undefined;
-  Managers: undefined;
-  Companies: undefined;
-};
+import { MainTabScreenProps } from './MainTabNavigator';
 
-export type FundsScreen = (
-  props: CompositeScreenProps<
-    MaterialTopTabScreenProps<MarketplaceTabsParamList, 'Funds'>,
-    FundsStackScreenProps
-  >,
-) => ReactElement;
-
-export type FundManagersScreen = (
-  props: CompositeScreenProps<
-    MaterialTopTabScreenProps<MarketplaceTabsParamList, 'Managers'>,
-    FundsStackScreenProps
-  >,
-) => ReactElement;
-
-export type FundCompaniesScreen = (
-  props: CompositeScreenProps<
-    MaterialTopTabScreenProps<MarketplaceTabsParamList, 'Companies'>,
-    FundsStackScreenProps
-  >,
-) => ReactElement;
-
-const MarketplaceTabs: MarketplaceScreen = () => {
+const Tab = createMaterialTopTabNavigator();
+const MarketplaceTabs = () => {
   return (
     <View style={styles.globalContainer}>
       <MainHeader />
@@ -76,6 +50,31 @@ const MarketplaceTabs: MarketplaceScreen = () => {
 };
 
 export default MarketplaceTabs;
+
+type MarketplaceTabsParamList = {
+  Funds: undefined;
+  Managers: undefined;
+  Companies: undefined;
+};
+
+export type MarketplaceScreenProps<
+  RouteName extends keyof MarketplaceTabsParamList = keyof MarketplaceTabsParamList,
+> = CompositeScreenProps<
+  StackScreenProps<MarketplaceTabsParamList, RouteName>,
+  MainTabScreenProps
+>;
+
+export type FundsScreen = (
+  props: MarketplaceScreenProps<'Funds'>,
+) => ReactElement | null;
+
+export type FundManagersScreen = (
+  props: MarketplaceScreenProps<'Managers'>,
+) => ReactElement | null;
+
+export type FundCompaniesScreen = (
+  props: MarketplaceScreenProps<'Companies'>,
+) => ReactElement | null;
 
 const styles = StyleSheet.create({
   globalContainer: {

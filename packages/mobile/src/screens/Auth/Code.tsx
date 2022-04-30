@@ -77,10 +77,10 @@ const CodeView: CodeScreen = ({ navigation }) => {
             <Text style={styles.hyperText}>Login</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.bottom}>
+        {/*<View style={styles.bottom}>
           <PTextLine title="OR" />
           <Text style={styles.invite}>request an invite</Text>
-        </View>
+        </View>*/}
       </PAppContainer>
     </SafeAreaView>
   );

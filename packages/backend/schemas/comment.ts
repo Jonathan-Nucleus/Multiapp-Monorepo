@@ -15,9 +15,10 @@ export namespace Comment {
     mentionIds?: ObjectId[];
     mediaUrl?: string;
     updatedAt?: Date;
+    deleted?: boolean;
   }
 
-  export type GraphQL = GraphQLEntity<Mongo> & {
+  export type GraphQL = Omit<GraphQLEntity<Mongo>, "deleted"> & {
     user: User.GraphQL;
     post: Post.GraphQL;
     comment?: Comment.GraphQL;
