@@ -45,7 +45,7 @@ const AvatarMenu: FC = () => {
     {
       icon: <Gear color="white" weight="light" size={24} />,
       title: "Account Settings",
-      path: "/",
+      path: "/setting",
     },
     {
       icon: <EnvelopeOpen color="white" weight="light" size={24} />,

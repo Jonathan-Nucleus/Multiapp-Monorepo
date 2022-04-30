@@ -4,6 +4,13 @@ import { FieldValues, Path, UseFormReturn, FieldError } from "react-hook-form";
 import Input, { InputProps } from "../Input";
 import Label from "../Label";
 import ErrorMessage from "../ErrorMessage";
+import Select from "../Select";
+import Textarea from "../Textarea";
+
+interface OptionProps {
+  label: string;
+  value: string;
+}
 
 interface FieldProps<TFieldValues>
   extends PropsWithChildren<HTMLProps<HTMLInputElement>> {
@@ -12,6 +19,11 @@ interface FieldProps<TFieldValues>
   state: UseFormReturn<TFieldValues>["formState"];
   label?: string;
   shape?: InputProps["shape"];
+  selectBox?: boolean;
+  options?: OptionProps[];
+  textarea?: boolean;
+  rows?: number;
+  textareaClassName?: string;
 }
 
 function Field<TFieldValues = FieldValues>({
@@ -23,6 +35,11 @@ function Field<TFieldValues = FieldValues>({
   ref: refIgnored, // Remove ref definition from HTMLInputElement
   className,
   children,
+  selectBox = false,
+  options = [],
+  textarea = false,
+  rows = 5,
+  textareaClassName,
   ...inputProps
 }: FieldProps<TFieldValues>): ReactElement {
   const { errors } = state;
@@ -37,12 +54,28 @@ function Field<TFieldValues = FieldValues>({
           {label}
         </Label>
       )}
-      <Input
-        id={name}
-        isInvalid={!!errorMessage}
-        {...register(name)}
-        {...inputProps}
-      />
+      {selectBox ? (
+        <Select
+          options={options}
+          isInvalid={!!errorMessage}
+          {...register(name)}
+          id={name}
+        />
+      ) : textarea ? (
+        <Textarea
+          id={name}
+          {...register(name)}
+          className={textareaClassName}
+          rows={rows}
+        />
+      ) : (
+        <Input
+          id={name}
+          isInvalid={!!errorMessage}
+          {...register(name)}
+          {...inputProps}
+        />
+      )}
       <ErrorMessage name={name} errors={errors} />
     </div>
   );
