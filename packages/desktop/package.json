@@ -15,7 +15,7 @@
     ]
   },
   "dependencies": {
-    "@apollo/client": "^3.5.10",
+    "@apollo/client": "^3.6.1",
     "@headlessui/react": "^1.6.0",
     "@hookform/resolvers": "^2.8.8",
     "@splidejs/react-splide": "^0.7.2",

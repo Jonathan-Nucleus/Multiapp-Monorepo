@@ -27,6 +27,25 @@
     tslib "^2.3.0"
     zen-observable-ts "^1.2.0"
 
+"@apollo/client@^3.6.1":
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/@apollo/client/-/client-3.6.1.tgz#2578aa3c06e4b8c41060936b9e508beb1abc1bab"
+  integrity sha512-WGC7n2IS7GIbCCfVvu58Qncmj6qUBYbI/DxPVHGffDuY5y5l+OI2YIr5UXyR8+G9Ly1d6iYbX6l6l+Rw6F6gHA==
+  dependencies:
+    "@graphql-typed-document-node/core" "^3.1.1"
+    "@wry/context" "^0.6.0"
+    "@wry/equality" "^0.5.0"
+    "@wry/trie" "^0.3.0"
+    graphql-tag "^2.12.6"
+    hoist-non-react-statics "^3.3.2"
+    optimism "^0.16.1"
+    prop-types "^15.7.2"
+    symbol-observable "^4.0.0"
+    ts-invariant "^0.10.0"
+    tslib "^2.3.0"
+    use-sync-external-store "^1.0.0"
+    zen-observable-ts "^1.2.0"
+
 "@apollo/protobufjs@1.2.2":
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/@apollo/protobufjs/-/protobufjs-1.2.2.tgz#4bd92cd7701ccaef6d517cdb75af2755f049f87c"

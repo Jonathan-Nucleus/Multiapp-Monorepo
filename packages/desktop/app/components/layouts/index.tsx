@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren } from "react";
+import { FC, PropsWithChildren, useEffect, useState } from "react";
 import NextNProgress from "nextjs-progressbar";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -15,21 +15,29 @@ const RootLayout: FC<RootLayoutProps> = ({
   layout,
   children,
 }: RootLayoutProps) => {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const router = useRouter();
-  if (middleware == "guest") {
-    if (status == "loading") {
-      return <></>;
-    }
-    if (session) {
+  const [routeChangeStarted, setRouteChangeStarted] = useState(false);
+  useEffect(() => {
+    const onRouteChangeStarted = () => {
+      setRouteChangeStarted(true);
+    };
+    const onRouteChangeCompleted = () => {
+      setRouteChangeStarted(false);
+    };
+    router.events.on("routeChangeStart", onRouteChangeStarted);
+    router.events.on("routeChangeComplete", onRouteChangeCompleted);
+    return () => {
+      router.events.off("routeChangeStart", onRouteChangeStarted);
+      router.events.off("routeChangeComplete", onRouteChangeCompleted);
+    };
+  }, [router]);
+  if (!routeChangeStarted && status != "loading") {
+    if (middleware == "guest" && status == "authenticated") {
       router.replace("/");
       return <></>;
     }
-  } else if (middleware == "auth") {
-    if (status == "loading") {
-      return <></>;
-    }
-    if (!session) {
+    if (middleware == "auth" && status == "unauthenticated") {
       router.replace(
         `${AppAuthOptions.pages?.signIn}?redirect=${router.asPath}`
       );
@@ -48,9 +56,15 @@ const RootLayout: FC<RootLayoutProps> = ({
         nonce=""
       />
       <main className={styles.main}>
-        {layout == "auth" && <AuthLayout>{children}</AuthLayout>}
-        {layout == "main" && <MainLayout>{children}</MainLayout>}
-        {layout == undefined && children}
+        {(status == "loading" || routeChangeStarted) ?
+          <></>
+          :
+          <>
+            {layout == "auth" && <AuthLayout>{children}</AuthLayout>}
+            {layout == "main" && <MainLayout>{children}</MainLayout>}
+            {layout == undefined && children}
+          </>
+        }
       </main>
     </>
   );
