@@ -217,6 +217,7 @@ const createUsersCollection = (
         email,
         firstName,
         lastName,
+        fullName: `${firstName} ${lastName}`,
         authProvider: provider,
         role: UserRoleOptions.USER,
         accreditation: AccreditationOptions.NONE.value,
@@ -262,6 +263,7 @@ const createUsersCollection = (
         salt,
         firstName,
         lastName,
+        fullName: `${firstName} ${lastName}`,
         role: UserRoleOptions.USER,
         accreditation: AccreditationOptions.NONE.value,
       };
@@ -408,11 +410,15 @@ const createUsersCollection = (
     /**
      * Updates a user's profile data.
      *
-     * @param profile The updated profile data
+     * @param currentUser   The current user.
+     * @param profile       The updated profile data.
      *
      * @returns   The updated user record.
      */
-    updateProfile: async (profile: User.ProfileInput): Promise<User.Mongo> => {
+    updateProfile: async (
+      currentUser: User.Mongo,
+      profile: User.ProfileInput
+    ): Promise<User.Mongo> => {
       const { _id, ...profileData } = profile;
       const keys = Object.keys(profileData);
 
@@ -421,9 +427,17 @@ const createUsersCollection = (
         (key) => profileData[key] === undefined && delete profileData[key]
       );
 
+      // Update full name
+      let fullName = currentUser.fullName;
+      if (keys.includes("firstName") || keys.includes("lastName")) {
+        fullName = `${profile.firstName || currentUser.firstName} ${
+          profile.lastName || currentUser.lastName
+        }`;
+      }
+
       const user = await usersCollection.findOneAndUpdate(
         { _id: toObjectId(_id), role: { $ne: "stub" } },
-        { $set: { ...profileData, updatedAt: new Date() } },
+        { $set: { ...profileData, fullName, updatedAt: new Date() } },
         { returnDocument: "after" }
       );
 
@@ -917,6 +931,38 @@ const createUsersCollection = (
       }
 
       return true;
+    },
+
+    /**
+     * Provides a list of users searched by keyword.
+     *
+     * @param search  Search keyword.
+     * @param limit   Optional limit for search result. Defaults to 10.
+     *
+     * @returns The list of users.
+     */
+    findByKeyword: async (
+      search: string = "",
+      limit = 10
+    ): Promise<User.Mongo[]> => {
+      const users = (await usersCollection
+        .aggregate([
+          {
+            $search: {
+              index: "fullName",
+              regex: {
+                query: `(.*)${search.split(" ").join("(.*)")}(.*)`,
+                path: "fullName",
+              },
+            },
+          },
+          {
+            $limit: limit,
+          },
+        ])
+        .toArray()) as User.Mongo[];
+
+      return users;
     },
   };
 

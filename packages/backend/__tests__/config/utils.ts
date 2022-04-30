@@ -56,6 +56,7 @@ export const createUser = async (
     _id: toObjectId(),
     firstName,
     lastName,
+    fullName: `${firstName} ${lastName}`,
     email: faker.internet.email(firstName, lastName),
     salt,
     password: hashPassword("test-pass", salt),

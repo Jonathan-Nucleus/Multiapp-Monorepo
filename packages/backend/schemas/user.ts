@@ -46,6 +46,7 @@ export namespace User {
     authProvider?: string;
     firstName: string;
     lastName: string;
+    fullName: string; // auto-generate by firstName and lastName. should not be updated manually.
     role: UserRole;
     accreditation: Accreditation;
     questionnaire?: Questionnaire;

@@ -40,6 +40,7 @@ export default async function (db: Db): Promise<ObjectId[]> {
       _id: new ObjectId(),
       firstName,
       lastName,
+      fullName: `${firstName} ${lastName}`,
       email:
         index === 0
           ? "darash.desai+test@gmail.com"

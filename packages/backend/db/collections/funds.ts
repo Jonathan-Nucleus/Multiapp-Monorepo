@@ -66,6 +66,37 @@ const createFundsCollection = (fundsCollection: Collection<Fund.Mongo>) => {
         })
         .toArray();
     },
+
+    /**
+     * Provides a list of funds searched by keyword.
+     *
+     * @param search  Search keyword.
+     * @param limit   Optional limit for search result. Defaults to 10.
+     *
+     * @returns The list of funds.
+     */
+    findByKeyword: async (
+      search: string = "",
+      limit = 10
+    ): Promise<Fund.Mongo[]> => {
+      const funds = (await fundsCollection
+        .aggregate([
+          {
+            $search: {
+              regex: {
+                query: `(.*)${search.split(" ").join("(.*)")}(.*)`,
+                path: "name",
+              },
+            },
+          },
+          {
+            $limit: limit,
+          },
+        ])
+        .toArray()) as Fund.Mongo[];
+
+      return funds;
+    },
   };
 };
 

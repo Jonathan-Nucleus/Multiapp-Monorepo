@@ -79,22 +79,21 @@ export const generateNotification = (
   type: NotificationType,
   user: User.Mongo
 ) => {
-  const userFullName = `${user.firstName} ${user.lastName}`;
   let title = "";
   let body = "";
 
   switch (type) {
     case "followed-by-user":
       title = "Followed";
-      body = `${userFullName} is following you.`;
+      body = `${user.fullName} is following you.`;
       break;
     case "like-post":
       title = "Liked";
-      body = `${userFullName} liked your post.`;
+      body = `${user.fullName} liked your post.`;
       break;
     case "comment-post":
       title = "Commented";
-      body = `${userFullName} commented on your post`;
+      body = `${user.fullName} commented on your post`;
       break;
     default:
       break;

@@ -217,6 +217,37 @@ const createCompaniesCollection = (
         return false;
       }
     },
+
+    /**
+     * Provides a list of companies searched by keyword.
+     *
+     * @param search  Search keyword.
+     * @param limit   Optional limit for search result. Defaults to 10.
+     *
+     * @returns The list of companies.
+     */
+    findByKeyword: async (
+      search: string = "",
+      limit = 10
+    ): Promise<Company.Mongo[]> => {
+      const companies = (await companiesCollection
+        .aggregate([
+          {
+            $search: {
+              regex: {
+                query: `(.*)${search.split(" ").join("(.*)")}(.*)`,
+                path: "name",
+              },
+            },
+          },
+          {
+            $limit: limit,
+          },
+        ])
+        .toArray()) as Company.Mongo[];
+
+      return companies;
+    },
   };
 };
 

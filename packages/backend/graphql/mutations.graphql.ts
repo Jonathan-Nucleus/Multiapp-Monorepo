@@ -353,7 +353,7 @@ const resolvers = {
           throw new BadRequestError("Not authorized");
         }
 
-        return db.users.updateProfile(profile);
+        return db.users.updateProfile(user, profile);
       }
     ),
 

@@ -41,6 +41,8 @@ const schema = gql`
     userProfile(userId: ID!): UserProfile
     companyProfile(companyId: ID!): Company
     notifications: [Notification!]
+    mentionUsers(search: String): [UserProfile!]
+    globalSearch(search: String): GlobalSearchResult
     users: [UserProfile!]!
   }
 
@@ -48,10 +50,24 @@ const schema = gql`
     managers: [User!]!
     funds: [Fund!]!
   }
+
+  type GlobalSearchResult {
+    users: [User!]!
+    companies: [Company!]!
+    posts: [Post!]!
+    funds: [Fund!]!
+  }
 `;
 
 export type FundManagers = {
   managers: User.Mongo[];
+  funds: Fund.Mongo[];
+};
+
+export type GlobalSearchResult = {
+  users: User.Mongo[];
+  companies: Company.Mongo[];
+  posts: Post.Mongo[];
   funds: Fund.Mongo[];
 };
 
@@ -349,6 +365,55 @@ const resolvers = {
         { db, user }
       ): Promise<Notification.Mongo[]> =>
         db.notifications.findAllByUser(user._id)
+    ),
+
+    mentionUsers: secureEndpoint(
+      async (
+        parentIgnored,
+        args: { search?: string },
+        { db, user }
+      ): Promise<User.Mongo[]> => {
+        const validator = yup
+          .object()
+          .shape({
+            search: yup.string(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { search } = args;
+
+        return db.users.findByKeyword(search);
+      }
+    ),
+
+    globalSearch: secureEndpoint(
+      async (
+        parentIgnored,
+        args: { search?: string },
+        { db, user }
+      ): Promise<GlobalSearchResult> => {
+        const validator = yup
+          .object()
+          .shape({
+            search: yup.string(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { search } = args;
+
+        const [users, companies, posts, funds] = await Promise.all([
+          db.users.findByKeyword(search),
+          db.companies.findByKeyword(search),
+          db.posts.findByKeyword(search),
+          db.funds.findByKeyword(search),
+        ]);
+
+        return { users, companies, posts, funds };
+      }
     ),
 
     users: secureEndpoint(

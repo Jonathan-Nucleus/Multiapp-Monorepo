@@ -288,6 +288,37 @@ const createPostsCollection = (
       return true;
     },
 
+    /**
+     * Provides a list of posts searched by keyword.
+     *
+     * @param search  Search keyword.
+     * @param limit   Optional limit for search result. Defaults to 10.
+     *
+     * @returns The list of posts.
+     */
+    findByKeyword: async (
+      search: string = "",
+      limit = 10
+    ): Promise<Post.Mongo[]> => {
+      const posts = (await postsCollection
+        .aggregate([
+          {
+            $search: {
+              regex: {
+                query: `(.*)${search.split(" ").join("(.*)")}(.*)`,
+                path: "body",
+              },
+            },
+          },
+          {
+            $limit: limit,
+          },
+        ])
+        .toArray()) as Post.Mongo[];
+
+      return posts;
+    },
+
     // TODO: Outstanding endpoints to implement
     // updatePost(post: PostUpdate) → Post
     // sharePost(postId: ID) → Post
