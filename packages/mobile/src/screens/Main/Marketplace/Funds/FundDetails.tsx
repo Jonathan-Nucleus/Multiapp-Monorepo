@@ -9,7 +9,6 @@ import {
 } from 'phosphor-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import MainHeader from 'mobile/src/components/main/Header';
 import PHeader from 'mobile/src/components/common/PHeader';
 
 import pStyles from 'mobile/src/theme/pStyles';
@@ -65,9 +64,7 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
 
   if (!fund) {
     return (
-      <SafeAreaView
-        style={pStyles.globalContainer}
-        edges={['right', 'top', 'left']}>
+      <SafeAreaView style={pStyles.globalContainer}>
         <PHeader
           leftIcon={<CaretLeft size={32} color={WHITE} />}
           leftStyle={styles.sideStyle}
@@ -79,9 +76,7 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
   }
 
   return (
-    <SafeAreaView
-      style={pStyles.globalContainer}
-      edges={['right', 'top', 'left']}>
+    <SafeAreaView style={pStyles.globalContainer}>
       <PHeader
         leftIcon={<CaretLeft size={32} color={WHITE} />}
         leftStyle={styles.sideStyle}
@@ -108,6 +103,7 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
           <Tab.Navigator
             sceneContainerStyle={styles.tabContainer}
             screenOptions={({ route }) => ({
+              swipeEnabled: false, // disabled swipe to scroll team members properly
               tabBarStyle: styles.tabBar,
               tabBarIndicatorStyle: styles.tabBarIndicator,
               tabBarActiveTintColor: WHITE,

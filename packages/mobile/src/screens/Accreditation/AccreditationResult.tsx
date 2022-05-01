@@ -14,9 +14,7 @@ import { AccreditationResultScreen } from 'mobile/src/navigations/AppNavigator';
 
 const AccreditationResult: AccreditationResultScreen = ({ navigation }) => {
   return (
-    <SafeAreaView
-      style={pStyles.globalContainer}
-      edges={['right', 'top', 'left']}>
+    <SafeAreaView style={pStyles.globalContainer}>
       <AccreditationHeader
         centerLabel="Investor Accreditation"
         handleBack={() => navigation.pop(2)}

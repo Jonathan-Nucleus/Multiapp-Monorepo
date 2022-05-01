@@ -8,6 +8,7 @@ import {
 } from '@apollo/client';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import { AsyncStorageWrapper, CachePersistor } from 'apollo3-cache-persist';
+import type { ApolloPersistOptions } from 'apollo3-cache-persist/types';
 import {
   attachTokenObserver,
   detachTokenObserver,
@@ -21,7 +22,8 @@ const cache = new InMemoryCache({
 });
 
 const persistor = new CachePersistor({
-  cache,
+  cache:
+    cache as unknown as ApolloPersistOptions<NormalizedCacheObject>['cache'], // Resolve type version error
   storage: new AsyncStorageWrapper(EncryptedStorage),
 });
 

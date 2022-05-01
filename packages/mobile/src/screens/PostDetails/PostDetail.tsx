@@ -33,9 +33,9 @@ import SelectionModal, {
   MenuDataItemProps,
 } from 'mobile/src/components/common/SelectionModal';
 import { showMessage } from 'mobile/src/services/utils';
-import { BLACK, WHITE } from 'shared/src/colors';
+import { BLACK, PRIMARYSOLID, PRIMARYSOLID7, WHITE } from 'shared/src/colors';
 import pStyles from 'mobile/src/theme/pStyles';
-import { Body2Bold, Body3 } from 'mobile/src/theme/fonts';
+import { Body2Bold, Body3, Body3Bold } from 'mobile/src/theme/fonts';
 import { SOMETHING_WRONG } from 'shared/src/constants';
 
 import LikesModal from './LikesModal';
@@ -138,12 +138,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
     useCallback(({ item }) => <CommentItem item={item} />, [comments]);
 
   if (!post || !comments || !likes) {
-    return (
-      <SafeAreaView
-        style={pStyles.globalContainer}
-        edges={['right', 'top', 'left']}
-      />
-    );
+    return <SafeAreaView style={pStyles.globalContainer} />;
   }
 
   const handleAddComment = async () => {
@@ -209,6 +204,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
 
       if (data?.editComment) {
         console.log('edit comment success');
+        initInputComment();
       } else {
         console.log('edit comment error');
       }
@@ -277,7 +273,6 @@ const PostDetail: PostDetailScreen = ({ route }) => {
             onPress={() => {
               setFocusCommentId(_id);
               if (user._id === accountData?.account._id) {
-                setEditComment(true);
                 setCommentMenuVisible(true);
               } else {
                 setSelectedUser(user);
@@ -313,9 +308,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
   };
 
   return (
-    <SafeAreaView
-      style={pStyles.globalContainer}
-      edges={['right', 'top', 'left']}>
+    <SafeAreaView style={pStyles.globalContainer}>
       <PHeader
         leftIcon={<CaretLeft size={32} color={WHITE} />}
         leftStyle={styles.sideStyle}
@@ -324,7 +317,11 @@ const PostDetail: PostDetailScreen = ({ route }) => {
       />
       <PAppContainer style={styles.container}>
         <PostItem post={post} userId={userId} />
-        <FlatList data={getComments || []} renderItem={renderCommentItem} />
+        <FlatList
+          data={getComments || []}
+          renderItem={renderCommentItem}
+          contentContainerStyle={styles.commentContainer}
+        />
       </PAppContainer>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'position' : undefined}>
@@ -347,14 +344,32 @@ const PostDetail: PostDetailScreen = ({ route }) => {
             value={comment}
             onChangeText={setComment}
             multiline
-            style={styles.input}
+            style={[
+              styles.input,
+              isEditComment ? { width: '100%' } : { width: '90%' },
+            ]}
             ref={inputRef}
           />
-          <TouchableOpacity onPress={handleAddComment}>
-            <PaperPlaneRight size={32} color={WHITE} />
-          </TouchableOpacity>
+          {!isEditComment && (
+            <TouchableOpacity onPress={handleAddComment}>
+              <PaperPlaneRight size={32} color={WHITE} />
+            </TouchableOpacity>
+          )}
         </View>
-        {isEditComment && <View />}
+        {isEditComment && (
+          <View style={styles.updateContainer}>
+            <TouchableOpacity
+              style={styles.cancelBtn}
+              onPress={initInputComment}>
+              <PLabel label="Cancel" textStyle={Body3Bold} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.updateBtn}
+              onPress={handleEditComment}>
+              <PLabel label="Update" textStyle={Body3Bold} />
+            </TouchableOpacity>
+          </View>
+        )}
       </KeyboardAvoidingView>
       <SelectionModal
         isVisible={kebobMenuVisible}
@@ -363,11 +378,13 @@ const PostDetail: PostDetailScreen = ({ route }) => {
         onPressCancel={() => setKebobMenuVisible(false)}
         onPressItem={(key) => {
           setKebobMenuVisible(false);
-          if (key === 'follow') {
-            handleFollowUser();
-          } else if (key === 'hide') {
-            handleHideUser();
-          }
+          setTimeout(() => {
+            if (key === 'follow') {
+              handleFollowUser();
+            } else if (key === 'hide') {
+              handleHideUser();
+            }
+          }, 500);
         }}
       />
       <LikesModal
@@ -382,11 +399,14 @@ const PostDetail: PostDetailScreen = ({ route }) => {
         onPressCancel={() => setCommentMenuVisible(false)}
         onPressItem={(key) => {
           setCommentMenuVisible(false);
-          if (key === 'edit') {
-            handleEditComment();
-          } else if (key === 'delete') {
-            handleDeleteComment();
-          }
+          setTimeout(() => {
+            if (key === 'edit') {
+              setEditComment(true);
+              inputRef?.current?.focus();
+            } else if (key === 'delete') {
+              handleDeleteComment();
+            }
+          }, 500);
         }}
       />
     </SafeAreaView>
@@ -397,12 +417,15 @@ export default PostDetail;
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 0,
   },
   headerContainer: {
     backgroundColor: BLACK,
     marginBottom: 0,
     height: 62,
+  },
+  commentContainer: {
+    paddingHorizontal: 16,
   },
   sideStyle: {
     top: 16,
@@ -438,11 +461,10 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: WHITE,
-    padding: 11,
-    paddingTop: 11, // important
+    padding: 16,
+    paddingTop: 16, // important
     minHeight: 36,
     borderRadius: 24,
-    width: '90%',
   },
   bodyContent: {
     marginLeft: 40,
@@ -456,5 +478,30 @@ const styles = StyleSheet.create({
     ...Body3,
     marginRight: 8,
     padding: 8,
+  },
+  updateContainer: {
+    backgroundColor: BLACK,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingBottom: 6,
+    marginRight: 16,
+  },
+  // TODO: global component for button
+  updateBtn: {
+    width: 100,
+    height: 45,
+    marginLeft: 16,
+    borderRadius: 22,
+    borderColor: PRIMARYSOLID,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: PRIMARYSOLID7,
+  },
+  cancelBtn: {
+    width: 80,
+    height: 45,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

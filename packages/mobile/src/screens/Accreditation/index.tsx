@@ -80,9 +80,7 @@ const Accreditation: AccreditationScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView
-      style={pStyles.globalContainer}
-      edges={['right', 'top', 'left']}>
+    <SafeAreaView style={pStyles.globalContainer}>
       <AccreditationHeader
         centerLabel="Investor Accreditation"
         handleBack={() => navigation.goBack()}

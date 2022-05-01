@@ -316,3 +316,27 @@ export function useProRequest(): MutationTuple<
     }
   `);
 }
+
+type UpdateFcmTokenVariables = {
+  fcmToken: string;
+};
+
+type UpdateFcmTokenData = {
+  updateFcmToken: boolean;
+};
+
+/**
+ * GraphQL mutation that save fcm token
+ *
+ * @returns   GraphQL mutation.
+ */
+export function useUpdateFcmToken(): MutationTuple<
+  UpdateFcmTokenData,
+  UpdateFcmTokenVariables
+> {
+  return useMutation<UpdateFcmTokenData, UpdateFcmTokenVariables>(gql`
+    mutation UpdateFcmToken($fcmToken: String!) {
+      updateFcmToken(fcmToken: $fcmToken)
+    }
+  `);
+}
