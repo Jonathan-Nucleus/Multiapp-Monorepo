@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
+import {
+  LinkPreview,
+  PreviewDataImage,
+} from '@flyerhq/react-native-link-preview';
 import FastImage from 'react-native-fast-image';
 import dayjs from 'dayjs';
 import {
@@ -8,19 +12,25 @@ import {
   Share,
   DotsThreeVertical,
 } from 'phosphor-react-native';
-import { AVATAR_URL, POST_URL } from 'react-native-dotenv';
 
 import PLabel from '../common/PLabel';
 import IconButton from '../common/IconButton';
 import UserInfo from '../common/UserInfo';
 import Tag from '../common/Tag';
 import Media from '../common/Media';
-import { PRIMARYSTATE, WHITE12, WHITE60, WHITE } from 'shared/src/colors';
-import { Body1, Body3 } from '../../theme/fonts';
+import {
+  PRIMARYSTATE,
+  WHITE12,
+  WHITE60,
+  WHITE,
+  BLACK,
+} from 'shared/src/colors';
+import { Body1, Body2Bold, Body3 } from '../../theme/fonts';
 import * as NavigationService from '../../services/navigation/NavigationService';
 import { Post } from 'mobile/src/graphql/query/post/usePosts';
 import { PostCategories } from 'backend/graphql/enumerations.graphql';
 import { useLikePost } from '../../graphql/mutation/posts';
+import { appWidth } from '../../utils/utils';
 
 export interface PostItemProps {
   post: Post;
@@ -89,7 +99,28 @@ const PostItem: React.FC<PostItemProps> = ({ post, userId, onPressMenu }) => {
           </TouchableOpacity>
         </View>
         <View style={styles.contentPadding}>
-          {body ? <PLabel label={body} textStyle={styles.body} /> : null}
+          {body ? (
+            <LinkPreview
+              containerStyle={styles.previewContainer}
+              renderText={(txt) => (
+                <PLabel label={txt} textStyle={styles.body} />
+              )}
+              renderImage={(img: PreviewDataImage) => (
+                <FastImage
+                  source={{ uri: img.url }}
+                  style={styles.previewImage}
+                />
+              )}
+              renderTitle={(txt) => (
+                <PLabel label={txt} textStyle={Body2Bold} />
+              )}
+              renderDescription={(txt) => (
+                <PLabel label={txt} textStyle={styles.body} />
+              )}
+              textContainerStyle={styles.previewTextContainer}
+              text={body}
+            />
+          ) : null}
           {mediaUrl ? <Media src={mediaUrl} /> : null}
         </View>
         <View style={[styles.postInfo, styles.contentPadding]}>
@@ -174,6 +205,20 @@ const styles = StyleSheet.create({
   },
   userInfo: {
     marginLeft: 8,
+  },
+  previewContainer: {
+    backgroundColor: BLACK,
+    overflow: 'hidden',
+  },
+  previewTextContainer: {
+    marginHorizontal: 5,
+  },
+  previewImage: {
+    width: appWidth - 36,
+    height: 200,
+    borderRadius: 12,
+    overflow: 'hidden',
+    alignSelf: 'center',
   },
   nameLabel: {
     ...Body1,
