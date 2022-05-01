@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 
 import PLabel from './PLabel';
-import { PRIMARYOVERLAY, PRIMARY, BLACK } from 'shared/src/colors';
+import { PRIMARY, BLACK, PRIMARYSOLID, WHITE } from 'shared/src/colors';
 
 interface PostCategoryProps {
   id: number;
@@ -17,14 +17,14 @@ const CheckboxLabel: React.FC<PostCategoryProps> = (props) => {
   const { id, category, value, viewStyle, handleChange } = props;
 
   return (
-    <View style={[styles.wrapper, viewStyle]}>
+    <View style={[styles.wrapper, viewStyle, value && styles.checkedWrapper]}>
       <CheckBox
         disabled={false}
         value={value}
         boxType="square"
-        onCheckColor={BLACK}
-        onFillColor={PRIMARY}
-        onTintColor={PRIMARY}
+        onCheckColor={PRIMARYSOLID}
+        onFillColor={WHITE}
+        onTintColor={WHITE}
         lineWidth={2.5}
         onValueChange={() => handleChange(id)}
         style={styles.checkBox}
@@ -44,8 +44,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     width: '45%',
     height: 48,
-    borderRadius: 24,
-    backgroundColor: PRIMARYOVERLAY,
+    borderRadius: 32,
+    borderColor: PRIMARYSOLID,
+    borderWidth: 1,
+  },
+  checkedWrapper: {
+    backgroundColor: PRIMARYSOLID,
   },
   checkBox: {
     width: 20,

@@ -1,13 +1,19 @@
 import React, { useState, useEffect, memo, useMemo } from 'react';
-import { ListRenderItem, FlatList, StyleSheet, View } from 'react-native';
+import {
+  ListRenderItem,
+  FlatList,
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  Text,
+} from 'react-native';
 import isEqual from 'react-fast-compare';
 import SplashScreen from 'react-native-splash-screen';
 import { useIsFocused } from '@react-navigation/native';
+import { SlidersHorizontal } from 'phosphor-react-native';
 
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import MainHeader from 'mobile/src/components/main/Header';
-import SelectionModal from 'mobile/src/components/common/SelectionModal';
-import Tag from 'mobile/src/components/common/Tag';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import PostItem, { PostItemProps } from 'mobile/src/components/main/PostItem';
 import { showMessage } from 'mobile/src/services/utils';
@@ -18,18 +24,27 @@ import OwnPostActionModal from './OwnPostActionModal';
 
 import { usePosts, Post } from 'mobile/src/graphql/query/post/usePosts';
 import { useAccount } from 'mobile/src/graphql/query/account';
-
 import { HomeScreen } from 'mobile/src/navigations/MainTabNavigator';
-
-const CategoryList = ['All', 'Investment Ideas', 'World News', 'Politics'];
+import FilterModal from 'mobile/src/screens/PostDetails/FilterModal';
+import { WHITE } from 'shared/src/colors';
+import type {
+  PostCategory,
+  PostRoleFilter,
+} from 'backend/graphql/posts.graphql';
+import { PostRoleFilterOptions } from 'backend/schemas/post';
+import { Body2Bold } from '../../../theme/fonts';
 
 const HomeComponent: HomeScreen = ({ navigation }) => {
-  const [category, setCategory] = useState('All');
+  const [selectedCategories, setSelectedCategories] = useState<
+    PostCategory[] | undefined
+  >(undefined);
+  const [selectedRole, setSelectedRole] = useState<PostRoleFilter>('EVERYONE');
+  const [visibleFilter, setVisibleFilter] = useState(false);
   const [kebobMenuVisible, setKebobMenuVisible] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | undefined>(undefined);
 
   const { data: userData } = useAccount();
-  const { data, error, loading, refetch } = usePosts();
+  const { data, refetch } = usePosts(selectedCategories, selectedRole);
 
   const account = userData?.account;
   const postData = data?.posts ?? [];
@@ -63,6 +78,11 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
     });
   };
 
+  const postFilter = (role: PostRoleFilter, cateogies: PostCategory[]) => {
+    setSelectedRole(role);
+    setSelectedCategories(cateogies.length > 0 ? cateogies : undefined);
+  };
+
   const renderItem: ListRenderItem<Post> = ({ item }) => (
     <PostItem
       post={item}
@@ -77,21 +97,15 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
   return (
     <View style={pStyles.globalContainer}>
       <MainHeader />
+      <View style={styles.row}>
+        <Text style={styles.filter}>
+          Posts from {PostRoleFilterOptions[selectedRole].label}
+        </Text>
+        <TouchableOpacity onPress={() => setVisibleFilter(true)}>
+          <SlidersHorizontal color={WHITE} size={24} />
+        </TouchableOpacity>
+      </View>
       <PAppContainer style={styles.container}>
-        <FlatList
-          horizontal
-          data={CategoryList}
-          renderItem={({ item }) => (
-            <Tag
-              label={item}
-              viewStyle={styles.tagStyle}
-              textStyle={styles.tagLabel}
-              isSelected={item === category}
-              onPress={setCategory}
-            />
-          )}
-          listKey="category"
-        />
         <FlatList
           data={postData}
           renderItem={renderItem}
@@ -115,6 +129,11 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
         post={selectedPost}
         visible={kebobMenuVisible && selectedPost?.user._id === account._id}
         onClose={() => setKebobMenuVisible(false)}
+      />
+      <FilterModal
+        isVisible={visibleFilter}
+        onClose={() => setVisibleFilter(false)}
+        onFilter={postFilter}
       />
     </View>
   );
@@ -148,5 +167,15 @@ const styles = StyleSheet.create({
   postLabel: {
     fontSize: 40,
     textAlign: 'center',
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 18,
+  },
+  filter: {
+    ...Body2Bold,
+    color: WHITE,
   },
 });

@@ -13,6 +13,7 @@ import {
   AudienceEnum,
   PostCategoryOptions,
   PostCategoryEnum,
+  PostRoleFilterEnum,
 } from "../schemas/post";
 
 type GraphQLPost = Post.GraphQL;
@@ -26,6 +27,7 @@ export type {
   PostInput,
   PostCategoryEnum as PostCategory,
   AudienceEnum as Audience,
+  PostRoleFilterEnum as PostRoleFilter,
 };
 
 const schema = gql`
