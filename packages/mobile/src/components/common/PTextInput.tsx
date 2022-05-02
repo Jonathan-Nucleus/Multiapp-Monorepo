@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 
 import PFormLabel from './PFormLabel';
-import { Body1 } from '../../theme/fonts';
+import { Body1, Body2 } from '../../theme/fonts';
 import { WHITE, PRIMARY, BLACK, GRAY800, GRAY700 } from 'shared/src/colors';
 
 interface PTextInputProps extends TextInputProps {
@@ -61,22 +61,6 @@ const PTextInput: React.FC<PTextInputProps> = (props) => {
   } = props;
 
   const [isFocused, setIsFocused] = useState(false);
-  const [borderColor, setBorderColor] = useState({
-    borderColor: WHITE,
-  });
-
-  useEffect(() => {
-    if (isFocused) {
-      setBorderColor({
-        borderColor: PRIMARY,
-      });
-    } else {
-      setBorderColor({
-        borderColor: WHITE,
-      });
-    }
-  }, [isFocused]);
-
   const handleOnChangeText = (val: string): void => {
     onChangeText?.(val);
   };
@@ -87,7 +71,7 @@ const PTextInput: React.FC<PTextInputProps> = (props) => {
         <PFormLabel
           label={label}
           style={labelStyle}
-          textStyle={labelTextStyle}
+          textStyle={[styles.defaultLabelText, labelTextStyle]}
         />
         <PFormLabel
           label={subLabel ?? ''}
@@ -103,7 +87,11 @@ const PTextInput: React.FC<PTextInputProps> = (props) => {
           placeholderTextColor={placeholderTextColor}
           onChangeText={handleOnChangeText}
           secureTextEntry={secureTextEntry}
-          style={[styles.textInput, textInputStyle, borderColor]}
+          style={[
+            styles.textInput,
+            textInputStyle,
+            isFocused && styles.focused,
+          ]}
           value={text}
           keyboardType={keyboardType}
           editable={editable}
@@ -154,6 +142,14 @@ const styles = StyleSheet.create({
     shadowColor: BLACK,
     shadowOpacity: 0.25,
     marginBottom: 20,
+  },
+  focused: {
+    borderColor: PRIMARY,
+  },
+  defaultLabelText: {
+    ...Body2,
+    color: WHITE,
+    fontWeight: '700',
   },
   container: {},
   view: {

@@ -16,6 +16,10 @@ import {
   FinancialStatusOptions,
   InvestmentLevelOptions,
   ProRoleOptions,
+  Questionnaire,
+  FinancialStatusEnum,
+  InvestorClassEnum,
+  InvestmentLevelEnum,
 } from "../schemas/user";
 import {
   User,
@@ -30,7 +34,25 @@ import type { Company } from "../schemas/company";
 type GraphQLUser = User.GraphQL;
 type GraphQLProfile = User.Profile;
 type FundManager = User.FundManager;
-export type { GraphQLUser as User, GraphQLProfile as UserProfile, FundManager };
+type OAuthInput = User.OAuthInput;
+type QuestionnaireInput = {
+  class: InvestorClassEnum;
+  status: FinancialStatusEnum[];
+  level?: InvestmentLevelEnum;
+  date: Date;
+};
+
+export type {
+  GraphQLUser as User,
+  GraphQLProfile as UserProfile,
+  FundManager,
+  OAuthInput,
+  Questionnaire,
+  QuestionnaireInput,
+  FinancialStatusEnum as FinancialStatus,
+  InvestorClassEnum as InvestorClass,
+  InvestmentLevelEnum as InvestmentLevel,
+};
 
 const schema = gql`
   ${UserSchema}

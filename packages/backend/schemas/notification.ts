@@ -70,8 +70,8 @@ export const NotificationSchema = `
 
   type NotificationData {
     userId: ID!
-    postID: ID
-    commentID: ID
+    postId: ID
+    commentId: ID
   }
 `;
 

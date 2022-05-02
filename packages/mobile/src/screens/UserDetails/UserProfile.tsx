@@ -286,7 +286,8 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
               />
             </View>
           ) : (
-            isMyAccount && (
+            isMyAccount &&
+            postData.length > 0 && (
               <View style={styles.noPostContainer}>
                 <Text style={styles.val}>You don’t have any posts, yet.</Text>
               </View>
@@ -473,6 +474,7 @@ const styles = StyleSheet.create({
   },
   noPostContainer: {
     alignSelf: 'center',
+    marginBottom: 36,
   },
   createPostBtn: {
     marginTop: 25,

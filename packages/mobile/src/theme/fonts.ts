@@ -1,6 +1,6 @@
 const Gotham = 'Gotham-Light';
 const GothamBold = 'Gotham-Bold';
-const GothamThin = 'Gotham-Thin';
+const GothamThin = 'Gotham-XLight';
 
 export const H5 = {
   fontSize: 24,

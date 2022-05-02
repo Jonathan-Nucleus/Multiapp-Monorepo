@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+  ListRenderItem,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 import PLabel from 'mobile/src/components/common/PLabel';
 import CheckboxLabel from 'mobile/src/components/common/CheckboxLabel';
@@ -19,17 +25,24 @@ import {
 import { Body1Bold, Body2Bold, H6Bold } from 'mobile/src/theme/fonts';
 import { appWidth } from 'mobile/src/utils/utils';
 
+import {
+  FinancialStatusOptions as StatusOptions,
+  FinancialStatus,
+  InvestorClass,
+  InvestmentLevel,
+} from 'mobile/src/graphql/mutation/account/useSaveQuestionnaire';
+
 interface AccreditationItemProps {
   index: number;
   isEnoughInvestor: boolean;
   handleGoNext: () => void;
   handleGoBack: () => void;
-  updateInvestOption: (investOption: string) => void;
-  updateFinancialOption: (financialOptions: string) => void;
-  updateInvestmentLevelOption: (option: string) => void;
+  updateInvestOption: (investOption: InvestorClass) => void;
+  updateFinancialOption: (financialOptions: FinancialStatus[]) => void;
+  updateInvestmentLevelOption: (option: InvestmentLevel | undefined) => void;
 }
 
-const InvestOptions = [
+const InvestOptions: { title: string; value: InvestorClass }[] = [
   {
     title: 'Individual',
     value: 'INDIVIDUAL',
@@ -44,47 +57,11 @@ const InvestOptions = [
   // },
 ];
 
-interface FinancialStatusProps {
-  id: number;
-  title: string;
-  value: string;
-  description: string;
-  isChecked: boolean;
-}
-
-const FinancialStatusOptions: FinancialStatusProps[] = [
-  {
-    id: 1,
-    isChecked: false,
-    title: 'Income',
-    value: 'MIN_INCOME',
-    description:
-      'I earn $200k+ per year or, with my spousal equivalent, $300K+ per year.',
-  },
-  {
-    id: 2,
-    isChecked: false,
-    title: 'Personal Net Worth',
-    value: 'NET_WORTH',
-    description: 'I/we have $1M+ in assets excluding primary residence.',
-  },
-  {
-    id: 3,
-    isChecked: false,
-    title: 'License Holder',
-    value: 'LICENSED',
-    description:
-      'I hold an active Series 7.65, or 82 licencse in good standing',
-  },
-  {
-    id: 4,
-    isChecked: false,
-    title: 'Affiliation',
-    value: 'AFFILIATED',
-    description:
-      'I am a knowledgeable employee, executive officer, trustee, general partner or advisory board member of a private fund',
-  },
-];
+const FinancialStatusOptions = StatusOptions.map((option, index) => ({
+  id: index,
+  isChecked: false,
+  ...option,
+}));
 
 const AccreditationItem: React.FC<AccreditationItemProps> = ({
   index = 0,
@@ -95,11 +72,15 @@ const AccreditationItem: React.FC<AccreditationItemProps> = ({
   updateFinancialOption,
   updateInvestmentLevelOption,
 }) => {
-  const [financialStatusOptions, setFinancialStatusOptions] = useState<
-    FinancialStatusProps[]
-  >(FinancialStatusOptions);
-  const [investLevel1, setInvestLevel1] = useState('');
-  const [investLevel2, setInvestLevel2] = useState('');
+  const [financialStatusOptions, setFinancialStatusOptions] = useState(
+    FinancialStatusOptions,
+  );
+  const [investLevel1, setInvestLevel1] = useState<boolean | undefined>(
+    undefined,
+  );
+  const [investLevel2, setInvestLevel2] = useState<boolean | undefined>(
+    undefined,
+  );
 
   const renderFirstSlide = () => {
     return (
@@ -137,14 +118,13 @@ const AccreditationItem: React.FC<AccreditationItemProps> = ({
       }
       return category;
     });
+    console.log(temp);
     setFinancialStatusOptions(temp);
   };
 
-  const renderFinancialStatusItem = ({
-    item,
-  }: {
-    item: FinancialStatusProps;
-  }) => (
+  const renderFinancialStatusItem: ListRenderItem<
+    typeof FinancialStatusOptions[number]
+  > = ({ item }) => (
     <CheckboxLabel
       id={item.id}
       category={`${item.title}: ${item.description}`}
@@ -167,12 +147,14 @@ const AccreditationItem: React.FC<AccreditationItemProps> = ({
         />
         <PLabel label="Select all that apply:" textStyle={Body2Bold} />
         <FlatList
-          data={FinancialStatusOptions}
+          data={financialStatusOptions}
           renderItem={renderFinancialStatusItem}
           contentContainerStyle={styles.financialListContainer}
           scrollEnabled={false}
           ListFooterComponent={
-            <TouchableOpacity style={styles.greyButton}>
+            <TouchableOpacity
+              style={styles.greyButton}
+              onPress={() => updateFinancialOption([])}>
               <PLabel label="None of the above" />
             </TouchableOpacity>
           }
@@ -190,12 +172,9 @@ const AccreditationItem: React.FC<AccreditationItemProps> = ({
               const checkedItems = financialStatusOptions.filter(
                 (item) => item.isChecked,
               );
-              if (checkedItems.length > 0) {
-                const values = checkedItems.map((item) => item.value);
-                updateFinancialOption(values[0]);
-              } else {
-                updateFinancialOption('');
-              }
+              checkedItems.length > 0
+                ? updateFinancialOption(checkedItems.map((item) => item.value))
+                : updateFinancialOption([]);
             }}
           />
         </View>
@@ -264,26 +243,29 @@ const AccreditationItem: React.FC<AccreditationItemProps> = ({
         />
         <View style={styles.selectionContainer}>
           <TouchableOpacity
-            style={[
-              styles.selectButton,
-              investLevel1 === 'TIER1' && styles.selectedButton,
-            ]}
-            onPress={() => setInvestLevel1('TIER1')}>
+            style={[styles.selectButton, investLevel1 && styles.selectedButton]}
+            onPress={() => setInvestLevel1(true)}>
             <PLabel
               label="Yes"
-              textStyle={investLevel1 === 'TIER1' ? styles.selectedLabel : {}}
+              textStyle={investLevel1 ? styles.selectedLabel : {}}
             />
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.selectButton}
+            style={[
+              styles.selectButton,
+              investLevel1 === false && styles.selectedButton,
+            ]}
             onPress={() => {
-              setInvestLevel1('');
-              setInvestLevel2('');
+              setInvestLevel1(false);
+              setInvestLevel2(false);
             }}>
-            <PLabel label="No" />
+            <PLabel
+              label="No"
+              textStyle={investLevel1 === false ? styles.selectedLabel : {}}
+            />
           </TouchableOpacity>
         </View>
-        {investLevel1 === 'TIER1' && (
+        {investLevel1 && (
           <>
             <PLabel
               label="Do you have at least $5M in investments?"
@@ -293,20 +275,24 @@ const AccreditationItem: React.FC<AccreditationItemProps> = ({
               <TouchableOpacity
                 style={[
                   styles.selectButton,
-                  investLevel2 === 'TIER2' && styles.selectedButton,
+                  investLevel2 && styles.selectedButton,
                 ]}
-                onPress={() => setInvestLevel2('TIER2')}>
+                onPress={() => setInvestLevel2(true)}>
                 <PLabel
                   label="Yes"
-                  textStyle={
-                    investLevel2 === 'TIER2' ? styles.selectedLabel : {}
-                  }
+                  textStyle={investLevel2 ? styles.selectedLabel : {}}
                 />
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.selectButton}
-                onPress={() => setInvestLevel2('')}>
-                <PLabel label="No" />
+                style={[
+                  styles.selectButton,
+                  investLevel2 === false && styles.selectedButton,
+                ]}
+                onPress={() => setInvestLevel2(false)}>
+                <PLabel
+                  label="No"
+                  textStyle={investLevel2 === false ? styles.selectedLabel : {}}
+                />
               </TouchableOpacity>
             </View>
           </>
@@ -320,7 +306,9 @@ const AccreditationItem: React.FC<AccreditationItemProps> = ({
             textStyle={styles.nextButtonLabel}
             btnContainer={{ width: '50%' }}
             onPress={() =>
-              updateInvestmentLevelOption(investLevel2 || investLevel1)
+              updateInvestmentLevelOption(
+                investLevel2 ? 'TIER2' : investLevel1 ? 'TIER1' : undefined,
+              )
             }
           />
         </View>
@@ -398,6 +386,7 @@ const styles = StyleSheet.create({
   checkContainer: {
     backgroundColor: BGDARK,
     borderRadius: 8,
+    borderWidth: 0,
     paddingVertical: 16,
     paddingHorizontal: 28,
     width: '100%',

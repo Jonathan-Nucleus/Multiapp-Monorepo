@@ -21,7 +21,7 @@ import PTextLine from '../../components/common/PTextLine';
 import ErrorText from '../../components/common/ErrorTxt';
 import { LOGIN } from '../../graphql/mutation/auth';
 import { Body2 } from '../../theme/fonts';
-import { BLACK, PRIMARY, WHITE, BLUE200 } from 'shared/src/colors';
+import { BLACK, PRIMARY, WHITE, BLUE200, WHITE12 } from 'shared/src/colors';
 import LogoSvg from '../../assets/icons/logo.svg';
 import AppleSvg from '../../assets/icons/apple.svg';
 import GoogleSvg from '../../assets/icons/google.svg';
@@ -32,6 +32,9 @@ import UncheckedSvg from '../../assets/icons/unchecked.svg';
 import { setToken } from 'mobile/src/utils/auth-token';
 import type { LoginScreen } from 'mobile/src/navigations/AuthStack';
 
+import { authenticate } from 'mobile/src/services/auth/google-provider';
+import { useLoginOAuth } from 'mobile/src/graphql/mutation/auth/useLoginOAuth';
+
 const Login: LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
@@ -39,10 +42,16 @@ const Login: LoginScreen = ({ navigation }) => {
   const [securePassEntry, setSecurePassEntry] = useState(true);
 
   const [login] = useMutation(LOGIN);
+  const [loginOAuth] = useLoginOAuth();
 
   useEffect(() => {
     SplashScreen.hide();
   }, []);
+
+  const saveAuthToken = async (token: string) => {
+    await setToken(token);
+    navigation.navigate('Main');
+  };
 
   const handleNextPage = async () => {
     Keyboard.dismiss();
@@ -54,13 +63,42 @@ const Login: LoginScreen = ({ navigation }) => {
         },
       });
       if (data.login) {
-        await setToken(data.login);
-        navigation.navigate('Main');
+        saveAuthToken(data.login);
       }
       console.log('logged user', data);
     } catch (e) {
       console.error('login error', e);
     }
+  };
+
+  const googleLogin = async () => {
+    const result = await authenticate();
+    if (result) {
+      const { token, payload } = result;
+      const { email, family_name, given_name } = payload;
+
+      const { data } = await loginOAuth({
+        variables: {
+          user: {
+            email,
+            firstName: given_name,
+            lastName: family_name,
+            tokenId: token,
+            provider: 'google',
+          },
+        },
+      });
+
+      if (data?.loginOAuth) {
+        saveAuthToken(data.loginOAuth);
+      }
+    } else {
+      console.log('Something went wrong');
+    }
+  };
+
+  const linkedInLogin = async () => {
+    console.log('Logging in via linked in');
   };
 
   return (
@@ -109,10 +147,10 @@ const Login: LoginScreen = ({ navigation }) => {
           <TouchableOpacity style={styles.icon}>
             <AppleSvg />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.icon}>
+          <TouchableOpacity style={styles.icon} onPress={linkedInLogin}>
             <LinkedinSvg />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.icon}>
+          <TouchableOpacity style={styles.icon} onPress={googleLogin}>
             <GoogleSvg />
           </TouchableOpacity>
         </View>
@@ -139,6 +177,7 @@ const styles = StyleSheet.create({
   },
   btnContainer: {
     marginTop: 20,
+    marginBottom: 64,
   },
   subLabelText: {
     color: PRIMARY,
@@ -157,14 +196,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   icon: {
-    borderWidth: 1,
-    borderColor: BLUE200,
-    borderRadius: 24,
-    width: 36,
-    height: 36,
+    borderWidth: 2,
+    borderColor: WHITE12,
+    borderRadius: 4,
+    width: 48,
+    height: 48,
     alignItems: 'center',
     justifyContent: 'center',
-    marginHorizontal: 12,
+    marginHorizontal: 16,
   },
   wrap: {
     flexDirection: 'row',

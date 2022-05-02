@@ -11,11 +11,10 @@ import { Body1Bold } from 'mobile/src/theme/fonts';
 interface AccreditationHeaderProps {
   centerLabel: string;
   handleBack?: () => void;
-  handleNext?: () => void;
 }
 
 const AccreditationHeader: React.FC<AccreditationHeaderProps> = (props) => {
-  const { centerLabel, handleBack, handleNext } = props;
+  const { centerLabel, handleBack } = props;
 
   return (
     <PHeader
@@ -27,7 +26,7 @@ const AccreditationHeader: React.FC<AccreditationHeaderProps> = (props) => {
       leftStyle={styles.sideStyle}
       centerIcon={<PLabel label={centerLabel} textStyle={styles.headerTitle} />}
       rightIcon={
-        <TouchableOpacity style={styles.iconContainer} onPress={handleNext}>
+        <TouchableOpacity style={styles.iconContainer} onPress={handleBack}>
           <X size={24} color={WHITE} />
         </TouchableOpacity>
       }

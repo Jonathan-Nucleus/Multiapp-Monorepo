@@ -12,7 +12,12 @@ import { appWidth } from 'mobile/src/utils/utils';
 
 import AccreditationHeader from './AccreditationHeader';
 import AccreditationItem from './AccreditationItem';
-import { useSaveQuestionnaire } from 'mobile/src/graphql/mutation/account';
+import {
+  useSaveQuestionnaire,
+  FinancialStatus,
+  InvestmentLevel,
+  InvestorClass,
+} from 'mobile/src/graphql/mutation/account/useSaveQuestionnaire';
 
 const slideData = [1, 2, 3, 4];
 
@@ -20,15 +25,15 @@ import { AccreditationScreen } from 'mobile/src/navigations/AppNavigator';
 
 const Accreditation: AccreditationScreen = ({ navigation }) => {
   const [activeSlide, setActiveSlide] = useState(0);
-  const [investOption, setInvestOption] = useState('');
-  const [finalcialOption, setFinancialOption] = useState('');
+  const [investOption, setInvestOption] = useState<InvestorClass | undefined>(
+    undefined,
+  );
+  const [financialOptions, setFinancialOptions] = useState<FinancialStatus[]>(
+    [],
+  );
   const slideRef = useRef<Carousel<number> | null>(null);
 
   const [saveQuestionnaire] = useSaveQuestionnaire();
-
-  const updateInvestOption = (option: string) => {
-    setInvestOption(option);
-  };
 
   const handleGoNext = () => {
     slideRef?.current?.snapToNext();
@@ -38,20 +43,20 @@ const Accreditation: AccreditationScreen = ({ navigation }) => {
     slideRef?.current?.snapToPrev();
   };
 
-  const saveAccreditation = async (level: string) => {
+  const saveAccreditation = async (level?: InvestmentLevel) => {
+    if (!investOption) return;
+
     try {
       const { data } = await saveQuestionnaire({
         variables: {
           questionnaire: {
             class: investOption,
-            status: finalcialOption,
+            status: financialOptions,
             level: level,
             date: new Date(),
           },
         },
       });
-
-      console.log('data', investOption, finalcialOption, level, data);
 
       if (data?.saveQuestionnaire._id) {
         navigation.navigate('AccreditationResult');
@@ -84,7 +89,6 @@ const Accreditation: AccreditationScreen = ({ navigation }) => {
       <AccreditationHeader
         centerLabel="Investor Accreditation"
         handleBack={() => navigation.goBack()}
-        // handleNext={handleNext}
       />
       <PAppContainer noScroll style={styles.container}>
         <Carousel
@@ -102,15 +106,15 @@ const Accreditation: AccreditationScreen = ({ navigation }) => {
           renderItem={({ index }) => (
             <AccreditationItem
               index={index}
-              isEnoughInvestor={!!finalcialOption}
+              isEnoughInvestor={financialOptions.length > 0}
               handleGoNext={handleGoNext}
               handleGoBack={handleGoBack}
               updateInvestOption={(option) => {
-                updateInvestOption(option);
+                setInvestOption(option);
                 handleGoNext();
               }}
               updateFinancialOption={(option) => {
-                setFinancialOption(option);
+                setFinancialOptions(option);
                 handleGoNext();
               }}
               updateInvestmentLevelOption={(level) => saveAccreditation(level)}

@@ -18,4 +18,7 @@ declare module 'react-native-dotenv' {
   declare const AVATAR_URL: string;
   declare const BACKGROUND_URL: string;
   declare const GRAPHQL_URI: string;
+  declare const GOOGLE_ID: string;
+  declare const LINKEDIN_ID: string;
+  declare const LINKEDIN_SECRET: string;
 }

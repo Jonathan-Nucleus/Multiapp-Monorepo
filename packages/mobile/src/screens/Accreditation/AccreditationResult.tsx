@@ -5,6 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import PLabel from 'mobile/src/components/common/PLabel';
 import QPSvg from 'shared/assets/images/QP.svg';
+import QCSvg from 'shared/assets/images/QC.svg';
+import AISvg from 'shared/assets/images/AI.svg';
 import pStyles from 'mobile/src/theme/pStyles';
 import { GRAY100, PRIMARYSOLID, PRIMARYSOLID7 } from 'shared/src/colors';
 import { H6Bold } from 'mobile/src/theme/fonts';
@@ -12,29 +14,60 @@ import { H6Bold } from 'mobile/src/theme/fonts';
 import AccreditationHeader from './AccreditationHeader';
 import { AccreditationResultScreen } from 'mobile/src/navigations/AppNavigator';
 
+import { useAccount } from 'mobile/src/graphql/query/account';
+
 const AccreditationResult: AccreditationResultScreen = ({ navigation }) => {
+  const { data: accountData } = useAccount();
+  const accreditation = accountData?.account?.accreditation;
+
+  let title = '';
+  let subtitle = '';
+
+  switch (accreditation) {
+    case 'ACCREDITED':
+      title = "You're an accredited investor!";
+      subtitle =
+        'Thank you for providing the information required by law to ' +
+        'verify your status as an accredited investor.';
+      break;
+
+    case 'QUALIFIED_CLIENT':
+      title = "You're a qualified client!";
+      subtitle = 'Thank you for verifying your qualified client status.';
+      break;
+
+    case 'QUALIFIED_PURCHASER':
+      title = 'You’re a qualified purchaser!';
+      subtitle = 'Thank you for verifying your qualified purchaser status.';
+      break;
+
+    case 'NONE':
+  }
+
   return (
     <SafeAreaView style={pStyles.globalContainer}>
       <AccreditationHeader
         centerLabel="Investor Accreditation"
         handleBack={() => navigation.pop(2)}
       />
-      <PAppContainer noScroll style={styles.container}>
-        <QPSvg />
-        <PLabel
-          label="You’re a qualified purchaser!"
-          textStyle={styles.titleLabel}
-        />
-        <PLabel
-          label="Thank you for verifying your qualified purchaser status."
-          textStyle={styles.descriptionLabel}
-        />
-        <TouchableOpacity
-          onPress={() => navigation.pop(2)}
-          style={styles.outlineBtn}>
-          <PLabel label="Back to App" />
-        </TouchableOpacity>
-      </PAppContainer>
+      {accreditation && (
+        <PAppContainer noScroll style={styles.container}>
+          {accreditation === 'QUALIFIED_PURCHASER' ? (
+            <QPSvg />
+          ) : accreditation === 'QUALIFIED_CLIENT' ? (
+            <QCSvg />
+          ) : (
+            <AISvg />
+          )}
+          <PLabel label={title} textStyle={styles.titleLabel} />
+          <PLabel label={subtitle} textStyle={styles.descriptionLabel} />
+          <TouchableOpacity
+            onPress={() => navigation.pop(2)}
+            style={styles.outlineBtn}>
+            <PLabel label="Back to App" />
+          </TouchableOpacity>
+        </PAppContainer>
+      )}
     </SafeAreaView>
   );
 };
@@ -52,6 +85,9 @@ const styles = StyleSheet.create({
   descriptionLabel: {
     color: GRAY100,
     marginBottom: 16,
+    textAlign: 'center',
+    lineHeight: 20,
+    marginHorizontal: 16,
   },
   outlineBtn: {
     position: 'absolute',

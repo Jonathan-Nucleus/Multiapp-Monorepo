@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 
 import PLabel from './PLabel';
@@ -10,12 +10,13 @@ interface PostCategoryProps {
   value: boolean;
   category: string;
   viewStyle?: object;
-  handleChange: (v: number) => void;
+  handleChange: (id: number) => void;
 }
 
 const CheckboxLabel: React.FC<PostCategoryProps> = (props) => {
   const { id, category, value, viewStyle, handleChange } = props;
 
+  const onChange = () => handleChange(id);
   return (
     <View style={[styles.wrapper, viewStyle, value && styles.checkedWrapper]}>
       <CheckBox
@@ -25,11 +26,13 @@ const CheckboxLabel: React.FC<PostCategoryProps> = (props) => {
         onCheckColor={PRIMARYSOLID}
         onFillColor={WHITE}
         onTintColor={WHITE}
-        lineWidth={2.5}
-        onValueChange={() => handleChange(id)}
+        lineWidth={2}
+        onValueChange={onChange}
         style={styles.checkBox}
       />
-      <PLabel label={category} viewStyle={styles.label} />
+      <Pressable onPress={onChange}>
+        <PLabel label={category} viewStyle={styles.label} />
+      </Pressable>
     </View>
   );
 };
@@ -56,6 +59,6 @@ const styles = StyleSheet.create({
     height: 20,
   },
   label: {
-    marginLeft: 8,
+    marginLeft: 12,
   },
 });

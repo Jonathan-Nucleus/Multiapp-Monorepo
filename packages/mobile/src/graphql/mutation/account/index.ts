@@ -1,8 +1,8 @@
 import { gql, useMutation, MutationTuple } from '@apollo/client';
 import { MediaUpload, MediaType } from 'backend/graphql/mutations.graphql';
 import { Post, PostInput } from 'backend/graphql/posts.graphql';
-import { UserProfile } from '../query/user/useProfile';
-import { CompanyProfile } from '../query/company/useCompany';
+import { UserProfile } from 'backend/graphql/users.graphql';
+import { Company } from 'backend/graphql/companies.graphql';
 
 export const UPDATE_SETTINGS = gql`
   mutation UpdateSettings($settings: SettingsInput!) {
@@ -190,7 +190,7 @@ type ProfileData = Pick<
   | 'linkedIn'
 >;
 type UpdateUserProfileVariables = {
-  profile: ProfileData;
+  profile: Pick<ProfileData, '_id'> & Partial<ProfileData>;
 };
 
 type UpdateUserProfileData = {
@@ -233,7 +233,7 @@ export function useUpdateUserProfile(): MutationTuple<
 }
 
 type CompanyData = Pick<
-  CompanyProfile,
+  Company,
   | '_id'
   | 'name'
   | 'avatar'

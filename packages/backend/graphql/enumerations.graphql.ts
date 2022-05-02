@@ -5,6 +5,12 @@ import {
   PostCategoryEnum,
 } from "../schemas/post";
 
+import {
+  FinancialStatusEnum,
+  FinancialStatusOptions as BackendFinancialStatusOptions,
+  InvestorClassOptions as BackendInvestorClassOptions,
+} from "../schemas/user";
+
 export const Audiences: AudienceEnum[] = Object.keys(AudienceOptions);
 export const PostCategories = Object.keys(PostCategoryOptions).reduce(
   (acc, category) => {
@@ -13,3 +19,20 @@ export const PostCategories = Object.keys(PostCategoryOptions).reduce(
   },
   {} as Record<PostCategoryEnum, string>
 );
+
+export const InvestorClassOptions = Object.keys(BackendInvestorClassOptions);
+
+const orderedStatusOptions: FinancialStatusEnum[] = [
+  "MIN_INCOME",
+  "NET_WORTH",
+  "LICENSED",
+  "AFFILIATED",
+];
+export const FinancialStatusOptions = orderedStatusOptions.map((key) => {
+  const { description, title } = BackendFinancialStatusOptions[key];
+  return {
+    value: key,
+    description,
+    title,
+  };
+});

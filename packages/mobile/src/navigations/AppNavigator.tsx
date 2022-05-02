@@ -41,7 +41,7 @@ import { MediaType } from 'backend/graphql/mutations.graphql';
 
 const defaultScreenOptions = {
   headerShown: false,
-  gestureEnabled: false,
+  gestureEnabled: true,
 };
 
 const Stack = createStackNavigator();
