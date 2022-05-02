@@ -6,11 +6,16 @@ import {
   FlatList,
   TouchableOpacity,
   Dimensions,
+  ViewProps,
 } from 'react-native';
-import FastImage from 'react-native-fast-image';
 import { Presentation } from 'phosphor-react-native';
-import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
+import FastImage from 'react-native-fast-image';
 
+import Tag from 'mobile/src/components/common/Tag';
+import PLabel from 'mobile/src/components/common/PLabel';
+import Avatar from 'mobile/src/components/common/Avatar';
+import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
+import { Body1Bold, Body2Bold, Body3, H6Bold } from 'mobile/src/theme/fonts';
 import {
   PRIMARY,
   WHITE,
@@ -22,11 +27,9 @@ import {
   BGDARK,
   WHITE60,
 } from 'shared/src/colors';
-import { Body2Bold, Body3, H6Bold } from 'mobile/src/theme/fonts';
-import Tag from 'mobile/src/components/common/Tag';
-import PLabel from 'mobile/src/components/common/PLabel';
 
 import { FundDetails } from 'mobile/src/graphql/query/marketplace';
+import { BACKGROUND_URL } from 'react-native-dotenv';
 
 interface PTitleProps {
   title: string;
@@ -34,7 +37,7 @@ interface PTitleProps {
   flex?: number;
 }
 
-interface FundOverviewProps {
+interface FundOverviewProps extends ViewProps {
   fund: FundDetails;
 }
 
@@ -50,24 +53,26 @@ const PTitle: FC<PTitleProps> = ({ title, subTitle, flex }) => {
 const LEFT_FLEX = 0.6;
 const RIGHT_FLEX = 0.4;
 
-const FundOverview: FC<FundOverviewProps> = ({ fund }) => {
+const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
   const renderTeamMemberItem: ListRenderItem<FundDetails['team'][number]> = ({
     item,
   }) => {
     return (
-      <TouchableOpacity>
+      <TouchableOpacity
+        onPress={() =>
+          NavigationService.navigate('UserDetails', {
+            screen: 'UserProfile',
+            params: {
+              userId: item._id,
+            },
+          })
+        }>
         <View
           style={[
             styles.memberItem,
             fund.team.length === 1 && styles.fullWidth,
           ]}>
-          <FastImage
-            style={styles.avatar}
-            source={{
-              uri: `${AVATAR_URL}/${item?.avatar}`,
-            }}
-            resizeMode={FastImage.resizeMode.cover}
-          />
+          <Avatar user={item} size={80} style={styles.avatar} />
           <PLabel
             textStyle={styles.name}
             label={`${item.firstName} ${item.lastName}`}
@@ -81,7 +86,7 @@ const FundOverview: FC<FundOverviewProps> = ({ fund }) => {
   const { background, avatar } = fund.company;
 
   return (
-    <View style={styles.overviewContainer}>
+    <View {...viewProps} style={[styles.overviewContainer, viewProps.style]}>
       <View style={styles.imagesContainer}>
         {background && (
           <FastImage
@@ -141,7 +146,7 @@ const FundOverview: FC<FundOverviewProps> = ({ fund }) => {
           <PTitle title="liquidity" subTitle="Quarterly w/30 days notice" />
         </View>
         <View style={styles.memberContainer}>
-          <PLabel label="Team Members" />
+          <PLabel label="Team Members" textStyle={styles.sectionTitle} />
           <FlatList
             data={fund.team}
             keyExtractor={(item) => item._id}
@@ -232,7 +237,6 @@ const styles = StyleSheet.create({
   tagStyle: {
     marginRight: 8,
   },
-  titleContainer: {},
   center: {
     textAlign: 'center',
     marginTop: 4,
@@ -289,9 +293,6 @@ const styles = StyleSheet.create({
     width: Dimensions.get('screen').width - 32,
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
     marginBottom: 16,
   },
   name: {
@@ -302,5 +303,9 @@ const styles = StyleSheet.create({
     color: WHITE60,
     marginTop: 8,
     textAlign: 'center',
+  },
+  sectionTitle: {
+    marginTop: 16,
+    ...Body1Bold,
   },
 });

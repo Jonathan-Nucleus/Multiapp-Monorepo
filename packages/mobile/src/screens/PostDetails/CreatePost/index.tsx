@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import {
   Image,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   StyleSheet,
   TouchableOpacity,
@@ -340,114 +342,124 @@ const CreatePost: CreatePostScreen = ({ navigation }) => {
   );
 
   return (
-    <SafeAreaView style={pStyles.globalContainer}>
-      <PostHeader
-        centerLabel="Create Post"
-        rightLabel="NEXT"
-        rightValidation={isValid}
-        handleNext={handleSubmit(onSubmit)}
-      />
-      <PAppContainer>
-        <View style={styles.usersPart}>
-          <Avatar user={account} size={32} />
-          <Controller
-            control={control}
-            name="user"
-            render={({ field }) => (
-              <>
-                <PostSelection
-                  icon={<UserSvg />}
-                  label={
-                    postAsData.find((option) => option.id === field.value)
-                      ?.value ?? ''
-                  }
-                  viewStyle={{ marginHorizontal: 8 }}
-                  onPress={() => setPostAsModalVisible(true)}
-                />
-                <PModal
-                  isVisible={postAsModalVisible}
-                  title="Post As"
-                  subTitle="You can post as yourself or a company you manage.">
-                  <View style={styles.radioGroupStyle}>
-                    <RadioGroup
-                      options={postAsData}
-                      activeButtonId={field.value}
-                      circleStyle={styles.radioCircle}
-                      onChange={(option) => field.onChange(option.id)}
-                    />
-                  </View>
-                  <TouchableOpacity
-                    onPress={() => setPostAsModalVisible(false)}
-                    style={styles.doneBtn}>
-                    <PLabel label="DONE" />
-                  </TouchableOpacity>
-                </PModal>
-              </>
-            )}
-          />
-          <Controller
-            control={control}
-            name="audience"
-            render={({ field }) => (
-              <>
-                <PostSelection
-                  icon={<GlobalSvg />}
-                  label={
-                    AUDIENCE_OPTIONS.find((option) => option.id === field.value)
-                      ?.value ?? ''
-                  }
-                  onPress={() => setAudienceModalVisible(true)}
-                />
-                <PModal
-                  isVisible={audienceModalVisible}
-                  title="Audience"
-                  subTitle="Who can see your post?">
-                  <View style={styles.radioGroupStyle}>
-                    <RadioGroup
-                      options={AUDIENCE_OPTIONS}
-                      activeButtonId={field.value}
-                      circleStyle={styles.radioCircle}
-                      onChange={(option) => field.onChange(option.id)}
-                    />
-                  </View>
-                  <TouchableOpacity
-                    onPress={() => setAudienceModalVisible(false)}
-                    style={styles.doneBtn}>
-                    <PLabel label="DONE" />
-                  </TouchableOpacity>
-                </PModal>
-              </>
-            )}
-          />
-        </View>
-        <Controller
-          control={control}
-          name="body"
-          render={({ field }) => (
-            <MentionInput
-              value={field.value ?? ''}
-              onChange={field.onChange}
-              placeholder="Create a post"
-              placeholderTextColor={WHITE60}
-              style={styles.mentionInput}
-              partTypes={[
-                {
-                  isBottomMentionSuggestionsRender: true,
-                  isInsertSpaceAfterMention: true,
-                  trigger: '@',
-                  renderSuggestions: renderMentionSuggestions,
-                  textStyle: {
-                    color: SECONDARY,
-                  },
-                },
-              ]}
-            />
-          )}
+    <SafeAreaView
+      style={pStyles.globalContainer}
+      edges={['top', 'left', 'right']}>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <PostHeader
+          centerLabel="Create Post"
+          rightLabel="NEXT"
+          rightValidation={isValid}
+          handleNext={handleSubmit(onSubmit)}
         />
-        {imageData && (
-          <Image source={{ uri: imageData.path }} style={styles.postImage} />
-        )}
-      </PAppContainer>
+        <PAppContainer
+          disableKeyboardScroll
+          contentContainerStyle={styles.flex}>
+          <View style={styles.usersPart}>
+            <Avatar user={account} size={32} />
+            <Controller
+              control={control}
+              name="user"
+              render={({ field }) => (
+                <>
+                  <PostSelection
+                    icon={<UserSvg />}
+                    label={
+                      postAsData.find((option) => option.id === field.value)
+                        ?.value ?? ''
+                    }
+                    viewStyle={{ marginHorizontal: 8 }}
+                    onPress={() => setPostAsModalVisible(true)}
+                  />
+                  <PModal
+                    isVisible={postAsModalVisible}
+                    title="Post As"
+                    subTitle="You can post as yourself or a company you manage.">
+                    <View style={styles.radioGroupStyle}>
+                      <RadioGroup
+                        options={postAsData}
+                        activeButtonId={field.value}
+                        circleStyle={styles.radioCircle}
+                        onChange={(option) => field.onChange(option.id)}
+                      />
+                    </View>
+                    <TouchableOpacity
+                      onPress={() => setPostAsModalVisible(false)}
+                      style={styles.doneBtn}>
+                      <PLabel label="DONE" />
+                    </TouchableOpacity>
+                  </PModal>
+                </>
+              )}
+            />
+            <Controller
+              control={control}
+              name="audience"
+              render={({ field }) => (
+                <>
+                  <PostSelection
+                    icon={<GlobalSvg />}
+                    label={
+                      AUDIENCE_OPTIONS.find(
+                        (option) => option.id === field.value,
+                      )?.value ?? ''
+                    }
+                    onPress={() => setAudienceModalVisible(true)}
+                  />
+                  <PModal
+                    isVisible={audienceModalVisible}
+                    title="Audience"
+                    subTitle="Who can see your post?">
+                    <View style={styles.radioGroupStyle}>
+                      <RadioGroup
+                        options={AUDIENCE_OPTIONS}
+                        activeButtonId={field.value}
+                        circleStyle={styles.radioCircle}
+                        onChange={(option) => field.onChange(option.id)}
+                      />
+                    </View>
+                    <TouchableOpacity
+                      onPress={() => setAudienceModalVisible(false)}
+                      style={styles.doneBtn}>
+                      <PLabel label="DONE" />
+                    </TouchableOpacity>
+                  </PModal>
+                </>
+              )}
+            />
+          </View>
+          <Controller
+            control={control}
+            name="body"
+            render={({ field }) => (
+              <MentionInput
+                value={field.value ?? ''}
+                onChange={field.onChange}
+                placeholder="Create a post"
+                placeholderTextColor={WHITE60}
+                style={styles.mentionInput}
+                containerStyle={styles.mentionContainer}
+                partTypes={[
+                  {
+                    isBottomMentionSuggestionsRender: true,
+                    isInsertSpaceAfterMention: true,
+                    trigger: '@',
+                    renderSuggestions: renderMentionSuggestions,
+                    textStyle: {
+                      color: SECONDARY,
+                    },
+                  },
+                ]}
+              />
+            )}
+          />
+          {imageData && (
+            <Image source={{ uri: imageData.path }} style={styles.postImage} />
+          )}
+        </PAppContainer>
+      </KeyboardAvoidingView>
       <View style={styles.actionWrapper}>
         <IconButton
           icon={<Camera size={32} color={WHITE} />}
@@ -483,6 +495,9 @@ const CreatePost: CreatePostScreen = ({ navigation }) => {
 export default CreatePost;
 
 const styles = StyleSheet.create({
+  flex: {
+    flex: 1,
+  },
   usersPart: {
     marginTop: 16,
     flexDirection: 'row',
@@ -492,6 +507,11 @@ const styles = StyleSheet.create({
     color: 'white',
     marginVertical: 16,
     fontSize: 16,
+    flex: 1,
+  },
+  mentionContainer: {
+    flex: 1,
+    flexGrow: 1,
   },
   mentionList: {
     backgroundColor: BGDARK,
@@ -515,8 +535,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    position: 'absolute',
-    bottom: 0,
     width: '100%',
     padding: 25,
   },

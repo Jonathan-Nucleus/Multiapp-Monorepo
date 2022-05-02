@@ -14,6 +14,7 @@ type WatchFundData = {
  * fund.
  *
  * @returns   GraphQL mutation.
+ * @deprecated  Please use this function from mutations/funds/useWatchFund
  */
 export function useWatchFund(): MutationTuple<
   WatchFundData,

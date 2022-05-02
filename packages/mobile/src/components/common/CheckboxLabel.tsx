@@ -45,7 +45,7 @@ const CheckboxLabel: React.FC<PostCategoryProps> = (props) => {
         onValueChange={onChange}
         style={styles.checkBox}
       />
-      <Pressable onPress={onChange}>
+      <Pressable onPress={onChange} style={styles.flex}>
         {children ? (
           children
         ) : (
@@ -79,5 +79,8 @@ const styles = StyleSheet.create({
   },
   label: {
     marginLeft: 12,
+  },
+  flex: {
+    flex: 1,
   },
 });

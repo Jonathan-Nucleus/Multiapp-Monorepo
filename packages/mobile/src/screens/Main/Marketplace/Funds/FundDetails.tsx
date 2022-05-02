@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-
 import { Pressable, StyleSheet, Text, View, ScrollView } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import {
@@ -27,7 +26,7 @@ import FundOverview from './FundOverview';
 
 import { useFund } from 'mobile/src/graphql/query/marketplace/useFund';
 import { useAccount } from 'mobile/src/graphql/query/account';
-import { useWatchFund } from 'mobile/src/graphql/mutation/funds';
+import { useWatchFund } from 'mobile/src/graphql/mutation/funds/useWatchFund';
 
 import { FundDetailsScreen } from 'mobile/src/navigations/AppNavigator';
 
@@ -36,32 +35,10 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
   const { fundId } = route.params;
   const { data } = useFund(fundId);
   const { data: accountData } = useAccount();
-  const [watchFund] = useWatchFund();
+  const { isWatching, toggleWatch } = useWatchFund(fundId);
+  const [tabviewHeight, setTabViewHeight] = useState<number>(500);
 
   const fund = data?.fund;
-  const isWatched = !!accountData?.account?.watchlistIds?.includes(fundId);
-  const [watching, setWatching] = useState(isWatched);
-
-  const toggleWatchlist = async (): Promise<void> => {
-    if (!accountData) return;
-
-    // Update state immediately for responsiveness
-    setWatching(!isWatched);
-
-    const result = await watchFund({
-      variables: {
-        fundId: fundId,
-        watch: !isWatched,
-      },
-      refetchQueries: ['Account'],
-    });
-
-    if (!result.data?.watchFund) {
-      // Revert back to original state on error
-      setWatching(isWatched);
-    }
-  };
-
   if (!fund) {
     return (
       <SafeAreaView style={pStyles.globalContainer}>
@@ -87,19 +64,25 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
         <FundProfileInfo fund={fund} />
         <View style={styles.actionBar}>
           <Pressable
-            onPress={toggleWatchlist}
+            onPress={toggleWatch}
             style={({ pressed }) => [pressed ? styles.onPress : undefined]}>
             <Star
               size={24}
-              color={watching ? PRIMARYSTATE : WHITE}
+              color={isWatching ? PRIMARYSTATE : WHITE}
               style={styles.favorite}
-              weight={watching ? 'fill' : 'regular'}
+              weight={isWatching ? 'fill' : 'regular'}
             />
           </Pressable>
-          <DotsThreeOutlineVertical size={24} color={WHITE} />
+          {/* Remove until actions have been defined.
+            <DotsThreeOutlineVertical size={24} color={WHITE} />
+            */}
         </View>
-        {/* TODO: use ohter lib for tab bar like react-native-tab-view */}
-        <View style={{ height: 1400 }}>
+        <View
+          style={{
+            ...(tabviewHeight !== null
+              ? { height: tabviewHeight }
+              : { flex: 1 }),
+          }}>
           <Tab.Navigator
             sceneContainerStyle={styles.tabContainer}
             screenOptions={({ route }) => ({
@@ -123,7 +106,15 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
             initialRouteName="FundOverview">
             <Tab.Screen
               name="Overview"
-              component={() => <FundOverview fund={fund} />}
+              component={() => (
+                <FundOverview
+                  fund={fund}
+                  onLayout={(event) => {
+                    const { height } = event.nativeEvent.layout;
+                    setTabViewHeight(height + styles.tabBar.height);
+                  }}
+                />
+              )}
             />
             <Tab.Screen name="Documents" component={() => <></>} />
           </Tab.Navigator>
@@ -160,6 +151,7 @@ const styles = StyleSheet.create({
     backgroundColor: BLACK,
     marginTop: 0,
     paddingTop: 0,
+    height: 48,
   },
   tabBarIndicator: {
     backgroundColor: PRIMARYSTATE,

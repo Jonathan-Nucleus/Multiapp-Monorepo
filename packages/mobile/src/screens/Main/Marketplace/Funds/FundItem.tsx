@@ -12,7 +12,7 @@ import {
 import FundProfileInfo from './FundProfileInfo';
 
 import { useAccount } from 'mobile/src/graphql/query/account';
-import { useWatchFund } from 'mobile/src/graphql/mutation/funds';
+import { useWatchFund } from 'mobile/src/graphql/mutation/funds/useWatchFund';
 
 type Fund = FundSummary & FundCompany & FundManager;
 export interface FundItemProps {
@@ -24,30 +24,7 @@ export interface FundItemProps {
 
 const FundItem: FC<FundItemProps> = ({ fund, onClickFundDetails }) => {
   const { data: accountData } = useAccount();
-  const [watchFund] = useWatchFund();
-
-  const isWatched = !!accountData?.account?.watchlistIds?.includes(fund._id);
-  const [watching, setWatching] = useState(isWatched);
-
-  const toggleWatchlist = async (): Promise<void> => {
-    if (!accountData) return;
-
-    // Update state immediately for responsiveness
-    setWatching(!isWatched);
-
-    const result = await watchFund({
-      variables: {
-        fundId: fund._id,
-        watch: !isWatched,
-      },
-      refetchQueries: ['Account'],
-    });
-
-    if (!result.data?.watchFund) {
-      // Revert back to original state on error
-      setWatching(isWatched);
-    }
-  };
+  const { isWatching, toggleWatch } = useWatchFund(fund._id);
 
   return (
     <View style={styles.fundItem}>
@@ -60,13 +37,13 @@ const FundItem: FC<FundItemProps> = ({ fund, onClickFundDetails }) => {
           onPress={onClickFundDetails}
         />
         <Pressable
-          onPress={toggleWatchlist}
+          onPress={toggleWatch}
           style={({ pressed }) => [pressed ? styles.onPress : undefined]}>
           <Star
             size={24}
-            color={watching ? PRIMARYSTATE : WHITE}
+            color={isWatching ? PRIMARYSTATE : WHITE}
             style={styles.favorite}
-            weight={watching ? 'fill' : 'regular'}
+            weight={isWatching ? 'fill' : 'regular'}
           />
         </Pressable>
       </View>

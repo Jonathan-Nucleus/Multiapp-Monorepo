@@ -72,7 +72,7 @@ const schema = gql`
     saveQuestionnaire(questionnaire: QuestionnaireInput!): User
     proRequest(request: ProRequestInput!): Boolean
 
-    watchFund(watch: Boolean!, fundId: ID!): Boolean
+    watchFund(watch: Boolean!, fundId: ID!): UserProfile
     followUser(follow: Boolean!, userId: ID!, asCompanyId: ID): Boolean
     followCompany(follow: Boolean!, companyId: ID!, asCompanyId: ID): Boolean
     hideUser(hide: Boolean!, userId: ID!): Boolean!
@@ -930,7 +930,7 @@ const resolvers = {
         parentIgnored,
         args: { fundId: string; watch: boolean },
         { db, user }
-      ): Promise<Boolean> => {
+      ): Promise<User.Mongo> => {
         const validator = yup
           .object()
           .shape({
@@ -953,7 +953,7 @@ const resolvers = {
 
         // Check that the user has access to this fund if adding to watchlist
         if (compareAccreditation(user.accreditation, fund.level) < 0) {
-          throw new UnprocessableEntityError("Not able to update watch list.");
+          throw new UnprocessableEntityError("Unauthorized to watch fund");
         }
 
         return db.users.setOnWatchlist(watch, fundId, user._id);

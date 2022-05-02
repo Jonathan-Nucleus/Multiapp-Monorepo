@@ -613,22 +613,25 @@ const createUsersCollection = (
       add: boolean,
       fundId: MongoId,
       userId: MongoId
-    ): Promise<boolean> => {
+    ): Promise<User.Mongo> => {
       const result = add
-        ? await usersCollection.updateOne(
-            { _id: toObjectId(userId) },
-            { $addToSet: { watchlistIds: toObjectId(fundId) } }
+        ? await usersCollection.findOneAndUpdate(
+            { _id: toObjectId(userId), role: { $ne: "stub" } },
+            { $addToSet: { watchlistIds: toObjectId(fundId) } },
+            { returnDocument: "after" }
           )
-        : await usersCollection.updateOne(
-            { _id: toObjectId(userId) },
-            { $pull: { watchlistIds: toObjectId(fundId) } }
+        : await usersCollection.findOneAndUpdate(
+            { _id: toObjectId(userId), role: { $ne: "stub" } },
+            { $pull: { watchlistIds: toObjectId(fundId) } },
+            { returnDocument: "after" }
           );
 
-      if (!result.acknowledged || result.modifiedCount === 0) {
+      const { value } = result;
+      if (!result.ok || !value) {
         throw new InternalServerError(`Not able to update watch list.`);
       }
 
-      return true;
+      return value as User.Mongo;
     },
 
     /**

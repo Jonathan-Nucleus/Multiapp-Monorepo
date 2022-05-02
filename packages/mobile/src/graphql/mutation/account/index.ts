@@ -29,11 +29,16 @@ export function useWatchFund(): MutationTuple<
   WatchFundData,
   WatchFundVariables
 > {
-  return useMutation<WatchFundData, WatchFundVariables>(gql`
-    mutation WatchFund($watch: Boolean!, $fundId: ID!) {
-      watchFund(watch: $watch, fundId: $fundId)
-    }
-  `);
+  return useMutation<WatchFundData, WatchFundVariables>(
+    gql`
+      mutation WatchFund($watch: Boolean!, $fundId: ID!) {
+        watchFund(watch: $watch, fundId: $fundId)
+      }
+    `,
+    {
+      refetchQueries: ['Funds'],
+    },
+  );
 }
 
 type FollowUserVariables = {

@@ -25,7 +25,7 @@ import {
 } from 'shared/src/colors';
 
 import type { Fund } from 'backend/graphql/funds.graphql';
-import { useWatchFund } from 'mobile/src/graphql/mutation/account';
+import { useWatchFund } from 'mobile/src/graphql/mutation/funds/useWatchFund';
 import { useAccount } from 'mobile/src/graphql/query/account';
 
 import { WatchlistScreen } from 'mobile/src/navigations/MainTabNavigator';

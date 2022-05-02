@@ -18,7 +18,10 @@ import { getIgniteDb } from "../../../db";
 describe("Mutations - watchFund", () => {
   const query = gql`
     mutation WatchFund($watch: Boolean!, $fundId: ID!) {
-      watchFund(watch: $watch, fundId: $fundId)
+      watchFund(watch: $watch, fundId: $fundId) {
+        _id
+        watchlistIds
+      }
     }
   `;
 
@@ -94,25 +97,14 @@ describe("Mutations - watchFund", () => {
       },
     });
 
-    expect(res.data?.watchFund).toBeTruthy();
+    expect(res.data?.watchFund).toBeDefined();
 
     const { users } = await getIgniteDb();
     const newUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
     expect(_.map(newUser.watchlistIds, (item) => item.toString())).toContain(
       fund1?._id.toString()
     );
-  });
-
-  it("fails to watch a fund that was already watched", async () => {
-    const res = await server.executeOperation({
-      query,
-      variables: {
-        fundId: fund1?._id.toString(),
-        watch: true,
-      },
-    });
-
-    expect(getErrorCode(res)).toBe(ErrorCode.INTERNAL_SERVER_ERROR);
+    expect(res.data?.watchFund?.watchlistIds).toContain(fund1?._id.toString());
   });
 
   it("succeeds to unwatch a fund", async () => {
@@ -124,12 +116,15 @@ describe("Mutations - watchFund", () => {
       },
     });
 
-    expect(res.data?.watchFund).toBeTruthy();
+    expect(res.data?.watchFund).toBeDefined();
 
     const { users } = await getIgniteDb();
     const newUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
     expect(
       _.map(newUser.watchlistIds, (item) => item.toString())
     ).not.toContain(fund1?._id.toString());
+    expect(res.data?.watchFund?.watchlistIds).not.toContain(
+      fund1?._id.toString()
+    );
   });
 });

@@ -149,16 +149,18 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
                 <Text style={styles.noAvatar}>{name.charAt(0)}</Text>
               </View>
             )}
-            <TouchableOpacity
-              onPress={() =>
-                NavigationService.navigate('EditCompanyPhoto', {
-                  companyId: company._id,
-                  type: 'AVATAR',
-                })
-              }
-              style={styles.pencil}>
-              <Pencil color={WHITE} size={18} />
-            </TouchableOpacity>
+            {isMyCompany && (
+              <TouchableOpacity
+                onPress={() =>
+                  NavigationService.navigate('EditCompanyPhoto', {
+                    companyId: company._id,
+                    type: 'AVATAR',
+                  })
+                }
+                style={styles.pencil}>
+                <Pencil color={WHITE} size={18} />
+              </TouchableOpacity>
+            )}
           </View>
         </View>
         <Text style={styles.val}>{name}</Text>
