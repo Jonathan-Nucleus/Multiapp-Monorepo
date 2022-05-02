@@ -130,7 +130,8 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
   const [watchFund] = useWatchFund();
   const { data: { fund } = {} } = useFund(fundId);
   const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
-  const { background: companyBackground, avatar: companyAvatar } = fund?.company ?? {};
+  const { background: companyBackground, avatar: companyAvatar } =
+    fund?.company ?? {};
   const isWatching = account?.watchlistIds?.includes(fundId) ?? false;
   const toggleWatchFund = async () => {
     try {
@@ -148,7 +149,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
           <Card className="bg-secondary/[.27] overflow-visible rounded p-0">
             <div className="flex flex-row bg-secondary/[.27] rounded overflow-hidden -m-px">
               <div className="flex-shrink-0 w-72 h-72 bg-white relative">
-                {companyBackground && (
+                {companyBackground?.url && (
                   <Image
                     loader={() =>
                       `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${companyBackground.url}`

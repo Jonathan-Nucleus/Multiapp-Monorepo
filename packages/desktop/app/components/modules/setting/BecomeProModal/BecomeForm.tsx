@@ -6,15 +6,13 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import Button from "../../../common/Button";
 import Field from "../../../common/Field";
 import { useProRequest } from "mobile/src/graphql/mutation/account";
+import { ProRoleOptions } from "backend/schemas/user";
+import { useRef } from "react";
 
-const DATA = [
-  { label: "Fund Manager", value: "MANAGER" },
-  { label: "Journalist", value: "JOURNALIST" },
-  { label: "C level manager", value: "C_LEVEL" },
-  { label: "Founder", value: "FOUNDER" },
-  { label: "Ex fund manager", value: "EX_MANAGER" },
-  { label: "Other", value: "OTHER" },
-];
+const ROLES = Object.keys(ProRoleOptions).map((option) => ({
+  value: option,
+  label: ProRoleOptions[option].label,
+}));
 
 type FormValues = {
   role: string;
@@ -39,6 +37,7 @@ interface BecomeFormProps {
 const BecomeForm: FC<BecomeFormProps> = ({ setSuccess }: BecomeFormProps) => {
   const [loading, setLoading] = useState(false);
   const [proRequest] = useProRequest();
+  const roleRef = useRef();
 
   const { register, handleSubmit, reset, formState } = useForm<
     yup.InferType<typeof schema>
@@ -95,7 +94,7 @@ const BecomeForm: FC<BecomeFormProps> = ({ setSuccess }: BecomeFormProps) => {
             label="I’m a:"
             autoComplete="role"
             selectBox
-            options={DATA}
+            options={ROLES}
           />
           <Field
             register={register}

@@ -55,6 +55,9 @@ module.exports = {
         brand: {
           overlay: "#CDA786",
         },
+        yellow: {
+          DEFAULT: "#F2A63F",
+        },
       },
     },
   },

@@ -17,6 +17,7 @@ import {
   Path,
 } from "react-hook-form";
 import * as yup from "yup";
+import Avatar from "../Avatar";
 
 // TODO: Stopgap measure to address breaking type changes for fragments ({})
 // in React 18.
@@ -141,17 +142,7 @@ function MentionTextarea<
                 return (
                   <div className="flex items-center p-2">
                     <div className="flex items-center">
-                      <Image
-                        loader={() =>
-                          `${process.env.NEXT_PUBLIC_AVATAR_URL}/${user?.avatar}`
-                        }
-                        src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${user?.avatar}`}
-                        alt=""
-                        width={56}
-                        height={56}
-                        className="object-cover rounded-full"
-                        unoptimized={true}
-                      />
+                      <Avatar size={56} src={user?.avatar} />
                     </div>
                     <div className="ml-2">
                       <div className="flex items-center">

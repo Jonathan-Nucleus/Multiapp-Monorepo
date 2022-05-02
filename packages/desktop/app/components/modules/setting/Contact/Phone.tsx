@@ -7,26 +7,23 @@ import { SubmitHandler, useForm } from "react-hook-form";
 
 import Button from "../../../common/Button";
 import Field from "../../../common/Field";
+import { ProRoleOptions } from "backend/schemas/user";
+
+const ROLES = Object.keys(ProRoleOptions).map((option) => ({
+  value: option,
+  label: ProRoleOptions[option].label,
+}));
 
 const DAY = [
   { label: "Morning (8am - 12pm)", value: "morning" },
   { label: "Afternoon (12pm - 5pm)", value: "afternoon" },
-  { label: "Evening (5pm-8pm)", value: "evening" },
+  { label: "Evening (5pm - 8pm)", value: "evening" },
 ];
 
 const TIMEZONE = [
   { label: "EST", value: "est" },
   { label: "PST", value: "pst" },
   { label: "CST", value: "cst" },
-];
-
-const FUND = [
-  { label: "LP |", value: "manager" },
-  { label: "Good Soil LP Fund with really long n", value: "journalist" },
-  { label: "Millenium Capital Diversified LP adve  ", value: "cManager" },
-  { label: "Big Man’s LP Fund for Winners", value: "founder" },
-  { label: "Geoff & Partners LP Fund for Playas", value: "exManager" },
-  { label: "Any Fund", value: "other" },
 ];
 
 type FormValues = {
@@ -116,7 +113,7 @@ const ContactPhone: FC<ContactPhoneProps> = ({
             label="Fund of Interest"
             autoComplete="fund"
             selectBox
-            options={FUND}
+            options={ROLES}
           />
           <Field
             register={register}

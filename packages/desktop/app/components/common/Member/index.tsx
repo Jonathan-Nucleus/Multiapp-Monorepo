@@ -5,6 +5,7 @@ import { Chats } from "phosphor-react";
 import type { User } from "backend/graphql/users.graphql";
 import Button from "../Button";
 import Card from "../Card";
+import Avatar from "../Avatar";
 
 interface MemberProps {
   member: User;
@@ -18,17 +19,7 @@ const Member: FC<MemberProps> = (props) => {
     <div className="flex items-center justify-between py-4">
       <div className="flex items-center">
         <div className="w-14 h-14 flex items-center justify-center">
-          <Image
-            loader={() =>
-              `${process.env.NEXT_PUBLIC_AVATAR_URL}/${member.avatar}`
-            }
-            src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${member.avatar}`}
-            alt=""
-            width={56}
-            height={56}
-            className="object-cover rounded-full"
-            unoptimized={true}
-          />
+          <Avatar size={56} src={member.avatar} />
         </div>
         <div className="ml-2">
           <div className="flex items-center">

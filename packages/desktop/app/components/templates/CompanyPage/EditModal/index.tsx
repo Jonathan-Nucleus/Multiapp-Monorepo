@@ -138,6 +138,9 @@ const CompanyEdit: FC<CompanyEditModalProps> = ({
                     name="about"
                     label="About"
                     autoComplete="about"
+                    textareaClassName="block w-full bg-white rounded-lg text-sm text-black p-2"
+                    rows={5}
+                    textarea
                   />
                 </div>
                 <div className="border-t p-4">

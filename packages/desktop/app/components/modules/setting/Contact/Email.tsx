@@ -5,15 +5,12 @@ import { SubmitHandler, useForm } from "react-hook-form";
 
 import Button from "../../../common/Button";
 import Field from "../../../common/Field";
+import { ProRoleOptions } from "backend/schemas/user";
 
-const FUND = [
-  { label: "Manager", value: "manager" },
-  { label: "Good Soil LP Fund with really long n", value: "journalist" },
-  { label: "Millenium Capital Diversified LP adve  ", value: "cManager" },
-  { label: "Big Man’s LP Fund for Winners", value: "founder" },
-  { label: "Geoff & Partners LP Fund for Playas", value: "exManager" },
-  { label: "Any Fund", value: "other" },
-];
+const ROLES = Object.keys(ProRoleOptions).map((option) => ({
+  value: option,
+  label: ProRoleOptions[option].label,
+}));
 
 type FormValues = {
   fund: string;
@@ -63,7 +60,7 @@ const ContactEmail: FC<ContactEmailProps> = ({
             label="Fund of Interest"
             autoComplete="fund"
             selectBox
-            options={FUND}
+            options={ROLES}
           />
           <Field
             register={register}

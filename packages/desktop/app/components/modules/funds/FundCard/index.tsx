@@ -48,7 +48,7 @@ const FundCard: FC<FundCardProps> = ({
         <div className="flex flex-row bg-secondary/[.27]">
           {showImages && (
             <div className="flex-shrink-0 w-72 h-72 bg-white relative">
-              {fund.company?.background && (
+              {fund.company?.background?.url && (
                 <Image
                   loader={() =>
                     `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund?.company?.background?.url}`
@@ -208,7 +208,7 @@ const FundCard: FC<FundCardProps> = ({
       </Card>
       <Card className="block lg:hidden rounded-none p-0">
         <div className="h-20 bg-white relative">
-          {fund.company?.background && (
+          {fund.company?.background?.url && (
             <Image
               loader={() =>
                 `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund?.company?.background?.url}`
@@ -223,7 +223,7 @@ const FundCard: FC<FundCardProps> = ({
         </div>
         <div className="relative px-4 pt-8 bg-secondary/[.27]">
           <div className="w-16 h-16 bg-purple-secondary rounded relative overflow-hidden -mt-16">
-            {fund?.company?.background && (
+            {fund?.company?.background?.url && (
               <Image
                 loader={() =>
                   `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund?.company?.background?.url}`

@@ -1,8 +1,6 @@
 import { FC, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import Logo from "shared/assets/images/logo-gradient.svg";
-import FundLogo from "shared/assets/images/logo-icon.svg";
 import {
   House,
   MagnifyingGlass,
@@ -10,12 +8,17 @@ import {
   Bell,
   List,
 } from "phosphor-react";
+
+import Logo from "shared/assets/images/logo-gradient.svg";
+import FundLogo from "shared/assets/images/logo-icon.svg";
+
 import NavItem from "./NavItem";
-import SearchInput from "../../../common/SearchInput";
 import Sidebar from "./Sidebar";
 import AvatarMenu from "./AvatarMenu";
 import Avatar from "../../../common/Avatar";
+import SearchInput from "../../../common/SearchInput";
 import { useAccount } from "mobile/src/graphql/query/account";
+import { useNotifications } from "mobile/src/graphql/query/notification";
 
 const navItems = [
   {
@@ -40,6 +43,9 @@ const navItems = [
 const Header: FC = () => {
   const [showSidebar, setShowSidebar] = useState(false);
   const { data: { account } = {} } = useAccount();
+  const { data: notificationData } = useNotifications();
+  const notifications = notificationData?.notifications ?? [];
+
   return (
     <header className="bg-surface-light10 shadow shadow-black sticky top-0 z-20">
       <nav className="hidden md:flex flex-row items-center p-5">
@@ -91,13 +97,15 @@ const Header: FC = () => {
           <Link href="/notifications">
             <a className="relative ml-4">
               <Bell color="white" size={24} />
-              <span
-                className={`bg-error-light rounded-full w-4 h-4 text-tiny
-                  text-white absolute -top-1.5 -right-1.5 flex items-center
-                  justify-center font-medium`}
-              >
-                1
-              </span>
+              {notifications.filter((v) => v.isNew).length > 0 && (
+                <span
+                  className={`bg-error-light rounded-full w-4 h-4 text-tiny
+                    text-white absolute -top-1.5 -right-1.5 flex items-center
+                    justify-center font-medium`}
+                >
+                  {notifications.filter((v) => v.isNew).length}
+                </span>
+              )}
             </a>
           </Link>
           <div className="ml-6">
@@ -112,9 +120,12 @@ const Header: FC = () => {
         >
           <div className="w-9 h-9 flex items-center justify-center relative">
             <Avatar size={36} src={account?.avatar} className="z-10" />
-            <span className="bg-error rounded-full w-4 h-4 text-xs text-white absolute -top-1.5 -left-1.5 flex item-center justify-center font-medium">
-              2
-            </span>
+            {notifications.filter((v) => v.isNew).length > 0 && (
+              <span className="bg-error-light rounded-full w-4 h-4 text-xs text-white absolute -top-1.5 -left-1.5 flex item-center justify-center font-medium z-50">
+                {notifications.filter((v) => v.isNew).length}
+              </span>
+            )}
+
             <List
               color="white"
               weight="light"

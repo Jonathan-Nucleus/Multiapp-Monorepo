@@ -149,8 +149,11 @@ const EditModal: FC<EditModalProps> = ({ show, onClose }) => {
                     register={register}
                     state={formState}
                     name="overview"
-                    label="overview"
+                    label="Bio"
                     autoComplete="overview"
+                    textareaClassName="block w-full bg-white rounded-lg text-sm text-black p-2"
+                    rows={5}
+                    textarea
                   />
                   <Field
                     register={register}

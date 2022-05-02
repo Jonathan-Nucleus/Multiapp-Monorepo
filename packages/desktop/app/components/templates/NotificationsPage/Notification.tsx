@@ -10,91 +10,54 @@ import {
 import Image from "next/image";
 import moment from "moment";
 
-import Avatar from "shared/assets/images/apple.svg";
+import { Notification } from "backend/graphql/notifications.graphql";
+import Avatar from "../../common/Avatar";
 
-interface Notification {
-  name: string;
-  image: string;
-  id: string;
-  unread: boolean;
-  mentioned?: boolean;
-  commented?: boolean;
-  liked?: boolean;
-  message?: boolean;
-  following?: boolean;
-  shared?: boolean;
-  lastMessage?: string;
-  createdAt: Date;
-}
 interface Props {
   notification: Notification;
+  handleReadNotification: (id: string) => void;
 }
 
-const Notification: FC<Props> = ({ notification }: Props) => {
-  const title = (val: Notification) => {
-    if (val.commented) {
-      return `${val.name} commented on your post`;
-    }
-    if (val.liked) {
-      return `${val.name} liked your post`;
-    }
-    if (val.message) {
-      return `${val.name} sent you a message`;
-    }
-    if (val.following) {
-      return `${val.name} is following you`;
-    }
-    if (val.mentioned) {
-      return `${val.name} mentioned you in a comment`;
-    }
-    if (val.shared) {
-      return `${val.name} shared your post`;
-    }
-    return `${val.name} sent you a message`;
-  };
-
+const NotificationDetail: FC<Props> = ({
+  notification,
+  handleReadNotification,
+}) => {
   const renderIcon = (val: Notification) => {
-    if (val.commented) {
+    if (val.type === "comment-post") {
       return <ChatCenteredText size={18} />;
     }
-    if (val.liked) {
+    if (val.type === "like-post") {
       return <ThumbsUp size={18} />;
     }
-    if (val.message) {
-      return <Chats size={18} />;
-    }
-    if (val.following) {
+    if (val.type === "followed-by-user") {
       return <UserCirclePlus size={18} />;
-    }
-    if (val.mentioned) {
-      return <At size={18} />;
-    }
-    if (val.shared) {
-      return <Share size={18} />;
     }
     return <Chats size={18} />;
   };
 
   return (
     <div
-      className={`flex justify-between items-center p-4 ${
-        notification.unread && "bg-background-blue"
+      className={`flex justify-between items-center p-4 cursor-pointer ${
+        notification.isNew && "bg-background-blue"
       } `}
-      key={notification.id}
+      key={notification._id}
+      onClick={() =>
+        notification.isNew && handleReadNotification(notification._id)
+      }
     >
       <div className="flex items-center  w-9/12">
         <div className="relative">
-          <Image src={Avatar} width={48} height={48} alt="" layout="fixed" />
+          {notification.isNew && (
+            <div className="absolute top-[18px] right-[58px] w-2 h-2 rounded-full bg-yellow"></div>
+          )}
+          <Avatar src={notification.user.avatar} size={48} className="pl-3" />
           <div className="absolute bottom-0 right-0 rounded-full bg-purple-secondary p-1">
             {renderIcon(notification)}
           </div>
         </div>
         <div className="ml-3 max-w-full grid">
-          <div className={notification.unread ? "font-bold" : "font-normal"}>
-            {title(notification)}
-          </div>
-          <div className="truncate text-white opacity-60">
-            {notification.lastMessage}
+          <div className={notification.isNew ? "font-bold" : "font-normal"}>
+            {notification.body}
           </div>
         </div>
       </div>
@@ -105,4 +68,4 @@ const Notification: FC<Props> = ({ notification }: Props) => {
   );
 };
 
-export default Notification;
+export default NotificationDetail;

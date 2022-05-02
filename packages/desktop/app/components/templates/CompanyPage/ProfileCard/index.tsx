@@ -80,7 +80,7 @@ const ProfileCard: FC<CompanyPageProps> = ({
         <Card className="rounded-none lg:rounded-2xl border-brand-overlay/[.1] p-0">
           <div>
             <div className="w-full h-16 lg:h-32 bg-gradient-to-r from-[#844AFF] to-primary relative">
-              {companyBackground && (
+              {companyBackground?.url && (
                 <Image
                   loader={() =>
                     `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${companyBackground.url}`
