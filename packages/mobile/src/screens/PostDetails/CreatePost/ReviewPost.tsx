@@ -1,10 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { FlatList, Image, Platform, StyleSheet, View } from 'react-native';
+import React from 'react';
+import { FlatList, Image, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  MentionInput,
-  replaceMentionValues,
-} from 'react-native-controlled-mentions';
+import { MentionInput } from 'react-native-controlled-mentions';
 import _ from 'lodash';
 const Buffer = global.Buffer || require('buffer').Buffer;
 
@@ -16,18 +13,14 @@ import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import { showMessage } from 'mobile/src/services/utils';
 import pStyles from 'mobile/src/theme/pStyles';
 import { SECONDARY } from 'shared/src/colors';
-import { SOMETHING_WRONG } from 'shared/src/constants';
 
 import PostSelection from './PostSelection';
 import PostHeader from './PostHeader';
 import { AUDIENCE_OPTIONS } from './index';
 
 import { useAccount } from 'mobile/src/graphql/query/account';
-import { Post } from 'mobile/src/graphql/query/post/usePosts';
 import {
-  useFetchUploadLink,
   useCreatePost,
-  PostCategory,
   PostCategories,
 } from 'mobile/src/graphql/mutation/posts';
 

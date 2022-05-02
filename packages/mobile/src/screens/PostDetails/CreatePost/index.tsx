@@ -15,7 +15,6 @@ import RadioGroup, { Option } from 'react-native-radio-button-group';
 import {
   MentionInput,
   MentionSuggestionsProps,
-  Suggestion,
   replaceMentionValues,
 } from 'react-native-controlled-mentions';
 import _ from 'lodash';
@@ -64,10 +63,7 @@ import { useAccount } from 'mobile/src/graphql/query/account';
 import { useUsers, User } from 'mobile/src/graphql/query/user/useUsers';
 import { useFetchUploadLink } from 'mobile/src/graphql/mutation/posts';
 
-import type {
-  Audience,
-  PostCategory,
-} from 'mobile/src/graphql/query/post/usePosts';
+import type { Audience } from 'mobile/src/graphql/query/post/usePosts';
 import { Audiences } from 'backend/graphql/enumerations.graphql';
 
 import PostHeader from './PostHeader';

@@ -3,22 +3,37 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 
 import PLabel from './PLabel';
-import { PRIMARY, BLACK, PRIMARYSOLID, WHITE } from 'shared/src/colors';
+import { PRIMARYSOLID, WHITE } from 'shared/src/colors';
 
 interface PostCategoryProps {
   id: number;
   value: boolean;
+  showBackground?: boolean;
   category: string;
+  children?: React.ReactNode;
   viewStyle?: object;
   handleChange: (id: number) => void;
 }
 
 const CheckboxLabel: React.FC<PostCategoryProps> = (props) => {
-  const { id, category, value, viewStyle, handleChange } = props;
+  const {
+    id,
+    category,
+    showBackground,
+    children,
+    value,
+    viewStyle,
+    handleChange,
+  } = props;
 
   const onChange = () => handleChange(id);
   return (
-    <View style={[styles.wrapper, viewStyle, value && styles.checkedWrapper]}>
+    <View
+      style={[
+        styles.wrapper,
+        viewStyle,
+        value && showBackground && styles.checkedWrapper,
+      ]}>
       <CheckBox
         disabled={false}
         value={value}
@@ -31,7 +46,11 @@ const CheckboxLabel: React.FC<PostCategoryProps> = (props) => {
         style={styles.checkBox}
       />
       <Pressable onPress={onChange}>
-        <PLabel label={category} viewStyle={styles.label} />
+        {children ? (
+          children
+        ) : (
+          <PLabel label={category} viewStyle={styles.label} />
+        )}
       </Pressable>
     </View>
   );

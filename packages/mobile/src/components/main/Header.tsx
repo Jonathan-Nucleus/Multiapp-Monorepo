@@ -89,6 +89,7 @@ const styles = StyleSheet.create({
   },
   headerLogoContainer: {
     flexDirection: 'row',
+    marginTop: 4,
   },
   logoTextWrapper: {
     marginLeft: 8,

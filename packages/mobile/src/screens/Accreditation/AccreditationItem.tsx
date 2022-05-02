@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
+  Text,
 } from 'react-native';
 
 import PLabel from 'mobile/src/components/common/PLabel';
@@ -22,7 +23,7 @@ import {
   WHITE,
   WHITE60,
 } from 'shared/src/colors';
-import { Body1Bold, Body2Bold, H6Bold } from 'mobile/src/theme/fonts';
+import { Body1Bold, Body2, Body2Bold, H6Bold } from 'mobile/src/theme/fonts';
 import { appWidth } from 'mobile/src/utils/utils';
 
 import {
@@ -130,8 +131,13 @@ const AccreditationItem: React.FC<AccreditationItemProps> = ({
       category={`${item.title}: ${item.description}`}
       value={item.isChecked}
       handleChange={handleFinancialStatusChange}
-      viewStyle={styles.checkContainer}
-    />
+      viewStyle={styles.checkContainer}>
+      <Text style={styles.financialItemTitle}>
+        {item.title}
+        {': '}
+        <Text style={styles.financialItemDescription}>{item.description}</Text>
+      </Text>
+    </CheckboxLabel>
   );
 
   const renderSecondSlide = () => {
@@ -394,6 +400,15 @@ const styles = StyleSheet.create({
   },
   financialListContainer: {
     marginTop: 16,
+  },
+  financialItemTitle: {
+    color: 'white',
+    ...Body2Bold,
+    marginLeft: 12,
+  },
+  financialItemDescription: {
+    color: 'white',
+    ...Body2,
   },
   bottomContainer: {
     paddingHorizontal: 16,

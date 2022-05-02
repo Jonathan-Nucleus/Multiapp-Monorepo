@@ -148,6 +148,7 @@ const styles = StyleSheet.create({
   },
   checkContainer: {
     backgroundColor: 'transparent',
+    borderWidth: 0,
     paddingLeft: 5,
     width: '100%',
   },

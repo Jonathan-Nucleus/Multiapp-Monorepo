@@ -96,6 +96,7 @@ const FilterModal: FC<ModalProps> = ({ isVisible, onClose, onFilter }) => {
     <CheckboxLabel
       id={item.id}
       category={item.label}
+      showBackground
       value={selectedTopics.includes(item.value)}
       handleChange={toggleTopic}
     />

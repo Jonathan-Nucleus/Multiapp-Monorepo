@@ -10,7 +10,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { AVATAR_URL } from 'react-native-dotenv';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import moment from 'moment';
 import {
@@ -47,7 +46,7 @@ import {
   useDeleteComment,
   useEditCommentPost,
 } from 'mobile/src/graphql/mutation/posts';
-import { usePost, Post, Comment } from 'mobile/src/graphql/query/post';
+import { usePost, Comment } from 'mobile/src/graphql/query/post';
 import {
   useFollowUser,
   useHideUser,

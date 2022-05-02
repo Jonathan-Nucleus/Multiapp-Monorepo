@@ -8,7 +8,6 @@ import {
   ScrollView,
 } from 'react-native';
 import Modal from 'react-native-modal';
-import { AVATAR_URL } from 'react-native-dotenv';
 
 import UserInfo from 'mobile/src/components/common/UserInfo';
 import PLabel from 'mobile/src/components/common/PLabel';

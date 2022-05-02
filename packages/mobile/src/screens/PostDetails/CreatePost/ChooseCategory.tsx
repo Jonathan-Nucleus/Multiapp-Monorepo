@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { ListRenderItem, StyleSheet, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -10,12 +10,7 @@ import pStyles from 'mobile/src/theme/pStyles';
 
 import PostHeader from './PostHeader';
 
-import {
-  useForm,
-  DefaultValues,
-  Controller,
-  useController,
-} from 'react-hook-form';
+import { useForm, DefaultValues, useController } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
@@ -91,6 +86,7 @@ const ChooseCategory: ChooseCategoryScreen = ({ route, navigation }) => {
     <CheckboxLabel
       id={item.id}
       category={item.label}
+      showBackground
       value={categoriesField.value.includes(item.value)}
       handleChange={handleChange}
     />
