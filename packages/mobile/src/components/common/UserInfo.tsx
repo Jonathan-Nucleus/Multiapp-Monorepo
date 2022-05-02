@@ -56,8 +56,7 @@ const UserInfo: React.FC<UserInfoProps> = (props) => {
     });
 
     if (!result.data?.followUser) {
-      // Revert back to original state on error
-      setIsFollowing(following);
+      setIsFollowing(!isFollowing);
     }
   };
 

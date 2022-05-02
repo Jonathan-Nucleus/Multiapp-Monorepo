@@ -45,6 +45,7 @@ import { useAccount } from 'mobile/src/graphql/query/account';
 import { useProfile } from 'mobile/src/graphql/query/user/useProfile';
 import { usePosts, Post } from 'mobile/src/graphql/query/user/usePosts';
 import { useManagedFunds } from 'mobile/src/graphql/query/user/useManagedFunds';
+import { useFollowUser } from 'mobile/src/graphql/mutation/account';
 
 import { UserProfileScreen } from 'mobile/src/navigations/UserDetailsStack';
 import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
@@ -58,11 +59,14 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
   const { data, refetch } = usePosts(userId);
   const isFocused = useIsFocused();
   const [focusState, setFocusState] = useState(isFocused);
+  const [followUser] = useFollowUser();
 
   const account = accountData?.account;
+  const following = account?.followingIds?.includes(userId ?? '');
   const funds = fundsData?.userProfile?.managedFunds ?? [];
   const profile = profileData?.userProfile;
   const postData = data?.userProfile?.posts ?? [];
+  const [isFollowing, setIsFollowing] = useState(following);
 
   // Refetch whenever the focus state changes to avoid refetching during
   // rerender cycles
@@ -74,6 +78,20 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
   const isMyAccount = useMemo(() => {
     return userId === account?._id ? true : false;
   }, [account]);
+
+  const toggleFollow = async () => {
+    try {
+      const result = await followUser({
+        variables: { follow: !isFollowing, userId: userId },
+      });
+
+      if (result.data?.followUser) {
+        setIsFollowing(!isFollowing);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const renderItem: ListRenderItem<Post> = ({ item }) => (
     <TouchableOpacity>
@@ -228,7 +246,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
             <PGradientOutlineButton
               label="Edit Profile"
               onPress={() => navigation.navigate('EditUserProfile')}
-              gradientContainer={styles.button}
+              gradientContainer={styles.editButton}
             />
           ) : (
             <View style={[styles.row, styles.between]}>
@@ -238,8 +256,8 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
                 gradientContainer={styles.button}
               />
               <PGradientButton
-                label="follow"
-                onPress={() => console.log(11)}
+                label={isFollowing ? 'Unfollow' : 'Follow'}
+                onPress={toggleFollow}
                 gradientContainer={styles.button}
               />
             </View>
@@ -438,6 +456,9 @@ const styles = StyleSheet.create({
   },
   button: {
     width: Dimensions.get('screen').width / 2 - 24,
+  },
+  editButton: {
+    width: Dimensions.get('screen').width - 36,
   },
   relative: {
     position: 'relative',

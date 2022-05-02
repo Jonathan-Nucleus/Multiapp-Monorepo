@@ -36,6 +36,7 @@ import Accreditation from '../screens/Accreditation';
 import AccreditationResult from '../screens/Accreditation/AccreditationResult';
 import Notification from '../screens/Notification';
 import NotificationDetail from '../screens/Notification/Details';
+import Preferences from '../screens/Main/Settings/Preferences';
 
 import { MediaType } from 'backend/graphql/mutations.graphql';
 
@@ -113,6 +114,7 @@ const AppNavigator = () => {
         />
         <Stack.Screen name="Search" component={SearchTabs} />
         <Stack.Screen name="Notification" component={Notification} />
+        <Stack.Screen name="Preferences" component={Preferences} />
         <Stack.Screen
           name="NotificationDetail"
           component={NotificationDetail}
@@ -141,10 +143,11 @@ type AppParamList = {
   Contact: undefined;
   VerificationSuccess: undefined;
   Search: undefined;
-  Notification: undefined;
+  Notifications: undefined;
   NotificationDetail: { postId: string; userId: string };
   Accreditation: undefined;
   AccreditationResult: undefined;
+  Preferences: undefined;
 };
 
 export type AppScreenProps<
@@ -180,9 +183,13 @@ export type AccreditationResultScreen = (
 ) => ReactElement;
 
 export type NotificationScreen = (
-  props: AppScreenProps<'Notification'>,
+  props: AppScreenProps<'Notifications'>,
 ) => ReactElement;
 
 export type NotificationDetailsScreen = (
   props: AppScreenProps<'NotificationDetail'>,
+) => ReactElement;
+
+export type PreferencesScreen = (
+  props: AppScreenProps<'Preferences'>,
 ) => ReactElement;

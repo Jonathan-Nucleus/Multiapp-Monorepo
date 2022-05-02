@@ -7,6 +7,7 @@ import {
   View,
 } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
+// import Autocomplete from 'react-native-autocomplete-input';
 
 import PTextInput from 'mobile/src/components/common/PTextInput';
 import ErrorText from 'mobile/src/components/common/ErrorTxt';
@@ -22,20 +23,12 @@ import { CaretDown } from 'phosphor-react-native';
 import PFormLabel from 'mobile/src/components/common/PFormLabel';
 import PMaskTextInput from 'mobile/src/components/common/PMaskTextInput';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
+import { useAccount } from 'mobile/src/graphql/query/account';
 
 const TimeDAY = [
   { label: 'Morning (8am - 12pm)', value: 'morning' },
   { label: 'Afternoon (12pm - 5pm)', value: 'afternoon' },
   { label: 'Evening (5pm-8pm)', value: 'evening' },
-];
-
-const FUND = [
-  { label: 'LP |', value: 'manager' },
-  { label: 'Good Soil LP Fund with really long n', value: 'journalist' },
-  { label: 'Millenium Capital Diversified LP adve  ', value: 'cManager' },
-  { label: 'Big Man’s LP Fund for Winners', value: 'founder' },
-  { label: 'Geoff & Partners LP Fund for Playas', value: 'exManager' },
-  { label: 'Any Fund', value: 'other' },
 ];
 
 const PhoneContact: React.FC = () => {
@@ -44,6 +37,9 @@ const PhoneContact: React.FC = () => {
   const [error, setError] = useState('');
   const [interest, setInterest] = useState('');
   const [info, setInfo] = useState('');
+  const [query, setQuery] = useState('');
+  const { data } = useAccount();
+  const funds = data?.account.managedFunds ?? [];
 
   const handleNextPage = async () => {
     Keyboard.dismiss();
@@ -76,10 +72,26 @@ const PhoneContact: React.FC = () => {
             right: 16,
           },
         }}
-        Icon={<CaretDown size={14} color={WHITE} weight="fill" />}
+        Icon={() => <CaretDown size={14} color={WHITE} weight="fill" />}
         placeholder={{ label: null, value: null }}
       />
-      <PFormLabel label="Fund of Interest" textStyle={styles.label} />
+      {/* <PFormLabel label="Fund of Interest" textStyle={styles.label} />
+      <View style={styles.autocompleteContainer}>
+        <Autocomplete
+          autoCorrect={false}
+          data={FUND}
+          value={query}
+          onChangeText={setQuery}
+          flatListProps={{
+            keyboardShouldPersistTaps: 'always',
+            renderItem: ({ item }) => (
+              <TouchableOpacity onPress={() => setQuery(item.value)}>
+                <Text style={styles.itemText}>{item.label}</Text>
+              </TouchableOpacity>
+            ),
+          }}
+        />
+      </View>
       <RNPickerSelect
         onValueChange={(val: string) => setInterest(val)}
         items={FUND}
@@ -91,8 +103,17 @@ const PhoneContact: React.FC = () => {
             right: 16,
           },
         }}
-        Icon={<CaretDown size={14} color={WHITE} weight="fill" />}
+        Icon={() => <CaretDown size={14} color={WHITE} weight="fill" />}
         placeholder={{ label: null, value: null }}
+      /> */}
+      <PTextInput
+        label="Fund of Interest"
+        onChangeText={(val: string) => setInterest(val)}
+        text={interest}
+        multiline={true}
+        underlineColorAndroid="transparent"
+        numberOfLines={4}
+        labelTextStyle={styles.label}
       />
       <PTextInput
         label="Additional Information"

@@ -13127,6 +13127,11 @@ react-native-app-auth@^6.4.3:
     invariant "2.2.4"
     react-native-base64 "0.0.2"
 
+react-native-autocomplete-input@^5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-autocomplete-input/-/react-native-autocomplete-input-5.1.0.tgz#01bb16873a4b2589ad47cda4ad69ae67dcf3c793"
+  integrity sha512-y6gIBm189hcsJO+6a4Hn8lNdy1qmY7yw1NAA6Bgvg8rznZk0r+35xXd1tu81aOZYJo9/LxGNlNL6Zblo3N1kGw==
+
 react-native-base64@0.0.2:
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/react-native-base64/-/react-native-base64-0.0.2.tgz#c28463c2c6779ac3ec5fdd12979ebc8c5f9b410a"

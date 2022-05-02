@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   FlatList,
@@ -13,11 +13,9 @@ import {
   Chats,
   DotsThreeOutlineVertical,
   ChatCenteredText,
-  ThumbsUp,
   UserCirclePlus,
-  At,
-  Share,
   CaretLeft,
+  ThumbsUp,
 } from 'phosphor-react-native';
 import {
   PRIMARYSTATE,
@@ -29,9 +27,9 @@ import {
   PRIMARY,
   BLUE500,
   WHITE60,
+  PRIMARYSOLID,
 } from 'shared/src/colors';
 import Modal from 'react-native-modal';
-import LinearGradient from 'react-native-linear-gradient';
 import moment from 'moment';
 
 import pStyles from 'mobile/src/theme/pStyles';
@@ -41,167 +39,67 @@ import Avatar from 'mobile/src/components/common/Avatar';
 import MainHeader from 'mobile/src/components/main/Header';
 
 import type { NotificationScreen } from 'mobile/src/navigations/AppNavigator';
+import { useNotifications } from 'mobile/src/graphql/query/notification';
+import { useReadNotification } from 'mobile/src/graphql/mutation/notification';
+import { Notification } from 'backend/graphql/notifications.graphql';
 
-const Items: Notification[] = [
-  /*{
-    name: 'Mike Wang',
-    description: 'Founder, Investor ',
-    company: 'Cartenna Capital',
-    image: Avatar,
-    id: '1',
-    unread: false,
-    lastMessage: 'What a great idea!',
-    liked: true,
-    createdAt: new Date('Thu Apr 10 2022 19:30:03 GMT-0600'),
-  },
-  {
-    name: 'Mike Wang',
-    description: 'Founder, Investor ',
-    company: 'Cartenna Capital',
-    image: Avatar,
-    id: '51',
-    unread: false,
-    lastMessage:
-      'Sure, I’ll send over the terms and conditions. What’s your name',
-    createdAt: new Date('Thu Apr 10 2022 18:30:03 GMT-0600'),
-  },
-  {
-    name: 'Mike Wang',
-    description: 'Founder, Investor ',
-    company: 'Cartenna Capital',
-    image: Avatar,
-    id: '41',
-    unread: true,
-    lastMessage: 'Richard Branson - this is what I was talking about.',
-    commented: true,
-    createdAt: new Date('Thu Apr 05 2022 18:30:03 GMT-0600'),
-  },
-  {
-    name: 'Mike Wang',
-    description: 'Founder, Investor ',
-    company: 'Cartenna Capital',
-    image: Avatar,
-    id: '31',
-    unread: true,
-    following: true,
-    createdAt: new Date('Thu Apr 05 2022 20:30:03 GMT-0600'),
-  },
-  {
-    name: 'Mike Wang',
-    description: 'Founder, Investor ',
-    company: 'Cartenna Capital',
-    image: Avatar,
-    id: '21',
-    unread: true,
-    shared: true,
-    createdAt: new Date('Thu Apr 11 2022 21:22:03 GMT-0600'),
-  },
-  {
-    name: 'Mike Wang',
-    description: 'Founder, Investor ',
-    company: 'Cartenna Capital',
-    image: Avatar,
-    id: '11',
-    unread: true,
-    message: true,
-    createdAt: new Date('Thu Apr 11 2022 20:30:03 GMT-0600'),
-  },
-  {
-    name: 'Robert Fox',
-    description: 'Founder, Investor ',
-    company: 'Cartenna Capital',
-    image: Avatar,
-    id: '121',
-    unread: true,
-    mentioned: true,
-    lastMesae: 'Richard Branson - this is what I was talking about.',
-    createdAt: new Date('Thu Apr 11 2022 17:30:03 GMT-0600'),
-  },*/
-];
-
-interface Notification {
-  name: string;
-  image: string;
-  id: string;
-  unread: boolean;
-  mentioned?: boolean;
-  commented?: boolean;
-  liked?: boolean;
-  message?: boolean;
-  following?: boolean;
-  shared?: boolean;
-  lastMessage?: string;
-  createdAt: Date;
-}
-
-const Notification: NotificationScreen = ({ navigation }) => {
+const Notifications: NotificationScreen = ({ navigation }) => {
   const [isVisible, setIsVisible] = useState(false);
-
-  const title = (val: Notification) => {
-    if (val.commented) {
-      return `${val.name} commented on your post`;
-    }
-    if (val.liked) {
-      return `${val.name} liked your post`;
-    }
-    if (val.message) {
-      return `${val.name} sent you a message`;
-    }
-    if (val.following) {
-      return `${val.name} is following you`;
-    }
-    if (val.mentioned) {
-      return `${val.name} mentioned you in a comment`;
-    }
-    if (val.shared) {
-      return `${val.name} shared your post`;
-    }
-    return `${val.name} sent you a message`;
-  };
+  const { data } = useNotifications();
+  const [readNotification] = useReadNotification();
+  const notifications = data?.notifications || [];
 
   const renderIcon = (val: Notification) => {
-    if (val.commented) {
+    if (val.type === 'comment-post') {
       return <ChatCenteredText size={18} color={WHITE} />;
     }
-    if (val.liked) {
+    if (val.type === 'like-post') {
       return <ThumbsUp size={18} color={WHITE} />;
     }
-    if (val.message) {
-      return <Chats size={18} color={WHITE} />;
-    }
-    if (val.following) {
+    if (val.type === 'followed-by-user') {
       return <UserCirclePlus size={18} color={WHITE} />;
     }
-    if (val.mentioned) {
-      return <At size={18} color={WHITE} />;
-    }
-    if (val.shared) {
-      return <Share size={18} color={WHITE} />;
-    }
+    // if (val.type === 'comment-post') {
+    //   return <ThumbsUp size={18} color={WHITE} />;
+    // }
+    // if (val.mentioned) {
+    //   return <At size={18} color={WHITE} />;
+    // }
+    // if (val.shared) {
+    //   return <Share size={18} color={WHITE} />;
+    // }
     return <Chats size={18} color={WHITE} />;
   };
 
-  const renderListItem: ListRenderItem<typeof Items[number]> = ({ item }) => {
+  const handleReadNotification = async (id?: string) => {
+    try {
+      await readNotification({
+        variables: {
+          notificationId: id,
+        },
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsVisible(false);
+    }
+  };
+
+  const renderListItem: ListRenderItem<typeof notifications[number]> = ({
+    item,
+  }) => {
     return (
-      <TouchableOpacity onLongPress={() => setIsVisible(true)}>
-        <View style={[styles.item, item.unread && styles.unread]}>
+      <TouchableOpacity
+        onLongPress={() => setIsVisible(true)}
+        onPress={() => handleReadNotification(item._id)}>
+        <View style={[styles.item, item.isNew && styles.unread]}>
           <View style={styles.avatarView}>
-            {item.unread && (
-              <LinearGradient
-                colors={['#844AFF', '#00AAE0']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.dot}
-              />
-            )}
-            <Avatar size={54} />
+            {item.isNew && <View style={styles.dot} />}
+            <Avatar size={54} user={item.user} />
             <View style={styles.chat}>{renderIcon(item)}</View>
           </View>
           <View style={styles.commentWrap}>
-            <Text style={styles.label}>{title(item)}</Text>
-            <Text numberOfLines={1} style={styles.comment}>
-              {item.lastMessage}
-            </Text>
+            <Text style={styles.label}>{item.body}</Text>
             <Text style={styles.comment}>
               {moment(item.createdAt).fromNow()}
             </Text>
@@ -224,9 +122,9 @@ const Notification: NotificationScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
       <FlatList
-        data={Items}
+        data={notifications}
         renderItem={renderListItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id}
         style={styles.flatList}
       />
       <Modal
@@ -235,7 +133,7 @@ const Notification: NotificationScreen = ({ navigation }) => {
         onBackdropPress={() => setIsVisible(false)}
         style={styles.bottomHalfModal}>
         <View style={styles.modalContent}>
-          <TouchableOpacity onPress={() => setIsVisible(false)}>
+          <TouchableOpacity onPress={() => handleReadNotification()}>
             <View style={styles.row}>
               <Checks color={WHITE} size={28} />
               <View style={styles.commentWrap}>
@@ -243,11 +141,15 @@ const Notification: NotificationScreen = ({ navigation }) => {
               </View>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setIsVisible(false)}>
+          <TouchableOpacity
+            onPress={() => {
+              setIsVisible(false);
+              navigation.navigate('Preferences');
+            }}>
             <View style={styles.row}>
               <Gear color={WHITE} size={28} />
               <View style={styles.commentWrap}>
-                <Text style={styles.label}>Notification Settins</Text>
+                <Text style={styles.label}>Notification Settings</Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -263,7 +165,7 @@ const Notification: NotificationScreen = ({ navigation }) => {
   );
 };
 
-export default Notification;
+export default Notifications;
 
 const styles = StyleSheet.create({
   globalContainer: {
@@ -354,6 +256,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 55,
     top: 27,
+    backgroundColor: PRIMARYSOLID,
   },
   avatarView: {
     flexDirection: 'row',

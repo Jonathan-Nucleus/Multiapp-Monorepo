@@ -9,9 +9,10 @@ import dayjs from 'dayjs';
 import {
   ThumbsUp,
   ChatCenteredText,
-  Share,
+  Share as ShareIcon,
   DotsThreeVertical,
 } from 'phosphor-react-native';
+import Share from 'react-native-share';
 
 import PLabel from '../common/PLabel';
 import IconButton from '../common/IconButton';
@@ -30,6 +31,7 @@ import * as NavigationService from '../../services/navigation/NavigationService'
 import { Post } from 'mobile/src/graphql/query/post/usePosts';
 import { PostCategories } from 'backend/graphql/enumerations.graphql';
 import { useLikePost } from '../../graphql/mutation/posts';
+import { showMessage } from '../../services/utils';
 import { appWidth } from '../../utils/utils';
 
 export interface PostItemProps {
@@ -79,6 +81,21 @@ const PostItem: React.FC<PostItemProps> = ({ post, userId, onPressMenu }) => {
         userId: post.user._id,
       },
     });
+  };
+
+  const onShare = async () => {
+    try {
+      const result = await Share.open({
+        title: 'Join me on Prometheus Alts!',
+        message: 'Share post item',
+        url: 'prometheusalts.com',
+      });
+      console.log('result', result);
+      showMessage('success', 'You shared post succesfully');
+    } catch (err) {
+      console.log(err);
+      showMessage('error', (err as Error).message);
+    }
   };
 
   return (
@@ -178,8 +195,9 @@ const PostItem: React.FC<PostItemProps> = ({ post, userId, onPressMenu }) => {
             onPress={goToDetails}
           />
           <IconButton
-            icon={<Share color={WHITE60} size={20} />}
+            icon={<ShareIcon color={WHITE60} size={20} />}
             label="Share"
+            onPress={onShare}
           />
         </View>
         <View style={styles.divider} />

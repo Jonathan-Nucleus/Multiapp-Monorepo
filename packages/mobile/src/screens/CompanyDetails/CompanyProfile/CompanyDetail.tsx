@@ -9,8 +9,14 @@ import {
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Modal from 'react-native-modal';
-import { Chats, CopySimple, Pencil, Share } from 'phosphor-react-native';
+import {
+  Chats,
+  CopySimple,
+  Pencil,
+  Share as ShareIcon,
+} from 'phosphor-react-native';
 import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
+import Share from 'react-native-share';
 
 import Avatar from 'mobile/src/components/common/Avatar';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
@@ -35,6 +41,7 @@ import { useAccount } from 'mobile/src/graphql/query/account';
 import { useFollowCompany } from 'mobile/src/graphql/mutation/account';
 import type { CompanyProfile } from 'mobile/src/graphql/query/company/useCompany';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
+import { showMessage } from '../../../services/utils';
 
 interface CompanyDetailProps {
   company: CompanyProfile;
@@ -81,6 +88,23 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
       }
     } catch (err) {
       console.log('err', err);
+    }
+  };
+
+  const onShare = async () => {
+    try {
+      const result = await Share.open({
+        title: 'Join me on Prometheus Alts!',
+        message: 'Share post',
+        url: 'prometheusalts.com',
+      });
+      setIsVisible(false);
+      console.log('result', result);
+      showMessage('success', 'You shared this post succesfully');
+    } catch (err) {
+      setIsVisible(false);
+      console.log(err);
+      showMessage('error', (err as Error).message);
     }
   };
 
@@ -231,9 +255,9 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
               </View>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setIsVisible(false)}>
+          <TouchableOpacity onPress={() => onShare()}>
             <View style={styles.item}>
-              <Share color={WHITE} size={28} />
+              <ShareIcon color={WHITE} size={28} />
               <View style={styles.commentWrap}>
                 <Text style={styles.modalLabel}>Share as Post</Text>
               </View>
