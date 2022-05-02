@@ -5,7 +5,7 @@ import { Star } from "phosphor-react";
 const Navbar: FC = () => {
   return (
     <div className="bg-background-cardDark shadow-sm shadow-black">
-      <nav className="container mx-auto  max-w-screen-xl">
+      <nav className="container mx-auto  max-w-screen-xl lg:px-4">
         <ul className="grid grid-cols-3 md:flex">
           <li className="md:w-44">
             <NavItem path={"/funds"} title="FUNDS" />

@@ -1,36 +1,32 @@
 import { FC } from "react";
 import "@splidejs/react-splide/css";
 import { Splide, SplideSlide } from "@splidejs/react-splide";
-import Image from "next/image";
 
-import PostsList, { PostsListProps } from "../../common/PostsList";
-import FeaturedPosts from "../../common/FeaturedPosts";
+import PostsList from "../../common/PostsList";
 import Card from "../../common/Card";
 import Avatar from "../../common/Avatar";
 import ProfileCard from "./ProfileCard";
 import TeamMembersList from "../../modules/teams/TeamMembersList";
 import FundCard from "../../modules/funds/FundCard";
-import { useFetchPosts } from "mobile/src/graphql/query/account";
 import { CompanyProfile } from "mobile/src/graphql/query/company/useCompany";
+import { useAccount } from "mobile/src/graphql/query/account";
 
 interface CompanyPageProps {
   company: CompanyProfile;
-  isEditable?: boolean;
 }
 
-const CompanyPage: FC<CompanyPageProps> = ({
-  company,
-  isEditable,
-}: CompanyPageProps) => {
+const CompanyPage: FC<CompanyPageProps> = ({ company }: CompanyPageProps) => {
   const funds = company.funds.map((fund) => ({ ...fund, company }));
   const members = company.members.map((member) => ({ ...member, company }));
+  const { data: { account } = {} } = useAccount();
+  const isMyCompany = (account?.companies.findIndex(item => item._id == company._id) ?? -1) != -1
 
   return (
     <div className="lg:mt-12 mb-12 lg:px-14">
       <div className="lg:grid grid-cols-6 gap-8">
         <div className="col-span-4">
           <div className="pb-5">
-            <ProfileCard company={company} isEditable={isEditable} />
+            <ProfileCard company={company} isEditable={isMyCompany} />
           </div>
           <div className="py-5">
             <div className="text-white mt-8 mb-2 ml-2 font-medium">Funds</div>

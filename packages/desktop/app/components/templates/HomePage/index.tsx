@@ -36,25 +36,27 @@ const HomePage: FC = () => {
             </div>
           )}
         </div>
-        <div className="min-w-0 mx-4">
-          {professionals.length > 0 && (
-            <FeaturedProfessionals professionals={professionals} />
-          )}
-          <div className="hidden md:block">
-            <AddPost
-              setShowPostModal={() => {
-                setSelectedPost(undefined);
-                setShowPostModal(true);
-              }}
-            />
-          </div>
-          <div className="mt-8">
-            <PostsList
-              onSelectPost={(post) => {
-                setSelectedPost(post);
-                setShowPostModal(true);
-              }}
-            />
+        <div className="min-w-0 flex-grow">
+          <div className="max-w-3xl mx-auto px-4">
+            {professionals.length > 0 && (
+              <FeaturedProfessionals professionals={professionals} />
+            )}
+            <div className="hidden md:block">
+              <AddPost
+                setShowPostModal={() => {
+                  setSelectedPost(undefined);
+                  setShowPostModal(true);
+                }}
+              />
+            </div>
+            <div className="mt-8">
+              <PostsList
+                onSelectPost={(post) => {
+                  setSelectedPost(post);
+                  setShowPostModal(true);
+                }}
+              />
+            </div>
           </div>
         </div>
         <div className="w-80 hidden lg:block flex-shrink-0 mx-4">

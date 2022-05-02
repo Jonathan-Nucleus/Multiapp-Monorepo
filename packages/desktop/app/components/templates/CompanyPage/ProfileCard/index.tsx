@@ -292,37 +292,45 @@ const ProfileCard: FC<CompanyPageProps> = ({
               </Button>
             </div>
             <div className="flex items-center p-4 border-t border-white/[.12]">
-              <div className="flex items-center cursor-pointer">
-                <Link href={company.linkedIn ?? "/"}>
-                  <a className="flex items-center text-white">
-                    <LinkedinLogo
-                      color="currentColor"
-                      size={24}
-                      weight="fill"
-                    />
-                    <div className="text-sm text-primary ml-1 hidden md:block">
-                      Linkedin
-                    </div>
-                  </a>
-                </Link>
-              </div>
-              <div className="flex items-center cursor-pointer ml-8">
-                <Link href={company.twitter ?? "/"}>
-                  <a className="flex items-center text-white">
-                    <TwitterLogo color="currentColor" size={24} weight="fill" />
-                    <div className="text-sm text-primary ml-1 hidden md:block">
-                      Twitter
-                    </div>
-                  </a>
-                </Link>
-              </div>
-              <div className="flex items-center cursor-pointer ml-8">
-                <Link href={company.website ?? "/"}>
-                  <a className="flex items-center text-white">
-                    <Globe color="currentColor" size={24} weight="fill" />
-                    <div className="text-sm text-primary ml-2">Website</div>
-                  </a>
-                </Link>
+              <div className="flex items-center -mx-4">
+                {company.linkedIn &&
+                  <div className="flex items-center cursor-pointer px-4">
+                    <Link href={company.linkedIn}>
+                      <a target="_blank" className="flex items-center text-white">
+                        <LinkedinLogo
+                          color="currentColor"
+                          size={24}
+                          weight="fill"
+                        />
+                        <div className="text-sm text-primary ml-1 hidden md:block">
+                          Linkedin
+                        </div>
+                      </a>
+                    </Link>
+                  </div>
+                }
+                {company.twitter &&
+                  <div className="flex items-center cursor-pointer px-4">
+                    <Link href={company.twitter}>
+                      <a target="_blank" className="flex items-center text-white">
+                        <TwitterLogo color="currentColor" size={24} weight="fill" />
+                        <div className="text-sm text-primary ml-1 hidden md:block">
+                          Twitter
+                        </div>
+                      </a>
+                    </Link>
+                  </div>
+                }
+                {company.website &&
+                  <div className="flex items-center cursor-pointer px-4">
+                    <Link href={company.website}>
+                      <a target="_blank" className="flex items-center text-white">
+                        <Globe color="currentColor" size={24} weight="fill" />
+                        <div className="text-sm text-primary ml-2">Website</div>
+                      </a>
+                    </Link>
+                  </div>
+                }
               </div>
               <div className="ml-auto">
                 <Menu>

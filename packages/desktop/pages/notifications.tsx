@@ -1,5 +1,5 @@
 import Head from "next/head";
-import NotificationPage from "../app/components/templates/NotificationList";
+import NotificationPage from "../app/components/templates/NotificationsPage";
 import { NextPageWithLayout } from "../app/types/next-page";
 
 const Notification: NextPageWithLayout = () => {

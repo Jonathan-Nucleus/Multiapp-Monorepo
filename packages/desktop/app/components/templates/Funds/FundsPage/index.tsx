@@ -43,10 +43,12 @@ const FundsPage: FC = () => {
                   <span className="ml-2">VERIFY ACCREDITATION STATUS</span>
                 </Button>
               </div>
-              <AccreditationQuestionnaire
-                show={isVerifying}
-                onClose={() => setIsVerifying(false)}
-              />
+              {isVerifying &&
+                <AccreditationQuestionnaire
+                  show={isVerifying}
+                  onClose={() => setIsVerifying(false)}
+                />
+              }
             </div>
           ) : (
             <>{funds.length > 0 && <FundsList funds={funds} />}</>

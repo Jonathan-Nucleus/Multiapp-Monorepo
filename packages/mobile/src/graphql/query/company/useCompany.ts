@@ -75,6 +75,9 @@ export function useCompany(
           avatar
           followerIds
           followingIds
+          website
+          linkedIn
+          twitter
           followers {
             _id
             firstName

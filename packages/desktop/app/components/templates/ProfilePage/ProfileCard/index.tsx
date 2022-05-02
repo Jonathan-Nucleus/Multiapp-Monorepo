@@ -39,6 +39,7 @@ interface ProfileCardProps {
 
 const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
   const [isVisible, setVisible] = useState(false);
+  const [followersModalTab, setFollowersModalTab] = useState(0);
   const [editableModal, setEditableModal] = useState(false);
   const [editablePhoto, setEditablePhoto] = useState<PhotoProps>({
     type: "AVATAR",
@@ -206,10 +207,13 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
                 </div>
                 <div
                   className="flex flex-wrap items-center justify-center text-center cursor-pointer px-4"
-                  onClick={() => setVisible(true)}
+                  onClick={() => {
+                    setFollowersModalTab(0);
+                    setVisible(true);
+                  }}
                 >
                   <div className="text-xl text-white font-medium mx-1">
-                    {user.followerIds?.length ?? 0}
+                    {user.followers?.length ?? 0}
                   </div>
                   <div className="text-xs text-white opacity-60 mx-1">
                     Followers
@@ -217,10 +221,13 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
                 </div>
                 <div
                   className="flex flex-wrap items-center justify-center text-center cursor-pointer px-4"
-                  onClick={() => setVisible(true)}
+                  onClick={() => {
+                    setFollowersModalTab(1);
+                    setVisible(true);
+                  }}
                 >
                   <div className="text-xl text-white font-medium mx-1">
-                    {user.followingIds?.length ?? 0}
+                    {user.following?.length ?? 0}
                   </div>
                   <div className="text-xs text-white opacity-60 mx-1">
                     Following
@@ -280,10 +287,13 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
                   </div>
                   <div
                     className="text-center cursor-pointer px-4"
-                    onClick={() => setVisible(true)}
+                    onClick={() => {
+                      setFollowersModalTab(0);
+                      setVisible(true);
+                    }}
                   >
                     <div className="text-xl text-white font-medium">
-                      {user.followerIds?.length ?? 0}
+                      {user.followers?.length ?? 0}
                     </div>
                     <div className="text-xs text-white opacity-60">
                       Followers
@@ -291,10 +301,13 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
                   </div>
                   <div
                     className="text-center cursor-pointer px-4"
-                    onClick={() => setVisible(true)}
+                    onClick={() => {
+                      setFollowersModalTab(1);
+                      setVisible(true);
+                    }}
                   >
                     <div className="text-xl text-white font-medium">
-                      {user.followingIds?.length ?? 0}
+                      {user.following?.length ?? 0}
                     </div>
                     <div className="text-xs text-white opacity-60">
                       Following
@@ -386,12 +399,15 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
           </div>
         </Card>
       </div>
-      <FollowersModal
-        show={isVisible}
-        onClose={() => setVisible(false)}
-        followers={user.followers}
-        following={user.following}
-      />
+      {isVisible &&
+        <FollowersModal
+          show={isVisible}
+          onClose={() => setVisible(false)}
+          selectedTab={followersModalTab}
+          followers={user.followers}
+          following={user.following}
+        />
+      }
       <EditModal show={editableModal} onClose={() => setEditableModal(false)} />
       <PhotoUploadModal
         show={editablePhoto.visible}

@@ -1,5 +1,5 @@
 import { FC, PropsWithChildren } from "react";
-import { SessionProvider, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { ApolloProvider } from "@apollo/client";
 import {
   createApolloClient,
