@@ -23,7 +23,12 @@ import { CaretDown } from 'phosphor-react-native';
 import PFormLabel from 'mobile/src/components/common/PFormLabel';
 import PMaskTextInput from 'mobile/src/components/common/PMaskTextInput';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
-import { useAccount } from 'mobile/src/graphql/query/account';
+import { ProRoleOptions } from 'backend/schemas/user';
+
+const ROLES = Object.keys(ProRoleOptions).map((option) => ({
+  value: option,
+  label: ProRoleOptions[option].label,
+}));
 
 const TimeDAY = [
   { label: 'Morning (8am - 12pm)', value: 'morning' },
@@ -37,9 +42,6 @@ const PhoneContact: React.FC = () => {
   const [error, setError] = useState('');
   const [interest, setInterest] = useState('');
   const [info, setInfo] = useState('');
-  const [query, setQuery] = useState('');
-  const { data } = useAccount();
-  const funds = data?.account.managedFunds ?? [];
 
   const handleNextPage = async () => {
     Keyboard.dismiss();
@@ -75,26 +77,10 @@ const PhoneContact: React.FC = () => {
         Icon={() => <CaretDown size={14} color={WHITE} weight="fill" />}
         placeholder={{ label: null, value: null }}
       />
-      {/* <PFormLabel label="Fund of Interest" textStyle={styles.label} />
-      <View style={styles.autocompleteContainer}>
-        <Autocomplete
-          autoCorrect={false}
-          data={FUND}
-          value={query}
-          onChangeText={setQuery}
-          flatListProps={{
-            keyboardShouldPersistTaps: 'always',
-            renderItem: ({ item }) => (
-              <TouchableOpacity onPress={() => setQuery(item.value)}>
-                <Text style={styles.itemText}>{item.label}</Text>
-              </TouchableOpacity>
-            ),
-          }}
-        />
-      </View>
+      <PFormLabel label="Fund of Interest" textStyle={styles.label} />
       <RNPickerSelect
         onValueChange={(val: string) => setInterest(val)}
-        items={FUND}
+        items={ROLES}
         value={interest}
         style={{
           ...pickerSelectStyles,
@@ -105,8 +91,8 @@ const PhoneContact: React.FC = () => {
         }}
         Icon={() => <CaretDown size={14} color={WHITE} weight="fill" />}
         placeholder={{ label: null, value: null }}
-      /> */}
-      <PTextInput
+      />
+      {/* <PTextInput
         label="Fund of Interest"
         onChangeText={(val: string) => setInterest(val)}
         text={interest}
@@ -114,7 +100,7 @@ const PhoneContact: React.FC = () => {
         underlineColorAndroid="transparent"
         numberOfLines={4}
         labelTextStyle={styles.label}
-      />
+      /> */}
       <PTextInput
         label="Additional Information"
         onChangeText={(val: string) => setInfo(val)}

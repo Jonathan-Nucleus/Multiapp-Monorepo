@@ -26,19 +26,16 @@ import { BLACK, WHITE, SUCCESS, GRAY700 } from 'shared/src/colors';
 import MainHeader from 'mobile/src/components/main/Header';
 import PFormLabel from 'mobile/src/components/common/PFormLabel';
 import { useProRequest } from 'mobile/src/graphql/mutation/account';
+import { ProRoleOptions } from 'backend/schemas/user';
+
+const ROLES = Object.keys(ProRoleOptions).map((option) => ({
+  value: option,
+  label: ProRoleOptions[option].label,
+}));
 
 interface BecomeProProps {
   navigation: NavigationProp<ParamListBase>;
 }
-
-const DATA = [
-  { label: 'Fund Manager', value: 'MANAGER' },
-  { label: 'Journalist', value: 'JOURNALIST' },
-  { label: 'C level manager', value: 'C_LEVEL' },
-  { label: 'Founder', value: 'FOUNDER' },
-  { label: 'Ex fund manager', value: 'EX_MANAGER' },
-  { label: 'Other', value: 'OTHER' },
-];
 
 const BecomePro: React.FC<BecomeProProps> = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -96,7 +93,7 @@ const BecomePro: React.FC<BecomeProProps> = ({ navigation }) => {
         <PFormLabel label="I am a " textStyle={styles.label} />
         <RNPickerSelect
           onValueChange={(val) => setRole(val)}
-          items={DATA}
+          items={ROLES}
           value={role}
           style={{
             ...pickerSelectStyles,

@@ -41,7 +41,6 @@ const UserInfo: React.FC<UserInfoProps> = (props) => {
   const toggleFollow = async () => {
     if (!user || !user._id) return;
 
-    // Update state immediately for responsiveness
     setIsFollowing(!isFollowing);
 
     const result = await followUser({
@@ -49,7 +48,7 @@ const UserInfo: React.FC<UserInfoProps> = (props) => {
     });
 
     if (!result.data?.followUser) {
-      setIsFollowing(!isFollowing);
+      setIsFollowing(following);
     }
   };
 

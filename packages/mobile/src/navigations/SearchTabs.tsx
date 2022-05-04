@@ -32,10 +32,13 @@ import {
   AppScreenProps,
   SearchScreen,
 } from 'mobile/src/navigations/AppNavigator';
+import { useGlobalSearch } from 'mobile/src/graphql/query/search';
 
 const Tab = createMaterialTopTabNavigator();
 const SearchTabs: SearchScreen = ({ navigation }) => {
   const [search, setSearch] = useState('');
+  const { data: searchData } = useGlobalSearch(search);
+
   const renderCenter = () => {
     return (
       <View style={styles.headerContainer}>
@@ -81,10 +84,38 @@ const SearchTabs: SearchScreen = ({ navigation }) => {
           ),
         })}
         initialRouteName="People">
-        <Tab.Screen name="People" component={People} />
-        <Tab.Screen name="Companies" component={Companies} />
-        <Tab.Screen name="Posts" component={Posts} />
-        <Tab.Screen name="Funds" component={Funds} />
+        <Tab.Screen name="People">
+          {() => (
+            <People
+              users={searchData?.globalSearch.users ?? []}
+              search={search}
+            />
+          )}
+        </Tab.Screen>
+        <Tab.Screen name="Companies">
+          {() => (
+            <Companies
+              companies={searchData?.globalSearch.companies ?? []}
+              search={search}
+            />
+          )}
+        </Tab.Screen>
+        <Tab.Screen name="Posts">
+          {() => (
+            <Posts
+              posts={searchData?.globalSearch.posts ?? []}
+              search={search}
+            />
+          )}
+        </Tab.Screen>
+        <Tab.Screen name="Funds">
+          {() => (
+            <Funds
+              funds={searchData?.globalSearch.funds ?? []}
+              search={search}
+            />
+          )}
+        </Tab.Screen>
       </Tab.Navigator>
     </View>
   );
@@ -106,20 +137,18 @@ export type SearchScreenProps<
   AppScreenProps
 >;
 
-export type PeopleScreen = (
-  props: SearchScreenProps<'People'>,
-) => ReactElement | null;
+export type PeopleScreen = (props: SearchScreenProps<'People'>) => ReactElement;
 
 export type CompaniesScreen = (
-  props: SearchScreenProps<'People'>,
+  props: SearchScreenProps<'Companies'>,
 ) => ReactElement | null;
 
 export type PostsScreen = (
-  props: SearchScreenProps<'People'>,
+  props: SearchScreenProps<'Posts'>,
 ) => ReactElement | null;
 
 export type FundsScreen = (
-  props: SearchScreenProps<'People'>,
+  props: SearchScreenProps<'Funds'>,
 ) => ReactElement | null;
 
 const styles = StyleSheet.create({

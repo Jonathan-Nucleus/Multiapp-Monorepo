@@ -130,7 +130,6 @@ const Settings: SettingsScreen = ({ navigation }) => {
               )}
             </View>
           </View>
-
           <View>
             <CaretRight size={28} color={WHITE} />
           </View>
@@ -261,6 +260,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   rightItem: {
+    flex: 1,
     marginLeft: 16,
   },
   proWrapper: {
@@ -282,5 +282,6 @@ const styles = StyleSheet.create({
   },
   alignCenter: {
     alignItems: 'center',
+    flex: 1,
   },
 });

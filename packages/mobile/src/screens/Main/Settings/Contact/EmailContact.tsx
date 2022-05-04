@@ -23,15 +23,12 @@ import { BLACK, WHITE, GRAY700 } from 'shared/src/colors';
 import { CaretLeft, CaretDown } from 'phosphor-react-native';
 import PFormLabel from 'mobile/src/components/common/PFormLabel';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
+import { ProRoleOptions } from 'backend/schemas/user';
 
-const FUND = [
-  { label: 'LP |', value: 'manager' },
-  { label: 'Good Soil LP Fund with really long n', value: 'journalist' },
-  { label: 'Millenium Capital Diversified LP adve  ', value: 'cManager' },
-  { label: 'Big Man’s LP Fund for Winners', value: 'founder' },
-  { label: 'Geoff & Partners LP Fund for Playas', value: 'exManager' },
-  { label: 'Any Fund', value: 'other' },
-];
+const ROLES = Object.keys(ProRoleOptions).map((option) => ({
+  value: option,
+  label: ProRoleOptions[option].label,
+}));
 
 const EmailContact: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -60,7 +57,7 @@ const EmailContact: React.FC = () => {
       <PFormLabel label="Fund of Interest" textStyle={styles.label} />
       <RNPickerSelect
         onValueChange={(val: string) => setInterest(val)}
-        items={FUND}
+        items={ROLES}
         value={interest}
         style={{
           ...pickerSelectStyles,

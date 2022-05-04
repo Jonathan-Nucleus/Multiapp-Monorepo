@@ -6,6 +6,7 @@ import { GRAY200, PRIMARYSOLID } from 'shared/src/colors';
 
 import type { UserProfile } from 'backend/graphql/users.graphql';
 import { AVATAR_URL } from 'react-native-dotenv';
+import { Body2Bold } from '../../theme/fonts';
 
 type User = Partial<Pick<UserProfile, 'firstName' | 'lastName' | 'avatar'>>;
 interface AvatarProps {
@@ -49,9 +50,7 @@ const styles = StyleSheet.create({
   },
   initials: {
     color: PRIMARYSOLID,
-    width: '70%',
-    fontSize: 1000,
-    fontWeight: '800',
     textAlign: 'center',
+    ...Body2Bold,
   },
 });

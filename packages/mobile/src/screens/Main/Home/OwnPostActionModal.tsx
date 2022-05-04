@@ -30,7 +30,7 @@ const OwnPostActionModal: React.FC<OwnPostActionModalProps> = ({
   const menuData = useMemo(
     () => [
       {
-        label: `Edit Post`,
+        label: 'Edit Post',
         icon: <Pencil size={26} color={WHITE} />,
         key: 'edit' as const,
       },
