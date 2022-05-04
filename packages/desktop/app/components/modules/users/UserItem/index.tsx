@@ -62,7 +62,7 @@ const UserItem: FC<UserItemProps> = ({
                   className="text-xs text-primary font-normal tracking-normal py-0"
                   onClick={toggleFollowing}
                 >
-                  {isFollowing ? "UNFOLLOW" : "FOLLOW"}
+                  {isFollowing ? "Unfollow" : "Follow"}
                 </Button>
               </div>
             </>

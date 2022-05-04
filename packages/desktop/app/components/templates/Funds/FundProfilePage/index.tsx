@@ -8,11 +8,10 @@ import Avatar from "../../../common/Avatar";
 import Button from "../../../common/Button";
 import Card from "../../../common/Card";
 import TeamMembersList from "../../../modules/teams/TeamMembersList";
-import { PINK } from "shared/src/colors";
 
 import { useAccount } from "mobile/src/graphql/query/account";
 import { useFund } from "mobile/src/graphql/query/marketplace/useFund";
-import { useWatchFund } from "mobile/src/graphql/mutation/funds";
+import { useWatchFund } from "mobile/src/graphql/mutation/funds/useWatchFund";
 
 const fundData = {
   mtd: "3.2%",
@@ -127,20 +126,12 @@ interface FundProfileProps {
 }
 
 const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
-  const [watchFund] = useWatchFund();
   const { data: { fund } = {} } = useFund(fundId);
   const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
+  const { isWatching, toggleWatch } = useWatchFund(fundId);
+
   const { background: companyBackground, avatar: companyAvatar } =
     fund?.company ?? {};
-  const isWatching = account?.watchlistIds?.includes(fundId) ?? false;
-  const toggleWatchFund = async () => {
-    try {
-      await watchFund({
-        variables: { watch: !isWatching, fundId },
-        refetchQueries: ["Account"],
-      });
-    } catch (err) {}
-  };
 
   return (
     <div className="container mx-auto mt-5 lg:px-4 max-w-screen-xl">
@@ -205,13 +196,12 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                   <Button variant="text">
                     <Share color="white" weight="light" size={24} />
                   </Button>
-                  <Button
-                    variant="text"
-                    className="ml-2"
-                    onClick={toggleWatchFund}
-                  >
+                  <Button variant="text" className="ml-2" onClick={toggleWatch}>
                     <Star
-                      color={isWatching ? PINK : "white"}
+                      className={
+                        isWatching ? "text-primary-medium" : "text-white"
+                      }
+                      color="currentColor"
                       weight={isWatching ? "fill" : "light"}
                       size={24}
                     />
@@ -237,7 +227,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                           selected ? "text-white/[.87]" : "text-primary"
                         } font-medium py-4`}
                       >
-                        OVERVIEW
+                        Overview
                       </div>
                     </div>
                   )}
@@ -256,7 +246,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                           selected ? "text-white/[.87]" : "text-primary"
                         } font-medium py-4`}
                       >
-                        DOCUMENTS
+                        Documents
                       </div>
                     </div>
                   )}
@@ -278,7 +268,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                   <div className="mt-5">
                     <Button variant="outline-primary">
                       <TelevisionSimple color="currentColor" size={24} />
-                      <span className="uppercase ml-3">view presentation</span>
+                      <span className="ml-3">View Presentation</span>
                     </Button>
                   </div>
                   <div className="mt-8">
@@ -560,7 +550,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                         variant="text"
                         className="text-sm text-primary font-normal tracking-wider py-0"
                       >
-                        FOLLOW
+                        Follow
                       </Button>
                     </div>
                   </div>
@@ -575,7 +565,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                     variant="gradient-primary"
                     className="w-full font-medium h-12"
                   >
-                    CONTACT SPECIALIST
+                    Contact Specialist
                   </Button>
                 </div>
               </div>

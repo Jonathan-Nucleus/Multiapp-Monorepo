@@ -87,7 +87,7 @@ const FilterDropdown: FC<FilterDropdownProps> = ({
             <Popover.Panel className="absolute left-0 bg-background-popover shadow-md shadow-black rounded z-10">
               <div className="grid grid-cols-3 p-5">
                 <div className="col-span-2">
-                  <div className="text-xs text-white font-medium">TOPICS</div>
+                  <div className="text-xs text-white font-medium">Topics</div>
                   <div className="grid grid-cols-2 mt-3">
                     {orderedTopics.map((item, index) => (
                       <div key={index} className="flex items-center my-2">
@@ -131,8 +131,8 @@ const FilterDropdown: FC<FilterDropdownProps> = ({
                   </div>
                 </div>
                 <div>
-                  <div className="text-xs text-white font-medium uppercase">
-                    posts from
+                  <div className="text-xs text-white font-medium">
+                    Posts From
                   </div>
                   <div className="mt-3">
                     {fromItems.map((item, index) => (
@@ -161,13 +161,13 @@ const FilterDropdown: FC<FilterDropdownProps> = ({
               <div className="border-t border-white/[.12] text-center p-4">
                 <Button
                   variant="gradient-primary"
-                  className="font-medium uppercase px-10"
+                  className="font-medium px-10"
                   onClick={() => {
                     onSelect(selectedTopics, selectedFrom);
                     close();
                   }}
                 >
-                  apply filters
+                  Apply Filters
                 </Button>
               </div>
             </Popover.Panel>

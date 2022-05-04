@@ -32,7 +32,7 @@ const Member: FC<MemberProps> = (props) => {
               className="text-xs text-primary tracking-normal font-normal py-0"
               onClick={() => toggleFollowingUser(member._id, true)}
             >
-              FOLLOW
+              Follow
             </Button>
           </div>
           <div className="text-xs text-white opacity-60">{member.position}</div>

@@ -151,7 +151,7 @@ const ProfileCard: FC<CompanyPageProps> = ({
                       className="w-40 text-sm font-medium"
                       onClick={() => toggleFollowCompany()}
                     >
-                      {isFollowing ? "UNFOLLOW" : "FOLLOW"}
+                      {isFollowing ? "Unfollow" : "Follow"}
                     </Button>
                   )}
                 </div>
@@ -288,7 +288,7 @@ const ProfileCard: FC<CompanyPageProps> = ({
                 className="w-full text-sm font-medium"
                 onClick={() => toggleFollowCompany()}
               >
-                {isFollowing ? "UNFOLLOW" : "FOLLOW"}
+                {isFollowing ? "Unfollow" : "Follow"}
               </Button>
             </div>
             <div className="flex items-center p-4 border-t border-white/[.12]">

@@ -47,7 +47,7 @@ const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
           className="text-xs text-primary tracking-normal font-normal ml-auto px-2 py-0"
           onClick={toggleFollowing}
         >
-          {isFollowing ? "UNFOLLOW" : "FOLLOW"}
+          {isFollowing ? "Unfollow" : "Follow"}
         </Button>
       </div>
     </>

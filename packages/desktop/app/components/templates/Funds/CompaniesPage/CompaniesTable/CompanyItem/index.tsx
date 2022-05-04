@@ -67,10 +67,10 @@ const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
         <div className="flex items-center justify-end">
           <Button
             variant="text"
-            className="text-primary font-medium text-md py-0 uppercase"
+            className="text-primary font-medium text-md py-0"
             onClick={toggleFollowCompany}
           >
-            {isFollowing ? "unfollow" : "follow"}
+            {isFollowing ? "Unfollow" : "Follow"}
           </Button>
           <Link href={`/company/${company._id}`}>
             <a>
@@ -79,7 +79,7 @@ const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
                 className={`text-primary text-white tracking-normal ml-4
               bg-purple-dark border border-primary-solid hover:bg-primary-solid`}
               >
-                VIEW PROFILE
+                View Profile
               </Button>
             </a>
           </Link>
@@ -110,10 +110,10 @@ const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
           <div className="ml-auto">
             <Button
               variant="outline-primary"
-              className="text-primary text-white uppercase"
+              className="text-primary text-white"
               onClick={toggleFollowCompany}
             >
-              {isFollowing ? "unfollow" : "follow"}
+              {isFollowing ? "Unfollow" : "Follow"}
             </Button>
           </div>
         </div>

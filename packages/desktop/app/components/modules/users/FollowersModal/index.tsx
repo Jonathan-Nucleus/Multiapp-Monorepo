@@ -70,7 +70,7 @@ const FollowersModal: FC<FollowersModalProps> = ({
                       selected ? "border-primary" : "border-transparent"
                     } px-8 py-4`}
                   >
-                    FOLLOWERS
+                    Followers
                   </div>
                 )}
               </Tab>
@@ -83,7 +83,7 @@ const FollowersModal: FC<FollowersModalProps> = ({
                       selected ? "border-primary" : "border-transparent"
                     } px-8 py-4`}
                   >
-                    FOLLOWING
+                    Following
                   </div>
                 )}
               </Tab>

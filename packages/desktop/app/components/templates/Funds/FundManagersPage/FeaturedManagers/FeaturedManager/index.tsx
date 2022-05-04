@@ -56,7 +56,7 @@ const FeaturedManager: FC<FeaturedManagerProps> = ({ manager }) => {
             className="text-xs text-primary font-normal tracking-normal py-0"
             onClick={toggleFollowUser}
           >
-            {isFollowing ? "UNFOLLOW" : "FOLLOW"}
+            {isFollowing ? "Unfollow" : "Follow"}
           </Button>
         }
       </div>

@@ -4,7 +4,7 @@ import CompanyCard from "./CompanyCard";
 import FeaturedProfessionals from "./FeaturedProfessionals";
 import AddPost from "./AddPost";
 import PostsList from "./PostsList";
-import InviteFriends from "./InviteFriends";
+import InviteFriends from "../../modules/users/InviteFriends";
 import WatchList from "./WatchList";
 import Button from "../../common/Button";
 import { useAccount } from "mobile/src/graphql/query/account";
@@ -37,7 +37,7 @@ const HomePage: FC = () => {
           )}
         </div>
         <div className="min-w-0 flex-grow">
-          <div className="max-w-3xl mx-auto px-4">
+          <div className="px-4">
             {professionals.length > 0 && (
               <FeaturedProfessionals professionals={professionals} />
             )}

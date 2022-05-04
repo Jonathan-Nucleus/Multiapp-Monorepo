@@ -61,14 +61,14 @@ const InviteCodePage: FC = () => {
             </Button>
           </div>
         </form>
-        <div className="text-center mt-12 text-white">OR, LOG IN WITH</div>
+        <div className="text-center mt-12 text-white">Or, Log in with</div>
         <div className="text-center mt-4">
           <Button
             variant="text"
-            className="uppercase text-primary"
+            className="text-primary"
             loading={loading}
           >
-            request an invite
+            Request an Invite
           </Button>
         </div>
       </div>

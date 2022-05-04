@@ -1,5 +1,5 @@
 import { Popover, Transition } from "@headlessui/react";
-import { FC, Fragment } from "react";
+import { FC, Fragment, useState } from "react";
 import { signOut } from "next-auth/react";
 import {
   CaretDown,
@@ -16,10 +16,14 @@ import MenuItem from "./MenuItem";
 import Avatar from "desktop/app/components/common/Avatar";
 import { useAccount } from "mobile/src/graphql/query/account";
 import Link from "next/link";
+import ModalDialog from "../../../../common/ModalDialog";
+import Button from "../../../../common/Button";
+import InviteFriends from "../../../../modules/users/InviteFriends";
 
 const AvatarMenu: FC = () => {
-  const { data: accountData } = useAccount();
-  const account = accountData?.account;
+  const { data: { account } = {} } = useAccount();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
   const items = [
     {
       icon: (
@@ -51,16 +55,23 @@ const AvatarMenu: FC = () => {
       icon: <EnvelopeOpen color="white" weight="light" size={24} />,
       title: "Invite Your Friends",
       path: "/",
+      onClick: () => setShowInviteModal(true),
     },
     {
       icon: <Lifebuoy color="white" weight="light" size={24} />,
       title: "Help & Support",
-      path: "/",
+      path: "https://help.prometheusalts.com/hc/en-us",
     },
     {
       icon: <FileText color="white" weight="light" size={24} />,
       title: "Policies, Terms & Disclosures",
+      path: "https://prometheusalts.com/legals/disclosure-library",
+    },
+    {
+      icon: <SignOut color="white" weight="light" size={24} />,
+      title: "Sign Out",
       path: "/",
+      onClick: () => setShowLogoutModal(true),
     },
   ];
   if (account?.accreditation === "ACCREDITED") {
@@ -76,73 +87,88 @@ const AvatarMenu: FC = () => {
   }
 
   return (
-    <Popover as="div" className="relative">
-      <Popover.Button>
-        <div className="flex flex-row items-center cursor-pointer">
-          <div className="w-8 h-8 flex items-center justify-center">
-            <Avatar size={32} />
-          </div>
-          <div className="ml-2">
-            <CaretDown color="white" weight="bold" size={16} />
-          </div>
-        </div>
-      </Popover.Button>
-      <Transition
-        as={Fragment}
-        enter="transition ease-out duration-200"
-        enterFrom="opacity-0 translate-y-1"
-        enterTo="opacity-100 translate-y-0"
-        leave="transition ease-in duration-150"
-        leaveFrom="opacity-100 translate-y-0"
-        leaveTo="opacity-0 translate-y-1"
-      >
-        <Popover.Panel className="absolute right-0 w-64 mt-6 bg-surface-light10 shadow-md shadow-black rounded">
-          <div className="divide-y border-white/[.12] divide-inherit pb-2">
-            <Popover.Button>
-              <Link href={"/profile/me"}>
-                <a>
-                  <div className="flex flex-row items-center p-4">
-                    <Avatar size={64} src={account?.avatar} />
-                    <div className="text-left ml-3">
-                      <div className="text-xl text-white">
-                        {account?.firstName} {account?.lastName}
-                      </div>
-                      <div className="text-sm text-white opacity-60">
-                        See your profile
-                      </div>
-                    </div>
-                  </div>
-                </a>
-              </Link>
-            </Popover.Button>
-            {items.map((item, index) => (
-              <MenuItem
-                key={index}
-                icon={item.icon}
-                title={item.title}
-                path={item.path}
-              />
-            ))}
-            <div>
-              <a
-                className="cursor-pointer px-4 py-3 flex flex-row items-center"
-                onClick={() =>
-                  signOut({
-                    redirect: false,
-                    callbackUrl: process.env.NEXTAUTH_URL,
-                  })
-                }
-              >
-              <span className="flex-shrink-0 flex items-center">
-                <SignOut color="white" weight="light" size={24} />
-              </span>
-                <span className="text-sm normal text-white ml-4">Sign Out</span>
-              </a>
+    <>
+      <Popover as="div" className="relative">
+        <Popover.Button>
+          <div className="flex flex-row items-center cursor-pointer">
+            <div className="w-8 h-8 flex items-center justify-center">
+              <Avatar size={32} />
+            </div>
+            <div className="ml-2">
+              <CaretDown color="white" weight="bold" size={16} />
             </div>
           </div>
-        </Popover.Panel>
-      </Transition>
-    </Popover>
+        </Popover.Button>
+        <Transition
+          as={Fragment}
+          enter="transition ease-out duration-200"
+          enterFrom="opacity-0 translate-y-1"
+          enterTo="opacity-100 translate-y-0"
+          leave="transition ease-in duration-150"
+          leaveFrom="opacity-100 translate-y-0"
+          leaveTo="opacity-0 translate-y-1"
+        >
+          <Popover.Panel className="absolute right-0 w-64 mt-6 bg-surface-light10 shadow-md shadow-black rounded">
+            <div className="divide-y border-white/[.12] divide-inherit pb-2">
+              <Popover.Button>
+                <Link href={"/profile/me"}>
+                  <a>
+                    <div className="flex flex-row items-center p-4">
+                      <Avatar size={64} src={account?.avatar} />
+                      <div className="text-left ml-3">
+                        <div className="text-xl text-white">
+                          {account?.firstName} {account?.lastName}
+                        </div>
+                        <div className="text-sm text-white opacity-60">
+                          See your profile
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </Link>
+              </Popover.Button>
+              {items.map((item, index) => (
+                <MenuItem
+                  key={index}
+                  icon={item.icon}
+                  title={item.title}
+                  path={item.path}
+                  onClick={item.onClick}
+                />
+              ))}
+            </div>
+          </Popover.Panel>
+        </Transition>
+      </Popover>
+      <ModalDialog
+        title={"Are you sure to logout?"}
+        className="w-96 max-w-full"
+        show={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+      >
+        <>
+          <div className="flex items-center justify-between px-8 py-5">
+            <Button
+              variant="outline-primary"
+              className="w-24"
+              onClick={() => setShowLogoutModal(false)}
+            >
+              No
+            </Button>
+            <Button variant="primary" className="w-24" onClick={() => signOut()}>
+              Yes
+            </Button>
+          </div>
+        </>
+      </ModalDialog>
+      <ModalDialog
+        show={showInviteModal}
+        className="!rounded-2xl"
+        onClose={() => setShowInviteModal(false)}
+      >
+        <InviteFriends onClose={() => setShowInviteModal(false)} />
+      </ModalDialog>
+    </>
   );
 };
 

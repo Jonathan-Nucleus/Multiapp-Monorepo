@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import React, { FC, useState } from "react";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -9,6 +9,7 @@ import Button from "../../../common/Button";
 import InvitationCoin from "./InvitationCoin";
 import { useInvites, Invitee } from "mobile/src/graphql/query/account";
 import { INVITE_USER } from "mobile/src/graphql/mutation/account";
+import { X } from "phosphor-react";
 
 const MAX_INVITES = 5;
 const variants = ["primary", "error", "secondary", "info", "success"];
@@ -20,15 +21,17 @@ const schema = yup
   })
   .required();
 
-const InviteFriends: FC = () => {
+interface InviteFriendsProps {
+  onClose?: () => void;
+}
+
+const InviteFriends: FC<InviteFriendsProps> = ({ onClose }) => {
   const [loading, setLoading] = useState(false);
   const { data: accountData } = useInvites();
   const [inviteUser] = useMutation(INVITE_USER, {
     refetchQueries: ["Invites"],
   });
-  const { register, handleSubmit, formState, reset } = useForm<
-    yup.InferType<typeof schema>
-  >({
+  const { register, handleSubmit, formState, reset } = useForm<yup.InferType<typeof schema>>({
     resolver: yupResolver(schema),
     mode: "onChange",
   });
@@ -53,8 +56,21 @@ const InviteFriends: FC = () => {
 
   return (
     <Card className="p-0">
-      <div className="text-white border-b border-white/[.12] p-4">
-        Invite Your Friends
+      <div className="flex items-center border-b border-white/[.12] p-4">
+        <div className="text-white">
+          Invite Your Friends
+        </div>
+        {onClose &&
+          <div className="flex ml-auto">
+            <Button
+              variant="text"
+              className="opacity-60 py-0"
+              onClick={onClose}
+            >
+              <X color="white" weight="bold" size={24} />
+            </Button>
+          </div>
+        }
       </div>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="p-4">
@@ -92,7 +108,7 @@ const InviteFriends: FC = () => {
             loading={loading}
             className="w-24"
           >
-            INVITE
+            Invite
           </Button>
         </div>
       </form>

@@ -3,13 +3,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { Share, Star } from "phosphor-react";
 import { useAccount } from "mobile/src/graphql/query/account";
-import { useWatchFund } from "mobile/src/graphql/mutation/funds";
+import { useWatchFund } from "mobile/src/graphql/mutation/funds/useWatchFund";
 import { useFollowUser } from "mobile/src/graphql/mutation/account";
 import { Fund } from "mobile/src/graphql/query/marketplace/useFunds";
 import Avatar from "desktop/app/components/common/Avatar";
 import Button from "desktop/app/components/common/Button";
 import Card from "desktop/app/components/common/Card";
-import { PINK } from "shared/src/colors";
 
 export interface FundCardProps {
   fund: Fund;
@@ -22,21 +21,14 @@ const FundCard: FC<FundCardProps> = ({
 }: FundCardProps) => {
   const { data: { account } = {} } = useAccount();
   const [followUser] = useFollowUser();
-  const [watchFund] = useWatchFund();
-  const isFollower = account?.followingIds?.includes(fund.manager._id) ?? false;
-  const isWatching = account?.watchlistIds?.includes(fund._id) ?? false;
-  const toggleFollowingUser = async (id: string, follow: boolean) => {
+  const { isWatching, toggleWatch } = useWatchFund(fund._id);
+  const isFollowing =
+    account?.followingIds?.includes(fund.manager._id) ?? false;
+  const isMyFund = account?._id == fund.manager._id;
+  const toggleFollowingUser = async (userId: string) => {
     try {
       await followUser({
-        variables: { follow: follow, userId: id },
-        refetchQueries: ["Account"],
-      });
-    } catch (err) {}
-  };
-  const toggleWatchFund = async (id: string, watch: boolean) => {
-    try {
-      await watchFund({
-        variables: { watch, fundId: id },
+        variables: { follow: !isFollowing, userId },
         refetchQueries: ["Account"],
       });
     } catch (err) {}
@@ -137,23 +129,23 @@ const FundCard: FC<FundCardProps> = ({
               {fund.manager.postIds?.length ?? 0} Posts
             </div>
             <div className="text-center min-h-0 flex-grow mb-2">
-              <Button
-                variant="text"
-                className="text-sm text-primary tracking-normal font-normal"
-                onClick={() =>
-                  toggleFollowingUser(fund.manager._id, !isFollower)
-                }
-              >
-                {isFollower ? "UNFOLLOW" : "FOLLOW"}
-              </Button>
+              <div className={isMyFund ? "invisible" : ""}>
+                <Button
+                  variant="text"
+                  className="text-sm text-primary tracking-normal font-normal"
+                  onClick={() => toggleFollowingUser(fund.manager._id)}
+                >
+                  {isFollowing ? "Unfollow" : "Follow"}
+                </Button>
+              </div>
             </div>
             <Link href={`/funds/${fund._id}`}>
               <a>
                 <Button
                   variant="gradient-primary"
-                  className="w-full text-sm uppercase font-medium"
+                  className="w-full text-sm font-medium"
                 >
-                  view fund details
+                  View Fund Details
                 </Button>
               </a>
             </Link>
@@ -191,13 +183,10 @@ const FundCard: FC<FundCardProps> = ({
               <Button variant="text">
                 <Share color="white" weight="light" size={20} />
               </Button>
-              <Button
-                variant="text"
-                className="ml-2"
-                onClick={() => toggleWatchFund(fund._id, !isWatching)}
-              >
+              <Button variant="text" className="ml-2" onClick={toggleWatch}>
                 <Star
-                  color={isWatching ? PINK : "white"}
+                  className={isWatching ? "text-primary-medium" : "text-white"}
+                  color="currentColor"
                   weight={isWatching ? "fill" : "light"}
                   size={20}
                 />
@@ -271,17 +260,21 @@ const FundCard: FC<FundCardProps> = ({
               </div>
               <div className="ml-3">
                 <div className="text-sm text-white flex items-center">
-                  {fund.manager.firstName} {fund.manager.lastName}
-                  <span className="mx-1">•</span>
-                  <Button
-                    variant="text"
-                    className="text-primary text-xs tracking-normal font-normal py-0"
-                    onClick={() =>
-                      toggleFollowingUser(fund.manager._id, !isFollower)
-                    }
-                  >
-                    {isFollower ? "UNFOLLOW" : "FOLLOW"}
-                  </Button>
+                  <div>
+                    {fund.manager.firstName} {fund.manager.lastName}
+                  </div>
+                  {!isMyFund && (
+                    <div className="flex items-center">
+                      <span className="mx-1">•</span>
+                      <Button
+                        variant="text"
+                        className="text-primary text-xs tracking-normal font-normal py-0"
+                        onClick={() => toggleFollowingUser(fund.manager._id)}
+                      >
+                        {isFollowing ? "Unfollow" : "Follow"}
+                      </Button>
+                    </div>
+                  )}
                 </div>
                 <div className="text-xs text-white opacity-60">
                   {fund.manager.followerIds?.length ?? 0} Followers
@@ -310,9 +303,9 @@ const FundCard: FC<FundCardProps> = ({
           <div className="flex items-center px-4 py-3">
             <Button
               variant="gradient-primary"
-              className="flex-grow text-sm uppercase font-medium"
+              className="flex-grow text-sm font-medium"
             >
-              view fund details
+              View Fund Details
             </Button>
             <Button variant="text" className="ml-3">
               <Star

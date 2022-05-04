@@ -26,20 +26,20 @@ const ManagersTable: FC = () => {
         <div className="border-white/[.12] lg:divide-y divide-inherit">
           <header className="hidden lg:grid grid-cols-4 py-2">
             <div className="flex items-center">
-              <div className="text-xs text-white font-bold">MANAGER NAME</div>
+              <div className="text-tiny text-white font-bold">Manager Name</div>
               <Button variant="text" className="text-white ml-2 py-0">
                 <SortAscending color="currentColor" weight="bold" size={16} />
               </Button>
             </div>
             <div className="flex items-center px-1">
-              <div className="text-xs text-white font-medium">COMPANY</div>
+              <div className="text-tiny text-white font-medium">Company</div>
               <Button variant="text" className="hidden text-white ml-2 py-0">
                 <SortAscending color="currentColor" weight="bold" size={16} />
               </Button>
             </div>
             <div className="flex items-center px-1">
-              <div className="text-xs text-white font-medium">
-                FUNDS MANAGED
+              <div className="text-tiny text-white font-medium">
+                Funds Managed
               </div>
               <Button variant="text" className="hidden text-white ml-2 py-0">
                 <SortAscending color="currentColor" weight="bold" size={16} />

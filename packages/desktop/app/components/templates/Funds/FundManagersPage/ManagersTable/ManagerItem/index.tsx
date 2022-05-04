@@ -87,7 +87,7 @@ const ManagerItem: FC<ManagerItemProps> = ({
               className="text-sm text-primary font-medium tracking-normal py-0"
               onClick={toggleFollowUser}
             >
-              {isFollowing ? "UNFOLLOW" : "FOLLOW"}
+              {isFollowing ? "Unfollow" : "Follow"}
             </Button>
           }
           <Link href={isMyProfile ? "/profile/me" : `/profile/${manager._id}`}>
@@ -96,7 +96,7 @@ const ManagerItem: FC<ManagerItemProps> = ({
                 variant="outline-primary"
                 className="text-sm text-white tracking-normal ml-4"
               >
-                VIEW PROFILE
+                View Profile
               </Button>
             </a>
           </Link>

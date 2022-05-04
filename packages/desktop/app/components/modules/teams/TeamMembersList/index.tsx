@@ -25,7 +25,7 @@ const TeamMembersList: FC<TeamMembersListProps> = ({ members, showChat }: TeamMe
             className="text-primary tracking-widest font-semibold py-0"
             onClick={() => setShowModal(true)}
           >
-            VIEW ALL
+            View All
           </Button>
         </div>
       </div>

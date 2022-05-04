@@ -48,7 +48,7 @@ const ModalDialog: FC<ModalDialogProps> = ({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className={className ?? "bg-background-card max-w-md rounded"}>
+              <Dialog.Panel className={"bg-background-card max-w-md rounded " + (className ?? "")}>
                 {title &&
                   <Dialog.Title className="flex items-center border-b border-white/[.12] px-5 py-3">
                     <div className="text-xl font-medium">

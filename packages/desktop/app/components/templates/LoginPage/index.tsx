@@ -77,8 +77,8 @@ const LoginPage: FC<LoginPageProps> = ({ providers }: LoginPageProps) => {
         <div className="mt-4">
           <span className="text-white text-sm col-auto">New here?</span>
           <Link href="/invite-code">
-            <a className="uppercase text-primary text-sm font-bold ml-4">
-              sign up with code
+            <a className="text-primary text-sm font-bold ml-4">
+              Sign up with Code
             </a>
           </Link>
         </div>
@@ -131,14 +131,14 @@ const LoginPage: FC<LoginPageProps> = ({ providers }: LoginPageProps) => {
             <Button
               type="submit"
               variant="gradient-primary"
-              className="w-full uppercase leading-6"
+              className="w-full leading-6"
               disabled={!isValid}
               loading={loading}
             >
-              Log in
+              Log In
             </Button>
           </div>
-          <div className="mt-12 text-center text-white">OR, LOG IN WITH</div>
+          <div className="mt-12 text-center text-white">Or, Log In with</div>
         </form>
       </div>
       <div className="container mx-auto mt-8 max-w-lg">
@@ -152,8 +152,8 @@ const LoginPage: FC<LoginPageProps> = ({ providers }: LoginPageProps) => {
                 onClick={() => signIn(provider)}
               >
                 {PROVIDER_ICONS[provider]}
-                <span className="ml-2 hidden md:inline-block">
-                  {provider.toUpperCase()}
+                <span className="ml-2 capitalize hidden md:inline-block">
+                  {provider}
                 </span>
               </Button>
             ),
@@ -163,7 +163,7 @@ const LoginPage: FC<LoginPageProps> = ({ providers }: LoginPageProps) => {
             className="w-12 h-12 md:w-full md:h-auto rounded-lg md:rounded-full border border-gray-400 md:border-primary"
           >
             {PROVIDER_ICONS["apple"]}
-            <span className="ml-2 hidden md:inline-block">APPLE</span>
+            <span className="ml-2 hidden md:inline-block">Apple</span>
           </Button>
         </div>
       </div>

@@ -62,8 +62,8 @@ const ForgotPasswordPage: FC = () => {
           onClick={() => router.replace(AppAuthOptions.pages?.signIn!!)}
         >
           <ArrowLeft size={32} weight="light" color="currentColor" />
-          <span className="uppercase ml-3">
-            Back to login
+          <span className="ml-3">
+            Back to Login
           </span>
         </Button>
         <h1 className="text-white text-2xl mt-6">Reset Password</h1>
@@ -85,7 +85,7 @@ const ForgotPasswordPage: FC = () => {
                 disabled={!isValid}
                 loading={loading}
               >
-                SEND EMAIL
+                Send Email
               </Button>
             </div>
           </form>

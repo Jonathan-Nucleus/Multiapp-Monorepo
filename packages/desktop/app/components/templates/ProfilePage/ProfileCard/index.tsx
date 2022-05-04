@@ -154,7 +154,7 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
                         className="w-40 text-sm font-medium"
                         onClick={toggleFollowing}
                       >
-                        {isFollowing ? "UNFOLLOW" : "FOLLOW"}
+                        {isFollowing ? "Unfollow" : "Follow"}
                       </Button>
                     </div>
                   </>
@@ -323,7 +323,7 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
                   className="w-full text-sm font-medium"
                   onClick={toggleFollowing}
                 >
-                  {isFollowing ? "UNFOLLOW" : "FOLLOW"}
+                  {isFollowing ? "Unfollow" : "Follow"}
                 </Button>
               </div>
             )}

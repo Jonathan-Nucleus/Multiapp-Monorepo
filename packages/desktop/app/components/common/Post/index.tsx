@@ -129,7 +129,7 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
                       className="text-tiny text-primary tracking-wider font-medium py-0"
                       onClick={() => toggleFollowingUser()}
                     >
-                      {isFollowingUser ? "UNFOLLOW" : "FOLLOW"}
+                      {isFollowingUser ? "Unfollow" : "Follow"}
                     </Button>
                   </div>
                 </div>
