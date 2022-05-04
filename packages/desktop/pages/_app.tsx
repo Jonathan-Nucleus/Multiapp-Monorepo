@@ -1,4 +1,5 @@
 import "../app/styles/app.scss";
+import type { GetServerSideProps } from "next";
 import type { AppProps } from "next/app";
 
 import RootLayout from "../app/components/layouts/index";
@@ -6,6 +7,7 @@ import SecureApolloProvider from "../app/components/providers/SecureApolloProvid
 import { ThemeProvider } from "next-themes";
 import { SessionProvider } from "next-auth/react";
 import { NextPageWithLayout } from "../app/types/next-page";
+
 import { initializeDatadogRum } from "../app/lib/datadog";
 initializeDatadogRum();
 
@@ -17,7 +19,6 @@ function MyApp({
   Component,
   pageProps: { session, ...pageProps },
 }: AppPropsWithLayout) {
-  console.log("KEY", process.env.NEXT_PUBLIC_DATADOG_RUM_APPLICATION_ID);
   return (
     <SessionProvider session={session}>
       <SecureApolloProvider apolloProps={pageProps}>
@@ -33,5 +34,13 @@ function MyApp({
     </SessionProvider>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  // Prevent static page optimization to enable runtime use of Datadog
+  // application key from local environment
+  return {
+    props: {},
+  };
+};
 
 export default MyApp;
