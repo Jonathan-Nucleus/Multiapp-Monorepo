@@ -19,13 +19,7 @@ import IconButton from '../common/IconButton';
 import UserInfo from '../common/UserInfo';
 import Tag from '../common/Tag';
 import Media from '../common/Media';
-import {
-  PRIMARYSTATE,
-  WHITE12,
-  WHITE60,
-  WHITE,
-  BLACK,
-} from 'shared/src/colors';
+import { PRIMARYSTATE, WHITE12, WHITE60, BLACK } from 'shared/src/colors';
 import { Body1, Body2Bold, Body3 } from '../../theme/fonts';
 import * as NavigationService from '../../services/navigation/NavigationService';
 import { Post } from 'mobile/src/graphql/query/post/usePosts';
@@ -112,7 +106,7 @@ const PostItem: React.FC<PostItemProps> = ({ post, userId, onPressMenu }) => {
           <TouchableOpacity
             style={styles.menuContainer}
             onPress={() => onPressMenu?.()}>
-            <DotsThreeVertical size={24} color={WHITE} />
+            <DotsThreeVertical size={24} color={WHITE60} weight="bold" />
           </TouchableOpacity>
         </View>
         <View style={styles.contentPadding}>
@@ -213,10 +207,9 @@ const styles = StyleSheet.create({
   headerWrapper: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingTop: 4,
   },
   menuContainer: {
-    marginTop: 12,
+    marginTop: 16,
   },
   contentPadding: {
     paddingHorizontal: 16,
@@ -230,6 +223,7 @@ const styles = StyleSheet.create({
   },
   previewTextContainer: {
     marginHorizontal: 5,
+    marginTop: 0,
   },
   previewImage: {
     width: appWidth - 36,
@@ -261,6 +255,7 @@ const styles = StyleSheet.create({
   tagStyle: {
     marginRight: 8,
     marginBottom: 8,
+    backgroundColor: WHITE12,
   },
   otherInfo: {
     flexDirection: 'row',

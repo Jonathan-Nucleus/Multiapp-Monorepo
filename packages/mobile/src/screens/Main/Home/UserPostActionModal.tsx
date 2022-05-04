@@ -57,7 +57,7 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
     () => [
       {
         label: `Follow ${user.firstName} ${user.lastName}`,
-        icon: <UserCirclePlus size={32} color={WHITE} />,
+        icon: <UserCirclePlus size={26} color={WHITE} />,
         key: 'follow' as const,
       },
       isMuted
@@ -83,7 +83,7 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
       },
       {
         label: `Hide ${user.firstName} ${user?.lastName}`,
-        icon: <EyeClosed size={32} color={WHITE} />,
+        icon: <EyeClosed size={26} color={WHITE} />,
         key: 'hide' as const,
       },
     ],

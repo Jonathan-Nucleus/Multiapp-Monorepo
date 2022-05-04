@@ -1,16 +1,9 @@
 import React, { useState } from 'react';
-import {
-  StyleSheet,
-  TouchableOpacity,
-  Text,
-  View,
-  ImageURISource,
-  Dimensions,
-} from 'react-native';
+import { StyleSheet, TouchableOpacity, Text, View } from 'react-native';
 
 import Avatar from './Avatar';
 import PLabel from './PLabel';
-import { Body1Bold, Body3, Body4Bold } from '../../theme/fonts';
+import { Body1Bold, Body3, Body3Bold, Body4Bold } from '../../theme/fonts';
 import { WHITE60, PRIMARY, GRAY100 } from 'shared/src/colors';
 import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 
@@ -125,12 +118,12 @@ const styles = StyleSheet.create({
   },
   proWrapper: {
     flexDirection: 'row',
-    marginLeft: 8,
+    marginLeft: 4,
     alignItems: 'center',
   },
   proLabel: {
-    marginLeft: 8,
-    ...Body3,
+    marginLeft: 4,
+    ...Body3Bold,
   },
   smallLabel: {
     ...Body3,
