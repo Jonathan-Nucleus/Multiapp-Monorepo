@@ -17,6 +17,7 @@ function MyApp({
   Component,
   pageProps: { session, ...pageProps },
 }: AppPropsWithLayout) {
+  console.log("KEY", process.env.NEXT_PUBLIC_DATADOG_RUM_APPLICATION_ID);
   return (
     <SessionProvider session={session}>
       <SecureApolloProvider apolloProps={pageProps}>
