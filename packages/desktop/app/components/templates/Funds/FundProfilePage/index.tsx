@@ -12,6 +12,7 @@ import TeamMembersList from "../../../modules/teams/TeamMembersList";
 import { useAccount } from "mobile/src/graphql/query/account";
 import { useFund } from "mobile/src/graphql/query/marketplace/useFund";
 import { useWatchFund } from "mobile/src/graphql/mutation/funds/useWatchFund";
+import SkeletonFundProfilePage from "../../Skeleton/Funds/FundProfilePage";
 
 const fundData = {
   mtd: "3.2%",
@@ -126,9 +127,14 @@ interface FundProfileProps {
 }
 
 const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
-  const { data: { fund } = {} } = useFund(fundId);
-  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
+  const { data } = useFund(fundId);
   const { isWatching, toggleWatch } = useWatchFund(fundId);
+  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
+
+  const fund = data?.fund;
+  if (!fund) {
+    return <SkeletonFundProfilePage />;
+  }
 
   const { background: companyBackground, avatar: companyAvatar } =
     fund?.company ?? {};

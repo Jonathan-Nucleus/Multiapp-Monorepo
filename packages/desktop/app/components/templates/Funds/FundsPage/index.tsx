@@ -6,12 +6,18 @@ import { useFunds } from "mobile/src/graphql/query/marketplace/useFunds";
 import FundsList from "./FundsList";
 import { useAccount } from "mobile/src/graphql/query/account";
 import AccreditationQuestionnaire from "../AccreditationQuestionnaire";
+import SkeletonFundsPage from "../../Skeleton/Funds";
 
 const FundsPage: FC = () => {
   const { data } = useFunds();
   const [isVerifying, setIsVerifying] = useState(false);
-  const funds = data?.funds ?? [];
+  const funds = data?.funds;
   const { data: accountData } = useAccount();
+
+  if (!funds) {
+    return <SkeletonFundsPage />;
+  }
+
   return (
     <>
       <Navbar />
@@ -43,12 +49,12 @@ const FundsPage: FC = () => {
                   <span className="ml-2">VERIFY ACCREDITATION STATUS</span>
                 </Button>
               </div>
-              {isVerifying &&
+              {isVerifying && (
                 <AccreditationQuestionnaire
                   show={isVerifying}
                   onClose={() => setIsVerifying(false)}
                 />
-              }
+              )}
             </div>
           ) : (
             <>{funds.length > 0 && <FundsList funds={funds} />}</>

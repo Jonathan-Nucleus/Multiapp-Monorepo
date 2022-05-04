@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useProfile } from "mobile/src/graphql/query/user/useProfile";
 import ProfilePage from "../../app/components/templates/ProfilePage";
 import { NextPageWithLayout } from "../../app/types/next-page";
+import SkeletonProfilePage from "../../app/components/templates/Skeleton/Profile";
 
 const Profile: NextPageWithLayout = () => {
   const router = useRouter();
@@ -15,7 +16,7 @@ const Profile: NextPageWithLayout = () => {
   );
 
   const user = profileData?.userProfile;
-  if (!user) return null;
+  if (!user) return <SkeletonProfilePage />;
 
   const title =
     userId === "me"

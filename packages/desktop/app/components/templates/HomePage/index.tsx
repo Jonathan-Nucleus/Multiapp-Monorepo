@@ -12,6 +12,7 @@ import ProfileCardSmall from "../../modules/users/ProfileCardSmall";
 import { useProfessionals } from "mobile/src/graphql/query/user/useProfessionals";
 import EditPostModal from "../../modules/posts/EditPostModal";
 import { PostSummary } from "mobile/src/graphql/fragments/post";
+import SkeletonHomePage from "../Skeleton/HomePage";
 
 const HomePage: FC = () => {
   const [showPostModal, setShowPostModal] = useState(false);
@@ -19,10 +20,12 @@ const HomePage: FC = () => {
   const { data: professionalsData } = useProfessionals(true);
   const user = accountData?.account;
   const professionals = professionalsData?.professionals ?? [];
-  const [selectedPost, setSelectedPost] = useState<PostSummary | undefined>(undefined);
+  const [selectedPost, setSelectedPost] = useState<PostSummary | undefined>(
+    undefined
+  );
 
   if (!user) {
-    return <></>;
+    return <SkeletonHomePage />;
   }
 
   return (
@@ -77,13 +80,13 @@ const HomePage: FC = () => {
           </Button>
         </div>
       </div>
-      {showPostModal &&
+      {showPostModal && (
         <EditPostModal
           post={selectedPost}
           show={showPostModal}
           onClose={() => setShowPostModal(false)}
         />
-      }
+      )}
     </>
   );
 };
