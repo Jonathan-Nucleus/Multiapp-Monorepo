@@ -120,7 +120,7 @@ const createNotificationsCollection = (
         throw new InternalServerError("Not able to read notification.");
       }
 
-      if (!result.matchedCount) {
+      if (notificationId && !result.matchedCount) {
         throw new NotFoundError("Notification");
       }
 

@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "e51c092e-9774-4a17-a93a-934e3da708d9",
+		"_postman_id": "920e2456-2e67-42f0-b97d-405fd07eb98f",
 		"name": "Prometheus API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -146,6 +146,42 @@
 					"response": []
 				},
 				{
+					"name": "Notifications",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjZlZjM0MzhjMDRiNzNlMTc1MjkzZDUiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NTE2ODc2MTB9.5_yIxDBcxHjMg7PdHCvbYujPmRg44H5ovB78mtDFW-g",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query Notifications {\n    notifications {\n        _id\n        type\n        title\n        body\n        isNew\n        data {\n            userId\n        }\n        user {\n            _id\n            firstName\n            lastName\n        }\n    }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Fund",
 					"request": {
 						"auth": {
@@ -273,6 +309,78 @@
 							"graphql": {
 								"query": "query Professionals($featured: Boolean) {\n  professionals(featured: $featured) {\n    _id\n    firstName\n    lastName\n    avatar\n  }\n}",
 								"variables": "{\n    \"featured\": true\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mention Users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4YTZjMjg5ZTAxN2YzYmVjNjUxNDciLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk5NzcxMDR9.2lITm_YcEXUwbojZUPnkJSNyN-mm2-0v4Jdao544nDc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MentionUsers($search: String) {\n    mentionUsers(search: $search) {\n        _id\n        firstName\n        lastName\n    }\n}",
+								"variables": "{\n    \"search\": \"a\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Global Search",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4YTZjMjg5ZTAxN2YzYmVjNjUxNDciLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk5NzcxMDR9.2lITm_YcEXUwbojZUPnkJSNyN-mm2-0v4Jdao544nDc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GlobalSearch($search: String) {\n    globalSearch(search: $search) {\n        users {\n            _id\n            firstName\n            lastName\n        }\n        companies {\n            _id\n            name\n        }\n        posts {\n            _id\n            body\n        }\n        funds {\n            _id\n            name\n        }\n    }\n}",
+								"variables": "{\n    \"search\": \"a\"\n}"
 							}
 						},
 						"url": {
@@ -678,6 +786,222 @@
 							"response": []
 						},
 						{
+							"name": "Delete Account",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjUwNjUzNGIwYzA0NjI4NDhlM2U5MmEiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk0MzY4NDh9.aj-aOShwh7CtREU0uHpxDnNzqypxCORea4QodaaTgVU",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation DeleteAccount {\n    deleteAccount\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Help Request (Email)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjUwNjUzNGIwYzA0NjI4NDhlM2U5MmEiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk0MzY4NDh9.aj-aOShwh7CtREU0uHpxDnNzqypxCORea4QodaaTgVU",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation HelpRequest($request: HelpRequestInput!) {\n    helpRequest(request: $request)\n}",
+										"variables": "{\n    \"request\": {\n        \"type\": \"EMAIL\",\n        \"email\": \"Alessandro73@gmail.com\",\n        \"fundId\": \"6272c45c3bf185f6f613572c\",\n        \"message\": \"Accusamus et porro architecto dolores ea ratione dolorem quos.\"\n    }\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Help Request (Phone)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjUwNjUzNGIwYzA0NjI4NDhlM2U5MmEiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk0MzY4NDh9.aj-aOShwh7CtREU0uHpxDnNzqypxCORea4QodaaTgVU",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation HelpRequest($request: HelpRequestInput!) {\n    helpRequest(request: $request)\n}",
+										"variables": "{\n    \"request\": {\n        \"type\": \"PHONE\",\n        \"phone\": \"453.861.6947\",\n        \"fundId\": \"6272c45c3bf185f6f613572c\",\n        \"preferredTimeOfDay\": \"MORNING\",\n        \"message\": \"Et optio ipsum fuga quo.\"\n    }\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update FCM Token",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjUwNjUzNGIwYzA0NjI4NDhlM2U5MmEiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk0MzY4NDh9.aj-aOShwh7CtREU0uHpxDnNzqypxCORea4QodaaTgVU",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation UpdateFcmToken($fcmToken: String!) {\n    updateFcmToken(fcmToken: $fcmToken)\n}",
+										"variables": "{\n  \"fcmToken\": \"fcmToken\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Read All Notification",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjZlZjM0MzhjMDRiNzNlMTc1MjkzZDUiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NTE2ODgxMDN9.KvWOBq5bEocNlZfyLjJlbaD7UOA7v9DmFiouxJLM9F0",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation readNotification {\n    readNotification\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Read One Notification",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjZlZjM0MzhjMDRiNzNlMTc1MjkzZDUiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NTE2ODgxMDN9.KvWOBq5bEocNlZfyLjJlbaD7UOA7v9DmFiouxJLM9F0",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation readNotification($notificationId: ID) {\n    readNotification(notificationId: $notificationId)\n}",
+										"variables": "{\n  \"notificationId\": \"6258c7d5a3382b28c7ae29d3\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "Hide User",
 							"request": {
 								"auth": {
@@ -990,6 +1314,42 @@
 									"graphql": {
 										"query": "mutation CreatePost($post: PostInput!) {\n  createPost(post: $post) {\n      _id\n      body\n      mediaUrl\n      likeIds\n      commentIds\n      createdAt\n      categories\n  }\n}",
 										"variables": "{\n     \"post\": {\n        \"categories\": [\n            \"NEWS\",\n            \"POLITICS\"\n        ],\n        \"audience\": \"EVERYONE\",\n        \"body\": \"This is my post\",\n        \"mediaUrl\": \"https://www.postmedia.com/this/is/my/image/or/video\",\n        \"mentionIds\": [\n          \"624f1a2eed55addaea6b4499\", \n          \"624f1a2eed55addaea6b4498\"\n        ]\n  }\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:4000/",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "4000",
+									"path": [
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Edit Post",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjcyYzViOGQ4MmUxZDhjYzk1YzNiZjgiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NTE2ODg5MDd9.BD3cBepN5BpFEMU9kMM79BIaZLfNmiBpxKLPpbiCN8c",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "mutation EditPost($post: PostUpdate!) {\n    editPost(post: $post) {\n        _id\n        audience\n        body\n        mediaUrl\n        categories\n        mentionIds\n        updatedAt\n    }\n}",
+										"variables": "{\n    \"post\": {\n        \"_id\": \"6272c5b9d82e1d8cc95c3c02\",\n        \"categories\": [\n            \"NEWS\",\n            \"POLITICS\"\n        ],\n        \"audience\": \"EVERYONE\",\n        \"body\": \"This is my post\"\n    }\n}"
 									}
 								},
 								"url": {
