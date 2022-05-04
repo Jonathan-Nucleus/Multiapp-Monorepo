@@ -1,18 +1,16 @@
 import React, { useContext } from "react";
-import { Attachment, logChatPromiseExecution, UserResponse } from "stream-chat";
+import { logChatPromiseExecution } from "stream-chat";
 import {
   MessageList,
   MessageInput,
   MessageInputProps,
   Window,
-  StreamMessage,
   useChannelActionContext,
-  useChannelStateContext,
 } from "stream-chat-react";
 
 import PChannelHeader from "./PChannelHeader";
-import MessagingInput from "../MessagingInput";
-import Message from "../Message";
+import PMessageList from "./PMessageList";
+import PMessagingInput from "./PMessageInput";
 import { GiphyContext, StreamType } from "../types";
 
 export type PChannelProps = {
@@ -22,8 +20,6 @@ export type PChannelProps = {
 export const PChannel: React.FC<PChannelProps> = (props) => {
   const { toggleMobile } = props;
   const { giphyState, setGiphyState } = useContext(GiphyContext);
-
-  const { channel } = useChannelStateContext<StreamType>();
   const { sendMessage } = useChannelActionContext<StreamType>();
 
   const overrideSubmitHandler: MessageInputProps["overrideSubmitHandler"] = (
@@ -68,9 +64,9 @@ export const PChannel: React.FC<PChannelProps> = (props) => {
   return (
     <Window>
       <PChannelHeader toggleMobile={toggleMobile} />
-      <MessageList messageActions={actions} Message={Message} />
+      <PMessageList />
       <MessageInput
-        Input={MessagingInput}
+        Input={PMessagingInput}
         overrideSubmitHandler={overrideSubmitHandler}
         focus
       />

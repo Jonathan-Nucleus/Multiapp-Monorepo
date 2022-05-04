@@ -1,23 +1,33 @@
 import { FC } from "react";
 import { Channel, ChannelMemberResponse, User } from "stream-chat";
 import { Avatar } from "stream-chat-react";
-
-import { getCleanImage } from "../Icons";
+import { Circle } from "phosphor-react";
 
 interface Member {
   name?: string;
   image?: string;
+  online?: boolean;
 }
 
 interface AvatarGroupProps {
   members: Member[];
+  size?: number;
 }
 
-const AvatarGroup: FC<AvatarGroupProps> = ({ members }) => {
+const AvatarGroup: FC<AvatarGroupProps> = ({ members, size = 48 }) => {
   switch (members.length) {
     case 1:
       return (
-        <Avatar image={members[0].image} name={members[0].name} size={40} />
+        <div className="relative">
+          <Avatar image={members[0].image} name={members[0].name} size={size} />
+          <div className="absolute bottom-0 right-[8px]">
+            {members[0].online ? (
+              <Circle weight="fill" size="16" color="#55C090" />
+            ) : (
+              <Circle weight="fill" size="16" color="#CD403A" />
+            )}
+          </div>
+        </div>        
       );
 
     case 2:
@@ -28,7 +38,7 @@ const AvatarGroup: FC<AvatarGroupProps> = ({ members }) => {
               image={members[0].image}
               name={members[0].name}
               shape="square"
-              size={40}
+              size={size}
             />
           </span>
           <span>
@@ -36,7 +46,7 @@ const AvatarGroup: FC<AvatarGroupProps> = ({ members }) => {
               image={members[1].image}
               name={members[1].name}
               shape="square"
-              size={40}
+              size={size}
             />
           </span>
         </div>
@@ -50,7 +60,7 @@ const AvatarGroup: FC<AvatarGroupProps> = ({ members }) => {
               image={members[0].image}
               name={members[0].name}
               shape="square"
-              size={40}
+              size={size}
             />
           </span>
           <span>
@@ -58,13 +68,13 @@ const AvatarGroup: FC<AvatarGroupProps> = ({ members }) => {
               image={members[1].image}
               name={members[1].name}
               shape="square"
-              size={20}
+              size={size / 2}
             />
             <Avatar
               image={members[2].image}
               name={members[2].name}
               shape="square"
-              size={20}
+              size={size / 2}
             />
           </span>
         </div>
@@ -78,13 +88,13 @@ const AvatarGroup: FC<AvatarGroupProps> = ({ members }) => {
               image={members[members.length - 1].image}
               name={members[members.length - 1].name}
               shape="square"
-              size={20}
+              size={size / 2}
             />
             <Avatar
               image={members[members.length - 2].image}
               name={members[members.length - 2].name}
               shape="square"
-              size={20}
+              size={size / 2}
             />
           </span>
           <span>
@@ -92,13 +102,13 @@ const AvatarGroup: FC<AvatarGroupProps> = ({ members }) => {
               image={members[members.length - 3].image}
               name={members[members.length - 3].name}
               shape="square"
-              size={20}
+              size={size / 2}
             />
             <Avatar
               image={members[members.length - 4].image}
               name={members[members.length - 4].name}
               shape="square"
-              size={20}
+              size={size / 2}
             />
           </span>
         </div>

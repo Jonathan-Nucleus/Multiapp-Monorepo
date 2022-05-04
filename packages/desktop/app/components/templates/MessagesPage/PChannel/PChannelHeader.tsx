@@ -1,13 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useChannelStateContext, useChatContext } from "stream-chat-react";
-import { ChannelMemberResponse } from "stream-chat";
 
 import { TypingIndicator } from "../TypingIndicator";
-import { ChannelType, StreamType } from "../types";
 import Input from "../../../common/Input";
 import AvatarGroup from "../AvatarGroup";
-import { ArrowLeft } from 'phosphor-react';
-import { ChannelInfoIcon, ChannelSaveIcon, getCleanImage } from "../Icons";
+import { ArrowLeft, CheckCircle, DotsThreeOutlineVertical } from "phosphor-react";
 
 type Props = {
   toggleMobile?: () => void;
@@ -72,7 +69,7 @@ const PChannelHeader: React.FC<Props> = (props) => {
     >
       <Input
         autoFocus
-        className="channel-header__edit-input"
+        className="h-12"
         onBlur={updateChannel}
         onChange={(event) => setChannelName(event.currentTarget.value)}
         placeholder="Type a new name for the chat"
@@ -86,23 +83,23 @@ const PChannelHeader: React.FC<Props> = (props) => {
     <div className="px-4 py-4 flex justify-between items-center border-b border-white/[.15]">
       <div className="flex items-center">
         <div className="mobile-nav-icon cursor-pointer mr-2" onClick={toggleMobile}>
-          <ArrowLeft size="25" />
+          <ArrowLeft size="32" />
         </div>
         <AvatarGroup members={avatarInfo} />
         {!isEditing ? (
-          <div className="channel-header__name text-white ml-1">
+          <div className="text-white ml-1">
             {channelName || title}
           </div>
         ) : (
           <EditHeader />
         )}
       </div>
-      <div className="messaging__channel-header__right">
+      <div className="flex items-center">
         <TypingIndicator />
         {!isEditing ? (
-          <ChannelInfoIcon {...{ isEditing, setIsEditing }} />
+          <DotsThreeOutlineVertical className="cursor-pointer" size="24" onClick={() => setIsEditing(true)} />
         ) : (
-          <ChannelSaveIcon />
+          <CheckCircle className="cursor-pointer" size="32" />
         )}
       </div>
     </div>

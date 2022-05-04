@@ -2,9 +2,7 @@ import React, { useRef } from "react";
 import { Avatar, useMessageContext, useChatContext } from "stream-chat-react";
 import dayjs from "dayjs";
 
-import styles from "./message.module.scss";
-
-export const Message = () => {
+export const PSimpleMessage = () => {
   const { message } = useMessageContext();
   const { client } = useChatContext();
 
@@ -38,4 +36,4 @@ export const Message = () => {
   );
 };
 
-export default Message;
+export default PSimpleMessage;

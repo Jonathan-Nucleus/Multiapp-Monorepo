@@ -7,7 +7,9 @@ export type CommandType = LiteralStringForUnion;
 export type EventType = {};
 export type MessageType = {};
 export type ReactionType = {};
-export type UserType = {};
+export type UserType = {
+  image?: string;
+};
 
 export type StreamType = {
   attachmentType: AttachmentType;

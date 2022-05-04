@@ -116,7 +116,7 @@ const MessagesPage = () => {
 
   return (
     <Chat client={chatClient.current} theme="prometheus-messages dark">
-      <div className="flex h-[calc(100vh-82px)]">
+      <div className="flex h-[calc(100vh-82px)] border border-white/[.15]">
         <div
           id="mobile-channel-list"
           className="w-[300px] border-r border-white/[.15] pmessages-sidebar"
@@ -148,6 +148,11 @@ const MessagesPage = () => {
               multipleUploads={true}
               ThreadHeader={PThreadHeader}
               TypingIndicator={() => null}
+              EmptyPlaceholder={
+                <GetStartedChannel
+                  onCreateChannel={() => setIsCreating(true)}
+                />
+              }
             >
               <GiphyContext.Provider value={giphyContextValue}>
                 <PChannel toggleMobile={toggleMobile} />

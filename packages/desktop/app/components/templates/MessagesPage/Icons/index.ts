@@ -9,8 +9,6 @@ export { CommandIcon } from "./CommandIcon";
 export { EmojiIcon } from "./EmojiIcon";
 export { LightningBoltSmall } from "./LightningBoltSmall";
 export { SendIcon } from "./SendIcon";
-export { XButton } from "./XButton";
-export { XButtonBackground } from "./XButtonBackground";
 
 export const getCleanImage = (member: ChannelMemberResponse) => {
   let cleanImage = member.user?.image || "";

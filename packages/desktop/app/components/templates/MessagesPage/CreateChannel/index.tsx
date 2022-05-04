@@ -10,11 +10,9 @@ import { UserResponse } from "stream-chat";
 import _debounce from "lodash/debounce";
 
 import Button from "desktop/app/components/common/Button";
-import Input from "desktop/app/components/common/Input";
 import TagInput, { TagRenderer } from "desktop/app/components/common/TagInput";
-
 import UserResult from "./UserResult";
-import { XButton } from "../Icons";
+import { X as XButton } from "phosphor-react";
 import { StreamType } from "../types";
 
 type CreateChannelProps = {
@@ -154,20 +152,20 @@ const CreateChannel: React.FC<CreateChannelProps> = ({
         onClick={onRemove}
       >
         <Avatar image={(user.image as string) ?? null} size={24} />
-        <div className="messaging-create-channel__user-text text-white mr-4 text-xs">
+        <div className="text-white mr-4 text-xs">
           {user.name}
         </div>
-        <XButton />
+        <XButton color="white" />
       </div>
     );
   };
 
   return (
-    <div className="w-full py-4 border-b border-white/[.15]">
+    <div className="w-full py-4 border-l border-white/[.15]">
       <div className="text-white mb-1 px-4 py-2">New Message</div>
       <header className="border-t border-white/[.15] pt-2">
         <div className="flex flex-row items-center px-4">
-          <span className="text-white mt-2 mr-4">To</span>
+          <span className="text-white mr-4">To</span>
           <div className="flex-auto px-2">
             <TagInput
               className="h-12"

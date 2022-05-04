@@ -1,13 +1,12 @@
+import React, { useMemo } from "react";
 import {
   ChannelPreviewUIComponentProps,
-  ChatContextValue,
   useChatContext,
 } from "stream-chat-react";
-import { Channel, ChannelMemberResponse } from "stream-chat";
 import dayjs from "dayjs";
-
 import AvatarGroup from "../AvatarGroup";
 import { StreamType } from "../types";
+import { Circle } from "phosphor-react";
 
 type PChannelPreviewProps = ChannelPreviewUIComponentProps & {
   setIsCreating: React.Dispatch<React.SetStateAction<boolean>>;
@@ -20,17 +19,23 @@ const PChannelPreview: React.FC<PChannelPreviewProps> = ({
   setIsCreating,
 }) => {
   const { channel: activeChannel, client } = useChatContext<StreamType>();
-  const members = Object.values(channel.state.members)
-    .filter(({ user }) => user?.id !== client.userID)
-    .map(({ user }) => ({
-      name: user?.name,
-      image: user?.image,
-    }));
+  const countUnread = channel?.countUnread() || 0;
+  const members = useMemo(() => {
+    if (!channel) return [];
+    
+    return Object.values(channel.state.members)
+      .filter(({ user }) => user?.id !== client.userID)
+      .map(({ user }) => ({
+        name: user?.name,
+        image: user?.image,
+        online: user?.online,
+      }));
+  }, [channel, client]);
 
   return (
     <div
       className={`
-        flex items-top rounded-lg cursor-pointer m-4 p-4 
+        relative flex items-center rounded-lg cursor-pointer p-4 
         ${
           channel?.id === activeChannel?.id ? "bg-info/[.24]" : "bg-transparent"
         }
@@ -40,10 +45,15 @@ const PChannelPreview: React.FC<PChannelPreviewProps> = ({
         setActiveChannel?.(channel);
       }}
     >
+      {countUnread > 0 && (
+        <div className="mr-2 absolute left-0">
+          <Circle weight="fill" color="#F2A63F" size="10" />
+        </div>        
+      )}
       <AvatarGroup members={members} />
       <div className="w-full">
         <div className="flex items-top justify-between text-white">
-          <div className="w-50 overflow-hidden overflow-ellipsis">
+          <div className="overflow-hidden overflow-ellipsis whitespace-nowrap">
             {channel.data?.name || members.map((member) => member.name).join(",")}
           </div>
           {lastMessage?.created_at && (
