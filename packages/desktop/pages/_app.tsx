@@ -6,7 +6,7 @@ import SecureApolloProvider from "../app/components/providers/SecureApolloProvid
 import { ThemeProvider } from "next-themes";
 import { SessionProvider } from "next-auth/react";
 import { NextPageWithLayout } from "../app/types/next-page";
-import {initializeDatadogRum} from "../app/lib/datadog";
+import { initializeDatadogRum } from "../app/lib/datadog";
 initializeDatadogRum();
 
 type AppPropsWithLayout = AppProps & {

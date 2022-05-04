@@ -1,6 +1,6 @@
 import { datadogRum } from '@datadog/browser-rum';
 
-export const initializeDatadog = ()=>{
+export const initializeDatadogRum = ()=>{
   datadogRum.init({
     applicationId: process.env.DATADOG_RUM_APPLICATION_ID!,
     clientToken: process.env.DATADOG_RUM_CLIENT_TOKEN!,
