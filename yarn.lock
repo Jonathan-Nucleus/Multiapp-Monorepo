@@ -1792,6 +1792,26 @@
   dependencies:
     "@cspotcode/source-map-consumer" "0.8.0"
 
+"@datadog/browser-core@4.8.1":
+  version "4.8.1"
+  resolved "https://registry.yarnpkg.com/@datadog/browser-core/-/browser-core-4.8.1.tgz#46c5baea76bf94d8f10591340c947e6b62737744"
+  integrity sha512-0kWdFN4in7BncWzHNqZVUg+dJIzM5jgGOHh1jM2gkOfX548gVo3teaKJWYvufRoNIPwYs9Qm1glBVt4cFQL/Pw==
+
+"@datadog/browser-rum-core@4.8.1":
+  version "4.8.1"
+  resolved "https://registry.yarnpkg.com/@datadog/browser-rum-core/-/browser-rum-core-4.8.1.tgz#ae67974f606dbb4b5e98b36f2d725d025eeb6c0d"
+  integrity sha512-cXO30/qNLcnp+BBRgtcSs4F4iG5N5JuGj891D2rHhd++h/6UYU+ivhgUJq+ZrAVKldetdM9H8VCBkClIOfQhaQ==
+  dependencies:
+    "@datadog/browser-core" "4.8.1"
+
+"@datadog/browser-rum@^4.8.1":
+  version "4.8.1"
+  resolved "https://registry.yarnpkg.com/@datadog/browser-rum/-/browser-rum-4.8.1.tgz#58964ab11562613d905721aa08554a2dff1177e0"
+  integrity sha512-Mcj2twuS6cc96/lfSX3pxwxWyzuvmS2eBw1k1E5mcoC6USryJ1w0p9cHHJYp3MVpvhHP2b5NLi97ZVzETnQ+gA==
+  dependencies:
+    "@datadog/browser-core" "4.8.1"
+    "@datadog/browser-rum-core" "4.8.1"
+
 "@egjs/hammerjs@^2.0.17":
   version "2.0.17"
   resolved "https://registry.yarnpkg.com/@egjs/hammerjs/-/hammerjs-2.0.17.tgz#5dc02af75a6a06e4c2db0202cae38c9263895124"
