@@ -7,11 +7,13 @@ import {
   NormalizedCacheObject,
 } from '@apollo/client';
 import EncryptedStorage from 'react-native-encrypted-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AsyncStorageWrapper, CachePersistor } from 'apollo3-cache-persist';
 import type { ApolloPersistOptions } from 'apollo3-cache-persist/types';
 import {
   attachTokenObserver,
   detachTokenObserver,
+  TokenAction,
 } from 'mobile/src/utils/auth-token';
 import { GRAPHQL_URI } from 'react-native-dotenv';
 
@@ -24,7 +26,7 @@ const cache = new InMemoryCache({
 const persistor = new CachePersistor({
   cache:
     cache as unknown as ApolloPersistOptions<NormalizedCacheObject>['cache'], // Resolve type version error
-  storage: new AsyncStorageWrapper(EncryptedStorage),
+  storage: new AsyncStorageWrapper(AsyncStorage),
 });
 
 export const useInitializeClient = () => {
@@ -35,8 +37,12 @@ export const useInitializeClient = () => {
   useEffect(() => {
     // Create an observer that is notified whenever the auth token changes to
     // trigger a reset of apollo client.
-    const tokenObserver = () => {
-      setReset(!reset);
+    const tokenObserver = (type: TokenAction) => {
+      if (type === 'set') {
+        setReset(!reset);
+      } else if (type === 'cleared') {
+        client?.clearStore();
+      }
     };
 
     async function initializeCache() {

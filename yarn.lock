@@ -4394,10 +4394,19 @@
   dependencies:
     "@types/react" "^17"
 
-"@types/react@*", "@types/react@18.0.5", "@types/react@^17":
+"@types/react@*", "@types/react@^17":
   version "17.0.44"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.44.tgz#c3714bd34dd551ab20b8015d9d0dbec812a51ec7"
   integrity sha512-Ye0nlw09GeMp2Suh8qoOv0odfgCoowfM/9MG6WeRD60Gq9wS90bdkdRtYbRkNhXOpG4H+YXGvj4wOWhAC0LJ1g==
+  dependencies:
+    "@types/prop-types" "*"
+    "@types/scheduler" "*"
+    csstype "^3.0.2"
+
+"@types/react@18.0.5":
+  version "18.0.5"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-18.0.5.tgz#1a4d4b705ae6af5aed369dec22800b20f89f5301"
+  integrity sha512-UPxNGInDCIKlfqBrm8LDXYWNfLHwIdisWcsH5GpMyGjhEDLFgTtlRBaoWuCua9HcyuE0rMkmAeZ3FXV1pYLIYQ==
   dependencies:
     "@types/prop-types" "*"
     "@types/scheduler" "*"
@@ -14564,6 +14573,21 @@ stream-chat@^6.4.0:
   version "6.5.0"
   resolved "https://registry.yarnpkg.com/stream-chat/-/stream-chat-6.5.0.tgz#15631ba94ac3760c01518d657b14c7e8242c3efb"
   integrity sha512-yIpyIJ6lew7hj5C1k6mSqG6/N3wlnrgaaxwnjcfd5x5EmXvkfN4q7ENcC3NDqMi7VP005odAs09FvH+iG6m0JQ==
+  dependencies:
+    "@babel/runtime" "^7.16.3"
+    "@types/jsonwebtoken" "^8.5.6"
+    "@types/ws" "^7.4.0"
+    axios "^0.22.0"
+    base64-js "^1.5.1"
+    form-data "^4.0.0"
+    isomorphic-ws "^4.0.1"
+    jsonwebtoken "^8.5.1"
+    ws "^7.4.4"
+
+stream-chat@^6.5.1:
+  version "6.5.1"
+  resolved "https://registry.yarnpkg.com/stream-chat/-/stream-chat-6.5.1.tgz#bf7661c0b6e10194cd1d3f5e73b81fc582fabc9c"
+  integrity sha512-FbjKfSstuK+vUwc3+p98mewczK9XwzCiiqDX9eCa/KUlF/Jp6UWVBzmcBPPk7nWCrnIgU/42XBFYKyjNfkqQmw==
   dependencies:
     "@babel/runtime" "^7.16.3"
     "@types/jsonwebtoken" "^8.5.6"

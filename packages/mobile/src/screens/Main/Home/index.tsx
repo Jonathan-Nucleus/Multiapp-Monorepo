@@ -10,7 +10,6 @@ import {
 import isEqual from 'react-fast-compare';
 import SplashScreen from 'react-native-splash-screen';
 import { useIsFocused } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SlidersHorizontal } from 'phosphor-react-native';
 
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
@@ -25,7 +24,6 @@ import OwnPostActionModal from './OwnPostActionModal';
 
 import { usePosts, Post } from 'mobile/src/graphql/query/post/usePosts';
 import { useAccount } from 'mobile/src/graphql/query/account';
-import { useUpdateFcmToken } from 'mobile/src/graphql/mutation/account';
 
 import { HomeScreen } from 'mobile/src/navigations/MainTabNavigator';
 import FilterModal from 'mobile/src/screens/PostDetails/FilterModal';
@@ -51,7 +49,6 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
 
   const { data: userData, loading: userLoading } = useAccount();
   const { data, refetch } = usePosts(selectedCategories, selectedRole);
-  const [updateFcmToken] = useUpdateFcmToken();
 
   const account = userData?.account;
   const postData = data?.posts ?? [];
@@ -68,7 +65,6 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     SplashScreen.hide();
-    handleUpdateFcmToken && handleUpdateFcmToken();
   }, []);
 
   if (userLoading || !account) {
@@ -83,23 +79,6 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
       </View>
     );
   }
-
-  const handleUpdateFcmToken = async () => {
-    try {
-      const fcmToken = await AsyncStorage.getItem('@fcm_token');
-      if (fcmToken) {
-        const { data } = await updateFcmToken({
-          variables: { fcmToken: fcmToken },
-        });
-
-        if (data?.updateFcmToken) {
-          console.log('fcm token success:');
-        }
-      }
-    } catch (e) {
-      console.log('fcm token fail:', e);
-    }
-  };
 
   const handleCreatePost = () => {
     navigation.navigate('PostDetails', {

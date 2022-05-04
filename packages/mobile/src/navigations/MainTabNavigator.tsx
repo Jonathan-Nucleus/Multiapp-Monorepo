@@ -15,9 +15,9 @@ import { WHITE, BLACK, BGDARK, GRAY400 } from 'shared/src/colors';
 
 import { Home } from 'mobile/src/screens/Main/Home';
 import MarketplaceTabs from './MarketplaceTabs';
+import ChatStack from './ChatStack';
 import MoreStack, { MoreStackParamList } from './MoreStack';
 import WatchList from 'mobile/src/screens/Main/WatchList';
-import Chat from 'mobile/src/screens/Main/Chat';
 
 import { AppScreenProps } from './AppNavigator';
 
@@ -74,7 +74,7 @@ const MainTabNavigator = () => {
       />
       <Tab.Screen
         name="Chat"
-        component={Chat}
+        component={ChatStack}
         options={{
           tabBarLabel: 'messages',
           tabBarIcon: ({ focused, size }) =>

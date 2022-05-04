@@ -75,6 +75,7 @@
     "react-native-text-input-mask": "^3.1.4",
     "react-native-toast-message": "^2.1.5",
     "react-native-video": "^5.2.0",
+    "stream-chat": "^6.5.1",
     "yup": "^0.32.11"
   },
   "devDependencies": {

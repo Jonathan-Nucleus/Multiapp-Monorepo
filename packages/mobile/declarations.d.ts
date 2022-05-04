@@ -21,4 +21,5 @@ declare module 'react-native-dotenv' {
   declare const GOOGLE_ID: string;
   declare const LINKEDIN_ID: string;
   declare const LINKEDIN_SECRET: string;
+  declare const GETSTREAM_ACCESS_KEY: string;
 }

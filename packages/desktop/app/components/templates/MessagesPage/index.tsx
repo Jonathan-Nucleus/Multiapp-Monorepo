@@ -7,13 +7,12 @@ import {
   LoadingIndicator,
 } from "stream-chat-react";
 import { useChecklist } from "./ChecklistTasks";
-import { useChatToken, useAccount } from "mobile/src/graphql/query/account";
+import { useAccount } from "mobile/src/graphql/query/account";
+import { useChatToken } from "mobile/src/graphql/query/account/useChatToken";
 
 import GetStartedChannel from "./GetStartedChannel";
 import CreateChannel from "./CreateChannel";
-import PChannelList, {
-  PChannelListHeader,
-} from "./PChannelList";
+import PChannelList, { PChannelListHeader } from "./PChannelList";
 import PChannelPreview from "./PChannelList/PChannelPreview";
 import PThreadHeader from "./PChannel/PThreadHeader";
 import { PChannel } from "./PChannel";
@@ -65,9 +64,7 @@ const MessagesPage = () => {
       initChat();
 
       return () => {
-        if (chatClient.current)
-          chatClient.current.disconnectUser();
-        
+        if (chatClient.current) chatClient.current.disconnectUser();
       };
     }
   }, [chatData, userData]);

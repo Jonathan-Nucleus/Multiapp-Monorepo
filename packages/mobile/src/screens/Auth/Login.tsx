@@ -11,7 +11,6 @@ import { useMutation } from '@apollo/client';
 import { NavigationProp } from '@react-navigation/native';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import SplashScreen from 'react-native-splash-screen';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import PAppContainer from '../../components/common/PAppContainer';
 import PHeader from '../../components/common/PHeader';
@@ -30,12 +29,7 @@ import LinkedinSvg from '../../assets/icons/linkedin.svg';
 import CheckedSvg from '../../assets/icons/checked.svg';
 import UncheckedSvg from '../../assets/icons/unchecked.svg';
 
-import {
-  setToken,
-  attachTokenObserver,
-  detachTokenObserver,
-  TokenAction,
-} from 'mobile/src/utils/auth-token';
+import { setToken, TokenAction } from 'mobile/src/utils/auth-token';
 import type { LoginScreen } from 'mobile/src/navigations/AuthStack';
 
 import { authenticate } from 'mobile/src/services/auth/google-provider';
@@ -54,37 +48,11 @@ const Login: LoginScreen = ({ navigation }) => {
 
   useEffect(() => {
     SplashScreen.hide();
-
-    const tokenObserver = (action: TokenAction): void => {
-      if (action === 'set') {
-        handleUpdateFcmToken();
-      }
-    };
-
-    attachTokenObserver(tokenObserver);
-    return () => detachTokenObserver(tokenObserver);
   }, []);
 
   const saveAuthToken = async (token: string) => {
     await setToken(token);
     navigation.navigate('Main');
-  };
-
-  const handleUpdateFcmToken = async () => {
-    try {
-      const fcmToken = await AsyncStorage.getItem('@fcm_token');
-      if (fcmToken) {
-        const { data } = await updateFcmToken({
-          variables: { fcmToken: fcmToken },
-        });
-
-        if (data?.updateFcmToken) {
-          console.log('fcm token success:');
-        }
-      }
-    } catch (e) {
-      console.log('fcm token fail:', e);
-    }
   };
 
   const handleNextPage = async () => {
