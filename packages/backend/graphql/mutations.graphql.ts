@@ -42,7 +42,11 @@ import type { Company } from "../schemas/company";
 import { AudienceOptions, PostCategoryOptions } from "../schemas/post";
 import type { Post } from "../schemas/post";
 import type { Comment } from "../schemas/comment";
-import { NotificationTypeOptions } from "../schemas/notification";
+import {
+  HelpRequest,
+  HelpRequestTypeOptions,
+  PreferredTimeOfDayOptions,
+} from "../schemas/help-request";
 
 const schema = gql`
   type Mutation {
@@ -56,8 +60,10 @@ const schema = gql`
     updateSettings(settings: SettingsInput!): Boolean
     updateUserProfile(profile: UserProfileInput): UserProfile
     updateCompanyProfile(profile: CompanyProfileInput): Company
+    deleteAccount: Boolean
 
     createPost(post: PostInput!): Post
+    editPost(post: PostUpdate!): Post
     deletePost(postId: ID!): Boolean
     featurePost(postId: ID!, feature: Boolean!): Post
     likePost(like: Boolean!, postId: ID!): Post
@@ -79,6 +85,7 @@ const schema = gql`
 
     readNotification(notificationId: ID): Boolean
     updateFcmToken(fcmToken: String): Boolean
+    helpRequest(request: HelpRequestInput!): Boolean
   }
 
   type MediaUpload {
@@ -466,7 +473,7 @@ const resolvers = {
         parentIgnored,
         args: { request: ProRequest },
         { db, user }
-      ): Promise<Boolean> => {
+      ): Promise<boolean> => {
         const validator = yup
           .object({
             request: yup
@@ -543,6 +550,56 @@ const resolvers = {
         await db.users.addPost(postData._id, user._id);
 
         return postData;
+      }
+    ),
+
+    editPost: secureEndpoint(
+      async (
+        parentIgnored,
+        args: { post: Post.Update },
+        { db, user }
+      ): Promise<Post.Mongo> => {
+        const validator = yup
+          .object()
+          .shape({
+            post: yup
+              .object()
+              .shape({
+                _id: yup.string().required().test({
+                  test: isObjectId,
+                  message: "Invalid post id",
+                }),
+                audience: yup
+                  .string()
+                  .oneOf(Object.values(AudienceOptions))
+                  .required(),
+                categories: yup
+                  .array()
+                  .of(
+                    yup
+                      .string()
+                      .oneOf(_.map(Object.values(PostCategoryOptions), "value"))
+                      .required()
+                  )
+                  .required(),
+                body: yup.string(),
+                mediaUrl: yup.string(),
+                mentionIds: yup.array().of(
+                  yup.string().test({
+                    test: isObjectId,
+                    message: "Invalid mention id",
+                  })
+                ),
+              })
+              .required(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { post } = args;
+
+        return db.posts.edit(post, user._id);
       }
     ),
 
@@ -1158,6 +1215,83 @@ const resolvers = {
         const { fcmToken } = args;
 
         return db.users.updateFcmToken(user._id, fcmToken);
+      }
+    ),
+
+    deleteAccount: secureEndpoint(
+      async (parentIgnored, argsIgnored, { db, user }): Promise<boolean> => {
+        return db.users.delete(user._id);
+      }
+    ),
+
+    helpRequest: secureEndpoint(
+      async (
+        parentIgnored,
+        args: { request: HelpRequest.Input },
+        { db, user }
+      ): Promise<boolean> => {
+        const validator = yup
+          .object({
+            request: yup
+              .object({
+                type: yup
+                  .string()
+                  .oneOf(
+                    Object.values(HelpRequestTypeOptions).map(
+                      (option) => option.value
+                    )
+                  )
+                  .required(),
+                fundId: yup.string().required().test({
+                  test: isObjectId,
+                  message: "Invalid fund id",
+                }),
+                email: yup.string().email().when("type", {
+                  is: "email",
+                  then: yup.string().required(),
+                }),
+                phone: yup.string().when("type", {
+                  is: "phone",
+                  then: yup.string().required(),
+                }),
+                preferredTimeOfDay: yup
+                  .string()
+                  .oneOf(
+                    Object.values(PreferredTimeOfDayOptions).map(
+                      (option) => option.value
+                    )
+                  )
+                  .when("type", {
+                    is: "phone",
+                    then: yup
+                      .string()
+                      .oneOf(
+                        Object.values(PreferredTimeOfDayOptions).map(
+                          (option) => option.value
+                        )
+                      )
+                      .required(),
+                  }),
+                message: yup.string().notRequired(),
+              })
+              .required(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { request } = args;
+
+        const fund = await db.funds.find(request.fundId);
+        if (!fund) {
+          throw new NotFoundError("Fund");
+        }
+
+        const requestData = await db.helpRequests.create(request, user._id);
+
+        PrometheusMailer.sendHelpRequest(user, requestData, fund);
+
+        return true;
       }
     ),
   },

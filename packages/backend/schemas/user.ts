@@ -59,6 +59,7 @@ export namespace User {
     fcmToken?: string;
     fcmTokenCreated?: Date;
     notificationBadge?: number;
+    deletedAt?: Date;
 
     // TODO: still needs to finalized
     //settings: Settings;
@@ -130,6 +131,7 @@ export namespace User {
         | "reportedPost"
         | "settings"
         | "questionnaire"
+        | "deletedAt"
       >
     > & {
       accreditation: AccreditationEnum;

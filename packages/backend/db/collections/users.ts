@@ -78,7 +78,10 @@ const createUsersCollection = (
         query = { email: email };
       }
 
-      return usersCollection.findOne(query);
+      return usersCollection.findOne({
+        ...query,
+        deletedAt: { $exists: false },
+      });
     },
 
     /**
@@ -99,6 +102,7 @@ const createUsersCollection = (
         ...(ids !== undefined
           ? { _id: { $in: ids ? toObjectIds(ids) : ids } }
           : {}),
+        deletedAt: { $exists: false },
       };
 
       return (await usersCollection.find(query).toArray()) as User.Mongo[];
@@ -116,6 +120,7 @@ const createUsersCollection = (
         .find({
           role: "professional",
           ...(featured ? { featured: true } : {}),
+          deletedAt: { $exists: false },
         })
         .toArray()) as User.FundManager[],
 
@@ -131,6 +136,7 @@ const createUsersCollection = (
         .find({
           managedFundsIds: { $exists: true },
           ...(featured ? { featured: true } : {}),
+          deletedAt: { $exists: false },
         })
         .toArray()) as User.FundManager[],
 
@@ -147,7 +153,10 @@ const createUsersCollection = (
       email: string,
       password: string
     ): Promise<User.Mongo> => {
-      const user = await usersCollection.findOne({ email });
+      const user = await usersCollection.findOne({
+        email,
+        deletedAt: { $exists: false },
+      });
       if (!user || !isUser(user) || !user.salt) {
         throw new NotFoundError();
       }
@@ -310,7 +319,11 @@ const createUsersCollection = (
      * @returns   The reset token.
      */
     requestPasswordReset: async (email: string): Promise<string> => {
-      const user = await usersCollection.findOne({ email });
+      const user = await usersCollection.findOne({
+        email,
+        deletedAt: { $exists: false },
+      });
+
       if (!user) {
         throw new NotFoundError();
       }
@@ -342,7 +355,10 @@ const createUsersCollection = (
       email: string,
       token: string
     ): Promise<User.Mongo> => {
-      const user = await usersCollection.findOne({ email });
+      const user = await usersCollection.findOne({
+        email,
+        deletedAt: { $exists: false },
+      });
       if (!user) {
         throw new NotFoundError();
       }
@@ -377,7 +393,10 @@ const createUsersCollection = (
      */
     verifyInvite: async (code: string): Promise<boolean> => {
       try {
-        const user = await usersCollection.findOne({ emailToken: code });
+        const user = await usersCollection.findOne({
+          emailToken: code,
+          deletedAt: { $exists: false },
+        });
         if (!user) {
           throw new NotFoundError();
         }
@@ -436,7 +455,11 @@ const createUsersCollection = (
       }
 
       const user = await usersCollection.findOneAndUpdate(
-        { _id: toObjectId(_id), role: { $ne: "stub" } },
+        {
+          _id: toObjectId(_id),
+          role: { $ne: "stub" },
+          deletedAt: { $exists: false },
+        },
         { $set: { ...profileData, fullName, updatedAt: new Date() } },
         { returnDocument: "after" }
       );
@@ -462,7 +485,7 @@ const createUsersCollection = (
      */
     addPost: async (postId: MongoId, userId: MongoId): Promise<boolean> => {
       const result = await usersCollection.updateOne(
-        { _id: toObjectId(userId) },
+        { _id: toObjectId(userId), deletedAt: { $exists: false } },
         { $addToSet: { postIds: toObjectId(postId) } }
       );
 
@@ -488,7 +511,7 @@ const createUsersCollection = (
       userId: MongoId
     ): Promise<boolean> => {
       const result = await usersCollection.updateOne(
-        { _id: toObjectId(userId) },
+        { _id: toObjectId(userId), deletedAt: { $exists: false } },
         { $addToSet: { reportedPosts: report } }
       );
 
@@ -516,11 +539,11 @@ const createUsersCollection = (
     ): Promise<boolean> => {
       const result = hide
         ? await usersCollection.updateOne(
-            { _id: toObjectId(userId) },
+            { _id: toObjectId(userId), deletedAt: { $exists: false } },
             { $addToSet: { hiddenPostIds: toObjectId(postId) } }
           )
         : await usersCollection.updateOne(
-            { _id: toObjectId(userId) },
+            { _id: toObjectId(userId), deletedAt: { $exists: false } },
             { $pull: { hiddenPostIds: toObjectId(postId) } }
           );
 
@@ -551,11 +574,11 @@ const createUsersCollection = (
     ): Promise<boolean> => {
       const result = mute
         ? await usersCollection.updateOne(
-            { _id: toObjectId(userId) },
+            { _id: toObjectId(userId), deletedAt: { $exists: false } },
             { $addToSet: { mutedPostIds: toObjectId(postId) } }
           )
         : await usersCollection.updateOne(
-            { _id: toObjectId(userId) },
+            { _id: toObjectId(userId), deletedAt: { $exists: false } },
             { $pull: { mutedPostIds: toObjectId(postId) } }
           );
 
@@ -592,7 +615,7 @@ const createUsersCollection = (
       };
 
       await usersCollection.updateOne(
-        { _id: toObjectId(userId) },
+        { _id: toObjectId(userId), deletedAt: { $exists: false } },
         { $set: { settings: newSettings, updatedAt: new Date() } }
       );
 
@@ -616,12 +639,20 @@ const createUsersCollection = (
     ): Promise<User.Mongo> => {
       const result = add
         ? await usersCollection.findOneAndUpdate(
-            { _id: toObjectId(userId), role: { $ne: "stub" } },
+            {
+              _id: toObjectId(userId),
+              role: { $ne: "stub" },
+              deletedAt: { $exists: false },
+            },
             { $addToSet: { watchlistIds: toObjectId(fundId) } },
             { returnDocument: "after" }
           )
         : await usersCollection.findOneAndUpdate(
-            { _id: toObjectId(userId), role: { $ne: "stub" } },
+            {
+              _id: toObjectId(userId),
+              role: { $ne: "stub" },
+              deletedAt: { $exists: false },
+            },
             { $pull: { watchlistIds: toObjectId(fundId) } },
             { returnDocument: "after" }
           );
@@ -652,11 +683,11 @@ const createUsersCollection = (
       try {
         const result = follow
           ? await usersCollection.updateOne(
-              { _id: toObjectId(userId) },
+              { _id: toObjectId(userId), deletedAt: { $exists: false } },
               { $addToSet: { followingIds: toObjectId(followUserId) } }
             )
           : await usersCollection.updateOne(
-              { _id: toObjectId(userId) },
+              { _id: toObjectId(userId), deletedAt: { $exists: false } },
               { $pull: { followingIds: toObjectId(followUserId) } }
             );
 
@@ -685,11 +716,11 @@ const createUsersCollection = (
       try {
         const result = following
           ? await usersCollection.updateOne(
-              { _id: toObjectId(userId) },
+              { _id: toObjectId(userId), deletedAt: { $exists: false } },
               { $addToSet: { followerIds: toObjectId(followerId) } }
             )
           : await usersCollection.updateOne(
-              { _id: toObjectId(userId) },
+              { _id: toObjectId(userId), deletedAt: { $exists: false } },
               { $pull: { followerIds: toObjectId(followerId) } }
             );
 
@@ -718,13 +749,13 @@ const createUsersCollection = (
       try {
         const result = follow
           ? await usersCollection.updateOne(
-              { _id: toObjectId(userId) },
+              { _id: toObjectId(userId), deletedAt: { $exists: false } },
               {
                 $addToSet: { companyFollowingIds: toObjectId(followCompanyId) },
               }
             )
           : await usersCollection.updateOne(
-              { _id: toObjectId(userId) },
+              { _id: toObjectId(userId), deletedAt: { $exists: false } },
               { $pull: { companyFollowingIds: toObjectId(followCompanyId) } }
             );
 
@@ -753,7 +784,7 @@ const createUsersCollection = (
       try {
         const result = following
           ? await usersCollection.updateOne(
-              { _id: toObjectId(userId) },
+              { _id: toObjectId(userId), deletedAt: { $exists: false } },
               {
                 $addToSet: {
                   companyFollowerIds: toObjectId(followerCompanyId),
@@ -761,7 +792,7 @@ const createUsersCollection = (
               }
             )
           : await usersCollection.updateOne(
-              { _id: toObjectId(userId) },
+              { _id: toObjectId(userId), deletedAt: { $exists: false } },
               { $pull: { companyFollowerIds: toObjectId(followerCompanyId) } }
             );
 
@@ -792,7 +823,7 @@ const createUsersCollection = (
       try {
         const result = hide
           ? await usersCollection.updateOne(
-              { _id: toObjectId(userId) },
+              { _id: toObjectId(userId), deletedAt: { $exists: false } },
               {
                 $addToSet: {
                   hiddenUserIds: toObjectId(hiddenUserId),
@@ -800,7 +831,7 @@ const createUsersCollection = (
               }
             )
           : await usersCollection.updateOne(
-              { _id: toObjectId(userId) },
+              { _id: toObjectId(userId), deletedAt: { $exists: false } },
               { $pull: { hiddenUserIds: toObjectId(hiddenUserId) } }
             );
 
@@ -835,7 +866,11 @@ const createUsersCollection = (
       }
 
       const user = await usersCollection.findOneAndUpdate(
-        { _id: toObjectId(userId), role: { $ne: "stub" } },
+        {
+          _id: toObjectId(userId),
+          role: { $ne: "stub" },
+          deletedAt: { $exists: false },
+        },
         {
           $set: {
             questionnaire: {
@@ -865,7 +900,11 @@ const createUsersCollection = (
       userId: MongoId
     ): Promise<User.Mongo> => {
       const user = await usersCollection.findOneAndUpdate(
-        { _id: toObjectId(userId), role: { $ne: "stub" } },
+        {
+          _id: toObjectId(userId),
+          role: { $ne: "stub" },
+          deletedAt: { $exists: false },
+        },
         { $set: { proRequest: request } },
         { returnDocument: "after" }
       );
@@ -887,7 +926,10 @@ const createUsersCollection = (
      *          accreditation status for the user.
      */
     deserialize: async (userId: MongoId): Promise<DeserializedUser> => {
-      const user = await usersCollection.findOne({ _id: toObjectId(userId) });
+      const user = await usersCollection.findOne({
+        _id: toObjectId(userId),
+        deletedAt: { $exists: false },
+      });
       if (!user || !isUser(user)) {
         throw new NotFoundError();
       }
@@ -914,7 +956,11 @@ const createUsersCollection = (
       fcmToken: string
     ): Promise<boolean> => {
       const user = await usersCollection.findOneAndUpdate(
-        { _id: toObjectId(userId), role: { $ne: "stub" } },
+        {
+          _id: toObjectId(userId),
+          role: { $ne: "stub" },
+          deletedAt: { $exists: false },
+        },
         {
           $set: {
             fcmToken,
@@ -944,10 +990,7 @@ const createUsersCollection = (
      *
      * @returns The list of users.
      */
-    findByKeyword: async (
-      search: string = "",
-      limit = 10
-    ): Promise<User.Mongo[]> => {
+    findByKeyword: async (search = "", limit = 10): Promise<User.Mongo[]> => {
       const users = (await usersCollection
         .aggregate([
           {
@@ -960,12 +1003,41 @@ const createUsersCollection = (
             },
           },
           {
+            $match: {
+              deletedAt: { $exists: false },
+            },
+          },
+          {
             $limit: limit,
           },
         ])
         .toArray()) as User.Mongo[];
 
       return users;
+    },
+
+    /**
+     * Soft delete a user account.
+     *
+     * @param userId  The id of the user.
+     *
+     * @returns   True if the user was successfully deleted and false
+     *            otherwise.
+     */
+    delete: async (userId: MongoId): Promise<boolean> => {
+      const result = await usersCollection.findOneAndUpdate(
+        {
+          _id: toObjectId(userId),
+          deletedAt: { $exists: false },
+        },
+        { $set: { deletedAt: new Date() } }
+      );
+
+      if (!result.ok || !result.value) {
+        throw new NotFoundError();
+      }
+
+      return true;
     },
   };
 

@@ -49,6 +49,7 @@ const createNotificationsCollection = (
     ): Promise<boolean> => {
       const user = await usersCollection.findOne({
         _id: toObjectId(userId),
+        deletedAt: { $exists: false },
       });
       if (!user || !isUser(user)) {
         throw new NotFoundError();

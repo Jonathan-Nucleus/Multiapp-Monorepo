@@ -3,7 +3,7 @@
  * from a MongoDB database.
  */
 
-import { Collection, ObjectId } from "mongodb";
+import { Collection, ObjectId, UpdateFilter } from "mongodb";
 import _ from "lodash";
 import {
   MongoId,
@@ -17,7 +17,6 @@ import type {
   Audience,
   PostRoleFilter,
 } from "../../schemas/post";
-import type { Comment } from "../../schemas/comment";
 import {
   InternalServerError,
   NotFoundError,
@@ -106,7 +105,9 @@ const createPostsCollection = (
           roleFilter === "professional-only"
         ) {
           const proIds = _.map(
-            await usersCollection.find({ role: "professional" }).toArray(),
+            await usersCollection
+              .find({ role: "professional", deletedAt: { $exists: false } })
+              .toArray(),
             "_id"
           );
           userIds = [...proIds];
@@ -159,6 +160,42 @@ const createPostsCollection = (
       await postsCollection.insertOne(postData);
 
       return postData;
+    },
+
+    /**
+     * Edit an existing post.
+     *
+     * @param post    Updated post data.
+     * @param userId  The id of the user editing the post.
+     *
+     * @returns   The updated post object or null if unauthorizered or an
+     *            error was encountered.
+     */
+    edit: async (post: Post.Update, userId: MongoId): Promise<Post.Mongo> => {
+      const { _id, mentionIds, ...postData } = post;
+      let updateFilter: UpdateFilter<Post.Mongo> = {
+        $set: {
+          ...postData,
+          updatedAt: new Date(),
+          ...(mentionIds ? { mentionIds: toObjectIds(mentionIds) } : {}),
+        },
+      };
+
+      const result = await postsCollection.findOneAndUpdate(
+        {
+          _id: toObjectId(_id),
+          userId: toObjectId(userId),
+          deleted: { $exists: false },
+        },
+        updateFilter,
+        { returnDocument: "after" }
+      );
+
+      if (!result.ok || !result.value) {
+        throw new NotFoundError("Post");
+      }
+
+      return result.value;
     },
 
     /**
@@ -308,6 +345,11 @@ const createPostsCollection = (
                 query: `(.*)${search.split(" ").join("(.*)")}(.*)`,
                 path: "body",
               },
+            },
+          },
+          {
+            $match: {
+              deleted: { $exists: false },
             },
           },
           {

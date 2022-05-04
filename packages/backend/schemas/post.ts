@@ -48,6 +48,12 @@ export namespace Post {
   // have been transformed to their Mongo types.
   export type Input = Pick<GraphQL, "body" | "mediaUrl" | "mentionIds"> &
     Pick<Mongo, "audience" | "categories">;
+
+  export type Update = Pick<
+    GraphQL,
+    "_id" | "body" | "mentionIds" | "mediaUrl"
+  > &
+    Pick<Mongo, "audience" | "categories">;
 }
 
 /** Enumeration describing the audience targeted by a post. */
@@ -205,6 +211,15 @@ export const PostSchema = `
   }
 
   input PostInput {
+    audience: Audience!
+    body: String
+    mediaUrl: String
+    categories: [PostCategory!]!
+    mentionIds: [ID!]
+  }
+
+  input PostUpdate {
+    _id: ID!
     audience: Audience!
     body: String
     mediaUrl: String

@@ -1,12 +1,17 @@
 import { ApolloError } from "apollo-server";
 import { SES } from "aws-sdk";
 import { promises as fs } from "fs";
-import { promisify } from "util";
 import path from "path";
 import ejs, { Data as EjsData } from "ejs";
 import { User } from "backend/schemas/user";
+import { HelpRequest } from "../schemas/help-request";
+import {
+  HelpRequestTypeMapping,
+  PreferredTimeOfDayOptionsMapping,
+} from "../graphql/help-requests.graphql";
 
 import "dotenv/config";
+import { Fund } from "../schemas/fund";
 
 const SENDER = process.env.EMAIL_SENDER as string;
 const PROMETHEUS_URL = process.env.PROMETHEUS_URL as string;
@@ -153,6 +158,39 @@ export const PrometheusMailer = {
     } catch (err) {
       console.log("err", err);
       throw new ApolloError(`Error sending pro request email`);
+    }
+  },
+
+  /**
+   * Sends an email to the business team whenever a user requests to contact
+   * a fund specialist.
+   *
+   * @param user          Auth user.
+   * @param helpRequest   Help request.
+   */
+  sendHelpRequest: async function (
+    user: User.Mongo,
+    helpRequest: HelpRequest.Mongo,
+    fund: Fund.Mongo
+  ): Promise<boolean> {
+    try {
+      const { _id: idIgnored, type, preferredTimeOfDay, ...rest } = helpRequest;
+
+      await sendEmail(CS_EMAIL, "help-request", {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        type: HelpRequestTypeMapping[type],
+        fundName: fund.name,
+        preferredTimeOfDay: preferredTimeOfDay
+          ? PreferredTimeOfDayOptionsMapping[preferredTimeOfDay]
+          : undefined,
+        ...rest,
+      });
+
+      return true;
+    } catch (err) {
+      console.log("err", err);
+      throw new ApolloError(`Error sending help request email`);
     }
   },
 };

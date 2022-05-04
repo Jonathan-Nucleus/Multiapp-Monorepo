@@ -10,6 +10,7 @@ import queryDefinitions from "./queries.graphql";
 import mutationDefinitions from "./mutations.graphql";
 import datesDefinition from "./dates.graphql";
 import notificationsDefinition from "./notifications.graphql";
+import helpRequestsDefinition from "./help-requests.graphql";
 
 const definitions = [
   commentsDefinitions,
@@ -21,6 +22,7 @@ const definitions = [
   mutationDefinitions,
   datesDefinition,
   notificationsDefinition,
+  helpRequestsDefinition,
 ];
 
 const typeDefs = definitions.map((definition) => definition.schema);

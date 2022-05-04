@@ -16,6 +16,7 @@ import funds from "./collections/funds";
 import posts from "./collections/posts";
 import comments from "./collections/comments";
 import notifications from "./collections/notifications";
+import helpRequests from "./collections/help-requests";
 
 import "dotenv/config";
 
@@ -28,6 +29,7 @@ export type IgniteDb = {
   posts: ReturnType<typeof posts>;
   comments: ReturnType<typeof comments>;
   notifications: ReturnType<typeof notifications>;
+  helpRequests: ReturnType<typeof helpRequests>;
 };
 
 let connectionPromise: Promise<IgniteDb> | null;
@@ -92,6 +94,7 @@ async function createInstance(connectionUrl?: string): Promise<IgniteDb> {
       db.collection("notifications"),
       db.collection("users")
     ),
+    helpRequests: helpRequests(db.collection("help-requests")),
   } as IgniteDb;
   return instance;
 }
