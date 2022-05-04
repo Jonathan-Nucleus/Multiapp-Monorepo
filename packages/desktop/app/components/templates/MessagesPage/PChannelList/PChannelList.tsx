@@ -2,16 +2,16 @@ import { FC, memo, PropsWithChildren } from "react";
 import { ChannelListMessengerProps } from "stream-chat-react";
 import { SkeletonLoader } from "./SkeletonLoader";
 
-type MessagingChannelListProps = ChannelListMessengerProps & PropsWithChildren<unknown>;
+type PChannelListProps = ChannelListMessengerProps & PropsWithChildren<unknown>;
 
-const MessagingChannelList: FC<MessagingChannelListProps> = ({
+const PChannelList: FC<PChannelListProps> = ({
   children,
   error = false,
   loading,
 }) => {
   if (error) {
     return (
-      <div className="messaging__channel-list__message">
+      <div className="px-4 text-white">
         Error loading conversations, please try again momentarily.
       </div>
     );
@@ -19,7 +19,7 @@ const MessagingChannelList: FC<MessagingChannelListProps> = ({
 
   if (loading) {
     return (
-      <div className="messaging__channel-list__message">
+      <div className="px-4">
         <SkeletonLoader />
       </div>
     );
@@ -28,4 +28,4 @@ const MessagingChannelList: FC<MessagingChannelListProps> = ({
   return <>{children}</>;
 };
 
-export default memo(MessagingChannelList);
+export default memo(PChannelList);

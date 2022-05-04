@@ -10,16 +10,16 @@ import {
   useChannelStateContext,
 } from "stream-chat-react";
 
-import MessagingChannelHeader from "./MessagingChannelHeader";
-import MessagingInput from "./MessagingInput";
-import Message from "./Message";
-import { GiphyContext, StreamType } from "./types";
+import PChannelHeader from "./PChannelHeader";
+import MessagingInput from "../MessagingInput";
+import Message from "../Message";
+import { GiphyContext, StreamType } from "../types";
 
-export type ChannelInnerProps = {
+export type PChannelProps = {
   toggleMobile: () => void;
 };
 
-export const ChannelInner: React.FC<ChannelInnerProps> = (props) => {
+export const PChannel: React.FC<PChannelProps> = (props) => {
   const { toggleMobile } = props;
   const { giphyState, setGiphyState } = useContext(GiphyContext);
 
@@ -67,7 +67,7 @@ export const ChannelInner: React.FC<ChannelInnerProps> = (props) => {
   const actions = ["delete", "edit", "flag", "mute", "react", "reply"];
   return (
     <Window>
-      <MessagingChannelHeader toggleMobile={toggleMobile} />
+      <PChannelHeader toggleMobile={toggleMobile} />
       <MessageList messageActions={actions} Message={Message} />
       <MessageInput
         Input={MessagingInput}

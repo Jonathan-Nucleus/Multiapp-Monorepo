@@ -73,7 +73,7 @@ const MessagingInput: React.FC<MessageInputProps> = () => {
       >
         <UploadsPreview />
         <div className="flex items-center justify-between w-full">
-          <div className="flex-auto mr-2 relative">
+          <div className="flex-auto mr-2 relative text-black">
             {giphyState && !messageInput.numberOfUploads && <GiphyIcon />}
             <ChatAutoComplete
               onChange={onChange}

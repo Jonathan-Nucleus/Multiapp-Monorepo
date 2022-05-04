@@ -1,10 +1,18 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  KeyboardEventHandler,
+} from "react";
 import { Avatar, useChatContext } from "stream-chat-react";
 import { UserResponse } from "stream-chat";
 import _debounce from "lodash/debounce";
 
 import Button from "desktop/app/components/common/Button";
 import Input from "desktop/app/components/common/Input";
+import TagInput, { TagRenderer } from "desktop/app/components/common/TagInput";
+
 import UserResult from "./UserResult";
 import { XButton } from "../Icons";
 import { StreamType } from "../types";
@@ -42,44 +50,38 @@ const CreateChannel: React.FC<CreateChannelProps> = ({
     return () => document.removeEventListener("click", clickListener);
   }, []);
 
-  const findUsers = async () => {
-    if (searching) return;
-    setSearching(true);
+  const findUsers = _debounce(
+    async () => {
+      if (searching) return;
+      setSearching(true);
 
-    try {
-      const response = await client.queryUsers(
-        {
-          id: { $ne: client.userID as string },
-          $and: [{ name: { $autocomplete: inputText } }],
-        },
-        { id: 1 },
-        { limit: 6 }
-      );
+      try {
+        const response = await client.queryUsers(
+          {
+            id: { $ne: client.userID as string },
+            $and: [{ name: { $autocomplete: inputText } }],
+          },
+          { id: 1 },
+          { limit: 6 }
+        );
 
-      if (!response.users.length) {
-        setSearchEmpty(true);
-      } else {
-        setSearchEmpty(false);
-        setUsers(response.users);
+        if (!response.users.length) {
+          setSearchEmpty(true);
+        } else {
+          setSearchEmpty(false);
+          setUsers(response.users);
+        }
+
+        setResultsOpen(true);
+      } catch (error) {
+        console.log({ error });
       }
 
-      setResultsOpen(true);
-    } catch (error) {
-      console.log({ error });
-    }
-
-    setSearching(false);
-  };
-
-  const findUsersDebounce = _debounce(findUsers, 100, {
-    trailing: true,
-  });
-
-  useEffect(() => {
-    if (inputText) {
-      findUsersDebounce();
-    }
-  }, [inputText]); // eslint-disable-line react-hooks/exhaustive-deps
+      setSearching(false);
+    },
+    100,
+    { trailing: true }
+  );
 
   const createChannel = async () => {
     const selectedUsersIds = selectedUsers.map((user) => user.id);
@@ -109,28 +111,28 @@ const CreateChannel: React.FC<CreateChannelProps> = ({
     inputRef.current?.focus();
   };
 
-  const removeUser = (user: UserResponse) => {
-    const newUsers = selectedUsers.filter((item) => item.id !== user.id);
+  const removeUser = (userId: string) => {
+    const newUsers = selectedUsers.filter((item) => item.id !== userId);
     setSelectedUsers(newUsers);
     inputRef.current?.focus();
   };
 
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent) => {
+  const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = useCallback(
+    (event) => {
       // check for up(ArrowUp) or down(ArrowDown) key
       if (event.key === "ArrowUp") {
+        event.preventDefault();
         setFocusedUser((prevFocused) => {
           if (prevFocused === undefined) return 0;
           return prevFocused === 0 ? users.length - 1 : prevFocused - 1;
         });
-      }
-      if (event.key === "ArrowDown") {
+      } else if (event.key === "ArrowDown") {
+        event.preventDefault();
         setFocusedUser((prevFocused) => {
           if (prevFocused === undefined) return 0;
           return prevFocused === users.length - 1 ? 0 : prevFocused + 1;
         });
-      }
-      if (event.key === "Enter") {
+      } else if (event.key === "Enter") {
         event.preventDefault();
         if (focusedUser !== undefined) {
           addUser(users[focusedUser]);
@@ -138,81 +140,84 @@ const CreateChannel: React.FC<CreateChannelProps> = ({
         }
       }
     },
-    [users, focusedUser] // eslint-disable-line
+    [users, focusedUser]
   );
 
-  useEffect(() => {
-    document.addEventListener("keydown", handleKeyDown, false);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [handleKeyDown]);
+  const renderTag: TagRenderer = ({ value, onRemove }) => {
+    const user = selectedUsers.find((obj) => obj.id === value);
+    if (!user) return null;
+
+    return (
+      <div
+        className={`messaging-create-channel__user items-center rounded-full
+          bg-background-blue pl-2 pr-3 mr-1 inline-flex cursor-pointer`}
+        onClick={onRemove}
+      >
+        <Avatar image={(user.image as string) ?? null} size={24} />
+        <div className="messaging-create-channel__user-text text-white mr-4 text-xs">
+          {user.name}
+        </div>
+        <XButton />
+      </div>
+    );
+  };
 
   return (
-    <div className="w-full p-4 border-b border-white/[.15]">
-      <div className="text-white mb-1">New Message</div>
-      <header className="border-y-1 border-white/[.15]">
-        <div className="flex flex-row items-start justify-between">
-          <div className="text-white mt-2 mr-4">To</div>
+    <div className="w-full py-4 border-b border-white/[.15]">
+      <div className="text-white mb-1 px-4 py-2">New Message</div>
+      <header className="border-t border-white/[.15] pt-2">
+        <div className="flex flex-row items-center px-4">
+          <span className="text-white mt-2 mr-4">To</span>
           <div className="flex-auto px-2">
-            <form>
-              <div className="relative">
-                <input
-                  autoFocus
-                  ref={inputRef}
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  placeholder={!selectedUsers.length ? "Type username" : ""}
-                  type="text"
-                  className="w-full h-12"
-                />
-                {inputText && (
-                  <div className="absolute min-w-[350px] mt-2 bg-background-header">
-                    <ul className="messaging-create-channel__user-results">
-                      {!!users?.length && !searchEmpty && (
-                        <div>
-                          {users.map((user, i) => (
-                            <div
-                              className={`messaging-create-channel__user-result cursor-pointer hover:bg-info ${
-                                focusedUser === i && "focused"
-                              }`}
-                              onClick={() => addUser(user)}
-                              key={user.id}
-                            >
-                              <UserResult user={user} />
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      {searchEmpty && (
+            <TagInput
+              className="h-12"
+              ref={inputRef}
+              value={inputText}
+              onChange={(evt) => {
+                setInputText(evt.currentTarget.value);
+                findUsers();
+              }}
+              onKeyDown={handleKeyDown}
+              placeholder="Type username"
+              tags={selectedUsers.map((user) => user.id)}
+              renderTag={renderTag}
+              onRemoveTag={(tag) => removeUser(tag)}
+            />
+            {inputText && (
+              <div className="absolute min-w-[350px] mt-2 bg-background-header">
+                <ul className="messaging-create-channel__user-results">
+                  {!!users?.length && !searchEmpty && (
+                    <div onMouseMove={() => setFocusedUser(undefined)}>
+                      {users.map((user, i) => (
                         <div
-                          onClick={() => {
-                            inputRef.current?.focus();
-                            clearState();
-                          }}
-                          className="messaging-create-channel__user-result empty text-white p-2"
+                          className={`messaging-create-channel__user-result
+                                cursor-pointer ${
+                                  focusedUser === i
+                                    ? "bg-info"
+                                    : focusedUser === undefined
+                                    ? "hover:bg-info"
+                                    : ""
+                                }`}
+                          onClick={() => addUser(user)}
+                          key={user.id}
                         >
-                          No people found...
+                          <UserResult user={user} />
                         </div>
-                      )}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </form>
-            {!!selectedUsers?.length && (
-              <div className="messaging-create-channel__users mt-2 flex flex-wrap">
-                {selectedUsers.map((user) => (
-                  <div
-                    className="messaging-create-channel__user flex items-center rounded-full bg-info px-2 mx-1"
-                    onClick={() => removeUser(user)}
-                    key={user.id}
-                  >
-                    <Avatar image={(user.image as string) ?? null} size={20} />
-                    <div className="messaging-create-channel__user-text text-white mr-2">
-                      {user.name}
+                      ))}
                     </div>
-                    <XButton />
-                  </div>
-                ))}
+                  )}
+                  {searchEmpty && (
+                    <div
+                      onClick={() => {
+                        inputRef.current?.focus();
+                        clearState();
+                      }}
+                      className="messaging-create-channel__user-result empty text-white p-2"
+                    >
+                      No people found...
+                    </div>
+                  )}
+                </ul>
               </div>
             )}
           </div>

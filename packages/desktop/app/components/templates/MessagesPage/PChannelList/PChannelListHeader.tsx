@@ -7,12 +7,12 @@ import _debounce from "lodash/debounce";
 /** Debounce interval in ms for performing a channel search on input. */
 const DEBOUNCE_INTERVAL = 500;
 
-type MessagingChannelListProps = {
+type PChannelListProps = {
   onCreateChannel?: () => void;
   onSearch?: (value: string) => void;
 };
 
-const MessagingChannelListHeader: React.FC<MessagingChannelListProps> = ({
+const PChannelListHeader: React.FC<PChannelListProps> = ({
   onCreateChannel,
   onSearch,
 }) => {
@@ -29,7 +29,7 @@ const MessagingChannelListHeader: React.FC<MessagingChannelListProps> = ({
   };
 
   return (
-    <div className="mb-4">
+    <div className="m-4">
       <div className="flex flex-row items-center justify-between my-4">
         <div className="text-white">Messages</div>
         <Button
@@ -52,4 +52,4 @@ const MessagingChannelListHeader: React.FC<MessagingChannelListProps> = ({
   );
 };
 
-export default React.memo(MessagingChannelListHeader);
+export default React.memo(PChannelListHeader);

@@ -9,11 +9,11 @@ import dayjs from "dayjs";
 import AvatarGroup from "../AvatarGroup";
 import { StreamType } from "../types";
 
-type MessagingChannelPreviewProps = ChannelPreviewUIComponentProps & {
+type PChannelPreviewProps = ChannelPreviewUIComponentProps & {
   setIsCreating: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const MessagingChannelPreview: React.FC<MessagingChannelPreviewProps> = ({
+const PChannelPreview: React.FC<PChannelPreviewProps> = ({
   channel,
   lastMessage,
   setActiveChannel,
@@ -30,7 +30,7 @@ const MessagingChannelPreview: React.FC<MessagingChannelPreviewProps> = ({
   return (
     <div
       className={`
-        flex items-top rounded-lg cursor-pointer p-4 overflow-hidden w-full
+        flex items-top rounded-lg cursor-pointer m-4 p-4 
         ${
           channel?.id === activeChannel?.id ? "bg-info/[.24]" : "bg-transparent"
         }
@@ -40,12 +40,17 @@ const MessagingChannelPreview: React.FC<MessagingChannelPreviewProps> = ({
         setActiveChannel?.(channel);
       }}
     >
-      <div className="mr-2 flex items-center">
-        <AvatarGroup members={members} />
-      </div>
-      <div className="flex flex-col justify-center overflow-hidden overflow-ellipsis">
-        <div className="text-white align-middle">
-          {channel.data?.name || members.map((member) => member.name).join(",")}
+      <AvatarGroup members={members} />
+      <div className="w-full">
+        <div className="flex items-top justify-between text-white">
+          <div className="w-50 overflow-hidden overflow-ellipsis">
+            {channel.data?.name || members.map((member) => member.name).join(",")}
+          </div>
+          {lastMessage?.created_at && (
+            <div className="text-[11px] w-15 text-right shrink-0 ml-2">
+              {dayjs(lastMessage.created_at).format("h:mm A")}
+            </div>
+          )}
         </div>
         {lastMessage && (
           <div
@@ -54,15 +59,10 @@ const MessagingChannelPreview: React.FC<MessagingChannelPreviewProps> = ({
           >
             {lastMessage.text}
           </div>
-        )}
+        )}        
       </div>
-      {lastMessage?.created_at && (
-        <div className="text-xs text-white w-10 text-right whitespace-nowrap">
-          {dayjs(lastMessage.created_at).format("h:mm A")}
-        </div>
-      )}
     </div>
   );
 };
 
-export default MessagingChannelPreview;
+export default PChannelPreview;

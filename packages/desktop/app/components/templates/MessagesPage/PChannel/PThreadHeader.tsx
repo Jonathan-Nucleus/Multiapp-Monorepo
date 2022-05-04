@@ -1,7 +1,7 @@
 import { ThreadHeaderProps } from "stream-chat-react";
 import { CloseThreadIcon } from "../Icons";
 
-const MessagingThreadHeader: React.FC<ThreadHeaderProps> = ({
+const PThreadHeader: React.FC<ThreadHeaderProps> = ({
   closeThread,
   thread,
 }) => {
@@ -22,4 +22,4 @@ const MessagingThreadHeader: React.FC<ThreadHeaderProps> = ({
   );
 };
 
-export default MessagingThreadHeader;
+export default PThreadHeader;

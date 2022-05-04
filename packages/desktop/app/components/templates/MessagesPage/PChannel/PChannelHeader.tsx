@@ -6,6 +6,7 @@ import { TypingIndicator } from "../TypingIndicator";
 import { ChannelType, StreamType } from "../types";
 import Input from "../../../common/Input";
 import AvatarGroup from "../AvatarGroup";
+import { ArrowLeft } from 'phosphor-react';
 import { ChannelInfoIcon, ChannelSaveIcon, getCleanImage } from "../Icons";
 
 type Props = {
@@ -13,7 +14,7 @@ type Props = {
   onCreateChannel?: () => void;
 };
 
-const MessagingChannelHeader: React.FC<Props> = (props) => {
+const PChannelHeader: React.FC<Props> = (props) => {
   const { toggleMobile } = props;
 
   const { client } = useChatContext();
@@ -82,8 +83,11 @@ const MessagingChannelHeader: React.FC<Props> = (props) => {
   );
 
   return (
-    <div className="messaging__channel-header px-4 py-4 flex justify-between items-center border-b border-white/[.15]">
-      <div className="messaging__channel-header__left flex items-center">
+    <div className="px-4 py-4 flex justify-between items-center border-b border-white/[.15]">
+      <div className="flex items-center">
+        <div className="mobile-nav-icon cursor-pointer mr-2" onClick={toggleMobile}>
+          <ArrowLeft size="25" />
+        </div>
         <AvatarGroup members={avatarInfo} />
         {!isEditing ? (
           <div className="channel-header__name text-white ml-1">
@@ -105,4 +109,4 @@ const MessagingChannelHeader: React.FC<Props> = (props) => {
   );
 };
 
-export default React.memo(MessagingChannelHeader);
+export default React.memo(PChannelHeader);

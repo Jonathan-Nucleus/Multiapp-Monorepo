@@ -11,17 +11,17 @@ import { useChatToken, useAccount } from "mobile/src/graphql/query/account";
 
 import GetStartedChannel from "./GetStartedChannel";
 import CreateChannel from "./CreateChannel";
-import MessagingChannelList, {
-  MessagingChannelListHeader,
-} from "./MessagingChannelList";
-import MessagingChannelPreview from "./MessagingChannelPreview";
-import MessagingThreadHeader from "./MessagingThread";
-import { ChannelInner } from "./ChannelInner";
+import PChannelList, {
+  PChannelListHeader,
+} from "./PChannelList";
+import PChannelPreview from "./PChannelList/PChannelPreview";
+import PThreadHeader from "./PChannel/PThreadHeader";
+import { PChannel } from "./PChannel";
 import { StreamType, GiphyContext } from "./types";
 
 const API_KEY = process.env.NEXT_PUBLIC_GETSTREAM_ACCESS_KEY as string;
 const TARGET_ORIGIN = process.env.NEXT_PUBLIC_STREAM_TARGET_ORIGIN as string;
-const options = { state: true, watch: true, presence: true, limit: 4 };
+const options = { state: true, watch: true, presence: true };
 
 const MessagesPage = () => {
   const chatClient = useRef<StreamChat | null>(null);
@@ -65,7 +65,9 @@ const MessagesPage = () => {
       initChat();
 
       return () => {
-        chatClient.current?.disconnectUser();
+        if (chatClient.current)
+          chatClient.current.disconnectUser();
+        
       };
     }
   }, [chatData, userData]);
@@ -82,10 +84,6 @@ const MessagesPage = () => {
   }, [isMobileNavVisible]);
 
   useEffect(() => {
-    /*
-     * Get the actual rendered window height to set the container size properly.
-     * In some browsers (like Safari) the nav bar can override the app.
-     */
     const setAppHeight = () => {
       const doc = document.documentElement;
       doc.style.setProperty("--app-height", `${window.innerHeight}px`);
@@ -121,13 +119,13 @@ const MessagesPage = () => {
 
   return (
     <Chat client={chatClient.current} theme="prometheus-messages dark">
-      <div className="flex h-[calc(100vh-78px)] overflow-hidden">
+      <div className="flex h-[calc(100vh-82px)]">
         <div
           id="mobile-channel-list"
-          className="w-72 p-4 border-r border-white/[.15]"
+          className="w-[300px] border-r border-white/[.15] pmessages-sidebar"
           onClick={toggleMobile}
         >
-          <MessagingChannelListHeader
+          <PChannelListHeader
             onCreateChannel={() => setIsCreating(!isCreating)}
             onSearch={onChannelSearch}
           />
@@ -135,13 +133,13 @@ const MessagesPage = () => {
             filters={channelFilters}
             sort={channelSort}
             options={options}
-            List={MessagingChannelList}
+            List={PChannelList}
             Preview={(props) => (
-              <MessagingChannelPreview {...{ setIsCreating }} {...props} />
+              <PChannelPreview {...{ setIsCreating }} {...props} />
             )}
           />
         </div>
-        <div className="flex-auto overflow-y-auto">
+        <div className="flex-auto">
           {isCreating ? (
             <CreateChannel
               toggleMobile={toggleMobile}
@@ -151,11 +149,11 @@ const MessagesPage = () => {
             <Channel
               maxNumberOfFiles={10}
               multipleUploads={true}
-              ThreadHeader={MessagingThreadHeader}
+              ThreadHeader={PThreadHeader}
               TypingIndicator={() => null}
             >
               <GiphyContext.Provider value={giphyContextValue}>
-                <ChannelInner toggleMobile={toggleMobile} />
+                <PChannel toggleMobile={toggleMobile} />
               </GiphyContext.Provider>
             </Channel>
           )}
