@@ -23,6 +23,7 @@ import {
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 import FundProfileInfo from './FundProfileInfo';
 import FundOverview from './FundOverview';
+import FundsPlaceholder from '../../../../components/placeholder/FundsPlaceholder';
 
 import { useFund } from 'mobile/src/graphql/query/marketplace/useFund';
 import { useAccount } from 'mobile/src/graphql/query/account';
@@ -33,13 +34,13 @@ import { FundDetailsScreen } from 'mobile/src/navigations/AppNavigator';
 const Tab = createMaterialTopTabNavigator();
 const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
   const { fundId } = route.params;
-  const { data } = useFund(fundId);
+  const { data, loading } = useFund(fundId);
   const { data: accountData } = useAccount();
   const { isWatching, toggleWatch } = useWatchFund(fundId);
   const [tabviewHeight, setTabViewHeight] = useState<number>(500);
 
   const fund = data?.fund;
-  if (!fund) {
+  if (!fund || loading) {
     return (
       <SafeAreaView style={pStyles.globalContainer}>
         <PHeader
@@ -48,6 +49,7 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
           onPressLeft={() => NavigationService.goBack()}
           containerStyle={styles.headerContainer}
         />
+        <FundsPlaceholder />
       </SafeAreaView>
     );
   }

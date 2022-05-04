@@ -37,6 +37,7 @@ import {
 
 import CompanyDetail from './CompanyDetail';
 import Funds from 'mobile/src/components/main/Funds';
+import ProfilePlaceholder from '../../../components/placeholder/ProfilePlaceholder';
 
 import { Post } from 'mobile/src/graphql/query/post/usePosts';
 import { useAccount } from 'mobile/src/graphql/query/account';
@@ -51,7 +52,7 @@ const CompanyProfile: CompanyProfileScreen = ({ navigation, route }) => {
   const { companyId } = route.params;
 
   const { data: accountData } = useAccount();
-  const { data: companyData } = useCompany(companyId);
+  const { data: companyData, loading: companyLoading } = useCompany(companyId);
   const { data: fundsData } = useFunds(companyId);
   const { data: postsData, refetch } = usePosts(companyId);
   const { data: featuredPostsData } = useFeaturedPosts(companyId);
@@ -81,8 +82,20 @@ const CompanyProfile: CompanyProfileScreen = ({ navigation, route }) => {
     setFocusState(isFocused);
   }
 
-  if (!company || !accountData) {
-    return <View style={pStyles.globalContainer} />;
+  if (!company || !accountData || companyLoading) {
+    return (
+      <View style={pStyles.globalContainer}>
+        <MainHeader
+          leftIcon={
+            <View style={styles.backIcon}>
+              <CaretLeft color={WHITE} />
+            </View>
+          }
+          onPressLeft={() => navigation.goBack()}
+        />
+        <ProfilePlaceholder variant="company" />
+      </View>
+    );
   }
 
   const renderItem: ListRenderItem<Post> = ({ item }) => (

@@ -25,6 +25,7 @@ import PostItem from 'mobile/src/components/main/PostItem';
 import FeaturedItem from 'mobile/src/components/main/settings/FeaturedItem';
 import Funds from 'mobile/src/components/main/Funds';
 import PGradientOutlineButton from 'mobile/src/components/common/PGradientOutlineButton';
+import ProfilePlaceholder from '../../components/placeholder/ProfilePlaceholder';
 import pStyles from 'mobile/src/theme/pStyles';
 import { Body2, Body3, H6Bold, H5Bold } from 'mobile/src/theme/fonts';
 import {
@@ -54,7 +55,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
   const { userId } = route.params;
 
   const { data: accountData } = useAccount({ fetchPolicy: 'cache-only' });
-  const { data: profileData } = useProfile(userId);
+  const { data: profileData, loading: profileLoading } = useProfile(userId);
   const { data: fundsData } = useManagedFunds(userId);
   const { data, refetch } = usePosts(userId);
   const isFocused = useIsFocused();
@@ -99,7 +100,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
     </TouchableOpacity>
   );
 
-  if (!account) {
+  if (!account || profileLoading) {
     return (
       <View style={pStyles.globalContainer}>
         <MainHeader
@@ -110,6 +111,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
           }
           onPressLeft={() => navigation.goBack()}
         />
+        <ProfilePlaceholder variant="user" />
       </View>
     );
   }

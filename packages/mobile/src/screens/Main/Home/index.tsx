@@ -29,6 +29,7 @@ import { useUpdateFcmToken } from 'mobile/src/graphql/mutation/account';
 
 import { HomeScreen } from 'mobile/src/navigations/MainTabNavigator';
 import FilterModal from 'mobile/src/screens/PostDetails/FilterModal';
+import PostItemPlaceholder from '../../../components/placeholder/PostItemPlaceholder';
 import { WHITE } from 'shared/src/colors';
 import type {
   PostCategory,
@@ -36,6 +37,8 @@ import type {
 } from 'backend/graphql/posts.graphql';
 import { PostRoleFilterOptions } from 'backend/schemas/post';
 import { Body2Bold } from '../../../theme/fonts';
+
+const PLACE_HOLDERS = 7;
 
 const HomeComponent: HomeScreen = ({ navigation }) => {
   const [selectedCategories, setSelectedCategories] = useState<
@@ -46,7 +49,7 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
   const [kebobMenuVisible, setKebobMenuVisible] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | undefined>(undefined);
 
-  const { data: userData } = useAccount();
+  const { data: userData, loading: userLoading } = useAccount();
   const { data, refetch } = usePosts(selectedCategories, selectedRole);
   const [updateFcmToken] = useUpdateFcmToken();
 
@@ -65,13 +68,18 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     SplashScreen.hide();
-    handleUpdateFcmToken();
+    handleUpdateFcmToken && handleUpdateFcmToken();
   }, []);
 
-  if (!account) {
+  if (userLoading || !account) {
+    // if show skeleton placeholder whenever loading posts,
+    // UX is not good whenever focusing on home tab
     return (
       <View style={pStyles.globalContainer}>
         <MainHeader />
+        {[...Array(PLACE_HOLDERS)].map(() => (
+          <PostItemPlaceholder />
+        ))}
       </View>
     );
   }

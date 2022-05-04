@@ -8,12 +8,15 @@ import { H6 } from 'mobile/src/theme/fonts';
 
 import AccreditationLock from './AccreditationLock';
 import FundItem from './FundItem';
+import FundsPlaceholder from '../../../../components/placeholder/FundsPlaceholder';
 import { FundsScreen } from 'mobile/src/navigations/MarketplaceTabs';
 
 import { useFunds, Fund } from 'mobile/src/graphql/query/marketplace/useFunds';
 
+const PLACE_HOLDERS = 7;
+
 const Funds: FundsScreen = ({ navigation }) => {
-  const { data, refetch } = useFunds();
+  const { data, refetch, loading } = useFunds();
 
   const isFocused = useIsFocused();
   const [focusState, setFocusState] = useState(isFocused);
@@ -23,6 +26,16 @@ const Funds: FundsScreen = ({ navigation }) => {
     console.log('refetching...');
     refetch();
     setFocusState(isFocused);
+  }
+
+  if (loading || !data?.funds) {
+    return (
+      <View style={pStyles.globalContainer}>
+        {[...Array(PLACE_HOLDERS)].map(() => (
+          <FundsPlaceholder />
+        ))}
+      </View>
+    );
   }
 
   if (data && data.funds && data.funds.length === 0) {
