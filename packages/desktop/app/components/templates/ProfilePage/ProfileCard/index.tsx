@@ -3,9 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   DotsThreeOutlineVertical,
-  LinkedinLogo,
-  TwitterLogo,
-  Globe,
   Copy,
   Users,
   WarningCircle,
@@ -14,6 +11,7 @@ import {
   Pencil,
 } from "phosphor-react";
 import { Menu } from "@headlessui/react";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 import Button from "../../../../components/common/Button";
 import Card from "../../../../components/common/Card";
@@ -27,6 +25,10 @@ import { useAccount } from "mobile/src/graphql/query/account";
 import { UserProfile } from "mobile/src/graphql/query/user/useProfile";
 import { MediaType } from "backend/graphql/mutations.graphql";
 
+import LinkedIn from "shared/assets/images/linkedin.svg";
+import Twitter from "shared/assets/images/twitter.svg";
+import Globe from "shared/assets/images/globe.svg";
+import ConfirmHideUserModal from "./ConfirmHideUserModal";
 interface PhotoProps {
   type: MediaType;
   visible: boolean;
@@ -45,6 +47,7 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
     type: "AVATAR",
     visible: false,
   });
+  const [showHideUser, setShowHideUser] = useState(false);
 
   let overviewShort: string | undefined = undefined;
   const [showFullOverView, setShowFullOverView] = useState(false);
@@ -235,17 +238,30 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
                 </div>
               </div>
             </div>
-            <div className="lg:hidden mt-4 mx-4">
-              <div className="text-white">
-                {user.firstName} {user.lastName}
+            <div className="lg:hidden flex justify-between items-center mt-4 mx-4">
+              <div>
+                <div className="text-white">
+                  {user.firstName} {user.lastName}
+                </div>
+                <div className="text-sm text-white opacity-60">
+                  {user.position}
+                </div>
+                <div className="text-sm text-white opacity-60">
+                  {user.company?.name}
+                </div>
               </div>
-              <div className="text-sm text-white opacity-60">
-                {user.position}
-              </div>
-              <div className="text-sm text-white opacity-60">
-                {user.company?.name}
-              </div>
+              {isEditable && isMyProfile && (
+                <Button
+                  variant="outline-primary"
+                  onClick={() => setEditableModal(true)}
+                  className="px-4"
+                >
+                  <Pencil size={24} color="white" />
+                  <div className="text-white ml-2">Edit Profile</div>
+                </Button>
+              )}
             </div>
+
             <div className="lg:grid grid-cols-2 mx-4 mt-4 lg:mt-2 mb-5">
               <div className="text-sm text-white">
                 <div>{user.tagline}</div>
@@ -330,12 +346,8 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
             <div className="flex items-center p-4 border-t border-white/[.12]">
               <div className="flex items-center cursor-pointer">
                 <Link href={user.linkedIn ?? "/"}>
-                  <a className="flex items-center text-white">
-                    <LinkedinLogo
-                      color="currentColor"
-                      size={24}
-                      weight="fill"
-                    />
+                  <a className="flex items-center text-white" target="_blank">
+                    <Image src={LinkedIn} alt="" layout={"intrinsic"} />
                     <div className="text-sm text-primary ml-1 hidden md:block">
                       Linkedin
                     </div>
@@ -344,8 +356,8 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
               </div>
               <div className="flex items-center cursor-pointer ml-8">
                 <Link href={user.twitter ?? "/"}>
-                  <a className="flex items-center text-white">
-                    <TwitterLogo color="currentColor" size={24} weight="fill" />
+                  <a className="flex items-center text-white" target="_blank">
+                    <Image src={Twitter} alt="" layout={"intrinsic"} />
                     <div className="text-sm text-primary ml-1 hidden md:block">
                       Twitter
                     </div>
@@ -354,8 +366,8 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
               </div>
               <div className="flex items-center cursor-pointer ml-8">
                 <Link href={user.website ?? "/"}>
-                  <a className="flex items-center text-white">
-                    <Globe color="currentColor" size={24} weight="fill" />
+                  <a className="flex items-center text-white" target="_blank">
+                    <Image src={Globe} alt="" layout={"intrinsic"} />
                     <div className="text-sm text-primary ml-2">Website</div>
                   </a>
                 </Link>
@@ -374,22 +386,37 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
                   <Menu.Items className="z-10	absolute right-0 w-64 bg-surface-light10 shadow-md shadow-black rounded">
                     <Menu.Item>
                       <div className="divide-y border-white/[.12] divide-inherit pb-2">
-                        <div className="flex items-center text-sm text-white cursor-pointer p-4">
+                        <div
+                          className="flex items-center text-sm text-white cursor-pointer p-4"
+                          onClick={() => {
+                            setFollowersModalTab(0);
+                            setVisible(true);
+                          }}
+                        >
                           <Users color="currentColor" size={24} />
                           <span className="ml-4">View All Followers</span>
                         </div>
-                        <div className="flex items-center text-sm text-white cursor-pointer p-4">
-                          <MinusCircle color="currentColor" size={24} />
-                          <span className="ml-4">Hide User</span>
-                        </div>
-                        <div className="flex items-center text-sm text-white cursor-pointer p-4">
-                          <WarningCircle color="currentColor" size={24} />
-                          <span className="ml-4">Report Profile</span>
-                        </div>
-                        <div className="flex items-center text-sm text-white cursor-pointer p-4">
-                          <Copy color="currentColor" size={24} />
-                          <span className="ml-4">Copy Profile Link</span>
-                        </div>
+                        {!isMyProfile && (
+                          <>
+                            <div
+                              className="flex items-center text-sm text-white cursor-pointer p-4"
+                              onClick={() => setShowHideUser(true)}
+                            >
+                              <MinusCircle color="currentColor" size={24} />
+                              <span className="ml-4">Hide User</span>
+                            </div>
+                            <div className="flex items-center text-sm text-white cursor-pointer p-4">
+                              <WarningCircle color="currentColor" size={24} />
+                              <span className="ml-4">Report Profile</span>
+                            </div>
+                          </>
+                        )}
+                        <CopyToClipboard text={user.website}>
+                          <div className="flex items-center text-sm text-white cursor-pointer p-4">
+                            <Copy color="currentColor" size={24} />
+                            <span className="ml-4">Copy Profile Link</span>
+                          </div>
+                        </CopyToClipboard>
                       </div>
                     </Menu.Item>
                   </Menu.Items>
@@ -399,7 +426,7 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
           </div>
         </Card>
       </div>
-      {isVisible &&
+      {isVisible && (
         <FollowersModal
           show={isVisible}
           onClose={() => setVisible(false)}
@@ -407,7 +434,7 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
           followers={user.followers}
           following={user.following}
         />
-      }
+      )}
       <EditModal show={editableModal} onClose={() => setEditableModal(false)} />
       <PhotoUploadModal
         show={editablePhoto.visible}
@@ -419,6 +446,11 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
         }}
         type={editablePhoto.type}
         user={user}
+      />
+      <ConfirmHideUserModal
+        user={user}
+        show={showHideUser}
+        onClose={() => setShowHideUser(false)}
       />
     </>
   );

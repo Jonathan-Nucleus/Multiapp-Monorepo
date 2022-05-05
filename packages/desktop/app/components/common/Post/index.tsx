@@ -105,7 +105,7 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
           <div className="ml-2">
             <div className="flex items-center">
               <Link href={`/profile/${user._id}`}>
-                <a className="text-white">
+                <a className="text-white capitalize">
                   {`${user.firstName} ${user.lastName}`}
                 </a>
               </Link>
@@ -159,7 +159,7 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
                     <>
                       <Menu.Item>
                         <div
-                          className="flex items-center px-4 py-3 cursor-pointer"
+                          className="flex items-center px-4 py-3 cursor-pointer  hover:bg-background-blue"
                           onClick={() => toggleFollowingUser()}
                         >
                           {isFollowingUser ? (
@@ -188,7 +188,7 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
                       </Menu.Item>
                       <Menu.Item>
                         <div
-                          className="flex items-center px-4 py-3 cursor-pointer"
+                          className="flex items-center px-4 py-3 cursor-pointer hover:bg-background-blue"
                           onClick={() => toggleMutePost()}
                         >
                           {isMuted ? (
@@ -213,7 +213,7 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
                       </Menu.Item>
                       <Menu.Item>
                         <div
-                          className="flex items-center px-4 py-3 cursor-pointer"
+                          className="flex items-center px-4 py-3 cursor-pointer hover:bg-background-blue"
                           onClick={() => hidePostCallback()}
                         >
                           <XSquare
@@ -226,7 +226,7 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
                       </Menu.Item>
                       <Menu.Item>
                         <div
-                          className="flex items-center px-4 py-3 cursor-pointer"
+                          className="flex items-center px-4 py-3 cursor-pointer hover:bg-background-blue"
                           onClick={() => setShowReportPost(true)}
                         >
                           <WarningOctagon
@@ -239,7 +239,7 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
                       </Menu.Item>
                       <Menu.Item>
                         <div
-                          className="flex items-center px-4 py-3 cursor-pointer"
+                          className="flex items-center px-4 py-3 cursor-pointer hover:bg-background-blue"
                           onClick={() => setShowHidePost(true)}
                         >
                           <EyeClosed
@@ -257,7 +257,7 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
                     <>
                       <Menu.Item>
                         <div
-                          className="flex items-center px-4 py-3 cursor-pointer"
+                          className="flex items-center px-4 py-3 cursor-pointer hover:bg-background-blue"
                           onClick={() => onClickToEdit && onClickToEdit()}
                         >
                           <Pencil
@@ -270,7 +270,7 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
                       </Menu.Item>
                       <Menu.Item>
                         <div
-                          className="flex items-center px-4 py-3 cursor-pointer"
+                          className="flex items-center px-4 py-3 cursor-pointer hover:bg-background-blue"
                           onClick={() => toggleMutePost()}
                         >
                           {isMuted ? (
@@ -295,7 +295,7 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
                       </Menu.Item>
                       <Menu.Item>
                         <div
-                          className="flex items-center px-4 py-3 cursor-pointer"
+                          className="flex items-center px-4 py-3 cursor-pointer hover:bg-background-blue"
                           onClick={() => deletePostCallback()}
                         >
                           <Trash fill="currentColor" weight="light" size={24} />

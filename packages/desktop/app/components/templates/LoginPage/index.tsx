@@ -1,22 +1,27 @@
 import { FC, ReactElement, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import { useRouter } from "next/router";
+import { signIn, getProviders } from "next-auth/react";
+import { RedirectableProviderType } from "next-auth/providers";
+import { WarningCircle } from "phosphor-react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
 import Input from "../../common/Input";
 import Label from "../../common/Label";
 import Checkbox from "../../common/Checkbox";
 import Button from "../../common/Button";
-import { signIn, getProviders } from "next-auth/react";
 import Alert from "../../common/Alert";
-import { AppleLogo, GoogleLogo, LinkedinLogo, WarningCircle } from "phosphor-react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { RedirectableProviderType } from "next-auth/providers";
-import { useRouter } from "next/router";
+import Apple from "shared/assets/images/apple.svg";
+import LinkedIn from "shared/assets/images/linkedin.svg";
+import Google from "shared/assets/images/google.svg";
 
 const PROVIDER_ICONS: Record<string, ReactElement> = {
-  apple: <AppleLogo color="white" weight="fill" size={20} />,
-  google: <GoogleLogo color="white" weight="bold" size={20} />,
-  linkedin: <LinkedinLogo color="white" weight="fill" size={20} />,
+  apple: <Image src={Apple} alt="" layout={"intrinsic"} />,
+  google: <Image src={Google} alt="" layout={"intrinsic"} />,
+  linkedin: <Image src={LinkedIn} alt="" layout={"intrinsic"} />,
 };
 
 interface LoginPageProps {
@@ -138,7 +143,11 @@ const LoginPage: FC<LoginPageProps> = ({ providers }: LoginPageProps) => {
               Log In
             </Button>
           </div>
-          <div className="mt-12 text-center text-white">Or, Log In with</div>
+          <div className="flex items-center justify-center mt-12 w-full">
+            <div className="bg-white/[.12] h-px flex-1"></div>
+            <div className="text-center text-white mx-4">Or, Log In with</div>
+            <div className="bg-white/[.12] h-px flex-1"></div>
+          </div>
         </form>
       </div>
       <div className="container mx-auto mt-8 max-w-lg">
@@ -156,7 +165,7 @@ const LoginPage: FC<LoginPageProps> = ({ providers }: LoginPageProps) => {
                   {provider}
                 </span>
               </Button>
-            ),
+            )
           )}
           <Button
             variant="outline-primary"

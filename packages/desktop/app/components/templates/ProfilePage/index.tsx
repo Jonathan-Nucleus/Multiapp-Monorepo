@@ -37,15 +37,19 @@ const ProfilePage: FC<ProfilePageProps> = ({ user }) => {
                 <ProfileCard user={user} isEditable={isMyProfile} />
               </div>
               <div className="lg:hidden mb-5 pt-5">
-                {user.companies.length > 0 &&
+                {user.companies.length > 0 && (
                   <CompaniesList companies={user.companies} />
-                }
+                )}
               </div>
               {funds.length > 0 ? (
                 <div className="py-5">
                   {funds.map((fund) => (
                     <div key={fund._id} className="mb-5">
-                      <FundCard fund={fund} showImages={false} />
+                      <FundCard
+                        fund={fund}
+                        showImages={false}
+                        profileType="manager"
+                      />
                     </div>
                   ))}
                 </div>
@@ -80,19 +84,19 @@ const ProfilePage: FC<ProfilePageProps> = ({ user }) => {
               )}
             </div>
           </div>
-          {user.companies.length > 0 &&
+          {user.companies.length > 0 && (
             <div className="w-80 flex-shrink-0 hidden lg:block mx-4">
               <CompaniesList companies={user.companies} />
             </div>
-          }
+          )}
         </div>
       </div>
-      {showPostModal &&
+      {showPostModal && (
         <EditPostModal
           show={showPostModal}
           onClose={() => setShowPostModal(false)}
         />
-      }
+      )}
     </>
   );
 };

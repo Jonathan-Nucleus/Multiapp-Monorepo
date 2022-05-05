@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Card from "../../../common/Card";
 import { CompanyType } from "desktop/app/types/common-props";
+import Avatar from "../../../common/Avatar";
 
 interface CompanyProps {
   company: CompanyType;
@@ -11,25 +12,24 @@ interface CompanyProps {
 const CompanyCard: FC<CompanyProps> = ({ company }) => {
   return (
     <div>
-      <div className="h-24 flex items-center justify-center">
-        {company.avatar && (
-          <Image
-            loader={() =>
-              `${process.env.NEXT_PUBLIC_AVATAR_URL}/${company.avatar}`
-            }
-            src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${company.avatar}`}
-            alt=""
-            width={88}
-            height={88}
-            className="bg-background object-cover rounded-xl"
-            unoptimized={true}
-          />
-        )}
-      </div>
+      <Link href={`/company/${company._id}`}>
+        <a>
+          <div className="h-24 flex items-center justify-center">
+            {company.avatar && (
+              <Avatar src={company.avatar} size={88} shape="square" />
+            )}
+          </div>
+        </a>
+      </Link>
+
       <Card className="text-center -mt-12">
-        <div className="text-xl text-white font-medium mt-12">
-          {company.name}
-        </div>
+        <Link href={`/company/${company._id}`}>
+          <a>
+            <div className="text-xl text-white font-medium mt-12">
+              {company.name}
+            </div>
+          </a>
+        </Link>
         <div className="grid grid-cols-3 border-white/[.12] divide-x divide-inherit mt-5">
           <div>
             <div className="font-medium text-xl text-white">

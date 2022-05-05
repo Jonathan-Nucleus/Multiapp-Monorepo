@@ -18,13 +18,22 @@ const ProfileCardSmall: FC<ProfileProps> = ({ user }: ProfileProps) => {
   const isMyProfile = user._id == session?.user?._id;
   return (
     <div>
-      <div className="h-24 flex items-center justify-center">
-        <Avatar src={user.avatar} size={88} />
-      </div>
+      <Link href={`/profile/${user._id}`}>
+        <a>
+          <div className="h-24 flex items-center justify-center">
+            <Avatar src={user.avatar} size={88} />
+          </div>
+        </a>
+      </Link>
+
       <Card className="text-center -mt-12">
-        <div className="text-xl text-white font-medium mt-12">
-          {user.firstName} {user.lastName}
-        </div>
+        <Link href={`/profile/${user._id}`}>
+          <a>
+            <div className="text-xl text-white font-medium mt-12 capitalize">
+              {user.firstName} {user.lastName}
+            </div>
+          </a>
+        </Link>
         <div className="text-sm text-white opacity-60">{user.position}</div>
         <div className="flex items-center justify-center mt-3">
           <div className="relative text-success">

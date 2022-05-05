@@ -10,8 +10,9 @@ import InvitationCoin from "./InvitationCoin";
 import { useInvites, Invitee } from "mobile/src/graphql/query/account";
 import { INVITE_USER } from "mobile/src/graphql/mutation/account";
 import { X } from "phosphor-react";
+import { useMemo } from "react";
 
-const MAX_INVITES = 5;
+const MAX_INVITES = 10;
 const variants = ["primary", "error", "secondary", "info", "success"];
 
 type FormValues = { email: string };
@@ -28,17 +29,25 @@ interface InviteFriendsProps {
 const InviteFriends: FC<InviteFriendsProps> = ({ onClose }) => {
   const [loading, setLoading] = useState(false);
   const { data: accountData } = useInvites();
+
   const [inviteUser] = useMutation(INVITE_USER, {
     refetchQueries: ["Invites"],
   });
-  const { register, handleSubmit, formState, reset } = useForm<yup.InferType<typeof schema>>({
+  const { register, handleSubmit, formState, reset } = useForm<
+    yup.InferType<typeof schema>
+  >({
     resolver: yupResolver(schema),
-    mode: "onChange",
+    mode: "onBlur",
   });
   const invitedFriends: Invitee[] = accountData?.account?.invitees ?? [];
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
-    if (MAX_INVITES - invitedFriends.length <= 0) return;
+    if (
+      accountData?.account.role !== "PROFESSIONAL" &&
+      MAX_INVITES - invitedFriends.length <= 0
+    ) {
+      return;
+    }
 
     setLoading(true);
     try {
@@ -54,13 +63,19 @@ const InviteFriends: FC<InviteFriendsProps> = ({ onClose }) => {
     setLoading(false);
   };
 
+  const label = useMemo(() => {
+    if (accountData?.account.role === "PROFESSIONAL") {
+      return "Enter Email Addresses";
+    }
+    return `Enter (up to ${MAX_INVITES - invitedFriends.length} more) Email
+    Addresses`;
+  }, [accountData, invitedFriends]);
+
   return (
     <Card className="p-0">
       <div className="flex items-center border-b border-white/[.12] p-4">
-        <div className="text-white">
-          Invite Your Friends
-        </div>
-        {onClose &&
+        <div className="text-white">Invite Your Friends</div>
+        {onClose && (
           <div className="flex ml-auto">
             <Button
               variant="text"
@@ -70,17 +85,14 @@ const InviteFriends: FC<InviteFriendsProps> = ({ onClose }) => {
               <X color="white" weight="bold" size={24} />
             </Button>
           </div>
-        }
+        )}
       </div>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="p-4">
           <Field
             type="email"
             name="email"
-            label={`Enter (up to ${
-              MAX_INVITES - invitedFriends.length
-            } more) Email
-            Addresses`}
+            label={label}
             register={register}
             state={formState}
           />
@@ -89,8 +101,8 @@ const InviteFriends: FC<InviteFriendsProps> = ({ onClose }) => {
           We want to seed this platform with those who really have a passion for
           financial markets, economics and great ideas.
         </div>
-        <div className="flex items-center justify-between mt-6 mb-4 px-4">
-          <div className="flex items-center -mx-1">
+        <div className="flex items-center justify-between flex-wrap mt-6 mb-4 px-4">
+          <div className="flex items-center -mx-1 mb-4">
             {[...Array(MAX_INVITES)].map((ignored, index) => (
               <InvitationCoin
                 key={`friend-${index}`}

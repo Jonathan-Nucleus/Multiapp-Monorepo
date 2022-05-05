@@ -94,10 +94,10 @@ const CompanyEdit: FC<CompanyEditModalProps> = ({
 
   return (
     <>
-      <Dialog open={show} onClose={onClose} className="fixed z-10 inset-0">
+      <Dialog open={show} onClose={onClose} className="fixed z-50 inset-0">
         <div className="flex items-center justify-center h-screen">
           <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
-          <Card className="flex flex-col border-0 mx-auto p-0 z-10 w-full max-w-md">
+          <Card className="flex flex-col border-0 mx-auto p-0 z-10 w-full max-w-md overflow-y-auto h-4/5">
             <div className="flex justify-between items-center border-b-2  px-4 py-2">
               <div className="text-sm text-white opacity-60 font-medium tracking-widest">
                 Edit Company

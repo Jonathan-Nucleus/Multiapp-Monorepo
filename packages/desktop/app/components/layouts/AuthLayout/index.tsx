@@ -1,5 +1,5 @@
 import { FC, PropsWithChildren } from "react";
-import Logo from "shared/assets/images/logo.svg";
+import Logo from "shared/assets/images/logo-gradient.svg";
 import Image from "next/image";
 
 type AuthLayoutProps = PropsWithChildren<unknown>;

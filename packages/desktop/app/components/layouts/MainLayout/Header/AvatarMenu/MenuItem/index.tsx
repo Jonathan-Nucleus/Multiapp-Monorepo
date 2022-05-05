@@ -9,11 +9,16 @@ interface MenuItemProps {
   onClick?: () => void;
 }
 
-const MenuItem: FC<MenuItemProps> = ({ icon, title, path, onClick }: MenuItemProps) => {
+const MenuItem: FC<MenuItemProps> = ({
+  icon,
+  title,
+  path,
+  onClick,
+}: MenuItemProps) => {
   const router = useRouter();
   return (
     <div
-      className="cursor-pointer px-4 py-3 flex flex-row items-center"
+      className="cursor-pointer px-4 py-3 flex flex-row items-center  hover:bg-background-blue"
       onClick={() => {
         onClick ? onClick() : router.push(path);
       }}

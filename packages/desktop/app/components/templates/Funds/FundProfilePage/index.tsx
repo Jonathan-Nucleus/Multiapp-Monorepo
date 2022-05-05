@@ -128,10 +128,10 @@ interface FundProfileProps {
 
 const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
   const { data } = useFund(fundId);
+  const fund = data?.fund;
   const { isWatching, toggleWatch } = useWatchFund(fundId);
   const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
 
-  const fund = data?.fund;
   if (!fund) {
     return <SkeletonFundProfilePage />;
   }

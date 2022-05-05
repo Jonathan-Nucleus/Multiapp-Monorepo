@@ -116,7 +116,7 @@ const AvatarMenu: FC = () => {
                     <div className="flex flex-row items-center p-4">
                       <Avatar size={64} src={account?.avatar} />
                       <div className="text-left ml-3">
-                        <div className="text-xl text-white">
+                        <div className="text-xl text-white capitalize">
                           {account?.firstName} {account?.lastName}
                         </div>
                         <div className="text-sm text-white opacity-60">
@@ -155,7 +155,11 @@ const AvatarMenu: FC = () => {
             >
               No
             </Button>
-            <Button variant="primary" className="w-24" onClick={() => signOut()}>
+            <Button
+              variant="primary"
+              className="w-24"
+              onClick={() => signOut()}
+            >
               Yes
             </Button>
           </div>

@@ -49,7 +49,16 @@ export const FUND_MANAGER_FRAGMENT = gql`
 `;
 
 export type FundCompany = {
-  company: Pick<Fund['company'], '_id' | 'name' | 'avatar' | 'background'>;
+  company: Pick<
+    Fund['company'],
+    | '_id'
+    | 'name'
+    | 'avatar'
+    | 'background'
+    | 'followerIds'
+    | 'postIds'
+    | 'followingIds'
+  >;
 };
 
 export const FUND_COMPANY_FRAGMENT = gql`
@@ -66,6 +75,9 @@ export const FUND_COMPANY_FRAGMENT = gql`
         height
         scale
       }
+      followerIds
+      followingIds
+      postIds
     }
   }
 `;

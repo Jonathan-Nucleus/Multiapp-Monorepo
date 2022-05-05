@@ -283,20 +283,33 @@ const ProfileCard: FC<CompanyPageProps> = ({
               </div>
             </div>
             <div className="lg:hidden mt-3 mb-5 px-4">
-              <Button
-                variant="gradient-primary"
-                className="w-full text-sm font-medium"
-                onClick={() => toggleFollowCompany()}
-              >
-                {isFollowing ? "Unfollow" : "Follow"}
-              </Button>
+              {isEditable ? (
+                <Button
+                  variant="gradient-primary"
+                  className="w-40 text-sm font-medium"
+                  onClick={() => setEditableModal(true)}
+                >
+                  Edit Company
+                </Button>
+              ) : (
+                <Button
+                  variant="gradient-primary"
+                  className="w-full text-sm font-medium"
+                  onClick={() => toggleFollowCompany()}
+                >
+                  {isFollowing ? "Unfollow" : "Follow"}
+                </Button>
+              )}
             </div>
             <div className="flex items-center p-4 border-t border-white/[.12]">
               <div className="flex items-center -mx-4">
-                {company.linkedIn &&
+                {company.linkedIn && (
                   <div className="flex items-center cursor-pointer px-4">
                     <Link href={company.linkedIn}>
-                      <a target="_blank" className="flex items-center text-white">
+                      <a
+                        target="_blank"
+                        className="flex items-center text-white"
+                      >
                         <LinkedinLogo
                           color="currentColor"
                           size={24}
@@ -308,29 +321,39 @@ const ProfileCard: FC<CompanyPageProps> = ({
                       </a>
                     </Link>
                   </div>
-                }
-                {company.twitter &&
+                )}
+                {company.twitter && (
                   <div className="flex items-center cursor-pointer px-4">
                     <Link href={company.twitter}>
-                      <a target="_blank" className="flex items-center text-white">
-                        <TwitterLogo color="currentColor" size={24} weight="fill" />
+                      <a
+                        target="_blank"
+                        className="flex items-center text-white"
+                      >
+                        <TwitterLogo
+                          color="currentColor"
+                          size={24}
+                          weight="fill"
+                        />
                         <div className="text-sm text-primary ml-1 hidden md:block">
                           Twitter
                         </div>
                       </a>
                     </Link>
                   </div>
-                }
-                {company.website &&
+                )}
+                {company.website && (
                   <div className="flex items-center cursor-pointer px-4">
                     <Link href={company.website}>
-                      <a target="_blank" className="flex items-center text-white">
+                      <a
+                        target="_blank"
+                        className="flex items-center text-white"
+                      >
                         <Globe color="currentColor" size={24} weight="fill" />
                         <div className="text-sm text-primary ml-2">Website</div>
                       </a>
                     </Link>
                   </div>
-                }
+                )}
               </div>
               <div className="ml-auto">
                 <Menu>
