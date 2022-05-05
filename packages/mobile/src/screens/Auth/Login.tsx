@@ -34,7 +34,6 @@ import type { LoginScreen } from 'mobile/src/navigations/AuthStack';
 
 import { authenticate } from 'mobile/src/services/auth/google-provider';
 import { useLoginOAuth } from 'mobile/src/graphql/mutation/auth/useLoginOAuth';
-import { useUpdateFcmToken } from 'mobile/src/graphql/mutation/account';
 import CheckboxLabel from '../../components/common/CheckboxLabel';
 
 const Login: LoginScreen = ({ navigation }) => {
@@ -45,7 +44,6 @@ const Login: LoginScreen = ({ navigation }) => {
 
   const [login] = useMutation(LOGIN);
   const [loginOAuth] = useLoginOAuth();
-  const [updateFcmToken] = useUpdateFcmToken();
 
   useEffect(() => {
     SplashScreen.hide();

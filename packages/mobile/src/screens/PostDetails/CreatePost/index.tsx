@@ -375,6 +375,7 @@ const CreatePost: CreatePostScreen = ({ navigation }) => {
           rightLabel="NEXT"
           rightValidation={isValid}
           handleNext={handleSubmit(onSubmit)}
+          handleBack={() => navigation.goBack()}
         />
         <PAppContainer
           disableKeyboardScroll

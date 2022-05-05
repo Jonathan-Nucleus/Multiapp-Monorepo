@@ -1,6 +1,5 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { X } from 'phosphor-react-native';
 
 import PLabel from 'mobile/src/components/common/PLabel';
@@ -14,19 +13,17 @@ interface PostHeaderProps {
   rightLabel: string;
   rightValidation: boolean;
   handleNext?: () => void;
+  handleBack?: () => void;
 }
 
 const PostHeader: React.FC<PostHeaderProps> = (props) => {
-  const { centerLabel, rightLabel, rightValidation, handleNext } = props;
-  const navigation = useNavigation();
+  const { centerLabel, rightLabel, rightValidation, handleNext, handleBack } =
+    props;
 
   return (
     <PHeader
       leftIcon={
-        <RoundIcon
-          icon={<X size={20} color={WHITE} />}
-          onPress={() => navigation.goBack()}
-        />
+        <RoundIcon icon={<X size={20} color={WHITE} />} onPress={handleBack} />
       }
       leftStyle={styles.sideStyle}
       centerIcon={<PLabel label={centerLabel} textStyle={styles.headerTitle} />}

@@ -59,7 +59,9 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
 
     if (result && result.data && result.data.createPost) {
       showMessage('success', 'Successfully posted!');
-      navigation.pop(3);
+      navigation.pop(2);
+      // it should go to different stack
+      navigation.navigate('Main');
     }
   };
 
@@ -77,6 +79,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
         rightLabel="POST"
         rightValidation={true}
         handleNext={handleSubmit}
+        handleBack={() => navigation.navigate('Main')}
       />
       <PAppContainer>
         <View style={styles.usersPart}>

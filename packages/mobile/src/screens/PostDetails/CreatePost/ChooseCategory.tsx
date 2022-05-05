@@ -99,6 +99,7 @@ const ChooseCategory: ChooseCategoryScreen = ({ route, navigation }) => {
         rightLabel="NEXT"
         rightValidation={isValid}
         handleNext={handleSubmit(onSubmit)}
+        handleBack={() => navigation.navigate('Main')}
       />
       <PAppContainer>
         <PLabel

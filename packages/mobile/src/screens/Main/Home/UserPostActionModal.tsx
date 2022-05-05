@@ -53,8 +53,8 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
   const isMuted =
     accountData?.account?.mutedPostIds?.includes(post._id) ?? false;
 
-  const menuData = useMemo(
-    () => [
+  const menuData = useMemo(() => {
+    const menuArray = [
       {
         label: `Follow ${user.firstName} ${user.lastName}`,
         icon: <UserCirclePlus size={26} color={WHITE} />,
@@ -86,9 +86,19 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
         icon: <EyeClosed size={26} color={WHITE} />,
         key: 'hide' as const,
       },
-    ],
-    [user, isMuted],
-  );
+    ];
+
+    const following = accountData?.account?.followingIds?.includes(
+      user?._id ?? '',
+    );
+
+    if (following) {
+      // if user is already following, need to omit follow option
+      return menuArray.slice(1);
+    } else {
+      return menuArray;
+    }
+  }, [user, accountData, isMuted]);
 
   const handleFollowUser = async () => {
     try {

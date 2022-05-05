@@ -34,6 +34,7 @@ const PHeader: React.FC<HeaderProps> = (props) => {
       {!!leftIcon && (
         <TouchableOpacity
           onPress={onPressLeft}
+          disabled={onPressLeft ? false : true}
           style={[styles.leftIcon, leftStyle]}>
           {leftIcon}
         </TouchableOpacity>

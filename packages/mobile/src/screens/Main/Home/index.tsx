@@ -47,8 +47,12 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
   const [kebobMenuVisible, setKebobMenuVisible] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | undefined>(undefined);
 
-  const { data: userData, loading: userLoading } = useAccount();
-  const { data, refetch } = usePosts(selectedCategories, selectedRole);
+  const { data: userData } = useAccount();
+  const {
+    data,
+    loading: postsLoading,
+    refetch,
+  } = usePosts(selectedCategories, selectedRole);
 
   const account = userData?.account;
   const postData = data?.posts ?? [];
@@ -67,7 +71,7 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
     SplashScreen.hide();
   }, []);
 
-  if (userLoading || !account) {
+  if (postsLoading || !account) {
     // if show skeleton placeholder whenever loading posts,
     // UX is not good whenever focusing on home tab
     return (
