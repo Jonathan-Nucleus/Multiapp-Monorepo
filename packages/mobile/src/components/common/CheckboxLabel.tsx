@@ -4,6 +4,7 @@ import CheckBox from '@react-native-community/checkbox';
 
 import PLabel from './PLabel';
 import { PRIMARYSOLID, WHITE } from 'shared/src/colors';
+import { Body2Bold } from '../../theme/fonts';
 
 interface PostCategoryProps {
   id: number;
@@ -79,6 +80,7 @@ const styles = StyleSheet.create({
   },
   label: {
     marginLeft: 12,
+    ...Body2Bold,
   },
   flex: {
     flex: 1,

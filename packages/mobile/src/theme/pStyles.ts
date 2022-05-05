@@ -5,6 +5,9 @@ const pStyles = {
     flex: 1,
     backgroundColor: BLACK,
   },
+  pressedStyle: {
+    opacity: 0.6,
+  },
 };
 
 export default pStyles;

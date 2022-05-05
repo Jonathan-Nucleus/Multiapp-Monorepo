@@ -12,6 +12,7 @@ export const PRIMARY = "#00AAE0";
 export const PRIMARYSTATE = "#714EFD";
 export const PRIMARYSOLID = "#544EFD";
 export const PRIMARYSOLID7 = "#544EFD12";
+export const PRIMARYSOLID36 = "#544EFD5C";
 export const PRIMARYLIGHT = "#EBEBFF";
 export const PRIMARYOVERLAY = "#22204A";
 export const SECONDARY = "#0067E0";

@@ -30,7 +30,9 @@ const Buffer = global.Buffer || require('buffer').Buffer;
 
 import UserSvg from 'shared/assets/images/user.svg';
 import GlobalSvg from 'shared/assets/images/global.svg';
-import AISvg from 'shared/assets/images/ai-badge.svg';
+import AISvg from 'shared/assets/images/AI.svg';
+import QPSvg from 'shared/assets/images/QP.svg';
+import QCSvg from 'shared/assets/images/QC.svg';
 
 import Avatar from 'mobile/src/components/common/Avatar';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
@@ -87,22 +89,42 @@ export const AUDIENCE_OPTIONS: Option<Audience>[] = [
   {
     id: 'EVERYONE',
     value: 'Everyone',
-    labelView: <RadioBodyView icon={<AISvg />} label="Everyone" />,
+    labelView: (
+      <RadioBodyView
+        icon={<GlobalSvg width={24} height={24} />}
+        label="Everyone"
+      />
+    ),
   },
   {
     id: 'ACCREDITED',
     value: 'Accredited Investors',
-    labelView: <RadioBodyView icon={<AISvg />} label="Accredited Investors" />,
+    labelView: (
+      <RadioBodyView
+        icon={<AISvg width={24} height={24} />}
+        label="Accredited Investors"
+      />
+    ),
   },
   {
     id: 'QUALIFIED_PURCHASER',
     value: 'Qualified Purchasers',
-    labelView: <RadioBodyView icon={<AISvg />} label="Qualified Purchasers" />,
+    labelView: (
+      <RadioBodyView
+        icon={<QPSvg width={24} height={24} />}
+        label="Qualified Purchasers"
+      />
+    ),
   },
   {
     id: 'QUALIFIED_CLIENT',
     value: 'Qualified Clients',
-    labelView: <RadioBodyView icon={<AISvg />} label="Qualified Clients" />,
+    labelView: (
+      <RadioBodyView
+        icon={<QCSvg width={24} height={24} />}
+        label="Qualified Clients"
+      />
+    ),
   },
 ];
 
@@ -504,6 +526,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   mentionInput: {
+    paddingHorizontal: 8,
+    paddingTop: 8,
+    lineHeight: 20,
     color: 'white',
     marginVertical: 16,
     fontSize: 16,
@@ -571,6 +596,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: PRIMARYSOLID7,
+    backgroundColor: 'transparent',
   },
 });

@@ -7,6 +7,7 @@ export type PostSummary = Pick<
   | 'body'
   | 'categories'
   | 'mediaUrl'
+  | 'audience'
   | 'mentionIds'
   | 'likeIds'
   | 'shareIds'

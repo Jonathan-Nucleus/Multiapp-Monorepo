@@ -27,6 +27,7 @@ import { PostCategories } from 'backend/graphql/enumerations.graphql';
 import { useLikePost } from '../../graphql/mutation/posts';
 import { showMessage } from '../../services/utils';
 import { appWidth } from '../../utils/utils';
+import pStyles from '../../theme/pStyles';
 
 export interface PostItemProps {
   post: Post;
@@ -96,11 +97,14 @@ const PostItem: React.FC<PostItemProps> = ({ post, userId, onPressMenu }) => {
     <Pressable onPress={goToDetails}>
       <View style={styles.container}>
         <View style={[styles.headerWrapper, styles.contentPadding]}>
-          <Pressable onPress={goToProfile}>
+          <Pressable
+            onPress={goToProfile}
+            style={({ pressed }) => (pressed ? pStyles.pressedStyle : {})}>
             <UserInfo
               user={user}
               avatarSize={56}
               auxInfo={dayjs(post.createdAt).format('MMM D')}
+              audienceInfo={post.audience}
             />
           </Pressable>
           <TouchableOpacity

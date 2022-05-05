@@ -5,7 +5,12 @@ import Avatar from './Avatar';
 import PLabel from './PLabel';
 import { Body1Bold, Body3, Body3Bold, Body4Bold } from '../../theme/fonts';
 import { WHITE60, PRIMARY, GRAY100 } from 'shared/src/colors';
+
 import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
+import QPSvg from 'shared/assets/images/QP.svg';
+import QCSvg from 'shared/assets/images/QC.svg';
+import AISvg from 'shared/assets/images/AI.svg';
+import GlobalSvg from 'shared/assets/images/global.svg';
 
 import { useFollowUser } from 'mobile/src/graphql/mutation/account';
 import { useAccount } from 'mobile/src/graphql/query/account';
@@ -23,21 +28,46 @@ interface UserInfoProps {
   avatarStyle?: object;
   avatarSize?: number;
   auxInfo?: string;
+  audienceInfo?: string;
 }
 
 const UserInfo: React.FC<UserInfoProps> = (props) => {
-  const { user, viewStyle, avatarSize, auxInfo } = props;
+  const { user, viewStyle, avatarSize, auxInfo, audienceInfo } = props;
 
   const { data: accountData } = useAccount();
   const [followUser] = useFollowUser();
 
   const account = accountData?.account;
   const { role, company } = user;
-  const isPro = user?.role === 'PROFESSIONAL';
+  const isPro = role === 'PROFESSIONAL' || role === 'VERIFIED';
   const isSelf = user?._id === account?._id;
   const following = account?.followingIds?.includes(user?._id ?? '');
 
   const [isFollowing, setIsFollowing] = useState(following);
+
+  let audienceIcon;
+  switch (audienceInfo) {
+    case 'ACCREDITED':
+      audienceIcon = <AISvg width={12} height={12} />;
+      break;
+
+    case 'QUALIFIED_CLIENT':
+      audienceIcon = <QCSvg width={12} height={12} />;
+      break;
+
+    case 'QUALIFIED_PURCHASER':
+      audienceIcon = <QPSvg width={12} height={12} />;
+      break;
+
+    case 'EVERYONE':
+      audienceIcon = <GlobalSvg width={12} height={12} />;
+      break;
+
+    default:
+      audienceIcon = <GlobalSvg width={12} height={12} />;
+      break;
+  }
+
   const toggleFollow = async () => {
     if (!user || !user._id) return;
 
@@ -74,6 +104,9 @@ const UserInfo: React.FC<UserInfoProps> = (props) => {
         <View style={styles.auxInfo}>
           {auxInfo ? (
             <PLabel label={auxInfo} textStyle={styles.smallLabel} />
+          ) : null}
+          {audienceInfo ? (
+            <View style={styles.audienceInfo}>{audienceIcon}</View>
           ) : null}
           {!isSelf && (
             <>
@@ -133,6 +166,9 @@ const styles = StyleSheet.create({
   auxInfo: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  audienceInfo: {
+    marginLeft: 4,
   },
   separator: {
     width: 4,
