@@ -59,6 +59,11 @@ export type DeserializedUser = {
   acc: User.Mongo["accreditation"];
 };
 
+export const DEFAULT_USER_OPTIONS = {
+  role: UserRoleOptions.USER,
+  accreditation: AccreditationOptions.NONE.value,
+};
+
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 const createUsersCollection = (
   usersCollection: Collection<User.Mongo | User.Stub>
@@ -228,8 +233,7 @@ const createUsersCollection = (
         lastName,
         fullName: `${firstName} ${lastName}`,
         authProvider: provider,
-        role: UserRoleOptions.USER,
-        accreditation: AccreditationOptions.NONE.value,
+        ...DEFAULT_USER_OPTIONS,
       };
 
       await usersCollection.insertOne(newUser);
@@ -273,8 +277,7 @@ const createUsersCollection = (
         firstName,
         lastName,
         fullName: `${firstName} ${lastName}`,
-        role: UserRoleOptions.USER,
-        accreditation: AccreditationOptions.NONE.value,
+        ...DEFAULT_USER_OPTIONS,
       };
 
       await usersCollection.replaceOne({ _id: userData._id }, newUser);

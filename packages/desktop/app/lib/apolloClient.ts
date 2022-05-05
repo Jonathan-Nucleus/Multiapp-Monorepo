@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { onError } from "@apollo/client/link/error";
 import {
   createHttpLink,
@@ -6,7 +5,6 @@ import {
   QueryOptions,
   ApolloQueryResult,
   OperationVariables,
-  ApolloCache,
   InMemoryCache,
   NormalizedCacheObject,
   from,
@@ -35,11 +33,11 @@ export type ApolloPageProps = {
  */
 export function createApolloClient(
   token?: string,
-  initialCache?: NormalizedCacheObject
+  initialCache?: NormalizedCacheObject,
 ): ApolloClient<NormalizedCacheObject> {
   const fetcher = (
     input: RequestInfo,
-    init?: RequestInit | undefined
+    init?: RequestInit | undefined,
   ): Promise<Response> => {
     if (typeof window !== "undefined") {
       return window.fetch(input, init);
@@ -58,7 +56,7 @@ export function createApolloClient(
           ", Location: ",
           locations,
           ", Path: ",
-          path
+          path,
         );
       });
     }
@@ -89,7 +87,7 @@ export function createApolloClient(
     },
   });
 
-  const initalizeCache = (): void => {
+  const initializeCache = (): void => {
     if (initialCache) {
       const data = client.extract();
       const mergedData = merge(data, initialCache);
@@ -123,12 +121,12 @@ export function createApolloClient(
         }
       });
 
-      initalizeCache();
+      initializeCache();
     };
 
     restoreCache();
   } else {
-    initalizeCache();
+    initializeCache();
   }
 
   return client;
@@ -165,7 +163,7 @@ export type SSRQueryResult<T> = ApolloQueryResult<T> & {
 export async function ssrQuery<T, TVariables = OperationVariables>(
   options: QueryOptions<TVariables, T>,
   token: string,
-  client?: ApolloClient<NormalizedCacheObject>
+  client?: ApolloClient<NormalizedCacheObject>,
 ): Promise<SSRQueryResult<T>> {
   const apolloClient = client || createApolloClient(token);
   const result = await apolloClient.query(options);

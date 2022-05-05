@@ -1,6 +1,4 @@
 import { gql, useMutation, MutationTuple } from '@apollo/client';
-import { MediaUpload, MediaType } from 'backend/graphql/mutations.graphql';
-import { Post, PostInput } from 'backend/graphql/posts.graphql';
 import { UserProfile } from 'backend/graphql/users.graphql';
 import { Company } from 'backend/graphql/companies.graphql';
 

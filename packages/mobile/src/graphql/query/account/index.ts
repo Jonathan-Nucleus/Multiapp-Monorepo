@@ -9,6 +9,7 @@ import {
   FUND_MANAGER_FRAGMENT,
   FundManager,
 } from 'mobile/src/graphql/fragments/fund';
+import { NotificationEventOptions } from 'backend/schemas/user';
 
 type FetchPostsVariables = {
   categories?: PostCategory[];
@@ -78,6 +79,7 @@ export type AccountData = {
     | 'posts'
     | 'managedFunds'
     | 'mutedPostIds'
+    | 'settings'
   > & {
     watchlist: WatchlistFund[];
     company: Pick<
@@ -130,8 +132,6 @@ export function useAccount(
           website
           linkedIn
           twitter
-          tagline
-          overview
           followerIds
           followingIds
           following {
@@ -237,6 +237,15 @@ export function useAccount(
             }
           }
           mutedPostIds
+          settings {
+            interests
+            tagging
+            messaging
+            emailUnreadMessage
+            notifications {
+              ${Object.keys(NotificationEventOptions)}
+            }
+          }
         }
       }
     `,

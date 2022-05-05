@@ -6,6 +6,7 @@ import {
   DeserializedUser,
   generateSalt,
   hashPassword,
+  DEFAULT_USER_OPTIONS,
 } from "../../db/collections/users";
 import { getAccessToken } from "../../lib/tokens";
 import { Accreditation, User, UserRole } from "../../schemas/user";
@@ -53,6 +54,7 @@ export const createUser = async (
   const salt = generateSalt();
 
   const user: User.Mongo = {
+    ...DEFAULT_USER_OPTIONS,
     _id: toObjectId(),
     firstName,
     lastName,

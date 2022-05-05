@@ -61,9 +61,6 @@ export namespace User {
     notificationBadge?: number;
     deletedAt?: Date;
 
-    // TODO: still needs to finalized
-    //settings: Settings;
-
     managedFundsIds?: ObjectId[];
     mutedPostIds?: ObjectId[];
     hiddenPostIds?: ObjectId[];
@@ -138,8 +135,9 @@ export namespace User {
       reportedPosts: Omit<GraphQLEntity<ReportedPost>, "violations"> & {
         violations: PostViolationEnum;
       };
-      settings: Omit<Settings, "interests"> & {
+      settings: Omit<Settings, "interests" | "notifications"> & {
         interests?: PostCategoryEnum[];
+        notifications: Record<NotificationEvent, NotificationMethodEnum>;
       };
       mutedPosts: Post.GraphQL[];
       hiddenPosts: Post.GraphQL[];
@@ -179,6 +177,21 @@ export namespace User {
 
 export interface Settings {
   interests?: PostCategory[];
+
+  /**
+   * Whether or user authorizes being tagged in posts, comments, and messages
+   * using the @mention feature.
+   */
+  tagging: boolean;
+
+  /** Whether or not user authorizes being directly messaged in the app. */
+  messaging: boolean;
+
+  /** Whether or not new messages should also be emailed to the user. */
+  emailUnreadMessage: boolean;
+
+  /** Notification method settings for various notification events. */
+  notifications: Record<NotificationEvent, NotificationMethod>;
 }
 
 export interface AdjustableImage {
@@ -219,6 +232,47 @@ export const UserRoleOptions = {
 } as const;
 export type UserRole = ValueOf<typeof UserRoleOptions>;
 export type UserRoleEnum = keyof typeof UserRoleOptions;
+
+export const NotificationMethodOptions = {
+  NONE: "none",
+  SMS: "sms",
+  EMAIL: "email",
+  BOTH: "both",
+} as const;
+export type NotificationMethod = ValueOf<typeof NotificationMethodOptions>;
+export type NotificationMethodEnum = keyof typeof NotificationMethodOptions;
+
+/**
+ * List of notification events that the user can set their notifiation method
+ * preferences for.
+ */
+export const NotificationEventOptions = {
+  postCreate: {
+    label: "New posts from people or companies you're following",
+    info: undefined,
+  },
+  postLike: {
+    label: "Likes on your posts",
+    info: undefined,
+  },
+  postComment: {
+    label: "Comments on your posts",
+    info: undefined,
+  },
+  commentLike: {
+    label: "Likes on your comments",
+    info: "When someone likes a comment you made on your own or anyone else's post.",
+  },
+  tagCreate: {
+    label: "Tagged in a post, comment, or profile page.",
+    info: "When someone tags you via @mention a post, comment or on their profile or company profile.",
+  },
+  messageReceived: {
+    label: "New Messages",
+    info: "When someone sends you a new message with Prometheus",
+  },
+} as const;
+export type NotificationEvent = keyof typeof NotificationEventOptions;
 
 /** Enumeration describing the accreditation status of the user. */
 export const AccreditationOptions = {
@@ -399,6 +453,7 @@ const UserProfileSchema = `
   companies: [Company!]
   watchlist: [Fund!]
   managedFunds: [Fund!]
+  settings: Settings
 `;
 
 export const UserSchema = `
@@ -512,12 +567,32 @@ export const UserSchema = `
     postId: ID!
   }
 
+  type NotificationSettings {
+    ${Object.keys(NotificationEventOptions).map(
+      (event) => `${event}: NotificationMethod!`
+    )}
+  }
+
+  input NotificationSettingsInput {
+    ${Object.keys(NotificationEventOptions).map(
+      (event) => `${event}: NotificationMethod!`
+    )}
+  }
+
   type Settings {
     interests: [PostCategory!]
+    tagging: Boolean!
+    messaging: Boolean!
+    emailUnreadMessage: Boolean!
+    notifications: NotificationSettings!
   }
 
   input SettingsInput {
     interests: [PostCategory!]
+    tagging: Boolean
+    messaging: Boolean
+    emailUnreadMessage: Boolean
+    notifications: NotificationSettingsInput
   }
 
   enum UserRole {
@@ -546,5 +621,9 @@ export const UserSchema = `
 
   enum ProRole {
     ${Object.keys(ProRoleOptions).map((key) => key)}
+  }
+
+  enum NotificationMethod {
+    ${Object.keys(NotificationMethodOptions).map((key) => key)}
   }
 `;

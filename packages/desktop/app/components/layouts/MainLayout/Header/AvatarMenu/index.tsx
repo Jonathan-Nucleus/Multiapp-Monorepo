@@ -35,7 +35,7 @@ const AvatarMenu: FC = () => {
         </div>
       ),
       title: "Accredited Investor",
-      path: "/",
+      path: "/funds",
     },
     {
       icon: (
@@ -44,12 +44,12 @@ const AvatarMenu: FC = () => {
         </div>
       ),
       title: "Become a Pro",
-      path: "/",
+      path: "/become-a-pro",
     },
     {
       icon: <Gear color="white" weight="light" size={24} />,
       title: "Account Settings",
-      path: "/setting",
+      path: "/settings",
     },
     {
       icon: <EnvelopeOpen color="white" weight="light" size={24} />,

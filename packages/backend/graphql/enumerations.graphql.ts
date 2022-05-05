@@ -5,6 +5,8 @@ import {
   PostCategoryEnum,
 } from "../schemas/post";
 
+import { NotificationMethodOptions } from "../schemas/user";
+
 import {
   FinancialStatusEnum,
   FinancialStatusOptions as BackendFinancialStatusOptions,
@@ -36,3 +38,5 @@ export const FinancialStatusOptions = orderedStatusOptions.map((key) => {
     title,
   };
 });
+
+export const NotificationMethods = Object.keys(NotificationMethodOptions);

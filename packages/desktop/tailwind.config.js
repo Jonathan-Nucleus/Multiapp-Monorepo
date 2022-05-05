@@ -52,10 +52,16 @@ module.exports = {
           secondary: "#714EFD",
           dark: "#212249",
         },
-        dark: "#CDA7861A",
+        dark: {
+          DEFAULT: "#CDA7861A",
+          secondary: "#787880",
+        },
         gray: {
           DEFAULT: "#121212",
           600: "#747474",
+        },
+        green: {
+          dark: "#32D74B",
         },
         brand: {
           overlay: "#CDA786",

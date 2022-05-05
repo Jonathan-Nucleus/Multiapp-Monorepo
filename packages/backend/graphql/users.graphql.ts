@@ -3,15 +3,12 @@ import {
   PartialSchema,
   ApolloServerContext,
   NoArgs,
-  secureEndpoint,
 } from "../lib/apollo-helper";
-
 import {
   UserSchema,
   UserRoleOptions,
   AccreditationOptions,
   PostViolationOptions,
-  PostViolationEnum,
   InvestorClassOptions,
   FinancialStatusOptions,
   InvestmentLevelOptions,
@@ -20,15 +17,14 @@ import {
   FinancialStatusEnum,
   InvestorClassEnum,
   InvestmentLevelEnum,
-} from "../schemas/user";
-import {
+  NotificationMethodOptions,
+  NotificationEvent,
   User,
   ReportedPost,
   isUser,
   compareAccreditation,
+  NotificationMethodEnum,
 } from "../schemas/user";
-import type { Post } from "../schemas/post";
-import type { Comment } from "../schemas/comment";
 import type { Company } from "../schemas/company";
 
 type GraphQLUser = User.GraphQL;
@@ -41,6 +37,13 @@ type QuestionnaireInput = {
   level?: InvestmentLevelEnum;
   date: Date;
 };
+type SettingsInput = {
+  interests?: string[];
+  tagging: boolean;
+  messaging: boolean;
+  emailUnreadMessage: boolean;
+  notifications: Record<NotificationEvent, NotificationMethodEnum>;
+};
 
 export type {
   GraphQLUser as User,
@@ -49,6 +52,7 @@ export type {
   OAuthInput,
   Questionnaire,
   QuestionnaireInput,
+  SettingsInput,
   FinancialStatusEnum as FinancialStatus,
   InvestorClassEnum as InvestorClass,
   InvestmentLevelEnum as InvestmentLevel,
@@ -154,6 +158,7 @@ const resolvers = {
     acc[option] = InvestorClassOptions[option].value;
     return acc;
   }, {}),
+  NotificationMethod: NotificationMethodOptions,
   FinancialStatus: Object.keys(FinancialStatusOptions).reduce<{
     [key: string]: string;
   }>((acc, option) => {

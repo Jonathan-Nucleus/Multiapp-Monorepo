@@ -2,7 +2,11 @@ import { Db, ObjectId } from "mongodb";
 import { faker } from "@faker-js/faker";
 
 import { User } from "../../schemas/user";
-import { generateSalt, hashPassword } from "../collections/users";
+import {
+  generateSalt,
+  hashPassword,
+  DEFAULT_USER_OPTIONS,
+} from "../collections/users";
 
 // The name of the mongo collection
 const COLLECTION = "users";
@@ -50,13 +54,12 @@ export default async function (db: Db): Promise<ObjectId[]> {
         index === 0 ? "TestPass123!" : "pro-ignite-pass",
         salt
       ),
-      role: "user",
-      accreditation: "none",
       website: faker.internet.url(),
       avatar: avatars[index % avatars.length],
       position: faker.name.jobTitle(),
       tagline: faker.lorem.sentence(),
       overview: faker.lorem.paragraph(),
+      ...DEFAULT_USER_OPTIONS,
     };
   });
 
