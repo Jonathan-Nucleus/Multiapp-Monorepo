@@ -105,8 +105,7 @@ const PMaskTextInput: React.FC<PMaskTextInputProps> = (props) => {
           placeholder={placeholder}
           placeholderTextColor={placeholderTextColor}
           onChangeText={(formatted, extracted) => {
-            console.log(formatted);
-            console.log(extracted);
+            onChangeText(extracted);
           }}
           secureTextEntry={secureTextEntry}
           style={[styles.textInput, textInputStyle, borderColor]}

@@ -31,6 +31,7 @@ import PGradientButton from '../../components/common/PGradientButton';
 import { PostCategories } from 'backend/graphql/enumerations.graphql';
 
 import type { TopicScreen } from 'mobile/src/navigations/AuthStack';
+import CheckboxLabel from '../../components/common/CheckboxLabel';
 const preferences = Object.keys(PostCategories);
 
 const Topic: TopicScreen = ({ navigation }) => {
@@ -81,18 +82,17 @@ const Topic: TopicScreen = ({ navigation }) => {
 
   const renderListItem: ListRenderItem<typeof preferences[number]> = ({
     item,
+    index,
   }) => {
     return (
-      <View style={styles.checkedWrap}>
-        <TouchableOpacity onPress={() => handleToggleCheck(item)}>
-          {selectedTopics.indexOf(item) > -1 ? (
-            <CheckedSvg />
-          ) : (
-            <UncheckedSvg />
-          )}
-        </TouchableOpacity>
-        <Text style={styles.checkedTxt}>{PostCategories[item]}</Text>
-      </View>
+      <CheckboxLabel
+        id={index}
+        value={selectedTopics.indexOf(item) > -1}
+        handleChange={() => handleToggleCheck(item)}
+        category={PostCategories[item]}
+        showBackground
+        viewStyle={styles.checkedWrap}
+      />
     );
   };
 
@@ -146,14 +146,7 @@ const styles = StyleSheet.create({
     paddingBottom: 60,
   },
   checkedWrap: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    marginBottom: 11,
-    backgroundColor: PRIMARYSOLID7,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 32,
+    width: '100%',
   },
   checkedTxt: {
     ...Body2,

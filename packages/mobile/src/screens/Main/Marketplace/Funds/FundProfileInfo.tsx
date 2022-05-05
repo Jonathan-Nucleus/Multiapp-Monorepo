@@ -134,7 +134,7 @@ const FundProfileInfo: FC<FundProfileInfo> = ({
               />
               <View>
                 <View style={styles.manager}>
-                  <Text style={[styles.whiteText, Body2]}>
+                  <Text style={[styles.whiteText, styles.name]}>
                     {`${fund.manager.firstName} ${fund.manager.lastName}`}
                   </Text>
                   <View style={styles.separator} />
@@ -325,5 +325,9 @@ const styles = StyleSheet.create({
   },
   favorite: {
     marginLeft: 16,
+  },
+  name: {
+    textTransform: 'capitalize',
+    ...Body2,
   },
 });

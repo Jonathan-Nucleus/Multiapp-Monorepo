@@ -48,7 +48,10 @@ const CompanyItem: FC<CompanyItemProps> = ({ company }) => {
           <Avatar user={manager} size={24} />
           <View style={{ marginLeft: 8 }}>
             <View style={styles.nameWrapper}>
-              <PLabel label={`${firstName} ${lastName}`} textStyle={Body1} />
+              <PLabel
+                label={`${firstName} ${lastName}`}
+                textStyle={styles.userName}
+              />
               {manager.role === 'PROFESSIONAL' && (
                 <View style={styles.proWrapper}>
                   <ShieldCheckSvg />
@@ -115,5 +118,9 @@ const styles = StyleSheet.create({
   titleLabel: {
     ...Body3,
     marginBottom: 4,
+  },
+  userName: {
+    ...Body1,
+    textTransform: 'capitalize',
   },
 });

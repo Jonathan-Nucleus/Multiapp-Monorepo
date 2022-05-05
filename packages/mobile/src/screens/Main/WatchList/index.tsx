@@ -144,6 +144,7 @@ const styles = StyleSheet.create({
   },
   name: {
     flexDirection: 'row',
+    textTransform: 'capitalize',
   },
   proBadge: {
     marginLeft: 8,

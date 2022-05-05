@@ -48,7 +48,6 @@ export const useInitializeClient = () => {
     async function initializeCache() {
       await persistor.restore();
       const token = await EncryptedStorage.getItem('accessToken');
-
       const _client = new ApolloClient({
         link: from([
           createHttpLink({

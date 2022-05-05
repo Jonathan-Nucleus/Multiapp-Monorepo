@@ -230,6 +230,7 @@ const styles = StyleSheet.create({
   noAvatar: {
     color: PRIMARYSOLID,
     ...H5Bold,
+    textTransform: 'uppercase',
   },
   avatarSections: {
     marginBottom: 60,

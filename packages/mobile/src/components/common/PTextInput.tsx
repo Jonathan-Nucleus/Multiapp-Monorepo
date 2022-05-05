@@ -8,11 +8,20 @@ import {
   TextInputProps,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  Text,
 } from 'react-native';
 
 import PFormLabel from './PFormLabel';
-import { Body1, Body2 } from '../../theme/fonts';
-import { WHITE, PRIMARY, BLACK, GRAY800, GRAY700 } from 'shared/src/colors';
+import { Body1, Body2, Body3 } from '../../theme/fonts';
+import {
+  WHITE,
+  PRIMARY,
+  BLACK,
+  GRAY800,
+  GRAY700,
+  DANGER,
+  DANGER30,
+} from 'shared/src/colors';
 
 interface PTextInputProps extends TextInputProps {
   containerStyle?: ViewStyle;
@@ -27,6 +36,8 @@ interface PTextInputProps extends TextInputProps {
   onPress?: () => void;
   onPressText?: () => void;
   icon?: string;
+  error?: string;
+  errorStyle?: TextStyle;
 }
 
 const PTextInput: React.FC<PTextInputProps> = (props) => {
@@ -57,6 +68,8 @@ const PTextInput: React.FC<PTextInputProps> = (props) => {
     placeholderTextColor = '#888',
     multiline = false,
     autoCorrect = true,
+    error,
+    errorStyle,
     ...textInputProps
   } = props;
 
@@ -91,6 +104,7 @@ const PTextInput: React.FC<PTextInputProps> = (props) => {
             styles.textInput,
             textInputStyle,
             isFocused && styles.focused,
+            !!error && styles.errorInput,
           ]}
           value={text}
           keyboardType={keyboardType}
@@ -116,7 +130,7 @@ const PTextInput: React.FC<PTextInputProps> = (props) => {
           </TouchableOpacity>
         )}
       </View>
-      {/* {!!error && <ErrorText error={error} errorStyle={errorStyle} />} */}
+      {!!error && <Text style={[styles.error, errorStyle]}>{error}</Text>}
     </View>
   );
 };
@@ -143,6 +157,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     marginBottom: 20,
   },
+  errorInput: {
+    borderColor: DANGER,
+    backgroundColor: DANGER30,
+  },
   focused: {
     borderColor: PRIMARY,
   },
@@ -163,6 +181,11 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  error: {
+    color: DANGER,
+    ...Body3,
+    marginBottom: 16,
   },
 });
 

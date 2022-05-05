@@ -52,5 +52,6 @@ const styles = StyleSheet.create({
     color: PRIMARYSOLID,
     textAlign: 'center',
     ...Body2Bold,
+    textTransform: 'capitalize',
   },
 });

@@ -35,6 +35,7 @@ import type { LoginScreen } from 'mobile/src/navigations/AuthStack';
 import { authenticate } from 'mobile/src/services/auth/google-provider';
 import { useLoginOAuth } from 'mobile/src/graphql/mutation/auth/useLoginOAuth';
 import { useUpdateFcmToken } from 'mobile/src/graphql/mutation/account';
+import CheckboxLabel from '../../components/common/CheckboxLabel';
 
 const Login: LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -133,12 +134,13 @@ const Login: LoginScreen = ({ navigation }) => {
         <TouchableOpacity onPress={() => navigation.navigate('ForgotPass')}>
           <Text style={styles.hyperText}>Forgot Password?</Text>
         </TouchableOpacity>
-        <View style={styles.checkedWrap}>
-          <TouchableOpacity onPress={() => setChecked(!checked)}>
-            {checked ? <CheckedSvg /> : <UncheckedSvg />}
-          </TouchableOpacity>
-          <Text style={styles.stayTxt}>Stay signed in</Text>
-        </View>
+        <CheckboxLabel
+          id={1}
+          category="Stay signed in"
+          value={!checked}
+          handleChange={() => setChecked(!checked)}
+          viewStyle={styles.checkedWrap}
+        />
         <PGradientButton
           label="log in"
           btnContainer={styles.btnContainer}
@@ -214,10 +216,8 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   checkedWrap: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    marginTop: 20,
+    borderWidth: 0,
+    paddingLeft: 0,
   },
   txt: {
     ...Body2,

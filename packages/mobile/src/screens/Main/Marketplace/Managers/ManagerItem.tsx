@@ -54,6 +54,7 @@ const styles = StyleSheet.create({
   },
   nameLabel: {
     ...Body1Bold,
+    textTransform: 'capitalize',
   },
   nameWrapper: {
     flexDirection: 'row',

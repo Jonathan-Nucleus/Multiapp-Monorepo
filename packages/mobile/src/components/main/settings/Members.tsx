@@ -88,6 +88,7 @@ const styles = StyleSheet.create({
   name: {
     color: WHITE,
     ...Body2Bold,
+    textTransform: 'capitalize',
   },
   position: {
     ...Body3,

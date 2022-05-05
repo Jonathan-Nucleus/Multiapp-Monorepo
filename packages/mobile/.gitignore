@@ -63,3 +63,4 @@ buck-out/
 
 *google-services*.json
 *GoogleService*
+.env

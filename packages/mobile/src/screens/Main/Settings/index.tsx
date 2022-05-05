@@ -276,6 +276,7 @@ const styles = StyleSheet.create({
   name: {
     ...H6Bold,
     color: WHITE,
+    textTransform: 'capitalize',
   },
   center: {
     justifyContent: 'center',

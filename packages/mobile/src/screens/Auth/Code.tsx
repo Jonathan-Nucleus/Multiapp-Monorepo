@@ -72,7 +72,7 @@ const CodeView: CodeScreen = ({ navigation }) => {
           onPress={handleVerifyCode}
         />
         <View style={styles.wrap}>
-          <Text style={styles.txt}>Already here? </Text>
+          <Text style={styles.txt}>Already have an account? </Text>
           <TouchableOpacity onPress={() => navigation.navigate('Login')}>
             <Text style={styles.hyperText}>Login</Text>
           </TouchableOpacity>
