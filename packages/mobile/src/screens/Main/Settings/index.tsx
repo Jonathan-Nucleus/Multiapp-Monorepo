@@ -33,6 +33,7 @@ import AIProSvg from 'shared/assets/images/al.svg';
 import AIUserSvg from 'shared/assets/images/ai-user.svg';
 
 import { SettingsScreen } from 'mobile/src/navigations/MoreStack';
+import Loading from '../../../components/common/Loading';
 
 interface RenderItemProps {
   item: {
@@ -92,6 +93,12 @@ const Settings: SettingsScreen = ({ navigation }) => {
       icon: <EnvelopeSimple size={26} color={WHITE} />,
     },
   ];
+  MENU_ITEMS.push({
+    id: 'Contact',
+    label: 'Contact Fund Specialist',
+    onPress: () => navigation.navigate('Contact'),
+    icon: <Headset size={26} color={WHITE} />,
+  });
   if (account?.role === 'PROFESSIONAL') {
     MENU_ITEMS.push({
       id: 'Contact',

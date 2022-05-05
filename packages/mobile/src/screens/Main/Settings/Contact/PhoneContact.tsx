@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Keyboard,
   StyleSheet,
@@ -10,7 +10,6 @@ import RNPickerSelect from 'react-native-picker-select';
 // import Autocomplete from 'react-native-autocomplete-input';
 
 import PTextInput from 'mobile/src/components/common/PTextInput';
-import ErrorText from 'mobile/src/components/common/ErrorTxt';
 import {
   Body2,
   Body1,
@@ -23,37 +22,62 @@ import { CaretDown } from 'phosphor-react-native';
 import PFormLabel from 'mobile/src/components/common/PFormLabel';
 import PMaskTextInput from 'mobile/src/components/common/PMaskTextInput';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
-import { ProRoleOptions } from 'backend/schemas/user';
+import { PreferredTimeOfDayOptions } from 'backend/schemas/help-request';
 
-const ROLES = Object.keys(ProRoleOptions).map((option) => ({
+const TimeDAY = Object.keys(PreferredTimeOfDayOptions).map((option) => ({
   value: option,
-  label: ProRoleOptions[option].label,
+  label: PreferredTimeOfDayOptions[option].label,
 }));
 
-const TimeDAY = [
-  { label: 'Morning (8am - 12pm)', value: 'morning' },
-  { label: 'Afternoon (12pm - 5pm)', value: 'afternoon' },
-  { label: 'Evening (5pm-8pm)', value: 'evening' },
-];
+interface Fund {
+  value: string;
+  label: string;
+}
 
-const PhoneContact: React.FC = () => {
+interface HelpRequestVariables {
+  request: {
+    type: string;
+    email?: string;
+    phone?: string;
+    fundId: string;
+    message: string;
+    preferredTimeOfDay?: string;
+  };
+}
+
+interface Props {
+  handleContact: (request: HelpRequestVariables) => void;
+  funds: Fund[];
+}
+
+const PhoneContact: React.FC<Props> = ({ handleContact, funds }) => {
   const [phone, setPhone] = useState('');
   const [preTime, setPreTime] = useState('');
-  const [error, setError] = useState('');
   const [interest, setInterest] = useState('');
   const [info, setInfo] = useState('');
 
-  const handleNextPage = async () => {
+  const handleNextPage = () => {
     Keyboard.dismiss();
-    try {
-    } catch (e) {
-      console.error('login error', e);
-    }
+    handleContact({
+      request: {
+        type: 'PHONE',
+        phone: phone,
+        fundId: interest,
+        message: info,
+        preferredTimeOfDay: preTime,
+      },
+    });
   };
+
+  const disabled = useMemo(() => {
+    if (info && phone && interest && preTime && phone.length === 10) {
+      return false;
+    }
+    return true;
+  }, [phone, interest, info, preTime]);
 
   return (
     <View style={styles.container}>
-      {!!error && <ErrorText error={error} />}
       <PMaskTextInput
         label="Phone Number"
         onChangeText={(val) => setPhone(val ?? '')}
@@ -80,7 +104,7 @@ const PhoneContact: React.FC = () => {
       <PFormLabel label="Fund of Interest" textStyle={styles.label} />
       <RNPickerSelect
         onValueChange={(val: string) => setInterest(val)}
-        items={ROLES}
+        items={funds}
         value={interest}
         style={{
           ...pickerSelectStyles,
@@ -92,15 +116,6 @@ const PhoneContact: React.FC = () => {
         Icon={() => <CaretDown size={14} color={WHITE} weight="fill" />}
         placeholder={{ label: null, value: null }}
       />
-      {/* <PTextInput
-        label="Fund of Interest"
-        onChangeText={(val: string) => setInterest(val)}
-        text={interest}
-        multiline={true}
-        underlineColorAndroid="transparent"
-        numberOfLines={4}
-        labelTextStyle={styles.label}
-      /> */}
       <PTextInput
         label="Additional Information"
         onChangeText={(val: string) => setInfo(val)}
@@ -119,6 +134,7 @@ const PhoneContact: React.FC = () => {
           label="Submit"
           btnContainer={styles.btnContainer}
           onPress={handleNextPage}
+          disabled={disabled}
         />
       </View>
     </View>

@@ -40,13 +40,17 @@ import MainHeader from 'mobile/src/components/main/Header';
 
 import type { NotificationScreen } from 'mobile/src/navigations/AppNavigator';
 import { useNotifications } from 'mobile/src/graphql/query/notification';
-import { useReadNotification } from 'mobile/src/graphql/mutation/notification';
+import {
+  useReadNotification,
+  useReadNotifications,
+} from 'mobile/src/graphql/mutation/notification';
 import { Notification } from 'backend/graphql/notifications.graphql';
 
 const Notifications: NotificationScreen = ({ navigation }) => {
   const [isVisible, setIsVisible] = useState(false);
   const { data } = useNotifications();
   const [readNotification] = useReadNotification();
+  const [readNotifications] = useReadNotifications();
   const notifications = data?.notifications || [];
 
   const renderIcon = (val: Notification) => {
@@ -78,6 +82,16 @@ const Notifications: NotificationScreen = ({ navigation }) => {
           notificationId: id,
         },
       });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsVisible(false);
+    }
+  };
+
+  const handleReadAllNotifications = async () => {
+    try {
+      await readNotifications();
     } catch (err) {
       console.log(err);
     } finally {
@@ -133,7 +147,7 @@ const Notifications: NotificationScreen = ({ navigation }) => {
         onBackdropPress={() => setIsVisible(false)}
         style={styles.bottomHalfModal}>
         <View style={styles.modalContent}>
-          <TouchableOpacity onPress={() => handleReadNotification()}>
+          <TouchableOpacity onPress={() => handleReadAllNotifications()}>
             <View style={styles.row}>
               <Checks color={WHITE} size={28} />
               <View style={styles.commentWrap}>

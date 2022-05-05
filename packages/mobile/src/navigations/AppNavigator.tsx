@@ -41,6 +41,7 @@ import NotificationDetail from '../screens/Notification/Details';
 import Preferences from '../screens/Main/Settings/Preferences';
 
 import { MediaType } from 'backend/graphql/mutations.graphql';
+import ContactSuccess from '../screens/Main/Settings/Contact/ContactSuccess';
 
 const defaultScreenOptions = {
   headerShown: false,
@@ -152,6 +153,7 @@ const AppNavigator = () => {
           name="AccreditationResult"
           component={AccreditationResult}
         />
+        <Stack.Screen name="ContactSuccess" component={ContactSuccess} />
       </Stack.Navigator>
     </NavigationContainer>
   );

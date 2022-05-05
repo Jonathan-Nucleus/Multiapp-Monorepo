@@ -11,7 +11,7 @@ import TextInputMask from 'react-native-text-input-mask';
 
 import PFormLabel from './PFormLabel';
 import { Body1 } from '../../theme/fonts';
-import { WHITE, PRIMARY, BLACK, GRAY800, GRAY700 } from 'shared/src/colors';
+import { WHITE, PRIMARY, BLACK, GRAY700, GRAY600 } from 'shared/src/colors';
 
 interface PMaskTextInputProps extends TextInputProps {
   containerStyle?: ViewStyle;
@@ -79,10 +79,6 @@ const PMaskTextInput: React.FC<PMaskTextInputProps> = (props) => {
     }
   }, [isFocused]);
 
-  const handleOnChangeText = (formatted: string, extracted?: string): void => {
-    onChangeText(extracted);
-  };
-
   return (
     <View style={[styles.container, containerStyle]}>
       <View style={styles.row}>
@@ -143,7 +139,7 @@ const styles = StyleSheet.create({
     ...Body1,
     color: WHITE,
     height: 43,
-    borderColor: GRAY800,
+    borderColor: GRAY600,
     borderWidth: 1,
     borderRadius: 8,
     paddingBottom: 5,

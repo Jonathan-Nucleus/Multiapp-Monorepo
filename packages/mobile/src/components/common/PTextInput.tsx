@@ -38,6 +38,7 @@ interface PTextInputProps extends TextInputProps {
   icon?: string;
   error?: string;
   errorStyle?: TextStyle;
+  numberOfLines?: number;
 }
 
 const PTextInput: React.FC<PTextInputProps> = (props) => {
@@ -70,6 +71,7 @@ const PTextInput: React.FC<PTextInputProps> = (props) => {
     autoCorrect = true,
     error,
     errorStyle,
+    numberOfLines = 1,
     ...textInputProps
   } = props;
 
@@ -122,6 +124,7 @@ const PTextInput: React.FC<PTextInputProps> = (props) => {
           autoFocus={autoFocus}
           multiline={multiline}
           autoCorrect={autoCorrect}
+          numberOfLines={numberOfLines}
         />
         {children}
         {!!icon && (
@@ -139,7 +142,8 @@ const styles = StyleSheet.create({
   textInput: {
     ...Body1,
     color: WHITE,
-    height: 43,
+    minHeight: 43,
+    maxHeight: 100,
     borderColor: GRAY800,
     borderWidth: 1,
     borderRadius: 8,

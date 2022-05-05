@@ -30,6 +30,8 @@ import {
 import PHeader from 'mobile/src/components/common/PHeader';
 import MainHeader from 'mobile/src/components/main/Header';
 import { useAccount } from 'mobile/src/graphql/query/account';
+import { useDeleteAccount } from 'mobile/src/graphql/mutation/account';
+import { clearToken } from 'mobile/src/utils/auth-token';
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
@@ -38,7 +40,19 @@ interface RouterProps {
 const AccountAdmin: FC<RouterProps> = ({ navigation }) => {
   const [isVisible, setIsVisible] = useState(false);
   const { data } = useAccount();
+  const [deleteAccount] = useDeleteAccount();
   const account = data?.account;
+
+  const handleDeleteAccount = async () => {
+    setIsVisible(false);
+    try {
+      await deleteAccount();
+      navigation.navigate('Auth');
+      await clearToken();
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const ACCOUNT_MENU_OPTIONS = [
     {
@@ -122,7 +136,7 @@ const AccountAdmin: FC<RouterProps> = ({ navigation }) => {
             <TouchableOpacity onPress={() => setIsVisible(false)}>
               <Text style={[styles.btnTxt, styles.cancel]}>Cancel</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setIsVisible(false)}>
+            <TouchableOpacity onPress={handleDeleteAccount}>
               <Text style={[styles.btnTxt, styles.danger]}>Delete Account</Text>
             </TouchableOpacity>
           </View>

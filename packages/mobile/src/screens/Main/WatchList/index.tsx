@@ -7,9 +7,7 @@ import {
   View,
   Text,
 } from 'react-native';
-import { NavigationProp } from '@react-navigation/native';
 import { Star, ShieldCheck } from 'phosphor-react-native';
-import FastImage from 'react-native-fast-image';
 
 import Avatar from 'mobile/src/components/common/Avatar';
 import MainHeader from 'mobile/src/components/main/Header';
@@ -18,18 +16,14 @@ import { Body1Bold, Body2Bold, Body3 } from 'mobile/src/theme/fonts';
 import {
   GRAY400,
   WHITE,
-  BGDARK,
   PRIMARYSOLID,
   SUCCESS,
   WHITE60,
 } from 'shared/src/colors';
 
-import type { Fund } from 'backend/graphql/funds.graphql';
 import { useWatchFund } from 'mobile/src/graphql/mutation/funds/useWatchFund';
 import { useAccount } from 'mobile/src/graphql/query/account';
-
 import { WatchlistScreen } from 'mobile/src/navigations/MainTabNavigator';
-import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
 
 const WatchList: WatchlistScreen = ({ navigation }) => {
   const { data: accountData, refetch } = useAccount();

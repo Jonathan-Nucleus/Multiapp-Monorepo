@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -12,8 +12,10 @@ import { CaretLeft, PhoneCall, Envelope } from 'phosphor-react-native';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import PTitle from 'mobile/src/components/common/PTitle';
 import { Body2, H6Bold } from 'mobile/src/theme/fonts';
-import { BLACK, WHITE, GRAY700, GRAY600 } from 'shared/src/colors';
 import MainHeader from 'mobile/src/components/main/Header';
+import { useHelpRequest } from 'mobile/src/graphql/mutation/account';
+import { useFunds } from 'mobile/src/graphql/query/marketplace/useFunds';
+import { BLACK, WHITE, GRAY600 } from 'shared/src/colors';
 import PhoneContact from './PhoneContact';
 import EmailContact from './EmailContact';
 
@@ -21,8 +23,45 @@ interface ContactProps {
   navigation: NavigationProp<ParamListBase>;
 }
 
+type HelpRequestVariables = {
+  request: {
+    type: string;
+    email?: string;
+    phone?: string;
+    fundId: string;
+    message: string;
+    preferredTimeOfDay?: string;
+  };
+};
+
 const Contact: React.FC<ContactProps> = ({ navigation }) => {
   const [selectTab, setSelectTab] = useState('phone');
+  const [helpRequest] = useHelpRequest();
+
+  const { data } = useFunds();
+
+  const FUNDS = useMemo(() => {
+    if (data?.funds && data?.funds?.length > 0) {
+      return data?.funds?.map((v) => ({
+        label: v.name,
+        value: v._id,
+      }));
+    }
+    return [];
+  }, [data]);
+
+  const handleContact = async (value: HelpRequestVariables) => {
+    try {
+      const { data: requestData } = await helpRequest({
+        variables: value,
+      });
+      if (requestData?.helpRequest) {
+        navigation.navigate('ContactSuccess');
+      }
+    } catch (e) {
+      console.error('contact error', e);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -77,7 +116,17 @@ const Contact: React.FC<ContactProps> = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        {selectTab === 'phone' ? <PhoneContact /> : <EmailContact />}
+        {selectTab === 'phone' ? (
+          <PhoneContact
+            handleContact={(val) => handleContact(val)}
+            funds={FUNDS}
+          />
+        ) : (
+          <EmailContact
+            handleContact={(val) => handleContact(val)}
+            funds={FUNDS}
+          />
+        )}
       </PAppContainer>
     </View>
   );

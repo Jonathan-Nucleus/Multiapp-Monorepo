@@ -343,3 +343,41 @@ export function useUpdateFcmToken(): MutationTuple<
     }
   `);
 }
+
+export function useDeleteAccount() {
+  return useMutation(gql`
+    mutation DeleteAccount {
+      deleteAccount
+    }
+  `);
+}
+
+type HelpRequestVariables = {
+  request: {
+    type: string;
+    email?: string;
+    phone?: string;
+    fundId: string;
+    message: string;
+    preferredTimeOfDay?: string;
+  };
+};
+
+type HelpRequestData = {
+  helpRequest: boolean;
+};
+
+/**
+ *
+ * @returns   GraphQL mutation.
+ */
+export function useHelpRequest(): MutationTuple<
+  HelpRequestData,
+  HelpRequestVariables
+> {
+  return useMutation<HelpRequestData, HelpRequestVariables>(gql`
+    mutation HelpRequest($request: HelpRequestInput!) {
+      helpRequest(request: $request)
+    }
+  `);
+}

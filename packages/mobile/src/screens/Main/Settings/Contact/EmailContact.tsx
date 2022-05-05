@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   StyleSheet,
   Keyboard,
@@ -6,12 +6,9 @@ import {
   TouchableOpacity,
   Text,
 } from 'react-native';
-import { useMutation } from '@apollo/client';
 import RNPickerSelect from 'react-native-picker-select';
 
-import PTitle from 'mobile/src/components/common/PTitle';
 import PTextInput from 'mobile/src/components/common/PTextInput';
-import ErrorText from 'mobile/src/components/common/ErrorTxt';
 import {
   Body2,
   Body1,
@@ -20,33 +17,58 @@ import {
   Body2Bold,
 } from 'mobile/src/theme/fonts';
 import { BLACK, WHITE, GRAY700 } from 'shared/src/colors';
-import { CaretLeft, CaretDown } from 'phosphor-react-native';
+import { CaretDown } from 'phosphor-react-native';
 import PFormLabel from 'mobile/src/components/common/PFormLabel';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
-import { ProRoleOptions } from 'backend/schemas/user';
+import { validateEmail } from '../../../../utils/utils';
 
-const ROLES = Object.keys(ProRoleOptions).map((option) => ({
-  value: option,
-  label: ProRoleOptions[option].label,
-}));
+interface Fund {
+  value: string;
+  label: string;
+}
 
-const EmailContact: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [error, setError] = useState('');
-  const [interest, setInterest] = useState('');
-  const [info, setInfo] = useState('');
-
-  const handleNextPage = async () => {
-    Keyboard.dismiss();
-    try {
-    } catch (e) {
-      console.error('login error', e);
-    }
+interface HelpRequestVariables {
+  request: {
+    type: string;
+    email?: string;
+    phone?: string;
+    fundId: string;
+    message: string;
+    preferredTimeOfDay?: string;
   };
+}
+
+interface Props {
+  handleContact: (request: HelpRequestVariables) => void;
+  funds: Fund[];
+}
+
+const EmailContact: React.FC<Props> = ({ handleContact, funds }) => {
+  const [email, setEmail] = useState('');
+  const [interest, setInterest] = useState('');
+  const [message, setMessage] = useState('');
+
+  const handleContactEmail = async () => {
+    Keyboard.dismiss();
+    handleContact({
+      request: {
+        type: 'EMAIL',
+        email: email,
+        fundId: interest,
+        message: message,
+      },
+    });
+  };
+
+  const disabled = useMemo(() => {
+    if (message && email && interest && validateEmail(email)) {
+      return false;
+    }
+    return true;
+  }, [email, interest, message]);
 
   return (
     <View style={styles.container}>
-      {!!error && <ErrorText error={error} />}
       <PTextInput
         label="Email Address"
         onChangeText={(val: string) => setEmail(val)}
@@ -57,7 +79,7 @@ const EmailContact: React.FC = () => {
       <PFormLabel label="Fund of Interest" textStyle={styles.label} />
       <RNPickerSelect
         onValueChange={(val: string) => setInterest(val)}
-        items={ROLES}
+        items={funds}
         value={interest}
         style={{
           ...pickerSelectStyles,
@@ -71,8 +93,8 @@ const EmailContact: React.FC = () => {
       />
       <PTextInput
         label="Additional Information"
-        onChangeText={(val: string) => setInfo(val)}
-        text={info}
+        onChangeText={(val: string) => setMessage(val)}
+        text={message}
         multiline={true}
         underlineColorAndroid="transparent"
         numberOfLines={4}
@@ -85,7 +107,8 @@ const EmailContact: React.FC = () => {
         <PGradientButton
           label="Submit"
           btnContainer={styles.btnContainer}
-          onPress={handleNextPage}
+          onPress={handleContactEmail}
+          disabled={disabled}
         />
       </View>
     </View>

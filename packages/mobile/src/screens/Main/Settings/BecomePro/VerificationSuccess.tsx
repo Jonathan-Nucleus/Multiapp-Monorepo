@@ -22,7 +22,7 @@ const VerificationSuccess: React.FC<VerificationSuccessProProps> = ({
           btnContainer={styles.btnContainer}
           onPress={() =>
             navigation.navigate('Main', {
-              screen: 'HomeStack',
+              screen: 'Home',
             })
           }
         />
