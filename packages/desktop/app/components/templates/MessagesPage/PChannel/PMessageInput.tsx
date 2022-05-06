@@ -27,7 +27,7 @@ const GiphyIcon = () => (
   </div>
 );
 
-const PMessagingInput: React.FC<MessageInputProps> = () => {
+const PMessagingInput: React.FC<MessageInputProps<StreamType>> = () => {
   const { giphyState, setGiphyState } = useContext(GiphyContext);
   const { acceptedFiles, maxNumberOfFiles, multipleUploads } =
     useChannelStateContext<StreamType>();
