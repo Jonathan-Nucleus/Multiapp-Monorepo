@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
-import {
-  LinkPreview,
-  PreviewDataImage,
-} from '@flyerhq/react-native-link-preview';
+import { LinkPreview } from '@flyerhq/react-native-link-preview';
 import FastImage from 'react-native-fast-image';
 import dayjs from 'dayjs';
 import {
@@ -19,14 +16,20 @@ import IconButton from '../common/IconButton';
 import UserInfo from '../common/UserInfo';
 import Tag from '../common/Tag';
 import Media from '../common/Media';
-import { PRIMARYSTATE, WHITE12, WHITE60, BLACK } from 'shared/src/colors';
+import {
+  PRIMARYSTATE,
+  WHITE12,
+  WHITE60,
+  BLACK,
+  PRIMARY,
+  GRAY900,
+} from 'shared/src/colors';
 import { Body1, Body2Bold, Body3 } from '../../theme/fonts';
 import * as NavigationService from '../../services/navigation/NavigationService';
 import { Post } from 'mobile/src/graphql/query/post/usePosts';
 import { PostCategories } from 'backend/graphql/enumerations.graphql';
 import { useLikePost } from '../../graphql/mutation/posts';
 import { showMessage } from '../../services/utils';
-import { appWidth } from '../../utils/utils';
 import pStyles from '../../theme/pStyles';
 
 export interface PostItemProps {
@@ -117,20 +120,36 @@ const PostItem: React.FC<PostItemProps> = ({ post, userId, onPressMenu }) => {
           {body ? (
             <LinkPreview
               containerStyle={styles.previewContainer}
-              renderText={(txt) => (
-                <PLabel label={txt} textStyle={styles.body} />
-              )}
-              renderImage={(img: PreviewDataImage) => (
-                <FastImage
-                  source={{ uri: img.url }}
-                  style={styles.previewImage}
-                />
-              )}
-              renderTitle={(txt) => (
-                <PLabel label={txt} textStyle={Body2Bold} />
-              )}
-              renderDescription={(txt) => (
-                <PLabel label={txt} textStyle={styles.body} />
+              renderLinkPreview={({ previewData }) => (
+                <>
+                  <PLabel label={body} textStyle={styles.body} />
+                  {previewData?.link && (
+                    <PLabel label={previewData.link} textStyle={styles.link} />
+                  )}
+                  {(!mediaUrl ||
+                    previewData?.title ||
+                    previewData?.description) && (
+                    <View style={styles.metaDataContainer}>
+                      {mediaUrl ? (
+                        <></>
+                      ) : (
+                        <FastImage
+                          source={{ uri: previewData?.image?.url }}
+                          style={styles.previewImage}
+                        />
+                      )}
+                      <PLabel
+                        label={previewData?.title || ''}
+                        textStyle={styles.title}
+                      />
+                      <PLabel
+                        label={previewData?.description || ''}
+                        textStyle={styles.description}
+                        numberOfLines={2}
+                      />
+                    </View>
+                  )}
+                </>
               )}
               textContainerStyle={styles.previewTextContainer}
               text={body}
@@ -230,11 +249,11 @@ const styles = StyleSheet.create({
     marginTop: 0,
   },
   previewImage: {
-    width: appWidth - 36,
+    width: '100%',
     height: 200,
-    borderRadius: 12,
+    borderTopRightRadius: 8,
+    borderTopLeftRadius: 8,
     overflow: 'hidden',
-    alignSelf: 'center',
   },
   nameLabel: {
     ...Body1,
@@ -244,8 +263,31 @@ const styles = StyleSheet.create({
     color: WHITE60,
     marginLeft: 4,
   },
+  metaDataContainer: {
+    flexDirection: 'column',
+    borderColor: WHITE12,
+    borderRadius: 8,
+    backgroundColor: GRAY900,
+    marginTop: 24,
+  },
+  title: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    lineHeight: 18,
+  },
+  description: {
+    marginHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 16,
+    ...Body2Bold,
+    lineHeight: 18,
+  },
   body: {
     lineHeight: 20,
+  },
+  link: {
+    color: PRIMARY,
+    marginTop: 24,
   },
   postInfo: {
     flexDirection: 'row',

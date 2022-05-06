@@ -463,6 +463,7 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingTop: 16, // important
     minHeight: 36,
+    maxHeight: 200,
     borderRadius: 24,
   },
   bodyContent: {

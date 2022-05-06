@@ -12,7 +12,7 @@ import Modal from 'react-native-modal';
 import IconButton from './IconButton';
 import PLabel from './PLabel';
 
-import { GRAY3, PRIMARYSOLID, PRIMARYSOLID7 } from 'shared/src/colors';
+import { BLACK, GRAY800, PRIMARYSOLID } from 'shared/src/colors';
 
 export interface MenuDataItemProps<Key = string> {
   label: string;
@@ -47,6 +47,9 @@ function SelectionModal<Key = string>(
       style={[styles.bottomHalfModal, modalStyle]}
       onBackdropPress={onPressCancel}>
       <View style={styles.modalWrapper}>
+        <View style={styles.modalKnobContainer}>
+          <View style={styles.modalKnob} />
+        </View>
         <FlatList
           data={dataArray}
           keyExtractor={(item) => `${item.key}`}
@@ -76,7 +79,7 @@ export default SelectionModal;
 
 const styles = StyleSheet.create({
   modalWrapper: {
-    backgroundColor: GRAY3,
+    backgroundColor: BLACK,
     paddingHorizontal: 28,
     paddingVertical: 32,
     borderTopLeftRadius: 20,
@@ -86,8 +89,18 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     margin: 0,
   },
+  modalKnobContainer: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  modalKnob: {
+    width: 72,
+    height: 8,
+    borderRadius: 30,
+    backgroundColor: GRAY800,
+  },
   menuLabel: {
-    marginLeft: 20,
+    marginLeft: 16,
   },
   menuItem: {
     marginLeft: 2,
@@ -103,6 +116,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: PRIMARYSOLID7,
+    backgroundColor: 'transparent',
   },
 });
