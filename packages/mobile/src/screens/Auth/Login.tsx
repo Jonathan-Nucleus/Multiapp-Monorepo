@@ -41,7 +41,7 @@ const Login: LoginScreen = ({ navigation }) => {
   const [pass, setPass] = useState('');
   const [checked, setChecked] = useState(false);
   const [securePassEntry, setSecurePassEntry] = useState(true);
-
+  const [error, setError] = useState(false);
   const [login] = useMutation(LOGIN);
   const [loginOAuth] = useLoginOAuth();
 
@@ -56,6 +56,7 @@ const Login: LoginScreen = ({ navigation }) => {
 
   const handleNextPage = async () => {
     Keyboard.dismiss();
+    setError(false);
     try {
       const { data } = await login({
         variables: {
@@ -68,33 +69,38 @@ const Login: LoginScreen = ({ navigation }) => {
       }
       console.log('logged user', data);
     } catch (e) {
+      setError(true);
       console.error('login error', e);
     }
   };
 
   const googleLogin = async () => {
-    const result = await authenticate();
-    if (result) {
-      const { token, payload } = result;
-      const { email, family_name, given_name } = payload;
+    try {
+      const result = await authenticate();
+      if (result) {
+        const { token, payload } = result;
+        const { email, family_name, given_name } = payload;
 
-      const { data } = await loginOAuth({
-        variables: {
-          user: {
-            email,
-            firstName: given_name,
-            lastName: family_name,
-            tokenId: token,
-            provider: 'google',
+        const { data } = await loginOAuth({
+          variables: {
+            user: {
+              email,
+              firstName: given_name,
+              lastName: family_name,
+              tokenId: token,
+              provider: 'google',
+            },
           },
-        },
-      });
+        });
 
-      if (data?.loginOAuth) {
-        saveAuthToken(data.loginOAuth);
+        if (data?.loginOAuth) {
+          saveAuthToken(data.loginOAuth);
+        }
+      } else {
+        console.log('Something went wrong');
       }
-    } else {
-      console.log('Something went wrong');
+    } catch (err) {
+      console.log('google login err', err);
     }
   };
 
@@ -113,7 +119,10 @@ const Login: LoginScreen = ({ navigation }) => {
             <Text style={styles.hyperText}>SIGN UP WITH CODE</Text>
           </TouchableOpacity>
         </View>
-        {/* <ErrorText error="Your email and/or password are incorrect." /> */}
+        {error && (
+          <ErrorText error="Your email and/or password are incorrect." />
+        )}
+
         <PTextInput
           label="Email"
           onChangeText={(val: string) => setEmail(val)}

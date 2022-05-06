@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   StyleSheet,
   Keyboard,
@@ -17,11 +17,14 @@ import PTextInput from '../../components/common/PTextInput';
 import PGradientButton from '../../components/common/PGradientButton';
 import ErrorText from '../../components/common/ErrorTxt';
 import { RESET_PASSWORD } from '../../graphql/mutation/auth';
-import { BLACK, PRIMARY, WHITE } from 'shared/src/colors';
+import { BGHEADER, BLACK, PRIMARY, WHITE, WHITE12 } from 'shared/src/colors';
 import { Body2 } from '../../theme/fonts';
 import LogoSvg from '../../assets/icons/logo.svg';
+import CheckCircleSvg from '../../assets/icons/CheckCircle.svg';
+import CircleSvg from '../../assets/icons/Circle.svg';
 
 import type { ResetPassScreen } from 'mobile/src/navigations/AuthStack';
+import { validatePassword } from '../../utils/utils';
 
 const ResetPass: ResetPassScreen = ({ navigation, route }) => {
   const [pass, setPass] = useState('');
@@ -29,15 +32,52 @@ const ResetPass: ResetPassScreen = ({ navigation, route }) => {
   const [securePassEntry, setSecurePassEntry] = useState(true);
   const [secureConfirmPassEntry, setSecureConfirmPassEntry] = useState(true);
   const [error, setError] = useState('');
+  const [checkedString, setCheckedString] = useState(false);
+  const [checkedSpecial, setCheckedSpecial] = useState(false);
+  const [checkedNumber, setCheckedNumber] = useState(false);
+  const [checkedLength, setCheckedLength] = useState(false);
+  const [passError, setPassError] = useState('');
 
   const [resetPassword] = useMutation(RESET_PASSWORD);
 
   const disabled = useMemo(() => {
-    if (pass && confirmPass && pass === confirmPass) {
+    if (
+      pass &&
+      confirmPass &&
+      validatePassword(pass).checkedLength &&
+      validatePassword(pass).checkedString &&
+      validatePassword(pass).checkedSpecial &&
+      validatePassword(pass).checkedNumber &&
+      pass === confirmPass
+    ) {
+      setPassError('');
       return false;
+    } else if (pass && confirmPass && pass !== confirmPass) {
+      setPassError('Confirm Password does not match');
+      return true;
     }
     return true;
   }, [pass, confirmPass]);
+
+  useEffect(() => {
+    const validation = validatePassword(pass);
+    setCheckedLength(false);
+    setCheckedString(false);
+    setCheckedNumber(false);
+    setCheckedSpecial(false);
+    if (validation.checkedLength) {
+      setCheckedLength(true);
+    }
+    if (validation.checkedString) {
+      setCheckedString(true);
+    }
+    if (validation.checkedSpecial) {
+      setCheckedSpecial(true);
+    }
+    if (validation.checkedNumber) {
+      setCheckedNumber(true);
+    }
+  }, [pass]);
 
   const handleNextPage = async () => {
     Keyboard.dismiss();
@@ -61,6 +101,15 @@ const ResetPass: ResetPassScreen = ({ navigation, route }) => {
     } catch (e: any) {
       setError(e.message);
     }
+  };
+
+  const renderItem = (text: string, validation: boolean) => {
+    return (
+      <View style={styles.renderItem}>
+        {validation ? <CheckCircleSvg /> : <CircleSvg />}
+        <Text style={styles.infoTxt}>{text}</Text>
+      </View>
+    );
   };
 
   return (
@@ -90,7 +139,14 @@ const ResetPass: ResetPassScreen = ({ navigation, route }) => {
           onPressText={() => setSecureConfirmPassEntry(!secureConfirmPassEntry)}
           text={confirmPass}
           subLabelTextStyle={styles.subLabelText}
+          error={passError}
         />
+        <View style={styles.info}>
+          {renderItem('8-16 characters', checkedLength)}
+          {renderItem('Upper and lower case', checkedString)}
+          {renderItem('Numbers', checkedNumber)}
+          {renderItem('Special characters (ex: @#$)', checkedSpecial)}
+        </View>
         <PGradientButton
           label="SAVE PASSWORD AND LOGIN"
           btnContainer={styles.btnContainer}
@@ -137,5 +193,22 @@ const styles = StyleSheet.create({
   txt: {
     ...Body2,
     color: WHITE,
+  },
+  infoTxt: {
+    color: WHITE,
+    ...Body2,
+    marginLeft: 9,
+  },
+  renderItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  info: {
+    padding: 16,
+    borderRadius: 4,
+    borderColor: WHITE12,
+    borderWidth: 1,
+    backgroundColor: BGHEADER,
   },
 });

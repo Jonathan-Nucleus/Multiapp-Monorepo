@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   StyleSheet,
   Keyboard,
@@ -23,6 +23,7 @@ import SuccessText from '../../components/common/SuccessText';
 import ErrorText from '../../components/common/ErrorTxt';
 
 import type { ForgotPassScreen } from 'mobile/src/navigations/AuthStack';
+import { validateEmail } from '../../utils/utils';
 
 const ForgotPass: ForgotPassScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -32,22 +33,30 @@ const ForgotPass: ForgotPassScreen = ({ navigation }) => {
 
   const handleReset = async () => {
     Keyboard.dismiss();
+    setErr('');
     try {
       const { data } = await forgotPassword({
         variables: {
           email: email,
         },
       });
-      console.log(123, data);
       if (data.requestPasswordReset) {
         setSent(true);
       } else {
         setErr('Please try again');
       }
     } catch (e) {
+      setErr((e as Error).message);
       console.error('forgot password error', e);
     }
   };
+
+  const disabled = useMemo(() => {
+    if (email && validateEmail(email)) {
+      return false;
+    }
+    return true;
+  }, [email]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -79,6 +88,7 @@ const ForgotPass: ForgotPassScreen = ({ navigation }) => {
               label="send email"
               btnContainer={styles.btnContainer}
               onPress={handleReset}
+              disabled={disabled}
             />
           </>
         )}
