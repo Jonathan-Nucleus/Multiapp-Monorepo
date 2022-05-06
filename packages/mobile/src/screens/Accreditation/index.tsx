@@ -1,6 +1,5 @@
 import React, { useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
@@ -85,7 +84,7 @@ const Accreditation: AccreditationScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={pStyles.globalContainer}>
+    <View style={pStyles.globalContainer}>
       <AccreditationHeader
         centerLabel="Investor Accreditation"
         handleBack={() => navigation.goBack()}
@@ -95,10 +94,8 @@ const Accreditation: AccreditationScreen = ({ navigation }) => {
           ref={slideRef}
           data={slideData}
           sliderWidth={appWidth}
-          // sliderHeight={appHeight}
           activeSlideOffset={20}
           itemWidth={appWidth}
-          // itemHeight={appHeight}
           scrollEnabled={false}
           inactiveSlideScale={1}
           inactiveSlideOpacity={1}
@@ -123,7 +120,7 @@ const Accreditation: AccreditationScreen = ({ navigation }) => {
         />
         {renderPagination()}
       </PAppContainer>
-    </SafeAreaView>
+    </View>
   );
 };
 

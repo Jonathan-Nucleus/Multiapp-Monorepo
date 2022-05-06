@@ -6,60 +6,68 @@ import {
   ViewStyle,
   StyleProp,
 } from 'react-native';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 
 interface HeaderProps {
   onPressLeft?: () => void;
-  onPressRight?: () => void;
   rightIcon?: React.ReactNode;
   leftIcon?: React.ReactNode;
   centerIcon?: React.ReactNode;
   containerStyle?: StyleProp<ViewStyle>;
+  outerContainerStyle?: StyleProp<ViewStyle>;
   leftStyle?: StyleProp<ViewStyle>;
   rightStyle?: StyleProp<ViewStyle>;
+  dividerColor?: string;
 }
 const PHeader: React.FC<HeaderProps> = (props) => {
   const {
     onPressLeft,
-    onPressRight,
     rightIcon,
     leftIcon,
     centerIcon,
     containerStyle,
+    outerContainerStyle,
     leftStyle,
     rightStyle,
+    dividerColor,
   } = props;
 
+  const insets = useSafeAreaInsets();
+  const outerStyles = {
+    paddingTop: insets.top,
+  };
+
   return (
-    <View style={[styles.container, containerStyle]}>
-      {!!leftIcon && (
-        <TouchableOpacity
-          onPress={onPressLeft}
-          disabled={onPressLeft ? false : true}
-          style={[styles.leftIcon, leftStyle]}>
-          {leftIcon}
-        </TouchableOpacity>
-      )}
-      {centerIcon}
-      {!!rightIcon && (
-        <TouchableOpacity
-          onPress={onPressRight}
-          style={[styles.rightIcon, rightStyle]}>
-          {rightIcon}
-        </TouchableOpacity>
-      )}
+    <View style={[styles.outerContainer, outerContainerStyle, outerStyles]}>
+      <View style={[styles.container, containerStyle]}>
+        {!!leftIcon && (
+          <TouchableOpacity
+            onPress={onPressLeft}
+            disabled={onPressLeft ? false : true}
+            style={leftStyle}>
+            {leftIcon}
+          </TouchableOpacity>
+        )}
+        <View style={styles.flex}>{centerIcon}</View>
+        {!!rightIcon && <View style={rightStyle}>{rightIcon}</View>}
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  outerContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 4,
+  },
   container: {
-    paddingTop: 40,
-    marginBottom: 40,
+    height: 48,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingBottom: 14,
     elevation: 5,
     shadowColor: 'rgba(0, 0, 0, 0.5)',
     shadowOffset: {
@@ -67,17 +75,11 @@ const styles = StyleSheet.create({
       height: 3,
     },
     shadowOpacity: 0.3,
-    height: 96,
   },
-  leftIcon: {
-    position: 'absolute',
-    left: 16,
-    top: 52,
-  },
-  rightIcon: {
-    position: 'absolute',
-    right: 16,
-    top: 52,
+  flex: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

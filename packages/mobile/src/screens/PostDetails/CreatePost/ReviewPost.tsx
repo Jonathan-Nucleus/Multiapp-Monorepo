@@ -1,6 +1,5 @@
 import React from 'react';
 import { FlatList, Image, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MentionInput } from 'react-native-controlled-mentions';
 import _ from 'lodash';
 const Buffer = global.Buffer || require('buffer').Buffer;
@@ -73,7 +72,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
     AUDIENCE_OPTIONS.find((option) => option.id === audience)?.value ?? '';
 
   return (
-    <SafeAreaView style={pStyles.globalContainer}>
+    <View style={pStyles.globalContainer}>
       <PostHeader
         centerLabel="Preview Post"
         rightLabel="POST"
@@ -119,7 +118,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
           />
         )}
       </PAppContainer>
-    </SafeAreaView>
+    </View>
   );
 };
 

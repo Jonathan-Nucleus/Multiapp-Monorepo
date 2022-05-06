@@ -1,6 +1,5 @@
 import React from 'react';
-import { ListRenderItem, StyleSheet, FlatList } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ListRenderItem, StyleSheet, FlatList, View } from 'react-native';
 
 import CheckboxLabel from 'mobile/src/components/common/CheckboxLabel';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
@@ -93,7 +92,7 @@ const ChooseCategory: ChooseCategoryScreen = ({ route, navigation }) => {
   );
 
   return (
-    <SafeAreaView style={pStyles.globalContainer}>
+    <View style={pStyles.globalContainer}>
       <PostHeader
         centerLabel="Choose Categories"
         rightLabel="NEXT"
@@ -114,7 +113,7 @@ const ChooseCategory: ChooseCategoryScreen = ({ route, navigation }) => {
           columnWrapperStyle={{ justifyContent: 'space-between' }}
         />
       </PAppContainer>
-    </SafeAreaView>
+    </View>
   );
 };
 

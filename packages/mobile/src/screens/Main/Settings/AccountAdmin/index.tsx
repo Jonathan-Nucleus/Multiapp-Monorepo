@@ -27,7 +27,6 @@ import {
   Body3,
   Body1Bold,
 } from 'mobile/src/theme/fonts';
-import PHeader from 'mobile/src/components/common/PHeader';
 import MainHeader from 'mobile/src/components/main/Header';
 import { useAccount } from 'mobile/src/graphql/query/account';
 import { useDeleteAccount } from 'mobile/src/graphql/mutation/account';

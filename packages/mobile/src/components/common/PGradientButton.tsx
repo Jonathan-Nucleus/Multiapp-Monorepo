@@ -17,6 +17,7 @@ interface ButtonProps {
   btnContainer?: ViewStyle;
   gradientContainer?: ViewStyle;
   textStyle?: TextStyle;
+  icon?: React.ReactNode;
   label?: string;
   onPress?: () => void;
   disabled?: boolean;
@@ -29,6 +30,7 @@ const PGradientButton: React.FC<ButtonProps> = (props) => {
     gradientContainer,
     textStyle,
     label,
+    icon,
     onPress,
     disabled = false,
     isLoading = false,
@@ -47,14 +49,19 @@ const PGradientButton: React.FC<ButtonProps> = (props) => {
         {isLoading ? (
           <UIActivityIndicator color={WHITE} size={24} />
         ) : (
-          <Text
-            style={[
-              styles.textStyle,
-              textStyle,
-              disabled && styles.disabledLabel,
-            ]}>
-            {label}
-          </Text>
+          <>
+            {label && (
+              <Text
+                style={[
+                  styles.textStyle,
+                  textStyle,
+                  disabled && styles.disabledLabel,
+                ]}>
+                {label}
+              </Text>
+            )}
+            {icon}
+          </>
         )}
       </LinearGradient>
     </TouchableOpacity>

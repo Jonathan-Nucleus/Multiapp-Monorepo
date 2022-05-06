@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, forwardRef } from 'react';
 import {
   View,
   ViewStyle,
@@ -41,102 +41,104 @@ interface PTextInputProps extends TextInputProps {
   numberOfLines?: number;
 }
 
-const PTextInput: React.FC<PTextInputProps> = (props) => {
-  const {
-    containerStyle,
-    label,
-    labelStyle,
-    labelTextStyle,
-    text,
-    textInputStyle,
-    subLabel,
-    subLabelStyle,
-    subLabelTextStyle,
-    onChangeText,
-    onPressText,
-    onPress,
-    onFocus,
-    onBlur,
-    onSubmitEditing,
-    icon,
-    placeholder,
-    secureTextEntry = false,
-    keyboardType = 'default',
-    editable = true,
-    autoCapitalize = 'none',
-    autoFocus = false,
-    children,
-    placeholderTextColor = '#888',
-    multiline = false,
-    autoCorrect = true,
-    error,
-    errorStyle,
-    numberOfLines = 1,
-    ...textInputProps
-  } = props;
+const PTextInput = forwardRef<React.FC<PTextInputProps>, PTextInputProps>(
+  (props, ref) => {
+    const {
+      containerStyle,
+      label,
+      labelStyle,
+      labelTextStyle,
+      text,
+      textInputStyle,
+      subLabel,
+      subLabelStyle,
+      subLabelTextStyle,
+      onChangeText,
+      onPressText,
+      onPress,
+      onFocus,
+      onBlur,
+      onSubmitEditing,
+      icon,
+      placeholder,
+      secureTextEntry = false,
+      keyboardType = 'default',
+      editable = true,
+      autoCapitalize = 'none',
+      autoFocus = false,
+      children,
+      placeholderTextColor = '#888',
+      multiline = false,
+      autoCorrect = true,
+      error,
+      errorStyle,
+      numberOfLines = 1,
+      ...textInputProps
+    } = props;
 
-  const [isFocused, setIsFocused] = useState(false);
-  const handleOnChangeText = (val: string): void => {
-    onChangeText?.(val);
-  };
+    const [isFocused, setIsFocused] = useState(false);
+    const handleOnChangeText = (val: string): void => {
+      onChangeText?.(val);
+    };
 
-  return (
-    <View style={[styles.container, containerStyle]}>
-      <View style={styles.row}>
-        <PFormLabel
-          label={label}
-          style={labelStyle}
-          textStyle={[styles.defaultLabelText, labelTextStyle]}
-        />
-        <PFormLabel
-          label={subLabel ?? ''}
-          style={subLabelStyle}
-          textStyle={subLabelTextStyle}
-          onPress={onPressText}
-        />
+    return (
+      <View style={[styles.container, containerStyle]}>
+        <View style={styles.row}>
+          <PFormLabel
+            label={label}
+            style={labelStyle}
+            textStyle={[styles.defaultLabelText, labelTextStyle]}
+          />
+          <PFormLabel
+            label={subLabel ?? ''}
+            style={subLabelStyle}
+            textStyle={subLabelTextStyle}
+            onPress={onPressText}
+          />
+        </View>
+        <View style={styles.view}>
+          <TextInput
+            {...textInputProps}
+            placeholder={placeholder}
+            placeholderTextColor={placeholderTextColor}
+            onChangeText={handleOnChangeText}
+            secureTextEntry={secureTextEntry}
+            style={[
+              styles.textInput,
+              textInputStyle,
+              isFocused && styles.focused,
+              !!error && styles.errorInput,
+            ]}
+            value={text}
+            keyboardType={keyboardType}
+            editable={editable}
+            autoCapitalize={autoCapitalize}
+            onSubmitEditing={onSubmitEditing}
+            onFocus={(evt) => {
+              onFocus?.(evt);
+              setIsFocused(true);
+            }}
+            onBlur={(evt) => {
+              onBlur?.(evt);
+              setIsFocused(false);
+            }}
+            autoFocus={autoFocus}
+            multiline={multiline}
+            autoCorrect={autoCorrect}
+            numberOfLines={numberOfLines}
+          />
+          {children}
+          {!!icon && (
+            <TouchableOpacity onPress={onPress}>
+              <View style={styles.icon}>{icon}</View>
+            </TouchableOpacity>
+          )}
+        </View>
+        {!!error && <Text style={[styles.error, errorStyle]}>{error}</Text>}
       </View>
-      <View style={styles.view}>
-        <TextInput
-          {...textInputProps}
-          placeholder={placeholder}
-          placeholderTextColor={placeholderTextColor}
-          onChangeText={handleOnChangeText}
-          secureTextEntry={secureTextEntry}
-          style={[
-            styles.textInput,
-            textInputStyle,
-            isFocused && styles.focused,
-            !!error && styles.errorInput,
-          ]}
-          value={text}
-          keyboardType={keyboardType}
-          editable={editable}
-          autoCapitalize={autoCapitalize}
-          onSubmitEditing={onSubmitEditing}
-          onFocus={(evt) => {
-            onFocus?.(evt);
-            setIsFocused(true);
-          }}
-          onBlur={(evt) => {
-            onBlur?.(evt);
-            setIsFocused(false);
-          }}
-          autoFocus={autoFocus}
-          multiline={multiline}
-          autoCorrect={autoCorrect}
-          numberOfLines={numberOfLines}
-        />
-        {children}
-        {!!icon && (
-          <TouchableOpacity onPress={onPress}>
-            <View style={styles.icon}>{icon}</View>
-          </TouchableOpacity>
-        )}
-      </View>
-      {!!error && <Text style={[styles.error, errorStyle]}>{error}</Text>}
-    </View>
-  );
-};
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   textInput: {

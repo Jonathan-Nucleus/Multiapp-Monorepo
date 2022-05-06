@@ -364,19 +364,17 @@ const CreatePost: CreatePostScreen = ({ navigation }) => {
   );
 
   return (
-    <SafeAreaView
-      style={pStyles.globalContainer}
-      edges={['top', 'left', 'right']}>
+    <View style={pStyles.globalContainer}>
+      <PostHeader
+        centerLabel="Create Post"
+        rightLabel="NEXT"
+        rightValidation={isValid}
+        handleNext={handleSubmit(onSubmit)}
+        handleBack={() => navigation.goBack()}
+      />
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <PostHeader
-          centerLabel="Create Post"
-          rightLabel="NEXT"
-          rightValidation={isValid}
-          handleNext={handleSubmit(onSubmit)}
-          handleBack={() => navigation.goBack()}
-        />
         <PAppContainer
           disableKeyboardScroll
           contentContainerStyle={styles.flex}>
@@ -511,7 +509,7 @@ const CreatePost: CreatePostScreen = ({ navigation }) => {
           viewStyle={styles.iconButton}
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

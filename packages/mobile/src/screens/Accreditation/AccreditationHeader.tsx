@@ -23,14 +23,12 @@ const AccreditationHeader: React.FC<AccreditationHeaderProps> = (props) => {
           <CaretLeft size={24} color={WHITE} />
         </TouchableOpacity>
       }
-      leftStyle={styles.sideStyle}
       centerIcon={<PLabel label={centerLabel} textStyle={styles.headerTitle} />}
       rightIcon={
         <TouchableOpacity style={styles.iconContainer} onPress={handleBack}>
           <X size={24} color={WHITE} />
         </TouchableOpacity>
       }
-      rightStyle={styles.sideStyle}
       containerStyle={styles.headerContainer}
     />
   );
@@ -42,15 +40,11 @@ const styles = StyleSheet.create({
   headerContainer: {
     paddingTop: 0,
     marginBottom: 0,
-    height: 62,
   },
   headerTitle: {
     ...Body1Bold,
   },
   iconContainer: {
     padding: 8,
-  },
-  sideStyle: {
-    top: 6,
   },
 });

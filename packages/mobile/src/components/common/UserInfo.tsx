@@ -14,6 +14,7 @@ import GlobalSvg from 'shared/assets/images/global.svg';
 
 import { useFollowUser } from 'mobile/src/graphql/mutation/account';
 import { useAccount } from 'mobile/src/graphql/query/account';
+import { Audience } from 'backend/graphql/posts.graphql';
 import { UserProfile } from 'backend/graphql/users.graphql';
 
 type User = Partial<
@@ -28,7 +29,7 @@ interface UserInfoProps {
   avatarStyle?: object;
   avatarSize?: number;
   auxInfo?: string;
-  audienceInfo?: string;
+  audienceInfo?: Audience;
 }
 
 const UserInfo: React.FC<UserInfoProps> = (props) => {

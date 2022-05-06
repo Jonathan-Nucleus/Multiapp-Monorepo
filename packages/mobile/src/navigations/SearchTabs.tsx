@@ -14,6 +14,7 @@ import { CompositeScreenProps } from '@react-navigation/native';
 import { X, MagnifyingGlass, CaretLeft } from 'phosphor-react-native';
 
 import PHeader from '../components/common/PHeader';
+import SearchInput from '../components/common/SearchInput';
 import { Body2, Body2Bold, Body3 } from '../theme/fonts';
 import {
   BLACK,
@@ -39,37 +40,19 @@ const SearchTabs: SearchScreen = ({ navigation }) => {
   const [search, setSearch] = useState('');
   const { data: searchData } = useGlobalSearch(search);
 
-  const renderCenter = () => {
-    return (
-      <View style={styles.headerContainer}>
-        <View style={styles.textContainer}>
-          <TextInput
-            style={styles.textInput}
-            value={search}
-            onChangeText={setSearch}
-          />
-          <View style={styles.icon}>
-            {search ? (
-              <TouchableOpacity onPress={() => setSearch('')}>
-                <X size={14} color={WHITE} />
-              </TouchableOpacity>
-            ) : (
-              <MagnifyingGlass size={14} color={WHITE} />
-            )}
-          </View>
-        </View>
-      </View>
-    );
-  };
-
   return (
     <View style={styles.globalContainer}>
       <PHeader
         leftIcon={<CaretLeft size={28} color={WHITE} />}
         onPressLeft={() => navigation.goBack()}
         rightIcon={<View />}
-        centerIcon={renderCenter()}
-        containerStyle={styles.container}
+        centerIcon={
+          <SearchInput
+            value={search}
+            onChangeText={setSearch}
+            onClear={() => setSearch('')}
+          />
+        }
       />
       <Tab.Navigator
         screenOptions={({ route }) => ({
@@ -174,27 +157,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 20,
     paddingHorizontal: 16,
-    width: '100%',
-    alignSelf: 'center',
-  },
-  headerContainer: {
-    alignSelf: 'center',
-    width: '80%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 10,
+    marginHorizontal: 16,
+    flex: 1,
   },
   textContainer: {
-    justifyContent: 'center',
     position: 'relative',
-    width: '100%',
+    flexDirection: 'row',
   },
   icon: {
     position: 'absolute',
-    right: 10,
-  },
-  container: {
-    marginTop: 10,
-    marginBottom: 0,
+    right: 28,
+    height: 34,
+    justifyContent: 'center',
   },
 });

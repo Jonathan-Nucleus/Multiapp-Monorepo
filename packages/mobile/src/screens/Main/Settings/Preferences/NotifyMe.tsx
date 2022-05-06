@@ -23,7 +23,6 @@ import {
   WHITE12,
 } from 'shared/src/colors';
 
-import PHeader from 'mobile/src/components/common/PHeader';
 import pStyles from 'mobile/src/theme/pStyles';
 import {
   Body1,

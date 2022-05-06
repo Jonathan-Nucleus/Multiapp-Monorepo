@@ -86,21 +86,23 @@ const AccreditationItem: React.FC<AccreditationItemProps> = ({
   const renderFirstSlide = () => {
     return (
       <View style={styles.container}>
-        <PLabel
-          label="Are you Investing as an:"
-          textStyle={styles.titleLabel}
-        />
-        {InvestOptions.map((item) => {
-          const { title, value } = item;
-          return (
-            <TouchableOpacity
-              style={styles.greyButton}
-              key={value}
-              onPress={() => updateInvestOption(value)}>
-              <PLabel label={title} />
-            </TouchableOpacity>
-          );
-        })}
+        <View style={styles.flex}>
+          <PLabel
+            label="Are you Investing as an:"
+            textStyle={styles.titleLabel}
+          />
+          {InvestOptions.map((item) => {
+            const { title, value } = item;
+            return (
+              <TouchableOpacity
+                style={styles.greyButton}
+                key={value}
+                onPress={() => updateInvestOption(value)}>
+                <PLabel label={title} />
+              </TouchableOpacity>
+            );
+          })}
+        </View>
         <View style={styles.bottomContainer}>
           <TouchableOpacity
             style={styles.cancelButton}
@@ -193,15 +195,17 @@ const AccreditationItem: React.FC<AccreditationItemProps> = ({
       <View style={[styles.container, styles.thirdSlide]}>
         {isEnoughInvestor ? (
           <>
-            <AISvg />
-            <PLabel
-              label="You’re an accredited investor!"
-              textStyle={styles.titleLabel}
-            />
-            <PLabel
-              label="Thank you for providing the information required by law to verify your status as an accredited investor."
-              textStyle={styles.descriptionLabel}
-            />
+            <View style={[styles.flex, styles.result]}>
+              <AISvg />
+              <PLabel
+                label="You’re an accredited investor!"
+                textStyle={styles.titleLabel}
+              />
+              <PLabel
+                label="Thank you for providing the information required by law to verify your status as an accredited investor."
+                textStyle={styles.descriptionLabel}
+              />
+            </View>
             <View style={styles.bottomContainer}>
               <PGradientButton
                 label="Next"
@@ -338,6 +342,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     height: '100%',
   },
+  flex: {
+    flex: 1,
+  },
+  result: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   thirdSlide: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -412,15 +423,15 @@ const styles = StyleSheet.create({
   },
   bottomContainer: {
     paddingHorizontal: 16,
+    paddingBottom: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    width: appWidth,
-    position: 'absolute',
-    bottom: 0,
+    width: '100%',
     height: 80,
   },
   secondBottomWrapper: {
     paddingHorizontal: 16,
+    paddingBottom: 16,
     position: 'absolute',
     bottom: 10,
     flexDirection: 'row',

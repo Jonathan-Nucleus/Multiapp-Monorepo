@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
@@ -45,30 +45,34 @@ const AccreditationResult: AccreditationResultScreen = ({ navigation }) => {
   }
 
   return (
-    <SafeAreaView style={pStyles.globalContainer}>
+    <View style={pStyles.globalContainer}>
       <AccreditationHeader
         centerLabel="Investor Accreditation"
         handleBack={() => navigation.pop(2)}
       />
       {accreditation && (
-        <PAppContainer noScroll style={styles.container}>
-          {accreditation === 'QUALIFIED_PURCHASER' ? (
-            <QPSvg />
-          ) : accreditation === 'QUALIFIED_CLIENT' ? (
-            <QCSvg />
-          ) : (
-            <AISvg />
-          )}
-          <PLabel label={title} textStyle={styles.titleLabel} />
-          <PLabel label={subtitle} textStyle={styles.descriptionLabel} />
-          <TouchableOpacity
-            onPress={() => navigation.pop(2)}
-            style={styles.outlineBtn}>
-            <PLabel label="Back to App" />
-          </TouchableOpacity>
-        </PAppContainer>
+        <SafeAreaView style={styles.flex}>
+          <PAppContainer noScroll style={styles.container}>
+            <View style={[styles.flex, styles.container]}>
+              {accreditation === 'QUALIFIED_PURCHASER' ? (
+                <QPSvg />
+              ) : accreditation === 'QUALIFIED_CLIENT' ? (
+                <QCSvg />
+              ) : (
+                <AISvg />
+              )}
+              <PLabel label={title} textStyle={styles.titleLabel} />
+              <PLabel label={subtitle} textStyle={styles.descriptionLabel} />
+            </View>
+            <TouchableOpacity
+              onPress={() => navigation.pop(2)}
+              style={styles.outlineBtn}>
+              <PLabel label="Back to App" />
+            </TouchableOpacity>
+          </PAppContainer>
+        </SafeAreaView>
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -76,6 +80,9 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  flex: {
+    flex: 1,
   },
   titleLabel: {
     ...H6Bold,
@@ -90,8 +97,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   outlineBtn: {
-    position: 'absolute',
-    bottom: 16,
     width: '100%',
     height: 45,
     marginTop: 24,

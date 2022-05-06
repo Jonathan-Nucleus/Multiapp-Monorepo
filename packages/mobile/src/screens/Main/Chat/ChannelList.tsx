@@ -1,16 +1,21 @@
 import React, { FC, useState, useEffect } from 'react';
 import { ListRenderItem, StyleSheet, FlatList, View, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CaretLeft, MagnifyingGlass } from 'phosphor-react-native';
-import { ChannelFilters, ChannelSort, Channel } from 'stream-chat';
+import { MagnifyingGlass, NotePencil } from 'phosphor-react-native';
 
-import PHeader from 'mobile/src/components/common/PHeader';
 import MainHeader from 'mobile/src/components/main/Header';
+import SearchInput from 'mobile/src/components/common/SearchInput';
+import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import { Body1, Body2, Body3 } from 'mobile/src/theme/fonts';
 import pStyles from 'mobile/src/theme/pStyles';
-import { WHITE, BGDARK } from 'shared/src/colors';
+import { WHITE, BGDARK, GRAY700, GRAY600 } from 'shared/src/colors';
 
-import { useChatContext } from 'mobile/src/context/Chat';
+import {
+  useChatContext,
+  Channel,
+  ChannelSort,
+  ChannelFilters,
+} from 'mobile/src/context/Chat';
 import ChannelItem from 'mobile/src/components/main/chat/ChannelItem';
 
 import { ChannelListScreen } from 'mobile/src/navigations/ChatStack';
@@ -28,16 +33,30 @@ const ChannelList: ChannelListScreen = ({ navigation }) => {
     members: { $in: [userId] },
   });
   const [channels, setChannels] = useState<Channel[]>([]);
+  const [search, setSearch] = useState('');
 
   const fetchChannels = async () => {
     const newChannels = await client.queryChannels(filters, DEFAULT_SORT, {
       limit: 12,
+      watch: true,
     });
     setChannels(newChannels);
   };
 
   useEffect(() => {
     fetchChannels();
+    const handler = client.on((event) => {
+      const { channel, message, member, user } = event;
+      //console.log('received event', event.type, channel, message, member, user);
+      switch (event.type) {
+        case 'user.watching.start':
+        case 'user.watching.stop':
+          fetchChannels();
+          break;
+      }
+    });
+
+    return () => handler.unsubscribe();
   }, []);
 
   const renderItem: ListRenderItem<Channel> = ({ item }) => (
@@ -47,15 +66,27 @@ const ChannelList: ChannelListScreen = ({ navigation }) => {
   return (
     <View style={pStyles.globalContainer}>
       <MainHeader />
+      <SearchInput
+        value={search}
+        onChangeText={setSearch}
+        onClear={() => setSearch('')}
+        containerStyle={styles.textContainerStyle}
+        style={styles.textStyle}
+        placeholder="Search messages"
+        placeholderTextColor={GRAY600}
+      />
       <FlatList
         data={channels}
         renderItem={renderItem}
         keyExtractor={(item) => `${item.data?.cid}`}
-        ListHeaderComponent={
-          <View>
-            <Text>Hedge Funds</Text>
-          </View>
-        }
+        contentContainerStyle={styles.list}
+      />
+      <PGradientButton
+        icon={<NotePencil color={WHITE} size={24} />}
+        btnContainer={styles.chatButton}
+        gradientContainer={styles.gradientContainer}
+        textStyle={styles.chatLabel}
+        onPress={() => navigation.navigate('NewChat')}
       />
     </View>
   );
@@ -71,5 +102,32 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  list: {
+    paddingTop: 16,
+  },
+  textContainerStyle: {
+    marginTop: 16,
+  },
+  textStyle: {
+    backgroundColor: GRAY700,
+    borderRadius: 16,
+    height: 40,
+    borderWidth: 0,
+    color: WHITE,
+  },
+  chatButton: {
+    position: 'absolute',
+    bottom: 22,
+    right: 22,
+  },
+  gradientContainer: {
+    width: 56,
+    height: 56,
+    paddingVertical: 0,
+  },
+  chatLabel: {
+    fontSize: 40,
+    textAlign: 'center',
   },
 });

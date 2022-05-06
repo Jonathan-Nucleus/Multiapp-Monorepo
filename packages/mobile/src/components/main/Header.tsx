@@ -17,6 +17,7 @@ import { AVATAR_URL } from 'react-native-dotenv';
 
 interface HeaderProps {
   containerStyle?: ViewStyle;
+  outerContainerStyle?: ViewStyle;
   rightIcon?: any;
   leftIcon?: any;
   centerIcon?: any;
@@ -24,8 +25,14 @@ interface HeaderProps {
 }
 
 const MainHeader: React.FC<HeaderProps> = (props) => {
-  const { containerStyle, leftIcon, rightIcon, centerIcon, onPressLeft } =
-    props;
+  const {
+    containerStyle,
+    outerContainerStyle,
+    leftIcon,
+    rightIcon,
+    centerIcon,
+    onPressLeft,
+  } = props;
 
   const { data } = useAccount();
 
@@ -73,6 +80,7 @@ const MainHeader: React.FC<HeaderProps> = (props) => {
         )
       }
       centerIcon={centerIcon}
+      outerContainerStyle={outerContainerStyle}
       containerStyle={[styles.headerContainer, containerStyle]}
       onPressLeft={onPressLeft}
     />
@@ -82,10 +90,6 @@ const MainHeader: React.FC<HeaderProps> = (props) => {
 const styles = StyleSheet.create({
   headerContainer: {
     justifyContent: 'space-between',
-    paddingTop: 50,
-    paddingBottom: 16,
-    backgroundColor: GRAY900,
-    marginBottom: 4,
   },
   headerLogoContainer: {
     flexDirection: 'row',

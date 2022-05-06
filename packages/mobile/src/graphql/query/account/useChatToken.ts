@@ -17,5 +17,6 @@ export function useChatToken(): QueryResult<ChatTokenData, ChatTokenVariables> {
         chatToken
       }
     `,
+    { fetchPolicy: 'network-only' },
   );
 }

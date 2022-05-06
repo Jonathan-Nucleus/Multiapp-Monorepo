@@ -25,7 +25,6 @@ const PostHeader: React.FC<PostHeaderProps> = (props) => {
       leftIcon={
         <RoundIcon icon={<X size={20} color={WHITE} />} onPress={handleBack} />
       }
-      leftStyle={styles.sideStyle}
       centerIcon={<PLabel label={centerLabel} textStyle={styles.headerTitle} />}
       rightIcon={
         <TouchableOpacity onPress={handleNext}>
@@ -35,8 +34,6 @@ const PostHeader: React.FC<PostHeaderProps> = (props) => {
           />
         </TouchableOpacity>
       }
-      rightStyle={styles.sideStyle}
-      containerStyle={styles.headerContainer}
     />
   );
 };
@@ -45,23 +42,18 @@ const styles = StyleSheet.create({
   headerContainer: {
     paddingTop: 0,
     marginBottom: 0,
-    height: 62,
   },
   headerTitle: {
     ...Body1Bold,
   },
   rightText: {
     ...Body1Bold,
-    marginTop: 5,
   },
   disabledText: {
     ...Body1Bold,
-    marginTop: 5,
     color: GRAY800,
   },
-  sideStyle: {
-    top: 10,
-  },
+  sideStyle: {},
 });
 
 export default PostHeader;

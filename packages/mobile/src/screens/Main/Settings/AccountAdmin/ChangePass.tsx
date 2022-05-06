@@ -11,7 +11,6 @@ import { NavigationProp, RouteProp } from '@react-navigation/native';
 import { CaretLeft, MagnifyingGlass } from 'phosphor-react-native';
 
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
-import PHeader from 'mobile/src/components/common/PHeader';
 import PTextInput from 'mobile/src/components/common/PTextInput';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import ErrorText from 'mobile/src/components/common/ErrorTxt';

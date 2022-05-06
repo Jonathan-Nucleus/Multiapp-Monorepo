@@ -5,16 +5,20 @@ import {
   StackScreenProps,
 } from '@react-navigation/stack';
 import { CompositeScreenProps } from '@react-navigation/native';
-import { StreamChat, Channel as SCChannel } from 'stream-chat';
+import { StreamChat } from 'stream-chat';
 
 import pStyles from 'mobile/src/theme/pStyles';
 import { WHITE } from 'shared/src/colors';
 
-import ChatProvider from 'mobile/src/context/Chat';
+import ChatProvider, {
+  StreamType,
+  Channel as ChannelType,
+} from 'mobile/src/context/Chat';
 import { useAccount } from 'mobile/src/graphql/query/account';
 import { useChatToken } from 'mobile/src/graphql/query/account/useChatToken';
 
 import ChannelList from 'mobile/src/screens/Main/Chat/ChannelList';
+import NewChat from 'mobile/src/screens/Main/Chat/NewChat';
 import Channel from 'mobile/src/screens/Main/Chat/Channel';
 
 import type { MainTabScreenProps } from './MainTabNavigator';
@@ -24,7 +28,7 @@ const Stack = createStackNavigator();
 const ChatStack = () => {
   const { data: accountData } = useAccount({ fetchPolicy: 'cache-only' });
   const { data, loading: loadingToken, called: calledToken } = useChatToken();
-  const chatClient = useRef<StreamChat | null>(null);
+  const chatClient = useRef<StreamChat<StreamType> | null>(null);
   const [isReady, setIsReady] = useState(false);
 
   const account = accountData?.account;
@@ -32,7 +36,7 @@ const ChatStack = () => {
 
   useEffect(() => {
     if (!chatClient.current && account && token) {
-      const client = StreamChat.getInstance(GETSTREAM_ACCESS_KEY);
+      const client = StreamChat.getInstance<StreamType>(GETSTREAM_ACCESS_KEY);
       (async () => {
         await client.connectUser(
           {
@@ -71,6 +75,7 @@ const ChatStack = () => {
         screenOptions={{ headerShown: false, gestureEnabled: true }}
         initialRouteName="ChannelList">
         <Stack.Screen name="ChannelList" component={ChannelList} />
+        <Stack.Screen name="NewChat" component={NewChat} />
         <Stack.Screen name="Channel" component={Channel} />
       </Stack.Navigator>
     </ChatProvider>
@@ -88,9 +93,10 @@ const styles = StyleSheet.create({
 
 export type ChatStackParamList = {
   ChannelList: undefined;
+  NewChat: undefined;
   Channel: {
     channelId: string;
-    initialData?: SCChannel;
+    initialData?: ChannelType;
   };
 };
 
@@ -103,6 +109,10 @@ export type ChatScreenProps<
 
 export type ChannelListScreen = (
   props: ChatScreenProps<'ChannelList'>,
+) => ReactElement | null;
+
+export type NewChatScreen = (
+  props: ChatScreenProps<'NewChat'>,
 ) => ReactElement | null;
 
 export type ChannelScreen = (
