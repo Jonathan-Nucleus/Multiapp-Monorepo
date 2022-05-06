@@ -1,5 +1,4 @@
 import React, { ChangeEvent, FC, useMemo, useState } from "react";
-import { X } from "phosphor-react";
 import * as yup from "yup";
 import "yup-phone";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -7,12 +6,6 @@ import { SubmitHandler, useForm } from "react-hook-form";
 
 import Button from "../../../common/Button";
 import Field from "../../../common/Field";
-import { ProRoleOptions } from "backend/schemas/user";
-
-const ROLES = Object.keys(ProRoleOptions).map((option) => ({
-  value: option,
-  label: ProRoleOptions[option].label,
-}));
 
 const DAY = [
   { label: "Morning (8am - 12pm)", value: "morning" },
@@ -26,13 +19,28 @@ const TIMEZONE = [
   { label: "CST", value: "cst" },
 ];
 
-type FormValues = {
+interface Fund {
+  value: string;
+  label: string;
+}
+interface HelpRequestVariables {
+  request: {
+    type: string;
+    email?: string;
+    phone?: string;
+    fundId: string;
+    message: string;
+    preferredTimeOfDay?: string;
+  };
+}
+
+interface FormValues {
   phoneNumber: string;
   time: string;
   timezone: string;
   fund: string;
   comment: string;
-};
+}
 
 const schema = yup.object({
   phoneNumber: yup
@@ -46,11 +54,13 @@ const schema = yup.object({
 });
 
 interface ContactPhoneProps {
-  setSuccess: () => void;
+  handleContact: (request: HelpRequestVariables) => void;
+  FUNDS: Fund[];
 }
 
 const ContactPhone: FC<ContactPhoneProps> = ({
-  setSuccess,
+  handleContact,
+  FUNDS,
 }: ContactPhoneProps) => {
   const [loading, setLoading] = useState(false);
 
@@ -64,13 +74,15 @@ const ContactPhone: FC<ContactPhoneProps> = ({
 
   const onSubmit: SubmitHandler<FormValues> = async (values) => {
     const { phoneNumber, time, timezone, fund, comment } = values;
-    try {
-      setLoading(true);
-    } catch (err) {
-      console.log("err", err);
-    } finally {
-      setSuccess();
-    }
+    handleContact({
+      request: {
+        type: "PHONE",
+        phone: phoneNumber,
+        fundId: fund,
+        message: comment,
+        preferredTimeOfDay: time,
+      },
+    });
   };
 
   return (
@@ -113,7 +125,7 @@ const ContactPhone: FC<ContactPhoneProps> = ({
             label="Fund of Interest"
             autoComplete="fund"
             selectBox
-            options={ROLES}
+            options={FUNDS}
           />
           <Field
             register={register}

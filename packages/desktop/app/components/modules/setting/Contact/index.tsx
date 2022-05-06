@@ -7,18 +7,55 @@ import Button from "../../../common/Button";
 import ContactPhone from "./Phone";
 import ContactEmail from "./Email";
 import Success from "./Success";
+import { useHelpRequest } from "mobile/src/graphql/mutation/account";
+import { useFunds } from "mobile/src/graphql/query/marketplace/useFunds";
 
 interface ContactusModalProps {
   show: boolean;
   onClose: () => void;
 }
 
+type HelpRequestVariables = {
+  request: {
+    type: string;
+    email?: string;
+    phone?: string;
+    fundId: string;
+    message: string;
+    preferredTimeOfDay?: string;
+  };
+};
+
 const ContactusModal: FC<ContactusModalProps> = ({
   show,
   onClose,
 }: ContactusModalProps) => {
-  const [loading, setLoading] = useState(false);
   const [type, setType] = useState("");
+  const [helpRequest] = useHelpRequest();
+  const { data } = useFunds();
+
+  const FUNDS = useMemo(() => {
+    if (data?.funds && data?.funds?.length > 0) {
+      return data?.funds?.map((v) => ({
+        label: v.name,
+        value: v._id,
+      }));
+    }
+    return [];
+  }, [data]);
+
+  const handleContact = async (value: HelpRequestVariables) => {
+    try {
+      const { data: requestData } = await helpRequest({
+        variables: value,
+      });
+      if (requestData?.helpRequest) {
+        setType("success");
+      }
+    } catch (e) {
+      console.error("contact error", e);
+    }
+  };
 
   return (
     <>
@@ -91,10 +128,10 @@ const ContactusModal: FC<ContactusModalProps> = ({
               </div>
             </div>
             {type === "phone" && (
-              <ContactPhone setSuccess={() => setType("success")} />
+              <ContactPhone handleContact={handleContact} FUNDS={FUNDS} />
             )}
             {type === "email" && (
-              <ContactEmail setSuccess={() => setType("success")} />
+              <ContactEmail handleContact={handleContact} FUNDS={FUNDS} />
             )}
             {type === "success" && <Success onClose={onClose} />}
           </Card>

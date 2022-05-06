@@ -7,27 +7,42 @@ import Button from "../../../common/Button";
 import Field from "../../../common/Field";
 import { ProRoleOptions } from "backend/schemas/user";
 
-const ROLES = Object.keys(ProRoleOptions).map((option) => ({
-  value: option,
-  label: ProRoleOptions[option].label,
-}));
+interface Fund {
+  value: string;
+  label: string;
+}
 
-type FormValues = {
+interface ContactEmailProps {
+  handleContact: (request: HelpRequestVariables) => void;
+  FUNDS: Fund[];
+}
+
+interface FormValues {
   fund: string;
   comment: string;
-};
+  email: string;
+}
 
 const schema = yup.object({
   fund: yup.string().default("").required("Required"),
   comment: yup.string().default("").required("Required"),
+  email: yup.string().email("Must be a valid email").required("Required"),
 });
 
-interface ContactEmailProps {
-  setSuccess: () => void;
+interface HelpRequestVariables {
+  request: {
+    type: string;
+    email?: string;
+    phone?: string;
+    fundId: string;
+    message: string;
+    preferredTimeOfDay?: string;
+  };
 }
 
 const ContactEmail: FC<ContactEmailProps> = ({
-  setSuccess,
+  handleContact,
+  FUNDS,
 }: ContactEmailProps) => {
   const [loading, setLoading] = useState(false);
 
@@ -39,14 +54,15 @@ const ContactEmail: FC<ContactEmailProps> = ({
   });
   const { isValid } = formState;
 
-  const onSubmit: SubmitHandler<FormValues> = async (values) => {
-    try {
-      setLoading(true);
-    } catch (err) {
-      console.log("err", err);
-    } finally {
-      setSuccess();
-    }
+  const onSubmit: SubmitHandler<FormValues> = (values) => {
+    handleContact({
+      request: {
+        type: "EMAIL",
+        email: values.email,
+        fundId: values.fund,
+        message: values.comment,
+      },
+    });
   };
 
   return (
@@ -56,11 +72,18 @@ const ContactEmail: FC<ContactEmailProps> = ({
           <Field
             register={register}
             state={formState}
+            name="email"
+            label="Email Address"
+            autoComplete="email"
+          />
+          <Field
+            register={register}
+            state={formState}
             name="fund"
             label="Fund of Interest"
             autoComplete="fund"
             selectBox
-            options={ROLES}
+            options={FUNDS}
           />
           <Field
             register={register}
