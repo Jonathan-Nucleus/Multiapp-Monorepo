@@ -11,7 +11,6 @@ import {
   Pencil,
 } from "phosphor-react";
 import { Menu } from "@headlessui/react";
-import { CopyToClipboard } from "react-copy-to-clipboard";
 
 import Button from "../../../../components/common/Button";
 import Card from "../../../../components/common/Card";
@@ -77,6 +76,10 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
         refetchQueries: ["Account", "UserProfile"],
       });
     } catch (error) {}
+  };
+
+  const copyProfileLink = () => {
+    navigator.clipboard.writeText(user.linkedIn ?? "");
   };
 
   return (
@@ -411,12 +414,13 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
                             </div>
                           </>
                         )}
-                        <CopyToClipboard text={user.website}>
-                          <div className="flex items-center text-sm text-white cursor-pointer p-4">
-                            <Copy color="currentColor" size={24} />
-                            <span className="ml-4">Copy Profile Link</span>
-                          </div>
-                        </CopyToClipboard>
+                        <div
+                          className="flex items-center text-sm text-white cursor-pointer p-4"
+                          onClick={()=> copyProfileLink()}
+                        >
+                          <Copy color="currentColor" size={24} />
+                          <span className="ml-4">Copy Profile Link</span>
+                        </div>
                       </div>
                     </Menu.Item>
                   </Menu.Items>
