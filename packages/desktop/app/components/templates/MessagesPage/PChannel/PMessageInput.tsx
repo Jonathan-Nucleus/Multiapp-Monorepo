@@ -1,5 +1,5 @@
 import React, { useCallback, useContext } from "react";
-import { ImageDropzone } from "react-file-utils";
+import { ImageDropzone, FileUploadButton } from "react-file-utils";
 import {
   ChatAutoComplete,
   EmojiPicker,
@@ -11,7 +11,8 @@ import {
 import _debounce from "lodash/debounce";
 
 import { GiphyContext, StreamType } from "../types";
-import { EmojiIcon, LightningBoltSmall, SendIcon } from "../Icons";
+import { Smiley, Image as ImageIcon, PaperPlaneRight } from "phosphor-react";
+import { LightningBoltSmall } from "../Icons";
 
 /**
  * Debounce time in milliseconds to prevent sending duplicate messages in
@@ -61,49 +62,69 @@ const PMessagingInput: React.FC<MessageInputProps> = () => {
 
   return (
     <div className="p-4 border-y border-white/[.15]">
-      <ImageDropzone
-        accept={acceptedFiles}
-        handleFiles={messageInput.uploadNewFiles}
-        multiple={multipleUploads}
-        disabled={
-          (maxNumberOfFiles !== undefined &&
-            messageInput.numberOfUploads >= maxNumberOfFiles) ||
-          giphyState
-        }
-      >
-        <UploadsPreview />
-        <div className="flex items-center justify-between w-full">
-          <div className="flex-auto mr-2 relative text-black">
-            {giphyState && !messageInput.numberOfUploads && <GiphyIcon />}
-            <ChatAutoComplete
-              onChange={onChange}
-              handleSubmit={_debounce(
-                messageInput.handleSubmit,
-                DEBOUNCE_INTERVAL
-              )}
-              rows={1}
-              placeholder="Send a message"
-            />
-            <div
-              className="str-chat__textarea-emoji"
-              role="button"
-              aria-roledescription="button"
-              onClick={messageInput.openEmojiPicker}
-              ref={messageInput.emojiPickerRef}
-            >
-              <EmojiIcon />
-            </div>
-            <EmojiPicker />
-          </div>
-          <div
-            role="button"
-            aria-roledescription="button"
-            onClick={_debounce(messageInput.handleSubmit, DEBOUNCE_INTERVAL)}
+      <div className="flex items-end justify-between w-full">
+        <div className="flex-auto text-black bg-white rounded-md border-2 hover:border-primary">
+          <ImageDropzone
+            accept={acceptedFiles}
+            handleFiles={messageInput.uploadNewFiles}
+            multiple={multipleUploads}
+            disabled={
+              (maxNumberOfFiles !== undefined &&
+                messageInput.numberOfUploads >= maxNumberOfFiles) ||
+              giphyState
+            }
           >
-            <SendIcon />
-          </div>
+            <EmojiPicker />
+            <div className="px-2">
+              <UploadsPreview />
+            </div>
+            <div className="relative">
+              {giphyState && !messageInput.numberOfUploads && <GiphyIcon />}
+              <ChatAutoComplete
+                onChange={onChange}
+                handleSubmit={_debounce(
+                  messageInput.handleSubmit,
+                  DEBOUNCE_INTERVAL
+                )}
+                rows={1}
+                placeholder="Send a message"
+              />
+              <div className="absolute top-0 right-4 h-full flex items-center">
+                <div
+                  className="mx-1"
+                  role="button"
+                  aria-roledescription="button"
+                  onClick={messageInput.openEmojiPicker}
+                  ref={messageInput.emojiPickerRef}
+                >
+                  <Smiley color="#00AAE0" weight="fill" size="24" />
+                </div>
+
+                <div
+                  className="mx-1"
+                  role="button"
+                  aria-roledescription="button"
+                >
+                  <FileUploadButton
+                    multiple
+                    handleFiles={messageInput.uploadNewFiles}
+                  >
+                    <ImageIcon color="#00AAE0" size="24" />
+                  </FileUploadButton>
+                </div>
+              </div>
+            </div>
+          </ImageDropzone>
         </div>
-      </ImageDropzone>
+        <div
+          role="button"
+          aria-roledescription="button"
+          onClick={_debounce(messageInput.handleSubmit, DEBOUNCE_INTERVAL)}
+          className="m-1"
+        >
+          <PaperPlaneRight size="32" />
+        </div>
+      </div>
     </div>
   );
 };

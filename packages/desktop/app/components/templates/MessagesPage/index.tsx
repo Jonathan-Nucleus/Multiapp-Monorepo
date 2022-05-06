@@ -64,7 +64,10 @@ const MessagesPage = () => {
       initChat();
 
       return () => {
-        if (chatClient.current) chatClient.current.disconnectUser();
+        if (chatClient.current) {
+          chatClient.current.disconnectUser()
+          chatClient.current = null;
+        };
       };
     }
   }, [chatData, userData]);

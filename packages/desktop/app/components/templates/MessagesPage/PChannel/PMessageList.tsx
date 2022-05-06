@@ -4,7 +4,7 @@ import {
   useChatContext,
   useChannelStateContext,
 } from "stream-chat-react";
-import PMessage from "./PSimpleMessage";
+import PMessageSimple from "./PMessageSimple";
 import AvatarGroup from "../AvatarGroup";
 import { StreamType } from "../types";
 
@@ -29,7 +29,7 @@ export const PMessageList: React.FC = () => {
   return (
     <div className="h-full overflow-y-auto">
       {messages && messages.length > 0 ? (
-        <MessageList messageActions={ACTIONS} Message={PMessage} />
+        <MessageList messageActions={ACTIONS} Message={PMessageSimple} />
       ) : (
         <div className="flex flex-col items-center justify-center p-4">
           <AvatarGroup members={members} size={80} />

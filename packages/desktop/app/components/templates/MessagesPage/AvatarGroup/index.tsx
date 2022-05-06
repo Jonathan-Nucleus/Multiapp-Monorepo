@@ -1,5 +1,4 @@
 import { FC } from "react";
-import { Channel, ChannelMemberResponse, User } from "stream-chat";
 import { Avatar } from "stream-chat-react";
 import { Circle } from "phosphor-react";
 

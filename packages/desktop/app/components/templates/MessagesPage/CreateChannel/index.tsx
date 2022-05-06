@@ -164,9 +164,9 @@ const CreateChannel: React.FC<CreateChannelProps> = ({
     <div className="w-full py-4 border-l border-white/[.15]">
       <div className="text-white mb-1 px-4 py-2">New Message</div>
       <header className="border-t border-white/[.15] pt-2">
-        <div className="flex flex-row items-center px-4">
-          <span className="text-white mr-4">To</span>
-          <div className="flex-auto px-2">
+        <div className="flex flex-col md:flex-row md:items-center items-stretch px-4">
+          <span className="text-white">To:</span>
+          <div className="flex-auto ml-2">
             <TagInput
               className="h-12"
               ref={inputRef}
@@ -210,7 +210,7 @@ const CreateChannel: React.FC<CreateChannelProps> = ({
                         inputRef.current?.focus();
                         clearState();
                       }}
-                      className="messaging-create-channel__user-result empty text-white p-2"
+                      className="create-channel__user-result empty text-white p-2"
                     >
                       No people found...
                     </div>
@@ -222,7 +222,7 @@ const CreateChannel: React.FC<CreateChannelProps> = ({
           <Button
             type="button"
             variant="gradient-primary"
-            className="create-channel-button"
+            className="ml-2 mt-8 md:mt-0"
             onClick={createChannel}
           >
             Start Chat

@@ -1,11 +1,15 @@
 import React from "react";
 import { LiteralStringForUnion } from "stream-chat";
 
-export type AttachmentType = {};
+export type AttachmentType = {
+  fize_size?: number | string | undefined;
+};
 export type ChannelType = {};
 export type CommandType = LiteralStringForUnion;
 export type EventType = {};
-export type MessageType = {};
+export type MessageType = {
+  errorStatusCode: number;
+};
 export type ReactionType = {};
 export type UserType = {
   image?: string;

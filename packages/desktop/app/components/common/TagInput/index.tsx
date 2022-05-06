@@ -39,7 +39,7 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>(
 
     return (
       <div
-        className={`flex flex-row bg-white rounded-sm w-full shadow-sm
+        className={`flex flex-row flex-wrap bg-white rounded-sm w-full shadow-sm
         shadow-inner block leading-7 px-1 py-0 text-black mt-0.5 border-2 ${
           focused ? "border-primary" : "border-transparent"
         }`}
