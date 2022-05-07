@@ -22,52 +22,54 @@ const ModalDialog: FC<ModalDialogProps> = ({
       <Transition appear show={show} as={Fragment}>
         <Dialog
           as="div"
-          className="fixed inset-0 z-20 overflow-y-auto"
+          className="relative z-20"
           unmount={true}
           open={show}
           onClose={() => {}}
         >
-          <div className="h-screen flex items-center justify-center px-4">
-            <Transition.Child
-              as={Fragment}
-              enter="ease-out duration-300"
-              enterFrom="opacity-0"
-              enterTo="opacity-100"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-100"
-              leaveTo="opacity-0"
-            >
-              <Dialog.Overlay className="fixed inset-0 bg-black opacity-70" />
-            </Transition.Child>
-            <Transition.Child
-              as={Fragment}
-              enter="ease-out duration-300"
-              enterFrom="opacity-0 scale-95"
-              enterTo="opacity-100 scale-100"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-100 scale-100"
-              leaveTo="opacity-0 scale-95"
-            >
-              <Dialog.Panel className={"bg-background-card max-w-md rounded " + (className ?? "")}>
-                {title &&
-                  <Dialog.Title className="flex items-center border-b border-white/[.12] px-5 py-3">
-                    <div className="text-xl font-medium">
-                      {title}
-                    </div>
-                    <div className="ml-auto">
-                      <Button
-                        variant="text"
-                        className="opacity-60"
-                        onClick={onClose}
-                      >
-                        <X color="white" weight="bold" size={24} />
-                      </Button>
-                    </div>
-                  </Dialog.Title>
-                }
-                <>{children}</>
-              </Dialog.Panel>
-            </Transition.Child>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black opacity-70" />
+          </Transition.Child>
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className={"bg-background-card max-w-md rounded shadow-sm " + (className ?? "")}>
+                  {title &&
+                    <Dialog.Title className="flex items-center border-b border-white/[.12] px-5 py-3">
+                      <div className="text-xl font-medium">
+                        {title}
+                      </div>
+                      <div className="ml-auto">
+                        <Button
+                          variant="text"
+                          className="opacity-60"
+                          onClick={onClose}
+                        >
+                          <X color="white" weight="bold" size={24} />
+                        </Button>
+                      </div>
+                    </Dialog.Title>
+                  }
+                  <>{children}</>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
           </div>
         </Dialog>
       </Transition>

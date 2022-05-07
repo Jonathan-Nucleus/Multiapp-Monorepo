@@ -42,8 +42,7 @@ interface PostProps {
 }
 
 const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
-  const { data: accountData } = useAccount();
-  const account = accountData?.account;
+  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const [likePost] = useLikePost();
   const [followUser] = useFollowUser();
   const [mutePost] = useMutePost();
@@ -54,12 +53,10 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
   const [showHidePost, setShowHidePost] = useState(false);
   const [showReportPost, setShowReportPost] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const isMyPost = user._id == accountData?.account._id;
-  const isFollowingUser =
-    accountData?.account.followingIds?.includes(user._id) ?? false;
+  const isMyPost = user._id == account?._id;
+  const isFollowingUser = account?.followingIds?.includes(user._id) ?? false;
   const isLiked = account ? post.likeIds?.includes(account._id) : false;
-  const isMuted =
-    accountData?.account.mutedPostIds?.includes(post._id) ?? false;
+  const isMuted = account?.mutedPostIds?.includes(post._id) ?? false;
   const toggleFollowingUser = async () => {
     await followUser({
       variables: { follow: !isFollowingUser, userId: user._id },
@@ -120,7 +117,7 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
               {user.role == "PROFESSIONAL" && (
                 <div className="text-white text-tiny ml-1.5 text-tiny">PRO</div>
               )}
-              {!isMyPost && (
+              {!isMyPost && !isFollowingUser && (
                 <div className="flex items-center">
                   <div className="mx-1 text-white opacity-60">•</div>
                   <div className="flex">

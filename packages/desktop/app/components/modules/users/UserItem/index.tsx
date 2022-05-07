@@ -27,10 +27,10 @@ const UserItem: FC<UserItemProps> = ({
   user,
   showChat = false,
 }: UserItemProps) => {
-  const { data: accountData } = useAccount();
+  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const [followUser] = useFollowUser();
-  const isFollowing = accountData?.account?.followingIds?.includes(user._id);
-  const isMyProfile = accountData?.account?._id == user._id;
+  const isFollowing = account?.followingIds?.includes(user._id);
+  const isMyProfile = account?._id == user._id;
   const toggleFollowing = async () => {
     try {
       await followUser({

@@ -29,7 +29,7 @@ const Watchlist: FC<UserProfileProps> = ({ user }) => {
     <Card className="p-0 border-white/[.12] divide-y divide-inherit">
       <div className="text-white  p-4">Watch List</div>
       {user.watchlist.map((item) => (
-        <div key={item._id} className="flex items-center p-4">
+        <div key={item._id} className="flex items-center p-4 hover:bg-primary-overlay/[.24] transition-all">
           <Link href={`/funds/${item._id}`}>
             <a>
               <div className="flex items-center">

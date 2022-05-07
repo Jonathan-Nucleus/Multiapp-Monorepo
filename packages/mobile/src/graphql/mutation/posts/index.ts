@@ -2,7 +2,6 @@ import { gql, useMutation, MutationTuple } from '@apollo/client';
 import type { MediaUpload, MediaType } from 'backend/graphql/mutations.graphql';
 import type { PostInput, PostCategory } from 'backend/graphql/posts.graphql';
 import type { Comment } from 'backend/graphql/comments.graphql';
-import type { FetchPostsData } from 'mobile/src/graphql/query/account';
 import { PostCategories } from 'backend/graphql/enumerations.graphql';
 import {
   POST_SUMMARY_FRAGMENT,
@@ -11,42 +10,6 @@ import {
 
 export type { PostCategory };
 export { PostCategories };
-
-export const CREATE_POST = gql`
-  mutation CreatePost($post: PostInput!) {
-    createPost(post: $post) {
-      _id
-      categories
-      audience
-      body
-      mediaUrl
-      mentionIds
-    }
-  }
-`;
-
-export const HIDE_POST = gql`
-  mutation HidePost($postId: ID!) {
-    hidePost(postId: $postId)
-  }
-`;
-
-export const MUTE_POST = gql`
-  mutation MutePost($mute: Boolean!, $postId: ID!) {
-    mutePost(mute: $mute, postId: $postId)
-  }
-`;
-
-export const EDIT_COMMENT = gql`
-  mutation EditComment($comment: CommentUpdate!) {
-    editComment(comment: $comment) {
-      _id
-      body
-      postId
-      createdAt
-    }
-  }
-`;
 
 type UploadLinkVariables = {
   localFilename: string;

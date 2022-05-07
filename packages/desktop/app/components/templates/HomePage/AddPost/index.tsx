@@ -8,38 +8,39 @@ import { UserProfileProps } from "../../../../types/common-props";
 import Skeleton from "./Skeleton";
 
 interface AddPostProps extends UserProfileProps {
-  setShowPostModal: (val: boolean) => void;
+  onClick: () => void;
 }
 
-const AddPost: FC<AddPostProps> = ({ user, setShowPostModal }) => {
+const AddPost: FC<AddPostProps> = ({ user, onClick }) => {
   if (!user) {
     return <Skeleton />;
   }
   return (
-    <Card className="bg-background-blue p-4">
-      <div className="flex items-center">
-        <Avatar size={56} src={user?.avatar} />
-        <Input
-          placeholder="Animated suggestions..."
-          className="text-sm rounded-3xl mx-4 px-5 h-12"
-        />
-        <Button
-          variant="gradient-primary"
-          className="w-12 h-12 rounded-full"
-          onClick={() => setShowPostModal(true)}
-        >
-          <Plus color="white" size={24} />
-        </Button>
-      </div>
-      <div className="mx-16 mt-2">
-        <Button variant="text" onClick={() => setShowPostModal(true)}>
-          <ImageIcon color="white" size={24} />
-          <span className="text-white opacity-60 font-normal tracking-normal ml-2">
+    <div className="cursor-pointer" onClick={onClick}>
+      <Card className="pointer-events-none bg-background-blue p-4">
+        <div className="flex items-center">
+          <Avatar size={56} src={user?.avatar} />
+          <Input
+            placeholder="Create a Post"
+            className="text-sm rounded-3xl mx-4 px-5 h-12"
+          />
+          <Button
+            variant="gradient-primary"
+            className="w-12 h-12 rounded-full"
+          >
+            <Plus color="white" size={24} />
+          </Button>
+        </div>
+        <div className="mx-16 mt-2">
+          <Button variant="text">
+            <ImageIcon color="white" size={24} />
+            <span className="text-white opacity-60 font-normal tracking-normal ml-2">
             Photo/Video
           </span>
-        </Button>
-      </div>
-    </Card>
+          </Button>
+        </div>
+      </Card>
+    </div>
   );
 };
 

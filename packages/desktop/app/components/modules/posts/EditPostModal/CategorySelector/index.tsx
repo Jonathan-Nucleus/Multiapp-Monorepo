@@ -19,15 +19,16 @@ export const categoriesSchema = yup
   .default([])
   .min(1);
 
-type CategorySelectorProps<
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends Path<TFieldValues> = Path<TFieldValues>
-> = Omit<ControllerProps<TFieldValues, TName>, "render">;
+type CategorySelectorProps<TFieldValues extends FieldValues = FieldValues,
+  TName extends Path<TFieldValues> = Path<TFieldValues>> = Omit<ControllerProps<TFieldValues, TName>, "render"> & {
+  error?: string;
+};
 
-function CategorySelector<
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends Path<TFieldValues> = Path<TFieldValues>
->(controllerProps: CategorySelectorProps<TFieldValues, TName>) {
+function CategorySelector<TFieldValues extends FieldValues = FieldValues,
+  TName extends Path<TFieldValues> = Path<TFieldValues>>({
+  error,
+  ...controllerProps
+}: CategorySelectorProps<TFieldValues, TName>) {
   return (
     <div className="flex flex-col h-full">
       <div className="text-white/[.6] p-4 border-t md:border-t-0 border-b border-white/[.12]">
@@ -36,6 +37,11 @@ function CategorySelector<
           Select categories to make your post easier to find and visible to more
           people.
         </div>
+        {error &&
+          <div className="text-xs text-error mt-2">
+            {error}
+          </div>
+        }
       </div>
       <div className="py-2 min-h-0 overflow-y-auto">
         <Controller

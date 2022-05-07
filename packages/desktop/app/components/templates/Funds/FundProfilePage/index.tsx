@@ -9,7 +9,6 @@ import Button from "../../../common/Button";
 import Card from "../../../common/Card";
 import TeamMembersList from "../../../modules/teams/TeamMembersList";
 
-import { useAccount } from "mobile/src/graphql/query/account";
 import { useFund } from "mobile/src/graphql/query/marketplace/useFund";
 import { useWatchFund } from "mobile/src/graphql/mutation/funds/useWatchFund";
 import SkeletonFundProfilePage from "../../Skeleton/Funds/FundProfilePage";
@@ -127,10 +126,8 @@ interface FundProfileProps {
 }
 
 const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
-  const { data } = useFund(fundId);
-  const fund = data?.fund;
+  const { data: { fund } = {} } = useFund(fundId);
   const { isWatching, toggleWatch } = useWatchFund(fundId);
-  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
 
   if (!fund) {
     return <SkeletonFundProfilePage />;
@@ -567,12 +564,16 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                   </div>
                 </div>
                 <div className="my-2">
-                  <Button
-                    variant="gradient-primary"
-                    className="w-full font-medium h-12"
-                  >
-                    Contact Specialist
-                  </Button>
+                  <Link href={"mailto:"}>
+                    <a>
+                      <Button
+                        variant="gradient-primary"
+                        className="w-full font-medium h-12"
+                      >
+                        Contact Specialist
+                      </Button>
+                    </a>
+                  </Link>
                 </div>
               </div>
               <div className="grid grid-cols-2">

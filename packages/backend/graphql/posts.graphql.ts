@@ -3,7 +3,6 @@ import {
   PartialSchema,
   ApolloServerContext,
   NoArgs,
-  secureEndpoint,
 } from "../lib/apollo-helper";
 
 import { Post, PostRoleFilterOptions } from "../schemas/post";
@@ -21,10 +20,12 @@ type PostInput = Omit<Post.Input, "audience" | "categories"> & {
   audience: AudienceEnum;
   categories: PostCategoryEnum[];
 };
+type PostUpdate = PostInput & { _id: string };
 
 export type {
   GraphQLPost as Post,
   PostInput,
+  PostUpdate,
   PostCategoryEnum as PostCategory,
   AudienceEnum as Audience,
   PostRoleFilterEnum as PostRoleFilter,

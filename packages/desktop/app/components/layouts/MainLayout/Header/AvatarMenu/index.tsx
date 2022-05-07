@@ -64,11 +64,13 @@ const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
       icon: <Lifebuoy color="white" weight="light" size={24} />,
       title: "Help & Support",
       path: "https://help.prometheusalts.com/hc/en-us",
+      external: true,
     },
     {
       icon: <FileText color="white" weight="light" size={24} />,
       title: "Policies, Terms & Disclosures",
       path: "https://prometheusalts.com/legals/disclosure-library",
+      external: true,
     },
     {
       icon: <SignOut color="white" weight="light" size={24} />,
@@ -94,9 +96,7 @@ const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
       <Popover as="div" className="relative">
         <Popover.Button>
           <div className="flex flex-row items-center cursor-pointer">
-            <div className="w-8 h-8 flex items-center justify-center">
-              <Avatar size={32} src={account?.avatar} />
-            </div>
+            <Avatar size={32} src={account?.avatar} />
             <div className="ml-2">
               <CaretDown color="white" weight="bold" size={16} />
             </div>
@@ -131,13 +131,26 @@ const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
                 </Link>
               </Popover.Button>
               {items.map((item, index) => (
-                <MenuItem
-                  key={index}
-                  icon={item.icon}
-                  title={item.title}
-                  path={item.path}
-                  onClick={item.onClick}
-                />
+                <div key={index}>
+                  {item.onClick ?
+                    <MenuItem
+                      key={index}
+                      icon={item.icon}
+                      title={item.title}
+                      onClick={item.onClick}
+                    />
+                    :
+                    <Link href={item.path} passHref={item.external}>
+                      <a target={item.external ? "_blank" : "_self"}>
+                        <MenuItem
+                          key={index}
+                          icon={item.icon}
+                          title={item.title}
+                        />
+                      </a>
+                    </Link>
+                  }
+                </div>
               ))}
             </div>
           </Popover.Panel>

@@ -35,7 +35,7 @@ const HomePage: FC = () => {
             <div className="hidden md:block">
               <AddPost
                 user={account}
-                setShowPostModal={() => {
+                onClick={() => {
                   setSelectedPost(undefined);
                   setShowPostModal(true);
                 }}

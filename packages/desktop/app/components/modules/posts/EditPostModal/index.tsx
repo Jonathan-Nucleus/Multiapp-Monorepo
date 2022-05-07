@@ -1,5 +1,4 @@
-import { FC, useState, useEffect, useRef, Fragment } from "react";
-import { Dialog, Transition } from "@headlessui/react";
+import { FC, useState, useEffect, useRef } from "react";
 import {
   Buildings,
   User,
@@ -17,7 +16,6 @@ import "emoji-mart/css/emoji-mart.css";
 
 import CategorySelector, { categoriesSchema } from "./CategorySelector";
 import Avatar from "desktop/app/components/common/Avatar";
-import Card from "desktop/app/components/common/Card";
 import Button from "desktop/app/components/common/Button";
 import Input from "desktop/app/components/common/Input";
 import Dropdown from "desktop/app/components/common/Dropdown";
@@ -42,6 +40,8 @@ import {
 import { Audience, PostCategory } from "backend/graphql/posts.graphql";
 import { Audiences } from "backend/graphql/enumerations.graphql";
 import { PostSummary } from "mobile/src/graphql/fragments/post";
+import { useEditPost } from "mobile/src/graphql/mutation/posts/useEditPost";
+import ModalDialog from "../../../common/ModalDialog";
 
 const audienceOptions = [
   {
@@ -127,6 +127,7 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
   const [localFileUrl, setLocalFileUrl] = useState<string | null>(null);
   const [showCategories, setShowCategories] = useState(!!post);
   const [createPost] = useCreatePost();
+  const [editPost] = useEditPost();
   const [fetchUploadLink] = useFetchUploadLink();
   const [loading, setLoading] = useState(false);
   const [visibleEmoji, setVisibleEmoji] = useState(false);
@@ -151,6 +152,7 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
     reset,
     getValues,
     setValue,
+    formState: { errors },
   } = useForm<yup.InferType<typeof schema>>({
     resolver: yupResolver(schema),
     defaultValues: schema.cast(
@@ -166,13 +168,12 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
       reset(
         schema.cast(
           {
-            mediaUrl: post?.mediaUrl,
+            mediaUrl: post?.mediaUrl ?? "",
             categories: post?.categories,
             mentionInput: {
               body: post?.body,
             },
           },
-          { assert: false },
         ) as DefaultValues<FormValues>,
       );
       setLocalFileUrl(post?.mediaUrl ? `${process.env.NEXT_PUBLIC_POST_URL}/${post.mediaUrl}` : null);
@@ -210,7 +211,21 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
           return;
         }
       } else {
-        closeModal();
+        const { data } = await editPost({
+          variables: {
+            post: {
+              _id: post._id,
+              audience,
+              categories,
+              mediaUrl,
+              body: mentionInput.body,
+              mentionIds: mentionInput.mentions?.map((mention) => mention.id),
+            },
+          },
+        });
+        if (data && data.editPost) {
+          closeModal();
+        }
       }
     } catch (err) {
     }
@@ -247,206 +262,185 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
   };
 
   return (
-    <Transition appear show={show} as={Fragment}>
-      <Dialog
-        open={show}
-        onClose={() => {}}
-        className="fixed z-20 inset-0"
-        unmount={true}
-      >
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="md:flex items-center justify-center h-screen p-4 overflow-y-auto">
-            <Transition.Child
-              as={Fragment}
-              enter="ease-out duration-300"
-              enterFrom="opacity-0"
-              enterTo="opacity-100"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-100"
-              leaveTo="opacity-0"
-            >
-              <Dialog.Overlay className="fixed inset-0 bg-black opacity-70" />
-            </Transition.Child>
-            <Transition.Child
-              as={Fragment}
-              enter="ease-out duration-300"
-              enterFrom="opacity-0 scale-95"
-              enterTo="opacity-100 scale-100"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-100 scale-100"
-              leaveTo="opacity-0 scale-95"
-            >
-              <Card className="relative md:flex flex-col border-0 md:h-4/5 p-0 z-20">
-                <div className="flex items-center justify-between p-4 border-b border-white/[.12]">
-                  <div className="text-xl text-white font-medium">
-                    {post ? "Edit Post" : "Create Post"}
-                  </div>
-                  <Button variant="text">
-                    <X color="white" weight="bold" size={24} onClick={closeModal} />
-                  </Button>
-                </div>
-                <div className="flex flex-col md:flex-row flex-grow md:min-h-0">
-                  <div className="flex flex-col md:w-[40rem] relative">
-                    <div className="flex flex-wrap items-center p-4">
-                      <Avatar size={56} src={account?.avatar} />
-                      <div className="ml-2">
-                        <Dropdown
-                          items={userOptions}
-                          control={control}
-                          name="user"
-                        />
-                      </div>
-                      <div className="ml-2">
-                        <Dropdown
-                          items={audienceOptions}
-                          control={control}
-                          name="audience"
-                        />
-                      </div>
-                    </div>
-                    <div className="mx-4 mt-2 caret-primary min-h-[100px] flex-grow">
-                      <MentionTextarea control={control} name="mentionInput" />
-                    </div>
-                    <div className="my-2">
-                      {localFileUrl && (
-                        <div className="relative px-4">
-                          <div className="h-64 relative">
-                            <Image
-                              alt=""
-                              loader={() => localFileUrl}
-                              src={localFileUrl}
-                              layout="fill"
-                              className="rounded-md"
-                              objectFit="cover"
-                              unoptimized={true}
-                              onLoad={() => {
-                                if (selectedFile.current) {
-                                  URL.revokeObjectURL(localFileUrl);
-                                }
-                              }}
-                            />
-                          </div>
-                          <Button
-                            variant="text"
-                            className="absolute top-1 right-5 py-0"
-                            onClick={() => {
-                              if (selectedFile.current) {
-                                selectedFile.current = undefined;
-                                URL.revokeObjectURL(localFileUrl);
-                              } else {
-                                setValue("mediaUrl", undefined);
-                              }
-                              setLocalFileUrl(null);
-                            }}
-                          >
-                            <XCircle size={32} color="#5F5F5F" weight="fill" />
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                    <div className="mx-4 mt-2 mb-2">
-                      <div className="flex items-center">
-                        <Controller
-                          control={control}
-                          name="mediaUrl"
-                          render={({ field }) => (
-                            <Input
-                              id="image-select"
-                              type="file"
-                              value=""
-                              onInput={async (evt) => {
-                                const file = evt.currentTarget.files?.[0];
-                                selectedFile.current = file;
-
-                                if (file) {
-                                  const remoteFilename = await uploadMedia(file);
-                                  field.onChange(remoteFilename);
-                                }
-                              }}
-                              className="hidden"
-                              accept="image/*, video/*"
-                            />
-                          )}
-                        />
-                        <Label
-                          htmlFor="image-select"
-                          className="flex items-center cursor-pointer hover:opacity-80 transition"
-                        >
-                          <div className="text-purple-secondary">
-                            <ImageIcon
-                              color="currentColor"
-                              weight="light"
-                              size={24}
-                            />
-                          </div>
-                          <div className="text-sm text-white/[.6] font-normal ml-2">
-                            Photo/Video
-                          </div>
-                        </Label>
-                        <div
-                          className="flex items-center text-white/[.6] ml-4 cursor-pointer hover:opacity-80 transition"
-                          onClick={() => setVisibleEmoji(!visibleEmoji)}
-                        >
-                          <div className="text-success">
-                            <Smiley color="currentColor" weight="light" size={24} />
-                          </div>
-                          <div className="text-sm ml-2">Emoji</div>
-                          <CaretDown
-                            color="currentColor"
-                            weight="bold"
-                            size={16}
-                            className="ml-1"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    {visibleEmoji && (
-                      <div className="absolute bottom-8 z-50">
-                        <Picker onSelect={onEmojiClick} style={{ width: "100%" }} />
-                      </div>
-                    )}
-                  </div>
-                  {showCategories && (
-                    <div className="w-full md:border-l border-white/[.12] md:w-80">
-                      <CategorySelector control={control} name="categories" />
-                    </div>
-                  )}
-                </div>
-                <div className="border-t border-white/[.12] flex items-center justify-between p-4">
-                  <Button
-                    variant="text"
-                    className="text-primary font-medium"
-                    onClick={closeModal}
-                  >
-                    CANCEL
-                  </Button>
-                  {showCategories ?
-                    <Button
-                      type="submit"
-                      variant="gradient-primary"
-                      className="w-48 font-medium"
-                      loading={loading}
-                    >
-                      {post ? "SAVE UPDATES" : "POST"}
-                    </Button>
-                    :
-                    <Button
-                      type="button"
-                      variant="gradient-primary"
-                      className="w-48 font-medium"
-                      loading={loading}
-                      onClick={() => setShowCategories(true)}
-                    >
-                      NEXT
-                    </Button>
-                  }
-                </div>
-              </Card>
-            </Transition.Child>
+    <ModalDialog
+      className="w-full md:w-auto max-w-full md:h-[80vh] relative"
+      show={show}
+      onClose={() => {}}
+    >
+      <form className="h-full">
+        <div className="h-full md:flex flex-col">
+          <div className="flex items-center justify-between p-4 border-b border-white/[.12]">
+            <div className="text-xl text-white font-medium">
+              {post ? "Edit Post" : "Create Post"}
+            </div>
+            <Button variant="text">
+              <X color="white" weight="bold" size={24} onClick={closeModal} />
+            </Button>
           </div>
-        </form>
-      </Dialog>
-    </Transition>
+          <div className="flex flex-col md:flex-row flex-grow md:min-h-0">
+            <div className="flex flex-col md:w-[40rem] relative">
+              <div className="flex flex-wrap items-center p-4">
+                <Avatar size={56} src={account?.avatar} />
+                <div className="ml-2">
+                  <Dropdown
+                    items={userOptions}
+                    control={control}
+                    name="user"
+                  />
+                </div>
+                <div className="ml-2">
+                  <Dropdown
+                    items={audienceOptions}
+                    control={control}
+                    name="audience"
+                  />
+                </div>
+              </div>
+              <div className="mx-4 mt-2 caret-primary min-h-[100px] flex-grow">
+                <MentionTextarea control={control} name="mentionInput" />
+              </div>
+              <div className="my-2">
+                {localFileUrl && (
+                  <div className="relative px-4">
+                    <div className="h-64 relative">
+                      <Image
+                        alt=""
+                        loader={() => localFileUrl}
+                        src={localFileUrl}
+                        layout="fill"
+                        className="rounded-md"
+                        objectFit="cover"
+                        unoptimized={true}
+                        onLoad={() => {
+                          if (selectedFile.current) {
+                            URL.revokeObjectURL(localFileUrl);
+                          }
+                        }}
+                      />
+                    </div>
+                    <Button
+                      variant="text"
+                      className="absolute top-1 right-5 py-0"
+                      onClick={() => {
+                        if (selectedFile.current) {
+                          selectedFile.current = undefined;
+                          URL.revokeObjectURL(localFileUrl);
+                        } else {
+                          setValue("mediaUrl", undefined);
+                        }
+                        setLocalFileUrl(null);
+                      }}
+                    >
+                      <XCircle size={32} color="#5F5F5F" weight="fill" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+              <div className="mx-4 mt-2 mb-2">
+                <div className="flex items-center">
+                  <Controller
+                    control={control}
+                    name="mediaUrl"
+                    render={({ field }) => (
+                      <Input
+                        id="image-select"
+                        type="file"
+                        value=""
+                        onInput={async (evt) => {
+                          const file = evt.currentTarget.files?.[0];
+                          selectedFile.current = file;
+
+                          if (file) {
+                            const remoteFilename = await uploadMedia(file);
+                            field.onChange(remoteFilename);
+                          }
+                        }}
+                        className="hidden"
+                        accept="image/*, video/*"
+                      />
+                    )}
+                  />
+                  <Label
+                    htmlFor="image-select"
+                    className="flex items-center cursor-pointer hover:opacity-80 transition"
+                  >
+                    <div className="text-purple-secondary">
+                      <ImageIcon
+                        color="currentColor"
+                        weight="light"
+                        size={24}
+                      />
+                    </div>
+                    <div className="text-sm text-white/[.6] font-normal ml-2">
+                      Photo/Video
+                    </div>
+                  </Label>
+                  <div
+                    className="flex items-center text-white/[.6] ml-4 cursor-pointer hover:opacity-80 transition"
+                    onClick={() => setVisibleEmoji(!visibleEmoji)}
+                  >
+                    <div className="text-success">
+                      <Smiley color="currentColor" weight="light" size={24} />
+                    </div>
+                    <div className="text-sm ml-2">Emoji</div>
+                    <CaretDown
+                      color="currentColor"
+                      weight="bold"
+                      size={16}
+                      className="ml-1"
+                    />
+                  </div>
+                </div>
+              </div>
+              {visibleEmoji && (
+                <div className="absolute bottom-8 z-50">
+                  <Picker onSelect={onEmojiClick} style={{ width: "100%" }} />
+                </div>
+              )}
+            </div>
+            {showCategories && (
+              <div className="w-full md:border-l border-white/[.12] md:w-80">
+                <CategorySelector
+                  control={control}
+                  name="categories"
+                  error={errors.categories ? "Please select at least one category." : ""}
+                />
+              </div>
+            )}
+          </div>
+          <div className="border-t border-white/[.12] flex items-center justify-between p-4">
+            <Button
+              variant="text"
+              className="text-primary font-medium"
+              onClick={closeModal}
+            >
+              Cancel
+            </Button>
+            {showCategories ?
+              <Button
+                type="button"
+                variant="gradient-primary"
+                className="w-48 font-medium"
+                loading={loading}
+                onClick={() => handleSubmit(onSubmit)()}
+              >
+                {post ? "Save Updates" : "Post"}
+              </Button>
+              :
+              <Button
+                type="button"
+                variant="gradient-primary"
+                className="w-48 font-medium"
+                loading={loading}
+                onClick={() => setShowCategories(true)}
+              >
+                NEXT
+              </Button>
+            }
+          </div>
+        </div>
+      </form>
+    </ModalDialog>
   );
 };
 
