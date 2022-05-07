@@ -35,24 +35,31 @@ const MessagesPage = () => {
   const [isMobileNavVisible, setMobileNav] = useState(false);
   const { data: userData } = useAccount();
   const { data: chatData } = useChatToken();
+  console.log("Received chat token", chatData);
+  console.log("App key", API_KEY);
+  console.log("App origin", TARGET_ORIGIN);
 
   useChecklist(chatClient.current, TARGET_ORIGIN);
 
   useEffect(() => {
+    console.log("checking chat startup details");
     if (API_KEY && !chatClient.current && chatData?.chatToken && userData) {
+      console.log("initializing chat client");
       const initChat = async () => {
         const client = StreamChat.getInstance(API_KEY, {
           enableInsights: true,
           enableWSFallback: true,
         });
+        console.log("client", client);
         await client.connectUser(
           {
             id: userData.account._id,
             name: `${userData.account.firstName} ${userData.account.lastName}`,
-            image: undefined,
+            image: `${process.env.NEXT_PUBLIC_AVATAR_URL}/${userData.account.avatar}`,
           },
           chatData.chatToken
         );
+        console.log("connected user", client);
 
         chatClient.current = client;
         setChannelFilters({
@@ -65,9 +72,9 @@ const MessagesPage = () => {
 
       return () => {
         if (chatClient.current) {
-          chatClient.current.disconnectUser()
+          chatClient.current.disconnectUser();
           chatClient.current = null;
-        };
+        }
       };
     }
   }, [chatData, userData]);
