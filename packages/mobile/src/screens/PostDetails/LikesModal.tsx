@@ -11,8 +11,9 @@ import Modal from 'react-native-modal';
 
 import UserInfo from 'mobile/src/components/common/UserInfo';
 import PLabel from 'mobile/src/components/common/PLabel';
-import { BGDARK, GRAY800, WHITE12 } from 'shared/src/colors';
+import { BLACK, WHITE12 } from 'shared/src/colors';
 import { Body1Bold } from 'mobile/src/theme/fonts';
+import pStyles from '../../theme/pStyles';
 
 import type { Like } from 'mobile/src/graphql/query/post';
 
@@ -36,8 +37,8 @@ const LikesModal: FC<ModalProps> = ({ isVisible, likes, onClose }) => {
       propagateSwipe={true}
       backdropOpacity={0.5}>
       <View style={styles.modalContent}>
-        <View style={styles.modalKnobContainer}>
-          <View style={styles.modalKnob} />
+        <View style={pStyles.modalKnobContainer}>
+          <View style={pStyles.modalKnob} />
         </View>
         <ScrollView>
           <View onStartShouldSetResponder={() => true}>
@@ -71,7 +72,7 @@ const styles = StyleSheet.create({
     margin: 0,
   },
   modalContent: {
-    backgroundColor: BGDARK,
+    backgroundColor: BLACK,
     padding: 20,
     borderRadius: 32,
     maxHeight: Dimensions.get('screen').height - 100,
@@ -85,14 +86,5 @@ const styles = StyleSheet.create({
   separator: {
     height: 1,
     backgroundColor: WHITE12,
-  },
-  modalKnobContainer: {
-    alignItems: 'center',
-  },
-  modalKnob: {
-    width: 72,
-    height: 8,
-    borderRadius: 30,
-    backgroundColor: GRAY800,
   },
 });

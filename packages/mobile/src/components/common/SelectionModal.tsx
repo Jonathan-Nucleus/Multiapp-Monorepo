@@ -12,7 +12,8 @@ import Modal from 'react-native-modal';
 import IconButton from './IconButton';
 import PLabel from './PLabel';
 
-import { BLACK, GRAY800, PRIMARYSOLID } from 'shared/src/colors';
+import { BLACK, PRIMARYSOLID } from 'shared/src/colors';
+import pStyles from '../../theme/pStyles';
 
 export interface MenuDataItemProps<Key = string> {
   label: string;
@@ -47,8 +48,8 @@ function SelectionModal<Key = string>(
       style={[styles.bottomHalfModal, modalStyle]}
       onBackdropPress={onPressCancel}>
       <View style={styles.modalWrapper}>
-        <View style={styles.modalKnobContainer}>
-          <View style={styles.modalKnob} />
+        <View style={pStyles.modalKnobContainer}>
+          <View style={pStyles.modalKnob} />
         </View>
         <FlatList
           data={dataArray}
@@ -88,16 +89,6 @@ const styles = StyleSheet.create({
   bottomHalfModal: {
     justifyContent: 'flex-end',
     margin: 0,
-  },
-  modalKnobContainer: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  modalKnob: {
-    width: 72,
-    height: 8,
-    borderRadius: 30,
-    backgroundColor: GRAY800,
   },
   menuLabel: {
     marginLeft: 16,

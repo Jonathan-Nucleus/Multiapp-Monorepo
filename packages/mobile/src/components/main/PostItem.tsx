@@ -36,9 +36,15 @@ export interface PostItemProps {
   post: Post;
   userId: string; // User id of the currently authenticated user
   onPressMenu?: () => void;
+  onPressLikes?: () => void;
 }
 
-const PostItem: React.FC<PostItemProps> = ({ post, userId, onPressMenu }) => {
+const PostItem: React.FC<PostItemProps> = ({
+  post,
+  userId,
+  onPressMenu,
+  onPressLikes,
+}) => {
   const { user, body, mediaUrl } = post;
   const [liked, setLiked] = useState(false);
   const [likePost] = useLikePost();
@@ -169,12 +175,16 @@ const PostItem: React.FC<PostItemProps> = ({ post, userId, onPressMenu }) => {
           </View>
           <View style={styles.otherInfo}>
             {post.likeIds && post.likeIds.length > 0 && (
-              <PLabel
-                label={`${post.likeIds.length} ${
-                  post.likeIds.length === 1 ? 'Like' : 'Likes'
-                }`}
-                textStyle={styles.smallLabel}
-              />
+              <Pressable
+                onPress={onPressLikes}
+                style={({ pressed }) => (pressed ? pStyles.pressedStyle : {})}>
+                <PLabel
+                  label={`${post.likeIds.length} ${
+                    post.likeIds.length === 1 ? 'Like' : 'Likes'
+                  }`}
+                  textStyle={styles.smallLabel}
+                />
+              </Pressable>
             )}
             {post.commentIds && post.commentIds.length > 0 && (
               <PLabel

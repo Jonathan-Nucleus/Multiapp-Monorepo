@@ -315,7 +315,11 @@ const PostDetail: PostDetailScreen = ({ route }) => {
         containerStyle={styles.headerContainer}
       />
       <PAppContainer style={styles.container}>
-        <PostItem post={post} userId={userId} />
+        <PostItem
+          post={post}
+          userId={userId}
+          onPressLikes={() => setLikesModalVisible(true)}
+        />
         <FlatList
           data={getComments || []}
           renderItem={renderCommentItem}
