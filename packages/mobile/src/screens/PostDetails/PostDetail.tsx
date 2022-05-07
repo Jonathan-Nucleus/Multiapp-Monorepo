@@ -32,7 +32,13 @@ import SelectionModal, {
   MenuDataItemProps,
 } from 'mobile/src/components/common/SelectionModal';
 import { showMessage } from 'mobile/src/services/utils';
-import { BLACK, PRIMARYSOLID, PRIMARYSOLID7, WHITE } from 'shared/src/colors';
+import {
+  BLACK,
+  PRIMARY,
+  PRIMARYSOLID,
+  PRIMARYSOLID7,
+  WHITE,
+} from 'shared/src/colors';
 import pStyles from 'mobile/src/theme/pStyles';
 import { Body2Bold, Body3, Body3Bold } from 'mobile/src/theme/fonts';
 import { SOMETHING_WRONG } from 'shared/src/constants';
@@ -45,6 +51,7 @@ import {
   useCommentPost,
   useDeleteComment,
   useEditCommentPost,
+  useLikeComment,
 } from 'mobile/src/graphql/mutation/posts';
 import { usePost, Comment } from 'mobile/src/graphql/query/post';
 import {
@@ -91,6 +98,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
   const [followUser] = useFollowUser();
   const [hideUser] = useHideUser();
   const { data: accountData } = useAccount();
+  const [likeComment] = useLikeComment();
 
   const getKebobMenuData = useMemo(() => {
     const KebobMenuDataArray = [
@@ -258,10 +266,28 @@ const PostDetail: PostDetailScreen = ({ route }) => {
     inputRef?.current?.blur();
   };
 
+  // TODO move to separate component
   const CommentItem = ({ item }: { item: Comment }) => {
     const { _id, commentId, user, body, createdAt } = item;
+    const [liked, setLiked] = useState(
+      (accountData?.account &&
+        item.likeIds?.includes(accountData?.account._id)) ??
+        false,
+    );
+
     const commentItemContainer = {
       marginLeft: commentId ? 32 : 0,
+    };
+
+    const toggleLike = async () => {
+      const toggled = !liked;
+      const { data } = await likeComment({
+        variables: { like: toggled, commentId: item._id },
+      });
+
+      data && data.likeComment
+        ? setLiked(toggled)
+        : console.log('Error liking comment');
     };
 
     return (
@@ -287,8 +313,11 @@ const PostDetail: PostDetailScreen = ({ route }) => {
             label={moment(createdAt).fromNow()}
             textStyle={styles.smallLabel}
           />
-          <TouchableOpacity>
-            <PLabel label="Like" textStyle={styles.smallLabel} />
+          <TouchableOpacity onPress={toggleLike}>
+            <PLabel
+              label="Like"
+              textStyle={[styles.smallLabel, liked ? styles.likedLabel : {}]}
+            />
           </TouchableOpacity>
           {!commentId && (
             <TouchableOpacity
@@ -482,6 +511,9 @@ const styles = StyleSheet.create({
     ...Body3,
     marginRight: 8,
     padding: 8,
+  },
+  likedLabel: {
+    color: PRIMARY,
   },
   updateContainer: {
     backgroundColor: BLACK,

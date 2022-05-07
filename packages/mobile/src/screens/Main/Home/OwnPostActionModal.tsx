@@ -14,12 +14,14 @@ interface OwnPostActionModalProps {
   post?: Post;
   visible: boolean;
   onClose?: () => void;
+  onEditPost?: () => void;
 }
 
 const OwnPostActionModal: React.FC<OwnPostActionModalProps> = ({
   post,
   visible,
   onClose,
+  onEditPost,
 }) => {
   if (!post) return null;
 
@@ -50,6 +52,7 @@ const OwnPostActionModal: React.FC<OwnPostActionModalProps> = ({
 
   const handleEditPost = () => {
     console.log('Editing post');
+    onEditPost && onEditPost();
   };
 
   const handleDeletePost = async () => {
