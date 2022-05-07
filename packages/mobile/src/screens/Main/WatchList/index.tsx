@@ -19,6 +19,7 @@ import {
   PRIMARYSOLID,
   SUCCESS,
   WHITE60,
+  WHITE12,
 } from 'shared/src/colors';
 
 import { useWatchFund } from 'mobile/src/graphql/mutation/funds/useWatchFund';
@@ -113,7 +114,7 @@ const styles = StyleSheet.create({
   item: {
     flexDirection: 'column',
     padding: 16,
-    borderBottomColor: WHITE60,
+    borderBottomColor: WHITE12,
     borderBottomWidth: 1,
     alignItems: 'flex-start',
   },

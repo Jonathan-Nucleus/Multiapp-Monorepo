@@ -38,6 +38,7 @@ import { useUpdateUserProfile } from 'mobile/src/graphql/mutation/account';
 import { useFetchUploadLink } from 'mobile/src/graphql/mutation/posts';
 
 import { EditUserPhotoScreen } from 'mobile/src/navigations/UserDetailsStack';
+import Avatar from '../../components/common/Avatar';
 
 const EditPhoto: EditUserPhotoScreen = ({ navigation, route }) => {
   const { type } = route.params;
@@ -170,21 +171,8 @@ const EditPhoto: EditUserPhotoScreen = ({ navigation, route }) => {
                 }}
                 resizeMode={FastImage.resizeMode.cover}
               />
-            ) : user?.avatar ? (
-              <FastImage
-                style={styles.avatar}
-                source={{
-                  uri: `${AVATAR_URL}/${user?.avatar}`,
-                }}
-                resizeMode={FastImage.resizeMode.cover}
-              />
             ) : (
-              <View style={styles.noAvatarContainer}>
-                <Text style={styles.noAvatar}>
-                  {user.firstName.charAt(0)}
-                  {user.lastName.charAt(0)}
-                </Text>
-              </View>
+              <Avatar user={user} size={200} />
             )
           ) : imageData?.path ? (
             <FastImage

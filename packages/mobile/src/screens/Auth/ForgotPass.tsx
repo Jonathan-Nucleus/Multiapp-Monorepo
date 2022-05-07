@@ -92,13 +92,6 @@ const ForgotPass: ForgotPassScreen = ({ navigation }) => {
             />
           </>
         )}
-        {sent && (
-          <PGradientButton
-            label="Reset Password"
-            btnContainer={styles.btnContainer}
-            onPress={() => navigation.navigate('ResetPass', { email })}
-          />
-        )}
         <View style={styles.row}>
           <Text style={styles.txt}>Return to </Text>
           <TouchableOpacity onPress={() => navigation.navigate('Login')}>

@@ -71,7 +71,10 @@ const Signup: SignupScreen = ({ navigation, route }) => {
       pass &&
       confirmPass &&
       pass === confirmPass &&
-      validatePassword(pass) &&
+      validatePassword(pass).checkedLength &&
+      validatePassword(pass).checkedString &&
+      validatePassword(pass).checkedSpecial &&
+      validatePassword(pass).checkedNumber &&
       agreed &&
       read
     ) {

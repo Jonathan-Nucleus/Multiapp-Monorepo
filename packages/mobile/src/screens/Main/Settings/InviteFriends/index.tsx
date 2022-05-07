@@ -26,6 +26,7 @@ import User2Svg from 'mobile/src/assets/images/user2.svg';
 import User3Svg from 'mobile/src/assets/images/user3.svg';
 import LampSvg from 'mobile/src/assets/images/lamp.svg';
 import AddSvg from 'mobile/src/assets/images/add.svg';
+import Avatar from '../../../../components/common/Avatar';
 
 interface RouterProps {
   navigation: NavigationProp<any, any>;
@@ -76,22 +77,7 @@ const InviteFriends: FC<RouterProps> = ({ navigation }) => {
           </View>
 
           <View style={styles.avatarContainer}>
-            {account?.avatar ? (
-              <FastImage
-                style={styles.avatar}
-                source={{
-                  uri: `${AVATAR_URL}/${account?.avatar}`,
-                }}
-                resizeMode={FastImage.resizeMode.cover}
-              />
-            ) : (
-              <View style={styles.noAvatarContainer}>
-                <Text style={styles.noAvatar}>
-                  {account?.firstName.charAt(0)}
-                  {account?.lastName.charAt(0)}
-                </Text>
-              </View>
-            )}
+            <Avatar user={account} size={84} />
           </View>
           <View style={styles.user3}>
             <User3Svg />

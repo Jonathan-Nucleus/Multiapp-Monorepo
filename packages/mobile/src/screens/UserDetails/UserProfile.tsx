@@ -47,17 +47,24 @@ import { useProfile } from 'mobile/src/graphql/query/user/useProfile';
 import { usePosts, Post } from 'mobile/src/graphql/query/user/usePosts';
 import { useManagedFunds } from 'mobile/src/graphql/query/user/useManagedFunds';
 import { useFollowUser } from 'mobile/src/graphql/mutation/account';
+import { useFeaturedPosts } from 'mobile/src/graphql/query/user/useFeaturedPosts';
 
 import { UserProfileScreen } from 'mobile/src/navigations/UserDetailsStack';
 import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
+import Avatar from '../../components/common/Avatar';
 
 const UserProfile: UserProfileScreen = ({ navigation, route }) => {
   const { userId } = route.params;
 
   const { data: accountData } = useAccount({ fetchPolicy: 'cache-only' });
-  const { data: profileData, loading: profileLoading } = useProfile(userId);
+  const {
+    data: profileData,
+    loading: profileLoading,
+    refetch: refetchAccount,
+  } = useProfile(userId);
   const { data: fundsData } = useManagedFunds(userId);
   const { data, refetch } = usePosts(userId);
+  const { data: featuredPostsData } = useFeaturedPosts(userId);
   const isFocused = useIsFocused();
   const [focusState, setFocusState] = useState(isFocused);
   const [followUser] = useFollowUser();
@@ -67,12 +74,15 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
   const funds = fundsData?.userProfile?.managedFunds ?? [];
   const profile = profileData?.userProfile;
   const postData = data?.userProfile?.posts ?? [];
+  const featuredPosts = featuredPostsData?.userProfile?.posts ?? [];
+
   const [isFollowing, setIsFollowing] = useState(following);
 
   // Refetch whenever the focus state changes to avoid refetching during
   // rerender cycles
   if (isFocused !== focusState) {
     refetch();
+    refetchAccount();
     setFocusState(isFocused);
   }
 
@@ -187,22 +197,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
         <View style={styles.content}>
           <View style={styles.companyDetail}>
             <View style={styles.relative}>
-              {avatar ? (
-                <FastImage
-                  style={styles.avatar}
-                  source={{
-                    uri: `${AVATAR_URL}/${avatar}`,
-                  }}
-                  resizeMode={FastImage.resizeMode.cover}
-                />
-              ) : (
-                <View style={styles.noAvatarContainer}>
-                  <Text style={styles.noAvatar}>
-                    {firstName.charAt(0)}
-                    {lastName.charAt(0)}
-                  </Text>
-                </View>
-              )}
+              <Avatar user={account} size={80} />
               {isMyAccount && (
                 <TouchableOpacity
                   onPress={() =>
@@ -268,11 +263,13 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
         <View style={[styles.row, styles.social]}>
           <View style={styles.row}>
             <TouchableOpacity
-              onPress={() => Linking.openURL(linkedIn ?? 'www.linkedin.com')}>
+              onPress={() =>
+                Linking.openURL(linkedIn ?? 'https://www.linkedin.com/')
+              }>
               <LinkedinSvg />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => Linking.openURL(twitter ?? 'www.twitter.com')}
+              onPress={() => Linking.openURL(twitter ?? 'https://twitter.com/')}
               style={styles.icon}>
               <TwitterSvg />
             </TouchableOpacity>
@@ -293,25 +290,18 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
           </TouchableOpacity>
         </View>
         <Funds accredited={accountData?.account.accreditation} funds={funds} />
-        <View style={styles.posts}>
-          {postData && postData.length > 0 ? (
+        <View>
+          {featuredPosts && featuredPosts.length > 0 && (
             <View>
               <Text style={styles.text}>Featured Posts</Text>
               <FlatList
-                data={postData || []}
+                data={featuredPosts || []}
                 renderItem={renderItem}
                 keyExtractor={(item) => `${item._id}`}
                 listKey="post"
                 horizontal
               />
             </View>
-          ) : (
-            isMyAccount &&
-            postData.length > 0 && (
-              <View style={styles.noPostContainer}>
-                <Text style={styles.val}>You don’t have any posts, yet.</Text>
-              </View>
-            )
           )}
 
           {postData && postData.length > 0 ? (
@@ -330,7 +320,9 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
                 <View style={styles.noPostContainer}>
                   <NoPostSvg />
                 </View>
-                <Text style={styles.val}>You don’t have any posts, yet.</Text>
+                <Text style={styles.comment}>
+                  You don’t have any posts, yet.
+                </Text>
                 <PGradientButton
                   label="Create a Post"
                   btnContainer={styles.createPostBtn}
@@ -435,9 +427,7 @@ const styles = StyleSheet.create({
     ...Body2,
     marginTop: 2,
     marginBottom: 8,
-  },
-  posts: {
-    paddingHorizontal: 16,
+    paddingLeft: 16,
   },
   avatar: {
     width: 80,

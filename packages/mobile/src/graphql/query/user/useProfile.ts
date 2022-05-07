@@ -80,8 +80,38 @@ export function useProfile(
           lastName
           avatar
           position
+          role
           tagline
           overview
+          followerIds
+          followingIds
+          postIds
+          following {
+            _id
+            firstName
+            lastName
+            avatar
+            position
+            company {
+              _id
+              name
+            }
+          }
+          followers {
+            _id
+            firstName
+            lastName
+            avatar
+            position
+            company {
+              _id
+              name
+              website
+              linkedIn
+              twitter
+            }
+          }
+          companyFollowingIds
           background {
             url
             x
@@ -108,20 +138,6 @@ export function useProfile(
             name
             avatar
             followerIds
-          }
-          followers {
-            _id
-            firstName
-            lastName
-            avatar
-            position
-          }
-          following {
-            _id
-            firstName
-            lastName
-            avatar
-            position
           }
           managedFunds {
             _id
@@ -153,6 +169,31 @@ export function useProfile(
               }
             }
           }
+          watchlist {
+            _id
+            name
+            companyId
+            managerId
+            manager {
+              _id
+              firstName
+              lastName
+              avatar
+              followerIds
+              postIds
+              position
+              role
+            }
+            company {
+              _id
+              name
+              website
+              linkedIn
+              twitter
+              avatar
+            }
+          }
+          watchlistIds
           linkedIn
           website
           twitter
