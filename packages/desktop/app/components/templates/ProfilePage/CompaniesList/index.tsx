@@ -2,14 +2,19 @@ import { FC } from "react";
 
 import CompanyItem from "./CompanyItem";
 import { CompanyType } from "desktop/app/types/common-props";
+import Skeleton from "./Skeleton";
 
 interface CompaniesListProps {
-  companies: CompanyType[];
+  companies: CompanyType[] | undefined;
 }
 
-const CompaniesList: FC<CompaniesListProps> = ({
-  companies,
-}: CompaniesListProps) => {
+const CompaniesList: FC<CompaniesListProps> = ({ companies }) => {
+  if (!companies) {
+    return <Skeleton />;
+  }
+  if (companies.length == 0) {
+    return <></>;
+  }
   return (
     <>
       <div className="px-3 lg:px-0">

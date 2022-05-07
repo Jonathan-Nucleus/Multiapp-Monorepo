@@ -12,6 +12,7 @@ import SidebarItem from "./SidebarItem";
 import { Transition } from "@headlessui/react";
 import Avatar from "../../../../common/Avatar";
 import { useAccount } from "mobile/src/graphql/query/account";
+import { UserProfile } from "mobile/src/graphql/query/user/useProfile";
 
 const sidebarItems = [
   {
@@ -52,6 +53,7 @@ const sidebarItems = [
 ];
 
 interface SidebarProps {
+  account: UserProfile | undefined;
   show: boolean;
   onClose: () => void;
 }

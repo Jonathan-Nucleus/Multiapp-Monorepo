@@ -2,18 +2,20 @@ import { FC } from "react";
 import Card from "../../../common/Card";
 import "@splidejs/react-splide/css";
 import { Splide, SplideSlide, SplideTrack } from "@splidejs/react-splide";
-import { Professional } from "mobile/src/graphql/query/user/useProfessionals";
 import ProfessionalItem from "./ProfessionalItem";
 import Button from "desktop/app/components/common/Button";
 import { ArrowCircleRight } from "phosphor-react";
+import { useProfessionals } from "mobile/src/graphql/query/user/useProfessionals";
+import Skeleton from "./Skeleton";
 
-interface FeaturedProfessionalsProps {
-  professionals: Professional[];
-}
-
-const FeaturedProfessionals: FC<FeaturedProfessionalsProps> = ({
-  professionals,
-}) => {
+const FeaturedProfessionals: FC = () => {
+  const { data: { professionals } = {} } = useProfessionals(true);
+  if (!professionals) {
+    return <Skeleton />;
+  }
+  if (professionals.length == 0) {
+    return <></>;
+  }
   return (
     <>
       <div className="font-medium text-xl text-white">

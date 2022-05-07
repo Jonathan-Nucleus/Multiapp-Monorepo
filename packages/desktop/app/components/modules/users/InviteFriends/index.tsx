@@ -11,6 +11,7 @@ import { useInvites, Invitee } from "mobile/src/graphql/query/account";
 import { INVITE_USER } from "mobile/src/graphql/mutation/account";
 import { X } from "phosphor-react";
 import { useMemo } from "react";
+import Skeleton from "./Skeleton";
 
 const MAX_INVITES = 10;
 const variants = ["primary", "error", "secondary", "info", "success"];
@@ -33,9 +34,7 @@ const InviteFriends: FC<InviteFriendsProps> = ({ onClose }) => {
   const [inviteUser] = useMutation(INVITE_USER, {
     refetchQueries: ["Invites"],
   });
-  const { register, handleSubmit, formState, reset } = useForm<
-    yup.InferType<typeof schema>
-  >({
+  const { register, handleSubmit, formState, reset } = useForm<yup.InferType<typeof schema>>({
     resolver: yupResolver(schema),
     mode: "onBlur",
   });
@@ -70,6 +69,10 @@ const InviteFriends: FC<InviteFriendsProps> = ({ onClose }) => {
     return `Enter (up to ${MAX_INVITES - invitedFriends.length} more) Email
     Addresses`;
   }, [accountData, invitedFriends]);
+
+  if (!accountData) {
+    return <Skeleton />;
+  }
 
   return (
     <Card className="p-0">

@@ -14,14 +14,17 @@ import {
 } from "phosphor-react";
 import MenuItem from "./MenuItem";
 import Avatar from "desktop/app/components/common/Avatar";
-import { useAccount } from "mobile/src/graphql/query/account";
 import Link from "next/link";
 import ModalDialog from "../../../../common/ModalDialog";
 import Button from "../../../../common/Button";
 import InviteFriends from "../../../../modules/users/InviteFriends";
+import { UserProfile } from "mobile/src/graphql/query/user/useProfile";
 
-const AvatarMenu: FC = () => {
-  const { data: { account } = {} } = useAccount();
+interface AvatarMenuProps {
+  account: UserProfile | undefined;
+}
+
+const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const items = [
@@ -92,7 +95,7 @@ const AvatarMenu: FC = () => {
         <Popover.Button>
           <div className="flex flex-row items-center cursor-pointer">
             <div className="w-8 h-8 flex items-center justify-center">
-              <Avatar size={32} />
+              <Avatar size={32} src={account?.avatar} />
             </div>
             <div className="ml-2">
               <CaretDown color="white" weight="bold" size={16} />

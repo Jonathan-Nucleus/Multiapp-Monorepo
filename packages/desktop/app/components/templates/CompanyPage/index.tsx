@@ -2,7 +2,7 @@ import { FC } from "react";
 import "@splidejs/react-splide/css";
 import { Splide, SplideSlide } from "@splidejs/react-splide";
 
-import PostsList from "../../common/PostsList";
+import PostsList from "../../modules/posts/PostsList";
 import Card from "../../common/Card";
 import Avatar from "../../common/Avatar";
 import ProfileCard from "./ProfileCard";
@@ -19,7 +19,7 @@ const CompanyPage: FC<CompanyPageProps> = ({ company }: CompanyPageProps) => {
   const funds = company.funds.map((fund) => ({ ...fund, company }));
   const members = company.members.map((member) => ({ ...member, company }));
   const { data: { account } = {} } = useAccount();
-  const isMyCompany = (account?.companies.findIndex(item => item._id == company._id) ?? -1) != -1
+  const isMyCompany = (account?.companies.findIndex(item => item._id == company._id) ?? -1) != -1;
 
   return (
     <div className="lg:mt-12 mb-12 lg:px-14">
@@ -77,10 +77,13 @@ const CompanyPage: FC<CompanyPageProps> = ({ company }: CompanyPageProps) => {
               </Splide>
             </Card>
           </div>
-          {/* {posts?.[0] && <FeaturedPosts posts={[posts[0]]} />} */}
           {company.posts && (
             <div className="py-5">
-              <PostsList posts={company.posts} />
+              <PostsList
+                posts={company.posts}
+                onSelectPost={() => {}}
+                onRefresh={() => {}}
+              />
             </div>
           )}
         </div>

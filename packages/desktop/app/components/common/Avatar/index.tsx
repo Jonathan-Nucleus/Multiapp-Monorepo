@@ -1,6 +1,5 @@
 import { FC, HTMLProps } from "react";
 import Image from "next/image";
-import { useAccount } from "mobile/src/graphql/query/account";
 
 interface AvatarProps extends HTMLProps<HTMLDivElement> {
   src?: string;
@@ -18,10 +17,6 @@ const Avatar: FC<AvatarProps> = ({
   shape = "circle",
   ...divProps
 }: AvatarProps) => {
-  const { data: accountData } = useAccount({ skip: !!src });
-  const account = accountData?.account;
-  const avatar = src ?? account?.avatar;
-
   return (
     <div
       {...divProps}
@@ -30,8 +25,8 @@ const Avatar: FC<AvatarProps> = ({
     >
       <Image
         src={
-          avatar
-            ? `${process.env.NEXT_PUBLIC_AVATAR_URL}/${avatar}`
+          src
+            ? `${process.env.NEXT_PUBLIC_AVATAR_URL}/${src}`
             : DEFAULT_AVATAR
         }
         alt=""

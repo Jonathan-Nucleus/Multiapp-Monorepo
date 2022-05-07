@@ -3,49 +3,38 @@ import { Plus } from "phosphor-react";
 import CompanyCard from "./CompanyCard";
 import FeaturedProfessionals from "./FeaturedProfessionals";
 import AddPost from "./AddPost";
-import PostsList from "./PostsList";
 import InviteFriends from "../../modules/users/InviteFriends";
-import WatchList from "./WatchList";
 import Button from "../../common/Button";
-import { useAccount } from "mobile/src/graphql/query/account";
+import { useAccount, useFetchPosts } from "mobile/src/graphql/query/account";
 import ProfileCardSmall from "../../modules/users/ProfileCardSmall";
-import { useProfessionals } from "mobile/src/graphql/query/user/useProfessionals";
 import EditPostModal from "../../modules/posts/EditPostModal";
 import { PostSummary } from "mobile/src/graphql/fragments/post";
-import SkeletonHomePage from "../Skeleton/HomePage";
+import Watchlist from "./Watchlist";
+import PostsList from "../../modules/posts/PostsList";
 
 const HomePage: FC = () => {
   const [showPostModal, setShowPostModal] = useState(false);
-  const { data: accountData } = useAccount();
-  const { data: professionalsData } = useProfessionals(true);
-  const user = accountData?.account;
-  const professionals = professionalsData?.professionals ?? [];
+  const { data: { account } = {} } = useAccount();
+  const { data: { posts } = {}, refetch } = useFetchPosts();
   const [selectedPost, setSelectedPost] = useState<PostSummary | undefined>(
-    undefined
+    undefined,
   );
-
-  if (!user) {
-    return <SkeletonHomePage />;
-  }
 
   return (
     <>
       <div className="flex flex-row mt-5 lg:mt-20 px-2">
         <div className="w-80 hidden lg:block flex-shrink-0 mx-4">
-          <ProfileCardSmall user={user} />
-          {user.companies.length > 0 && (
-            <div className="mt-12" key={user.companies[0]._id}>
-              <CompanyCard company={user.companies[0]} />
-            </div>
-          )}
+          <ProfileCardSmall user={account} />
+          <div className="mt-12">
+            <CompanyCard user={account} />
+          </div>
         </div>
         <div className="min-w-0 flex-grow">
           <div className="px-4">
-            {professionals.length > 0 && (
-              <FeaturedProfessionals professionals={professionals} />
-            )}
+            <FeaturedProfessionals />
             <div className="hidden md:block">
               <AddPost
+                user={account}
                 setShowPostModal={() => {
                   setSelectedPost(undefined);
                   setShowPostModal(true);
@@ -54,21 +43,21 @@ const HomePage: FC = () => {
             </div>
             <div className="mt-8">
               <PostsList
+                posts={posts}
                 onSelectPost={(post) => {
                   setSelectedPost(post);
                   setShowPostModal(true);
                 }}
+                onRefresh={(categories) => refetch({ categories })}
               />
             </div>
           </div>
         </div>
         <div className="w-80 hidden lg:block flex-shrink-0 mx-4">
           <InviteFriends />
-          {user.watchlistIds && user.watchlistIds.length > 0 && (
-            <div className="mt-5">
-              <WatchList />
-            </div>
-          )}
+          <div className="mt-5">
+            <Watchlist user={account} />
+          </div>
         </div>
         <div className="block md:hidden absolute bottom-5 right-5">
           <Button

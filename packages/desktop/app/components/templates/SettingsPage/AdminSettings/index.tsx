@@ -1,10 +1,9 @@
 import { FC } from "react";
 import { UserCircle, Key, Trash } from "phosphor-react";
 import Card from "../../../common/Card";
-import { UserProfileProps } from "../../../../types/common-props";
 import Link from "next/link";
 
-const AdminSettings: FC<UserProfileProps> = () => {
+const AdminSettings: FC = () => {
   return (
     <Card className="p-0">
       <div className="divide-y divide-inherit border-white/[.12]">

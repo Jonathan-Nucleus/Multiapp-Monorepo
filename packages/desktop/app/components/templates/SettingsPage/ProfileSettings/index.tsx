@@ -13,10 +13,10 @@ const ProfileSettings: FC<UserProfileProps> = ({ user }) => {
           <Link href={"/profile/me"}>
             <a>
               <div className="flex items-center px-5 py-4">
-                <Avatar size={64} src={user.avatar} />
+                <Avatar size={64} src={user?.avatar} />
                 <div className="text-left ml-3">
                   <div className="text-xl text-white">
-                    {user.firstName} {user.lastName}
+                    {user?.firstName} {user?.lastName}
                   </div>
                   <div className="text-sm text-white opacity-60">
                     See your profile

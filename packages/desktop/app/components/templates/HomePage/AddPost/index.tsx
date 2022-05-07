@@ -4,18 +4,21 @@ import Avatar from "desktop/app/components/common/Avatar";
 import Input from "desktop/app/components/common/Input";
 import Button from "desktop/app/components/common/Button";
 import { Plus, Image as ImageIcon } from "phosphor-react";
-import { useAccount } from "mobile/src/graphql/query/account";
+import { UserProfileProps } from "../../../../types/common-props";
+import Skeleton from "./Skeleton";
 
-interface AddPostProps {
+interface AddPostProps extends UserProfileProps {
   setShowPostModal: (val: boolean) => void;
 }
 
-const AddPost: FC<AddPostProps> = ({ setShowPostModal }) => {
-  const { data: accountData } = useAccount();
+const AddPost: FC<AddPostProps> = ({ user, setShowPostModal }) => {
+  if (!user) {
+    return <Skeleton />;
+  }
   return (
     <Card className="bg-background-blue p-4">
       <div className="flex items-center">
-        <Avatar size={56} src={accountData?.account.avatar} />
+        <Avatar size={56} src={user?.avatar} />
         <Input
           placeholder="Animated suggestions..."
           className="text-sm rounded-3xl mx-4 px-5 h-12"

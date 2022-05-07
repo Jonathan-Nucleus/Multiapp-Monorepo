@@ -15,60 +15,60 @@ import { Menu } from "@headlessui/react";
 import Button from "../../../../components/common/Button";
 import Card from "../../../../components/common/Card";
 import Avatar from "../../../common/Avatar";
-import EditModal from "./EditModal";
 import FollowersModal from "../../../modules/users/FollowersModal";
-import PhotoUploadModal from "./EditModal/PhotoUpload";
 
 import { useFollowUser } from "mobile/src/graphql/mutation/account";
 import { useAccount } from "mobile/src/graphql/query/account";
 import { UserProfile } from "mobile/src/graphql/query/user/useProfile";
-import { MediaType } from "backend/graphql/mutations.graphql";
 
 import LinkedIn from "shared/assets/images/linkedin.svg";
 import Twitter from "shared/assets/images/twitter.svg";
 import Globe from "shared/assets/images/globe.svg";
 import ConfirmHideUserModal from "./ConfirmHideUserModal";
-interface PhotoProps {
-  type: MediaType;
-  visible: boolean;
-}
+import Skeleton from "./Skeleton";
+import { UserProfileProps } from "../../../../types/common-props";
+import { MediaType } from "backend/graphql/mutations.graphql";
 
-interface ProfileCardProps {
-  user: UserProfile;
+interface ProfileCardProps extends UserProfileProps {
   isEditable?: boolean;
+  onSelectToEditProfile: () => void;
+  onSelectToEditMedia: (mediaType: MediaType) => void;
 }
 
-const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
+const ProfileCard: FC<ProfileCardProps> = ({
+  user,
+  isEditable = false,
+  onSelectToEditProfile,
+  onSelectToEditMedia,
+}) => {
   const [isVisible, setVisible] = useState(false);
+  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
+  const [followUser] = useFollowUser();
   const [followersModalTab, setFollowersModalTab] = useState(0);
-  const [editableModal, setEditableModal] = useState(false);
-  const [editablePhoto, setEditablePhoto] = useState<PhotoProps>({
-    type: "AVATAR",
-    visible: false,
-  });
   const [showHideUser, setShowHideUser] = useState(false);
-
   let overviewShort: string | undefined = undefined;
   const [showFullOverView, setShowFullOverView] = useState(false);
   {
     const regexpSpace = /\s/g;
-    const result = user.overview?.matchAll(regexpSpace);
+    const result = user?.overview?.matchAll(regexpSpace);
     if (result) {
       const matches = Array.from(result);
       const wordsToSplit = 20;
       if (matches.length > wordsToSplit) {
-        overviewShort = user.overview?.substring(
+        overviewShort = user?.overview?.substring(
           0,
-          matches[wordsToSplit].index!
+          matches[wordsToSplit].index!,
         );
       }
     }
   }
 
-  const { data: accountData } = useAccount();
-  const [followUser] = useFollowUser();
-  const isFollowing = accountData?.account?.followingIds?.includes(user._id);
-  const isMyProfile = accountData?.account?._id == user._id;
+  if (!user) {
+    return <Skeleton />;
+  }
+
+  const isFollowing = account?.followingIds?.includes(user._id);
+  const isMyProfile = account?._id == user._id;
   const toggleFollowing = async () => {
     try {
       await followUser({
@@ -77,7 +77,6 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
       });
     } catch (error) {}
   };
-
   const copyProfileLink = () => {
     navigator.clipboard.writeText(user.linkedIn ?? "");
   };
@@ -102,13 +101,8 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
               )}
               {isEditable && isMyProfile && (
                 <div
-                  onClick={() =>
-                    setEditablePhoto({
-                      type: "BACKGROUND",
-                      visible: true,
-                    })
-                  }
                   className="rounded-full border border-primary flex-shrink-0 w-10 h-10 bg-surface-light10 flex items-center justify-center cursor-pointer absolute right-4 top-4"
+                  onClickCapture={() => onSelectToEditMedia("BACKGROUND")}
                 >
                   <Pencil size={24} color="white" />
                 </div>
@@ -127,13 +121,8 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
 
                 {isEditable && isMyProfile && (
                   <div
-                    onClick={() =>
-                      setEditablePhoto({
-                        type: "AVATAR",
-                        visible: true,
-                      })
-                    }
                     className="rounded-full border border-primary flex-shrink-0 w-10 h-10 bg-surface-light10 flex items-center justify-center cursor-pointer absolute right-0 bottom-0"
+                    onClickCapture={() => onSelectToEditMedia("AVATAR")}
                   >
                     <Pencil size={24} color="white" />
                   </div>
@@ -168,8 +157,8 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
                 {isEditable && isMyProfile && (
                   <Button
                     variant="outline-primary"
-                    onClick={() => setEditableModal(true)}
                     className="px-4"
+                    onClick={onSelectToEditProfile}
                   >
                     <Pencil size={24} color="white" />
                     <div className="text-white ml-2">Edit Profile</div>
@@ -189,13 +178,8 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
                 )}
                 {isEditable && isMyProfile && (
                   <div
-                    onClick={() =>
-                      setEditablePhoto({
-                        type: "AVATAR",
-                        visible: true,
-                      })
-                    }
                     className="rounded-full border border-primary flex-shrink-0 w-8 h-8 bg-surface-light10 flex items-center justify-center cursor-pointer absolute right-0 bottom-0"
+                    onClickCapture={() => onSelectToEditMedia("AVATAR")}
                   >
                     <Pencil size={20} color="white" />
                   </div>
@@ -256,8 +240,8 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
               {isEditable && isMyProfile && (
                 <Button
                   variant="outline-primary"
-                  onClick={() => setEditableModal(true)}
                   className="px-4"
+                  onClick={onSelectToEditProfile}
                 >
                   <Pencil size={24} color="white" />
                   <div className="text-white ml-2">Edit Profile</div>
@@ -416,7 +400,7 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
                         )}
                         <div
                           className="flex items-center text-sm text-white cursor-pointer p-4"
-                          onClick={()=> copyProfileLink()}
+                          onClick={() => copyProfileLink()}
                         >
                           <Copy color="currentColor" size={24} />
                           <span className="ml-4">Copy Profile Link</span>
@@ -439,18 +423,6 @@ const ProfileCard: FC<ProfileCardProps> = ({ user, isEditable = false }) => {
           following={user.following}
         />
       )}
-      <EditModal show={editableModal} onClose={() => setEditableModal(false)} />
-      <PhotoUploadModal
-        show={editablePhoto.visible}
-        onClose={() => {
-          setEditablePhoto({
-            type: "AVATAR",
-            visible: false,
-          });
-        }}
-        type={editablePhoto.type}
-        user={user}
-      />
       <ConfirmHideUserModal
         user={user}
         show={showHideUser}

@@ -1,4 +1,4 @@
-import { FC } from "react";
+import React, { FC } from "react";
 import { CircleWavy } from "phosphor-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -10,11 +10,31 @@ import { AccreditationOptions } from "backend/schemas/user";
 import { UserProfile } from "mobile/src/graphql/query/user/useProfile";
 
 interface ProfileProps {
-  user: UserProfile;
+  user: UserProfile | undefined;
 }
 
 const ProfileCardSmall: FC<ProfileProps> = ({ user }: ProfileProps) => {
   const { data: session } = useSession();
+  if (!user) {
+    return (
+      <div className="animate-pulse">
+        <div className="h-24 flex items-center justify-center">
+          <div className="w-[88px] h-[88px] rounded-full bg-skeleton" />
+        </div>
+        <Card className="text-center -mt-12">
+          <div className="flex items-center justify-center flex-col">
+            <div className="w-1/2 h-1 mt-12 bg-skeleton rounded-lg" />
+            <div className="w-1/4 h-1 mt-3 bg-skeleton rounded-lg" />
+          </div>
+          <div className="grid grid-cols-3 gap-x-4 mt-5">
+            <div className="bg-skeleton rounded-md h-8" />
+            <div className="bg-skeleton rounded-md h-8" />
+            <div className="bg-skeleton rounded-md h-8" />
+          </div>
+        </Card>
+      </div>
+    );
+  }
   const isMyProfile = user._id == session?.user?._id;
   return (
     <div>

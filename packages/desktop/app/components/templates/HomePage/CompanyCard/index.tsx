@@ -1,15 +1,18 @@
 import { FC } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import Card from "../../../common/Card";
-import { CompanyType } from "desktop/app/types/common-props";
+import { UserProfileProps } from "desktop/app/types/common-props";
 import Avatar from "../../../common/Avatar";
+import Skeleton from "./Skeleton";
 
-interface CompanyProps {
-  company: CompanyType;
-}
-
-const CompanyCard: FC<CompanyProps> = ({ company }) => {
+const CompanyCard: FC<UserProfileProps> = ({ user }) => {
+  if (!user) {
+    return <Skeleton />
+  }
+  const company = user.companies.length > 0 ? user.companies[0] : undefined;
+  if (!company) {
+    return <></>
+  }
   return (
     <div>
       <Link href={`/company/${company._id}`}>
@@ -21,7 +24,6 @@ const CompanyCard: FC<CompanyProps> = ({ company }) => {
           </div>
         </a>
       </Link>
-
       <Card className="text-center -mt-12">
         <Link href={`/company/${company._id}`}>
           <a>

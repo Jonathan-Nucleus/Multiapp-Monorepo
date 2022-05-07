@@ -314,7 +314,7 @@ const SettingsPage: FC = () => {
                 <ProfileSettings user={account} />
               </div>
               <div className="mt-8">
-                <AdminSettings user={account} />
+                <AdminSettings />
               </div>
             </>
           )}

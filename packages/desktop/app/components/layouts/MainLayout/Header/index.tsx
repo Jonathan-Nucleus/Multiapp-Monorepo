@@ -109,7 +109,7 @@ const Header: FC = () => {
             </a>
           </Link>
           <div className="ml-6">
-            <AvatarMenu />
+            <AvatarMenu account={account} />
           </div>
         </div>
       </nav>
@@ -142,14 +142,18 @@ const Header: FC = () => {
           </Link>
         </div>
         <div>
-          <Link href="/search">
+          <Link href="/">
             <a className="flex items-center">
               <MagnifyingGlass color="white" size={32} />
             </a>
           </Link>
         </div>
       </nav>
-      <Sidebar show={showSidebar} onClose={() => setShowSidebar(false)} />
+      <Sidebar
+        account={account}
+        show={showSidebar}
+        onClose={() => setShowSidebar(false)}
+      />
     </header>
   );
 };

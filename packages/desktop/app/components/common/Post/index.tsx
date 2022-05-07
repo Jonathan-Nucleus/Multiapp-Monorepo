@@ -1,7 +1,6 @@
 import { FC, Fragment, useState } from "react";
 import Link from "next/link";
 import Card from "../Card";
-import Image from "next/image";
 import {
   Bell,
   BellSlash,
@@ -35,6 +34,7 @@ import { useFollowUser } from "mobile/src/graphql/mutation/account";
 import { Menu, Transition } from "@headlessui/react";
 import ConfirmHideUserModal from "./ConfirmHideUserModal";
 import ReportPostModal from "./ReportPostModal";
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
 
 interface PostProps {
   post: PostSummary;
@@ -53,6 +53,7 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
   const [visibleComment, setVisibleComment] = useState(false);
   const [showHidePost, setShowHidePost] = useState(false);
   const [showReportPost, setShowReportPost] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const isMyPost = user._id == accountData?.account._id;
   const isFollowingUser =
     accountData?.account.followingIds?.includes(user._id) ?? false;
@@ -83,10 +84,9 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
       refetchQueries: ["Posts"],
     });
   };
-  const deletePostCallback = async () => {};
   return (
     <>
-      <Card className="border-0 p-0 rounded-none	md:rounded-2xl mb-6">
+      <Card className="border-0 p-0 rounded-none overflow-visible	md:rounded-2xl mb-6">
         <div className="flex items-center px-4 pt-4">
           <div className="w-14 h-14 flex items-center justify-center">
             <Link href={`/profile/${user._id}`}>
@@ -296,7 +296,7 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
                       <Menu.Item>
                         <div
                           className="flex items-center px-4 py-3 cursor-pointer hover:bg-background-blue"
-                          onClick={() => deletePostCallback()}
+                          onClick={() => setShowDeleteConfirm(true)}
                         >
                           <Trash fill="currentColor" weight="light" size={24} />
                           <div className="ml-4">Delete post</div>
@@ -396,6 +396,11 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
         show={visiblePostLikeModal}
         onClose={() => setVisiblePostLikeModal(false)}
         members={post.likes}
+      />
+      <ConfirmDeleteModal
+        postId={post._id}
+        show={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
       />
     </>
   );
