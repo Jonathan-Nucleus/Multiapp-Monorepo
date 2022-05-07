@@ -34,7 +34,9 @@ const InviteFriends: FC<InviteFriendsProps> = ({ onClose }) => {
   const [inviteUser] = useMutation(INVITE_USER, {
     refetchQueries: ["Invites"],
   });
-  const { register, handleSubmit, formState, reset } = useForm<yup.InferType<typeof schema>>({
+  const { register, handleSubmit, formState, reset } = useForm<
+    yup.InferType<typeof schema>
+  >({
     resolver: yupResolver(schema),
     mode: "onBlur",
   });

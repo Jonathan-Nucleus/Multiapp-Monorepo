@@ -56,6 +56,8 @@ export type {
   FinancialStatusEnum as FinancialStatus,
   InvestorClassEnum as InvestorClass,
   InvestmentLevelEnum as InvestmentLevel,
+  NotificationMethodEnum as NotificationMethod,
+  NotificationEvent,
 };
 
 const schema = gql`

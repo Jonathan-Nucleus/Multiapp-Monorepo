@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement } from 'react';
 import {
   ListRenderItem,
   StyleSheet,
@@ -9,60 +9,41 @@ import {
 } from 'react-native';
 
 import { GRAY20, WHITE, GREEN, WHITE60, WHITE12 } from 'shared/src/colors';
-
 import { Body1Bold, Body2, Body2Bold, Body3 } from 'mobile/src/theme/fonts';
 import PhoneSvg from 'mobile/src/assets/icons/phone.svg';
 import EmailSvg from 'mobile/src/assets/icons/email.svg';
 
-interface NotificationMethod {
-  label1: string;
-  toggleSwitch?: () => void;
-  isEnabled?: boolean;
-  id: string;
-  value: boolean;
-  icon: ReactElement;
-}
-
-interface SelectedNotificationMethod {
-  id: string;
-  value: boolean;
-}
-
 const NotificationMethods = [
   {
     icon: <PhoneSvg />,
-    label1: 'Mobile Push',
-    value: false,
-    id: 'phone',
+    label: 'Mobile Push',
+    key: 'enablePush',
   },
   {
     icon: <EmailSvg />,
-    label1: 'Email',
-    value: false,
-    id: 'email',
+    label: 'Email',
+    key: 'enableEmail',
   },
 ];
 
-const NotificationMethodChooser: React.FC = () => {
-  const [enabledList, setEnabledList] = useState<SelectedNotificationMethod[]>(
-    [],
-  );
+interface NotificationMethod {
+  label: string;
+  key: string;
+  icon: ReactElement;
+}
 
-  const handleToggleSelect = (val: boolean, item: NotificationMethod) => {
-    const _enabledList = [...enabledList];
-    const objIndex = _enabledList.findIndex((v) => v.id === item.id);
-    if (objIndex > -1) {
-      _enabledList[objIndex].value = val;
-    } else {
-      _enabledList.push({
-        id: item.id,
-        value: val,
-      });
-    }
+interface NotificationProp {
+  [key: string]: boolean;
+}
+interface NotificationMethodProps {
+  handleToggleNotificationMethod: (val: boolean, key: string) => void;
+  notificationMethod: NotificationProp;
+}
 
-    setEnabledList(_enabledList);
-  };
-
+const NotificationMethodChooser: React.FC<NotificationMethodProps> = ({
+  handleToggleNotificationMethod,
+  notificationMethod,
+}) => {
   const renderListNotificationItem: ListRenderItem<NotificationMethod> = ({
     item,
   }) => {
@@ -71,17 +52,17 @@ const NotificationMethodChooser: React.FC = () => {
         style={[
           styles.item,
           styles.notificationContainer,
-          item.id === 'phone' && styles.border,
+          item.key === 'enablePush' && styles.border,
         ]}>
         {item.icon}
         <View style={[styles.leftItem, styles.notificationItem]}>
-          <Text style={styles.label}>{item.label1}</Text>
+          <Text style={styles.label}>{item.label}</Text>
         </View>
         <Switch
           trackColor={{ false: GRAY20, true: GREEN }}
           ios_backgroundColor={GRAY20}
-          onValueChange={(val) => handleToggleSelect(val, item)}
-          value={enabledList.findIndex((v) => v.id === item.id && v.value) > -1}
+          onValueChange={(val) => handleToggleNotificationMethod(val, item.key)}
+          value={notificationMethod?.[item.key]}
         />
       </View>
     );

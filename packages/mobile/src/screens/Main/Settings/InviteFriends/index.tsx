@@ -40,7 +40,8 @@ const InviteFriends: FC<RouterProps> = ({ navigation }) => {
     try {
       const result = await Share.open({
         title: 'Join me on Prometheus Alts!',
-        message: `Share code ${code.join('')}`,
+        // message: `Share code ${code.join('')}`,
+        message: 'Share code',
         url: 'prometheusalts.com',
       });
 

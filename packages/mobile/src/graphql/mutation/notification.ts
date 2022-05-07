@@ -14,7 +14,7 @@ export function useReadNotification(): MutationTuple<
 > {
   return useMutation<ReadNotificationData, ReadNotificationVariables>(
     gql`
-      mutation ReadAllNotifications($notificationId: ID!) {
+      mutation ReadNotification($notificationId: ID!) {
         readNotification(notificationId: $notificationId)
       }
     `,
@@ -27,7 +27,7 @@ export function useReadNotification(): MutationTuple<
 export function useReadNotifications() {
   return useMutation(
     gql`
-      mutation readNotification {
+      mutation ReadAllNotifications {
         readNotification
       }
     `,
