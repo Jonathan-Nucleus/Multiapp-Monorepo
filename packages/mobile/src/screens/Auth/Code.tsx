@@ -64,6 +64,7 @@ const CodeView: CodeScreen = ({ navigation }) => {
           onSubmitEditing={handleVerifyCode}
           autoFocus={true}
           containerStyle={styles.textContainer}
+          textContainerStyle={styles.textInputContainer}
           textInputStyle={styles.textInput}
         />
         <PGradientButton
@@ -94,11 +95,14 @@ const styles = StyleSheet.create({
     backgroundColor: BLACK,
   },
   textContainer: {
-    marginTop: 17,
+    marginTop: 16,
   },
-  textInput: {
+  textInputContainer: {
+    marginTop: 4,
     borderRadius: 16,
     height: 56,
+  },
+  textInput: {
     fontSize: 24,
     paddingHorizontal: 12,
   },

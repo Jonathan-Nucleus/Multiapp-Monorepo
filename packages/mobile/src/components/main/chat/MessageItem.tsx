@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import { WHITE, PRIMARYSOLID, GRAY700 } from 'shared/src/colors';
 import { Body2, Body2Bold, Body3, Body4Thin } from 'mobile/src/theme/fonts';
 
-import { ChatContext, Message } from 'mobile/src/context/Chat';
+import { Message } from 'mobile/src/services/chat';
 import ChatAvatar from 'mobile/src/components/main/chat/ChatAvatar';
 
 interface MessageItemProps {
@@ -36,7 +36,8 @@ const MessageItem: React.FC<MessageItemProps> = ({
           style={styles.avatar}
         />
       )}
-      <View style={!finalMessage ? styles.avatarSpacer : null}>
+      <View
+        style={[styles.message, !finalMessage ? styles.avatarSpacer : null]}>
         <View
           style={[
             styles.messageBubble,
@@ -88,6 +89,9 @@ const styles = StyleSheet.create({
   },
   userInfo: {
     paddingLeft: 8,
+  },
+  message: {
+    maxWidth: '75%',
   },
   messageBubble: {
     borderRadius: 16,

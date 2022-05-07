@@ -33,14 +33,15 @@ import { useForm, Controller, DefaultValues } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 
+import { useChatContext } from 'mobile/src/context/Chat';
 import {
-  useChatContext,
+  findUsers,
+  createChannel,
   Channel,
   ChannelSort,
   ChannelFilters,
   User,
-} from 'mobile/src/context/Chat';
-import { findUsers, createChannel } from 'mobile/src/utils/chat';
+} from 'mobile/src/services/chat';
 import UserItem from 'mobile/src/components/main/chat/UserItem';
 
 import { NewChatScreen } from 'mobile/src/navigations/ChatStack';
@@ -53,13 +54,11 @@ const DEFAULT_SORT: ChannelSort = [
 
 type FormValues = {
   search?: string;
-  message?: string;
 };
 
 const schema = yup
   .object({
     search: yup.string().notRequired().default(''),
-    message: yup.string().trim().notRequired().default(''),
   })
   .required();
 
@@ -95,15 +94,11 @@ const NewChat: NewChatScreen = ({ navigation }) => {
     performSearch();
   }, []);
 
-  const onSubmit = async ({ message }: FormValues) => {
+  const onSubmit = async () => {
     if (selectedUsers.length === 0) return;
 
     const members = [userId, ...selectedUsers.map((user) => user.id)];
     const channel = await createChannel(client, members);
-
-    if (message && message !== '') {
-      await channel.sendMessage({ text: message });
-    }
 
     navigation.dispatch(
       CommonActions.reset({
@@ -159,7 +154,10 @@ const NewChat: NewChatScreen = ({ navigation }) => {
               field.onChange(text);
               performSearch();
             }}
-            onClear={() => field.onChange('')}
+            onClear={() => {
+              field.onChange('');
+              performSearch();
+            }}
             containerStyle={styles.textContainerStyle}
             style={styles.textStyle}
             placeholder="Search members"
@@ -176,42 +174,15 @@ const NewChat: NewChatScreen = ({ navigation }) => {
           <View style={styles.separator} />
         </View>
       ) : null}
-      <FlatList
-        data={users.filter(
-          (user) => !selectedUsers.some((u) => u.id == user.id),
-        )}
-        renderItem={renderItem}
-        keyExtractor={(item) => `${item.id}`}
-      />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <View style={styles.inputContainer}>
-          <Controller
-            name="message"
-            control={control}
-            render={({ field }) => (
-              <PTextInput
-                {...field}
-                placeholder="Type a message..."
-                label=""
-                labelStyle={styles.label}
-                subLabelStyle={styles.label}
-                textInputStyle={styles.input}
-                text={field.value}
-                onChangeText={field.onChange}
-                onSubmitEditing={handleSubmit(onSubmit)}
-                keyboardAppearance="dark"
-              />
-            )}
-          />
-          <View style={styles.imageButton}>
-            <Pressable
-              onPress={() => console.log('open gallery')}
-              style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}>
-              <ImageSquare size={20} color={WHITE} />
-            </Pressable>
-          </View>
-        </View>
+        <FlatList
+          data={users.filter(
+            (user) => !selectedUsers.some((u) => u.id == user.id),
+          )}
+          renderItem={renderItem}
+          keyExtractor={(item) => `${item.id}`}
+        />
       </KeyboardAvoidingView>
     </View>
   );
@@ -269,12 +240,16 @@ const styles = StyleSheet.create({
   inputContainer: {
     position: 'relative',
   },
-  input: {
-    paddingLeft: 64,
+  textInputContainer: {
     marginBottom: 8,
     marginTop: 0,
     borderRadius: 16,
     borderWidth: 0,
+  },
+  input: {
+    paddingLeft: 64,
+    paddingRight: 16,
+    lineHeight: 18,
     ...Body2,
   },
   imageButton: {

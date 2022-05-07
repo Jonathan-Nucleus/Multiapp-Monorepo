@@ -46,7 +46,7 @@ import {
   processMessages,
   addMessage,
   PMessage,
-} from 'mobile/src/utils/chat';
+} from 'mobile/src/services/chat';
 import MessageItem from 'mobile/src/components/main/chat/MessageItem';
 
 import { ChannelScreen } from 'mobile/src/navigations/ChatStack';
@@ -201,11 +201,13 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
                 label=""
                 labelStyle={styles.label}
                 subLabelStyle={styles.label}
+                textContainerStyle={styles.textInputContainer}
                 textInputStyle={styles.input}
                 text={field.value}
                 onChangeText={field.onChange}
                 onSubmitEditing={handleSubmit(onSubmit)}
                 keyboardAppearance="dark"
+                multiline={true}
               />
             )}
           />
@@ -260,12 +262,16 @@ const styles = StyleSheet.create({
   inputContainer: {
     position: 'relative',
   },
-  input: {
-    paddingLeft: 64,
+  textInputContainer: {
     marginBottom: 8,
     marginTop: 0,
     borderRadius: 16,
     borderWidth: 0,
+  },
+  input: {
+    paddingLeft: 64,
+    paddingRight: 16,
+    lineHeight: 18,
     ...Body2,
   },
   imageButton: {

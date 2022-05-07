@@ -10,13 +10,9 @@ import { Body1, Body2, Body3 } from 'mobile/src/theme/fonts';
 import pStyles from 'mobile/src/theme/pStyles';
 import { WHITE, BGDARK, GRAY700, GRAY600 } from 'shared/src/colors';
 
-import {
-  useChatContext,
-  Channel,
-  ChannelSort,
-  ChannelFilters,
-} from 'mobile/src/context/Chat';
+import { useChatContext } from 'mobile/src/context/Chat';
 import ChannelItem from 'mobile/src/components/main/chat/ChannelItem';
+import { Channel, ChannelSort, ChannelFilters } from 'mobile/src/services/chat';
 
 import { ChannelListScreen } from 'mobile/src/navigations/ChatStack';
 
@@ -51,6 +47,7 @@ const ChannelList: ChannelListScreen = ({ navigation }) => {
       switch (event.type) {
         case 'user.watching.start':
         case 'user.watching.stop':
+        case 'message.new':
           fetchChannels();
           break;
       }

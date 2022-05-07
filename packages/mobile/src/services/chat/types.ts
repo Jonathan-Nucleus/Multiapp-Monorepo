@@ -1,4 +1,3 @@
-import React, { useContext } from 'react';
 import type {
   StreamChat,
   DefaultGenerics,
@@ -14,6 +13,8 @@ type UserType = Pick<
   'id' | 'name' | 'online' | 'created_at' | 'last_active'
 > & {
   image?: string;
+  company?: string;
+  position?: string;
 };
 
 type MessageType = Pick<
@@ -32,26 +33,3 @@ export type Message = MessageType;
 export type ChannelFilters = SCChannelFilters<StreamType>;
 export type ChannelSort = SCChanelSort<StreamType>;
 export type Client = StreamChat<StreamType>;
-
-export interface ChatSession {
-  client: Client;
-  userId: string;
-}
-
-export const ChatContext = React.createContext<ChatSession | undefined>(
-  undefined,
-);
-
-export function useChatContext(): ChatSession {
-  const chatSession = useContext(ChatContext);
-  if (!chatSession) {
-    throw new Error(
-      'Chat session context not properly initializeed, Please check to ensure that you have included the approprate Context Provider',
-    );
-  }
-
-  return chatSession;
-}
-
-const ChatProvider = ChatContext.Provider;
-export default ChatProvider;

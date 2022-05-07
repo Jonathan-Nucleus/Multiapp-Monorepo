@@ -4,17 +4,20 @@ import {
   UserSort,
   UserOptions,
 } from 'stream-chat';
-import {
-  Client,
-  ChannelFilters,
-  ChannelSort,
-  Channel,
-  Message,
-  User,
-  StreamType,
-} from 'mobile/src/context/Chat';
 import _ from 'lodash';
 import dayjs from 'dayjs';
+
+export * from './types';
+
+import type {
+  User,
+  Channel,
+  Message,
+  ChannelFilters,
+  ChannelSort,
+  Client,
+  StreamType,
+} from './types';
 
 const CHANNEL_TYPE = 'messaging';
 
@@ -140,7 +143,7 @@ export const findUsers = _.debounce(
     return [];
   },
   100,
-  { trailing: true },
+  { leading: true, trailing: true },
 );
 
 /**

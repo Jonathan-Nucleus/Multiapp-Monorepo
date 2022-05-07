@@ -29,6 +29,7 @@ const SearchInput = forwardRef<TextInput, SearchInputProps>(
         <TextInput
           {...inputProps}
           ref={ref}
+          keyboardAppearance="dark"
           style={[
             styles.textInput,
             inputProps.style,

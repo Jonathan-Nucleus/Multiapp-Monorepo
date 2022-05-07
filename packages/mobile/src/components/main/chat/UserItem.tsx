@@ -6,9 +6,9 @@ import * as NavigationService from 'mobile/src/services/navigation/NavigationSer
 import { WHITE } from 'shared/src/colors';
 import { Body2, Body2Bold } from 'mobile/src/theme/fonts';
 
-import { useChatContext, User } from 'mobile/src/context/Chat';
 import ChatAvatar from 'mobile/src/components/main/chat/ChatAvatar';
-import { channelName } from 'mobile/src/utils/chat';
+import { useChatContext } from 'mobile/src/context/Chat';
+import { channelName, User } from 'mobile/src/services/chat';
 
 interface UserItemProps {
   user: User;
@@ -24,7 +24,11 @@ const UserItem: React.FC<UserItemProps> = ({ user, onPress }) => {
         <ChatAvatar user={user} />
         <View style={[styles.col, styles.userInfo]}>
           <Text style={[styles.textWhite, Body2Bold]}>{user.name}</Text>
-          <Text style={[styles.textWhite, Body2]}>Lorem...</Text>
+          {user.position ? (
+            <Text style={[styles.textWhite, Body2]}>{`${user.position}${
+              user.company ? ` @ ${user.company}` : ''
+            }`}</Text>
+          ) : null}
         </View>
       </View>
     </Pressable>

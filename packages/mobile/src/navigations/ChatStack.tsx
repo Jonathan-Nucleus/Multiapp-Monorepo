@@ -1,19 +1,12 @@
-import React, { ReactElement, useRef, useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import React, { ReactElement } from 'react';
 import {
   createStackNavigator,
   StackScreenProps,
 } from '@react-navigation/stack';
 import { CompositeScreenProps } from '@react-navigation/native';
-import { StreamChat } from 'stream-chat';
 
-import pStyles from 'mobile/src/theme/pStyles';
-import { WHITE } from 'shared/src/colors';
-
-import ChatProvider, {
-  StreamType,
-  Channel as ChannelType,
-} from 'mobile/src/context/Chat';
+import { ChatProvider } from 'mobile/src/context/Chat';
+import { Channel as ChannelType } from 'mobile/src/services/chat';
 import { useAccount } from 'mobile/src/graphql/query/account';
 import { useChatToken } from 'mobile/src/graphql/query/account/useChatToken';
 
@@ -28,49 +21,16 @@ const Stack = createStackNavigator();
 const ChatStack = () => {
   const { data: accountData } = useAccount({ fetchPolicy: 'cache-only' });
   const { data, loading: loadingToken, called: calledToken } = useChatToken();
-  const chatClient = useRef<StreamChat<StreamType> | null>(null);
-  const [isReady, setIsReady] = useState(false);
 
   const account = accountData?.account;
   const token = data?.chatToken;
-
-  useEffect(() => {
-    if (!chatClient.current && account && token) {
-      const client = StreamChat.getInstance<StreamType>(GETSTREAM_ACCESS_KEY);
-      (async () => {
-        await client.connectUser(
-          {
-            id: account._id,
-            name: `${account.firstName} ${account.lastName}`,
-            image: `${AVATAR_URL}/${account.avatar}`,
-          },
-          token,
-        );
-
-        console.log('Started chat');
-
-        chatClient.current = client;
-        setIsReady(true);
-      })();
-
-      return () => {
-        if (!chatClient.current) return;
-        chatClient.current.disconnectUser();
-        console.log('Stopped chat');
-      };
-    }
-  }, [account, token]);
 
   if (calledToken && !loadingToken && !token) {
     console.log('Error fetching chat token');
   }
 
-  return !chatClient.current || !account ? (
-    <View style={[pStyles.globalContainer, styles.container]}>
-      <ActivityIndicator size="large" color={WHITE} />
-    </View>
-  ) : (
-    <ChatProvider value={{ client: chatClient.current, userId: account._id }}>
+  return (
+    <ChatProvider user={account} token={token}>
       <Stack.Navigator
         screenOptions={{ headerShown: false, gestureEnabled: true }}
         initialRouteName="ChannelList">
@@ -83,13 +43,6 @@ const ChatStack = () => {
 };
 
 export default ChatStack;
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
 
 export type ChatStackParamList = {
   ChannelList: undefined;

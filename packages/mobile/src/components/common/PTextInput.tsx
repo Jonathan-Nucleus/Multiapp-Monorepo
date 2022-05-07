@@ -2,6 +2,7 @@ import React, { useEffect, useState, forwardRef } from 'react';
 import {
   View,
   ViewStyle,
+  StyleProp,
   StyleSheet,
   TextStyle,
   TextInput,
@@ -24,20 +25,21 @@ import {
 } from 'shared/src/colors';
 
 interface PTextInputProps extends TextInputProps {
-  containerStyle?: ViewStyle;
+  containerStyle?: StyleProp<ViewStyle>;
   label: string;
-  labelTextStyle?: TextStyle;
-  labelStyle?: ViewStyle;
+  labelTextStyle?: StyleProp<TextStyle>;
+  labelStyle?: StyleProp<ViewStyle>;
   subLabel?: string;
-  subLabelTextStyle?: TextStyle;
-  subLabelStyle?: ViewStyle;
+  subLabelTextStyle?: StyleProp<TextStyle>;
+  subLabelStyle?: StyleProp<ViewStyle>;
   text: string;
-  textInputStyle?: ViewStyle;
+  textContainerStyle?: StyleProp<ViewStyle>;
+  textInputStyle?: StyleProp<TextStyle>;
   onPress?: () => void;
   onPressText?: () => void;
   icon?: string;
   error?: string;
-  errorStyle?: TextStyle;
+  errorStyle?: StyleProp<TextStyle>;
   numberOfLines?: number;
 }
 
@@ -50,6 +52,7 @@ const PTextInput = forwardRef<React.FC<PTextInputProps>, PTextInputProps>(
       labelTextStyle,
       text,
       textInputStyle,
+      textContainerStyle,
       subLabel,
       subLabelStyle,
       subLabelTextStyle,
@@ -96,7 +99,12 @@ const PTextInput = forwardRef<React.FC<PTextInputProps>, PTextInputProps>(
             onPress={onPressText}
           />
         </View>
-        <View style={styles.view}>
+        <View
+          style={[
+            styles.view,
+            textContainerStyle,
+            !!error && styles.errorInput,
+          ]}>
           <TextInput
             {...textInputProps}
             placeholder={placeholder}
@@ -107,7 +115,6 @@ const PTextInput = forwardRef<React.FC<PTextInputProps>, PTextInputProps>(
               styles.textInput,
               textInputStyle,
               isFocused && styles.focused,
-              !!error && styles.errorInput,
             ]}
             value={text}
             keyboardType={keyboardType}
@@ -144,24 +151,8 @@ const styles = StyleSheet.create({
   textInput: {
     ...Body1,
     color: WHITE,
-    minHeight: 43,
-    maxHeight: 100,
-    borderColor: GRAY800,
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingBottom: 5,
-    paddingTop: 7,
-    paddingHorizontal: 8,
-    backgroundColor: GRAY700,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowRadius: 2,
-    elevation: 1,
-    shadowColor: BLACK,
-    shadowOpacity: 0.25,
-    marginBottom: 20,
+    paddingTop: 0,
+    textAlignVertical: 'top',
   },
   errorInput: {
     borderColor: DANGER,
@@ -178,6 +169,24 @@ const styles = StyleSheet.create({
   container: {},
   view: {
     position: 'relative',
+    minHeight: 44,
+    maxHeight: 140,
+    borderColor: GRAY800,
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+    backgroundColor: GRAY700,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowRadius: 2,
+    elevation: 1,
+    shadowColor: BLACK,
+    shadowOpacity: 0.25,
+    marginBottom: 20,
+    justifyContent: 'center',
   },
   icon: {
     position: 'absolute',

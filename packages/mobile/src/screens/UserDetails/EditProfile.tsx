@@ -118,7 +118,8 @@ const EditProfile: EditUserProfileScreen = ({ navigation }) => {
           onChangeText={(val: string) => setBio(val)}
           text={bio}
           multiline
-          textInputStyle={styles.bio}
+          textInputStyle={styles.bioText}
+          textContainerStyle={styles.bio}
         />
         <Text style={styles.social}>Social / Website Links</Text>
         <View style={styles.row}>
@@ -187,6 +188,9 @@ const styles = StyleSheet.create({
   },
   bio: {
     height: 180,
+  },
+  bioText: {
+    height: '100%',
   },
   icon: {
     position: 'absolute',

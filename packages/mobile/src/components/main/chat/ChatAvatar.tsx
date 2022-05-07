@@ -4,7 +4,7 @@ import FastImage from 'react-native-fast-image';
 
 import Avatar from 'mobile/src/components/common/Avatar';
 import { WHITE } from 'shared/src/colors';
-import { User } from 'mobile/src/context/Chat';
+import { User } from 'mobile/src/services/chat';
 
 interface ChatAvatarProps {
   user: User;
