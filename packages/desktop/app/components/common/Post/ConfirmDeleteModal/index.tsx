@@ -35,7 +35,7 @@ const ConfirmDeleteModal: FC<ConfirmDeleteModalProps> = ({ postId, show, onClose
               onClick={async () => {
                 setLoading(true);
                 try {
-                  await deletePost({ variables: { postId }, refetchQueries: ["Posts"] });
+                  await deletePost({ variables: { postId }});
                 } catch (e) {
                 }
                 setLoading(false);

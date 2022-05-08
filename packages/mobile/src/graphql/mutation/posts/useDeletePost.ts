@@ -24,7 +24,7 @@ export function useDeletePost(): MutationTuple<
       }
     `,
     {
-      refetchQueries: ['Posts', 'Post'],
+      refetchQueries: ['Posts', 'Post', 'AccountPosts'],
     },
   );
 }

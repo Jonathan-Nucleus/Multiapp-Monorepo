@@ -26,7 +26,7 @@ export function useEditPost(): MutationTuple<EditPostData, EditPostVariables> {
       }
     `,
     {
-      refetchQueries: ['Posts'],
+      refetchQueries: ['Posts', 'AccountPosts'],
     },
   );
 }

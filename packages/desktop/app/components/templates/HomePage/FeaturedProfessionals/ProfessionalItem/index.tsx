@@ -1,17 +1,17 @@
 import { Professional } from "mobile/src/graphql/query/user/useProfessionals";
 import { FC } from "react";
-import { useAccount } from "mobile/src/graphql/query/account";
 import { useFollowUser } from "mobile/src/graphql/mutation/account";
 import Image from "next/image";
 import Button from "desktop/app/components/common/Button";
 import Link from "next/link";
+import { useCachedAccount } from "mobile/src/graphql/query/account/useAccount";
 
 interface ProfessionalItemProps {
   professional: Professional;
 }
 
 const ProfessionalItem: FC<ProfessionalItemProps> = ({ professional }) => {
-  const { data: { account } = {} } = useAccount();
+  const account = useCachedAccount();
   const [followUser] = useFollowUser();
   const isMyProfile = account?._id == professional._id;
   const isFollowing = account?.followingIds?.includes(professional._id) ?? false;

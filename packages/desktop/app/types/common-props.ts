@@ -3,9 +3,14 @@ import { AccountData } from "mobile/src/graphql/query/account";
 import { FetchPostsData } from "mobile/src/graphql/query/account";
 import { UserProfile } from "mobile/src/graphql/query/user/useProfile";
 
-export type PostType = Exclude<FetchPostsData["posts"], undefined>[number];
+type PostType = Exclude<FetchPostsData["posts"], undefined>[number];
+type CompanyType = AccountData["account"]["companies"][number];
 
-export type CompanyType = AccountData["account"]["companies"][number];
+export type {
+  PostType,
+  CompanyType,
+  UserProfile,
+};
 
 export interface UserProfileProps extends PropsWithChildren<unknown> {
   user: UserProfile | undefined;

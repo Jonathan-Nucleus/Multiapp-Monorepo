@@ -26,15 +26,15 @@ import {
   useMutePost,
 } from "mobile/src/graphql/mutation/posts";
 import moment from "moment";
-import LikeModal from "./LikeModal";
+import LikeModal from "./LikesModal";
 import CommentPost from "../Comment";
 import { PostSummary } from "mobile/src/graphql/fragments/post";
-import { useAccount } from "mobile/src/graphql/query/account";
 import { useFollowUser } from "mobile/src/graphql/mutation/account";
 import { Menu, Transition } from "@headlessui/react";
 import ConfirmHideUserModal from "./ConfirmHideUserModal";
 import ReportPostModal from "./ReportPostModal";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import { useCachedAccount } from "mobile/src/graphql/query/account/useAccount";
 
 interface PostProps {
   post: PostSummary;
@@ -42,7 +42,7 @@ interface PostProps {
 }
 
 const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
-  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
+  const account = useCachedAccount();
   const [likePost] = useLikePost();
   const [followUser] = useFollowUser();
   const [mutePost] = useMutePost();

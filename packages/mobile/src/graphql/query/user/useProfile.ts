@@ -32,6 +32,7 @@ export type UserProfile = Pick<
   | 'website'
   | 'managedFunds'
   | 'accreditation'
+  | 'mutedPostIds'
 > & {
   watchlist: WatchlistFund[];
   company?: Pick<

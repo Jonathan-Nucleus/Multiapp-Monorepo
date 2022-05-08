@@ -67,7 +67,7 @@ export function useCreatePost(): MutationTuple<
       }
     `,
     {
-      refetchQueries: ['Posts'],
+      refetchQueries: ['Posts', 'AccountPosts'],
     },
   );
 }

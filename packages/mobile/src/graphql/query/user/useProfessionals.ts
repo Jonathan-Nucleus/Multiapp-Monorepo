@@ -1,6 +1,7 @@
 import { User } from 'backend/graphql/users.graphql';
 import { gql, QueryResult, useQuery } from '@apollo/client';
 import { Company } from 'backend/graphql/companies.graphql';
+import { useEffect, useState } from 'react';
 
 export type Professional = Pick<
   User,
@@ -39,3 +40,14 @@ export function useProfessionals(
     { variables: { featured } },
   );
 }
+
+export const useProfessionalsStated = (featured: boolean) => {
+  const { data, loading } = useProfessionals(featured);
+  const [state, setState] = useState<Professional[]>();
+  useEffect(() => {
+    if (!loading && data?.professionals) {
+      setState(data.professionals);
+    }
+  }, [data, loading]);
+  return state;
+};

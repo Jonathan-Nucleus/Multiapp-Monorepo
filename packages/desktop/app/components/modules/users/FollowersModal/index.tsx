@@ -53,7 +53,7 @@ const FollowersModal: FC<FollowersModalProps> = ({
       <ModalDialog
         show={show}
         onClose={onClose}
-        className="flex flex-col bg-background-card border-0 h-3/4 mx-auto p-0 z-10 w-full max-w-md"
+        className="flex flex-col border-0 h-[80vh] p-0 z-20 w-full max-w-md"
       >
         <Tab.Group
           selectedIndex={selectedTabIndex}

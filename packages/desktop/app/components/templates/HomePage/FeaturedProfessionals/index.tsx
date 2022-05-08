@@ -5,11 +5,11 @@ import { Splide, SplideSlide, SplideTrack } from "@splidejs/react-splide";
 import ProfessionalItem from "./ProfessionalItem";
 import Button from "desktop/app/components/common/Button";
 import { ArrowCircleRight } from "phosphor-react";
-import { useProfessionals } from "mobile/src/graphql/query/user/useProfessionals";
+import { useProfessionalsStated } from "mobile/src/graphql/query/user/useProfessionals";
 import Skeleton from "./Skeleton";
 
 const FeaturedProfessionals: FC = () => {
-  const { data: { professionals } = {} } = useProfessionals(true);
+  const professionals = useProfessionalsStated(true);
   if (!professionals) {
     return <Skeleton />;
   }

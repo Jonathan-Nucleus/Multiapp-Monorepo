@@ -5,6 +5,7 @@ import {
   POST_SUMMARY_FRAGMENT,
   PostSummary,
 } from 'mobile/src/graphql/fragments/post';
+import { useEffect, useState } from 'react';
 
 type AccountPostsVariables = {
   categories?: PostCategory[];
@@ -42,3 +43,14 @@ export function usePosts(
     },
   );
 }
+
+export const usePostsStated = (categories?: PostCategory[]) => {
+  const { data, loading, refetch } = usePosts(categories);
+  const [state, setState] = useState<Post[]>();
+  useEffect(() => {
+    if (!loading && data?.account?.posts) {
+      setState(data.account.posts);
+    }
+  }, [data, loading]);
+  return { data: state, refetch };
+};

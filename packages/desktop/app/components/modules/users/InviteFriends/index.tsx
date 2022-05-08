@@ -7,11 +7,11 @@ import Card from "../../../common/Card";
 import Field from "../../../common/Field";
 import Button from "../../../common/Button";
 import InvitationCoin from "./InvitationCoin";
-import { useInvites, Invitee } from "mobile/src/graphql/query/account";
 import { INVITE_USER } from "mobile/src/graphql/mutation/account";
 import { X } from "phosphor-react";
-import { useMemo } from "react";
 import Skeleton from "./Skeleton";
+import { useInviteesStated } from "mobile/src/graphql/query/account/useInvites";
+import { useCachedAccount } from "mobile/src/graphql/query/account/useAccount";
 
 const MAX_INVITES = 10;
 const variants = ["primary", "error", "secondary", "info", "success"];
@@ -29,22 +29,27 @@ interface InviteFriendsProps {
 
 const InviteFriends: FC<InviteFriendsProps> = ({ onClose }) => {
   const [loading, setLoading] = useState(false);
-  const { data: accountData } = useInvites();
-
+  const account = useCachedAccount();
+  const invitedFriends = useInviteesStated();
   const [inviteUser] = useMutation(INVITE_USER, {
     refetchQueries: ["Invites"],
   });
-  const { register, handleSubmit, formState, reset } = useForm<
-    yup.InferType<typeof schema>
-  >({
+  const { register, handleSubmit, formState, reset } = useForm<yup.InferType<typeof schema>>({
     resolver: yupResolver(schema),
     mode: "onBlur",
   });
-  const invitedFriends: Invitee[] = accountData?.account?.invitees ?? [];
 
+  if (!account || !invitedFriends) {
+    return <Skeleton />;
+  }
+
+  const label = account?.role === "PROFESSIONAL" ?
+    "Enter Email Addresses"
+    :
+    `Enter (up to ${MAX_INVITES - invitedFriends.length} more) Email Addresses`;
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     if (
-      accountData?.account.role !== "PROFESSIONAL" &&
+      account?.role !== "PROFESSIONAL" &&
       MAX_INVITES - invitedFriends.length <= 0
     ) {
       return;
@@ -63,18 +68,6 @@ const InviteFriends: FC<InviteFriendsProps> = ({ onClose }) => {
     }
     setLoading(false);
   };
-
-  const label = useMemo(() => {
-    if (accountData?.account.role === "PROFESSIONAL") {
-      return "Enter Email Addresses";
-    }
-    return `Enter (up to ${MAX_INVITES - invitedFriends.length} more) Email
-    Addresses`;
-  }, [accountData, invitedFriends]);
-
-  if (!accountData) {
-    return <Skeleton />;
-  }
 
   return (
     <Card className="p-0">

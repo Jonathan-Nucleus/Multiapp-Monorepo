@@ -8,7 +8,7 @@ import {
   Path,
 } from "react-hook-form";
 
-interface DropdownProps<
+export interface DropdownProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends Path<TFieldValues> = Path<TFieldValues>
 > extends Omit<ControllerProps<TFieldValues, TName>, "render"> {

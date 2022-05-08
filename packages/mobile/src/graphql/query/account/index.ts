@@ -254,7 +254,7 @@ export function useAccount(
 }
 
 export type Invitee = Pick<User, 'avatar' | 'email' | 'firstName' | 'lastName'>;
-type InvitesVariables = never;
+export type InvitesVariables = never;
 export type InvitesData = {
   account: Pick<User, '_id' | 'role'> & {
     invitees: Invitee[];

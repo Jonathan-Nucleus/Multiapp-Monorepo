@@ -5,7 +5,7 @@
  * @param length
  */
 export const getInitials = (text: string, length = 2): string => {
-  const words = text.split(" ")
+  const words = text.split(" ");
   const initials = words
     .map(word => word.trim().length > 0 ? word.trim()[0] : "")
     .join("");

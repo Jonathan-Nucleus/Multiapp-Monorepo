@@ -18,7 +18,7 @@ import CategorySelector, { categoriesSchema } from "./CategorySelector";
 import Avatar from "desktop/app/components/common/Avatar";
 import Button from "desktop/app/components/common/Button";
 import Input from "desktop/app/components/common/Input";
-import Dropdown from "desktop/app/components/common/Dropdown";
+import Dropdown, { DropdownProps } from "desktop/app/components/common/Dropdown";
 import Label from "desktop/app/components/common/Label";
 import MentionTextarea, {
   mentionTextSchema,
@@ -32,7 +32,6 @@ import {
 } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useAccount } from "mobile/src/graphql/query/account";
 import {
   useCreatePost,
   useFetchUploadLink,
@@ -42,6 +41,7 @@ import { Audiences } from "backend/graphql/enumerations.graphql";
 import { PostSummary } from "mobile/src/graphql/fragments/post";
 import { useEditPost } from "mobile/src/graphql/mutation/posts/useEditPost";
 import ModalDialog from "../../../common/ModalDialog";
+import { useCachedAccount } from "mobile/src/graphql/query/account/useAccount";
 
 const audienceOptions = [
   {
@@ -122,7 +122,8 @@ interface EditPostModalProps {
 }
 
 const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
-  const { data: { account } = {} } = useAccount();
+  const account = useCachedAccount();
+  const [userOptions, setUserOptions] = useState<DropdownProps["items"][number][]>([]);
   const selectedFile = useRef<File | undefined>(undefined);
   const [localFileUrl, setLocalFileUrl] = useState<string | null>(null);
   const [showCategories, setShowCategories] = useState(!!post);
@@ -131,21 +132,6 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
   const [fetchUploadLink] = useFetchUploadLink();
   const [loading, setLoading] = useState(false);
   const [visibleEmoji, setVisibleEmoji] = useState(false);
-  const userOptions = account
-    ? [
-      {
-        icon: <User color="currentColor" weight="fill" size={24} />,
-        title: `${account.firstName} ${account.lastName}`,
-        value: account._id,
-      },
-      ...account?.companies.map((company) => ({
-        icon: <Buildings color="currentColor" weight="fill" size={24} />,
-        title: company.name,
-        value: company._id,
-      })),
-    ]
-    : [];
-
   const {
     handleSubmit,
     control,
@@ -155,30 +141,43 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
     formState: { errors },
   } = useForm<yup.InferType<typeof schema>>({
     resolver: yupResolver(schema),
-    defaultValues: schema.cast(
-      { user: account?._id },
-      { assert: false },
-    ) as DefaultValues<FormValues>,
+    defaultValues: schema.cast({ categories: [] }) as DefaultValues<FormValues>,
     mode: "onChange",
   });
 
-  // Reset form default values once user data is available
   useEffect(() => {
-    if (post) {
-      reset(
-        schema.cast(
-          {
-            mediaUrl: post?.mediaUrl ?? "",
-            categories: post?.categories,
-            mentionInput: {
-              body: post?.body,
+    if (account) {
+      setUserOptions([
+        {
+          icon: <User color="currentColor" weight="fill" size={24} />,
+          title: `${account.firstName} ${account.lastName}`,
+          value: account._id,
+        },
+        ...account.companies.map((company) => ({
+          icon: <Buildings color="currentColor" weight="fill" size={24} />,
+          title: company.name,
+          value: company._id,
+        })),
+      ]);
+      if (post) {
+        reset(
+          schema.cast(
+            {
+              user: account._id,
+              mediaUrl: post.mediaUrl ?? "",
+              categories: post.categories,
+              mentionInput: {
+                body: post.body,
+              },
             },
-          },
-        ) as DefaultValues<FormValues>,
-      );
-      setLocalFileUrl(post?.mediaUrl ? `${process.env.NEXT_PUBLIC_POST_URL}/${post.mediaUrl}` : null);
+          ) as DefaultValues<FormValues>,
+        );
+        setLocalFileUrl(post.mediaUrl ? `${process.env.NEXT_PUBLIC_POST_URL}/${post.mediaUrl}` : null);
+      } else {
+        reset(schema.cast({ user: account._id }) as DefaultValues<FormValues>);
+      }
     }
-  }, [reset, post]);
+  }, [account, post, reset]);
 
   const onEmojiClick = (emojiObject: any) => {
     const body = getValues("mentionInput.body");

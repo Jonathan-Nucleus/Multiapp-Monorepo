@@ -17,8 +17,8 @@ import Sidebar from "./Sidebar";
 import AvatarMenu from "./AvatarMenu";
 import Avatar from "../../../common/Avatar";
 import SearchInput from "../../../common/SearchInput";
-import { useAccount } from "mobile/src/graphql/query/account";
-import { useNotifications } from "mobile/src/graphql/query/notification";
+import { useCachedAccount } from "mobile/src/graphql/query/account/useAccount";
+import { useNotificationsStated } from "mobile/src/graphql/query/notification/useNotifications";
 
 const navItems = [
   {
@@ -42,9 +42,8 @@ const navItems = [
 
 const Header: FC = () => {
   const [showSidebar, setShowSidebar] = useState(false);
-  const { data: { account } = {} } = useAccount();
-  const { data: notificationData } = useNotifications();
-  const notifications = notificationData?.notifications ?? [];
+  const account = useCachedAccount();
+  const notifications = useNotificationsStated() ?? [];
 
   return (
     <header className="bg-surface-light10 shadow shadow-black sticky top-0 z-20">
