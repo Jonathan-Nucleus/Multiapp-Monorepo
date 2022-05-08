@@ -1,16 +1,16 @@
-name: Validate PR (Backend)
+name: Validate PR (Desktop)
 on:
   pull_request:
     branches:
       - 'main'
     paths:
-      - 'packages/backend/**'
+      - 'packages/desktop/**'
       - 'package.json'
-      - '.github/workflows/validate-pr-backend.yml'
+      - '.github/workflows/validate-pr-desktop.yml'
 
 jobs:
-  validate-pr-backend:
-    name: Validate PR (Backend)
+  validate-pr-desktop:
+    name: Validate PR (Desktop)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
@@ -28,7 +28,4 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Typecheck
-        run: yarn typecheck --scope=backend
-
-      - name: Unit test
-        run: yarn test --scope=backend
+        run: yarn typecheck --scope=desktop

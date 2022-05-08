@@ -10,7 +10,7 @@
     "dev": "ts-node-dev --script-mode --transpile-only --no-notify --exit-child index.ts",
     "prod": "ts-node -P tsconfig-prod.json --transpile-only index.ts",
     "test": "export NODE_OPTIONS=\"--max-old-space-size=8192\" && jest --no-cache --runInBand --logHeapUsage",
-    "typecheck": "tsc --noEmit --skipLibCheck -p ./tsconfig.json"
+    "typecheck": "tsc --noEmit -p ./tsconfig.json"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.67.0",
