@@ -52,9 +52,6 @@ const ResetPass: ResetPassScreen = ({ navigation, route }) => {
     ) {
       setPassError('');
       return false;
-    } else if (pass && confirmPass && pass !== confirmPass) {
-      setPassError('Confirm Password does not match');
-      return true;
     }
     return true;
   }, [pass, confirmPass]);
@@ -83,7 +80,7 @@ const ResetPass: ResetPassScreen = ({ navigation, route }) => {
     Keyboard.dismiss();
     setError('');
     if (pass !== confirmPass) {
-      setError('Password does not match');
+      setPassError('Confirm Password does not match');
       return;
     }
 
@@ -98,8 +95,8 @@ const ResetPass: ResetPassScreen = ({ navigation, route }) => {
         navigation.navigate('Main');
         return;
       }
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError((e as Error).message);
     }
   };
 
@@ -125,7 +122,10 @@ const ResetPass: ResetPassScreen = ({ navigation, route }) => {
           label="Password"
           subLabel={securePassEntry ? 'Show' : 'Hide'}
           secureTextEntry={securePassEntry}
-          onChangeText={(val: string) => setPass(val)}
+          onChangeText={(val: string) => {
+            setPassError('');
+            setPass(val);
+          }}
           onPressText={() => setSecurePassEntry(!securePassEntry)}
           subLabelTextStyle={styles.subLabelText}
           text={pass}
@@ -135,7 +135,10 @@ const ResetPass: ResetPassScreen = ({ navigation, route }) => {
           label="Confirm Password"
           subLabel={secureConfirmPassEntry ? 'Show' : 'Hide'}
           secureTextEntry={secureConfirmPassEntry}
-          onChangeText={(val: string) => setConfirmPass(val)}
+          onChangeText={(val: string) => {
+            setPassError('');
+            setConfirmPass(val);
+          }}
           onPressText={() => setSecureConfirmPassEntry(!secureConfirmPassEntry)}
           text={confirmPass}
           subLabelTextStyle={styles.subLabelText}

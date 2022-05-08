@@ -1,4 +1,5 @@
 import React, { ReactElement } from 'react';
+import { StyleSheet, Text } from 'react-native';
 import {
   createBottomTabNavigator,
   BottomTabScreenProps,
@@ -11,15 +12,15 @@ import { House, Star, Chats, DotsThreeCircle } from 'phosphor-react-native';
 
 import FundsSVG from 'shared/assets/images/fund.svg';
 import GreyFundsSVG from 'shared/assets/images/grey-fund.svg';
-import { WHITE, BLACK, BGDARK, GRAY400 } from 'shared/src/colors';
+import { WHITE, BLACK, BGDARK, GRAY400, WHITE12 } from 'shared/src/colors';
 
 import { Home } from 'mobile/src/screens/Main/Home';
+import WatchList from 'mobile/src/screens/Main/WatchList';
 import MarketplaceTabs from './MarketplaceTabs';
 import ChatStack from './ChatStack';
 import MoreStack, { MoreStackParamList } from './MoreStack';
-import WatchList from 'mobile/src/screens/Main/WatchList';
-
 import { AppScreenProps } from './AppNavigator';
+import { Body5Bold, Body5 } from '../theme/fonts';
 
 const Tab = createBottomTabNavigator();
 const MainTabNavigator = () => {
@@ -28,20 +29,22 @@ const MainTabNavigator = () => {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: BGDARK,
+          backgroundColor: BLACK,
           borderTopWidth: 1,
-          borderTopColor: BLACK,
+          borderTopColor: WHITE12,
         },
         tabBarLabelStyle: {
-          color: WHITE,
           textTransform: 'uppercase',
         },
+        tabBarShowLabel: true,
       }}>
       <Tab.Screen
         name="Home"
         component={Home}
         options={{
-          tabBarLabel: 'HOME',
+          tabBarLabel: ({ focused }) => (
+            <Text style={[styles.text, focused && styles.bold]}>HOME</Text>
+          ),
           tabBarIcon: ({ focused, size }) =>
             focused ? (
               <House size={size} color={WHITE} weight="fill" />
@@ -54,7 +57,9 @@ const MainTabNavigator = () => {
         name="Watchlist"
         component={WatchList}
         options={{
-          tabBarLabel: 'watchlist',
+          tabBarLabel: ({ focused }) => (
+            <Text style={[styles.text, focused && styles.bold]}>watchlist</Text>
+          ),
           tabBarIcon: ({ focused, size }) =>
             focused ? (
               <Star size={size} color={WHITE} weight="fill" />
@@ -67,7 +72,9 @@ const MainTabNavigator = () => {
         name="Marketplace"
         component={MarketplaceTabs}
         options={{
-          tabBarLabel: 'funds',
+          tabBarLabel: ({ focused }) => (
+            <Text style={[styles.text, focused && styles.bold]}>funds</Text>
+          ),
           tabBarIcon: ({ focused }) =>
             focused ? <FundsSVG /> : <GreyFundsSVG />,
         }}
@@ -76,7 +83,9 @@ const MainTabNavigator = () => {
         name="Chat"
         component={ChatStack}
         options={{
-          tabBarLabel: 'messages',
+          tabBarLabel: ({ focused }) => (
+            <Text style={[styles.text, focused && styles.bold]}>messages</Text>
+          ),
           tabBarIcon: ({ focused, size }) =>
             focused ? (
               <Chats size={size} color={WHITE} weight="fill" />
@@ -89,7 +98,9 @@ const MainTabNavigator = () => {
         name="More"
         component={MoreStack}
         options={{
-          tabBarLabel: 'MORE',
+          tabBarLabel: ({ focused }) => (
+            <Text style={[styles.text, focused && styles.bold]}>MORE</Text>
+          ),
           tabBarIcon: ({ focused, size }) =>
             focused ? (
               <DotsThreeCircle size={size} color={WHITE} weight="fill" />
@@ -130,3 +141,15 @@ export type WatchlistScreen = (
 export type SettingsScreen = (
   props: MainTabScreenProps<'More'>,
 ) => ReactElement | null;
+
+const styles = StyleSheet.create({
+  text: {
+    ...Body5,
+    color: GRAY400,
+    textTransform: 'uppercase',
+  },
+  bold: {
+    ...Body5Bold,
+    color: WHITE,
+  },
+});

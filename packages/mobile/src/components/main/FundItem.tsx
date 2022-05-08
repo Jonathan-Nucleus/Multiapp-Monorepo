@@ -96,11 +96,8 @@ const FundItem: React.FC<FundItemProps> = ({ fund }) => {
           textStyle={styles.button}
           btnContainer={styles.buttonContainer}
           onPress={() =>
-            NavigationService.navigate('Marketplace', {
-              screen: 'FundDetails',
-              params: {
-                fundId: fund._id,
-              },
+            NavigationService.navigate('FundDetails', {
+              fundId: fund._id,
             })
           }
         />

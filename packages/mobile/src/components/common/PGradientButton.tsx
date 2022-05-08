@@ -88,6 +88,6 @@ const styles = StyleSheet.create({
   textStyle: {
     color: WHITE,
     ...Body2,
-    textTransform: 'uppercase',
+    textTransform: 'capitalize',
   },
 });

@@ -18,6 +18,7 @@ import type {
   FundSummary,
   Accredidation,
 } from 'mobile/src/graphql/fragments/fund';
+import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 
 interface FundProps {
   funds: FundSummary[];
@@ -50,7 +51,7 @@ const Funds: React.FC<FundProps> = ({ funds, accredited }) => {
               Only verified accredited investors can browse funds.
               <Text
                 style={styles.more}
-                onPress={() => Linking.openURL('https://www.google.com/')}>
+                onPress={() => Linking.openURL('https://prometheusalts.com/')}>
                 {' '}
                 More Info
               </Text>
@@ -58,7 +59,7 @@ const Funds: React.FC<FundProps> = ({ funds, accredited }) => {
           </View>
           <PGradientOutlineButton
             label="Verify Accredidation Status"
-            onPress={() => console.log(123)}
+            onPress={() => NavigationService.navigate('Accreditation')}
           />
         </View>
       )}

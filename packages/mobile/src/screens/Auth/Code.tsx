@@ -57,7 +57,7 @@ const CodeView: CodeScreen = ({ navigation }) => {
         <PTextInput
           label="Enter Code"
           onChangeText={(val: string) => {
-            setCode(val);
+            setCode(val.toUpperCase());
             // setError(false);
           }}
           text={code}

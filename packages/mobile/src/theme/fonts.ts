@@ -43,6 +43,16 @@ export const H6Bold = {
   fontFamily: GothamBold,
 };
 
+export const Body5Bold = {
+  fontSize: 9,
+  fontFamily: GothamBold,
+};
+
+export const Body5 = {
+  fontSize: 9,
+  fontFamily: Gotham,
+};
+
 export const Body4 = {
   fontSize: 10,
   fontFamily: Gotham,

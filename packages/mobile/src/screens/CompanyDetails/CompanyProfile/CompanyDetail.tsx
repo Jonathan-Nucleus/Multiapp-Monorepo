@@ -35,6 +35,7 @@ import {
   PRIMARY,
   BGDARK,
   PRIMARYSOLID,
+  BLACK,
 } from 'shared/src/colors';
 
 import { useAccount } from 'mobile/src/graphql/query/account';
@@ -95,16 +96,16 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
     try {
       const result = await Share.open({
         title: 'Join me on Prometheus Alts!',
-        message: 'Share post',
-        url: 'prometheusalts.com',
+        message: 'Share company',
+        url: company.linkedIn ? company.linkedIn : 'prometheusalts.com',
       });
-      setIsVisible(false);
       console.log('result', result);
       showMessage('success', 'You shared this post succesfully');
     } catch (err) {
-      setIsVisible(false);
       console.log(err);
       showMessage('error', (err as Error).message);
+    } finally {
+      setIsVisible(false);
     }
   };
 
@@ -228,9 +229,10 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
               <TwitterSvg />
             </TouchableOpacity>
           )}
+          {twitter !== '' ||
+            (linkedIn !== '' && <View style={styles.verticalLine} />)}
           {website && website !== '' && (
             <>
-              <View style={styles.verticalLine} />
               <TouchableOpacity onPress={() => Linking.openURL(website)}>
                 <Text style={styles.website} numberOfLines={1}>
                   {website}
@@ -249,7 +251,13 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
         onBackdropPress={() => setIsVisible(false)}
         style={styles.bottomHalfModal}>
         <View style={styles.modalContent}>
-          <TouchableOpacity onPress={() => setIsVisible(false)}>
+          <TouchableOpacity
+            onPress={() => {
+              setIsVisible(false);
+              NavigationService.navigate('Main', {
+                screen: 'Chat',
+              });
+            }}>
             <View style={styles.item}>
               <Chats color={WHITE} size={28} />
               <View style={styles.commentWrap}>
@@ -277,6 +285,7 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
           <PGradientOutlineButton
             label="Cancel"
             onPress={() => setIsVisible(false)}
+            textStyle={styles.cancelBtnTxt}
           />
         </View>
       </Modal>
@@ -373,6 +382,7 @@ const styles = StyleSheet.create({
   },
   socialView: {
     flexDirection: 'row',
+    alignItems: 'center',
   },
   socialItem: {
     marginHorizontal: 16,
@@ -382,8 +392,9 @@ const styles = StyleSheet.create({
     margin: 0,
   },
   modalContent: {
-    backgroundColor: BGDARK,
-    padding: 20,
+    backgroundColor: BLACK,
+    paddingVertical: 37,
+    paddingHorizontal: 28,
     borderRadius: 32,
   },
   commentWrap: {
@@ -438,5 +449,8 @@ const styles = StyleSheet.create({
   },
   editButton: {
     width: Dimensions.get('screen').width - 32,
+  },
+  cancelBtnTxt: {
+    textTransform: 'capitalize',
   },
 });

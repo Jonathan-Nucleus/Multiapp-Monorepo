@@ -30,6 +30,7 @@ import { useAccount } from 'mobile/src/graphql/query/account';
 import { useWatchFund } from 'mobile/src/graphql/mutation/funds/useWatchFund';
 
 import { FundDetailsScreen } from 'mobile/src/navigations/AppNavigator';
+import MainHeader from '../../../../components/main/Header';
 
 const Tab = createMaterialTopTabNavigator();
 const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
@@ -42,25 +43,21 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
   const fund = data?.fund;
   if (!fund || loading) {
     return (
-      <SafeAreaView style={pStyles.globalContainer}>
-        <PHeader
+      <View style={pStyles.globalContainer}>
+        <MainHeader
           leftIcon={<CaretLeft size={32} color={WHITE} />}
-          leftStyle={styles.sideStyle}
           onPressLeft={() => NavigationService.goBack()}
-          containerStyle={styles.headerContainer}
         />
         <FundsPlaceholder />
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={pStyles.globalContainer}>
-      <PHeader
+    <View style={pStyles.globalContainer}>
+      <MainHeader
         leftIcon={<CaretLeft size={32} color={WHITE} />}
-        leftStyle={styles.sideStyle}
         onPressLeft={() => NavigationService.goBack()}
-        containerStyle={styles.headerContainer}
       />
       <ScrollView>
         <FundProfileInfo fund={fund} />
@@ -122,7 +119,7 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
           </Tab.Navigator>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 

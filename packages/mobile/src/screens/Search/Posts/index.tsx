@@ -86,14 +86,17 @@ const Posts: React.FC<PostProps> = ({ posts, search }: PostProps) => {
           {allPosts.length} people results for "{search}" in Posts
         </Text>
       )}
-      <View style={styles.row}>
-        <Text style={styles.filter}>
-          Posts from {PostRoleFilterOptions[selectedRole].label}
-        </Text>
-        <TouchableOpacity onPress={() => setVisibleFilter(true)}>
-          <SlidersHorizontal color={WHITE} size={24} />
-        </TouchableOpacity>
-      </View>
+      {posts.length > 0 && (
+        <View style={styles.row}>
+          <Text style={styles.filter}>
+            Posts from {PostRoleFilterOptions[selectedRole].label}
+          </Text>
+          <TouchableOpacity onPress={() => setVisibleFilter(true)}>
+            <SlidersHorizontal color={WHITE} size={24} />
+          </TouchableOpacity>
+        </View>
+      )}
+
       <FlatList
         data={allPosts}
         keyExtractor={(item) => item._id}

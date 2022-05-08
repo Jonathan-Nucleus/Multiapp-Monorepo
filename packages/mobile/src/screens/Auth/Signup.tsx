@@ -142,8 +142,8 @@ const Signup: SignupScreen = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <PHeader centerIcon={<LogoSvg />} />
       <PAppContainer>
+        <PHeader centerIcon={<LogoSvg />} />
         <PTitle title="You’re in!" subTitle="We a few more details..." />
         {!!error && <ErrorText error="Verification code does not matched" />}
         <PTextInput

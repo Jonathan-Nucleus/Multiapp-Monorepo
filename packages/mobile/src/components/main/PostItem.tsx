@@ -91,8 +91,8 @@ const PostItem: React.FC<PostItemProps> = ({
     try {
       const result = await Share.open({
         title: 'Join me on Prometheus Alts!',
-        message: 'Share post item',
-        url: 'prometheusalts.com',
+        message: 'Share post',
+        url: `prometheusalts.com://post:${post._id}`,
       });
       console.log('result', result);
       showMessage('success', 'You shared post succesfully');

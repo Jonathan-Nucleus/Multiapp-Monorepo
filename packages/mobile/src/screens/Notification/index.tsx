@@ -6,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
   ListRenderItem,
+  Pressable,
 } from 'react-native';
 import {
   Gear,
@@ -48,7 +49,7 @@ import { Notification } from 'backend/graphql/notifications.graphql';
 
 const Notifications: NotificationScreen = ({ navigation }) => {
   const [isVisible, setIsVisible] = useState(false);
-  const { data } = useNotifications();
+  const { data, refetch } = useNotifications();
   const [readNotification] = useReadNotification();
   const [readNotifications] = useReadNotifications();
   const notifications = data?.notifications || [];
@@ -82,6 +83,7 @@ const Notifications: NotificationScreen = ({ navigation }) => {
           notificationId: id,
         },
       });
+      refetch();
     } catch (err) {
       console.log(err);
     } finally {
@@ -92,6 +94,7 @@ const Notifications: NotificationScreen = ({ navigation }) => {
   const handleReadAllNotifications = async () => {
     try {
       await readNotifications();
+      refetch();
     } catch (err) {
       console.log(err);
     } finally {
@@ -103,9 +106,7 @@ const Notifications: NotificationScreen = ({ navigation }) => {
     item,
   }) => {
     return (
-      <TouchableOpacity
-        onLongPress={() => setIsVisible(true)}
-        onPress={() => handleReadNotification(item._id)}>
+      <Pressable onPress={() => handleReadNotification(item._id)}>
         <View style={[styles.item, item.isNew && styles.unread]}>
           <View style={styles.avatarView}>
             {item.isNew && <View style={styles.dot} />}
@@ -119,7 +120,7 @@ const Notifications: NotificationScreen = ({ navigation }) => {
             </Text>
           </View>
         </View>
-      </TouchableOpacity>
+      </Pressable>
     );
   };
 

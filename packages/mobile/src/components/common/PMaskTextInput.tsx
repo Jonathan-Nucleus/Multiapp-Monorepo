@@ -11,7 +11,14 @@ import TextInputMask from 'react-native-text-input-mask';
 
 import PFormLabel from './PFormLabel';
 import { Body1 } from '../../theme/fonts';
-import { WHITE, PRIMARY, BLACK, GRAY700, GRAY600 } from 'shared/src/colors';
+import {
+  WHITE,
+  PRIMARY,
+  BLACK,
+  GRAY700,
+  GRAY600,
+  GRAY800,
+} from 'shared/src/colors';
 
 interface PMaskTextInputProps extends TextInputProps {
   containerStyle?: ViewStyle;
@@ -70,11 +77,11 @@ const PMaskTextInput: React.FC<PMaskTextInputProps> = (props) => {
   useEffect(() => {
     if (isFocused) {
       setBorderColor({
-        borderColor: PRIMARY,
+        borderColor: WHITE,
       });
     } else {
       setBorderColor({
-        borderColor: WHITE,
+        borderColor: GRAY800,
       });
     }
   }, [isFocused]);
@@ -138,12 +145,18 @@ const styles = StyleSheet.create({
   textInput: {
     ...Body1,
     color: WHITE,
-    height: 43,
-    borderColor: GRAY600,
+    paddingTop: 0,
+    textAlignVertical: 'top',
+  },
+  container: {},
+  view: {
+    position: 'relative',
+    minHeight: 44,
+    maxHeight: 140,
+    borderColor: GRAY800,
     borderWidth: 1,
     borderRadius: 8,
-    paddingBottom: 5,
-    paddingTop: 7,
+    paddingVertical: 8,
     paddingHorizontal: 8,
     backgroundColor: GRAY700,
     shadowOffset: {
@@ -155,10 +168,7 @@ const styles = StyleSheet.create({
     shadowColor: BLACK,
     shadowOpacity: 0.25,
     marginBottom: 20,
-  },
-  container: {},
-  view: {
-    position: 'relative',
+    justifyContent: 'center',
   },
   icon: {
     position: 'absolute',

@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     backgroundColor: DANGER30,
   },
   focused: {
-    borderColor: PRIMARY,
+    borderColor: WHITE,
   },
   defaultLabelText: {
     ...Body2,
