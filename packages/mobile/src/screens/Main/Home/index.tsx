@@ -91,6 +91,24 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
     });
   };
 
+  const handleEditPost = () => {
+    // TODO company and audience
+    // const isCompany = user !== account._id;
+    navigation.navigate('PostDetails', {
+      screen: 'CreatePost',
+      params: {
+        editPost: true,
+        user: selectedPost?.user._id,
+        id: selectedPost?._id,
+        description: selectedPost?.body,
+        audience: selectedPost?.audience,
+        categories: selectedPost?.categories,
+        mediaUrl: selectedPost?.mediaUrl,
+        mentionIds: selectedPost?.mentionIds,
+      },
+    });
+  };
+
   const postFilter = (role: PostRoleFilter, cateogies: PostCategory[]) => {
     setSelectedRole(role);
     setSelectedCategories(cateogies.length > 0 ? cateogies : undefined);
@@ -142,6 +160,7 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
         post={selectedPost}
         visible={kebobMenuVisible && selectedPost?.user._id === account._id}
         onClose={() => setKebobMenuVisible(false)}
+        onEditPost={() => handleEditPost()}
       />
       <FilterModal
         isVisible={visibleFilter}

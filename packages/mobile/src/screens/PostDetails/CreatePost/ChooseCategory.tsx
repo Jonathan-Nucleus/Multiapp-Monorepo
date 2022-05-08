@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ListRenderItem, StyleSheet, FlatList, View } from 'react-native';
 
 import CheckboxLabel from 'mobile/src/components/common/CheckboxLabel';
@@ -48,16 +48,17 @@ const ChooseCategory: ChooseCategoryScreen = ({ route, navigation }) => {
     formState: { isValid },
   } = useForm<yup.InferType<typeof schema>>({
     resolver: yupResolver(schema),
-    defaultValues: schema.cast(
-      {},
-      { assert: false },
-    ) as DefaultValues<FormValues>,
+    // defaultValues: schema.cast(
+    //   {},
+    //   { assert: false },
+    // ) as DefaultValues<FormValues>,
     mode: 'onChange',
   });
 
   const { field: categoriesField } = useController({
     name: 'categories',
     control,
+    defaultValue: route.params.categories ?? [],
   });
 
   const onSubmit = (values: FormValues): void => {

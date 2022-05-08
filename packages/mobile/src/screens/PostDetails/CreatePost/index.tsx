@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Image,
   KeyboardAvoidingView,
@@ -27,6 +27,8 @@ import {
   CirclesFour,
 } from 'phosphor-react-native';
 const Buffer = global.Buffer || require('buffer').Buffer;
+
+import { POST_URL } from 'react-native-dotenv';
 
 import UserSvg from 'shared/assets/images/user.svg';
 import GlobalSvg from 'shared/assets/images/global.svg';
@@ -160,7 +162,7 @@ const schema = yup
   })
   .required();
 
-const CreatePost: CreatePostScreen = ({ navigation }) => {
+const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   const { data: accountData } = useAccount();
   const { data: usersData } = useUsers();
   const [fetchUploadLink] = useFetchUploadLink();
@@ -177,12 +179,13 @@ const CreatePost: CreatePostScreen = ({ navigation }) => {
 
   const {
     handleSubmit,
+    setValue,
     control,
     formState: { isValid },
   } = useForm<yup.InferType<typeof schema>>({
     resolver: yupResolver(schema),
     defaultValues: schema.cast(
-      { user: account?._id },
+      { user: account?._id, body: route.params?.description ?? '' },
       { assert: false, stripUnknown: true },
     ) as DefaultValues<FormValues>,
     mode: 'onChange',
@@ -208,9 +211,12 @@ const CreatePost: CreatePostScreen = ({ navigation }) => {
       // automatically parse this text in the post view and add links to
       // their profile page.
       description: replaceMentionValues(body ?? '', ({ name }) => `@${name}`),
-      mediaUrl,
+      mediaUrl: mediaUrl ? mediaUrl : route.params?.mediaUrl,
       localMediaPath: imageData?.path,
       mentions: [], // TODO: Parse from body and add here
+      editPost: route.params?.editPost,
+      id: route.params?.id,
+      categories: route.params?.categories,
     });
   };
 
@@ -476,8 +482,15 @@ const CreatePost: CreatePostScreen = ({ navigation }) => {
               />
             )}
           />
-          {imageData && (
+          {imageData ? (
             <Image source={{ uri: imageData.path }} style={styles.postImage} />
+          ) : (
+            route.params?.mediaUrl && (
+              <Image
+                source={{ uri: `${POST_URL}/${route.params?.mediaUrl}` }}
+                style={styles.postImage}
+              />
+            )
           )}
         </PAppContainer>
       </KeyboardAvoidingView>

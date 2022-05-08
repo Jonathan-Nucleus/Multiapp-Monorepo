@@ -4,6 +4,8 @@ import { MentionInput } from 'react-native-controlled-mentions';
 import _ from 'lodash';
 const Buffer = global.Buffer || require('buffer').Buffer;
 
+import { POST_URL } from 'react-native-dotenv';
+
 import UserSvg from 'shared/assets/images/user.svg';
 import GlobalSvg from 'shared/assets/images/global.svg';
 import Avatar from 'mobile/src/components/common/Avatar';
@@ -21,6 +23,7 @@ import { useAccount } from 'mobile/src/graphql/query/account';
 import {
   useCreatePost,
   PostCategories,
+  useEditPost,
 } from 'mobile/src/graphql/mutation/posts';
 
 import { ReviewPostScreen } from 'mobile/src/navigations/PostDetailsStack';
@@ -28,6 +31,7 @@ import { ReviewPostScreen } from 'mobile/src/navigations/PostDetailsStack';
 const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
   const { data: accountData } = useAccount();
   const [createPost] = useCreatePost();
+  const [editPost] = useEditPost();
 
   const account = accountData?.account;
   const {
@@ -41,7 +45,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
   } = route.params;
 
   const handleSubmit = async () => {
-    const postData = {
+    let postData = {
       categories,
       audience,
       body: description,
@@ -50,17 +54,34 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
       // TODO: Update endpoint to accept company
     };
 
-    const result = await createPost({
-      variables: {
-        post: postData,
-      },
-    });
+    if (route.params?.editPost) {
+      const id = route.params?.id;
+      postData = { ...postData, _id: id };
+      const result = await editPost({
+        variables: {
+          post: postData,
+        },
+      });
 
-    if (result && result.data && result.data.createPost) {
-      showMessage('success', 'Successfully posted!');
-      navigation.pop(2);
-      // it should go to different stack
-      navigation.navigate('Main');
+      if (result && result.data && result.data.editPost) {
+        showMessage('success', 'Successfully edited!');
+        navigation.pop(2);
+        // it should go to different stack
+        navigation.navigate('Main');
+      }
+    } else {
+      const result = await createPost({
+        variables: {
+          post: postData,
+        },
+      });
+
+      if (result && result.data && result.data.createPost) {
+        showMessage('success', 'Successfully posted!');
+        navigation.pop(2);
+        // it should go to different stack
+        navigation.navigate('Main');
+      }
     }
   };
 
@@ -104,8 +125,15 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
             },
           ]}
         />
-        {localMediaPath && (
+        {localMediaPath ? (
           <Image source={{ uri: localMediaPath }} style={styles.postImage} />
+        ) : (
+          route.params?.mediaUrl && (
+            <Image
+              source={{ uri: `${POST_URL}/${route.params?.mediaUrl}` }}
+              style={styles.postImage}
+            />
+          )
         )}
         {categories && categories.length > 0 && (
           <FlatList

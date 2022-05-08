@@ -32,8 +32,9 @@ const PostDetailsStack = () => {
 export default PostDetailsStack;
 
 export type PostDetailsStackParamList = {
-  CreatePost: undefined;
-  ChooseCategory: {
+  CreatePost: {
+    id?: string;
+    editPost?: boolean;
     user: string;
     audience: Audience;
     company: boolean;
@@ -41,10 +42,10 @@ export type PostDetailsStackParamList = {
     mentions: string[];
     mediaUrl?: string;
     localMediaPath?: string;
+    categories?: PostCategory[];
   };
-  ReviewPost: PostDetailsStackParamList['ChooseCategory'] & {
-    categories: PostCategory[];
-  };
+  ChooseCategory: PostDetailsStackParamList['CreatePost'];
+  ReviewPost: PostDetailsStackParamList['CreatePost'];
   PostDetail: { postId: string; userId: string };
 };
 
