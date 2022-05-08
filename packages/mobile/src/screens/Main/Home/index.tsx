@@ -87,24 +87,16 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
   const handleCreatePost = () => {
     navigation.navigate('PostDetails', {
       screen: 'CreatePost',
-      params: undefined,
+      params: {},
     });
   };
 
   const handleEditPost = () => {
-    // TODO company and audience
-    // const isCompany = user !== account._id;
+    if (!selectedPost) return;
     navigation.navigate('PostDetails', {
       screen: 'CreatePost',
       params: {
-        editPost: true,
-        user: selectedPost?.user._id,
-        id: selectedPost?._id,
-        description: selectedPost?.body,
-        audience: selectedPost?.audience,
-        categories: selectedPost?.categories,
-        mediaUrl: selectedPost?.mediaUrl,
-        mentionIds: selectedPost?.mentionIds,
+        post: selectedPost,
       },
     });
   };
@@ -117,13 +109,18 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
   const renderItem: ListRenderItem<Post> = ({ item }) => (
     <PostItem
       post={item}
-      userId={account._id}
       onPressMenu={() => {
         setSelectedPost(item);
         setKebobMenuVisible(true);
       }}
     />
   );
+
+  const myPost =
+    (selectedPost &&
+      (selectedPost.userId === account._id ||
+        account.companyIds?.includes(selectedPost.userId))) ??
+    false;
 
   return (
     <View style={pStyles.globalContainer}>
@@ -153,12 +150,12 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
       />
       <UserPostActionModal
         post={selectedPost}
-        visible={kebobMenuVisible && selectedPost?.user._id !== account._id}
+        visible={kebobMenuVisible && !myPost}
         onClose={() => setKebobMenuVisible(false)}
       />
       <OwnPostActionModal
         post={selectedPost}
-        visible={kebobMenuVisible && selectedPost?.user._id === account._id}
+        visible={kebobMenuVisible && myPost}
         onClose={() => setKebobMenuVisible(false)}
         onEditPost={() => handleEditPost()}
       />

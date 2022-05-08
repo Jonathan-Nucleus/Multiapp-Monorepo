@@ -12,8 +12,11 @@ import ReviewPost from '../screens/PostDetails/CreatePost/ReviewPost';
 
 import type { AppScreenProps } from './AppNavigator';
 
-import { Post, PostCategory } from 'mobile/src/graphql/query/post/usePosts';
-import type { Audience } from 'mobile/src/graphql/query/post/usePosts';
+import type {
+  Audience,
+  Post,
+  PostCategory,
+} from 'mobile/src/graphql/query/post/usePosts';
 
 const Stack = createStackNavigator();
 const PostDetailsStack = () => {
@@ -33,20 +36,31 @@ export default PostDetailsStack;
 
 export type PostDetailsStackParamList = {
   CreatePost: {
-    id?: string;
-    editPost?: boolean;
-    user: string;
+    post?: Pick<
+      Post,
+      | '_id'
+      | 'audience'
+      | 'categories'
+      | 'body'
+      | 'mediaUrl'
+      | 'mentionIds'
+      | 'userId'
+    >;
+  };
+  ChooseCategory: {
+    _id?: string;
+    userId: string;
     audience: Audience;
-    company: boolean;
-    description?: string;
-    mentions: string[];
+    body?: string;
+    mentionIds: string[];
     mediaUrl?: string;
     localMediaPath?: string;
     categories?: PostCategory[];
   };
-  ChooseCategory: PostDetailsStackParamList['CreatePost'];
-  ReviewPost: PostDetailsStackParamList['CreatePost'];
-  PostDetail: { postId: string; userId: string };
+  ReviewPost: PostDetailsStackParamList['ChooseCategory'] & {
+    categories: PostCategory[];
+  };
+  PostDetail: { postId: string };
 };
 
 export type PostDetailsScreenProps<

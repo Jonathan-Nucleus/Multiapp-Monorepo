@@ -307,9 +307,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
           {postData && postData.length > 0 ? (
             <FlatList
               data={postData || []}
-              renderItem={({ item }) => (
-                <PostItem post={item} userId={account._id} />
-              )}
+              renderItem={({ item }) => <PostItem post={item} />}
               keyExtractor={(item) => `${item._id}`}
               listKey="post"
               ListHeaderComponent={<Text style={styles.text}>All Posts</Text>}
@@ -327,7 +325,10 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
                   label="Create a Post"
                   btnContainer={styles.createPostBtn}
                   onPress={() =>
-                    navigation.navigate('PostDetails', { screen: 'CreatePost' })
+                    navigation.navigate('PostDetails', {
+                      screen: 'CreatePost',
+                      params: {},
+                    })
                   }
                 />
               </View>

@@ -16,6 +16,7 @@ import { useFollowUser } from 'mobile/src/graphql/mutation/account';
 import { useAccount } from 'mobile/src/graphql/query/account';
 import { Audience } from 'backend/graphql/posts.graphql';
 import { UserProfile } from 'backend/graphql/users.graphql';
+import { Company as CompanyProfile } from 'backend/graphql/companies.graphql';
 
 type User = Partial<
   Pick<UserProfile, '_id' | 'firstName' | 'lastName' | 'avatar' | 'role'>
@@ -23,8 +24,10 @@ type User = Partial<
   company?: { name: string };
 };
 
+type Company = Pick<CompanyProfile, '_id' | 'name' | 'avatar'>;
+
 interface UserInfoProps {
-  user: User;
+  user?: User | Company;
   viewStyle?: object;
   avatarStyle?: object;
   avatarSize?: number;
@@ -34,12 +37,21 @@ interface UserInfoProps {
 
 const UserInfo: React.FC<UserInfoProps> = (props) => {
   const { user, viewStyle, avatarSize, auxInfo, audienceInfo } = props;
+  if (!user) return null;
+
+  let userData: User | undefined;
+  let companyData: Company | undefined;
+  if ('firstName' in user) {
+    userData = user;
+  } else {
+    companyData = user as Company;
+  }
 
   const { data: accountData } = useAccount();
   const [followUser] = useFollowUser();
 
   const account = accountData?.account;
-  const { role, company } = user;
+  const { role, company } = userData ?? {};
   const isPro = role === 'PROFESSIONAL' || role === 'VERIFIED';
   const isSelf = user?._id === account?._id;
   const following = account?.followingIds?.includes(user?._id ?? '');
@@ -88,10 +100,18 @@ const UserInfo: React.FC<UserInfoProps> = (props) => {
       <Avatar user={user} size={avatarSize} />
       <View style={styles.userInfo}>
         <View style={styles.nameWrapper}>
-          <PLabel
-            label={`${user.firstName} ${user.lastName}`}
-            textStyle={styles.nameLabel}
-          />
+          {userData ? (
+            <PLabel
+              label={`${userData.firstName} ${userData.lastName}`}
+              textStyle={styles.nameLabel}
+            />
+          ) : null}
+          {companyData ? (
+            <PLabel
+              label={`${companyData.name}`}
+              textStyle={styles.nameLabel}
+            />
+          ) : null}
           {isPro && (
             <View style={styles.proWrapper}>
               <ShieldCheckSvg />

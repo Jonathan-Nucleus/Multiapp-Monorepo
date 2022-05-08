@@ -27,8 +27,12 @@ const NotificationDetail: NotificationDetailsScreen = ({
   const renderItem: ListRenderItem<Post> = ({ item }) => (
     <PostItem
       post={item}
-      userId={userId}
-      onPressMenu={() => console.log('pressed menu')}
+      onPressMenu={() =>
+        navigation.navigate('PostDetails', {
+          screen: 'PostDetail',
+          params: { postId },
+        })
+      }
     />
   );
 

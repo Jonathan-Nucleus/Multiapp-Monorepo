@@ -88,7 +88,11 @@ async function createInstance(connectionUrl?: string): Promise<IgniteDb> {
     users: users(db.collection("users")),
     companies: companies(db.collection("companies")),
     funds: funds(db.collection("funds")),
-    posts: posts(db.collection("posts"), db.collection("users")),
+    posts: posts(
+      db.collection("posts"),
+      db.collection("users"),
+      db.collection("companies")
+    ),
     comments: comments(db.collection("comments"), db.collection("posts")),
     notifications: notifications(
       db.collection("notifications"),

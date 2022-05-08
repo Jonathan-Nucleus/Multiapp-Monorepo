@@ -66,6 +66,7 @@ export default async function (
           _id: postId,
           userId,
           visible: true,
+          isCompany: false,
           body: faker.lorem.paragraph(),
           mediaUrl: stockImages[randomInt(0, stockImages.length - 1)],
           audience: audienceValues[randomInt(0, audienceValues.length - 1)],

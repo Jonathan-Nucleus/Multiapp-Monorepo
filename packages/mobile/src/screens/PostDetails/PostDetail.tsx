@@ -58,7 +58,7 @@ import {
   useFollowUser,
   useHideUser,
 } from 'mobile/src/graphql/mutation/account';
-import { useAccount } from 'mobile/src/graphql/query/account';
+import { useCachedAccount } from 'mobile/src/graphql/query/account/useAccount';
 
 import { PostDetailScreen } from 'mobile/src/navigations/PostDetailsStack';
 
@@ -77,7 +77,7 @@ const CommentMenuDataArray = [
 ];
 
 const PostDetail: PostDetailScreen = ({ route }) => {
-  const { postId, userId } = route.params;
+  const { postId } = route.params;
 
   const [comment, setComment] = useState('');
   const [kebobMenuVisible, setKebobMenuVisible] = useState(false); // someone's comment
@@ -97,7 +97,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
   const [editComment] = useEditCommentPost();
   const [followUser] = useFollowUser();
   const [hideUser] = useHideUser();
-  const { data: accountData } = useAccount();
+  const account = useCachedAccount();
   const [likeComment] = useLikeComment();
 
   const getKebobMenuData = useMemo(() => {
@@ -270,9 +270,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
   const CommentItem = ({ item }: { item: Comment }) => {
     const { _id, commentId, user, body, createdAt } = item;
     const [liked, setLiked] = useState(
-      (accountData?.account &&
-        item.likeIds?.includes(accountData?.account._id)) ??
-        false,
+      (account && item.likeIds?.includes(account._id)) ?? false,
     );
 
     const commentItemContainer = {
@@ -297,7 +295,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
           <TouchableOpacity
             onPress={() => {
               setFocusCommentId(_id);
-              if (user._id === accountData?.account._id) {
+              if (user._id === account?._id) {
                 setCommentMenuVisible(true);
               } else {
                 setSelectedUser(user);
@@ -344,11 +342,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
         containerStyle={styles.headerContainer}
       />
       <PAppContainer style={styles.container}>
-        <PostItem
-          post={post}
-          userId={userId}
-          onPressLikes={() => setLikesModalVisible(true)}
-        />
+        <PostItem post={post} onPressLikes={() => setLikesModalVisible(true)} />
         <FlatList
           data={getComments || []}
           renderItem={renderCommentItem}

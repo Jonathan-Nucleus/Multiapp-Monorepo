@@ -479,27 +479,6 @@ const createUsersCollection = (
     },
 
     /**
-     * Adds a post to the user's list of post.
-     *
-     * @param postId  The id of the post.
-     * @param userId  The id of the user.
-     *
-     * @returns   Whether or not the post was successfully add.
-     */
-    addPost: async (postId: MongoId, userId: MongoId): Promise<boolean> => {
-      const result = await usersCollection.updateOne(
-        { _id: toObjectId(userId), deletedAt: { $exists: false } },
-        { $addToSet: { postIds: toObjectId(postId) } }
-      );
-
-      if (!result.acknowledged || result.modifiedCount === 0) {
-        throw new InternalServerError("Not able to add a post.");
-      }
-
-      return true;
-    },
-
-    /**
      * Reports a post as inappropriate, indicating the violation data and
      * logging under ther user record.
      *

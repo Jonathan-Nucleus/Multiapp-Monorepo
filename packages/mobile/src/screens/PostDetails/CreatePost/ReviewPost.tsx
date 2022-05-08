@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, Image, StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 import { MentionInput } from 'react-native-controlled-mentions';
 import _ from 'lodash';
 const Buffer = global.Buffer || require('buffer').Buffer;
@@ -29,66 +29,78 @@ import {
 import { ReviewPostScreen } from 'mobile/src/navigations/PostDetailsStack';
 
 const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
+  const { ...postData } = route.params;
+  const {
+    userId,
+    audience,
+    categories,
+    body,
+    mentionIds,
+    mediaUrl,
+    localMediaPath,
+  } = postData;
+
   const { data: accountData } = useAccount();
   const [createPost] = useCreatePost();
   const [editPost] = useEditPost();
 
   const account = accountData?.account;
-  const {
-    categories,
-    description,
-    mentions,
-    mediaUrl,
-    audience,
-    user,
-    localMediaPath,
-  } = route.params;
 
   const handleSubmit = async () => {
-    let postData = {
-      categories,
+    let success = false;
+    let finalPostData = {
+      body,
       audience,
-      body: description,
+      categories,
       mediaUrl,
-      mentionIds: mentions,
-      // TODO: Update endpoint to accept company
+      mentionIds,
     };
 
-    if (route.params?.editPost) {
-      const id = route.params?.id;
-      postData = { ...postData, _id: id };
+    if (postData._id) {
       const result = await editPost({
         variables: {
-          post: postData,
+          post: {
+            _id: postData._id.toString(),
+            userId,
+            ...finalPostData,
+          },
         },
       });
 
       if (result && result.data && result.data.editPost) {
         showMessage('success', 'Successfully edited!');
-        navigation.pop(2);
-        // it should go to different stack
-        navigation.navigate('Main');
+        success = true;
       }
     } else {
       const result = await createPost({
         variables: {
-          post: postData,
+          post: {
+            ...finalPostData,
+            ...(userId !== account?._id ? { companyId: userId } : {}),
+          },
         },
       });
 
       if (result && result.data && result.data.createPost) {
         showMessage('success', 'Successfully posted!');
-        navigation.pop(2);
-        // it should go to different stack
-        navigation.navigate('Main');
+        success = true;
       }
+    }
+
+    if (success) {
+      navigation.pop(2);
+      // it should go to different stack
+      navigation.navigate('Main');
+    } else {
+      showMessage('Error', 'Uh oh! We encountered a problem.');
     }
   };
 
   const postAsLabel =
-    account?._id === user
+    account?._id === userId
       ? `${account?.firstName} ${account?.lastName}`
-      : account?.companies.find((company) => company._id === user)?.name ?? '';
+      : account?.companies.find((company) => company._id === userId)?.name ??
+        '';
   const selectedAudienceLabel =
     AUDIENCE_OPTIONS.find((option) => option.id === audience)?.value ?? '';
 
@@ -112,7 +124,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
           <PostSelection icon={<GlobalSvg />} label={selectedAudienceLabel} />
         </View>
         <MentionInput
-          value={description ?? ''}
+          value={body ?? ''}
           onChange={() => {}}
           editable={false}
           style={styles.mentionInput}
@@ -136,14 +148,15 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
           )
         )}
         {categories && categories.length > 0 && (
-          <FlatList
-            horizontal
-            data={categories}
-            renderItem={({ item }) => (
-              <Tag label={PostCategories[item]} viewStyle={styles.tagStyle} />
-            )}
-            listKey="category"
-          />
+          <View style={styles.tagContainer}>
+            {categories.map((category) => (
+              <Tag
+                key={category}
+                label={PostCategories[category]}
+                viewStyle={styles.tagStyle}
+              />
+            ))}
+          </View>
         )}
       </PAppContainer>
     </View>
@@ -169,9 +182,14 @@ const styles = StyleSheet.create({
     marginVertical: 16,
     borderRadius: 16,
   },
+  tagContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
   tagStyle: {
     paddingHorizontal: 15,
     marginRight: 8,
+    marginBottom: 8,
     borderRadius: 16,
   },
 });

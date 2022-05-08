@@ -3,9 +3,11 @@ import { ApolloServer, gql } from "apollo-server";
 import { createTestApolloServer } from "../../../lib/server";
 import { ErrorCode } from "../../../lib/validate";
 import { User } from "../../../schemas/user";
+import { Company } from "../../../schemas/company";
 import {
   createPost,
   createUser,
+  createCompany,
   getErrorCode,
   getFieldError,
 } from "../../config/utils";
@@ -29,9 +31,15 @@ describe("Mutations - editPost", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
-  let user: User.Mongo | null;
-  let post1: Post.Mongo | null;
+  let authUser: User.Mongo;
+  let authCompany: Company.Mongo;
+  let user: User.Mongo;
+  let company1: Company.Mongo;
+  let post1: Post.Mongo;
+  let post2: Post.Mongo;
+  let post3: Post.Mongo;
+  let post4: Post.Mongo;
+
   const postData = {
     body: faker.lorem.sentence(),
     audience: "EVERYONE",
@@ -42,8 +50,13 @@ describe("Mutations - editPost", () => {
 
   beforeAll(async () => {
     authUser = await createUser();
+    authCompany = await createCompany(authUser._id);
     user = await createUser();
-    post1 = await createPost(authUser?._id);
+    company1 = await createCompany(user._id);
+    post1 = await createPost(authUser._id);
+    post2 = await createPost(authCompany._id, true);
+    post3 = await createPost(user._id);
+    post4 = await createPost(company1._id, true);
     server = createTestApolloServer(authUser);
   });
 
@@ -53,6 +66,21 @@ describe("Mutations - editPost", () => {
       variables: {
         post: {
           ...postData,
+          userId: authUser._id.toString(),
+        },
+      },
+    });
+
+    expect(getErrorCode(res)).toBe(ErrorCode.BAD_USER_INPUT);
+  });
+
+  it("fails without user id", async () => {
+    const res = await server.executeOperation({
+      query,
+      variables: {
+        post: {
+          ...postData,
+          _id: toObjectId().toString(),
         },
       },
     });
@@ -67,6 +95,7 @@ describe("Mutations - editPost", () => {
         post: {
           ...postData,
           _id: "test",
+          userId: authUser._id.toString(),
         },
       },
     });
@@ -82,6 +111,7 @@ describe("Mutations - editPost", () => {
         post: {
           ...postData,
           _id: toObjectId().toString(),
+          userId: authUser._id.toString(),
           mentionIds: ["test"],
         },
       },
@@ -97,6 +127,7 @@ describe("Mutations - editPost", () => {
       variables: {
         post: {
           _id: toObjectId().toString(),
+          userId: authUser._id.toString(),
         },
       },
     });
@@ -111,11 +142,42 @@ describe("Mutations - editPost", () => {
         post: {
           ...postData,
           _id: toObjectId().toString(),
+          userId: authUser._id.toString(),
         },
       },
     });
 
     expect(getErrorCode(res)).toBe(ErrorCode.NOT_FOUND);
+  });
+
+  it("fails with unauthorized user", async () => {
+    const res = await server.executeOperation({
+      query,
+      variables: {
+        post: {
+          ...postData,
+          _id: post3._id.toString(),
+          userId: authUser._id.toString(),
+        },
+      },
+    });
+
+    expect(getErrorCode(res)).toBe(ErrorCode.NOT_FOUND);
+  });
+
+  it("fails with unauthorized user for company post", async () => {
+    const res = await server.executeOperation({
+      query,
+      variables: {
+        post: {
+          ...postData,
+          _id: post4._id.toString(),
+          userId: company1._id.toString(),
+        },
+      },
+    });
+
+    expect(getErrorCode(res)).toBe(ErrorCode.BAD_REQUEST);
   });
 
   it("returns post with updated body", async () => {
@@ -125,6 +187,30 @@ describe("Mutations - editPost", () => {
         post: {
           ...postData,
           _id: post1?._id.toString(),
+          userId: authUser._id.toString(),
+        },
+      },
+    });
+
+    expect(res.data?.editPost?.body).toBe(postData.body);
+
+    const { posts } = await getIgniteDb();
+
+    const newPost = await posts.find(toObjectId(post1?._id));
+    expect(newPost?.body).toBe(postData.body);
+    expect(newPost?.updatedAt?.toISOString()).not.toBe(
+      post1?.updatedAt?.toISOString()
+    );
+  });
+
+  it("succeeds for user company post", async () => {
+    const res = await server.executeOperation({
+      query,
+      variables: {
+        post: {
+          ...postData,
+          _id: post2._id.toString(),
+          userId: authCompany._id.toString(),
         },
       },
     });

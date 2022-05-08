@@ -537,6 +537,13 @@ const resolvers = {
                     message: "Invalid mention id",
                   })
                 ),
+                companyId: yup
+                  .string()
+                  .test({
+                    test: isObjectId,
+                    message: "Invalid company id",
+                  })
+                  .notRequired(),
               })
               .required(),
           })
@@ -545,10 +552,16 @@ const resolvers = {
         validateArgs(validator, args);
 
         const { post } = args;
+        if (
+          post.companyId &&
+          !user.companyIds?.find(
+            (companyId) => companyId.toString() === post.companyId
+          )
+        ) {
+          throw new BadRequestError("Not authorized");
+        }
+
         const postData = await db.posts.create(post, user._id);
-
-        await db.users.addPost(postData._id, user._id);
-
         return postData;
       }
     ),
@@ -590,6 +603,10 @@ const resolvers = {
                     message: "Invalid mention id",
                   })
                 ),
+                userId: yup.string().required().test({
+                  test: isObjectId,
+                  message: "Invalid user id",
+                }),
               })
               .required(),
           })
@@ -598,8 +615,16 @@ const resolvers = {
         validateArgs(validator, args);
 
         const { post } = args;
+        if (
+          user._id.toString() !== post.userId &&
+          !user.companyIds?.find(
+            (companyId) => companyId.toString() === post.userId
+          )
+        ) {
+          throw new BadRequestError("Not authorized");
+        }
 
-        return db.posts.edit(post, user._id);
+        return db.posts.edit(post, post.userId);
       }
     ),
 

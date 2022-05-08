@@ -42,23 +42,24 @@ const schema = yup
   .required();
 
 const ChooseCategory: ChooseCategoryScreen = ({ route, navigation }) => {
+  const { categories = [] } = route.params;
+
   const {
     handleSubmit,
     control,
     formState: { isValid },
   } = useForm<yup.InferType<typeof schema>>({
     resolver: yupResolver(schema),
-    // defaultValues: schema.cast(
-    //   {},
-    //   { assert: false },
-    // ) as DefaultValues<FormValues>,
+    defaultValues: schema.cast(
+      { categories },
+      { assert: false },
+    ) as DefaultValues<FormValues>,
     mode: 'onChange',
   });
 
   const { field: categoriesField } = useController({
     name: 'categories',
     control,
-    defaultValue: route.params.categories ?? [],
   });
 
   const onSubmit = (values: FormValues): void => {

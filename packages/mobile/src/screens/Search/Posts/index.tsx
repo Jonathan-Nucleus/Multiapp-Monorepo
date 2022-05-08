@@ -48,12 +48,12 @@ const Posts: React.FC<PostProps> = ({ posts, search }: PostProps) => {
         v.categories.some((c) => selectedCategories.includes(c)),
       );
       if (selectedRole !== 'EVERYONE') {
-        return filteredPosts.filter((v) => v.user.role === 'PROFESSIONAL');
+        return filteredPosts.filter((v) => v.user?.role === 'PROFESSIONAL');
       }
       return filteredPosts;
     } else {
       if (selectedRole !== 'EVERYONE') {
-        return posts.filter((v) => v.user.role === 'PROFESSIONAL');
+        return posts.filter((v) => v.user?.role === 'PROFESSIONAL');
       }
       return posts;
     }
@@ -71,13 +71,18 @@ const Posts: React.FC<PostProps> = ({ posts, search }: PostProps) => {
   const renderItem: ListRenderItem<Post> = ({ item }) => (
     <PostItem
       post={item}
-      userId={account?._id}
       onPressMenu={() => {
         setSelectedPost(item);
         setKebobMenuVisible(true);
       }}
     />
   );
+
+  const myPost =
+    (selectedPost &&
+      (selectedPost.userId === account._id ||
+        account.companyIds?.includes(selectedPost.userId))) ??
+    false;
 
   return (
     <View style={pStyles.globalContainer}>
@@ -104,12 +109,12 @@ const Posts: React.FC<PostProps> = ({ posts, search }: PostProps) => {
       />
       <UserPostActionModal
         post={selectedPost}
-        visible={kebobMenuVisible && selectedPost?.user._id !== account._id}
+        visible={kebobMenuVisible && !myPost}
         onClose={() => setKebobMenuVisible(false)}
       />
       <OwnPostActionModal
         post={selectedPost}
-        visible={kebobMenuVisible && selectedPost?.user._id === account._id}
+        visible={kebobMenuVisible && myPost}
         onClose={() => setKebobMenuVisible(false)}
       />
       <FilterModal

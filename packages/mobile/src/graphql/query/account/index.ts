@@ -66,6 +66,7 @@ export type AccountData = {
     | 'tagline'
     | 'overview'
     | 'background'
+    | 'companyIds'
     | 'followerIds'
     | 'followers'
     | 'followingIds'
@@ -132,6 +133,7 @@ export function useAccount(
           website
           linkedIn
           twitter
+          companyIds
           followerIds
           followingIds
           following {

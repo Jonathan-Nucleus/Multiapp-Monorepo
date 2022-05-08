@@ -1,6 +1,10 @@
 import { gql, useMutation, MutationTuple } from '@apollo/client';
 import type { MediaUpload, MediaType } from 'backend/graphql/mutations.graphql';
-import type { PostInput, PostCategory } from 'backend/graphql/posts.graphql';
+import type {
+  PostInput,
+  PostUpdate,
+  PostCategory,
+} from 'backend/graphql/posts.graphql';
 import type { Comment } from 'backend/graphql/comments.graphql';
 import { PostCategories } from 'backend/graphql/enumerations.graphql';
 import {
@@ -73,7 +77,7 @@ export function useCreatePost(): MutationTuple<
 }
 
 type EditPostVariables = {
-  post: PostInput;
+  post: PostUpdate;
 };
 
 type EditPostData = {

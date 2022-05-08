@@ -65,7 +65,7 @@ import {
 } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { useAccount } from 'mobile/src/graphql/query/account';
+import { useCachedAccount } from 'mobile/src/graphql/query/account/useAccount';
 import { useUsers, User } from 'mobile/src/graphql/query/user/useUsers';
 import { useFetchUploadLink } from 'mobile/src/graphql/mutation/posts';
 
@@ -131,7 +131,7 @@ export const AUDIENCE_OPTIONS: Option<Audience>[] = [
 ];
 
 type FormValues = {
-  user: string;
+  userId: string;
   audience: Audience;
   mediaUrl?: string;
   body?: string;
@@ -140,7 +140,7 @@ type FormValues = {
 
 const schema = yup
   .object({
-    user: yup.string().required('Required'),
+    userId: yup.string().required('Required'),
     audience: yup
       .mixed()
       .oneOf<Audience>(Audiences)
@@ -163,7 +163,9 @@ const schema = yup
   .required();
 
 const CreatePost: CreatePostScreen = ({ navigation, route }) => {
-  const { data: accountData } = useAccount();
+  const { post } = route.params;
+
+  const account = useCachedAccount();
   const { data: usersData } = useUsers();
   const [fetchUploadLink] = useFetchUploadLink();
 
@@ -174,7 +176,6 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   );
 
   const users = usersData?.users ?? [];
-  const account = accountData?.account;
   const companies = account?.companies ?? [];
 
   const {
@@ -185,11 +186,25 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   } = useForm<yup.InferType<typeof schema>>({
     resolver: yupResolver(schema),
     defaultValues: schema.cast(
-      { user: account?._id, body: route.params?.description ?? '' },
+      post
+        ? {
+            userId: post.userId,
+            body: post.body ?? '',
+            audience: post.audience,
+            mediaUrl: post.mediaUrl ?? undefined,
+            mentionIds: post.mentionIds ?? [],
+          }
+        : { user: account?._id },
       { assert: false, stripUnknown: true },
     ) as DefaultValues<FormValues>,
     mode: 'onChange',
   });
+
+  useEffect(() => {
+    if (account && !post?._id) {
+      setValue('userId', account._id);
+    }
+  }, [account]);
 
   const { field: mediaField } = useController({ name: 'mediaUrl', control });
   const { field: mentionsField } = useController({
@@ -200,23 +215,18 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   const onSubmit = (values: FormValues): void => {
     if (!account) return;
 
-    const { user, audience, body, mediaUrl } = values;
-    const isCompany = user !== account._id;
-
+    const { userId, audience, body, mediaUrl, mentionIds } = values;
     navigation.navigate('ChooseCategory', {
-      user,
+      ...(post ?? {}),
+      userId,
       audience,
-      company: isCompany,
       // TODO: Remove this and keep original body text. Add components that
       // automatically parse this text in the post view and add links to
       // their profile page.
-      description: replaceMentionValues(body ?? '', ({ name }) => `@${name}`),
-      mediaUrl: mediaUrl ? mediaUrl : route.params?.mediaUrl,
+      body: replaceMentionValues(body ?? '', ({ name }) => `@${name}`),
+      mediaUrl,
       localMediaPath: imageData?.path,
-      mentions: [], // TODO: Parse from body and add here
-      editPost: route.params?.editPost,
-      id: route.params?.id,
-      categories: route.params?.categories,
+      mentionIds, // TODO: Parse from body and add here
     });
   };
 
@@ -388,7 +398,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
             <Avatar user={account} size={32} />
             <Controller
               control={control}
-              name="user"
+              name="userId"
               render={({ field }) => (
                 <>
                   <PostSelection
@@ -462,6 +472,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
             name="body"
             render={({ field }) => (
               <MentionInput
+                keyboardAppearance="dark"
                 value={field.value ?? ''}
                 onChange={field.onChange}
                 placeholder="Create a post"
@@ -484,14 +495,12 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
           />
           {imageData ? (
             <Image source={{ uri: imageData.path }} style={styles.postImage} />
-          ) : (
-            route.params?.mediaUrl && (
-              <Image
-                source={{ uri: `${POST_URL}/${route.params?.mediaUrl}` }}
-                style={styles.postImage}
-              />
-            )
-          )}
+          ) : post?.mediaUrl ? (
+            <Image
+              source={{ uri: `${POST_URL}/${post.mediaUrl}` }}
+              style={styles.postImage}
+            />
+          ) : null}
         </PAppContainer>
       </KeyboardAvoidingView>
       <View style={styles.actionWrapper}>

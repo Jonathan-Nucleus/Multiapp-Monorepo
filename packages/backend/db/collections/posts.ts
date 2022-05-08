@@ -23,11 +23,13 @@ import {
   UnprocessableEntityError,
 } from "../../lib/validate";
 import { User } from "../../schemas/user";
+import { Company } from "../../schemas/company";
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 const createPostsCollection = (
   postsCollection: Collection<Post.Mongo>,
-  usersCollection: Collection<User.Mongo>
+  usersCollection: Collection<User.Mongo>,
+  companiesCollection: Collection<Company.Mongo>
 ) => {
   return {
     /**
@@ -148,16 +150,39 @@ const createPostsCollection = (
      * @returns   Persisted post data with id.
      */
     create: async (post: Post.Input, userId: MongoId): Promise<Post.Mongo> => {
-      const { mentionIds } = post;
+      const { companyId, mentionIds, ...otherData } = post;
+      const isCompany = !!companyId;
       const postData: Post.Mongo = {
-        ...post,
+        ...otherData,
         _id: new ObjectId(),
         mentionIds: mentionIds ? toObjectIds(mentionIds) : undefined,
         visible: true,
-        userId: toObjectId(userId),
+        userId: toObjectId(companyId ?? userId),
+        isCompany,
       };
 
-      await postsCollection.insertOne(postData);
+      const insertResult = await postsCollection.insertOne(postData);
+      if (!insertResult.acknowledged) {
+        throw new InternalServerError("Not able to add a post.");
+      }
+
+      if (isCompany) {
+        const updateResult = await companiesCollection.updateOne(
+          { _id: toObjectId(companyId), deletedAt: { $exists: false } },
+          { $addToSet: { postIds: postData._id } }
+        );
+        if (!updateResult.acknowledged || updateResult.modifiedCount === 0) {
+          throw new InternalServerError("Not able assign company.");
+        }
+      } else {
+        const updateResult = await usersCollection.updateOne(
+          { _id: toObjectId(userId), deletedAt: { $exists: false } },
+          { $addToSet: { postIds: postData._id } }
+        );
+        if (!updateResult.acknowledged || updateResult.modifiedCount === 0) {
+          throw new InternalServerError("Not able to assign user.");
+        }
+      }
 
       return postData;
     },
@@ -176,6 +201,7 @@ const createPostsCollection = (
       let updateFilter: UpdateFilter<Post.Mongo> = {
         $set: {
           ...postData,
+          userId: toObjectId(userId),
           updatedAt: new Date(),
           ...(mentionIds ? { mentionIds: toObjectIds(mentionIds) } : {}),
         },

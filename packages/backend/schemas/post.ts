@@ -7,12 +7,14 @@ import {
   Accreditation,
   AccreditationEnum,
 } from "./user";
+import { Company } from "./company";
 import type { Comment } from "./comment";
 
 export namespace Post {
   export interface Mongo {
     _id: ObjectId;
     userId: ObjectId;
+    isCompany: boolean;
     audience: Audience;
     body?: string;
     mediaUrl?: string;
@@ -35,7 +37,8 @@ export namespace Post {
     audience: AudienceEnum;
     categories: PostCategoryEnum[];
     createdAt: Date;
-    user: User.GraphQL;
+    user?: User.GraphQL;
+    company?: Company.GraphQL;
     mentions: User.GraphQL[];
     likes: User.GraphQL[];
     shares: Post.GraphQL[];
@@ -47,11 +50,13 @@ export namespace Post {
   // Defines the server-side input schema for posts after GraphQL enumarations
   // have been transformed to their Mongo types.
   export type Input = Pick<GraphQL, "body" | "mediaUrl" | "mentionIds"> &
-    Pick<Mongo, "audience" | "categories">;
+    Pick<Mongo, "audience" | "categories"> & {
+      companyId?: string;
+    };
 
   export type Update = Pick<
     GraphQL,
-    "_id" | "body" | "mentionIds" | "mediaUrl"
+    "_id" | "body" | "mentionIds" | "mediaUrl" | "userId"
   > &
     Pick<Mongo, "audience" | "categories">;
 }
@@ -188,6 +193,7 @@ export const PostSchema = `
   type Post {
     _id: ID!
     userId: ID!
+    isCompany: Boolean!
     audience: Audience!
     body: String
     mediaUrl: String
@@ -203,6 +209,7 @@ export const PostSchema = `
     featured: Boolean
 
     user: User
+    company: Company
     mentions: [User!]
     likes: [User!]
     comments: [Comment!]
@@ -211,6 +218,7 @@ export const PostSchema = `
   }
 
   input PostInput {
+    companyId: ID
     audience: Audience!
     body: String
     mediaUrl: String
@@ -220,6 +228,7 @@ export const PostSchema = `
 
   input PostUpdate {
     _id: ID!
+    userId: ID!
     audience: Audience!
     body: String
     mediaUrl: String

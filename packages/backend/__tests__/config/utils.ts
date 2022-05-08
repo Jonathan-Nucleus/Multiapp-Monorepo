@@ -101,6 +101,7 @@ export const createStub = async (): Promise<User.Stub> => {
 
 export const createPost = async (
   userId?: MongoId,
+  isCompany = false,
   categories?: PostCategory[],
   audience?: Audience
 ): Promise<Post.Mongo> => {
@@ -109,6 +110,7 @@ export const createPost = async (
   const post: Post.Mongo = {
     _id: toObjectId(),
     visible: true,
+    isCompany,
     body: faker.lorem.sentence(),
     userId: toObjectId(userId),
     audience:

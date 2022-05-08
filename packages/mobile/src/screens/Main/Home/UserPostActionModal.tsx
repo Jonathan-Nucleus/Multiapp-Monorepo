@@ -40,7 +40,7 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
 }) => {
   if (!post) return null;
 
-  const { user } = post;
+  const { user, company } = post;
   const [reportPostModalVisible, setReportPostModalVisible] = useState(false);
 
   const { data: accountData } = useAccount();
@@ -55,11 +55,17 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
 
   const menuData = useMemo(() => {
     const menuArray = [
-      {
-        label: `Follow ${user.firstName} ${user.lastName}`,
-        icon: <UserCirclePlus size={26} color={WHITE} />,
-        key: 'follow' as const,
-      },
+      user
+        ? {
+            label: `Follow ${user.firstName} ${user.lastName}`,
+            icon: <UserCirclePlus size={26} color={WHITE} />,
+            key: 'follow' as const,
+          }
+        : {
+            label: `Follow ${company?.name}`,
+            icon: <UserCirclePlus size={26} color={WHITE} />,
+            key: 'follow' as const,
+          },
       isMuted
         ? {
             label: 'Turn on notifications for this post',
@@ -81,11 +87,15 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
         icon: <WarningOctagon size={26} color={WHITE} />,
         key: 'report' as const,
       },
-      {
-        label: `Hide ${user.firstName} ${user?.lastName}`,
-        icon: <EyeClosed size={26} color={WHITE} />,
-        key: 'hide' as const,
-      },
+      ...(user // Only supported for users, not company posts
+        ? [
+            {
+              label: `Hide ${user.firstName} ${user.lastName}`,
+              icon: <EyeClosed size={26} color={WHITE} />,
+              key: 'hide' as const,
+            },
+          ]
+        : []),
     ];
 
     const following = accountData?.account?.followingIds?.includes(
@@ -101,6 +111,8 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
   }, [user, accountData, isMuted]);
 
   const handleFollowUser = async () => {
+    if (!user) return; // TODO: Update to support companies
+
     try {
       const { data } = await followUser({
         variables: { follow: true, userId: user._id },
@@ -118,6 +130,8 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
   };
 
   const handleHideUser = async () => {
+    if (!user) return;
+
     try {
       const { data } = await hideUser({
         variables: { hide: true, userId: user._id },

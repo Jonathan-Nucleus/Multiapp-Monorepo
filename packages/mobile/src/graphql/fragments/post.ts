@@ -1,4 +1,6 @@
 import { gql } from '@apollo/client';
+import { UserProfile } from 'backend/graphql/users.graphql';
+import { Company } from 'backend/graphql/companies.graphql';
 import { Post } from 'backend/graphql/posts.graphql';
 
 export type PostSummary = Pick<
@@ -9,6 +11,7 @@ export type PostSummary = Pick<
   | 'mediaUrl'
   | 'audience'
   | 'mentionIds'
+  | 'userId'
   | 'likeIds'
   | 'shareIds'
   | 'commentIds'
@@ -16,12 +19,14 @@ export type PostSummary = Pick<
   | 'comments'
   | 'likes'
 > & {
-  user: Pick<
-    Post['user'],
+  user?: Pick<
+    UserProfile,
     '_id' | 'firstName' | 'lastName' | 'avatar' | 'position' | 'role'
   > & {
-    company: Pick<Exclude<Post['user']['company'], undefined>, 'name'>;
+    company: Pick<Company, 'name'>;
   };
+
+  company?: Pick<Company, '_id' | 'name' | 'avatar'>;
 };
 
 export const POST_SUMMARY_FRAGMENT = gql`
@@ -35,6 +40,7 @@ export const POST_SUMMARY_FRAGMENT = gql`
     shareIds
     commentIds
     createdAt
+    userId
     user {
       _id
       firstName
@@ -45,6 +51,11 @@ export const POST_SUMMARY_FRAGMENT = gql`
       company {
         name
       }
+    }
+    company {
+      _id
+      name
+      avatar
     }
     likes {
       _id

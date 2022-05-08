@@ -156,9 +156,7 @@ const CompanyProfile: CompanyProfileScreen = ({ navigation, route }) => {
             {posts.length > 0 ? (
               <FlatList
                 data={posts}
-                renderItem={({ item }) => (
-                  <PostItem post={item} userId={accountData.account._id} />
-                )}
+                renderItem={({ item }) => <PostItem post={item} />}
                 keyExtractor={(item) => `${item._id}`}
                 listKey="post"
                 ListHeaderComponent={<Text style={styles.text}>All Posts</Text>}
@@ -178,6 +176,7 @@ const CompanyProfile: CompanyProfileScreen = ({ navigation, route }) => {
                     onPress={() =>
                       navigation.navigate('PostDetails', {
                         screen: 'CreatePost',
+                        params: {},
                       })
                     }
                   />

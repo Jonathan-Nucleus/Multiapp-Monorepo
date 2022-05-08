@@ -16,24 +16,32 @@ interface FeedItemProps {
 }
 
 const FeaturedItem: React.FC<FeedItemProps> = ({ post }) => {
-  const { user, body, mediaUrl } = post;
+  const { user, company, body, mediaUrl } = post;
   const goToDetails = () => {
     NavigationService.navigate('PostDetails', {
       screen: 'PostDetail',
       params: {
         postId: post._id,
-        userId: user._id,
       },
     });
   };
 
   const goToProfile = () => {
-    NavigationService.navigate('UserDetails', {
-      screen: 'UserProfile',
-      params: {
-        userId: post.user._id,
-      },
-    });
+    if (user) {
+      NavigationService.navigate('UserDetails', {
+        screen: 'UserProfile',
+        params: {
+          userId: user._id,
+        },
+      });
+    } else if (company) {
+      NavigationService.navigate('CompanyDetails', {
+        screen: 'CompanyProfile',
+        params: {
+          companyId: company._id,
+        },
+      });
+    }
   };
 
   return (
@@ -42,7 +50,7 @@ const FeaturedItem: React.FC<FeedItemProps> = ({ post }) => {
         <Pressable onPress={goToProfile}>
           <View style={styles.headerWrapper}>
             <UserInfo
-              user={user}
+              user={user || company}
               avatarSize={56}
               auxInfo={dayjs(post.createdAt).format('MMM D')}
             />

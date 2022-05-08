@@ -20,7 +20,10 @@ type PostInput = Omit<Post.Input, "audience" | "categories"> & {
   audience: AudienceEnum;
   categories: PostCategoryEnum[];
 };
-type PostUpdate = PostInput & { _id: string };
+type PostUpdate = Omit<Post.Update, "audience" | "categories"> & {
+  audience: AudienceEnum;
+  categories: PostCategoryEnum[];
+};
 
 export type {
   GraphQLPost as Post,
@@ -60,7 +63,13 @@ const resolvers = {
       parent: Post.Mongo,
       argsIgnored: NoArgs,
       { db }: ApolloServerContext
-    ) => db.users.find({ _id: parent.userId }),
+    ) => (parent.isCompany ? null : db.users.find({ _id: parent.userId })),
+
+    company: async (
+      parent: Post.Mongo,
+      argsIgnored: NoArgs,
+      { db }: ApolloServerContext
+    ) => (parent.isCompany ? db.companies.find(parent.userId) : null),
 
     mentions: async (
       parent: Post.Mongo,

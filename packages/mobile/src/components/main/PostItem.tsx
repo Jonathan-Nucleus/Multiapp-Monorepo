@@ -16,6 +16,10 @@ import IconButton from '../common/IconButton';
 import UserInfo from '../common/UserInfo';
 import Tag from '../common/Tag';
 import Media from '../common/Media';
+import * as NavigationService from '../../services/navigation/NavigationService';
+import { showMessage } from '../../services/utils';
+import { Body1, Body2Bold, Body3 } from '../../theme/fonts';
+import pStyles from '../../theme/pStyles';
 import {
   PRIMARYSTATE,
   WHITE12,
@@ -24,34 +28,32 @@ import {
   PRIMARY,
   GRAY900,
 } from 'shared/src/colors';
-import { Body1, Body2Bold, Body3 } from '../../theme/fonts';
-import * as NavigationService from '../../services/navigation/NavigationService';
+
 import { Post } from 'mobile/src/graphql/query/post/usePosts';
 import { PostCategories } from 'backend/graphql/enumerations.graphql';
+
 import { useLikePost } from '../../graphql/mutation/posts';
-import { showMessage } from '../../services/utils';
-import pStyles from '../../theme/pStyles';
+import { useCachedAccount } from '../../graphql/query/account/useAccount';
 
 export interface PostItemProps {
   post: Post;
-  userId: string; // User id of the currently authenticated user
   onPressMenu?: () => void;
   onPressLikes?: () => void;
 }
 
 const PostItem: React.FC<PostItemProps> = ({
   post,
-  userId,
   onPressMenu,
   onPressLikes,
 }) => {
-  const { user, body, mediaUrl } = post;
+  const { user, company, body, mediaUrl } = post;
   const [liked, setLiked] = useState(false);
   const [likePost] = useLikePost();
+  const account = useCachedAccount();
 
   useEffect(() => {
-    setLiked(post.likeIds?.includes(userId) ?? false);
-  }, [post, userId]);
+    account && setLiked(post.likeIds?.includes(account._id) ?? false);
+  }, [post, account]);
 
   const toggleLike = async (): Promise<void> => {
     const toggled = !liked;
@@ -73,18 +75,26 @@ const PostItem: React.FC<PostItemProps> = ({
       screen: 'PostDetail',
       params: {
         postId: post._id,
-        userId,
       },
     });
   };
 
   const goToProfile = () => {
-    NavigationService.navigate('UserDetails', {
-      screen: 'UserProfile',
-      params: {
-        userId: post.user._id,
-      },
-    });
+    if (user) {
+      NavigationService.navigate('UserDetails', {
+        screen: 'UserProfile',
+        params: {
+          userId: user._id,
+        },
+      });
+    } else if (company) {
+      NavigationService.navigate('CompanyDetails', {
+        screen: 'CompanyProfile',
+        params: {
+          companyId: company._id,
+        },
+      });
+    }
   };
 
   const onShare = async () => {
@@ -110,7 +120,7 @@ const PostItem: React.FC<PostItemProps> = ({
             onPress={goToProfile}
             style={({ pressed }) => (pressed ? pStyles.pressedStyle : {})}>
             <UserInfo
-              user={user}
+              user={user || company}
               avatarSize={56}
               auxInfo={dayjs(post.createdAt).format('MMM D')}
               audienceInfo={post.audience}

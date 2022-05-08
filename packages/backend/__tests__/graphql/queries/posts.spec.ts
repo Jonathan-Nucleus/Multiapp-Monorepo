@@ -42,56 +42,67 @@ describe("Query - posts", () => {
     posts = (await Promise.all([
       await createPost(
         authUser?._id,
+        false,
         [PostCategoryOptions.IDEAS.value],
         "everyone"
       ),
       await createPost(
         authUser?._id,
+        false,
         [PostCategoryOptions.IDEAS.value],
         "accredited"
       ),
       await createPost(
         authUser?._id,
+        false,
         [PostCategoryOptions.IDEAS.value],
         "client"
       ),
       await createPost(
         authUser?._id,
+        false,
         [PostCategoryOptions.IDEAS.value],
         "purchaser"
       ),
       await createPost(
         user1?._id,
+        false,
         [PostCategoryOptions.NEWS.value],
         "everyone"
       ),
       await createPost(
         user1?._id,
+        false,
         [PostCategoryOptions.NEWS.value],
         "accredited"
       ),
       await createPost(
         user2?._id,
+        false,
         [PostCategoryOptions.NEWS.value],
         "everyone"
       ),
       await createPost(
         user2?._id,
+        false,
         [PostCategoryOptions.NEWS.value],
         "accredited"
       ),
       await createPost(
         user3?._id,
+        false,
         [PostCategoryOptions.NEWS.value],
         "everyone"
       ),
       await createPost(
         user3?._id,
+        false,
         [PostCategoryOptions.NEWS.value],
         "accredited"
       ),
       await createPost(
         user3?._id,
+        false,
         [PostCategoryOptions.NEWS.value],
         "accredited"
       ),

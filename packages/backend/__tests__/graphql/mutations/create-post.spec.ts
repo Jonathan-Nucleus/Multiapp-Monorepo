@@ -2,8 +2,10 @@ import { ApolloServer, gql } from "apollo-server";
 import { createTestApolloServer } from "../../../lib/server";
 import { ErrorCode } from "../../../lib/validate";
 import { User } from "../../../schemas/user";
+import { Company } from "../../../schemas/company";
 import {
   createUser,
+  createCompany,
   DbCollection,
   getErrorCode,
   getFieldError,
@@ -17,18 +19,29 @@ describe("Mutations - createPost", () => {
     mutation CreatePost($post: PostInput!) {
       createPost(post: $post) {
         _id
+        isCompany
         body
         mediaUrl
         likeIds
         commentIds
         createdAt
         categories
+        user {
+          _id
+        }
+        company {
+          _id
+        }
       }
     }
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
+  let authUser: User.Mongo;
+  let authCompany: Company.Mongo;
+  let user1: User.Mongo;
+  let company1: Company.Mongo;
+
   const postData = {
     audience: Object.keys(AudienceOptions)[0],
     categories: [Object.keys(PostCategoryOptions)[0]],
@@ -39,7 +52,15 @@ describe("Mutations - createPost", () => {
 
   beforeAll(async () => {
     authUser = await createUser();
+    user1 = await createUser();
+    authCompany = await createCompany(authUser._id);
+    company1 = await createCompany(user1._id);
+
     server = createTestApolloServer(authUser);
+
+    if (!authUser || !user1 || !authCompany || !company1 || !server) {
+      throw new Error("Failed to create test objects");
+    }
   });
 
   it("fails with invalid audience", async () => {
@@ -85,6 +106,20 @@ describe("Mutations - createPost", () => {
     expect(getFieldError(res, "post.mentionIds[0]")).toBeDefined();
   });
 
+  it("fails to posts as another user's company", async () => {
+    const res = await server.executeOperation({
+      query,
+      variables: {
+        post: {
+          ...postData,
+          companyId: company1?._id.toString(),
+        },
+      },
+    });
+
+    expect(getErrorCode(res)).toBe(ErrorCode.BAD_REQUEST);
+  });
+
   it("returns new post data", async () => {
     const { users, db } = await getIgniteDb();
     const oldPostCount = await db
@@ -105,13 +140,61 @@ describe("Mutations - createPost", () => {
       JSON.stringify(postData.categories)
     );
     expect(res.data?.createPost?.mediaUrl).toBe(postData.mediaUrl);
+    expect(res.data?.createPost?.user?._id).toBe(authUser._id.toString());
 
-    const newUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const newUser = (await users.find({
+      _id: authUser._id,
+    })) as User.Mongo | null;
+    if (!newUser) {
+      throw new Error("Cannot find original post creator");
+    }
+
     const newPostCount = await db
       .collection(DbCollection.POSTS)
       .countDocuments();
 
     expect(newUser.postIds?.map((id) => id.toString())).toContain(
+      res.data?.createPost._id
+    );
+    expect(newPostCount).toBe(oldPostCount + 1);
+  });
+
+  it("posts as the user's company", async () => {
+    const { users, companies, db } = await getIgniteDb();
+    const oldPostCount = await db
+      .collection(DbCollection.POSTS)
+      .countDocuments();
+
+    const res = await server.executeOperation({
+      query,
+      variables: {
+        post: {
+          ...postData,
+          companyId: authCompany._id.toString(),
+        },
+      },
+    });
+
+    expect(res.data?.createPost?.body).toBe(postData.body);
+    expect(JSON.stringify(res.data?.createPost?.categories)).toBe(
+      JSON.stringify(postData.categories)
+    );
+    expect(res.data?.createPost?.mediaUrl).toBe(postData.mediaUrl);
+    expect(res.data?.createPost?.company?._id).toBe(authCompany._id.toString());
+    expect(res.data?.createPost?.isCompany).toBe(true);
+
+    const newCompany = (await companies.find(
+      authCompany._id
+    )) as Company.Mongo | null;
+    if (!newCompany) {
+      throw new Error("Cannot find original post creator");
+    }
+
+    const newPostCount = await db
+      .collection(DbCollection.POSTS)
+      .countDocuments();
+
+    expect(newCompany.postIds?.map((id) => id.toString())).toContain(
       res.data?.createPost._id
     );
     expect(newPostCount).toBe(oldPostCount + 1);
