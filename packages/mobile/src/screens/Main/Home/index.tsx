@@ -71,9 +71,7 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
     SplashScreen.hide();
   }, []);
 
-  if (postsLoading || !account) {
-    // if show skeleton placeholder whenever loading posts,
-    // UX is not good whenever focusing on home tab
+  if (!postData || !account) {
     return (
       <View style={pStyles.globalContainer}>
         <MainHeader />

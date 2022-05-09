@@ -6,10 +6,10 @@ import AddPost from "../AddPost";
 import { UserProfileProps } from "../../../../types/common-props";
 import Button from "../../../common/Button";
 import { Plus } from "phosphor-react";
-import { usePostsStated } from "mobile/src/graphql/query/account/usePosts";
+import { usePosts } from "mobile/src/graphql/query/post/usePosts";
 
 const PostsSection: FC<UserProfileProps> = ({ user }) => {
-  const { data: posts, refetch } = usePostsStated();
+  const { data: { posts = [] } = {}, refetch } = usePosts();
   const [showPostModal, setShowPostModal] = useState(false);
   const [selectedPost, setSelectedPost] = useState<PostSummary>();
   return (

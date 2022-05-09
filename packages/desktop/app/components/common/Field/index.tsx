@@ -1,5 +1,6 @@
 import { ReactElement, HTMLProps, PropsWithChildren } from "react";
 import { FieldValues, Path, UseFormReturn, FieldError } from "react-hook-form";
+import dot from "dot-object";
 
 import Input, { InputProps } from "../Input";
 import Label from "../Label";
@@ -43,9 +44,10 @@ function Field<TFieldValues = FieldValues>({
   ...inputProps
 }: FieldProps<TFieldValues>): ReactElement {
   const { errors } = state;
-  const errorMessage = (
+  const errorMessage = dot.pick(
+    name,
     errors as unknown as Record<Path<TFieldValues>, FieldError>
-  )[name] as FieldError | undefined;
+  ) as FieldError | undefined;
 
   return (
     <div className={`mb-4 ${className}`}>

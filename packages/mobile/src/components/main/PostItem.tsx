@@ -310,6 +310,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   postInfo: {
+    marginTop: 16,
     flexDirection: 'row',
     alignItems: 'flex-start',
   },

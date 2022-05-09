@@ -34,13 +34,14 @@ import Contact from '../screens/Main/Settings/Contact';
 import VerificationSuccess from '../screens/Main/Settings/BecomePro/VerificationSuccess';
 import FundDetails from '../screens/Main/Marketplace/Funds/FundDetails';
 import SearchTabs from './SearchTabs';
-import Accreditation from '../screens/Accreditation';
+import AccreditationStack from './AccreditationStack';
 import AccreditationResult from '../screens/Accreditation/AccreditationResult';
 import Notification from '../screens/Notification';
 import NotificationDetail from '../screens/Notification/Details';
 import Preferences from '../screens/Main/Settings/Preferences';
 
 import { MediaType } from 'backend/graphql/mutations.graphql';
+import { Accreditation } from 'mobile/src/graphql/mutation/account/useSaveQuestionnaire';
 import ContactSuccess from '../screens/Main/Settings/Contact/ContactSuccess';
 
 const defaultScreenOptions = {
@@ -148,7 +149,10 @@ const AppNavigator = () => {
           name="NotificationDetail"
           component={NotificationDetail}
         />
-        <Stack.Screen name="Accreditation" component={Accreditation} />
+        <Stack.Screen
+          name="AccreditationStack"
+          component={AccreditationStack}
+        />
         <Stack.Screen
           name="AccreditationResult"
           component={AccreditationResult}
@@ -175,8 +179,11 @@ type AppParamList = {
   Search: undefined;
   Notifications: undefined;
   NotificationDetail: { postId: string; userId: string };
+  AccreditationStack: undefined;
   Accreditation: undefined;
-  AccreditationResult: undefined;
+  AccreditationResult: {
+    accreditation: Accreditation;
+  };
   Preferences: undefined;
 };
 
@@ -206,10 +213,6 @@ export type SearchScreen = (
 
 export type AccreditationScreen = (
   props: AppScreenProps<'Accreditation'>,
-) => ReactElement;
-
-export type AccreditationResultScreen = (
-  props: AppScreenProps<'AccreditationResult'>,
 ) => ReactElement;
 
 export type NotificationScreen = (

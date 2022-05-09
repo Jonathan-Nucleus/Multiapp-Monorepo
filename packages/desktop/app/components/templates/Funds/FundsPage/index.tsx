@@ -12,7 +12,7 @@ const FundsPage: FC = () => {
   const { data } = useFunds();
   const [isVerifying, setIsVerifying] = useState(false);
   const funds = data?.funds;
-  const { data: accountData } = useAccount();
+  const { data: accountData } = useAccount({ fetchPolicy: "cache-only" });
 
   if (!funds) {
     return <SkeletonFundsPage />;

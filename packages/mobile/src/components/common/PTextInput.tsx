@@ -25,22 +25,22 @@ import {
 } from 'shared/src/colors';
 
 interface PTextInputProps extends TextInputProps {
-  containerStyle?: StyleProp<ViewStyle>;
   label: string;
+  text: string;
+  icon?: string;
+  numberOfLines?: number;
+  onPress?: () => void;
+  onPressText?: () => void;
+  error?: string;
+  errorStyle?: StyleProp<TextStyle>;
+  containerStyle?: StyleProp<ViewStyle>;
   labelTextStyle?: StyleProp<TextStyle>;
   labelStyle?: StyleProp<ViewStyle>;
   subLabel?: string;
   subLabelTextStyle?: StyleProp<TextStyle>;
   subLabelStyle?: StyleProp<ViewStyle>;
-  text: string;
   textContainerStyle?: StyleProp<ViewStyle>;
   textInputStyle?: StyleProp<TextStyle>;
-  onPress?: () => void;
-  onPressText?: () => void;
-  icon?: string;
-  error?: string;
-  errorStyle?: StyleProp<TextStyle>;
-  numberOfLines?: number;
 }
 
 const PTextInput = forwardRef<React.FC<PTextInputProps>, PTextInputProps>(
@@ -141,7 +141,7 @@ const PTextInput = forwardRef<React.FC<PTextInputProps>, PTextInputProps>(
             </TouchableOpacity>
           )}
         </View>
-        {!!error && <Text style={[styles.error, errorStyle]}>{error}</Text>}
+        <Text style={[styles.error, errorStyle]}>{error ? error : null}</Text>
       </View>
     );
   },
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     elevation: 1,
     shadowColor: BLACK,
     shadowOpacity: 0.25,
-    marginBottom: 20,
+    marginBottom: 4,
     justifyContent: 'center',
   },
   icon: {
@@ -200,7 +200,8 @@ const styles = StyleSheet.create({
   error: {
     color: DANGER,
     ...Body3,
-    marginBottom: 16,
+    marginBottom: 10,
+    height: 12,
   },
 });
 

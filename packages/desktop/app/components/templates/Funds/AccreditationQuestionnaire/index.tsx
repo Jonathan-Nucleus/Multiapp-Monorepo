@@ -1,51 +1,42 @@
-import { ChangeEvent, FC, useState } from "react";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Buildings,
-  CircleWavy,
-  UserCircle,
-  Users,
-} from "phosphor-react";
+import { FC, useRef, useState } from "react";
+import { useRouter } from "next/router";
+import { ArrowLeft, ArrowRight } from "phosphor-react";
+
+import ModalDialog from "desktop/app/components/common/ModalDialog";
+import Wizard from "desktop/app/components/common/Wizard";
 import Button from "desktop/app/components/common/Button";
-import Label from "desktop/app/components/common/Label";
-import Radio from "../../../common/Radio";
-import Checkbox from "../../../common/Checkbox";
-import ModalDialog from "../../../common/ModalDialog";
+import AccreditationResult from "./Result";
+
 import {
   useSaveQuestionnaire,
-  FinancialStatus,
-  InvestmentLevel,
-  InvestorClass,
+  Accreditation,
+  InvestorClass as InvestorClassType,
 } from "mobile/src/graphql/mutation/account/useSaveQuestionnaire";
-import ButtonToggleGroup from "./ButtonToggleGroup";
-import { FinancialStatusOptions, InvestorClassOptions } from "backend/schemas/user";
-import { useRouter } from "next/router";
 
-const STEP_COUNT = 4;
-const investorOptions = Object.keys(InvestorClassOptions).map((key) => {
-  let icon;
-  if (key == "INDIVIDUAL") {
-    icon = <UserCircle size={24} color="currentColor" />;
-  } else if (key == "ENTITY") {
-    icon = <Buildings size={24} color="currentColor" />;
-  } else if (key == "ADVISOR") {
-    icon = <Users size={24} color="currentColor" />;
-  }
-  return {
-    key,
-    icon,
-    label: InvestorClassOptions[key].label,
-  };
-});
-const financialOptions = Object.keys(FinancialStatusOptions).map((key) => {
-  return {
-    key,
-    title: FinancialStatusOptions[key].title,
-    value: FinancialStatusOptions[key].value,
-    description: FinancialStatusOptions[key].description,
-  };
-});
+import InvestorClass, {
+  FormData as InvestorClassData,
+  formSchema as investorClassSchema,
+} from "./InvestorClass";
+
+import BaseFinancialStatus, {
+  FormData as BaseFinancialStatusData,
+  formSchema as baseStatusSchema,
+} from "./BaseFinancialStatus";
+
+import FAIntake, {
+  FormData as FAIntakeData,
+  formSchema as faIntakeSchema,
+} from "./FAIntake";
+
+import AdvancedFinancialStatus, {
+  FormData as AdvancedFinancialStatusData,
+  formSchema as advancedStatusSchema,
+} from "./AdvancedFinancialStatus";
+
+type FormData = InvestorClassData &
+  BaseFinancialStatusData &
+  AdvancedFinancialStatusData &
+  FAIntakeData;
 
 interface AccreditationQuestionnaireProps {
   show: boolean;
@@ -56,280 +47,201 @@ const AccreditationQuestionnaire: FC<AccreditationQuestionnaireProps> = ({
   show,
   onClose,
 }) => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [questionnaireInput, setQuestionnaireInput] = useState<{
-    class?: InvestorClass,
-    status: FinancialStatus[],
-    level?: InvestmentLevel,
-  }>({
-    class: undefined,
-    status: [],
-    level: undefined,
-  });
-  const [loading, setLoading] = useState(false);
-  const [saveQuestionnaire] = useSaveQuestionnaire();
   const router = useRouter();
-  const onSubmit = async () => {
-    if (currentStep == 3) {
-      // Submit questionnaire input.
-      setLoading(true);
-      const { data } = await saveQuestionnaire({
-        variables: {
-          questionnaire: {
-            class: questionnaireInput.class!!,
-            status: questionnaireInput.status,
-            level: questionnaireInput.level,
-            date: new Date(),
-          },
+  const [saveQuestionnaire] = useSaveQuestionnaire();
+  const [accreditation, setAccreditation] = useState<Accreditation | undefined>(
+    undefined
+  );
+  const formDataRef = useRef<Partial<FormData>>({});
+  const [investorClass, setInvestorClass] = useState<
+    InvestorClassType | undefined
+  >(undefined);
+
+  const onSubmit = async (values: FormData) => {
+    const {
+      class: investorClass,
+      baseStatus,
+      individualStatuses,
+      entityStatuses,
+      advisorRequest,
+    } = values;
+
+    const status = [
+      ...baseStatus,
+      ...(investorClass === "INDIVIDUAL" && individualStatuses.TIER1 === "yes"
+        ? ["TIER1"]
+        : []),
+      ...(investorClass === "INDIVIDUAL" && individualStatuses.TIER2 === "yes"
+        ? ["TIER2"]
+        : []),
+      ...(investorClass === "ENTITY" ? entityStatuses : []),
+    ];
+
+    const { data } = await saveQuestionnaire({
+      variables: {
+        questionnaire: {
+          class: investorClass,
+          status,
+          advisorRequest:
+            investorClass === "ADVISOR" ? advisorRequest : undefined,
+          date: new Date(),
         },
-      });
-      if (data?.saveQuestionnaire._id) {
-        setCurrentStep(STEP_COUNT);
-      }
-      setLoading(false);
-    } else if (questionnaireInput.class) {
-      setCurrentStep(currentStep + 1);
+      },
+    });
+
+    if (!data?.saveQuestionnaire) {
+      console.log("Error submitting questionnaire data");
+      return false;
     }
+
+    return () => {
+      setAccreditation(data?.saveQuestionnaire.accreditation);
+    };
   };
 
   return (
     <>
       <ModalDialog
         title="Accreditation"
-        className="bg-background-card max-w-lg rounded-lg"
+        className="bg-background-card w-[30rem] rounded-lg"
         show={show}
         onClose={onClose}
       >
-        <div className="flex flex-col md:flex-row flex-grow md:min-h-0 overflow-y-auto">
-          <div className="flex flex-col p-4 md:w-[40rem]">
-            {currentStep == 1 && (
-              <div id="accreditation-step1">
-                <div className="text-white">
-                  Are you investing as an:
-                </div>
-                <div className="mt-3">
-                  {investorOptions.map((item, index) => (
-                    <div key={index} className="flex items-center py-2">
-                      <Radio
-                        id={item.key}
-                        className="hidden"
-                        value={item.key}
-                        onChange={() => setQuestionnaireInput({ ...questionnaireInput, class: item.key })}
-                      />
-                      <Label
-                        htmlFor={item.key}
-                        className={`font-medium cursor-pointer uppercase rounded-full flex items-center px-4 w-full border border-info h-10 hover:bg-info/[.6] transition-all 
-                              ${questionnaireInput.class == item.key ? "bg-info/[.6]" : "bg-info/[.1]"}
-                            `}
+        {accreditation ? (
+          <AccreditationResult
+            accreditation={accreditation}
+            onClose={() => {
+              onClose();
+              router.reload();
+            }}
+          />
+        ) : (
+          <Wizard<FormData>
+            onSubmit={onSubmit}
+            currentData={formDataRef}
+            wrapper={({
+              wizardStep,
+              showNavigation,
+              bag: {
+                stepTitles,
+                state: { currentStep, totalSteps },
+                helpers,
+              },
+            }) => (
+              <>
+                {wizardStep}
+                <div
+                  className={`flex items-center justify-between p-4 relative min-h-[3rem]
+                  ${showNavigation ? "border-t border-white/[.12]" : "mt-4"}`}
+                >
+                  {showNavigation && (
+                    <>
+                      <Button
+                        type="button"
+                        variant="text"
+                        className="text-primary font-medium uppercase"
+                        onClick={() => {
+                          helpers.previous();
+                          if (currentStep === 1) {
+                            setInvestorClass(undefined); // Reset whenever on this page
+                          }
+                        }}
                       >
-                        <div>{item.icon}</div>
-                        <div className="ml-2">{item.label}</div>
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {currentStep === 2 && (
-              <div id="accreditation-step2">
-                <div className="text-white font-medium">
-                  Select all that apply:
-                </div>
-                <div className="mt-3">
-                  {financialOptions.map((item, index) => (
-                    <div
-                      key={index}
-                      className="flex items-start py-5 border-b border-white/[.13]"
-                    >
-                      <Checkbox
-                        id={item.key}
-                        className="shrink-0"
-                        checked={questionnaireInput.status.includes(item.key)}
-                        onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                          const status = questionnaireInput.status;
-                          if (event.target.checked) {
-                            status.push(item.key);
-                          } else {
-                            status.splice(status.indexOf(item.key), 1);
-                          }
-                          setQuestionnaireInput({ ...questionnaireInput, status });
-                        }}
-                      />
-                      <Label
-                        htmlFor={item.key}
-                        className="font-medium ml-3 leading-4 -mt-1"
+                        <div>
+                          <ArrowLeft size={24} color="currentColor" />
+                        </div>
+                        <div className="ml-1">Back</div>
+                      </Button>
+                      <Button
+                        type="submit"
+                        variant="outline-primary"
+                        className={`w-40 font-medium border border-info
+                          text-white bg-info/[.2] hover:bg-info/[.7] px-3`}
                       >
-                        <span className="font-semibold tracking-wider">
-                          {item.title}
-                        </span>
-                        :{" "}
-                        <span className="font-light leading-5 tracking-wider">
-                          {item.description}
-                        </span>
-                      </Label>
+                        <div className="ml-4 mr-2 flex-1">continue</div>
+                        <div>
+                          <ArrowRight color="currentColor" size={24} />
+                        </div>
+                      </Button>
+                    </>
+                  )}
+                  <div
+                    className={`absolute bottom-0 top-0 left-0 right-0 flex
+                  items-center justify-center pointer-events-none h-100`}
+                  >
+                    <div className="flex items-center justify-center w-1/3">
+                      {[...Array(totalSteps + 1)].map((_, stepIndex) => (
+                        <span
+                          key={stepIndex}
+                          className={`rounded-full mx-1 w-2 h-2 ${
+                            currentStep === stepIndex
+                              ? "bg-info"
+                              : "bg-white/[.38]"
+                          }`}
+                        />
+                      ))}
                     </div>
-                  ))}
-                  <div className="flex items-center py-4 text-primary">
-                    <Label
-                      className="leading-4 cursor-pointer"
-                      onClick={() => setQuestionnaireInput({ ...questionnaireInput, status: [] })}
-                    >
-                      <span className="text-primary font-normal">
-                        None of these apply to me
-                      </span>
-                    </Label>
                   </div>
                 </div>
-              </div>
+              </>
             )}
+          >
+            <Wizard.Step
+              stepName="Investor Class"
+              schema={investorClassSchema}
+              showNavigation={false}
+              renderer={(props) => {
+                if (investorClass !== undefined) {
+                  props.wizardBag.helpers.next();
+                }
 
-            {currentStep === 3 && (
-              <div id="accreditation-step3">
-                <div className="flex flex-col justify-center border-b border-white/[.12] py-6">
-                  <div className="text-success relative flex justify-center">
-                    <CircleWavy
-                      color="currentColor"
-                      weight="fill"
-                      size={100}
-                      className="self-center"
-                    />
-                    <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-3xl font-bold text-white">
-                      AI
-                    </div>
-                  </div>
-                  <h5 className="text-center text-white mt-3 text-lg tracking-wide font-medium">
-                    Welcome!
-                    <br />
-                    You&apos;re an Accredited Investor!
-                  </h5>
-                </div>
-                <div className="py-4">
-                  <div className="text-xs text-white leading-4 font-light mb-8 tracking-widest">
-                    Some funds on Prometheus are only available to Qualified
-                    Purchasers or Qualified Clients. To find out if you
-                    qualify, complete the short questionnaire bellow
-                  </div>
-                  <div className="mb-8">
-                    <div className="text-white tracking-wider font-light">
-                      Do you have at least $2.2M in investments?
-                    </div>
-                    <div className="mt-3">
-                      <ButtonToggleGroup
-                        value={questionnaireInput.level == "TIER1" || questionnaireInput.level == "TIER2" ? "yes" : "no"}
-                        onChange={(value) => {
-                          if (value == "no") {
-                            setQuestionnaireInput({ ...questionnaireInput, level: undefined });
-                          } else if (questionnaireInput.level == undefined) {
-                            setQuestionnaireInput({ ...questionnaireInput, level: "TIER1" });
-                          }
-                        }}
-                      />
-                    </div>
-                  </div>
-                  <div className="mb-3">
-                    <div className="text-white tracking-wider font-light">
-                      Do you have at least $5M in investments?
-                    </div>
-                    <div className="mt-3">
-                      <ButtonToggleGroup
-                        value={questionnaireInput.level == "TIER2" ? "yes" : "no"}
-                        onChange={(value) => {
-                          if (value == "yes") {
-                            setQuestionnaireInput({ ...questionnaireInput, level: "TIER2" });
-                          } else if (questionnaireInput.level == "TIER2") {
-                            setQuestionnaireInput({ ...questionnaireInput, level: undefined });
-                          }
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {currentStep === 4 && (
-              <div id="accreditation-step4">
-                <div className="flex flex-col justify-center py-6">
-                  <div className="text-success relative flex justify-center">
-                    <CircleWavy
-                      color="currentColor"
-                      weight="fill"
-                      size={100}
-                      className="self-center"
-                    />
-                    <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-3xl font-bold text-white">
-                      QP
-                    </div>
-                  </div>
-                  <h5 className="text-center text-white mt-3 text-lg medium tracking-wide">
-                    Awesome!
-                    <br />
-                    You&apos;re a Qualified Purchaser!
-                  </h5>
-                </div>
-                <div className="pb-4">
-                  <div className="text-white text-sm text-center font-light mb-3">
-                    Thank you for verifying your qualified purchaser status.
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-        <div className="border-t border-white/[.12] flex items-center justify-between p-4">
-          <div className="w-1/3">
-            {currentStep > 1 && (
-              <Button
-                type="button"
-                variant="text"
-                className="text-primary font-medium uppercase"
-                onClick={() => setCurrentStep(currentStep - 1)}
-              >
-                <div><ArrowLeft size={24} color="currentColor" /></div>
-                <div className="ml-1">Back</div>
-              </Button>
-            )}
-          </div>
-          <div className="flex items-center justify-center w-1/3">
-            {[...Array(STEP_COUNT)].map((_, stepIndex) => (
-              <span
-                key={stepIndex}
-                className={`rounded-full mx-1 w-[10px] h-[10px] ${
-                  currentStep === stepIndex + 1
-                    ? "bg-info"
-                    : "bg-white/[.38]"
-                }`}
+                return <InvestorClass {...props} />;
+              }}
+              onNext={async () => {
+                setInvestorClass(formDataRef.current.class);
+              }}
+            />
+            {investorClass === "ADVISOR" ? (
+              <Wizard.Step
+                stepName="FAIntake"
+                schema={faIntakeSchema}
+                renderer={(props) => <FAIntake {...props} />}
               />
-            ))}
-          </div>
-          <div className="w-1/3 text-right">
-            {currentStep != STEP_COUNT ? (
-              <Button
-                type="button"
-                variant="outline-primary"
-                className="w-36 border border-info text-white bg-info/[.2] hover:bg-info/[.7] px-5"
-                loading={loading}
-                onClick={onSubmit}
-              >
-                <div className="mr-2">continue</div>
-                <div><ArrowRight color="currentColor" size={24} /></div>
-              </Button>
             ) : (
-              <Button
-                type="submit"
-                variant="outline-primary"
-                className="w-36 uppercase border border-info text-white bg-info/[.2] hover:bg-info/[.7]"
-                onClick={() => {
-                  onClose();
-                  router.reload();
+              <Wizard.Step
+                stepName="Base Status"
+                schema={baseStatusSchema}
+                onNext={async (bag) => {
+                  if (formDataRef.current.baseStatus?.length === 0) {
+                    bag
+                      .submitForm()
+                      .catch((err) => console.log("err submitting form", err));
+
+                    return false;
+                  }
                 }}
-              >
-                Close
-              </Button>
+                renderer={(props) => (
+                  <BaseFinancialStatus
+                    {...props}
+                    investorClass={investorClass ?? "INDIVIDUAL"}
+                  />
+                )}
+              />
             )}
-          </div>
-        </div>
+            {investorClass !== "ADVISOR" && (
+              <Wizard.Step
+                stepName="Advanced Status"
+                schema={advancedStatusSchema}
+                renderer={(props) => (
+                  <AdvancedFinancialStatus
+                    {...props}
+                    investorClass={investorClass ?? "INDIVIDUAL"}
+                  />
+                )}
+              />
+            )}
+          </Wizard>
+        )}
       </ModalDialog>
     </>
   );

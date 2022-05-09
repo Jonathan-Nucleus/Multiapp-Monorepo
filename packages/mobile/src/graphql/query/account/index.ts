@@ -112,6 +112,8 @@ export type AccountData = {
  * GraphQL query that fetches the account details for the current user
  *
  * @returns   GraphQL query.
+ *
+ * @deprecated  See query/account/useAccount for alternative implementation.
  */
 export function useAccount(
   options?: QueryHookOptions<AccountData, AccountVariables>,

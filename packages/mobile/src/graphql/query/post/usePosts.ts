@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { gql, useQuery, QueryResult } from '@apollo/client';
 import {
   PostCategory,
@@ -29,7 +30,8 @@ export function usePosts(
   categories?: PostCategory[],
   roleFilter?: PostRoleFilter,
 ): QueryResult<PostsData, PostsVariables> {
-  return useQuery<PostsData, PostsVariables>(
+  const [state, setState] = useState<PostsData>();
+  const { data, loading, ...rest } = useQuery<PostsData, PostsVariables>(
     gql`
       ${POST_SUMMARY_FRAGMENT}
       query Posts($categories: [PostCategory!], $roleFilter: PostRoleFilter) {
@@ -42,4 +44,12 @@ export function usePosts(
       variables: { ...(categories ? { categories } : {}) },
     },
   );
+
+  useEffect(() => {
+    if (!loading && data) {
+      setState(data);
+    }
+  }, [data, loading]);
+
+  return { data: state, loading, ...rest };
 }

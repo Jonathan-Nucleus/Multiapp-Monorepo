@@ -5,6 +5,7 @@ import {
   UseFormStateReturn,
   FieldError,
 } from "react-hook-form";
+import dot from "dot-object";
 
 interface LabelProps<TFieldValues> extends HTMLProps<HTMLLabelElement> {
   name?: Path<TFieldValues>;
@@ -18,9 +19,10 @@ function Label<TFieldValues = FieldValues>({
 }: LabelProps<TFieldValues>): ReactElement {
   const error =
     name &&
-    ((errors as unknown as Record<Path<TFieldValues>, FieldError>)?.[name] as
-      | FieldError
-      | undefined);
+    (dot.pick(
+      name,
+      errors as unknown as Record<Path<TFieldValues>, FieldError>
+    ) as FieldError | undefined);
 
   return (
     <label

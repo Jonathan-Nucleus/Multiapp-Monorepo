@@ -5,6 +5,7 @@ import {
   View,
   Text,
   TouchableOpacity,
+  Pressable,
   Linking,
 } from 'react-native';
 import { NavigationProp } from '@react-navigation/native';
@@ -31,6 +32,10 @@ import { Body3, H6Bold, Body4Bold, Body2Bold } from 'mobile/src/theme/fonts';
 import { useAccount } from 'mobile/src/graphql/query/account';
 import AIProSvg from 'shared/assets/images/al.svg';
 import AIUserSvg from 'shared/assets/images/ai-user.svg';
+import QPSvg from 'shared/assets/images/QP.svg';
+import QCSvg from 'shared/assets/images/QC.svg';
+import AISvg from 'shared/assets/images/AI.svg';
+import FASvg from 'shared/assets/images/FA.svg';
 
 import { SettingsScreen } from 'mobile/src/navigations/MoreStack';
 import Loading from '../../../components/common/Loading';
@@ -41,24 +46,32 @@ interface RenderItemProps {
     comment?: string;
     id: string;
     icon: any;
-    onPress: () => void;
+    onPress: (() => void) | undefined;
   };
 }
 
 const Settings: SettingsScreen = ({ navigation }) => {
   const { data } = useAccount();
   const account = data?.account;
+  const isAccredited = account?.accreditation !== 'NONE';
   const MENU_ITEMS = [
     {
       id: 'accreditation',
       label: 'Accreditation',
-      comment:
-        account?.accreditation === 'ACCREDITED'
-          ? 'You are accredited'
-          : 'Verify Accreditation',
-      onPress: () => navigation.navigate('Accreditation'),
+      comment: isAccredited ? 'You are accredited!' : 'Verify Accreditation',
+      onPress: !isAccredited
+        ? () => navigation.navigate('AccreditationStack')
+        : undefined,
       icon:
-        account?.accreditation === 'ACCREDITED' ? <AIProSvg /> : <AIUserSvg />,
+        account?.accreditation === 'ACCREDITED' ? (
+          <AISvg width={26} height={26} />
+        ) : account?.accreditation === 'QUALIFIED_CLIENT' ? (
+          <QCSvg width={26} height={26} />
+        ) : account?.accreditation === 'QUALIFIED_PURCHASER' ? (
+          <QPSvg width={26} height={26} />
+        ) : (
+          <AIUserSvg />
+        ),
     },
     {
       id: 'Admin',
@@ -126,7 +139,11 @@ const Settings: SettingsScreen = ({ navigation }) => {
 
   const renderListItem = ({ item }: RenderItemProps) => {
     return (
-      <TouchableOpacity onPress={item.onPress}>
+      <Pressable
+        onPress={item.onPress}
+        style={({ pressed }) => [
+          pressed && item.onPress ? pStyles.pressedStyle : null,
+        ]}>
         <View style={[styles.item, styles.between, styles.border]}>
           <View style={[styles.row, styles.alignCenter]}>
             {item.icon}
@@ -141,7 +158,7 @@ const Settings: SettingsScreen = ({ navigation }) => {
             <CaretRight size={28} color={WHITE} />
           </View>
         </View>
-      </TouchableOpacity>
+      </Pressable>
     );
   };
 

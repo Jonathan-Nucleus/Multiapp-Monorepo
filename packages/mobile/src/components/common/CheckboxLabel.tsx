@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 
@@ -16,7 +16,7 @@ interface PostCategoryProps {
   handleChange: (id: number) => void;
 }
 
-const CheckboxLabel: React.FC<PostCategoryProps> = (props) => {
+const CheckboxLabel = forwardRef<CheckBox, PostCategoryProps>((props, ref) => {
   const {
     id,
     category,
@@ -55,7 +55,7 @@ const CheckboxLabel: React.FC<PostCategoryProps> = (props) => {
       </Pressable>
     </View>
   );
-};
+});
 
 export default CheckboxLabel;
 

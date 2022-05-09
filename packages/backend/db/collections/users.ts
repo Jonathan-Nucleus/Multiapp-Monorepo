@@ -20,11 +20,10 @@ import {
   AccreditationOptions,
   Settings,
   ReportedPost,
+  Accreditation,
   Questionnaire,
   ProRequest,
   isUser,
-  Accreditation,
-  InvestmentLevelOptions,
 } from "../../schemas/user";
 import {
   BadRequestError,
@@ -837,13 +836,25 @@ const createUsersCollection = (
       questionnaire: Questionnaire
     ): Promise<User.Mongo | null> => {
       let accreditation: Accreditation = "none";
-      if (questionnaire.status && questionnaire.status.length > 0) {
-        accreditation = "accredited";
+      const { class: investorClass, status } = questionnaire;
 
-        if (questionnaire.level === InvestmentLevelOptions.TIER1) {
-          accreditation = "client";
-        } else if (questionnaire.level === InvestmentLevelOptions.TIER2) {
-          accreditation = "purchaser";
+      if (investorClass !== "advisor") {
+        if (status.length > 0) {
+          accreditation = "accredited";
+        }
+
+        if (investorClass === "individual") {
+          if (status.includes("$2.2M")) accreditation = "client";
+          if (status.includes("$5M")) accreditation = "purchaser";
+        } else if (investorClass === "entity") {
+          if (status.includes("tier1-ai-owners")) accreditation = "client";
+          if (
+            status.includes("qp-owners") ||
+            status.includes("trust-assets") ||
+            status.includes("tier3")
+          ) {
+            accreditation = "purchaser";
+          }
         }
       }
 

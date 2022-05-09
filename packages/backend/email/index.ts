@@ -193,4 +193,39 @@ export const PrometheusMailer = {
       throw new ApolloError(`Error sending help request email`);
     }
   },
+
+  /**
+   * Sends an email to the business team whenever a user requests to be reviewed
+   * as a financial advisor;
+   *
+   * @param user          Auth user.
+   */
+  sendFARequest: async function (user: User.Mongo): Promise<boolean> {
+    const { questionnaire } = user;
+    const { advisorRequest } = questionnaire ?? {};
+    if (!questionnaire || !advisorRequest) {
+      console.log("Invalid financial advisor request data.");
+      return false;
+    }
+
+    const { firm, crd, email, phone, contactMethod } = advisorRequest;
+
+    try {
+      await sendEmail(CS_EMAIL, "advisor-request", {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        userId: user._id,
+        firm,
+        crd,
+        phone,
+        email,
+        contactMethod,
+      });
+
+      return true;
+    } catch (err) {
+      console.log("err", err);
+      throw new ApolloError(`Error sending help request email`);
+    }
+  },
 };

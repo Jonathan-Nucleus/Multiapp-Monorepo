@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>New Fiancial Advisor review request</title>
+
+		<link rel="apple-touch-icon" sizes="180x180" href="img/favicon/apple-touch-icon.png">
+		<link rel="icon" type="image/png" sizes="32x32" href="img/favicon/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
+
+	  <style>
+	    body
+	    {
+	        font-family: Helvetica, Arial, sans-serif;
+	    }
+	  </style>
+	</head>
+	<body style="background:#121212; padding:0; margin:0">
+	  <%= firstName %> <%= lastName %> (<%= userId %>)is requesting to be reviewed
+		as a Financial Advisor on Prometheus Alts.
+		<ul>
+			<li>Firm: <%= firm %></li>
+			<li>Firm CRD#: <%= crd %></li>
+			<li>Phone: <%= phone %></li>
+			<li>Email: <%= email %></li>
+			<li>Preferred Contact Method: <%= contactMethod %></li>
+		</ul>
+	</body>
+</html>

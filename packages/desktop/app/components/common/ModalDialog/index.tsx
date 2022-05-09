@@ -49,12 +49,15 @@ const ModalDialog: FC<ModalDialogProps> = ({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className={"bg-background-card max-w-md rounded shadow-sm " + (className ?? "")}>
-                  {title &&
+                <Dialog.Panel
+                  className={
+                    "bg-background-card max-w-md rounded shadow-sm " +
+                    (className ?? "")
+                  }
+                >
+                  {title && (
                     <Dialog.Title className="flex items-center border-b border-white/[.12] px-5 py-3">
-                      <div className="text-xl font-medium">
-                        {title}
-                      </div>
+                      <div className="text-xl font-medium">{title}</div>
                       <div className="ml-auto">
                         <Button
                           variant="text"
@@ -65,7 +68,7 @@ const ModalDialog: FC<ModalDialogProps> = ({
                         </Button>
                       </div>
                     </Dialog.Title>
-                  }
+                  )}
                   <>{children}</>
                 </Dialog.Panel>
               </Transition.Child>

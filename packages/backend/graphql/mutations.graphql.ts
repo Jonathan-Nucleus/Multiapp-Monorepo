@@ -2,6 +2,7 @@ import { gql } from "apollo-server";
 import * as yup from "yup";
 import _ from "lodash";
 import { PrometheusMailer } from "../email";
+import "yup-phone";
 
 import {
   PartialSchema,
@@ -32,7 +33,6 @@ import {
   Questionnaire,
   InvestorClassOptions,
   FinancialStatusOptions,
-  InvestmentLevelOptions,
   compareAccreditation,
   PostViolationOptions,
   ProRequest,
@@ -448,10 +448,39 @@ const resolvers = {
                       .required()
                   )
                   .required(),
-                level: yup
-                  .string()
-                  .oneOf(Object.values(InvestmentLevelOptions)),
                 date: yup.date().required(),
+                advisorRequest: yup
+                  .object()
+                  .notRequired()
+                  .when("class", {
+                    is: "advisor",
+                    then: yup
+                      .object({
+                        firm: yup.string().trim().required("Required"),
+                        crd: yup.string().trim().required("Required"),
+                        phone: yup
+                          .string()
+                          .phone(
+                            undefined,
+                            false,
+                            "Oops, looks like an invalid phone number"
+                          )
+                          .required("Required"),
+                        email: yup
+                          .string()
+                          .email("Must be a valid email")
+                          .required("Required"),
+                        contactMethod: yup
+                          .string()
+                          .oneOf(
+                            Object.values(HelpRequestTypeOptions).map(
+                              (option) => option.value
+                            )
+                          )
+                          .required(),
+                      })
+                      .required(),
+                  }),
               })
               .required(),
           })
@@ -461,10 +490,16 @@ const resolvers = {
 
         const { questionnaire } = args;
 
-        return db.users.saveQuestionnaire(user._id, {
+        const userData = await db.users.saveQuestionnaire(user._id, {
           ...questionnaire,
           status: Array.from(new Set(questionnaire.status)), // Ensure unique values
         });
+
+        if (userData && questionnaire.class === "advisor") {
+          await PrometheusMailer.sendFARequest(userData);
+        }
+
+        return userData;
       }
     ),
 

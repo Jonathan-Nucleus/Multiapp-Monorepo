@@ -47,13 +47,16 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
   const [followUser] = useFollowUser();
   const [mutePost] = useMutePost();
   const [hidePost] = useHidePost();
-  const { user, mediaUrl } = post;
+
   const [visiblePostLikeModal, setVisiblePostLikeModal] = useState(false);
   const [visibleComment, setVisibleComment] = useState(false);
   const [showHidePost, setShowHidePost] = useState(false);
   const [showReportPost, setShowReportPost] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const isMyPost = user._id == account?._id;
+
+  const { user, company, mediaUrl } = post;
+  const isMyPost =
+    user?._id === account?._id || account?.companyIds?.includes(company?._id);
   const isFollowingUser = account?.followingIds?.includes(user._id) ?? false;
   const isLiked = account ? post.likeIds?.includes(account._id) : false;
   const isMuted = account?.mutedPostIds?.includes(post._id) ?? false;

@@ -1,9 +1,9 @@
-import { useAccount } from './index';
-import { UserProfile } from '../user/useProfile';
+import { useAccount, AccountData } from './index';
 import { useEffect, useState } from 'react';
 import _ from 'lodash';
 
-export const useCachedAccount = () => {
+type UserProfile = AccountData['account'];
+export const useCachedAccount = (): UserProfile | undefined => {
   const { data, loading } = useAccount({ fetchPolicy: 'cache-only' });
   const [account, setAccount] = useState<UserProfile>();
   useEffect(() => {

@@ -24,7 +24,7 @@ import {
 } from 'phosphor-react-native';
 
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
-import PHeader from 'mobile/src/components/common/PHeader';
+import Header from 'mobile/src/components/main/Header';
 import PLabel from 'mobile/src/components/common/PLabel';
 import PostItem from 'mobile/src/components/main/PostItem';
 import UserInfo from 'mobile/src/components/common/UserInfo';
@@ -334,10 +334,9 @@ const PostDetail: PostDetailScreen = ({ route }) => {
   };
 
   return (
-    <SafeAreaView style={pStyles.globalContainer}>
-      <PHeader
+    <SafeAreaView style={pStyles.globalContainer} edges={['bottom']}>
+      <Header
         leftIcon={<CaretLeft size={32} color={WHITE} />}
-        leftStyle={styles.sideStyle}
         onPressLeft={() => NavigationService.goBack()}
         containerStyle={styles.headerContainer}
       />
@@ -448,13 +447,9 @@ const styles = StyleSheet.create({
   headerContainer: {
     backgroundColor: BLACK,
     marginBottom: 0,
-    height: 62,
   },
   commentContainer: {
     paddingHorizontal: 16,
-  },
-  sideStyle: {
-    top: 16,
   },
   userItemContainer: {
     flexDirection: 'row',
@@ -479,11 +474,13 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     backgroundColor: BLACK,
-    marginHorizontal: 16,
+    marginLeft: 16,
+    marginRight: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 8,
+    height: 40,
   },
   input: {
     backgroundColor: WHITE,

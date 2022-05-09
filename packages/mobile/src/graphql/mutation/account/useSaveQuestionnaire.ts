@@ -5,21 +5,21 @@ import {
 } from 'backend/graphql/enumerations.graphql';
 import { QuestionnaireInput } from 'backend/graphql/users.graphql';
 import {
-  UserProfile,
+  User,
   FinancialStatus,
   InvestorClass,
-  InvestmentLevel,
+  Accreditation,
 } from 'backend/graphql/users.graphql';
 
 export { InvestorClassOptions, FinancialStatusOptions };
-export type { InvestorClass, FinancialStatus, InvestmentLevel };
+export type { InvestorClass, FinancialStatus, Accreditation };
 
 type SaveQuestionnaireVariables = {
   questionnaire: QuestionnaireInput;
 };
 
 type SaveQuestionnaireData = {
-  saveQuestionnaire: Pick<UserProfile, '_id'>;
+  saveQuestionnaire: Pick<User, 'accreditation'>;
 };
 
 /**
@@ -34,7 +34,7 @@ export function useSaveQuestionnaire(): MutationTuple<
   return useMutation<SaveQuestionnaireData, SaveQuestionnaireVariables>(gql`
     mutation SaveQuestionnaire($questionnaire: QuestionnaireInput!) {
       saveQuestionnaire(questionnaire: $questionnaire) {
-        _id
+        accreditation
       }
     }
   `);

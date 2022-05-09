@@ -11,12 +11,11 @@ import {
   PostViolationOptions,
   InvestorClassOptions,
   FinancialStatusOptions,
-  InvestmentLevelOptions,
   ProRoleOptions,
   Questionnaire,
+  QuestionnaireInput,
   FinancialStatusEnum,
   InvestorClassEnum,
-  InvestmentLevelEnum,
   NotificationMethodOptions,
   NotificationEvent,
   User,
@@ -24,6 +23,7 @@ import {
   isUser,
   compareAccreditation,
   NotificationMethodEnum,
+  AccreditationEnum,
 } from "../schemas/user";
 import type { Company } from "../schemas/company";
 
@@ -31,12 +31,7 @@ type GraphQLUser = User.GraphQL;
 type GraphQLProfile = User.Profile;
 type FundManager = User.FundManager;
 type OAuthInput = User.OAuthInput;
-type QuestionnaireInput = {
-  class: InvestorClassEnum;
-  status: FinancialStatusEnum[];
-  level?: InvestmentLevelEnum;
-  date: Date;
-};
+
 type SettingsInput = {
   interests?: string[];
   tagging: boolean;
@@ -53,9 +48,9 @@ export type {
   Questionnaire,
   QuestionnaireInput,
   SettingsInput,
+  AccreditationEnum as Accreditation,
   FinancialStatusEnum as FinancialStatus,
   InvestorClassEnum as InvestorClass,
-  InvestmentLevelEnum as InvestmentLevel,
   NotificationMethodEnum as NotificationMethod,
   NotificationEvent,
 };
@@ -167,7 +162,6 @@ const resolvers = {
     acc[option] = FinancialStatusOptions[option].value;
     return acc;
   }, {}),
-  InvestmentLevel: InvestmentLevelOptions,
   ProRole: Object.keys(ProRoleOptions).reduce<{
     [key: string]: string;
   }>((acc, option) => {

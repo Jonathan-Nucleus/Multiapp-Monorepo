@@ -39,7 +39,7 @@ const AccreditationLock: FC = () => {
         />
         <PGradientButton
           label="Verify Accreditation Status"
-          onPress={() => NavigationService.navigate('Accreditation')}
+          onPress={() => NavigationService.navigate('AccreditationStack')}
         />
       </View>
     </View>

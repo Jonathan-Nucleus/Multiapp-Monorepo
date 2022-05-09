@@ -5,6 +5,7 @@ import { Post, PostCategory, PostCategoryEnum } from "./post";
 import { Company } from "./company";
 import { Fund } from "./fund";
 import { Comment } from "./comment";
+import { HelpRequestType, HelpRequestTypeEnum } from "./help-request";
 
 export namespace ContentCreator {
   export interface Mongo {
@@ -212,9 +213,27 @@ export interface ReportedPost {
 export interface Questionnaire {
   class: InvestorClass;
   status: FinancialStatus[];
-  level?: InvestmentLevel;
   date: Date;
+  advisorRequest?: {
+    firm: string;
+    crd: string;
+    phone: string;
+    email: string;
+    contactMethod: HelpRequestType;
+  };
 }
+
+export type QuestionnaireInput = {
+  class: InvestorClassEnum;
+  status: FinancialStatusEnum[];
+  date: Date;
+  advisorRequest?: Omit<
+    Exclude<Questionnaire["advisorRequest"], undefined>,
+    "contactMethod"
+  > & {
+    contactMethod: HelpRequestTypeEnum;
+  };
+};
 
 export interface ProRequest {
   role: ProRoleEnum;
@@ -326,6 +345,26 @@ export const FinancialStatusOptions = {
     title: "Personal Net Worth",
     description: "I/we have $1M+ in assets excluding primary residence.",
   },
+  ASSETS: {
+    value: "assets",
+    title: "Assets",
+    description: "Entity has more than $5M in assets.",
+  },
+  TIER1: {
+    value: "$2.2M",
+    title: "Do you have at least $2.2M in investments?",
+    description: "",
+  },
+  TIER2: {
+    value: "$5M",
+    title: "Do you have at least $5M in investments?",
+    description: "",
+  },
+  AI_OWNERS: {
+    value: "ai-owners",
+    title: "Ownership",
+    description: "All owners of the Entity are Accredited Investors.",
+  },
   LICENSED: {
     value: "licensed",
     title: "License Holder",
@@ -338,16 +377,30 @@ export const FinancialStatusOptions = {
     description:
       "I am a knowledgeable employee, executive officer, trustee, general partner, or advisory board member of a private fund.",
   },
+  QP_OWNERS: {
+    value: "qp-owners",
+    title: "Ownership",
+    description: "All owners of the Entity are Qualified Purchasers.",
+  },
+  TIER1_AI_OWNERS: {
+    value: "tier1-ai-owners",
+    title: "Ownership",
+    description:
+      "All owners of the Entity are Accredited Investors with each of the entity's owners havea net worth of $2.2M.",
+  },
+  TRUST_ASSETS: {
+    value: "trust-assets",
+    title: "Assets",
+    description: "I'm a trust with $5M+ in investments.",
+  },
+  TIER3: {
+    value: "tier3",
+    title: "Assets",
+    description: "I'm an entity that owns and invests $25M+ in investments.",
+  },
 } as const;
 export type FinancialStatus = ValueOf<typeof FinancialStatusOptions>["value"];
 export type FinancialStatusEnum = keyof typeof FinancialStatusOptions;
-
-export const InvestmentLevelOptions = {
-  TIER1: "$2.2M",
-  TIER2: "$5M",
-} as const;
-export type InvestmentLevel = ValueOf<typeof InvestmentLevelOptions>;
-export type InvestmentLevelEnum = keyof typeof InvestmentLevelOptions;
 
 export function compareAccreditation(
   a: Accreditation,
@@ -524,8 +577,8 @@ export const UserSchema = `
   input QuestionnaireInput {
     class: InvestorClass!
     status: [FinancialStatus!]!
-    level: InvestmentLevel
     date: Date!
+    advisorRequest: AdvisorRequestInput
   }
 
   input ProRequestInput {
@@ -595,6 +648,14 @@ export const UserSchema = `
     notifications: NotificationSettingsInput
   }
 
+  input AdvisorRequestInput {
+    firm: String!
+    crd: String!
+    phone: String!
+    email: String!
+    contactMethod: HelpRequestType!
+  }
+
   enum UserRole {
     ${Object.keys(UserRoleOptions).map((key) => key)}
   }
@@ -613,10 +674,6 @@ export const UserSchema = `
 
   enum FinancialStatus {
     ${Object.keys(FinancialStatusOptions).map((key) => key)}
-  }
-
-  enum InvestmentLevel {
-    ${Object.keys(InvestmentLevelOptions).map((key) => key)}
   }
 
   enum ProRole {

@@ -70,6 +70,21 @@ describe("Mutations - saveQuestionnaire", () => {
     expect(getErrorCode(res)).toBe(ErrorCode.BAD_USER_INPUT);
   });
 
+  it("fails with for advisor with no request data", async () => {
+    const res = await server.executeOperation({
+      query,
+      variables: {
+        questionnaire: {
+          ...questionnaireData,
+          class: "advisor",
+          level: "",
+        },
+      },
+    });
+
+    expect(getErrorCode(res)).toBe(ErrorCode.BAD_USER_INPUT);
+  });
+
   it("succeeds with empty status", async () => {
     const res = await server.executeOperation({
       query,

@@ -28,7 +28,7 @@ const Funds: FundsScreen = ({ navigation }) => {
     setFocusState(isFocused);
   }
 
-  if (loading || !data?.funds) {
+  if (!data?.funds && loading) {
     return (
       <View style={pStyles.globalContainer}>
         {[...Array(PLACE_HOLDERS)].map(() => (
