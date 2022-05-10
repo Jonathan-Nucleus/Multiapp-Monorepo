@@ -17,6 +17,9 @@ const SENDER = process.env.EMAIL_SENDER as string;
 const PROMETHEUS_URL = process.env.PROMETHEUS_URL as string;
 const MAILER_TEMPLATE_PATH: string = path.join(__dirname, "./templates");
 const CS_EMAIL = process.env.CS_EMAIL as string;
+const EMAIL_ENABLED = JSON.parse(
+  (process.env.EMAIL_ENABLED ?? "true").toLowerCase()
+) as boolean;
 
 const sesInstance = new SES({
   region: process.env.REGION,
@@ -62,6 +65,8 @@ async function sendEmail(
   template: string,
   templateData: EjsData
 ): Promise<EmailResponse> {
+  if (!EMAIL_ENABLED) return true;
+
   // Render the HTML email and extract the subject from the title
   const html: string = await renderTemplate(template, templateData);
   const subject: string = html.match(/<title[^>]*>([^<]+)<\/title>/)?.[1] || "";
@@ -107,6 +112,7 @@ export const PrometheusMailer = {
 
       return true;
     } catch (err) {
+      console.log("Error", err);
       throw new ApolloError(`Error sending invite code to ${recipient}`);
     }
   },
@@ -128,6 +134,7 @@ export const PrometheusMailer = {
 
       return true;
     } catch (err) {
+      console.log("Error", err);
       throw new ApolloError(
         `Error sending password reset email to ${recipient}`
       );
