@@ -18,8 +18,8 @@ import PThreadHeader from "./PChannel/PThreadHeader";
 import { PChannel } from "./PChannel";
 import { StreamType, GiphyContext } from "./types";
 
-const API_KEY = process.env.NEXT_PUBLIC_GETSTREAM_ACCESS_KEY as string;
-const TARGET_ORIGIN = process.env.NEXT_PUBLIC_STREAM_TARGET_ORIGIN as string;
+const API_KEY = "2xhrce9kvxbt"; //process.env.NEXT_PUBLIC_GETSTREAM_ACCESS_KEY as string;
+const TARGET_ORIGIN = "https://getstream.io"; //process.env.NEXT_PUBLIC_STREAM_TARGET_ORIGIN as string;
 const options = { state: true, watch: true, presence: true };
 
 const MessagesPage = () => {

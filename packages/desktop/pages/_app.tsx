@@ -34,12 +34,4 @@ function MyApp({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
-  // Prevent static page optimization to enable runtime use of Datadog
-  // application key from local environment
-  return {
-    props: {},
-  };
-};
-
 export default MyApp;
