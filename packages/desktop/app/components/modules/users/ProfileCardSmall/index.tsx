@@ -38,7 +38,7 @@ const ProfileCardSmall: FC<ProfileProps> = ({ user }: ProfileProps) => {
   const isMyProfile = user._id == session?.user?._id;
   return (
     <div>
-      <Link href={`/profile/${user._id}`}>
+      <Link href={`/profile/${isMyProfile ? "me" : user._id}`}>
         <a>
           <div className="h-24 flex items-center justify-center">
             <Avatar user={user} size={88} />

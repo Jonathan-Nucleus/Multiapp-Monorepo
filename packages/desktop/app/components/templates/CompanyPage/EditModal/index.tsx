@@ -1,18 +1,16 @@
-import React, { ChangeEvent, FC, useEffect, useState } from "react";
-import { Dialog, Tab } from "@headlessui/react";
-import { X } from "phosphor-react";
-import Image from "next/image";
+import React, { FC, useState } from "react";
+import { Dialog } from "@headlessui/react";
+import { WarningCircle, X } from "phosphor-react";
 import * as yup from "yup";
 import "yup-phone";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { DefaultValues, SubmitHandler, useForm } from "react-hook-form";
 
 import Card from "../../../common/Card";
 import Button from "../../../common/Button";
 import Field from "../../../common/Field";
 import Alert from "../../../common/Alert";
-import { useAccount } from "mobile/src/graphql/query/account";
-import WarningIcon from "shared/assets/images/warning-red.svg";
+
 import { CompanyProfile } from "mobile/src/graphql/query/company/useCompany";
 import { useUpdateCompanyProfile } from "mobile/src/graphql/mutation/account";
 
@@ -46,31 +44,24 @@ const CompanyEdit: FC<CompanyEditModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [updateCompanyProfile] = useUpdateCompanyProfile();
-
-  const { register, handleSubmit, reset, formState } = useForm<
-    yup.InferType<typeof schema>
-  >({
-    resolver: yupResolver(schema),
-    mode: "onChange",
-  });
-
-  const { isValid } = formState;
-
-  useEffect(() => {
-    if (company) {
-      reset({
+  const { register, handleSubmit, formState } =
+    useForm<yup.InferType<typeof schema>>({
+      resolver: yupResolver(schema),
+      defaultValues: schema.cast({
         name: company.name,
         about: company.overview,
-        website: company.website,
-        linkedIn: company.linkedIn,
-        twitter: company.twitter,
-      });
-    }
-  }, [company]);
+        website: company.website ?? "",
+        linkedIn: company.linkedIn ?? "",
+        twitter: company.twitter ?? "",
+      }) as DefaultValues<FormValues>,
+      mode: "onChange",
+    });
+  const { isValid } = formState;
 
   const onSubmit: SubmitHandler<FormValues> = async (values) => {
     const { name, about, website, twitter, linkedIn } = values;
     try {
+      setLoading(true);
       await updateCompanyProfile({
         variables: {
           profile: {
@@ -83,9 +74,8 @@ const CompanyEdit: FC<CompanyEditModalProps> = ({
           },
         },
       });
-      setLoading(true);
     } catch (err) {
-      console.log(err);
+      setError("Save failed with error");
     } finally {
       setLoading(false);
       onClose();
@@ -115,8 +105,8 @@ const CompanyEdit: FC<CompanyEditModalProps> = ({
                 <div className="my-6 mb-9">
                   <Alert variant="error">
                     <div className="flex flex-row">
-                      <div className="flex-shrink-0 mt-1">
-                        <Image src={WarningIcon} alt="" />
+                      <div className="flex-shrink-0 text-error">
+                        <WarningCircle size={24} weight="bold" color="currentColor" />
                       </div>
                       <div className="text-white ml-3">{error}</div>
                     </div>

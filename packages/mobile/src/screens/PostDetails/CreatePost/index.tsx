@@ -65,7 +65,7 @@ import {
 } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { useCachedAccount } from 'mobile/src/graphql/query/account/useAccount';
+import { useAccount } from 'mobile/src/graphql/query/account/useAccount';
 import { useUsers, User } from 'mobile/src/graphql/query/user/useUsers';
 import { useFetchUploadLink } from 'mobile/src/graphql/mutation/posts';
 
@@ -165,7 +165,7 @@ const schema = yup
 const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   const { post } = route.params;
 
-  const account = useCachedAccount();
+  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const { data: usersData } = useUsers();
   const [fetchUploadLink] = useFetchUploadLink();
 

@@ -7,6 +7,7 @@ import {
   FundCompany,
   FundManager,
 } from 'mobile/src/graphql/fragments/fund';
+import { useEffect, useState } from "react";
 
 type FundsVariables = never;
 
@@ -22,7 +23,8 @@ export type FundsData = {
  * @returns   GraphQL query.
  */
 export function useFunds(): QueryResult<FundsData, FundsVariables> {
-  return useQuery<FundsData, FundsVariables>(gql`
+  const [state, setState] = useState<FundsData>();
+  const { data, loading, ...rest } = useQuery<FundsData, FundsVariables>(gql`
     ${FUND_SUMMARY_FRAGMENT}
     ${FUND_COMPANY_FRAGMENT}
     ${FUND_MANAGER_FRAGMENT}
@@ -34,4 +36,10 @@ export function useFunds(): QueryResult<FundsData, FundsVariables> {
       }
     }
   `);
+  useEffect(() => {
+    if (!loading && data) {
+      setState(data);
+    }
+  }, [data, loading]);
+  return { data: state, loading, ...rest };
 }

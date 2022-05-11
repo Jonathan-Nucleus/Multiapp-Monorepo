@@ -10,11 +10,10 @@ import InvitationCoin from "./InvitationCoin";
 import { INVITE_USER } from "mobile/src/graphql/mutation/account";
 import { X } from "phosphor-react";
 import Skeleton from "./Skeleton";
-import { useInviteesStated } from "mobile/src/graphql/query/account/useInvites";
-import { useCachedAccount } from "mobile/src/graphql/query/account/useAccount";
+import { useInvites } from "mobile/src/graphql/query/account/useInvites";
+import { useAccount } from "mobile/src/graphql/query/account/useAccount";
 
 const MAX_INVITES = 10;
-const variants = ["primary", "error", "secondary", "info", "success"];
 
 type FormValues = { email: string };
 const schema = yup
@@ -29,8 +28,9 @@ interface InviteFriendsProps {
 
 const InviteFriends: FC<InviteFriendsProps> = ({ onClose }) => {
   const [loading, setLoading] = useState(false);
-  const account = useCachedAccount();
-  const invitedFriends = useInviteesStated();
+  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
+  const { data: invitesData } = useInvites();
+  const invitedFriends = invitesData?.account?.invitees;
   const [inviteUser] = useMutation(INVITE_USER, {
     refetchQueries: ["Invites"],
   });
@@ -99,17 +99,12 @@ const InviteFriends: FC<InviteFriendsProps> = ({ onClose }) => {
           We want to seed this platform with those who really have a passion for
           financial markets, economics and great ideas.
         </div>
-        <div className="flex items-center justify-between flex-wrap mt-6 mb-4 px-4">
-          <div className="flex items-center -mx-1 mb-4">
+        <div className="flex items-center justify-between flex-wrap mt-5 mb-4 px-4">
+          <div className="flex items-center flex-wrap -mx-1 mb-3">
             {[...Array(MAX_INVITES)].map((ignored, index) => (
-              <InvitationCoin
-                key={`friend-${index}`}
-                avatar={invitedFriends?.[index]?.avatar}
-                email={invitedFriends?.[index]?.email}
-                firstName={invitedFriends?.[index]?.firstName}
-                lastName={invitedFriends?.[index]?.lastName}
-                variant={variants[index]}
-              />
+              <div key={index} className="mx-1 my-1">
+                <InvitationCoin user={invitedFriends?.[index]} />
+              </div>
             ))}
           </div>
           <Button

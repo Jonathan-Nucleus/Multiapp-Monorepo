@@ -1,5 +1,4 @@
 import { gql, useQuery, QueryResult } from '@apollo/client';
-import _ from 'lodash';
 import {
   USER_SUMMARY_FRAGMENT,
   UserSummary,
@@ -19,7 +18,8 @@ export type UsersData = {
  * @returns   GraphQL query.
  */
 export function useUsers(): QueryResult<UsersData, UsersVariables> {
-  return useQuery<UsersData, UsersVariables>(
+  const [state, setState] = useState<UsersData>();
+  const { data, loading, ...rest } = useQuery<UsersData, UsersVariables>(
     gql`
       ${USER_SUMMARY_FRAGMENT}
       query Users {
@@ -29,15 +29,10 @@ export function useUsers(): QueryResult<UsersData, UsersVariables> {
       }
     `,
   );
-}
-
-export const useUsersStated = () => {
-  const { data, loading } = useUsers();
-  const [state, setState] = useState<User[]>();
   useEffect(() => {
-    if (!loading && data?.users && !_.isEqual(data.users, state)) {
-      setState(data.users);
+    if (!loading && data) {
+      setState(data);
     }
   }, [data, loading]);
-  return state;
-};
+  return { data: state, loading, ...rest };
+}

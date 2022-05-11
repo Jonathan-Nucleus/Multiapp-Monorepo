@@ -9,7 +9,7 @@ import ProfileCard from "./ProfileCard";
 import TeamMembersList from "../../modules/teams/TeamMembersList";
 import FundCard from "../../modules/funds/FundCard";
 import { CompanyProfile } from "mobile/src/graphql/query/company/useCompany";
-import { useAccount } from "mobile/src/graphql/query/account";
+import { useAccount } from "mobile/src/graphql/query/account/useAccount";
 
 interface CompanyPageProps {
   company: CompanyProfile;
@@ -18,7 +18,7 @@ interface CompanyPageProps {
 const CompanyPage: FC<CompanyPageProps> = ({ company }: CompanyPageProps) => {
   const funds = company.funds.map((fund) => ({ ...fund, company }));
   const members = company.members.map((member) => ({ ...member, company }));
-  const { data: { account } = {} } = useAccount();
+  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const isMyCompany =
     (account?.companies.findIndex((item) => item._id == company._id) ?? -1) !=
     -1;

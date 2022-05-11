@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import {
   ListRenderItem,
   FlatList,
@@ -56,10 +56,9 @@ import {
   useFollowUser,
   useHideUser,
 } from 'mobile/src/graphql/mutation/account';
-import { useCachedAccount } from 'mobile/src/graphql/query/account/useAccount';
+import { useAccount } from 'mobile/src/graphql/query/account/useAccount';
 
 import { PostDetailScreen } from 'mobile/src/navigations/PostDetailsStack';
-import MainHeader from '../../components/main/Header';
 
 type CommentUser = Comment['user'];
 const CommentMenuDataArray = [
@@ -96,7 +95,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
   const [editComment] = useEditCommentPost();
   const [followUser] = useFollowUser();
   const [hideUser] = useHideUser();
-  const account = useCachedAccount();
+  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const [likeComment] = useLikeComment();
 
   const isFollowing = account?.followingIds?.includes(selectedUser?._id ?? '');

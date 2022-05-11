@@ -21,10 +21,7 @@ const ProfileSettings: FC<UserProfileProps> = ({ user }) => {
                 <div className="flex items-center px-5 py-4">
                   <Avatar
                     size={64}
-                    src={user?.avatar}
-                    name={`${user?.firstName.charAt(0)}.${user?.lastName.charAt(
-                      0
-                    )}`}
+                    user={user}
                   />
                   <div className="text-left ml-3">
                     <div className="text-xl text-white">

@@ -1,16 +1,14 @@
 import { gql, useQuery, QueryResult } from '@apollo/client';
 import { Company as GraphQLCompany } from 'backend/graphql/companies.graphql';
 import { User as GraphQLUser } from 'backend/graphql/users.graphql';
-import {
-  POST_SUMMARY_FRAGMENT,
-  PostSummary,
-} from 'mobile/src/graphql/fragments/post';
+import { PostSummary } from 'mobile/src/graphql/fragments/post';
 import {
   FUND_SUMMARY_FRAGMENT,
   FUND_MANAGER_FRAGMENT,
   FundSummary,
   FundManager,
 } from 'mobile/src/graphql/fragments/fund';
+import { useEffect, useState } from 'react';
 
 export type CompanyMember = Pick<
   GraphQLCompany['members'][number],
@@ -62,7 +60,8 @@ type CompanyVariables = {
 export function useCompany(
   companyId?: string,
 ): QueryResult<CompanyData, CompanyVariables> {
-  return useQuery<CompanyData, CompanyVariables>(
+  const [state, setState] = useState<CompanyData>();
+  const { data, loading, ...rest } = useQuery<CompanyData, CompanyVariables>(
     gql`
       ${FUND_SUMMARY_FRAGMENT}
       ${FUND_MANAGER_FRAGMENT}
@@ -126,4 +125,10 @@ export function useCompany(
       variables: { companyId: companyId ?? '' },
     },
   );
+  useEffect(() => {
+    if (!loading && data) {
+      setState(data);
+    }
+  }, [data, loading]);
+  return { data: state, loading, ...rest };
 }

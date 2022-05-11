@@ -8,7 +8,7 @@ import { ShieldCheck } from "phosphor-react";
 
 import { useAccount } from "mobile/src/graphql/query/account";
 import { useFollowCompany } from "mobile/src/graphql/mutation/account";
-import { Company } from "mobile/src/graphql/query/marketplace";
+import { Company } from "mobile/src/graphql/query/marketplace/useFundCompanies";
 
 interface CompanyItemProps {
   company: Company;

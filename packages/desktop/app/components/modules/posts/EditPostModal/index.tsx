@@ -43,7 +43,7 @@ import { Audiences } from "backend/graphql/enumerations.graphql";
 import { PostSummary } from "mobile/src/graphql/fragments/post";
 import { useEditPost } from "mobile/src/graphql/mutation/posts/useEditPost";
 import ModalDialog from "../../../common/ModalDialog";
-import { useCachedAccount } from "mobile/src/graphql/query/account/useAccount";
+import { useAccount } from "mobile/src/graphql/query/account/useAccount";
 
 const audienceOptions = [
   {
@@ -124,7 +124,7 @@ interface EditPostModalProps {
 }
 
 const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
-  const account = useCachedAccount();
+  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const [userOptions, setUserOptions] = useState<
     DropdownProps["items"][number][]
   >([]);
@@ -165,19 +165,21 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
       ]);
       if (post) {
         reset(
-          schema.cast({
-            user: post.userId,
-            mediaUrl: post.mediaUrl ?? "",
-            categories: post.categories,
-            mentionInput: {
-              body: post.body,
+          schema.cast(
+            {
+              user: account._id == post.userId ? account._id : post.userId,
+              mediaUrl: post.mediaUrl ?? "",
+              categories: post.categories,
+              mentionInput: {
+                body: post.body,
+              },
             },
-          }) as DefaultValues<FormValues>
+          ) as DefaultValues<FormValues>,
         );
         setLocalFileUrl(
           post.mediaUrl
             ? `${process.env.NEXT_PUBLIC_POST_URL}/${post.mediaUrl}`
-            : null
+            : null,
         );
       } else {
         reset(schema.cast({ user: account._id }) as DefaultValues<FormValues>);
@@ -209,6 +211,7 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
               mediaUrl,
               body: mentionInput.body,
               mentionIds: mentionInput.mentions?.map((mention) => mention.id),
+              ...(user != account?._id ? { companyId: user } : {}),
             },
           },
         });
@@ -221,7 +224,7 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
           variables: {
             post: {
               _id: post._id,
-              userId: user,
+              userId: post.userId,
               audience,
               categories,
               mediaUrl,
@@ -286,7 +289,7 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
           <div className="flex flex-col md:flex-row flex-grow md:min-h-0">
             <div className="flex flex-col md:w-[40rem] relative">
               <div className="flex flex-wrap items-center p-4">
-                <Avatar size={56} src={account?.avatar} />
+                <Avatar size={56} user={account} />
                 <div className="ml-2">
                   <Dropdown items={userOptions} control={control} name="user" />
                 </div>

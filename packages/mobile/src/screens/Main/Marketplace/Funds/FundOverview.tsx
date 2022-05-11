@@ -28,7 +28,7 @@ import {
   WHITE60,
 } from 'shared/src/colors';
 
-import { FundDetails } from 'mobile/src/graphql/query/marketplace';
+import { FundDetails } from 'mobile/src/graphql/query/marketplace/useFund';
 import { BACKGROUND_URL } from 'react-native-dotenv';
 
 interface PTitleProps {

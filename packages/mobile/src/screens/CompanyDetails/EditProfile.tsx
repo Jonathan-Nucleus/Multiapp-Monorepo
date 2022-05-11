@@ -6,7 +6,6 @@ import {
   Text,
   TouchableOpacity,
 } from 'react-native';
-import { NavigationProp, RouteProp } from '@react-navigation/native';
 import { CaretLeft, LinkedinLogo, TwitterLogo } from 'phosphor-react-native';
 
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
@@ -17,7 +16,7 @@ import { Body1Bold, Body2, Body4 } from 'mobile/src/theme/fonts';
 import { PRIMARY, WHITE, WHITE12, WHITE60 } from 'shared/src/colors';
 import pStyles from 'mobile/src/theme/pStyles';
 
-import { useCompany } from 'mobile/src/graphql/query/company';
+import { useCompany } from 'mobile/src/graphql/query/company/useCompany';
 import { useUpdateCompanyProfile } from 'mobile/src/graphql/mutation/account';
 
 import { EditCompanyPhotoScreen } from 'mobile/src/navigations/CompanyDetailsStack';
@@ -46,10 +45,7 @@ const EditCompanyProfile: EditCompanyPhotoScreen = ({ navigation, route }) => {
   const [updateCompanyProfile] = useUpdateCompanyProfile();
 
   const disabled = useMemo(() => {
-    if (name) {
-      return false;
-    }
-    return true;
+    return !name;
   }, [name]);
 
   const handleUpdateProfile = async () => {

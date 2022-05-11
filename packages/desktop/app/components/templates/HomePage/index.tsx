@@ -5,7 +5,7 @@ import InviteFriends from "../../modules/users/InviteFriends";
 import ProfileCardSmall from "../../modules/users/ProfileCardSmall";
 import Watchlist from "./Watchlist";
 import PostsSection from "./PostsSection";
-import { useCachedAccount } from "mobile/src/graphql/query/account/useAccount";
+import { useAccount } from "mobile/src/graphql/query/account/useAccount";
 import { useWatchFund } from "mobile/src/graphql/mutation/funds/useWatchFund";
 import Button from "../../common/Button";
 import { useEffect } from "react";
@@ -16,7 +16,7 @@ interface WatchProps {
 }
 
 const HomePage: FC = () => {
-  const account = useCachedAccount();
+  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const [watchFund] = useWatchFund();
   const [watchItem, setWatchItem] = useState<WatchProps | null>(null);
 

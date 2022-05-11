@@ -16,8 +16,7 @@ import {
 import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 import FundCompanyInfo from './FundCompanyInfo';
 
-import { Company } from 'mobile/src/graphql/query/marketplace';
-import { AVATAR_URL } from 'react-native-dotenv';
+import { Company } from 'mobile/src/graphql/query/marketplace/useFundCompanies';
 
 interface CompanyItemProps {
   company: Company;
@@ -28,7 +27,7 @@ const CompanyItem: FC<CompanyItemProps> = ({ company }) => {
 
   // Only show data for first fund manager
   const manager = fundManagers[0];
-  const { _id, firstName, lastName, avatar, position } = manager;
+  const { firstName, lastName, position } = manager;
 
   const goToManager = () =>
     NavigationService.navigate('UserDetails', {

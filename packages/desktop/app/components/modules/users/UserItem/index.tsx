@@ -5,7 +5,7 @@ import { Chats } from "phosphor-react";
 import Button from "desktop/app/components/common/Button";
 import Avatar from "desktop/app/components/common/Avatar";
 import { useFollowUser } from "mobile/src/graphql/mutation/account";
-import { useCachedAccount } from "mobile/src/graphql/query/account/useAccount";
+import { useAccount } from "mobile/src/graphql/query/account/useAccount";
 
 export type UserType = {
   _id: string;
@@ -27,7 +27,7 @@ const UserItem: FC<UserItemProps> = ({
   user,
   showChat = false,
 }: UserItemProps) => {
-  const account = useCachedAccount();
+  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const [followUser] = useFollowUser();
   const isFollowing = account?.followingIds?.includes(user._id);
   const isMyProfile = account?._id == user._id;

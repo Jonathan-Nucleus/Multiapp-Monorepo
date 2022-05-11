@@ -6,13 +6,11 @@ import CompanyItem from './CompanyItem';
 import {
   useFundCompanies,
   Company,
-} from 'mobile/src/graphql/query/marketplace';
+} from 'mobile/src/graphql/query/marketplace/useFundCompanies';
 import { FundCompaniesScreen } from 'mobile/src/navigations/MarketplaceTabs';
 
 const Companies: FundCompaniesScreen = () => {
-  const { data } = useFundCompanies();
-  const companies = data?.fundCompanies ?? [];
-
+  const { data: { fundCompanies: companies = [] } = {} } = useFundCompanies();
   const keyExtractor = (item: Company): string => item._id;
   const renderItem: ListRenderItem<Company> = ({ item }) => {
     return <CompanyItem company={item} />;

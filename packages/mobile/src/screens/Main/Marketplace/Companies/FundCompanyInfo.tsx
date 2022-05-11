@@ -4,12 +4,11 @@ import Avatar from 'mobile/src/components/common/Avatar';
 import { WHITE, BLACK } from 'shared/src/colors';
 import { Body1Bold, Body3 } from 'mobile/src/theme/fonts';
 
-import { AVATAR_URL } from 'react-native-dotenv';
 import PLabel from 'mobile/src/components/common/PLabel';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 
-import { Company } from 'mobile/src/graphql/query/marketplace';
+import { Company } from 'mobile/src/graphql/query/marketplace/useFundCompanies';
 import { useAccount } from 'mobile/src/graphql/query/account';
 import { useFollowCompany } from 'mobile/src/graphql/mutation/account';
 

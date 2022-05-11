@@ -17,7 +17,7 @@ import Sidebar from "./Sidebar";
 import AvatarMenu from "./AvatarMenu";
 import Avatar from "../../../common/Avatar";
 import SearchInput from "../../../common/SearchInput";
-import { useCachedAccount } from "mobile/src/graphql/query/account/useAccount";
+import { useAccount } from "mobile/src/graphql/query/account/useAccount";
 import { useNotificationsStated } from "mobile/src/graphql/query/notification/useNotifications";
 
 const navItems = [
@@ -42,7 +42,7 @@ const navItems = [
 
 const Header: FC = () => {
   const [showSidebar, setShowSidebar] = useState(false);
-  const account = useCachedAccount();
+  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const notifications = useNotificationsStated() ?? [];
 
   return (

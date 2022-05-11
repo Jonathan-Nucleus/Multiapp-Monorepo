@@ -11,7 +11,7 @@ import {
 import { WHITE, WHITE60 } from 'shared/src/colors';
 import { H6Bold } from '../../../theme/fonts';
 
-import { Company } from 'mobile/src/graphql/query/marketplace';
+import { Company } from 'mobile/src/graphql/query/marketplace/useFundCompanies';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 import Avatar from 'mobile/src/components/common/Avatar';
 import pStyles from '../../../theme/pStyles';

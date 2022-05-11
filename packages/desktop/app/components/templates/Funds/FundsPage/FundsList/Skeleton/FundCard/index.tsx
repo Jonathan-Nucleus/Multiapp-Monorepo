@@ -1,13 +1,7 @@
 import React, { FC } from "react";
-import { Fund } from "mobile/src/graphql/query/marketplace/useFunds";
-import Card from "desktop/app/components/common/Card";
+import Card from "../../../../../../common/Card";
 
-export interface FundCardProps {
-  fund: Fund;
-  showImages?: boolean;
-}
-
-const FundCard: FC<FundCardProps> = () => {
+const FundCard: FC = () => {
   return (
     <>
       <Card className="hidden lg:block rounded-xl p-0 border-0">

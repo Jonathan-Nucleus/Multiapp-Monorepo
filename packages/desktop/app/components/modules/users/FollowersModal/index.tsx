@@ -5,7 +5,7 @@ import { X } from "phosphor-react";
 import Button from "desktop/app/components/common/Button";
 import Input from "desktop/app/components/common/Input";
 import UserItem from "../UserItem";
-import { FollowUser } from "mobile/src/graphql/query/company";
+import { FollowUser } from "mobile/src/graphql/query/company/useCompany";
 import ModalDialog from "../../../common/ModalDialog";
 
 interface FollowersModalProps {

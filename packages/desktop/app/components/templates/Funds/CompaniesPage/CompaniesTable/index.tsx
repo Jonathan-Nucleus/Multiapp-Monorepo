@@ -4,12 +4,10 @@ import { SortAscending } from "phosphor-react";
 import Paginator from "../../../../common/Paginator";
 import CompanyItem from "./CompanyItem";
 
-import { useFundCompanies } from "mobile/src/graphql/query/marketplace";
+import { useFundCompanies } from "mobile/src/graphql/query/marketplace/useFundCompanies";
 
 const ManagersTable: FC = () => {
-  const { data } = useFundCompanies();
-  const companies = data?.fundCompanies ?? [];
-
+  const { data: { fundCompanies: companies = [] } = {} } = useFundCompanies();
   const [page, setPage] = useState(1);
   return (
     <>

@@ -1,4 +1,4 @@
-import { FC, ReactNode } from "react";
+import { ReactNode } from "react";
 import {
   DataFunc,
   Mention,
@@ -6,7 +6,6 @@ import {
   MentionsInputProps,
 } from "react-mentions";
 import styles from "./index.module.scss";
-import Image from "next/image";
 import { ShieldCheck } from "phosphor-react";
 
 import {
@@ -18,56 +17,13 @@ import {
 } from "react-hook-form";
 import * as yup from "yup";
 import Avatar from "../Avatar";
+import { useUsers } from "mobile/src/graphql/query/user/useUsers";
+import { useAccount } from "mobile/src/graphql/query/account/useAccount";
 
 // TODO: Stopgap measure to address breaking type changes for fragments ({})
 // in React 18.
 const MentionsInput =
   MentionsInputReact17 as unknown as React.FC<MentionsInputProps>;
-
-const users = [
-  {
-    id: 1,
-    name: "Michelle Jordan",
-    position: "CEO @ HedgeFunds ‘R’ Us",
-    type: "PRO",
-    avatar: "7d9d80b7-90dd-42e8-b3e2-a7a37d6cd1ba.png",
-  },
-  {
-    id: 2,
-    name: "Brian McAdams",
-    position: "CEO @ HedgeFunds ‘R’ Us",
-    type: "PRO",
-    avatar: "614f6093-f67e-40f4-84ea-32c3bacb44f4.png",
-  },
-  {
-    id: 3,
-    name: "Enrique Javier Abeyta Ubilios",
-    position: "CEO @ HedgeFunds ‘R’ Us",
-    type: "PRO",
-    avatar: "58ec51e9-57a0-4d86-97d2-3d42e8f823ba.png",
-  },
-  {
-    id: 4,
-    name: "Thomas Franklin",
-    position: "CEO @ HedgeFunds ‘R’ Us",
-    type: "PRO",
-    avatar: "ab3efdcb-5549-4962-bf5c-511a4d11ac18.png",
-  },
-  {
-    id: 5,
-    name: "Peter Avellone",
-    position: "CEO @ HedgeFunds ‘R’ Us",
-    type: "PRO",
-    avatar: "5b2809ef-cba3-4dca-bb2e-64861926df61.png",
-  },
-  {
-    id: 6,
-    name: "Mariah Carey",
-    position: "CEO @ HedgeFunds ‘R’ Us",
-    type: "PRO",
-    avatar: "ae31d937-d8a6-4942-bbd4-26ac4d7e0f6d.png",
-  },
-];
 
 export const mentionTextSchema = yup
   .object({
@@ -80,32 +36,34 @@ export const mentionTextSchema = yup
             id: yup.string().required(),
             name: yup.string().required(),
           })
-          .required()
+          .required(),
       )
       .default([]),
   })
   .required();
 
-type MentionTextareaProps<
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends Path<TFieldValues> = Path<TFieldValues>
-> = Omit<ControllerProps<TFieldValues, TName>, "render">;
+type MentionTextareaProps<TFieldValues extends FieldValues = FieldValues,
+  TName extends Path<TFieldValues> = Path<TFieldValues>> = Omit<ControllerProps<TFieldValues, TName>, "render">;
 
-function MentionTextarea<
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends Path<TFieldValues> = Path<TFieldValues>
->(controllerProps: MentionTextareaProps<TFieldValues, TName>) {
+function MentionTextarea<TFieldValues extends FieldValues = FieldValues,
+  TName extends Path<TFieldValues> = Path<TFieldValues>>(controllerProps: MentionTextareaProps<TFieldValues, TName>) {
   const mentionsController = useController<TFieldValues, TName>({
     ...controllerProps,
     name: `${controllerProps.name}.mentions` as TName,
   });
+  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
+  const { data: { users: allUsers = [] } = {} } = useUsers();
+  const users = allUsers.filter(user => user._id != account?._id);
 
   const dataFunc: DataFunc = (query, callback) => {
     const items = users
-      .filter(({ name }) => name.toLowerCase().includes(query.toLowerCase()))
-      .map(({ id, name }) => ({
-        id,
-        display: name,
+      .filter(({ firstName, lastName }) =>
+        firstName.toLowerCase().includes(query.toLowerCase()) ||
+        lastName.toLowerCase().includes(query.toLowerCase()),
+      )
+      .map(({ _id, firstName, lastName }) => ({
+        id: _id,
+        display: `${firstName} ${lastName}`,
       }));
     callback(items);
   };
@@ -127,6 +85,7 @@ function MentionTextarea<
             <Mention
               trigger="@"
               data={dataFunc}
+              className={styles.mentions__mention}
               appendSpaceOnAdd
               onAdd={(id, display) => {
                 mentionsController.field.onChange([
@@ -138,7 +97,7 @@ function MentionTextarea<
                 ]);
               }}
               renderSuggestion={(suggestion, search, highlightedDisplay) => {
-                const user = users.find((item) => item.id == suggestion.id);
+                const user = users.find((user) => user._id == suggestion.id);
                 return (
                   <div className="flex items-center p-2">
                     <div className="flex items-center">
@@ -149,16 +108,20 @@ function MentionTextarea<
                         <div className="text-base">
                           {highlightedDisplay as unknown as ReactNode}
                         </div>
-                        <div className="text-success ml-2">
-                          <ShieldCheck
-                            color="currentColor"
-                            weight="fill"
-                            size={16}
-                          />
-                        </div>
-                        <div className="text-xs text-white ml-1">
-                          {user?.type}
-                        </div>
+                        {user?.role == "PROFESSIONAL" &&
+                          <div className="flex items-center">
+                            <div className="text-success ml-2">
+                              <ShieldCheck
+                                color="currentColor"
+                                weight="fill"
+                                size={16}
+                              />
+                            </div>
+                            <div className="text-white text-tiny ml-1.5">
+                              PRO
+                            </div>
+                          </div>
+                        }
                       </div>
                       <div className="text-white text-xs opacity-60">
                         {user?.position}

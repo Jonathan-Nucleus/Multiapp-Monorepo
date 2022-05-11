@@ -4,7 +4,7 @@
 
 .mentions--multiLine .mentions__input {
   min-height: 100px;
-  @apply h-full outline-none;
+  @apply h-full outline-none border border-transparent;
 }
 
 .mentions__suggestions__list {
@@ -16,4 +16,7 @@
 }
 
 .mentions__mention {
+  @apply text-primary;
+  z-index: 1;
+  position: relative;
 }

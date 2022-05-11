@@ -4,35 +4,30 @@ import { Info, Lock } from "phosphor-react";
 import Button from "../../../common/Button";
 import { useFunds } from "mobile/src/graphql/query/marketplace/useFunds";
 import FundsList from "./FundsList";
-import { useAccount } from "mobile/src/graphql/query/account";
+import { useAccount } from "mobile/src/graphql/query/account/useAccount";
 import AccreditationQuestionnaire from "../AccreditationQuestionnaire";
-import SkeletonFundsPage from "../../Skeleton/Funds";
 
 const FundsPage: FC = () => {
-  const { data } = useFunds();
+  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const [isVerifying, setIsVerifying] = useState(false);
-  const funds = data?.funds;
-  const { data: accountData } = useAccount({ fetchPolicy: "cache-only" });
-
-  if (!funds) {
-    return <SkeletonFundsPage />;
-  }
-
+  const { data: { funds } = {} } = useFunds();
   return (
     <>
       <Navbar />
       <div className="container mx-auto my-6 max-w-screen-xl lg:px-4">
-        <header className="flex items-center px-4 lg:px-0">
-          <h1 className="text-2xl text-white">Browse by Fund</h1>
-          <div className="text-xs text-white opacity-60 ml-2 mt-2">
-            {funds.length} Funds
-          </div>
-          <Button variant="text" className="text-gray-600 ml-auto">
-            <Info color="currentColor" weight="light" size={24} />
-          </Button>
-        </header>
+        <div className={!funds ? "invisible" : ""}>
+          <header className="flex items-center px-4 lg:px-0">
+            <h1 className="text-2xl text-white">Browse by Fund</h1>
+            <div className="text-xs text-white opacity-60 ml-2 mt-2">
+              {funds?.length ?? 0} Funds
+            </div>
+            <Button variant="text" className="text-gray-600 ml-auto">
+              <Info color="currentColor" weight="light" size={24} />
+            </Button>
+          </header>
+        </div>
         <div className="my-9">
-          {accountData?.account?.accreditation == "NONE" ? (
+          {account?.accreditation == "NONE" ? (
             <div className="backdrop-blur text-center px-4 pt-36 pb-64">
               <div className="text-2xl text-white flex items-center justify-center">
                 <Lock color="currentColor" size={48} weight="light" />
@@ -57,7 +52,7 @@ const FundsPage: FC = () => {
               )}
             </div>
           ) : (
-            <>{funds.length > 0 && <FundsList funds={funds} />}</>
+            <FundsList funds={funds} />
           )}
         </div>
         <footer className="border-t border-white/[.12] mt-6 px-4 lg:px-0 pt-3">

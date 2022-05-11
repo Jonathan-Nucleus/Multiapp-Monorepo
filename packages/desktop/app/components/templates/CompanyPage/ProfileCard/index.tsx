@@ -19,7 +19,7 @@ import Avatar from "../../../common/Avatar";
 import { CompanyProfile } from "mobile/src/graphql/query/company/useCompany";
 import FollowersModal from "../../../modules/users/FollowersModal";
 import { useFollowCompany } from "mobile/src/graphql/mutation/account";
-import { useAccount } from "mobile/src/graphql/query/account";
+import { useAccount } from "mobile/src/graphql/query/account/useAccount";
 import EditModal from "../EditModal";
 import PhotoUploadModal from "../EditModal/PhotoUpload";
 import { MediaType } from "backend/graphql/mutations.graphql";
@@ -38,7 +38,7 @@ const ProfileCard: FC<CompanyPageProps> = ({
   company,
   isEditable,
 }: CompanyPageProps) => {
-  const { data: accountData } = useAccount({ fetchPolicy: "cache-only" });
+  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const [isVisible, setVisible] = useState(false);
   const [editableModal, setEditableModal] = useState(false);
   const [editablePhoto, setEditablePhoto] = useState<PothoProps>({
@@ -56,14 +56,13 @@ const ProfileCard: FC<CompanyPageProps> = ({
       if (matches.length > wordsToSplit) {
         overviewShort = company.overview?.substring(
           0,
-          matches[wordsToSplit].index!
+          matches[wordsToSplit].index!,
         );
       }
     }
   }
   const [followCompany] = useFollowCompany();
-  const isFollowing =
-    accountData?.account?.companyFollowingIds?.includes(company._id) ?? false;
+  const isFollowing = account?.companyFollowingIds?.includes(company._id) ?? false;
   const toggleFollowCompany = async () => {
     try {
       await followCompany({

@@ -1,46 +1,7 @@
 import { gql, useQuery, QueryHookOptions, QueryResult } from '@apollo/client';
-import { PostCategory } from 'backend/graphql/posts.graphql';
 import { User } from 'backend/graphql/users.graphql';
-import {
-  POST_SUMMARY_FRAGMENT,
-  PostSummary,
-} from 'mobile/src/graphql/fragments/post';
-import {
-  FUND_MANAGER_FRAGMENT,
-  FundManager,
-} from 'mobile/src/graphql/fragments/fund';
+import { FundManager } from 'mobile/src/graphql/fragments/fund';
 import { NotificationEventOptions } from 'backend/schemas/user';
-
-type FetchPostsVariables = {
-  categories?: PostCategory[];
-};
-
-type Post = PostSummary;
-export type FetchPostsData = {
-  posts?: Post[];
-};
-
-/**
- * GraphQL query that fetches posts for the current users home feed.
- *
- * @returns   GraphQL query.
- */
-export function useFetchPosts(): QueryResult<
-  FetchPostsData,
-  FetchPostsVariables
-> {
-  return useQuery<FetchPostsData, FetchPostsVariables>(
-    gql`
-      ${POST_SUMMARY_FRAGMENT}
-      query Posts($categories: [PostCategory!]) {
-        posts(categories: $categories) {
-          ...PostSummaryFields
-        }
-      }
-    `,
-    { fetchPolicy: 'cache-and-network' },
-  );
-}
 
 type AccountVariables = never;
 export type WatchlistFund = FundManager &
@@ -248,47 +209,6 @@ export function useAccount(
             emailUnreadMessage
             notifications {
               ${Object.keys(NotificationEventOptions)}
-            }
-          }
-        }
-      }
-    `,
-    { ...options },
-  );
-}
-
-export type Invitee = Pick<User, 'avatar' | 'email' | 'firstName' | 'lastName'>;
-export type InvitesVariables = never;
-export type InvitesData = {
-  account: Pick<User, '_id' | 'role'> & {
-    invitees: Invitee[];
-  };
-};
-
-/**
- * GraphQL query that fetches invitations sent by this user.
- *
- * @returns   GraphQL query.
- */
-export function useInvites(
-  options?: QueryHookOptions<InvitesData, InvitesVariables>,
-): QueryResult<InvitesData, InvitesVariables> {
-  return useQuery<InvitesData, InvitesVariables>(
-    gql`
-      query Invites {
-        account {
-          _id
-          role
-          invitees {
-            __typename
-            ... on User {
-              avatar
-              email
-              firstName
-              lastName
-            }
-            ... on UserStub {
-              email
             }
           }
         }

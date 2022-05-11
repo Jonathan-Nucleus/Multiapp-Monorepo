@@ -1,40 +1,40 @@
 import { FC } from "react";
 import Avatar from "desktop/app/components/common/Avatar";
+import { Invitee } from "mobile/src/graphql/query/account/useInvites";
 
 interface InvitationCoin {
-  avatar?: string;
-  email: string;
-  firstName?: string;
-  lastName?: string;
-  variant: string;
+  user?: Invitee;
 }
 
 const InvitationCoin: FC<InvitationCoin> = ({
-  avatar,
-  email,
-  firstName,
-  lastName,
-  variant,
+  user,
 }) => {
-  return avatar ? (
-    <Avatar src={avatar} size={16} />
-  ) : (
-    <div
-      className={`w-6 h-6 mx-0.5 rounded-full flex
-        justify-center items-center ${
-          email
-            ? `bg-${variant ? variant : "transparent"}`
-            : "border border-slate-300"
-        }`}
-    >
-      {email && (
-        <span className="uppercase text-xs">
-          {!!firstName && !!lastName
-            ? `${firstName.charAt(0)}${lastName.charAt(0)}`
-            : email.charAt(0)}
-        </span>
-      )}
-    </div>
+  return (
+    <>
+      {user ?
+        <div className="w-6 h-6 rounded-full overflow-hidden">
+          {user.avatar ?
+            <Avatar user={user} size={24} />
+            :
+            <div
+              className={`w-full h-full flex items-center justify-center
+                ${(user.firstName && user.lastName) ? "bg-error" : "bg-gray-600"}`
+              }
+            >
+              <span className="uppercase text-xs text-white font-medium">
+                {(user.firstName && user.lastName) ?
+                  `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`
+                  :
+                  `${user.email.charAt(0)}`
+                }
+              </span>
+            </div>
+          }
+        </div>
+        :
+        <div className="w-6 h-6 rounded-full border border-slate-300" />
+      }
+    </>
   );
 };
 

@@ -1,6 +1,5 @@
 import { gql, useQuery, QueryResult } from '@apollo/client';
 import { Fund as GraphQLFund } from 'backend/graphql/funds.graphql';
-import { Company as GraphQLCompany } from 'backend/graphql/companies.graphql';
 import {
   FUND_SUMMARY_FRAGMENT,
   FUND_COMPANY_FRAGMENT,

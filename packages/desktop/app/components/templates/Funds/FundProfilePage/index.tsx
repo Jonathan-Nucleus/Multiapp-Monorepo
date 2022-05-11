@@ -11,7 +11,7 @@ import TeamMembersList from "../../../modules/teams/TeamMembersList";
 
 import { useFund } from "mobile/src/graphql/query/marketplace/useFund";
 import { useWatchFund } from "mobile/src/graphql/mutation/funds/useWatchFund";
-import SkeletonFundProfilePage from "../../Skeleton/Funds/FundProfilePage";
+import Skeleton from "./Skeleton";
 
 const fundData = {
   mtd: "3.2%",
@@ -132,12 +132,11 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
   const [more, setMore] = useState(false);
   const [moreInvestor, setMoreInvestor] = useState(false);
   const [moreOption, setMoreOption] = useState(false);
-  if (!fund) {
-    return <SkeletonFundProfilePage />;
-  }
+  const companyBackground = fund?.company?.background?.url
 
-  const { background: companyBackground, avatar: companyAvatar } =
-    fund?.company ?? {};
+  if (!fund) {
+    return <Skeleton />;
+  }
 
   return (
     <div className="container mx-auto mt-5 lg:px-4 max-w-screen-xl">
@@ -146,12 +145,12 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
           <Card className="bg-secondary/[.27] overflow-visible rounded p-0">
             <div className="flex flex-row bg-secondary/[.27] rounded overflow-hidden -m-px">
               <div className="flex-shrink-0 w-72 h-72 bg-white relative">
-                {companyBackground?.url && (
+                {companyBackground && (
                   <Image
                     loader={() =>
-                      `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${companyBackground.url}`
+                      `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${companyBackground}`
                     }
-                    src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${companyBackground.url}`}
+                    src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${companyBackground}`}
                     alt=""
                     layout="fill"
                     className="object-cover"

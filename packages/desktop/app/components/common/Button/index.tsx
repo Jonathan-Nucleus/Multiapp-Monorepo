@@ -18,8 +18,8 @@ const Button: FC<ButtonProps> = ({
   let buttonClass = "";
   if (variant == "primary") {
     buttonClass =
-      "text-primary bg-primary " +
-      "text-sm text-white font-bold rounded-full tracking-widest " +
+      "text-white bg-primary " +
+      "text-sm font-bold rounded-full tracking-widest " +
       "inline-flex justify-center items-center px-4 py-2 " +
       "hover:bg-primary/75 focus:outline-none transition ";
   } else if (variant == "outline-primary") {
