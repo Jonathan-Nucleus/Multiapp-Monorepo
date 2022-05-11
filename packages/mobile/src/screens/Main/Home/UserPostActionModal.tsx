@@ -53,11 +53,17 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
   const isMuted =
     accountData?.account?.mutedPostIds?.includes(post._id) ?? false;
 
+  const isFollowing = accountData?.account?.followingIds?.includes(
+    user?._id ?? '',
+  );
+
   const menuData = useMemo(() => {
     const menuArray = [
       user
         ? {
-            label: `Follow ${user.firstName} ${user.lastName}`,
+            label: `${isFollowing ? 'Unfollow' : 'Follow'} ${user.firstName} ${
+              user.lastName
+            }`,
             icon: <UserCirclePlus size={26} color={WHITE} />,
             key: 'follow' as const,
           }
@@ -98,30 +104,23 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
         : []),
     ];
 
-    const following = accountData?.account?.followingIds?.includes(
-      user?._id ?? '',
-    );
-
-    if (following) {
-      // if user is already following, need to omit follow option
-      return menuArray.slice(1);
-    } else {
-      return menuArray;
-    }
-  }, [user, accountData, isMuted]);
+    return menuArray;
+  }, [user, accountData, isMuted, isFollowing]);
 
   const handleFollowUser = async () => {
     if (!user) return; // TODO: Update to support companies
 
     try {
       const { data } = await followUser({
-        variables: { follow: true, userId: user._id },
+        variables: { follow: !isFollowing, userId: user._id },
       });
 
       data?.followUser
         ? showMessage(
             'success',
-            `You’re following ${user.firstName} ${user.lastName}`,
+            isFollowing
+              ? `You’re unfollowing ${user.firstName} ${user.lastName}`
+              : `You’re following ${user.firstName} ${user.lastName}`,
           )
         : showMessage('error', SOMETHING_WRONG);
     } catch (err) {

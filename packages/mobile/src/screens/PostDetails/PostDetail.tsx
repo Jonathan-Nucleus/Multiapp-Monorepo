@@ -99,10 +99,14 @@ const PostDetail: PostDetailScreen = ({ route }) => {
   const account = useCachedAccount();
   const [likeComment] = useLikeComment();
 
+  const isFollowing = account?.followingIds?.includes(selectedUser?._id ?? '');
+
   const getKebobMenuData = useMemo(() => {
     const KebobMenuDataArray = [
       {
-        label: `Follow ${selectedUser?.firstName} ${selectedUser?.lastName}`,
+        label: `${isFollowing ? 'Unfollow' : 'Follow'} ${
+          selectedUser?.firstName
+        } ${selectedUser?.lastName}`,
         icon: <UserCirclePlus size={32} color={WHITE} />,
         key: 'follow',
       },
@@ -119,11 +123,15 @@ const PostDetail: PostDetailScreen = ({ route }) => {
     ];
 
     return KebobMenuDataArray;
-  }, [selectedUser]);
+  }, [selectedUser, isFollowing]);
 
   const post = data?.post;
   const comments = post?.comments;
   const likes = post?.likes;
+
+  if (!post || !comments || !likes) {
+    return <SafeAreaView style={pStyles.globalContainer} />;
+  }
 
   const getComments = useMemo(() => {
     const parentComments = comments?.filter((item) => !item.commentId);
@@ -140,12 +148,9 @@ const PostDetail: PostDetailScreen = ({ route }) => {
     return updatedComments;
   }, [comments]);
 
-  const renderCommentItem: ListRenderItem<typeof getComments[number]> =
-    useCallback(({ item }) => <CommentItem item={item} />, [comments]);
-
-  if (!post || !comments || !likes) {
-    return <SafeAreaView style={pStyles.globalContainer} />;
-  }
+  const renderCommentItem: ListRenderItem<typeof getComments[number]> = ({
+    item,
+  }) => <CommentItem item={item} />;
 
   const handleAddComment = async () => {
     try {
@@ -226,10 +231,16 @@ const PostDetail: PostDetailScreen = ({ route }) => {
 
     try {
       const { data } = await followUser({
-        variables: { follow: true, userId: selectedUser._id },
+        variables: { follow: !isFollowing, userId: selectedUser._id },
       });
       if (data?.followUser) {
-        showMessage('success', 'Successfully followed user!');
+        showMessage(
+          'success',
+          isFollowing
+            ? `You’re unfollowing ${selectedUser.firstName} ${selectedUser.lastName}`
+            : `You’re following ${selectedUser.firstName} ${selectedUser.lastName}`,
+        );
+        refetch();
       } else {
         showMessage('error', SOMETHING_WRONG);
       }
@@ -290,7 +301,11 @@ const PostDetail: PostDetailScreen = ({ route }) => {
     return (
       <View style={commentItemContainer}>
         <View style={styles.userItemContainer}>
-          <UserInfo user={user} avatarSize={32} />
+          <UserInfo
+            user={user}
+            avatarSize={32}
+            viewStyle={styles.userInfoContainer}
+          />
           <TouchableOpacity
             onPress={() => {
               setFocusCommentId(_id);
@@ -453,6 +468,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  userInfoContainer: {
+    paddingVertical: 12,
   },
   replyContainer: {
     flexDirection: 'row',

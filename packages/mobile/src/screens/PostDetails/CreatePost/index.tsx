@@ -245,11 +245,19 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     const imageData = await ImagePicker.openCamera({
       width: 300,
       height: 400,
-      cropping: true,
+      cropping: false, // cropping caused error
       includeBase64: true,
     });
 
     await uploadImage(imageData);
+  };
+
+  const takeVideo = async (): Promise<void> => {
+    const videoData = await ImagePicker.openCamera({
+      mediaType: 'video',
+    });
+
+    await uploadImage(videoData);
   };
 
   const uploadImage = async (imageData: ImageOrVideo): Promise<void> => {
@@ -257,7 +265,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       imageData.mime.lastIndexOf('/') + 1,
     );
 
-    let { filename = `image.${extension}` } = imageData;
+    let filename = imageData.filename ?? `image.${extension}`;
 
     // Rename file extension if it an HEIC format on iOS
     filename = filename.toLowerCase();
@@ -516,6 +524,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
           label="Take Video"
           textStyle={styles.iconText}
           viewStyle={styles.iconButton}
+          onPress={takeVideo}
         />
         <IconButton
           icon={<GalleryImage size={32} color={WHITE} />}

@@ -43,7 +43,12 @@ const MarketplaceTabs = () => {
         initialRouteName="Funds">
         <Tab.Screen name="Funds" component={Funds} />
         <Tab.Screen name="Managers" component={Managers} />
-        <Tab.Screen name="Companies" component={Companies} />
+        {/*
+          Commenting this section out for now to align with updated requirements.
+          Can look into adding section back in the future.
+
+          <Tab.Screen name="Companies" component={Companies} />
+         */}
       </Tab.Navigator>
     </View>
   );
