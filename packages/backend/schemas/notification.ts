@@ -78,7 +78,7 @@ export const NotificationSchema = `
 export const generateNotification = (
   type: NotificationType,
   user: User.Mongo
-) => {
+): { title: string; body: string } => {
   let title = "";
   let body = "";
 

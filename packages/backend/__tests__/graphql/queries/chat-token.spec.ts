@@ -1,6 +1,5 @@
 import faker from "@faker-js/faker";
 import { ApolloServer, gql } from "apollo-server";
-import _ from "lodash";
 import * as GetStreamModule from "getstream";
 import { createTestApolloServer } from "../../../lib/server";
 import { User } from "../../../schemas/user";
@@ -16,7 +15,7 @@ describe("Query - chatToken", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
+  let authUser: User.Mongo;
 
   beforeAll(async () => {
     authUser = await createUser();

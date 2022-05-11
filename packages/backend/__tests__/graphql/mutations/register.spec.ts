@@ -21,7 +21,7 @@ describe("Mutations - register", () => {
 
   let server: ApolloServer;
   let stub: User.Stub | null;
-  let user: User.Mongo | null;
+  let user: User.Mongo;
   const userData = {
     email: faker.internet.email(),
     firstName: faker.name.firstName(),

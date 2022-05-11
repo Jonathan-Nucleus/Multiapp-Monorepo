@@ -1,5 +1,4 @@
 import { ApolloServer, gql } from "apollo-server";
-import _ from "lodash";
 import { createTestApolloServer } from "../../../lib/server";
 import { User } from "../../../schemas/user";
 import { Notification } from "../../../schemas/notification";
@@ -21,8 +20,8 @@ describe("Mutations - readNotification", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
-  let user1: User.Mongo | null;
+  let authUser: User.Mongo;
+  let user1: User.Mongo;
   let notifications: Notification.Mongo[];
 
   beforeAll(async () => {
@@ -62,7 +61,7 @@ describe("Mutations - readNotification", () => {
 
   it("succeeds to read notification", async () => {
     const { users } = await getIgniteDb();
-    const oldUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const oldUser = (await users.find({ _id: authUser._id })) as User.Mongo;
 
     const res = await server.executeOperation({
       query,
@@ -73,14 +72,14 @@ describe("Mutations - readNotification", () => {
 
     expect(res.data?.readNotification).toBeTruthy();
 
-    const newUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const newUser = (await users.find({ _id: authUser._id })) as User.Mongo;
     const oldNotificationBadge = (oldUser.notificationBadge || 0) - 1;
     expect(newUser.notificationBadge).toBe(oldNotificationBadge);
   });
 
   it("fails with past notification id", async () => {
     const { users } = await getIgniteDb();
-    const oldUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const oldUser = (await users.find({ _id: authUser._id })) as User.Mongo;
 
     const res = await server.executeOperation({
       query,
@@ -91,7 +90,7 @@ describe("Mutations - readNotification", () => {
 
     expect(getErrorCode(res)).toBe(ErrorCode.NOT_FOUND);
 
-    const newUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const newUser = (await users.find({ _id: authUser._id })) as User.Mongo;
     expect(newUser.notificationBadge).toBe(oldUser.notificationBadge);
   });
 
@@ -104,7 +103,7 @@ describe("Mutations - readNotification", () => {
 
     expect(res.data?.readNotification).toBeTruthy();
 
-    const newUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const newUser = (await users.find({ _id: authUser._id })) as User.Mongo;
     expect(newUser.notificationBadge).toBe(0);
   });
 });

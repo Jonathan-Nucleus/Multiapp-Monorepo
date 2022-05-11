@@ -12,7 +12,7 @@ export const connectDb = async (): Promise<void> => {
   await getIgniteDb(`${uri}${testDbName}`);
 };
 
-export const closeDb = async () => {
+export const closeDb = async (): Promise<void> => {
   await disconnectDb();
   if (mongod) {
     await mongod.stop();

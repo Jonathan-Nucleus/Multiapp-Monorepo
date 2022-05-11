@@ -1,6 +1,6 @@
 import type { DocumentNode, GraphQLError, GraphQLFieldResolver } from "graphql";
 import { MongoError } from "mongodb";
-import { AuthenticationError } from "apollo-server-errors";
+import { AuthenticationError, ApolloError } from "apollo-server-errors";
 import type { IResolvers } from "@graphql-tools/utils";
 
 import type { IgniteDb } from "../db";
@@ -76,7 +76,9 @@ export function secureEndpoint<
   return secureResolver;
 }
 
-export const formatError = (error: GraphQLError) => {
+export const formatError = (
+  error: GraphQLError
+): ApolloError | GraphQLError => {
   if (process.env.NODE_ENV === "development") {
     console.error(error);
   }

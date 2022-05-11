@@ -21,8 +21,8 @@ describe("Mutations - inviteUser", () => {
 
   let server: ApolloServer;
   let stub: User.Stub | null;
-  let authUser: User.Mongo | null;
-  let user: User.Mongo | null;
+  let authUser: User.Mongo;
+  let user: User.Mongo;
   const email = faker.internet.email();
 
   beforeAll(async () => {
@@ -73,7 +73,7 @@ describe("Mutations - inviteUser", () => {
       .mockResolvedValueOnce(true);
 
     const { users } = await getIgniteDb();
-    const oldUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const oldUser = (await users.find({ _id: authUser._id })) as User.Mongo;
 
     const res = await server.executeOperation({
       query,
@@ -85,7 +85,7 @@ describe("Mutations - inviteUser", () => {
     expect(res.data).toHaveProperty("inviteUser");
     expect(res.data?.inviteUser).toBeTruthy();
 
-    const newUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const newUser = (await users.find({ _id: authUser._id })) as User.Mongo;
 
     expect(newUser.inviteeIds?.length).toBe(
       (oldUser.inviteeIds?.length || 0) + 1
@@ -100,7 +100,7 @@ describe("Mutations - inviteUser", () => {
       .mockResolvedValueOnce(true);
 
     const { users } = await getIgniteDb();
-    const oldUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const oldUser = (await users.find({ _id: authUser._id })) as User.Mongo;
 
     const res = await server.executeOperation({
       query,
@@ -112,7 +112,7 @@ describe("Mutations - inviteUser", () => {
     expect(res.data).toHaveProperty("inviteUser");
     expect(res.data?.inviteUser).toBeTruthy();
 
-    const newUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const newUser = (await users.find({ _id: authUser._id })) as User.Mongo;
 
     expect(newUser.inviteeIds?.length).toBe(
       (oldUser.inviteeIds?.length || 0) + 1

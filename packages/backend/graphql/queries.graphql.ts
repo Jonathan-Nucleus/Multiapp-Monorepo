@@ -14,7 +14,7 @@ import {
   validateArgs,
 } from "../lib/validate";
 
-import { User, isUser, compareAccreditation, UserRole } from "../schemas/user";
+import { User, isUser, compareAccreditation } from "../schemas/user";
 import type { Company } from "../schemas/company";
 import {
   Post,
@@ -100,7 +100,7 @@ const resolvers = {
       async (
         parentIgnored,
         args: { postId: string },
-        { db, user }
+        { db }
       ): Promise<Post.Mongo | null> => {
         const validator = yup
           .object()
@@ -177,12 +177,12 @@ const resolvers = {
       async (
         parentIgnored,
         argsIgnored,
-        { db, user }
+        { user }
       ): Promise<User.Mongo | null> => user
     ),
 
     chatToken: secureEndpoint(
-      async (parentIgnored, argsIgnored, { db, user }): Promise<string> =>
+      async (parentIgnored, argsIgnored, { user }): Promise<string> =>
         getChatToken(user._id.toString())
     ),
 
@@ -271,18 +271,15 @@ const resolvers = {
     ),
 
     fundCompanies: secureEndpoint(
-      async (
-        parentIgnored,
-        argsIgnored,
-        { db, user }
-      ): Promise<Company.Mongo[]> => db.companies.fundCompanies()
+      async (parentIgnored, argsIgnored, { db }): Promise<Company.Mongo[]> =>
+        db.companies.fundCompanies()
     ),
 
     professionals: secureEndpoint(
       async (
         parentIgnored,
         args: { featured?: boolean },
-        { db, user }
+        { db }
       ): Promise<User.Mongo[]> => {
         const validator = yup
           .object()
@@ -303,7 +300,7 @@ const resolvers = {
       async (
         parentIgnored,
         args: { userId: string },
-        { db, user }
+        { db }
       ): Promise<User.Mongo | User.Stub> => {
         const validator = yup
           .object()
@@ -333,7 +330,7 @@ const resolvers = {
       async (
         parentIgnored,
         args: { companyId: string },
-        { db, user }
+        { db }
       ): Promise<Company.Mongo> => {
         const validator = yup
           .object()
@@ -371,7 +368,7 @@ const resolvers = {
       async (
         parentIgnored,
         args: { search?: string },
-        { db, user }
+        { db }
       ): Promise<User.Mongo[]> => {
         const validator = yup
           .object()
@@ -392,7 +389,7 @@ const resolvers = {
       async (
         parentIgnored,
         args: { search?: string },
-        { db, user }
+        { db }
       ): Promise<GlobalSearchResult> => {
         const validator = yup
           .object()
@@ -417,7 +414,7 @@ const resolvers = {
     ),
 
     users: secureEndpoint(
-      async (parentIgnored, argsIgnored, { db, user }): Promise<User.Mongo[]> =>
+      async (parentIgnored, argsIgnored, { db }): Promise<User.Mongo[]> =>
         db.users.findAll()
     ),
   },

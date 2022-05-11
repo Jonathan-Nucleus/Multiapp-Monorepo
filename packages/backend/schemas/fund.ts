@@ -1,12 +1,7 @@
 import { ObjectId } from "mongodb";
 import { ValueOf, GraphQLEntity } from "../lib/mongo-helper";
 
-import type {
-  User,
-  Accreditation,
-  AccreditationEnum,
-  AdjustableImage,
-} from "./user";
+import type { User, Accreditation, AccreditationEnum } from "./user";
 import type { Company } from "./company";
 
 export namespace Fund {

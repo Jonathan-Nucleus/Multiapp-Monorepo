@@ -66,10 +66,6 @@ export type { FinancialStatusEnum as FinancialStatus };
 export const FinancialStatusOptions = Object.keys(
   BackendFinancialStatusOptions
 );
-type FinancialStatusData = Record<
-  Extract<InvestorClassEnum, "INDIVIDUAL" | "ENTITY">,
-  { value: FinancialStatusEnum; description: string; title: string }[]
->;
 
 export const BaseFinancialStatusData = {
   INDIVIDUAL: baseIndividualStatusOptions.map((key) => {

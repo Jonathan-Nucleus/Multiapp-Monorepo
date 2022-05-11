@@ -30,5 +30,8 @@ jobs:
       - name: Typecheck
         run: yarn typecheck --scope=backend
 
+      - name: Lint
+        run: yarn lint --scope=backend
+
       - name: Unit test
         run: yarn test --scope=backend

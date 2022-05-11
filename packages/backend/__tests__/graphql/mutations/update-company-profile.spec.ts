@@ -5,7 +5,6 @@ import { User } from "../../../schemas/user";
 import { Company } from "../../../schemas/company";
 import { createUser, createCompany, getErrorCode } from "../../config/utils";
 import { getIgniteDb } from "../../../db";
-import { PostCategoryOptions } from "../../../schemas/post";
 
 describe("Mutations - updateCompanyProfile", () => {
   const query = gql`
@@ -32,12 +31,12 @@ describe("Mutations - updateCompanyProfile", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
-  let authCompany: Company.Mongo | null;
+  let authUser: User.Mongo;
+  let authCompany: Company.Mongo;
 
   beforeAll(async () => {
     authUser = await createUser();
-    authCompany = await createCompany(authUser!._id);
+    authCompany = await createCompany(authUser._id);
     server = createTestApolloServer(authUser);
   });
 
@@ -80,7 +79,7 @@ describe("Mutations - updateCompanyProfile", () => {
       query,
       variables: {
         profile: {
-          _id: anotherCompany?._id.toString(),
+          _id: anotherCompany._id.toString(),
           ...newProfileData,
         },
       },
@@ -94,7 +93,7 @@ describe("Mutations - updateCompanyProfile", () => {
       query,
       variables: {
         profile: {
-          _id: authCompany?._id.toString(),
+          _id: authCompany._id.toString(),
           ...newProfileData,
           website: "not-a-real-website",
         },
@@ -106,12 +105,10 @@ describe("Mutations - updateCompanyProfile", () => {
 
   it("succeeds with correct profile data", async () => {
     const { companies } = await getIgniteDb();
-    const oldCompany = (await companies.find(
-      authCompany!._id
-    )) as Company.Mongo;
+    const oldCompany = (await companies.find(authCompany._id)) as Company.Mongo;
 
     const profileData = {
-      _id: authCompany?._id.toString(),
+      _id: authCompany._id.toString(),
       ...newProfileData,
     };
 
@@ -127,9 +124,7 @@ describe("Mutations - updateCompanyProfile", () => {
       JSON.stringify(profileData)
     );
 
-    const newCompany = (await companies.find(
-      authCompany!._id
-    )) as Company.Mongo;
+    const newCompany = (await companies.find(authCompany._id)) as Company.Mongo;
 
     expect(JSON.stringify(newCompany)).not.toBe(JSON.stringify(oldCompany));
     expect(newCompany.updatedAt).not.toBe(oldCompany.updatedAt);
@@ -137,9 +132,7 @@ describe("Mutations - updateCompanyProfile", () => {
 
   it("succeeds with partial profile data", async () => {
     const { companies } = await getIgniteDb();
-    const oldCompany = (await companies.find(
-      authCompany!._id
-    )) as Company.Mongo;
+    const oldCompany = (await companies.find(authCompany._id)) as Company.Mongo;
 
     const res = await server.executeOperation({
       query,
@@ -163,9 +156,7 @@ describe("Mutations - updateCompanyProfile", () => {
     expect(res.data?.updateCompanyProfile?.linkedIn).toBe(oldCompany.linkedIn);
     expect(res.data?.updateCompanyProfile?.twitter).toBe(oldCompany.twitter);
 
-    const newCompany = (await companies.find(
-      authCompany!._id
-    )) as Company.Mongo;
+    const newCompany = (await companies.find(authCompany._id)) as Company.Mongo;
 
     expect(JSON.stringify(newCompany)).not.toBe(JSON.stringify(oldCompany));
     expect(newCompany.updatedAt).not.toBe(oldCompany.updatedAt);

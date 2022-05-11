@@ -3,13 +3,8 @@
  * individual companies from a MongoDB database.
  */
 
-import { Collection, ObjectId } from "mongodb";
-import {
-  MongoId,
-  toObjectId,
-  toObjectIds,
-  GraphQLEntity,
-} from "../../lib/mongo-helper";
+import { Collection } from "mongodb";
+import { MongoId, toObjectId, toObjectIds } from "../../lib/mongo-helper";
 import type { Company } from "../../schemas/company";
 import { InternalServerError, NotFoundError } from "../../lib/validate";
 
@@ -227,7 +222,7 @@ const createCompaniesCollection = (
      * @returns The list of companies.
      */
     findByKeyword: async (
-      search: string = "",
+      search = "",
       limit = 10
     ): Promise<Company.Mongo[]> => {
       const companies = (await companiesCollection

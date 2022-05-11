@@ -1,5 +1,4 @@
 import { ApolloServer, gql } from "apollo-server";
-import _ from "lodash";
 import { createTestApolloServer } from "../../../lib/server";
 import { ErrorCode } from "../../../lib/validate";
 import { User } from "../../../schemas/user";
@@ -13,7 +12,7 @@ describe("Query - verifyInvite", () => {
   `;
 
   let server: ApolloServer;
-  let user: User.Mongo | null;
+  let user: User.Mongo;
 
   beforeAll(async () => {
     user = await createUser();

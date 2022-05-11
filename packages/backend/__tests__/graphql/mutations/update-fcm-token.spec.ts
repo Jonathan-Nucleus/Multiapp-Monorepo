@@ -14,8 +14,7 @@ describe("Mutations - updateFcmToken", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
-  const email = faker.internet.email();
+  let authUser: User.Mongo;
 
   beforeAll(async () => {
     authUser = await createUser();
@@ -47,7 +46,7 @@ describe("Mutations - updateFcmToken", () => {
     expect(res.data?.updateFcmToken).toBeTruthy();
 
     const { users } = await getIgniteDb();
-    const newUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const newUser = (await users.find({ _id: authUser._id })) as User.Mongo;
 
     expect(newUser.fcmToken).toBe(newToken);
     expect(newUser.fcmTokenCreated).toBeDefined();

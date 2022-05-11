@@ -1016,8 +1016,7 @@ const resolvers = {
     uploadLink: secureEndpoint(
       async (
         parentIgnored,
-        args: { localFilename: string; type: MediaType },
-        { db, user }
+        args: { localFilename: string; type: MediaType }
       ): Promise<RemoteUpload | null> => {
         const validator = yup
           .object()

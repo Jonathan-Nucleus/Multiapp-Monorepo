@@ -29,3 +29,6 @@ jobs:
 
       - name: Typecheck
         run: yarn typecheck --scope=desktop
+
+      - name: Lint
+        run: yarn lint --scope=desktop

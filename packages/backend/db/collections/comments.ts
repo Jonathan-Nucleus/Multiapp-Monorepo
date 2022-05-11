@@ -4,12 +4,7 @@
  */
 
 import { Collection, ObjectId, UpdateFilter } from "mongodb";
-import {
-  MongoId,
-  toObjectId,
-  toObjectIds,
-  GraphQLEntity,
-} from "../../lib/mongo-helper";
+import { MongoId, toObjectId, toObjectIds } from "../../lib/mongo-helper";
 import { NotFoundError } from "../../lib/validate";
 import type { Comment } from "../../schemas/comment";
 import type { Post } from "../../schemas/post";
@@ -96,7 +91,7 @@ const createCommentsCollection = (
       userId: MongoId
     ): Promise<Comment.Mongo> => {
       const { _id, body, mentionIds } = comment;
-      let updateFilter: UpdateFilter<Comment.Mongo> = {
+      const updateFilter: UpdateFilter<Comment.Mongo> = {
         $set: {
           body,
           updatedAt: new Date(),

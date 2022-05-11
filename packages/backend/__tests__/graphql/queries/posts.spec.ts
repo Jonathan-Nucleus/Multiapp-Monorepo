@@ -1,5 +1,4 @@
 import { ApolloServer, gql } from "apollo-server";
-import _ from "lodash";
 import { createTestApolloServer } from "../../../lib/server";
 import { ErrorCode } from "../../../lib/validate";
 import { User } from "../../../schemas/user";
@@ -28,80 +27,79 @@ describe("Query - posts", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
-  let user1: User.Mongo | null;
-  let user2: User.Mongo | null;
-  let user3: User.Mongo | null;
-  let posts: Post.Mongo[];
+  let authUser: User.Mongo;
+  let user1: User.Mongo;
+  let user2: User.Mongo;
+  let user3: User.Mongo;
 
   beforeAll(async () => {
     authUser = await createUser("user", "client");
     user1 = await createUser("user", "accredited");
     user2 = await createUser("user");
     user3 = await createUser("professional", "accredited");
-    posts = (await Promise.all([
+    const postsIgnored = (await Promise.all([
       await createPost(
-        authUser?._id,
+        authUser._id,
         false,
         [PostCategoryOptions.IDEAS.value],
         "everyone"
       ),
       await createPost(
-        authUser?._id,
+        authUser._id,
         false,
         [PostCategoryOptions.IDEAS.value],
         "accredited"
       ),
       await createPost(
-        authUser?._id,
+        authUser._id,
         false,
         [PostCategoryOptions.IDEAS.value],
         "client"
       ),
       await createPost(
-        authUser?._id,
+        authUser._id,
         false,
         [PostCategoryOptions.IDEAS.value],
         "purchaser"
       ),
       await createPost(
-        user1?._id,
+        user1._id,
         false,
         [PostCategoryOptions.NEWS.value],
         "everyone"
       ),
       await createPost(
-        user1?._id,
+        user1._id,
         false,
         [PostCategoryOptions.NEWS.value],
         "accredited"
       ),
       await createPost(
-        user2?._id,
+        user2._id,
         false,
         [PostCategoryOptions.NEWS.value],
         "everyone"
       ),
       await createPost(
-        user2?._id,
+        user2._id,
         false,
         [PostCategoryOptions.NEWS.value],
         "accredited"
       ),
       await createPost(
-        user3?._id,
+        user3._id,
         false,
         [PostCategoryOptions.NEWS.value],
         "everyone"
       ),
       await createPost(
-        user3?._id,
+        user3._id,
         false,
         [PostCategoryOptions.NEWS.value],
         "accredited"
       ),
       await createPost(
-        user3?._id,
+        user3._id,
         false,
         [PostCategoryOptions.NEWS.value],
         "accredited"

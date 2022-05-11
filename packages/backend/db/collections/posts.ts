@@ -5,12 +5,7 @@
 
 import { Collection, ObjectId, UpdateFilter } from "mongodb";
 import _ from "lodash";
-import {
-  MongoId,
-  toObjectId,
-  toObjectIds,
-  GraphQLEntity,
-} from "../../lib/mongo-helper";
+import { MongoId, toObjectId, toObjectIds } from "../../lib/mongo-helper";
 import type {
   Post,
   PostCategory,
@@ -89,8 +84,8 @@ const createPostsCollection = (
       ignoreUsers: MongoId[] = [],
       roleFilter: PostRoleFilter = "everyone",
       followingUsers: MongoId[] = [],
-      offset: number = 0,
-      limit: number = 0
+      offset = 0,
+      limit = 0
     ): Promise<Post.Mongo[]> => {
       const audienceLevels: Audience[] = [
         "everyone",
@@ -198,7 +193,7 @@ const createPostsCollection = (
      */
     edit: async (post: Post.Update, userId: MongoId): Promise<Post.Mongo> => {
       const { _id, mentionIds, ...postData } = post;
-      let updateFilter: UpdateFilter<Post.Mongo> = {
+      const updateFilter: UpdateFilter<Post.Mongo> = {
         $set: {
           ...postData,
           userId: toObjectId(userId),
@@ -359,10 +354,7 @@ const createPostsCollection = (
      *
      * @returns The list of posts.
      */
-    findByKeyword: async (
-      search: string = "",
-      limit = 10
-    ): Promise<Post.Mongo[]> => {
+    findByKeyword: async (search = "", limit = 10): Promise<Post.Mongo[]> => {
       const posts = (await postsCollection
         .aggregate([
           {

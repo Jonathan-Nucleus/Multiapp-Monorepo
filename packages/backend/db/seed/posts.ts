@@ -43,10 +43,7 @@ export default async function (
   userIds: ObjectId[]
 ): Promise<ObjectId[]> {
   // Drop the collection if it exists before (re)creating it
-  await db
-    .collection<Post.Mongo>(COLLECTION)
-    .drop()
-    .catch(() => {});
+  await db.collection<Post.Mongo>(COLLECTION).drop().catch(console.log);
 
   // Generate post data
   const postsByUser: Record<string, ObjectId[]> = {};

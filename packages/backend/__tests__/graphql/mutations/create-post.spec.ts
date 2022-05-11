@@ -112,7 +112,7 @@ describe("Mutations - createPost", () => {
       variables: {
         post: {
           ...postData,
-          companyId: company1?._id.toString(),
+          companyId: company1._id.toString(),
         },
       },
     });
@@ -140,7 +140,7 @@ describe("Mutations - createPost", () => {
       JSON.stringify(postData.categories)
     );
     expect(res.data?.createPost?.mediaUrl).toBe(postData.mediaUrl);
-    expect(res.data?.createPost?.user?._id).toBe(authUser._id.toString());
+    expect(res.data?.createPost?.user._id).toBe(authUser._id.toString());
 
     const newUser = (await users.find({
       _id: authUser._id,
@@ -160,7 +160,7 @@ describe("Mutations - createPost", () => {
   });
 
   it("posts as the user's company", async () => {
-    const { users, companies, db } = await getIgniteDb();
+    const { companies, db } = await getIgniteDb();
     const oldPostCount = await db
       .collection(DbCollection.POSTS)
       .countDocuments();
@@ -180,7 +180,7 @@ describe("Mutations - createPost", () => {
       JSON.stringify(postData.categories)
     );
     expect(res.data?.createPost?.mediaUrl).toBe(postData.mediaUrl);
-    expect(res.data?.createPost?.company?._id).toBe(authCompany._id.toString());
+    expect(res.data?.createPost?.company._id).toBe(authCompany._id.toString());
     expect(res.data?.createPost?.isCompany).toBe(true);
 
     const newCompany = (await companies.find(

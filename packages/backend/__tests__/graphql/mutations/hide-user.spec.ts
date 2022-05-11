@@ -16,8 +16,8 @@ describe("Mutations - hideUser", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
-  let user: User.Mongo | null;
+  let authUser: User.Mongo;
+  let user: User.Mongo;
 
   beforeAll(async () => {
     authUser = await createUser();
@@ -55,7 +55,7 @@ describe("Mutations - hideUser", () => {
       query,
       variables: {
         hide: true,
-        userId: user?._id.toString(),
+        userId: user._id.toString(),
       },
     });
 
@@ -63,9 +63,9 @@ describe("Mutations - hideUser", () => {
 
     const { users } = await getIgniteDb();
 
-    const newUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const newUser = (await users.find({ _id: authUser._id })) as User.Mongo;
     expect(_.map(newUser.hiddenUserIds, (item) => item.toString())).toContain(
-      user?._id.toString()
+      user._id.toString()
     );
   });
 
@@ -74,7 +74,7 @@ describe("Mutations - hideUser", () => {
       query,
       variables: {
         hide: false,
-        userId: user?._id.toString(),
+        userId: user._id.toString(),
       },
     });
 
@@ -82,9 +82,9 @@ describe("Mutations - hideUser", () => {
 
     const { users } = await getIgniteDb();
 
-    const newUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const newUser = (await users.find({ _id: authUser._id })) as User.Mongo;
     expect(
       _.map(newUser.hiddenUserIds, (item) => item.toString())
-    ).not.toContain(user?._id.toString());
+    ).not.toContain(user._id.toString());
   });
 });

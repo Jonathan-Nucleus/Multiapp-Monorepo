@@ -23,8 +23,8 @@ describe("Mutations - helpRequest", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
-  let fund1: Fund.Mongo | null;
+  let authUser: User.Mongo;
+  let fund1: Fund.Mongo;
 
   const emailRequest = {
     type: "EMAIL",
@@ -148,7 +148,7 @@ describe("Mutations - helpRequest", () => {
       variables: {
         request: {
           ...emailRequest,
-          fundId: fund1?._id.toString(),
+          fundId: fund1._id.toString(),
         },
       },
     });
@@ -164,7 +164,7 @@ describe("Mutations - helpRequest", () => {
       .findOne({}, { sort: { _id: -1 } })) as HelpRequest.Mongo;
     expect(newHelpRequest.type).toBe("email");
     expect(newHelpRequest.email).toBe(emailRequest.email);
-    expect(newHelpRequest.fundId.toString()).toBe(fund1?._id.toString());
+    expect(newHelpRequest.fundId.toString()).toBe(fund1._id.toString());
     expect(newHelpRequest.message).toBe(emailRequest.message);
 
     spy.mockRestore();
@@ -184,7 +184,7 @@ describe("Mutations - helpRequest", () => {
       variables: {
         request: {
           ...phoneRequest,
-          fundId: fund1?._id.toString(),
+          fundId: fund1._id.toString(),
         },
       },
     });
@@ -200,7 +200,7 @@ describe("Mutations - helpRequest", () => {
       .findOne({}, { sort: { _id: -1 } })) as HelpRequest.Mongo;
     expect(newHelpRequest.type).toBe("phone");
     expect(newHelpRequest.phone).toBe(phoneRequest.phone);
-    expect(newHelpRequest.fundId.toString()).toBe(fund1?._id.toString());
+    expect(newHelpRequest.fundId.toString()).toBe(fund1._id.toString());
     expect(newHelpRequest.message).toBe(phoneRequest.message);
     expect(newHelpRequest.preferredTimeOfDay).toBe("morning");
 

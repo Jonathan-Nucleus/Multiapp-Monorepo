@@ -21,9 +21,8 @@ describe("Mutations - hidePost", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
-  let user: User.Mongo | null;
-  let post1: Post.Mongo | null;
+  let authUser: User.Mongo;
+  let post1: Post.Mongo;
   const hideData = {
     postId: toObjectId().toString(),
     hide: true,
@@ -31,8 +30,7 @@ describe("Mutations - hidePost", () => {
 
   beforeAll(async () => {
     authUser = await createUser();
-    user = await createUser();
-    post1 = await createPost(authUser?._id);
+    post1 = await createPost(authUser._id);
     server = createTestApolloServer(authUser);
   });
 
@@ -65,7 +63,7 @@ describe("Mutations - hidePost", () => {
       query,
       variables: {
         ...hideData,
-        postId: post1?._id.toString(),
+        postId: post1._id.toString(),
       },
     });
 
@@ -73,9 +71,9 @@ describe("Mutations - hidePost", () => {
 
     const { users } = await getIgniteDb();
 
-    const newUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const newUser = (await users.find({ _id: authUser._id })) as User.Mongo;
     expect(_.map(newUser.hiddenPostIds, (item) => item.toString())).toContain(
-      post1?._id.toString()
+      post1._id.toString()
     );
   });
 
@@ -84,7 +82,7 @@ describe("Mutations - hidePost", () => {
       query,
       variables: {
         ...hideData,
-        postId: post1?._id.toString(),
+        postId: post1._id.toString(),
       },
     });
 
@@ -96,7 +94,7 @@ describe("Mutations - hidePost", () => {
       query,
       variables: {
         hide: false,
-        postId: post1?._id.toString(),
+        postId: post1._id.toString(),
       },
     });
 
@@ -104,9 +102,9 @@ describe("Mutations - hidePost", () => {
 
     const { users } = await getIgniteDb();
 
-    const newUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const newUser = (await users.find({ _id: authUser._id })) as User.Mongo;
     expect(
       _.map(newUser.hiddenPostIds, (item) => item.toString())
-    ).not.toContain(post1?._id.toString());
+    ).not.toContain(post1._id.toString());
   });
 });

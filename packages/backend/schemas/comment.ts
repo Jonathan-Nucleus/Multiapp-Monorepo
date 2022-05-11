@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 
-import type { ValueOf, GraphQLEntity } from "../lib/mongo-helper";
+import type { GraphQLEntity } from "../lib/mongo-helper";
 import type { User } from "./user";
 import type { Post } from "./post";
 

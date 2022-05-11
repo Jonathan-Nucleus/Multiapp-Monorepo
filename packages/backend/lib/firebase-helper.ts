@@ -4,12 +4,13 @@ import "dotenv/config";
 
 let firebaseInitialized = false;
 
-export const initializeFirebase = () => {
+export const initializeFirebase = (): void => {
   try {
     if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
       throw new Error("Missing credential file.");
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const serviceAccount = require(process.env.GOOGLE_APPLICATION_CREDENTIALS);
 
     if (!serviceAccount) {

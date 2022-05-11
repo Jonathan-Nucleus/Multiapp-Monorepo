@@ -43,10 +43,7 @@ export default async function (
   userIds: ObjectId[]
 ): Promise<ObjectId[]> {
   // Drop the collection if it exists before (re)creating it
-  await db
-    .collection(COLLECTION)
-    .drop()
-    .catch(() => {});
+  await db.collection(COLLECTION).drop().catch(console.log);
 
   // Generate company data
   const companies = [...Array(NUM_COMPANIES)].map<Company.Mongo>(

@@ -1,5 +1,4 @@
 import { ApolloServer, gql } from "apollo-server";
-import _ from "lodash";
 import { createTestApolloServer } from "../../../lib/server";
 import { User } from "../../../schemas/user";
 import {
@@ -39,7 +38,7 @@ describe("Query - globalSearch", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
+  let authUser: User.Mongo;
   let userData: User.Mongo[];
   let companyData: Company.Mongo[];
   let postData: Post.Mongo[];

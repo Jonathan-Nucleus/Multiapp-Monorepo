@@ -29,14 +29,14 @@ describe("Query - companyProfile", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
-  let user1: User.Mongo | null;
-  let company1: Company.Mongo | null;
+  let authUser: User.Mongo;
+  let user1: User.Mongo;
+  let company1: Company.Mongo;
 
   beforeAll(async () => {
     authUser = await createUser();
     user1 = await createUser();
-    company1 = await createCompany(user1?._id);
+    company1 = await createCompany(user1._id);
     server = createTestApolloServer(authUser);
   });
 
@@ -67,13 +67,13 @@ describe("Query - companyProfile", () => {
     const res = await server.executeOperation({
       query,
       variables: {
-        companyId: company1?._id.toString(),
+        companyId: company1._id.toString(),
       },
     });
 
     expect(res.data?.companyProfile.name).toBe(company1?.name);
     const memberIds = _.map(res.data?.companyProfile.members, "_id");
-    expect(memberIds).toContain(user1?._id.toString());
-    expect(memberIds).not.toContain(authUser?._id.toString());
+    expect(memberIds).toContain(user1._id.toString());
+    expect(memberIds).not.toContain(authUser._id.toString());
   });
 });

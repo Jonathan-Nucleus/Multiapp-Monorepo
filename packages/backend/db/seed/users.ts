@@ -29,10 +29,7 @@ const avatars = [
 
 export default async function (db: Db): Promise<ObjectId[]> {
   // Drop the collection if it exists before (re)creating it
-  await db
-    .collection<User.Mongo>(COLLECTION)
-    .drop()
-    .catch(() => {});
+  await db.collection<User.Mongo>(COLLECTION).drop().catch(console.log);
 
   // Generate user data
   const users = [...Array(NUM_USERS)].map<User.Mongo>((valIgnored, index) => {

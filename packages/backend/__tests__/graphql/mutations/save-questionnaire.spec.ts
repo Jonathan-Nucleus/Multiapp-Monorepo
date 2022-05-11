@@ -16,7 +16,7 @@ describe("Mutations - saveQuestionnaire", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
+  let authUser: User.Mongo;
   const questionnaireData = {
     class: "INDIVIDUAL",
     status: ["MIN_INCOME"],
@@ -99,7 +99,7 @@ describe("Mutations - saveQuestionnaire", () => {
     expect(res.data?.saveQuestionnaire.accreditation).toBe("NONE");
 
     const { users } = await getIgniteDb();
-    const newUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const newUser = (await users.find({ _id: authUser._id })) as User.Mongo;
 
     expect(newUser.questionnaire?.class).toBe("individual");
     expect(newUser.questionnaire?.status).toHaveLength(0);
@@ -121,7 +121,7 @@ describe("Mutations - saveQuestionnaire", () => {
     expect(res.data?.saveQuestionnaire.accreditation).toBe("ACCREDITED");
 
     const { users } = await getIgniteDb();
-    const newUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const newUser = (await users.find({ _id: authUser._id })) as User.Mongo;
 
     expect(newUser.questionnaire?.class).toBe("individual");
     expect(newUser.questionnaire?.status).toHaveLength(1);
@@ -145,7 +145,7 @@ describe("Mutations - saveQuestionnaire", () => {
     expect(res.data?.saveQuestionnaire.accreditation).toBe("ACCREDITED");
 
     const { users } = await getIgniteDb();
-    const newUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const newUser = (await users.find({ _id: authUser._id })) as User.Mongo;
 
     expect(newUser.questionnaire?.class).toBe("individual");
     expect(newUser.questionnaire?.status).toHaveLength(1);
@@ -161,7 +161,7 @@ describe("Mutations - saveQuestionnaire", () => {
       variables: {
         questionnaire: {
           ...questionnaireData,
-          level: "TIER1",
+          status: ["TIER1"],
         },
       },
     });
@@ -175,7 +175,7 @@ describe("Mutations - saveQuestionnaire", () => {
       variables: {
         questionnaire: {
           ...questionnaireData,
-          level: "TIER2",
+          status: ["TIER2"],
         },
       },
     });

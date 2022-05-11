@@ -56,7 +56,7 @@ const resolvers = {
     createdAt: async (
       parent: HelpRequest.Mongo,
       argsIgnored: NoArgs,
-      { db }: ApolloServerContext
+      contextIgnored: ApolloServerContext
     ) => parent._id.getTimestamp(),
 
     user: async (

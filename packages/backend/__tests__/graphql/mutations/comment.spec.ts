@@ -33,9 +33,9 @@ describe("Mutations - comment", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
-  let user: User.Mongo | null;
-  let post1: Post.Mongo | null;
+  let authUser: User.Mongo;
+  let user: User.Mongo;
+  let post1: Post.Mongo;
   const commentData = {
     body: "test post body",
     mentionIds: [toObjectId().toString()],
@@ -44,7 +44,7 @@ describe("Mutations - comment", () => {
   beforeAll(async () => {
     authUser = await createUser();
     user = await createUser();
-    post1 = await createPost(authUser?._id);
+    post1 = await createPost(authUser._id);
     server = createTestApolloServer(authUser);
   });
 
@@ -81,7 +81,7 @@ describe("Mutations - comment", () => {
       variables: {
         comment: {
           ...commentData,
-          postId: post1?._id.toString(),
+          postId: post1._id.toString(),
           mentionIds: ["test"],
         },
       },
@@ -97,7 +97,7 @@ describe("Mutations - comment", () => {
       variables: {
         comment: {
           ...commentData,
-          postId: post1?._id.toString(),
+          postId: post1._id.toString(),
           commentId: "test",
         },
       },
@@ -122,16 +122,16 @@ describe("Mutations - comment", () => {
       variables: {
         comment: {
           ...commentData,
-          postId: post1?._id.toString(),
-          mentionIds: [user?._id.toString()],
+          postId: post1._id.toString(),
+          mentionIds: [user._id.toString()],
         },
       },
     });
 
     expect(res.data?.comment?.body).toBe(commentData.body);
-    expect(res.data?.comment?.mentions[0]._id).toBe(user?._id.toString());
+    expect(res.data?.comment?.mentions[0]._id).toBe(user._id.toString());
 
-    const newPost = (await posts.find(toObjectId(post1?._id))) as Post.Mongo;
+    const newPost = (await posts.find(toObjectId(post1._id))) as Post.Mongo;
 
     expect(post1?.updatedAt?.toISOString()).not.toBe(
       newPost.updatedAt?.toISOString()

@@ -27,17 +27,17 @@ describe("Query - funds", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
-  let company1: Company.Mongo | null;
+  let authUser: User.Mongo;
+  let company1: Company.Mongo;
   let funds: Fund.Mongo[];
 
   beforeAll(async () => {
     authUser = await createUser("user", "client");
-    company1 = await createCompany(authUser?._id);
+    company1 = await createCompany(authUser._id);
     funds = (await Promise.all([
-      await createFund(authUser?._id, company1?._id, "accredited"),
-      await createFund(authUser?._id, company1?._id, "client"),
-      await createFund(authUser?._id, company1?._id, "purchaser"),
+      await createFund(authUser._id, company1._id, "accredited"),
+      await createFund(authUser._id, company1._id, "client"),
+      await createFund(authUser._id, company1._id, "purchaser"),
     ])) as Fund.Mongo[];
 
     server = createTestApolloServer(authUser);

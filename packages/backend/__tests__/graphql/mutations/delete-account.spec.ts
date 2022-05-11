@@ -14,7 +14,7 @@ describe("Mutations - deleteAccount", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
+  let authUser: User.Mongo;
 
   beforeAll(async () => {
     authUser = await createUser();
@@ -33,7 +33,7 @@ describe("Mutations - deleteAccount", () => {
 
     expect(res.data?.deleteAccount).toBeTruthy();
 
-    const newUser = await users.find({ _id: toObjectId(authUser?._id) });
+    const newUser = await users.find({ _id: toObjectId(authUser._id) });
     expect(newUser).toBeNull();
 
     const newUserCount = await db

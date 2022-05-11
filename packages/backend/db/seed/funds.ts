@@ -4,7 +4,7 @@ import { faker } from "@faker-js/faker";
 import { randomInt, randomArray } from "./helpers";
 import { Company } from "../../schemas/company";
 import { Fund } from "../../schemas/fund";
-import { User, AccreditationOptions } from "../../schemas/user";
+import { AccreditationOptions } from "../../schemas/user";
 
 // The name of the mongo collection
 const COLLECTION = "funds";
@@ -13,7 +13,6 @@ const COLLECTION = "funds";
 const MAX_FUNDS_PER_COMPANY = 4;
 const MAX_TEAM_MEMBERS_PER_FUND = 6;
 const MAX_TAGS_PER_FUND = 5;
-const NUM_HIGHLIGHTS = 4;
 
 const accreditationValues = Object.keys(AccreditationOptions).map(
   (key) => AccreditationOptions[key].value
@@ -25,14 +24,11 @@ export default async function (
   companyIds: ObjectId[]
 ): Promise<ObjectId[]> {
   // Drop the collection if it exists before (re)creating it
-  await db
-    .collection(COLLECTION)
-    .drop()
-    .catch(() => {});
+  await db.collection(COLLECTION).drop().catch(console.log);
 
   // Generate comment data
   const managers: Record<string, ObjectId[]> = {};
-  const fundsByCompany = companyIds.map<Fund.Mongo[]>((companyId) => {
+  const fundsByCompany = companyIds.map<Fund.Mongo[]>(() => {
     return [...Array(randomInt(0, MAX_FUNDS_PER_COMPANY))].map<Fund.Mongo>(
       () => {
         const fundId = new ObjectId();

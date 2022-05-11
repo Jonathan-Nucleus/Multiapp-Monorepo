@@ -1,4 +1,3 @@
-import faker from "@faker-js/faker";
 import { ApolloServer, gql } from "apollo-server";
 import { createTestApolloServer } from "../../../lib/server";
 import { ErrorCode } from "../../../lib/validate";
@@ -22,16 +21,16 @@ describe("Mutations - deletePost", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
-  let user1: User.Mongo | null;
-  let post1: Post.Mongo | null;
-  let post2: Post.Mongo | null;
+  let authUser: User.Mongo;
+  let user1: User.Mongo;
+  let post1: Post.Mongo;
+  let post2: Post.Mongo;
 
   beforeAll(async () => {
     authUser = await createUser();
     user1 = await createUser();
-    post1 = await createPost(authUser?._id);
-    post2 = await createPost(user1?._id);
+    post1 = await createPost(authUser._id);
+    post2 = await createPost(user1._id);
     server = createTestApolloServer(authUser);
   });
 
@@ -71,7 +70,7 @@ describe("Mutations - deletePost", () => {
     const res = await server.executeOperation({
       query,
       variables: {
-        postId: post2?._id.toString(),
+        postId: post2._id.toString(),
       },
     });
 
@@ -87,13 +86,13 @@ describe("Mutations - deletePost", () => {
     const res = await server.executeOperation({
       query,
       variables: {
-        postId: post1?._id.toString(),
+        postId: post1._id.toString(),
       },
     });
 
     expect(res.data?.deletePost).toBeTruthy();
 
-    const newPost = await posts.find(toObjectId(post1?._id));
+    const newPost = await posts.find(toObjectId(post1._id));
     expect(newPost).toBeNull();
 
     const newPostCount = await db

@@ -4,7 +4,6 @@ import { ErrorCode } from "../../../lib/validate";
 import { User } from "../../../schemas/user";
 import { createUser, getErrorCode } from "../../config/utils";
 import { getIgniteDb } from "../../../db";
-import { PostCategoryOptions } from "../../../schemas/post";
 
 describe("Mutations - updateUserProfile", () => {
   const query = gql`
@@ -33,7 +32,7 @@ describe("Mutations - updateUserProfile", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
+  let authUser: User.Mongo;
 
   beforeAll(async () => {
     authUser = await createUser();
@@ -80,7 +79,7 @@ describe("Mutations - updateUserProfile", () => {
       query,
       variables: {
         profile: {
-          _id: anotherUser?._id.toString(),
+          _id: anotherUser._id.toString(),
           ...newProfileData,
         },
       },
@@ -94,7 +93,7 @@ describe("Mutations - updateUserProfile", () => {
       query,
       variables: {
         profile: {
-          _id: authUser?._id.toString(),
+          _id: authUser._id.toString(),
           ...newProfileData,
           website: "not-a-real-website",
         },
@@ -106,10 +105,10 @@ describe("Mutations - updateUserProfile", () => {
 
   it("succeeds with correct profile data", async () => {
     const { users } = await getIgniteDb();
-    const oldUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const oldUser = (await users.find({ _id: authUser._id })) as User.Mongo;
 
     const profileData = {
-      _id: authUser?._id.toString(),
+      _id: authUser._id.toString(),
       ...newProfileData,
     };
 
@@ -125,7 +124,7 @@ describe("Mutations - updateUserProfile", () => {
       JSON.stringify(profileData)
     );
 
-    const newUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const newUser = (await users.find({ _id: authUser._id })) as User.Mongo;
 
     expect(JSON.stringify(newUser)).not.toBe(JSON.stringify(oldUser));
     expect(newUser.updatedAt).not.toBe(oldUser.updatedAt);
@@ -133,7 +132,7 @@ describe("Mutations - updateUserProfile", () => {
 
   it("succeeds with partial profile data", async () => {
     const { users } = await getIgniteDb();
-    const oldUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const oldUser = (await users.find({ _id: authUser._id })) as User.Mongo;
 
     const res = await server.executeOperation({
       query,
@@ -159,7 +158,7 @@ describe("Mutations - updateUserProfile", () => {
     expect(res.data?.updateUserProfile?.linkedIn).toBe(oldUser.linkedIn);
     expect(res.data?.updateUserProfile?.twitter).toBe(oldUser.twitter);
 
-    const newUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const newUser = (await users.find({ _id: authUser._id })) as User.Mongo;
 
     expect(JSON.stringify(newUser)).not.toBe(JSON.stringify(oldUser));
     expect(newUser.updatedAt).not.toBe(oldUser.updatedAt);

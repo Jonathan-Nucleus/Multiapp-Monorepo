@@ -20,7 +20,7 @@ describe("Mutations - requestPasswordReset", () => {
 
   let server: ApolloServer;
   let stub: User.Stub | null;
-  let user: User.Mongo | null;
+  let user: User.Mongo;
   const email = faker.internet.email();
 
   beforeAll(async () => {

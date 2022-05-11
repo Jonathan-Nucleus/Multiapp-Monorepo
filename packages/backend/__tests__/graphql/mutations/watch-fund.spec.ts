@@ -26,16 +26,16 @@ describe("Mutations - watchFund", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
-  let company1: Company.Mongo | null;
-  let fund1: Fund.Mongo | null;
-  let fund2: Fund.Mongo | null;
+  let authUser: User.Mongo;
+  let company1: Company.Mongo;
+  let fund1: Fund.Mongo;
+  let fund2: Fund.Mongo;
 
   beforeAll(async () => {
     authUser = await createUser("user", "client");
-    company1 = await createCompany(authUser?._id);
-    fund1 = await createFund(authUser?._id, company1?._id);
-    fund2 = await createFund(authUser?._id, company1?._id, "purchaser");
+    company1 = await createCompany(authUser._id);
+    fund1 = await createFund(authUser._id, company1._id);
+    fund2 = await createFund(authUser._id, company1._id, "purchaser");
     server = createTestApolloServer(authUser);
   });
 
@@ -80,7 +80,7 @@ describe("Mutations - watchFund", () => {
     const res = await server.executeOperation({
       query,
       variables: {
-        fundId: fund2?._id.toString(),
+        fundId: fund2._id.toString(),
         watch: true,
       },
     });
@@ -92,7 +92,7 @@ describe("Mutations - watchFund", () => {
     const res = await server.executeOperation({
       query,
       variables: {
-        fundId: fund1?._id.toString(),
+        fundId: fund1._id.toString(),
         watch: true,
       },
     });
@@ -100,18 +100,18 @@ describe("Mutations - watchFund", () => {
     expect(res.data?.watchFund).toBeDefined();
 
     const { users } = await getIgniteDb();
-    const newUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const newUser = (await users.find({ _id: authUser._id })) as User.Mongo;
     expect(_.map(newUser.watchlistIds, (item) => item.toString())).toContain(
-      fund1?._id.toString()
+      fund1._id.toString()
     );
-    expect(res.data?.watchFund?.watchlistIds).toContain(fund1?._id.toString());
+    expect(res.data?.watchFund?.watchlistIds).toContain(fund1._id.toString());
   });
 
   it("succeeds to unwatch a fund", async () => {
     const res = await server.executeOperation({
       query,
       variables: {
-        fundId: fund1?._id.toString(),
+        fundId: fund1._id.toString(),
         watch: false,
       },
     });
@@ -119,12 +119,12 @@ describe("Mutations - watchFund", () => {
     expect(res.data?.watchFund).toBeDefined();
 
     const { users } = await getIgniteDb();
-    const newUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const newUser = (await users.find({ _id: authUser._id })) as User.Mongo;
     expect(
       _.map(newUser.watchlistIds, (item) => item.toString())
-    ).not.toContain(fund1?._id.toString());
+    ).not.toContain(fund1._id.toString());
     expect(res.data?.watchFund?.watchlistIds).not.toContain(
-      fund1?._id.toString()
+      fund1._id.toString()
     );
   });
 });

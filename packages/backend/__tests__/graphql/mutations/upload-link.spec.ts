@@ -1,6 +1,5 @@
 import faker from "@faker-js/faker";
 import { ApolloServer, gql } from "apollo-server";
-import _ from "lodash";
 import * as S3RequestPresigner from "@aws-sdk/s3-request-presigner";
 import { createTestApolloServer } from "../../../lib/server";
 import { ErrorCode } from "../../../lib/validate";
@@ -21,7 +20,7 @@ describe("Mutations - uploadLink", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
+  let authUser: User.Mongo;
   const fileExt = faker.system.commonFileExt();
   const fileData = {
     localFilename: faker.system.commonFileName(fileExt),

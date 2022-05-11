@@ -13,7 +13,7 @@ export enum ErrorCode {
 }
 
 export class NotFoundError extends ApolloError {
-  constructor(resource: string = "User") {
+  constructor(resource = "User") {
     super(`${resource} not found`, ErrorCode.NOT_FOUND);
 
     Object.defineProperty(this, "name", { value: "NotFoundError" });
@@ -56,7 +56,7 @@ export class InternalServerError extends ApolloError {
   }
 }
 
-export function validateArgs<T>(schema: yup.BaseSchema<T>, args: Object): T {
+export function validateArgs<T>(schema: yup.BaseSchema<T>, args: unknown): T {
   try {
     schema.validateSync(args, { abortEarly: false });
   } catch (err) {

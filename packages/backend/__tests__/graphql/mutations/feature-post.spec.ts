@@ -22,16 +22,16 @@ describe("Mutations - featurePost", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
-  let user: User.Mongo | null;
-  let post1: Post.Mongo | null;
-  let post2: Post.Mongo | null;
+  let authUser: User.Mongo;
+  let user: User.Mongo;
+  let post1: Post.Mongo;
+  let post2: Post.Mongo;
 
   beforeAll(async () => {
     authUser = await createUser();
     user = await createUser();
-    post1 = await createPost(authUser?._id);
-    post2 = await createPost(user?._id);
+    post1 = await createPost(authUser._id);
+    post2 = await createPost(user._id);
     server = createTestApolloServer(authUser);
   });
 
@@ -64,7 +64,7 @@ describe("Mutations - featurePost", () => {
     const res = await server.executeOperation({
       query,
       variables: {
-        postId: post2?._id.toString(),
+        postId: post2._id.toString(),
         feature: true,
       },
     });
@@ -76,12 +76,12 @@ describe("Mutations - featurePost", () => {
     const res = await server.executeOperation({
       query,
       variables: {
-        postId: post1?._id.toString(),
+        postId: post1._id.toString(),
         feature: true,
       },
     });
 
-    expect(res.data?.featurePost._id.toString()).toBe(post1?._id.toString());
+    expect(res.data?.featurePost._id.toString()).toBe(post1._id.toString());
     expect(res.data?.featurePost.featured).toBeTruthy();
   });
 
@@ -89,12 +89,12 @@ describe("Mutations - featurePost", () => {
     const res = await server.executeOperation({
       query,
       variables: {
-        postId: post1?._id.toString(),
+        postId: post1._id.toString(),
         feature: false,
       },
     });
 
-    expect(res.data?.featurePost._id.toString()).toBe(post1?._id.toString());
+    expect(res.data?.featurePost._id.toString()).toBe(post1._id.toString());
     expect(res.data?.featurePost.featured).toBeFalsy();
   });
 });

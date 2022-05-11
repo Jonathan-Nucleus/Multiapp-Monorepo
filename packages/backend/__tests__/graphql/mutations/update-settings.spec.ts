@@ -14,7 +14,7 @@ describe("Mutations - updateSettings", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
+  let authUser: User.Mongo;
 
   beforeAll(async () => {
     authUser = await createUser();
@@ -36,7 +36,7 @@ describe("Mutations - updateSettings", () => {
 
   it("succeeds with correct settings", async () => {
     const { users } = await getIgniteDb();
-    const oldUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const oldUser = (await users.find({ _id: authUser._id })) as User.Mongo;
 
     const postCategory = Object.keys(PostCategoryOptions)[0];
 
@@ -52,7 +52,7 @@ describe("Mutations - updateSettings", () => {
     expect(res.data).toHaveProperty("updateSettings");
     expect(res.data?.updateSettings).toBeTruthy();
 
-    const newUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const newUser = (await users.find({ _id: authUser._id })) as User.Mongo;
 
     expect(newUser.settings?.interests).toContain(
       PostCategoryOptions[postCategory].value

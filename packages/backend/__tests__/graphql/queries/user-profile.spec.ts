@@ -38,16 +38,16 @@ describe("Query - userProfile", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
-  let user1: User.Mongo | null;
-  let company1: Company.Mongo | null;
-  let company2: Company.Mongo | null;
+  let authUser: User.Mongo;
+  let user1: User.Mongo;
+  let company1: Company.Mongo;
+  let company2: Company.Mongo;
 
   beforeAll(async () => {
     authUser = await createUser();
     user1 = await createUser();
-    company1 = await createCompany(user1?._id);
-    company2 = await createCompany(user1?._id);
+    company1 = await createCompany(user1._id);
+    company2 = await createCompany(user1._id);
     server = createTestApolloServer(authUser);
   });
 
@@ -78,7 +78,7 @@ describe("Query - userProfile", () => {
     const res = await server.executeOperation({
       query,
       variables: {
-        userId: user1?._id.toString(),
+        userId: user1._id.toString(),
       },
     });
 
@@ -87,9 +87,9 @@ describe("Query - userProfile", () => {
     expect(res.data?.userProfile.avatar).toBe(user1?.avatar);
     expect(res.data?.userProfile.position).toBe(user1?.position);
     expect(res.data?.userProfile.createdAt).toBeFalsy();
-    expect(res.data?.userProfile.company._id).toBe(company1?._id.toString());
+    expect(res.data?.userProfile.company._id).toBe(company1._id.toString());
     const companyIds = _.map(res.data?.userProfile.companies, "_id");
-    expect(companyIds).toContain(company1?._id.toString());
-    expect(companyIds).toContain(company2?._id.toString());
+    expect(companyIds).toContain(company1._id.toString());
+    expect(companyIds).toContain(company2._id.toString());
   });
 });

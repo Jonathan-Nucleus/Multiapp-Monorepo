@@ -20,7 +20,7 @@ const resolvers = {
     createdAt: async (
       parent: Comment.Mongo,
       argsIgnored: NoArgs,
-      { db }: ApolloServerContext
+      contextIgnored: ApolloServerContext
     ) => parent._id.getTimestamp(),
 
     user: async (

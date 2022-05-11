@@ -22,10 +22,9 @@ describe("Mutations - reportPost", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
-  let user: User.Mongo | null;
-  let post1: Post.Mongo | null;
-  let post2: Post.Mongo | null;
+  let authUser: User.Mongo;
+  let user: User.Mongo;
+  let post1: Post.Mongo;
   const reportData = {
     postId: toObjectId().toString(),
     violations: [Object.keys(PostViolationOptions)[0]],
@@ -35,8 +34,7 @@ describe("Mutations - reportPost", () => {
   beforeAll(async () => {
     authUser = await createUser();
     user = await createUser();
-    post1 = await createPost(authUser?._id);
-    post2 = await createPost(user?._id);
+    post1 = await createPost(user._id);
     server = createTestApolloServer(authUser);
   });
 
@@ -103,7 +101,7 @@ describe("Mutations - reportPost", () => {
       variables: {
         report: {
           ...reportData,
-          postId: post2?._id.toString(),
+          postId: post1._id.toString(),
         },
       },
     });
@@ -112,14 +110,14 @@ describe("Mutations - reportPost", () => {
 
     const { posts, users } = await getIgniteDb();
 
-    const newUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const newUser = (await users.find({ _id: authUser._id })) as User.Mongo;
     expect(
       _.map(newUser.reportedPosts, (item) => item.postId.toString())
-    ).toContain(post2?._id.toString());
+    ).toContain(post1._id.toString());
 
-    const newPost = await posts.find(post2?._id as MongoId);
+    const newPost = await posts.find(post1._id as MongoId);
     expect(_.map(newPost?.reporterIds, (item) => item.toString())).toContain(
-      authUser?._id.toString()
+      authUser._id.toString()
     );
   });
 
@@ -129,7 +127,7 @@ describe("Mutations - reportPost", () => {
       variables: {
         report: {
           ...reportData,
-          postId: post2?._id.toString(),
+          postId: post1._id.toString(),
         },
       },
     });

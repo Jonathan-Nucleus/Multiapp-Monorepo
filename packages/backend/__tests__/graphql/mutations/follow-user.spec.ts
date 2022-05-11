@@ -18,8 +18,8 @@ describe("Mutations - followUser", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
-  let user: User.Mongo | null;
+  let authUser: User.Mongo;
+  let user: User.Mongo;
 
   beforeAll(async () => {
     authUser = await createUser();
@@ -45,7 +45,7 @@ describe("Mutations - followUser", () => {
       query,
       variables: {
         follow: true,
-        userId: authUser?._id.toString(),
+        userId: authUser._id.toString(),
       },
     });
 
@@ -73,7 +73,7 @@ describe("Mutations - followUser", () => {
       query,
       variables: {
         follow: true,
-        userId: user?._id.toString(),
+        userId: user._id.toString(),
       },
     });
 
@@ -82,14 +82,14 @@ describe("Mutations - followUser", () => {
     const { users } = await getIgniteDb();
 
     const [newUser1, newUser2] = (await users.findAll([
-      toObjectId(authUser?._id),
-      toObjectId(user?._id),
+      toObjectId(authUser._id),
+      toObjectId(user._id),
     ])) as User.Mongo[];
     expect(_.map(newUser1.followingIds, (item) => item.toString())).toContain(
-      user?._id.toString()
+      user._id.toString()
     );
     expect(_.map(newUser2.followerIds, (item) => item.toString())).toContain(
-      authUser?._id.toString()
+      authUser._id.toString()
     );
 
     spy.mockRestore();
@@ -106,22 +106,22 @@ describe("Mutations - followUser", () => {
       query,
       variables: {
         follow: false,
-        userId: user?._id.toString(),
+        userId: user._id.toString(),
       },
     });
 
     expect(res.data?.followUser).toBeTruthy();
 
     const [newUser1, newUser2] = (await users.findAll([
-      toObjectId(authUser?._id),
-      toObjectId(user?._id),
+      toObjectId(authUser._id),
+      toObjectId(user._id),
     ])) as User.Mongo[];
     expect(
       _.map(newUser1.followingIds, (item) => item.toString())
-    ).not.toContain(user?._id.toString());
+    ).not.toContain(user._id.toString());
     expect(
       _.map(newUser2.followerIds, (item) => item.toString())
-    ).not.toContain(authUser?._id.toString());
+    ).not.toContain(authUser._id.toString());
 
     spy.mockRestore();
   });

@@ -21,10 +21,8 @@ describe("Mutations - mutePost", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
-  let user: User.Mongo | null;
-  let post1: Post.Mongo | null;
-  let post2: Post.Mongo | null;
+  let authUser: User.Mongo;
+  let post1: Post.Mongo;
   const muteData = {
     postId: toObjectId().toString(),
     mute: true,
@@ -32,9 +30,7 @@ describe("Mutations - mutePost", () => {
 
   beforeAll(async () => {
     authUser = await createUser();
-    user = await createUser();
-    post1 = await createPost(authUser?._id);
-    post2 = await createPost(user?._id);
+    post1 = await createPost(authUser._id);
     server = createTestApolloServer(authUser);
   });
 
@@ -67,7 +63,7 @@ describe("Mutations - mutePost", () => {
       query,
       variables: {
         ...muteData,
-        postId: post1?._id.toString(),
+        postId: post1._id.toString(),
       },
     });
 
@@ -75,9 +71,9 @@ describe("Mutations - mutePost", () => {
 
     const { users } = await getIgniteDb();
 
-    const newUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const newUser = (await users.find({ _id: authUser._id })) as User.Mongo;
     expect(_.map(newUser.mutedPostIds, (item) => item.toString())).toContain(
-      post1?._id.toString()
+      post1._id.toString()
     );
   });
 
@@ -86,7 +82,7 @@ describe("Mutations - mutePost", () => {
       query,
       variables: {
         ...muteData,
-        postId: post1?._id.toString(),
+        postId: post1._id.toString(),
       },
     });
 
@@ -98,7 +94,7 @@ describe("Mutations - mutePost", () => {
       query,
       variables: {
         mute: false,
-        postId: post1?._id.toString(),
+        postId: post1._id.toString(),
       },
     });
 
@@ -106,9 +102,9 @@ describe("Mutations - mutePost", () => {
 
     const { users } = await getIgniteDb();
 
-    const newUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const newUser = (await users.find({ _id: authUser._id })) as User.Mongo;
     expect(
       _.map(newUser.mutedPostIds, (item) => item.toString())
-    ).not.toContain(post1?._id.toString());
+    ).not.toContain(post1._id.toString());
   });
 });

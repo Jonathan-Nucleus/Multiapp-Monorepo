@@ -1,10 +1,7 @@
 import { ApolloServer, gql } from "apollo-server";
-import _ from "lodash";
 import { createTestApolloServer } from "../../../lib/server";
 import { User } from "../../../schemas/user";
-import { createCompany, createFund, createUser } from "../../config/utils";
-import { Company } from "../../../schemas/company";
-import { Fund } from "../../../schemas/fund";
+import { createUser } from "../../config/utils";
 
 describe("Query - professionals", () => {
   const query = gql`
@@ -18,12 +15,11 @@ describe("Query - professionals", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
-  let users: User.Mongo[];
+  let authUser: User.Mongo;
 
   beforeAll(async () => {
     authUser = await createUser("user");
-    users = (await Promise.all([
+    const usersIgnored = (await Promise.all([
       await createUser("professional", "none"),
       await createUser("professional", "none"),
       await createUser("professional", "none", true),

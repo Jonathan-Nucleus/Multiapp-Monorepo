@@ -2,3 +2,4 @@ __snapshots__
 coverage
 .firebase/*
 !.firebase/.keep
+.eslintcache

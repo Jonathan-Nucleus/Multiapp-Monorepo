@@ -121,7 +121,7 @@ export function getIgniteDb(connectionUrl?: string): Promise<IgniteDb> {
   return connectionPromise;
 }
 
-export const disconnectDb = async () => {
+export const disconnectDb = async (): Promise<void> => {
   if (instance) {
     await instance.db.dropDatabase();
     await instance.client.close();

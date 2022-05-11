@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { ValueOf, GraphQLEntity } from "../lib/mongo-helper";
+import { GraphQLEntity } from "../lib/mongo-helper";
 
 import { ContentCreatorSchema } from "./user";
 import type { User, ContentCreator } from "./user";

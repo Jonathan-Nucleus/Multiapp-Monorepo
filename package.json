@@ -9,7 +9,8 @@
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "test": "lerna run test",
-    "typecheck": "lerna run typecheck"
+    "typecheck": "lerna run typecheck",
+    "lint": "lerna run lint"
   },
   "devDependencies": {
     "@types/jest": "27.0.2",

@@ -17,10 +17,7 @@ export default async function (
   postIds: ObjectId[]
 ): Promise<ObjectId[]> {
   // Drop the collection if it exists before (re)creating it
-  await db
-    .collection(COLLECTION)
-    .drop()
-    .catch(() => {});
+  await db.collection(COLLECTION).drop().catch(console.log);
 
   // Generate comment data
   const commentsByPost: Record<string, ObjectId[]> = {};

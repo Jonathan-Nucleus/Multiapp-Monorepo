@@ -1,5 +1,4 @@
 import { ApolloServer, gql } from "apollo-server";
-import _ from "lodash";
 import { createTestApolloServer } from "../../../lib/server";
 import { User } from "../../../schemas/user";
 import { createUser } from "../../config/utils";
@@ -17,7 +16,7 @@ describe("Query - mentionUsers", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
+  let authUser: User.Mongo;
   let usersData: User.Mongo[];
 
   beforeAll(async () => {

@@ -20,7 +20,7 @@ describe("Mutations - resetPassword", () => {
 
   let server: ApolloServer;
   let stub: User.Stub | null;
-  let user: User.Mongo | null;
+  let user: User.Mongo;
 
   beforeAll(async () => {
     server = createTestApolloServer();

@@ -1,5 +1,4 @@
 import { ApolloServer, gql } from "apollo-server";
-import _ from "lodash";
 import { createTestApolloServer } from "../../../lib/server";
 import { ErrorCode } from "../../../lib/validate";
 import { User } from "../../../schemas/user";
@@ -36,16 +35,16 @@ describe("Query - fund", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
-  let company1: Company.Mongo | null;
+  let authUser: User.Mongo;
+  let company1: Company.Mongo;
   let funds: Fund.Mongo[];
 
   beforeAll(async () => {
     authUser = await createUser("user", "accredited");
-    company1 = await createCompany(authUser?._id);
+    company1 = await createCompany(authUser._id);
     funds = (await Promise.all([
-      await createFund(authUser?._id, company1?._id, "accredited"),
-      await createFund(authUser?._id, company1?._id, "client"),
+      await createFund(authUser._id, company1._id, "accredited"),
+      await createFund(authUser._id, company1._id, "client"),
     ])) as Fund.Mongo[];
     server = createTestApolloServer(authUser);
   });
@@ -81,12 +80,12 @@ describe("Query - fund", () => {
       },
     });
 
-    expect(res.data?.fund._id).toBe(funds[0]?._id.toString());
+    expect(res.data?.fund._id).toBe(funds[0]._id.toString());
     expect(res.data?.fund.name).toBe(funds[0]?.name.toString());
-    expect(res.data?.fund.manager._id).toBe(authUser?._id.toString());
+    expect(res.data?.fund.manager._id).toBe(authUser._id.toString());
     expect(res.data?.fund.manager.firstName).toBe(authUser?.firstName);
     expect(res.data?.fund.manager.lastName).toBe(authUser?.lastName);
-    expect(res.data?.fund.company._id).toBe(company1?._id.toString());
+    expect(res.data?.fund.company._id).toBe(company1._id.toString());
     expect(res.data?.fund.company.name).toBe(company1?.name);
   });
 

@@ -2,10 +2,7 @@ import { ApolloServer, gql } from "apollo-server";
 import _ from "lodash";
 import { createTestApolloServer } from "../../../lib/server";
 import { User } from "../../../schemas/user";
-import {
-  Notification,
-  NotificationTypeOptions,
-} from "../../../schemas/notification";
+import { Notification } from "../../../schemas/notification";
 import { createNotification, createUser } from "../../config/utils";
 import { getIgniteDb } from "../../../db";
 
@@ -28,8 +25,8 @@ describe("Query - notifications", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
-  let user1: User.Mongo | null;
+  let authUser: User.Mongo;
+  let user1: User.Mongo;
   let notifications: Notification.Mongo[];
 
   beforeAll(async () => {
@@ -55,10 +52,10 @@ describe("Query - notifications", () => {
     expect(ids).toContain(notifications[1]._id.toString());
     expect(ids).toContain(notifications[2]._id.toString());
 
-    expect(res.data?.notifications[0].user._id).toBe(authUser?._id.toString());
+    expect(res.data?.notifications[0].user._id).toBe(authUser._id.toString());
 
     const { users } = await getIgniteDb();
-    const newUser = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const newUser = (await users.find({ _id: authUser._id })) as User.Mongo;
     expect(newUser.notificationBadge).toBe(2);
   });
 });

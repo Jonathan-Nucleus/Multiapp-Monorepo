@@ -1,10 +1,5 @@
 import { gql } from "apollo-server";
-import {
-  PartialSchema,
-  ApolloServerContext,
-  NoArgs,
-  secureEndpoint,
-} from "../lib/apollo-helper";
+import { PartialSchema, secureEndpoint } from "../lib/apollo-helper";
 
 import type { Company } from "../schemas/company";
 import { CompanySchema } from "../schemas/company";
@@ -22,7 +17,7 @@ const resolvers = {
     ...contentCreatorResolvers,
 
     createdAt: secureEndpoint(
-      async (parent: Company.Mongo, argsIgnored, { db }) =>
+      async (parent: Company.Mongo, argsIgnored, contextIgnored) =>
         parent._id.getTimestamp()
     ),
 

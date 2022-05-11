@@ -13,7 +13,7 @@ import "dotenv/config";
 const IGNITE_SECRET = process.env.IGNITE_SECRET;
 if (!IGNITE_SECRET) throw new Error("IGNITE_SECRET env var undefined");
 
-export const createApolloServer = (mongoUrl?: string) =>
+export const createApolloServer = (mongoUrl?: string): ApolloServer =>
   new ApolloServer({
     schema,
     context: async (context): Promise<ApolloServerContext> => {
@@ -45,7 +45,9 @@ export const createApolloServer = (mongoUrl?: string) =>
     introspection: false,
   });
 
-export const createTestApolloServer = (user?: User.Mongo | null) =>
+export const createTestApolloServer = (
+  user?: User.Mongo | null
+): ApolloServer =>
   new ApolloServer({
     schema,
     context: async (): Promise<ApolloServerContext> => {

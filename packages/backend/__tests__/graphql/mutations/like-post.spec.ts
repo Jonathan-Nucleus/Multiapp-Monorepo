@@ -1,5 +1,4 @@
 import { ApolloServer, gql } from "apollo-server";
-import _ from "lodash";
 import * as FirebaseModule from "../../../lib/firebase-helper";
 import { createTestApolloServer } from "../../../lib/server";
 import { ErrorCode } from "../../../lib/validate";
@@ -26,9 +25,8 @@ describe("Mutations - likePost", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
-  let user: User.Mongo | null;
-  let post1: Post.Mongo | null;
+  let authUser: User.Mongo;
+  let post1: Post.Mongo;
   const likeData = {
     postId: toObjectId().toString(),
     like: true,
@@ -36,8 +34,7 @@ describe("Mutations - likePost", () => {
 
   beforeAll(async () => {
     authUser = await createUser();
-    user = await createUser();
-    post1 = await createPost(authUser?._id);
+    post1 = await createPost(authUser._id);
     server = createTestApolloServer(authUser);
   });
 
@@ -74,12 +71,12 @@ describe("Mutations - likePost", () => {
       query,
       variables: {
         ...likeData,
-        postId: post1?._id.toString(),
+        postId: post1._id.toString(),
       },
     });
 
-    expect(res.data?.likePost._id).toBe(post1?._id.toString());
-    expect(res.data?.likePost.likeIds).toContain(authUser?._id.toString());
+    expect(res.data?.likePost._id).toBe(post1._id.toString());
+    expect(res.data?.likePost.likeIds).toContain(authUser._id.toString());
 
     spy.mockRestore();
   });
@@ -93,12 +90,12 @@ describe("Mutations - likePost", () => {
       query,
       variables: {
         like: false,
-        postId: post1?._id.toString(),
+        postId: post1._id.toString(),
       },
     });
 
-    expect(res.data?.likePost._id).toBe(post1?._id.toString());
-    expect(res.data?.likePost.likeIds).not.toContain(authUser?._id.toString());
+    expect(res.data?.likePost._id).toBe(post1._id.toString());
+    expect(res.data?.likePost.likeIds).not.toContain(authUser._id.toString());
 
     spy.mockRestore();
   });

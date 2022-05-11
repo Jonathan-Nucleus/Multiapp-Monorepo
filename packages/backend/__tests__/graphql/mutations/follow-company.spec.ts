@@ -22,14 +22,14 @@ describe("Mutations - followCompany", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
-  let user: User.Mongo | null;
-  let company1: Company.Mongo | null;
+  let authUser: User.Mongo;
+  let user: User.Mongo;
+  let company1: Company.Mongo;
 
   beforeAll(async () => {
     authUser = await createUser();
     user = await createUser();
-    company1 = await createCompany(user?._id);
+    company1 = await createCompany(user._id);
     server = createTestApolloServer(authUser);
   });
 
@@ -63,7 +63,7 @@ describe("Mutations - followCompany", () => {
       query,
       variables: {
         follow: true,
-        companyId: company1?._id.toString(),
+        companyId: company1._id.toString(),
       },
     });
 
@@ -71,15 +71,15 @@ describe("Mutations - followCompany", () => {
 
     const { users, companies } = await getIgniteDb();
 
-    const newUser1 = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const newUser1 = (await users.find({ _id: authUser._id })) as User.Mongo;
     const newCompany1 = (await companies.find(
-      toObjectId(company1?._id)
+      toObjectId(company1._id)
     )) as Company.Mongo;
     expect(
       _.map(newUser1.companyFollowingIds, (item) => item.toString())
-    ).toContain(company1?._id.toString());
+    ).toContain(company1._id.toString());
     expect(_.map(newCompany1.followerIds, (item) => item.toString())).toContain(
-      authUser?._id.toString()
+      authUser._id.toString()
     );
   });
 
@@ -88,7 +88,7 @@ describe("Mutations - followCompany", () => {
       query,
       variables: {
         follow: false,
-        companyId: company1?._id.toString(),
+        companyId: company1._id.toString(),
       },
     });
 
@@ -96,15 +96,15 @@ describe("Mutations - followCompany", () => {
 
     const { users, companies } = await getIgniteDb();
 
-    const newUser1 = (await users.find({ _id: authUser?._id })) as User.Mongo;
+    const newUser1 = (await users.find({ _id: authUser._id })) as User.Mongo;
     const newCompany1 = (await companies.find(
-      toObjectId(company1?._id)
+      toObjectId(company1._id)
     )) as Company.Mongo;
     expect(
       _.map(newUser1.companyFollowingIds, (item) => item.toString())
-    ).not.toContain(company1?._id.toString());
+    ).not.toContain(company1._id.toString());
     expect(
       _.map(newCompany1.followerIds, (item) => item.toString())
-    ).not.toContain(authUser?._id.toString());
+    ).not.toContain(authUser._id.toString());
   });
 });

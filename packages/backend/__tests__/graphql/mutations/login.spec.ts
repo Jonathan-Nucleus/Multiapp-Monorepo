@@ -12,7 +12,7 @@ describe("Mutations - login", () => {
   `;
 
   let server: ApolloServer;
-  let user: User.Mongo | null;
+  let user: User.Mongo;
 
   beforeAll(async () => {
     server = createTestApolloServer();

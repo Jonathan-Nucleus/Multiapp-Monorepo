@@ -28,10 +28,9 @@ describe("Mutations - editComment", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
-  let user: User.Mongo | null;
-  let post1: Post.Mongo | null;
-  let comment1: Comment.Mongo | null;
+  let authUser: User.Mongo;
+  let post1: Post.Mongo;
+  let comment1: Comment.Mongo;
   const commentData = {
     body: faker.lorem.sentence(),
     mentionIds: [toObjectId().toString()],
@@ -39,9 +38,8 @@ describe("Mutations - editComment", () => {
 
   beforeAll(async () => {
     authUser = await createUser();
-    user = await createUser();
-    post1 = await createPost(authUser?._id);
-    comment1 = await createComment(authUser?._id, post1?._id);
+    post1 = await createPost(authUser._id);
+    comment1 = await createComment(authUser._id, post1._id);
     server = createTestApolloServer(authUser);
   });
 
@@ -137,17 +135,17 @@ describe("Mutations - editComment", () => {
       variables: {
         comment: {
           ...commentData,
-          _id: comment1?._id.toString(),
+          _id: comment1._id.toString(),
         },
       },
     });
 
     expect(res.data?.editComment?.body).toBe(commentData.body);
-    expect(res.data?.editComment?.postId).toBe(post1?._id.toString());
+    expect(res.data?.editComment?.postId).toBe(post1._id.toString());
 
     const { comments } = await getIgniteDb();
 
-    const newComment = await comments.find(toObjectId(comment1?._id));
+    const newComment = await comments.find(toObjectId(comment1._id));
     expect(newComment?.body).toBe(commentData.body);
     expect(newComment?.updatedAt?.toISOString()).not.toBe(
       comment1?.updatedAt?.toISOString()

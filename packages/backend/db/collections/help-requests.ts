@@ -3,7 +3,6 @@
  * help requests from a MongoDB database.
  */
 
-import _ from "lodash";
 import { Collection, ObjectId } from "mongodb";
 import { MongoId, toObjectId } from "../../lib/mongo-helper";
 import { HelpRequest } from "../../schemas/help-request";

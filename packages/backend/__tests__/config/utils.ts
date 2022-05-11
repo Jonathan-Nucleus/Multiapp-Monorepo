@@ -22,17 +22,15 @@ import { Comment } from "../../schemas/comment";
 import { Company } from "../../schemas/company";
 import { Fund } from "../../schemas/fund";
 import { InternalServerError } from "../../lib/validate";
-import {
-  NotificationType,
-  Notification,
-  NotificationTypeOptions,
-} from "../../schemas/notification";
+import { NotificationType, Notification } from "../../schemas/notification";
 
-export const getFieldError = (response: GraphQLResponse, field: string) =>
-  (response.errors?.[0].extensions?.errors as any)[field];
+export const getFieldError = (
+  response: GraphQLResponse,
+  field: string
+): unknown => (response.errors?.[0].extensions?.errors as never)[field];
 
-export const getErrorCode = (response: GraphQLResponse) =>
-  response.errors?.[0].extensions?.code;
+export const getErrorCode = (response: GraphQLResponse): string =>
+  response.errors?.[0].extensions?.code as string;
 
 export enum DbCollection {
   USERS = "users",
@@ -46,7 +44,7 @@ export enum DbCollection {
 export const createUser = async (
   role: UserRole = "user",
   accreditation: Accreditation = "none",
-  featured: boolean = false
+  featured = false
 ): Promise<User.Mongo> => {
   const { db } = await getIgniteDb();
   const firstName = faker.name.firstName();
@@ -247,7 +245,7 @@ export const createFund = async (
 export const createNotification = async (
   fromUserId: MongoId,
   toUserId: MongoId,
-  isNew: boolean = true,
+  isNew = true,
   type: NotificationType = "followed-by-user"
 ): Promise<Notification.Mongo> => {
   const { db } = await getIgniteDb();
@@ -291,7 +289,7 @@ export const deserializeUser = (user: User.Mongo): DeserializedUser => {
   };
 };
 
-export const generateAuthToken = (user?: User.Mongo | null): string => {
+export const generateAuthToken = (user?: User.Mongo): string => {
   if (!user) {
     throw new Error("Invalid user.");
   }

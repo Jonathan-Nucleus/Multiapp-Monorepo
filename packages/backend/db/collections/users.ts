@@ -189,7 +189,7 @@ const createUsersCollection = (
         // Verify google token
         const client = new OAuth2Client(process.env.GOOGLE_ID as string);
         try {
-          const ticket = await client.verifyIdToken({
+          const ticketIgnored = await client.verifyIdToken({
             idToken: tokenId,
             audience: process.env.GOOLGE_ID as string,
           });

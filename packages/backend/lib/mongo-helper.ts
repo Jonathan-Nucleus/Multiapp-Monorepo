@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-types */
+
 import { ObjectId } from "mongodb";
 
 export type MongoId = ObjectId | string;

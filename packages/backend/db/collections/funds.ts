@@ -3,13 +3,8 @@
  * specific funds associated with companies from a MongoDB database.
  */
 
-import { Collection, ObjectId } from "mongodb";
-import {
-  MongoId,
-  toObjectId,
-  toObjectIds,
-  GraphQLEntity,
-} from "../../lib/mongo-helper";
+import { Collection } from "mongodb";
+import { MongoId, toObjectId, toObjectIds } from "../../lib/mongo-helper";
 import type { Fund } from "../../schemas/fund";
 import type { Accreditation } from "../../schemas/user";
 
@@ -75,10 +70,7 @@ const createFundsCollection = (fundsCollection: Collection<Fund.Mongo>) => {
      *
      * @returns The list of funds.
      */
-    findByKeyword: async (
-      search: string = "",
-      limit = 10
-    ): Promise<Fund.Mongo[]> => {
+    findByKeyword: async (search = "", limit = 10): Promise<Fund.Mongo[]> => {
       const funds = (await fundsCollection
         .aggregate([
           {

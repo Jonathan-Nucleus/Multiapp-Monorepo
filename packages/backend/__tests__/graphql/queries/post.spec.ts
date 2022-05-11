@@ -1,5 +1,4 @@
 import { ApolloServer, gql } from "apollo-server";
-import _ from "lodash";
 import { createTestApolloServer } from "../../../lib/server";
 import { ErrorCode } from "../../../lib/validate";
 import { User } from "../../../schemas/user";
@@ -27,14 +26,14 @@ describe("Query - post", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
-  let user: User.Mongo | null;
-  let post1: Post.Mongo | null;
+  let authUser: User.Mongo;
+  let user: User.Mongo;
+  let post1: Post.Mongo;
 
   beforeAll(async () => {
     authUser = await createUser();
     user = await createUser();
-    post1 = await createPost(user?._id);
+    post1 = await createPost(user._id);
     server = createTestApolloServer(authUser);
   });
 
@@ -65,12 +64,12 @@ describe("Query - post", () => {
     const res = await server.executeOperation({
       query,
       variables: {
-        postId: post1?._id.toString(),
+        postId: post1._id.toString(),
       },
     });
 
-    expect(res.data?.post._id).toBe(post1?._id.toString());
-    expect(res.data?.post.user._id).toBe(user?._id.toString());
+    expect(res.data?.post._id).toBe(post1._id.toString());
+    expect(res.data?.post.user._id).toBe(user._id.toString());
     expect(res.data?.post.user.firstName).toBe(user?.firstName);
     expect(res.data?.post.user.lastName).toBe(user?.lastName);
   });

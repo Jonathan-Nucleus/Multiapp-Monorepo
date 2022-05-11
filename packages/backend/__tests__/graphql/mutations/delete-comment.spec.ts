@@ -1,4 +1,3 @@
-import faker from "@faker-js/faker";
 import { ApolloServer, gql } from "apollo-server";
 import { createTestApolloServer } from "../../../lib/server";
 import { ErrorCode } from "../../../lib/validate";
@@ -24,18 +23,18 @@ describe("Mutations - deleteComment", () => {
   `;
 
   let server: ApolloServer;
-  let authUser: User.Mongo | null;
-  let user1: User.Mongo | null;
-  let post1: Post.Mongo | null;
-  let comment1: Comment.Mongo | null;
-  let comment2: Comment.Mongo | null;
+  let authUser: User.Mongo;
+  let user1: User.Mongo;
+  let post1: Post.Mongo;
+  let comment1: Comment.Mongo;
+  let comment2: Comment.Mongo;
 
   beforeAll(async () => {
     authUser = await createUser();
     user1 = await createUser();
-    post1 = await createPost(authUser?._id);
-    comment1 = await createComment(authUser?._id, post1?._id);
-    comment2 = await createComment(user1?._id, post1?._id);
+    post1 = await createPost(authUser._id);
+    comment1 = await createComment(authUser._id, post1._id);
+    comment2 = await createComment(user1._id, post1._id);
     server = createTestApolloServer(authUser);
   });
 
@@ -75,7 +74,7 @@ describe("Mutations - deleteComment", () => {
     const res = await server.executeOperation({
       query,
       variables: {
-        commentId: comment2?._id.toString(),
+        commentId: comment2._id.toString(),
       },
     });
 
@@ -83,7 +82,7 @@ describe("Mutations - deleteComment", () => {
   });
 
   it("succeeds to delete a comment", async () => {
-    const { posts, db, comments } = await getIgniteDb();
+    const { db, comments } = await getIgniteDb();
     const oldCommentCount = await db
       .collection(DbCollection.COMMENTS)
       .countDocuments();
@@ -91,13 +90,13 @@ describe("Mutations - deleteComment", () => {
     const res = await server.executeOperation({
       query,
       variables: {
-        commentId: comment1?._id.toString(),
+        commentId: comment1._id.toString(),
       },
     });
 
     expect(res.data?.deleteComment).toBeTruthy();
 
-    const newComment = await comments.find(toObjectId(comment1?._id));
+    const newComment = await comments.find(toObjectId(comment1._id));
     expect(newComment).toBeNull();
 
     const newCommentCount = await db

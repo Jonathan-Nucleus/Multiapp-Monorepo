@@ -3,7 +3,6 @@ import {
   PartialSchema,
   ApolloServerContext,
   NoArgs,
-  secureEndpoint,
 } from "../lib/apollo-helper";
 
 import type { Fund } from "../schemas/fund";
@@ -28,7 +27,7 @@ const resolvers = {
     createdAt: async (
       parent: Fund.Mongo,
       argsIgnored: NoArgs,
-      { db }: ApolloServerContext
+      contextIgnored: ApolloServerContext
     ) => parent._id.getTimestamp(),
 
     manager: async (

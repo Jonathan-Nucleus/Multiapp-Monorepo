@@ -186,7 +186,7 @@ describe("Mutations - editPost", () => {
       variables: {
         post: {
           ...postData,
-          _id: post1?._id.toString(),
+          _id: post1._id.toString(),
           userId: authUser._id.toString(),
         },
       },
@@ -196,7 +196,7 @@ describe("Mutations - editPost", () => {
 
     const { posts } = await getIgniteDb();
 
-    const newPost = await posts.find(toObjectId(post1?._id));
+    const newPost = await posts.find(toObjectId(post1._id));
     expect(newPost?.body).toBe(postData.body);
     expect(newPost?.updatedAt?.toISOString()).not.toBe(
       post1?.updatedAt?.toISOString()
@@ -219,7 +219,7 @@ describe("Mutations - editPost", () => {
 
     const { posts } = await getIgniteDb();
 
-    const newPost = await posts.find(toObjectId(post1?._id));
+    const newPost = await posts.find(toObjectId(post1._id));
     expect(newPost?.body).toBe(postData.body);
     expect(newPost?.updatedAt?.toISOString()).not.toBe(
       post1?.updatedAt?.toISOString()
