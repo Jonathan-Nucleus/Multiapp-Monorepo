@@ -192,7 +192,7 @@ const pickerSelectStyles = StyleSheet.create({
   inputIOS: {
     ...Body1,
     paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingHorizontal: 8,
     color: WHITE,
     width: '100%',
     borderColor: WHITE,

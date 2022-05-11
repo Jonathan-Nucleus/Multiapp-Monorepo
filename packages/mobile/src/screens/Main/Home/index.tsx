@@ -15,8 +15,7 @@ import { SlidersHorizontal } from 'phosphor-react-native';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import MainHeader from 'mobile/src/components/main/Header';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
-import PostItem, { PostItemProps } from 'mobile/src/components/main/PostItem';
-import { showMessage } from 'mobile/src/services/utils';
+import PostItem from 'mobile/src/components/main/PostItem';
 import pStyles from 'mobile/src/theme/pStyles';
 
 import UserPostActionModal from './UserPostActionModal';
@@ -24,7 +23,6 @@ import OwnPostActionModal from './OwnPostActionModal';
 
 import { usePosts, Post } from 'mobile/src/graphql/query/post/usePosts';
 import { useAccount } from 'mobile/src/graphql/query/account';
-
 import { HomeScreen } from 'mobile/src/navigations/MainTabNavigator';
 import FilterModal from 'mobile/src/screens/PostDetails/FilterModal';
 import PostItemPlaceholder from '../../../components/placeholder/PostItemPlaceholder';
@@ -161,6 +159,8 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
         isVisible={visibleFilter}
         onClose={() => setVisibleFilter(false)}
         onFilter={postFilter}
+        selectedCategories={selectedCategories}
+        role={selectedRole}
       />
     </View>
   );

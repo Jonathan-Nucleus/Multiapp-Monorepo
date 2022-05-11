@@ -9,7 +9,6 @@ import {
   Share as ShareIcon,
   DotsThreeVertical,
 } from 'phosphor-react-native';
-import Share from 'react-native-share';
 
 import PLabel from '../common/PLabel';
 import IconButton from '../common/IconButton';
@@ -33,6 +32,7 @@ import { Post } from 'mobile/src/graphql/query/post/usePosts';
 import { PostCategories } from 'backend/graphql/enumerations.graphql';
 
 import { useLikePost } from '../../graphql/mutation/posts';
+import { useCreatePost } from 'mobile/src/graphql/mutation/posts';
 import { useCachedAccount } from '../../graphql/query/account/useAccount';
 
 export interface PostItemProps {
@@ -49,6 +49,7 @@ const PostItem: React.FC<PostItemProps> = ({
   const { user, company, body, mediaUrl } = post;
   const [liked, setLiked] = useState(false);
   const [likePost] = useLikePost();
+  const [createPost] = useCreatePost();
   const account = useCachedAccount();
 
   useEffect(() => {
@@ -99,12 +100,21 @@ const PostItem: React.FC<PostItemProps> = ({
 
   const onShare = async () => {
     try {
-      const result = await Share.open({
-        title: 'Join me on Prometheus Alts!',
-        message: 'Share post',
-        url: `prometheusalts.com://post:${post._id}`,
+      const postData = {
+        body: 'Share post',
+        likePost: post._id,
+        categories: post.categories,
+        mediaUrl: post.mediaUrl,
+        mentionIds: post.mentionIds,
+        audience: post.audience,
+      };
+      // TODO: Share Post
+
+      await createPost({
+        variables: {
+          post: postData,
+        },
       });
-      console.log('result', result);
       showMessage('success', 'You shared post succesfully');
     } catch (err) {
       console.log(err);
@@ -137,7 +147,7 @@ const PostItem: React.FC<PostItemProps> = ({
             <LinkPreview
               containerStyle={styles.previewContainer}
               renderLinkPreview={({ previewData }) => (
-                <>
+                <Pressable onPress={goToDetails}>
                   <PLabel label={body} textStyle={styles.body} />
                   {previewData?.link && (
                     <PLabel label={previewData.link} textStyle={styles.link} />
@@ -165,7 +175,7 @@ const PostItem: React.FC<PostItemProps> = ({
                       />
                     </View>
                   )}
-                </>
+                </Pressable>
               )}
               textContainerStyle={styles.previewTextContainer}
               text={body}

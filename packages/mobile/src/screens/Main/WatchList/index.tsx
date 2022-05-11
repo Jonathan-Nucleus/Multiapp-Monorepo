@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   FlatList,
   ListRenderItem,
@@ -12,31 +12,77 @@ import { Star, ShieldCheck } from 'phosphor-react-native';
 import Avatar from 'mobile/src/components/common/Avatar';
 import MainHeader from 'mobile/src/components/main/Header';
 import pStyles from 'mobile/src/theme/pStyles';
-import { Body1Bold, Body2Bold, Body3 } from 'mobile/src/theme/fonts';
+import { Body1Bold, Body2, Body2Bold, Body3 } from 'mobile/src/theme/fonts';
 import {
   GRAY400,
   WHITE,
   PRIMARYSOLID,
   SUCCESS,
-  WHITE60,
+  WHITE10,
   WHITE12,
+  WHITE87,
 } from 'shared/src/colors';
 
 import { useWatchFund } from 'mobile/src/graphql/mutation/funds/useWatchFund';
 import { useAccount } from 'mobile/src/graphql/query/account';
 import { WatchlistScreen } from 'mobile/src/navigations/MainTabNavigator';
 
+interface SelectItemProps {
+  id: string;
+  name: string;
+}
+
 const WatchList: WatchlistScreen = ({ navigation }) => {
   const { data: accountData, refetch } = useAccount();
   const [watchFund] = useWatchFund();
+  const [selectedItem, setSelectedItem] = useState<SelectItemProps | null>(
+    null,
+  );
+  const [isWatched, setWatched] = useState(false);
   const watchList = accountData?.account.watchlist ?? [];
 
-  const handleRemoveWatchList = async (id: string): Promise<void> => {
+  useEffect(() => {
+    if (!isWatched) {
+      return;
+    }
+    const timer = setTimeout(() => setWatched(false), 5000);
+    return () => clearTimeout(timer);
+  }, [isWatched]);
+
+  const handleRemoveWatchList = async (
+    id: string,
+    name: string,
+  ): Promise<void> => {
     try {
       const { data } = await watchFund({
         variables: { watch: false, fundId: id },
       });
       if (data?.watchFund) {
+        setSelectedItem({
+          id,
+          name,
+        });
+        setWatched(true);
+        refetch();
+      } else {
+        console.log('err', data);
+      }
+    } catch (err) {
+      console.log('err', err);
+    }
+  };
+
+  const handleAddWatchList = async (): Promise<void> => {
+    if (!selectedItem) {
+      return;
+    }
+
+    try {
+      const { data } = await watchFund({
+        variables: { watch: true, fundId: selectedItem.id },
+      });
+      if (data?.watchFund) {
+        setWatched(false);
         refetch();
       } else {
         console.log('err', data);
@@ -66,7 +112,8 @@ const WatchList: WatchlistScreen = ({ navigation }) => {
               <Text style={styles.title}>{item.name}</Text>
               <Text style={styles.type}>{item.company.name}</Text>
             </View>
-            <TouchableOpacity onPress={() => handleRemoveWatchList(item._id)}>
+            <TouchableOpacity
+              onPress={() => handleRemoveWatchList(item._id, item.name)}>
               <Star size={24} color={PRIMARYSOLID} weight="fill" />
             </TouchableOpacity>
           </View>
@@ -99,6 +146,17 @@ const WatchList: WatchlistScreen = ({ navigation }) => {
   return (
     <View style={pStyles.globalContainer}>
       <MainHeader />
+      {isWatched && (
+        <View style={styles.undoContainer}>
+          <Text style={styles.undoTxt}>
+            You removed <Text style={styles.bold}>{selectedItem?.name}</Text>.
+          </Text>
+          <TouchableOpacity onPress={handleAddWatchList}>
+            <Text style={styles.bold}>UNDO</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       <FlatList
         data={watchList}
         renderItem={renderListItem}
@@ -173,5 +231,23 @@ const styles = StyleSheet.create({
   },
   userType: {
     marginLeft: 6,
+  },
+  undoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: WHITE10,
+    padding: 10,
+    borderRadius: 8,
+    marginTop: 16,
+  },
+  undoTxt: {
+    color: WHITE,
+    ...Body2,
+    marginRight: 10,
+  },
+  bold: {
+    ...Body2Bold,
+    color: WHITE,
   },
 });

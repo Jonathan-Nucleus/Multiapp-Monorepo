@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -52,21 +52,37 @@ interface ModalProps {
   isVisible: boolean;
   onClose: () => void;
   onFilter: (role: PostRoleFilter, categoies: PostCategory[]) => void;
+  selectedCategories?: PostCategory[];
+  role?: PostRoleFilter;
 }
 
-const FilterModal: FC<ModalProps> = ({ isVisible, onClose, onFilter }) => {
+const FilterModal: FC<ModalProps> = ({
+  isVisible,
+  onClose,
+  onFilter,
+  selectedCategories,
+  role,
+}) => {
   const [selectedTopics, setSelectedTopics] = useState<PostCategory[]>([]);
   const [selectedRole, setSelectedRole] = useState<PostRoleFilter>('EVERYONE');
+
+  useEffect(() => {
+    setSelectedTopics(selectedCategories ?? []);
+  }, [selectedCategories]);
+
+  useEffect(() => {
+    role && setSelectedRole(role);
+  }, [role]);
 
   const toggleTopic = (categoryIndex: number): void => {
     let newValue = [...selectedTopics];
 
-    const index = selectedTopics.indexOf(CATEGORY_OPTIONS[categoryIndex].value);
+    const index = newValue.indexOf(CATEGORY_OPTIONS[categoryIndex].value);
     index >= 0
       ? newValue.splice(index, 1)
       : newValue.push(CATEGORY_OPTIONS[categoryIndex].value);
 
-    setSelectedTopics(newValue);
+    setSelectedTopics(newValue.length > 0 ? newValue : []);
   };
 
   const renderRole: ListRenderItem<typeof ROLE_OPTIONS[number]> = ({
@@ -97,7 +113,7 @@ const FilterModal: FC<ModalProps> = ({ isVisible, onClose, onFilter }) => {
       id={item.id}
       category={item.label}
       showBackground
-      value={selectedTopics.includes(item.value)}
+      value={selectedCategories?.includes(item.value) ? true : false}
       handleChange={toggleTopic}
     />
   );

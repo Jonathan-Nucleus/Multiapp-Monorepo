@@ -197,7 +197,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
         <View style={styles.content}>
           <View style={styles.companyDetail}>
             <View style={styles.relative}>
-              <Avatar user={account} size={80} />
+              <Avatar user={profile} size={80} />
               {isMyAccount && (
                 <TouchableOpacity
                   onPress={() =>
@@ -238,7 +238,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
               <Text style={styles.comment}>Posts</Text>
             </View>
           </View>
-          <Text style={styles.decription}>{account.overview}</Text>
+          <Text style={styles.decription}>{profile.overview}</Text>
           {isMyAccount ? (
             <PGradientOutlineButton
               label="Edit Profile"
@@ -289,7 +289,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
             <DotsThreeVerticalSvg />
           </TouchableOpacity>
         </View>
-        <Funds accredited={accountData?.account.accreditation} funds={funds} />
+        <Funds accredited={profile.accreditation} funds={funds} />
         <View>
           {featuredPosts && featuredPosts.length > 0 && (
             <View>

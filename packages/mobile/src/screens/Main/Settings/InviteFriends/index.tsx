@@ -4,8 +4,6 @@ import { NavigationProp } from '@react-navigation/native';
 import { CaretLeft, Check } from 'phosphor-react-native';
 import { WHITE, BLUE300, PINK, GRAY600, PRIMARYSOLID } from 'shared/src/colors';
 import Share from 'react-native-share';
-import FastImage from 'react-native-fast-image';
-import { AVATAR_URL } from 'react-native-dotenv';
 
 import pStyles from 'mobile/src/theme/pStyles';
 import {
@@ -13,7 +11,6 @@ import {
   Body1Bold,
   Body2,
   Body2Bold,
-  Body3,
   H5Bold,
 } from 'mobile/src/theme/fonts';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
@@ -42,7 +39,7 @@ const InviteFriends: FC<RouterProps> = ({ navigation }) => {
       const result = await Share.open({
         title: 'Join me on Prometheus Alts!',
         // message: `Share code ${code.join('')}`,
-        message: 'Share code',
+        message: 'Join me on Prometheus Alts!',
         url: 'prometheusalts.com',
       });
 

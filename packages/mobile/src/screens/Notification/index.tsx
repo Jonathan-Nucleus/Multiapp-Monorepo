@@ -76,7 +76,12 @@ const Notifications: NotificationScreen = ({ navigation }) => {
     return <Chats size={18} color={WHITE} />;
   };
 
-  const handleReadNotification = async (id?: string) => {
+  const handleReadNotification = async (
+    id: string,
+    type: string,
+    postId?: string,
+    userId?: string,
+  ) => {
     try {
       await readNotification({
         variables: {
@@ -84,6 +89,19 @@ const Notifications: NotificationScreen = ({ navigation }) => {
         },
       });
       refetch();
+      if (
+        (type === 'comment-post' || type === 'like-post') &&
+        postId &&
+        userId
+      ) {
+        navigation.navigate('PostDetails', {
+          screen: 'PostDetail',
+          params: {
+            postId: postId,
+            userId: userId,
+          },
+        });
+      }
     } catch (err) {
       console.log(err);
     } finally {
@@ -106,7 +124,15 @@ const Notifications: NotificationScreen = ({ navigation }) => {
     item,
   }) => {
     return (
-      <Pressable onPress={() => handleReadNotification(item._id)}>
+      <Pressable
+        onPress={() =>
+          handleReadNotification(
+            item._id,
+            item.type,
+            item.data.postId,
+            item.data.userId,
+          )
+        }>
         <View style={[styles.item, item.isNew && styles.unread]}>
           <View style={styles.avatarView}>
             {item.isNew && <View style={styles.dot} />}

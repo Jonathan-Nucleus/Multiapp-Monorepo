@@ -28,9 +28,7 @@ import Header from 'mobile/src/components/main/Header';
 import PLabel from 'mobile/src/components/common/PLabel';
 import PostItem from 'mobile/src/components/main/PostItem';
 import UserInfo from 'mobile/src/components/common/UserInfo';
-import SelectionModal, {
-  MenuDataItemProps,
-} from 'mobile/src/components/common/SelectionModal';
+import SelectionModal from 'mobile/src/components/common/SelectionModal';
 import { showMessage } from 'mobile/src/services/utils';
 import {
   BLACK,
@@ -61,6 +59,7 @@ import {
 import { useCachedAccount } from 'mobile/src/graphql/query/account/useAccount';
 
 import { PostDetailScreen } from 'mobile/src/navigations/PostDetailsStack';
+import MainHeader from '../../components/main/Header';
 
 type CommentUser = Comment['user'];
 const CommentMenuDataArray = [
@@ -338,7 +337,6 @@ const PostDetail: PostDetailScreen = ({ route }) => {
       <Header
         leftIcon={<CaretLeft size={32} color={WHITE} />}
         onPressLeft={() => NavigationService.goBack()}
-        containerStyle={styles.headerContainer}
       />
       <PAppContainer style={styles.container}>
         <PostItem post={post} onPressLikes={() => setLikesModalVisible(true)} />

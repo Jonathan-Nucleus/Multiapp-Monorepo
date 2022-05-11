@@ -31,6 +31,7 @@ import {
 
 import { useAccount } from 'mobile/src/graphql/query/account';
 import { useFollowUser } from 'mobile/src/graphql/mutation/account';
+import PGradientButton from '../../../../components/common/PGradientButton';
 
 export type Fund = FundSummary & FundManager & FundCompany;
 export interface FundProfileInfo {
@@ -78,6 +79,10 @@ const FundProfileInfo: FC<FundProfileInfo> = ({
         userId: fund.manager._id,
       },
     });
+
+  const handleContact = () => {
+    NavigationService.navigate('Contact');
+  };
 
   const { background, avatar } = fund.company;
   return (
@@ -157,6 +162,11 @@ const FundProfileInfo: FC<FundProfileInfo> = ({
             </View>
           </Pressable>
         )}
+        <PGradientButton
+          label="contact specialist"
+          onPress={handleContact}
+          btnContainer={styles.contactBtn}
+        />
       </View>
       <View style={styles.fundSummaryContainer}>
         <View style={[styles.fundDescriptorContainer, styles.rightSeparator]}>
@@ -329,5 +339,8 @@ const styles = StyleSheet.create({
   name: {
     textTransform: 'capitalize',
     ...Body2,
+  },
+  contactBtn: {
+    marginTop: 15,
   },
 });
