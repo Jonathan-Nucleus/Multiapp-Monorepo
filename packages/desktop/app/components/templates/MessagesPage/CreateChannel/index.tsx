@@ -13,7 +13,7 @@ import Button from "desktop/app/components/common/Button";
 import TagInput, { TagRenderer } from "desktop/app/components/common/TagInput";
 import UserResult from "./UserResult";
 import { X as XButton } from "phosphor-react";
-import { StreamType } from "../types";
+import { StreamType } from "../../../../types/message";
 
 type CreateChannelProps = {
   onClose?: () => void;
@@ -152,9 +152,7 @@ const CreateChannel: React.FC<CreateChannelProps> = ({
         onClick={onRemove}
       >
         <Avatar image={(user.image as string) ?? null} size={24} />
-        <div className="text-white mr-4 text-xs">
-          {user.name}
-        </div>
+        <div className="text-white mr-4 text-xs">{user.name}</div>
         <XButton color="white" />
       </div>
     );
@@ -222,7 +220,7 @@ const CreateChannel: React.FC<CreateChannelProps> = ({
           <Button
             type="button"
             variant="gradient-primary"
-            className="ml-2 mt-8 md:mt-0"
+            className="ml-2 mt-8 h-[40px] md:mt-0"
             onClick={createChannel}
           >
             Start Chat

@@ -7,15 +7,11 @@ interface UserResultProps {
 }
 
 const UserResult: FC<UserResultProps> = ({ user }) => (
-  <li className="messaging-create-channel__user-result flex items-center p-2">
-    <Avatar image={(user.image as string) ?? null} size={40} />
-    {user.online && (
-      <div className="messaging-create-channel__user-result-online" />
-    )}
-    <div className="messaging-create-channel__user-result__details">
-      <span className="font-bold text-base text-white">{user.name}</span>
-      <br />
-      <span className="text-sm text-white/[.6]">{user.name}</span>
+  <li className="flex items-center p-2">
+    <Avatar image={(user.image as string) ?? null} size={48} />
+    <div className="ml-1">
+      <div className="font-bold text-base text-white">{user.name}</div>
+      <div className="text-sm text-white/[.6]">{user.name}</div>
     </div>
   </li>
 );

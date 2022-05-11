@@ -1,5 +1,5 @@
 import { useChatContext, useTypingContext } from "stream-chat-react";
-import type { StreamType } from "../types";
+import type { StreamType } from "../../../../types/message";
 
 export const TypingIndicator = () => {
   const { client } = useChatContext<StreamType>();

@@ -1,5 +1,5 @@
 import { ThreadHeaderProps } from "stream-chat-react";
-import { CloseThreadIcon } from "../Icons";
+import { XCircle } from "phosphor-react";
 
 const PThreadHeader: React.FC<ThreadHeaderProps> = ({
   closeThread,
@@ -12,12 +12,12 @@ const PThreadHeader: React.FC<ThreadHeaderProps> = ({
   };
 
   return (
-    <div className="custom-thread-header">
-      <div className="custom-thread-header__left">
-        <p className="custom-thread-header__left-title">Thread</p>
-        <p className="custom-thread-header__left-count">{getReplyCount()}</p>
+    <div className="flex items-center justify-between p-2">
+      <div className="flex items-center">
+        <p className="">Thread</p>
+        <p className="ml-2 text-xs">{getReplyCount()}</p>
       </div>
-      <CloseThreadIcon {...{ closeThread }} />
+      <XCircle className="cursor-pointer" onClick={closeThread} size={24} />
     </div>
   );
 };

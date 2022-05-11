@@ -1,15 +1,10 @@
 import { FC } from "react";
 import { Avatar } from "stream-chat-react";
 import { Circle } from "phosphor-react";
-
-interface Member {
-  name?: string;
-  image?: string;
-  online?: boolean;
-}
+import { AvatarMember } from "../../../../types/message";
 
 interface AvatarGroupProps {
-  members: Member[];
+  members: AvatarMember[];
   size?: number;
 }
 
@@ -19,7 +14,7 @@ const AvatarGroup: FC<AvatarGroupProps> = ({ members, size = 48 }) => {
       return (
         <div className="relative">
           <Avatar image={members[0].image} name={members[0].name} size={size} />
-          <div className="absolute bottom-0 right-[8px]">
+          <div className="absolute bottom-0 right-[16%]">
             {members[0].online ? (
               <Circle weight="fill" size="16" color="#55C090" />
             ) : (
@@ -31,7 +26,11 @@ const AvatarGroup: FC<AvatarGroupProps> = ({ members, size = 48 }) => {
 
     case 2:
       return (
-        <div className="channel-preview__avatars two">
+        <div
+          className={`
+          channel-preview__avatars two rounded-full
+        `}
+        >
           <span>
             <Avatar
               image={members[0].image}
@@ -53,7 +52,11 @@ const AvatarGroup: FC<AvatarGroupProps> = ({ members, size = 48 }) => {
 
     case 3:
       return (
-        <div className="channel-preview__avatars three">
+        <div
+          className={`
+          channel-preview__avatars three rounded-full
+        `}
+        >
           <span>
             <Avatar
               image={members[0].image}
@@ -81,7 +84,11 @@ const AvatarGroup: FC<AvatarGroupProps> = ({ members, size = 48 }) => {
 
     default:
       return (
-        <div className="channel-preview__avatars">
+        <div
+          className={`
+          channel-preview__avatars rounded-full
+        `}
+        >
           <span>
             <Avatar
               image={members[members.length - 1].image}

@@ -16,7 +16,7 @@ import PChannelList, { PChannelListHeader } from "./PChannelList";
 import PChannelPreview from "./PChannelList/PChannelPreview";
 import PThreadHeader from "./PChannel/PThreadHeader";
 import { PChannel } from "./PChannel";
-import { StreamType, GiphyContext } from "./types";
+import { GiphyContext } from "../../../types/message";
 
 const API_KEY = "2xhrce9kvxbt"; //process.env.NEXT_PUBLIC_GETSTREAM_ACCESS_KEY as string;
 const TARGET_ORIGIN = "https://getstream.io"; //process.env.NEXT_PUBLIC_STREAM_TARGET_ORIGIN as string;
@@ -42,7 +42,6 @@ const MessagesPage = () => {
   useChecklist(chatClient.current, TARGET_ORIGIN);
 
   useEffect(() => {
-    console.log("checking chat startup details");
     if (API_KEY && !chatClient.current && chatData?.chatToken && userData) {
       console.log("initializing chat client");
       const initChat = async () => {
@@ -50,7 +49,7 @@ const MessagesPage = () => {
           enableInsights: true,
           enableWSFallback: true,
         });
-        console.log("client", client);
+        
         await client.connectUser(
           {
             id: userData.account._id,
@@ -122,7 +121,11 @@ const MessagesPage = () => {
     setChannelFilters(criteria);
   };
 
-  if (!chatClient.current) return <LoadingIndicator />;
+  if (!chatClient.current) return (
+    <div className="flex items-center justify-center h-[calc(100vh-82px)]">
+      <LoadingIndicator size={40} />
+    </div>
+  );
 
   return (
     <Chat client={chatClient.current} theme="prometheus-messages dark">

@@ -1,11 +1,13 @@
 import React from "react";
 import {
-  MessageText,
   Attachment,
   Avatar,
+  EditMessageForm,
   MessageDeleted,
+  MessageInput,
   MessageOptions,
   MessageRepliesCountButton,
+  MessageText,
   MessageTimestamp,
   ReactionSelector,
   ReactionsList,
@@ -14,10 +16,14 @@ import {
   messageHasReactions,
 } from "stream-chat-react";
 import { Check } from "phosphor-react";
-import { StreamType } from "../types";
+import ModalDialog from "../../../common/ModalDialog";
+import { StreamType } from "../../../../types/message";
 
 export const PMessageSimple = () => {
   const {
+    additionalMessageInputProps,
+    editing,
+    clearEditingState,
     endOfGroup,
     firstOfGroup,
     groupedByUser,
@@ -48,6 +54,23 @@ export const PMessageSimple = () => {
 
   return (
     <>
+      {editing && (
+        <ModalDialog
+          title={"Edit Message"}
+          className="w-96 max-w-full text-white"
+          show={editing}
+          onClose={clearEditingState}
+        >
+          <div className="p-4 text-white">
+            <MessageInput
+              clearEditingState={clearEditingState}
+              Input={EditMessageForm}
+              message={message}
+              {...additionalMessageInputProps}
+            />
+          </div>
+        </ModalDialog>
+      )}
       <div
         className={`
           ${messageClasses}
@@ -121,15 +144,14 @@ export const PMessageSimple = () => {
             <div
               className={`
                 flex items-center text-white text-sm
-                ${isMyMessage() ? 'justify-end' : ''}
+                ${isMyMessage() ? "justify-end" : ""}
               `}
             >
-              {isMyMessage() && message.status === 'received' && <Check color="white" size="20" />}
+              {isMyMessage() && message.status === "received" && (
+                <Check color="white" size="20" />
+              )}
               &nbsp;
-              <MessageTimestamp
-                customClass="text-white/[.6]"
-                format="h:mm A"
-              />
+              <MessageTimestamp customClass="text-white/[.6]" format="h:mm A" />
             </div>
           )}
         </div>

@@ -1,19 +1,19 @@
 import React, { useContext } from "react";
 import { logChatPromiseExecution } from "stream-chat";
 import {
-  MessageList,
+  Thread,
   MessageInput,
   MessageInputProps,
   MessageToSend,
   Window,
   useChannelActionContext,
 } from "stream-chat-react";
-import dayjs from "dayjs";
 
 import PChannelHeader from "./PChannelHeader";
 import PMessageList from "./PMessageList";
 import PMessagingInput from "./PMessageInput";
-import { GiphyContext, StreamType } from "../types";
+import { GiphyContext, StreamType } from "../../../../types/message";
+import PMessageSimple from "./PMessageSimple";
 
 export type PChannelProps = {
   toggleMobile: () => void;
@@ -52,16 +52,18 @@ export const PChannel: React.FC<PChannelProps> = (props) => {
       setGiphyState(false);
     };
 
-  const actions = ["delete", "edit", "flag", "mute", "react", "reply"];
   return (
-    <Window>
-      <PChannelHeader toggleMobile={toggleMobile} />
-      <PMessageList />
-      <MessageInput
-        Input={PMessagingInput}
-        overrideSubmitHandler={overrideSubmitHandler}
-        focus
-      />
-    </Window>
+    <>
+      <Window>
+        <PChannelHeader toggleMobile={toggleMobile} />
+        <PMessageList />
+        <MessageInput
+          Input={PMessagingInput}
+          overrideSubmitHandler={overrideSubmitHandler}
+          focus
+        />
+      </Window>
+      <Thread Input={PMessagingInput} Message={PMessageSimple} />
+    </>
   );
 };

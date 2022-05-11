@@ -7,7 +7,6 @@ const notifyParent = (parent: string) => (message: any) => {
 
 const YOUTUBE_LINK = "https://youtu.be/Ujvy-DEA-UM";
 
-// We have to keep this task list up-to-date with the website"s checklist
 const [
   REACT_TO_MESSAGE,
   RUN_GIPHY,

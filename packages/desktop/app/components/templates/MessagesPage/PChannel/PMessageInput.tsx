@@ -10,14 +10,10 @@ import {
 } from "stream-chat-react";
 import _debounce from "lodash/debounce";
 
-import { GiphyContext, StreamType } from "../types";
+import { GiphyContext, StreamType } from "../../../../types/message";
 import { Smiley, Image as ImageIcon, PaperPlaneRight } from "phosphor-react";
 import { LightningBoltSmall } from "../Icons";
 
-/**
- * Debounce time in milliseconds to prevent sending duplicate messages in
- * quick succession.
- */
 const DEBOUNCE_INTERVAL = 50;
 
 const GiphyIcon = () => (

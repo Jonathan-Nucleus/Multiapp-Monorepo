@@ -1,30 +1,15 @@
-import React, { useMemo } from "react";
-import {
-  MessageList,
-  useChatContext,
-  useChannelStateContext,
-} from "stream-chat-react";
+import React from "react";
+import { MessageList, useChannelStateContext } from "stream-chat-react";
+import { useMessageChannel } from "../../../../hooks/useMessageChannel";
 import PMessageSimple from "./PMessageSimple";
 import AvatarGroup from "../AvatarGroup";
-import { StreamType } from "../types";
+import { StreamType } from "../../../../types/message";
 
 const ACTIONS = ["delete", "edit", "flag", "mute", "react", "reply"];
 
 export const PMessageList: React.FC = () => {
-  const { channel, client } = useChatContext<StreamType>();
-  const { messages } = useChannelStateContext<StreamType>();
-
-  const members = useMemo(() => {
-    if (!channel) return [];
-    
-    return Object.values(channel.state.members)
-      .filter(({ user }) => user?.id !== client.userID)
-      .map(({ user }) => ({
-        name: user?.name,
-        image: user?.image,
-        online: user?.online,
-      }));
-  }, [channel, client]);
+  const { channel, messages } = useChannelStateContext<StreamType>();
+  const { channelAvatar } = useMessageChannel(channel);
 
   return (
     <div className="h-full overflow-y-auto">
@@ -32,8 +17,8 @@ export const PMessageList: React.FC = () => {
         <MessageList messageActions={ACTIONS} Message={PMessageSimple} />
       ) : (
         <div className="flex flex-col items-center justify-center p-4">
-          <AvatarGroup members={members} size={80} />
-          <p className="mt-2 font-bold">{members[0].name}</p>
+          <AvatarGroup members={channelAvatar} size={65} />
+          <p className="mt-2 font-bold">{channelAvatar[0].name}</p>
         </div>
       )}
     </div>
