@@ -10,7 +10,8 @@ import EmailNotificationImage from "shared/assets/images/email-notification.svg"
 
 import {
   NotificationEvent,
-  NotificationEventOptions, NotificationMethodEnum,
+  NotificationEventOptions,
+  NotificationMethodEnum,
 } from "backend/schemas/user";
 import { useAccount } from "mobile/src/graphql/query/account";
 import { useUpdateSettings } from "mobile/src/graphql/mutation/account/useUpdateSettings";
@@ -33,25 +34,26 @@ type FormValues = {
   emailUnreadMessage: boolean;
   enablePush: boolean;
   enableEmail: boolean;
-  notifications: Record<NotificationEvent, { sms: boolean, email: boolean }>;
+  notifications: Record<NotificationEvent, { sms: boolean; email: boolean }>;
 };
 
 const SettingsPage: FC = () => {
   const { data: { account } = {} } = useAccount();
   const [updateSettings] = useUpdateSettings();
-  const {
-    control,
-    reset,
-    getValues,
-    watch,
-    handleSubmit,
-  } = useForm<FormValues>({ mode: "onChange" });
+  const { control, reset, getValues, watch, handleSubmit } =
+    useForm<FormValues>({ mode: "onChange" });
   useEffect(() => {
     if (account) {
       const settings = account.settings;
-      const notifications = {} as Record<NotificationEvent, { sms: boolean, email: boolean }>;
+      const notifications = {} as Record<
+        NotificationEvent,
+        { sms: boolean; email: boolean }
+      >;
       let enablePush = false;
       let enableEmail = false;
+      if (!settings) {
+        return;
+      }
       Object.keys(settings.notifications).forEach((key) => {
         const notification = settings.notifications[key];
         if (notification == "BOTH") {
@@ -82,7 +84,10 @@ const SettingsPage: FC = () => {
   const onSubmit = async (values: FormValues) => {
     try {
       // Set interests empty array when not available.
-      const notifications = {} as Record<NotificationEvent, NotificationMethodEnum>;
+      const notifications = {} as Record<
+        NotificationEvent,
+        NotificationMethodEnum
+      >;
       Object.keys(values.notifications).forEach((key: NotificationEvent) => {
         const notification = values.notifications[key];
         if (notification.sms && notification.email) {
@@ -99,11 +104,13 @@ const SettingsPage: FC = () => {
         tagging: values.tagging,
         messaging: values.messaging,
         emailUnreadMessage: values.emailUnreadMessage,
-        interests: account?.settings.interests ?? [],
+        interests: account?.settings?.interests ?? [],
         notifications,
       };
       await updateSettings({ variables: { settings: settingsInput } });
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   if (!account) {
@@ -129,12 +136,10 @@ const SettingsPage: FC = () => {
                       />
                     </div>
                     <div className="ml-7 mt-1">
-                      <div className="text-white">
-                        Allow tagging
-                      </div>
+                      <div className="text-white">Allow tagging</div>
                       <div className="text-xs text-white/[.6] mt-2">
-                        If allowed, users may tag you in posts, comments and messages
-                        using the @mention feature.
+                        If allowed, users may tag you in posts, comments and
+                        messages using the @mention feature.
                       </div>
                     </div>
                   </div>
@@ -155,11 +160,10 @@ const SettingsPage: FC = () => {
                         />
                       </div>
                       <div className="ml-7 mt-1">
-                        <div className="text-white">
-                          Allow messages
-                        </div>
+                        <div className="text-white">Allow messages</div>
                         <div className="text-xs text-white/[.6] mt-2">
-                          If allowed, users may message you within Prometheus Alts
+                          If allowed, users may message you within Prometheus
+                          Alts
                         </div>
                       </div>
                     </div>
@@ -208,9 +212,7 @@ const SettingsPage: FC = () => {
                         }}
                       />
                       <div className="ml-7">
-                        <div className="text-white">
-                          Mobile Push
-                        </div>
+                        <div className="text-white">Mobile Push</div>
                       </div>
                     </div>
                   </div>
@@ -233,9 +235,7 @@ const SettingsPage: FC = () => {
                         }}
                       />
                       <div className="ml-7">
-                        <div className="text-white">
-                          Email
-                        </div>
+                        <div className="text-white">Email</div>
                       </div>
                     </div>
                   </div>
@@ -243,9 +243,7 @@ const SettingsPage: FC = () => {
               </Card>
             </div>
             <div className="mt-6">
-              <div className="text-white font-medium px-1">
-                Notifications
-              </div>
+              <div className="text-white font-medium px-1">Notifications</div>
               <Card className="border-none mt-2 p-0">
                 <div className="divide-y divide-inherit border-white/[.12]">
                   {notificationItems.map((notification, index) => (
@@ -255,11 +253,11 @@ const SettingsPage: FC = () => {
                           <div className="text-white">
                             {notification.label}
                           </div>
-                          {notification.info &&
+                          {notification.info && (
                             <div className="text-xs text-white/[.6] mt-2">
                               {notification.info}
                             </div>
-                          }
+                          )}
                         </div>
                         <div className="flex items-center flex-shrink-0">
                           <div className="flex items-center">
@@ -273,7 +271,11 @@ const SettingsPage: FC = () => {
                               />
                             </div>
                             <div className="ml-7">
-                              <div className={watch("enablePush") ? "" : "opacity-60"}>
+                              <div
+                                className={
+                                  watch("enablePush") ? "" : "opacity-60"
+                                }
+                              >
                                 <div className="text-sm text-white">
                                   Mobile Push
                                 </div>
@@ -291,10 +293,12 @@ const SettingsPage: FC = () => {
                               />
                             </div>
                             <div className="ml-7">
-                              <div className={watch("enablePush") ? "" : "opacity-60"}>
-                                <div className="text-sm text-white">
-                                  Email
-                                </div>
+                              <div
+                                className={
+                                  watch("enablePush") ? "" : "opacity-60"
+                                }
+                              >
+                                <div className="text-sm text-white">Email</div>
                               </div>
                             </div>
                           </div>

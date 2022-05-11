@@ -57,7 +57,7 @@ const ProfileCard: FC<ProfileCardProps> = ({
       if (matches.length > wordsToSplit) {
         overviewShort = user?.overview?.substring(
           0,
-          matches[wordsToSplit].index!,
+          matches[wordsToSplit].index!
         );
       }
     }
@@ -77,6 +77,7 @@ const ProfileCard: FC<ProfileCardProps> = ({
       });
     } catch (error) {}
   };
+
   const copyProfileLink = () => {
     navigator.clipboard.writeText(user.linkedIn ?? "");
   };
@@ -110,15 +111,7 @@ const ProfileCard: FC<ProfileCardProps> = ({
             </div>
             <div className="hidden lg:flex items-center relative mx-5 -mt-6">
               <div className="relative">
-                {user.avatar ? (
-                  <Avatar src={user.avatar} size={120} />
-                ) : (
-                  <div className="w-[120px] h-[120px] flex items-center justify-center bg-primary w-full h-full text-4xl text-white rounded-full">
-                    {user.firstName.charAt(0)}
-                    {user.lastName.charAt(0)}
-                  </div>
-                )}
-
+                <Avatar user={user} size={120} />
                 {isEditable && isMyProfile && (
                   <div
                     className="rounded-full border border-primary flex-shrink-0 w-10 h-10 bg-surface-light10 flex items-center justify-center cursor-pointer absolute right-0 bottom-0"
@@ -168,14 +161,7 @@ const ProfileCard: FC<ProfileCardProps> = ({
             </div>
             <div className="flex lg:hidden items-center p-4">
               <div className="relative">
-                {user.avatar ? (
-                  <Avatar src={user.avatar} size={80} />
-                ) : (
-                  <div className="w-[80px] h-[80px] flex items-center justify-center bg-primary w-full h-full text-2xl text-white rounded-full">
-                    {user.firstName.charAt(0)}
-                    {user.lastName.charAt(0)}
-                  </div>
-                )}
+                <Avatar user={user} size={80} />
                 {isEditable && isMyProfile && (
                   <div
                     className="rounded-full border border-primary flex-shrink-0 w-8 h-8 bg-surface-light10 flex items-center justify-center cursor-pointer absolute right-0 bottom-0"

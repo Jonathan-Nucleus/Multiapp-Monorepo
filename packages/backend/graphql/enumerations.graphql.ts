@@ -14,6 +14,11 @@ import {
   InvestorClassOptions as BackendInvestorClassOptions,
 } from "../schemas/user";
 
+import {
+  HelpRequestTypeOptions as BackendHelpRequestTypeOptions,
+  HelpRequestTypeEnum,
+} from "../schemas/help-request";
+
 export const Audiences: AudienceEnum[] = Object.keys(AudienceOptions);
 export const PostCategories = Object.keys(PostCategoryOptions).reduce(
   (acc, category) => {
@@ -104,3 +109,8 @@ export const AdvancedFinancialStatusData = {
 } as const;
 
 export const NotificationMethods = Object.keys(NotificationMethodOptions);
+
+export const HelpRequestTypeOptions = Object.keys(
+  BackendHelpRequestTypeOptions
+);
+export type { HelpRequestTypeEnum as HelpRequestType };

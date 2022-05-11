@@ -19,7 +19,7 @@ export function useReadNotification(): MutationTuple<
       }
     `,
     {
-      refetchQueries: ['notifications'],
+      refetchQueries: ['Notifications'],
     },
   );
 }
@@ -31,5 +31,8 @@ export function useReadNotifications() {
         readNotification
       }
     `,
+    {
+      refetchQueries: ['Notifications'],
+    },
   );
 }

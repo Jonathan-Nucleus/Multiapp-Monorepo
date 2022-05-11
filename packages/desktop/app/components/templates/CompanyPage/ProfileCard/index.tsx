@@ -108,14 +108,7 @@ const ProfileCard: FC<CompanyPageProps> = ({
             </div>
             <div className="hidden lg:flex relative mx-5">
               <div className="w-[120px] h-[120px] bg-background rounded-2xl relative overflow-hidden -mt-12">
-                {company.avatar ? (
-                  <Avatar src={company.avatar} size={120} shape="square" />
-                ) : (
-                  <div className="flex items-center justify-center bg-white w-full h-full text-4xl text-primary">
-                    {company.name.charAt(0)}
-                  </div>
-                )}
-
+                <Avatar user={company} size={120} shape="square" />
                 {isEditable && (
                   <div
                     onClick={() =>
@@ -160,13 +153,7 @@ const ProfileCard: FC<CompanyPageProps> = ({
             <div className="flex lg:hidden items-center p-4">
               <div className="w-[80px] h-[80px] bg-background rounded-2xl relative overflow-hidden -mt-12">
                 <div className="relative">
-                  {company.avatar ? (
-                    <Avatar src={company.avatar} size={80} shape="square" />
-                  ) : (
-                    <div className="flex items-center justify-center bg-white w-[80px] h-[80px] text-4xl text-primary overflow-hidden">
-                      {company.name.charAt(0)}
-                    </div>
-                  )}
+                  <Avatar user={company} size={80} shape="square" />
                   {isEditable && (
                     <div
                       onClick={() =>

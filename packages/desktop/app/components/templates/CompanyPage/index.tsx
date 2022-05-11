@@ -19,7 +19,9 @@ const CompanyPage: FC<CompanyPageProps> = ({ company }: CompanyPageProps) => {
   const funds = company.funds.map((fund) => ({ ...fund, company }));
   const members = company.members.map((member) => ({ ...member, company }));
   const { data: { account } = {} } = useAccount();
-  const isMyCompany = (account?.companies.findIndex(item => item._id == company._id) ?? -1) != -1;
+  const isMyCompany =
+    (account?.companies.findIndex((item) => item._id == company._id) ?? -1) !=
+    -1;
 
   return (
     <div className="lg:mt-12 mb-12 lg:px-14">
@@ -54,7 +56,7 @@ const CompanyPage: FC<CompanyPageProps> = ({ company }: CompanyPageProps) => {
                   <SplideSlide key={index}>
                     <div className="mx-2">
                       <div className="w-40 h-40 relative">
-                        <Avatar src={member.avatar} size={56} shape="circle" />
+                        <Avatar user={member} size={56} shape="circle" />
                         <div className="absolute top-0 left-0 right-0 bottom-0">
                           <div className="bg-gradient-to-b from-transparent to-black w-full h-full flex flex-col justify-end rounded-lg">
                             <div className="p-3 text-center">

@@ -31,13 +31,11 @@ const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
     <>
       <div className="flex items-center">
         <div className="w-14 h-14 flex flex-shrink-0 rounded-lg overflow-hidden relative">
-          {company.avatar && (
-            <Link href={`/company/${company._id}`}>
-              <a>
-                <Avatar src={company.avatar} shape="square" />
-              </a>
-            </Link>
-          )}
+          <Link href={`/company/${company._id}`}>
+            <a>
+              <Avatar user={company} shape="square" />
+            </a>
+          </Link>
         </div>
         <Link href={`/company/${company._id}`}>
           <a className="text-white ml-4">{company.name}</a>

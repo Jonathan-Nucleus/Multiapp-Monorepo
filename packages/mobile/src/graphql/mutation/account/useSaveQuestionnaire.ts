@@ -2,6 +2,8 @@ import { gql, useMutation, MutationTuple } from '@apollo/client';
 import {
   InvestorClassOptions,
   FinancialStatusOptions,
+  HelpRequestType,
+  HelpRequestTypeOptions,
 } from 'backend/graphql/enumerations.graphql';
 import { QuestionnaireInput } from 'backend/graphql/users.graphql';
 import {
@@ -13,6 +15,8 @@ import {
 
 export { InvestorClassOptions, FinancialStatusOptions };
 export type { InvestorClass, FinancialStatus, Accreditation };
+export type ContactMethod = HelpRequestType;
+export const ContactMethodOptions = HelpRequestTypeOptions;
 
 type SaveQuestionnaireVariables = {
   questionnaire: QuestionnaireInput;

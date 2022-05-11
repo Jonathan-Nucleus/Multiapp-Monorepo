@@ -7,6 +7,8 @@ import Wizard from "desktop/app/components/common/Wizard";
 import Button from "desktop/app/components/common/Button";
 import AccreditationResult from "./Result";
 
+import { FinancialStatus } from "mobile/src/graphql/mutation/account/useSaveQuestionnaire";
+
 import {
   useSaveQuestionnaire,
   Accreditation,
@@ -69,10 +71,10 @@ const AccreditationQuestionnaire: FC<AccreditationQuestionnaireProps> = ({
     const status = [
       ...baseStatus,
       ...(investorClass === "INDIVIDUAL" && individualStatuses.TIER1 === "yes"
-        ? ["TIER1"]
+        ? ["TIER1" as FinancialStatus]
         : []),
       ...(investorClass === "INDIVIDUAL" && individualStatuses.TIER2 === "yes"
-        ? ["TIER2"]
+        ? ["TIER2" as FinancialStatus]
         : []),
       ...(investorClass === "ENTITY" ? entityStatuses : []),
     ];

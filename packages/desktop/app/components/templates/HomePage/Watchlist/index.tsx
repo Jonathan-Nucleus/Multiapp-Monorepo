@@ -3,22 +3,25 @@ import { Star } from "phosphor-react";
 import Avatar from "../../../common/Avatar";
 import Card from "../../../common/Card";
 import Button from "../../../common/Button";
-import { useWatchFund } from "mobile/src/graphql/mutation/funds/useWatchFund";
 import Link from "next/link";
-import { UserProfileProps } from "../../../../types/common-props";
+import { UserProfile } from "mobile/src/graphql/query/user/useProfile";
 import Skeleton from "./Skeleton";
 
-const Watchlist: FC<UserProfileProps> = ({ user }) => {
-  const [watchFund] = useWatchFund();
-  const handleRemoveWatchList = async (id: string) => {
-    try {
-      await watchFund({
-        variables: { watch: false, fundId: id },
-        refetchQueries: ["Account"],
-      });
-    } catch (err) {
-    }
-  };
+interface WatchProps {
+  id: string;
+  name: string;
+}
+interface WatchListProps {
+  user: UserProfile | undefined;
+  setWatchItem: (val: WatchProps) => void;
+  handleToggleWatchList: (id: string, watch: boolean) => void;
+}
+
+const Watchlist: FC<WatchListProps> = ({
+  user,
+  setWatchItem,
+  handleToggleWatchList,
+}) => {
   if (!user) {
     return <Skeleton />;
   }
@@ -29,12 +32,15 @@ const Watchlist: FC<UserProfileProps> = ({ user }) => {
     <Card className="p-0 border-white/[.12] divide-y divide-inherit">
       <div className="text-white  p-4">Watch List</div>
       {user.watchlist.map((item) => (
-        <div key={item._id} className="flex items-center p-4 hover:bg-primary-overlay/[.24] transition-all">
+        <div
+          key={item._id}
+          className="flex items-center p-4 hover:bg-primary-overlay/[.24] transition-all"
+        >
           <Link href={`/funds/${item._id}`}>
             <a>
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <Avatar src={item.company.avatar} size={48} shape="square" />
+                  <Avatar user={item.company} size={48} shape="square" />
                 </div>
                 <div className="ml-3">
                   <div className="text-white leading-4">{item.name}</div>
@@ -49,7 +55,13 @@ const Watchlist: FC<UserProfileProps> = ({ user }) => {
             <Button
               variant="text"
               className={"text-primary-medium"}
-              onClick={() => handleRemoveWatchList(item._id)}
+              onClick={() => {
+                setWatchItem({
+                  id: item._id,
+                  name: item.name,
+                });
+                handleToggleWatchList(item._id, false);
+              }}
             >
               <Star color="currentColor" weight={"fill"} size={16} />
             </Button>

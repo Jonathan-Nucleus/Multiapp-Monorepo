@@ -23,16 +23,15 @@ const FeaturedManager: FC<FeaturedManagerProps> = ({ manager }) => {
         variables: { follow: !isFollowing, userId: manager._id },
         refetchQueries: ["Account"],
       });
-    } catch (err) {
-    }
+    } catch (err) {}
   };
 
   return (
     <div className="mx-2">
       <Link href={`/profile/${manager._id}`}>
         <a>
-          <div className="w-40 h-40 relative">
-            <Avatar src={manager.avatar} size={160} shape="square" />
+          <div className="relative">
+            <Avatar user={manager} size={160} shape="square" />
             <div className="absolute top-0 left-0 right-0 bottom-0">
               <div className="bg-gradient-to-b from-transparent to-black w-full h-full flex flex-col justify-end rounded-lg">
                 <div className="p-3">
@@ -42,7 +41,9 @@ const FeaturedManager: FC<FeaturedManagerProps> = ({ manager }) => {
                   <div className="text-white text-xs font-semibold">
                     {manager.position}
                   </div>
-                  <div className="text-white text-xs">{manager.company.name}</div>
+                  <div className="text-white text-xs">
+                    {manager.company.name.charAt(0)}
+                  </div>
                 </div>
               </div>
             </div>
@@ -50,7 +51,7 @@ const FeaturedManager: FC<FeaturedManagerProps> = ({ manager }) => {
         </a>
       </Link>
       <div className="text-center mt-1.5">
-        {!isMyProfile &&
+        {!isMyProfile && (
           <Button
             variant="text"
             className="text-xs text-primary font-normal tracking-normal py-0"
@@ -58,7 +59,7 @@ const FeaturedManager: FC<FeaturedManagerProps> = ({ manager }) => {
           >
             {isFollowing ? "Unfollow" : "Follow"}
           </Button>
-        }
+        )}
       </div>
     </div>
   );

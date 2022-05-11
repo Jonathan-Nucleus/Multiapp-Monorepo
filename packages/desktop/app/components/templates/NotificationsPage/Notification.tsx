@@ -50,7 +50,7 @@ const NotificationDetail: FC<Props> = ({
           {notification.isNew && (
             <div className="absolute top-[18px] right-[58px] w-2 h-2 rounded-full bg-yellow"></div>
           )}
-          <Avatar src={notification.user.avatar} size={48} className="pl-3" />
+          <Avatar user={notification.user} size={48} className="pl-3" />
           <div className="absolute bottom-0 right-0 rounded-full bg-purple-secondary p-1">
             {renderIcon(notification)}
           </div>

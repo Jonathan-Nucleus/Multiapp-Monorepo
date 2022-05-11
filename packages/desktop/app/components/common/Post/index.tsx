@@ -55,8 +55,14 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const { user, company, mediaUrl } = post;
+  if (!user || !account) {
+    // TODO: return skeleton
+    return null;
+  }
+
   const isMyPost =
-    user?._id === account?._id || account?.companyIds?.includes(company?._id);
+    user?._id === account._id ||
+    (company && account.companyIds?.includes(company._id));
   const isFollowingUser = account?.followingIds?.includes(user._id) ?? false;
   const isLiked = account ? post.likeIds?.includes(account._id) : false;
   const isMuted = account?.mutedPostIds?.includes(post._id) ?? false;
@@ -84,24 +90,16 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
       refetchQueries: ["Posts"],
     });
   };
+
   return (
     <>
       <Card className="border-0 p-0 rounded-none overflow-visible	md:rounded-2xl mb-6">
         <div className="flex items-center px-4 pt-4">
-          <div className="w-14 h-14 flex items-center justify-center">
-            <Link href={`/profile/${user._id}`}>
-              <a>
-                {user.avatar ? (
-                  <Avatar size={56} src={user.avatar} />
-                ) : (
-                  <div className="w-[56px] h-[56px] flex items-center justify-center bg-primary w-full h-full text-2xl text-white rounded-full">
-                    {user.firstName.charAt(0)}
-                    {user.lastName.charAt(0)}
-                  </div>
-                )}
-              </a>
-            </Link>
-          </div>
+          <Link href={`/profile/${user._id}`}>
+            <a>
+              <Avatar user={user} size={56} />
+            </a>
+          </Link>
           <div className="ml-2">
             <div className="flex items-center">
               <Link href={`/profile/${user._id}`}>
@@ -237,21 +235,23 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
                           <div className="ml-4">Report post</div>
                         </div>
                       </Menu.Item>
-                      <Menu.Item>
-                        <div
-                          className="flex items-center px-4 py-3 cursor-pointer hover:bg-background-blue"
-                          onClick={() => setShowHidePost(true)}
-                        >
-                          <EyeClosed
-                            fill="currentColor"
-                            weight="light"
-                            size={24}
-                          />
-                          <div className="ml-4">
-                            Hide {post.user.firstName} {post.user.lastName}
+                      {post.user && (
+                        <Menu.Item>
+                          <div
+                            className="flex items-center px-4 py-3 cursor-pointer hover:bg-background-blue"
+                            onClick={() => setShowHidePost(true)}
+                          >
+                            <EyeClosed
+                              fill="currentColor"
+                              weight="light"
+                              size={24}
+                            />
+                            <div className="ml-4">
+                              Hide {post.user.firstName} {post.user.lastName}
+                            </div>
                           </div>
-                        </div>
-                      </Menu.Item>
+                        </Menu.Item>
+                      )}
                     </>
                   ) : (
                     <>
@@ -307,11 +307,13 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
                 </Menu.Items>
               </Transition>
             </Menu>
-            <ConfirmHideUserModal
-              post={post}
-              show={showHidePost}
-              onClose={() => setShowHidePost(false)}
-            />
+            {post.user && (
+              <ConfirmHideUserModal
+                user={post.user}
+                show={showHidePost}
+                onClose={() => setShowHidePost(false)}
+              />
+            )}
             <ReportPostModal
               post={post}
               show={showReportPost}

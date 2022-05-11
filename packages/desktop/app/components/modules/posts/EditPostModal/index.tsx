@@ -18,7 +18,9 @@ import CategorySelector, { categoriesSchema } from "./CategorySelector";
 import Avatar from "desktop/app/components/common/Avatar";
 import Button from "desktop/app/components/common/Button";
 import Input from "desktop/app/components/common/Input";
-import Dropdown, { DropdownProps } from "desktop/app/components/common/Dropdown";
+import Dropdown, {
+  DropdownProps,
+} from "desktop/app/components/common/Dropdown";
 import Label from "desktop/app/components/common/Label";
 import MentionTextarea, {
   mentionTextSchema,
@@ -123,7 +125,9 @@ interface EditPostModalProps {
 
 const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
   const account = useCachedAccount();
-  const [userOptions, setUserOptions] = useState<DropdownProps["items"][number][]>([]);
+  const [userOptions, setUserOptions] = useState<
+    DropdownProps["items"][number][]
+  >([]);
   const selectedFile = useRef<File | undefined>(undefined);
   const [localFileUrl, setLocalFileUrl] = useState<string | null>(null);
   const [showCategories, setShowCategories] = useState(!!post);
@@ -161,18 +165,20 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
       ]);
       if (post) {
         reset(
-          schema.cast(
-            {
-              user: account._id,
-              mediaUrl: post.mediaUrl ?? "",
-              categories: post.categories,
-              mentionInput: {
-                body: post.body,
-              },
+          schema.cast({
+            user: post.userId,
+            mediaUrl: post.mediaUrl ?? "",
+            categories: post.categories,
+            mentionInput: {
+              body: post.body,
             },
-          ) as DefaultValues<FormValues>,
+          }) as DefaultValues<FormValues>
         );
-        setLocalFileUrl(post.mediaUrl ? `${process.env.NEXT_PUBLIC_POST_URL}/${post.mediaUrl}` : null);
+        setLocalFileUrl(
+          post.mediaUrl
+            ? `${process.env.NEXT_PUBLIC_POST_URL}/${post.mediaUrl}`
+            : null
+        );
       } else {
         reset(schema.cast({ user: account._id }) as DefaultValues<FormValues>);
       }
@@ -186,6 +192,7 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
   };
 
   const onSubmit: SubmitHandler<FormValues> = async ({
+    user,
     audience,
     mediaUrl,
     categories,
@@ -214,6 +221,7 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
           variables: {
             post: {
               _id: post._id,
+              userId: user,
               audience,
               categories,
               mediaUrl,
@@ -226,8 +234,7 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
           closeModal();
         }
       }
-    } catch (err) {
-    }
+    } catch (err) {}
   };
 
   const uploadMedia = async (file: File): Promise<string | undefined> => {
@@ -281,11 +288,7 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
               <div className="flex flex-wrap items-center p-4">
                 <Avatar size={56} src={account?.avatar} />
                 <div className="ml-2">
-                  <Dropdown
-                    items={userOptions}
-                    control={control}
-                    name="user"
-                  />
+                  <Dropdown items={userOptions} control={control} name="user" />
                 </div>
                 <div className="ml-2">
                   <Dropdown
@@ -402,7 +405,11 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
                 <CategorySelector
                   control={control}
                   name="categories"
-                  error={errors.categories ? "Please select at least one category." : ""}
+                  error={
+                    errors.categories
+                      ? "Please select at least one category."
+                      : ""
+                  }
                 />
               </div>
             )}
@@ -415,7 +422,7 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
             >
               Cancel
             </Button>
-            {showCategories ?
+            {showCategories ? (
               <Button
                 type="button"
                 variant="gradient-primary"
@@ -425,7 +432,7 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
               >
                 {post ? "Save Updates" : "Post"}
               </Button>
-              :
+            ) : (
               <Button
                 type="button"
                 variant="gradient-primary"
@@ -435,7 +442,7 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
               >
                 NEXT
               </Button>
-            }
+            )}
           </div>
         </div>
       </form>

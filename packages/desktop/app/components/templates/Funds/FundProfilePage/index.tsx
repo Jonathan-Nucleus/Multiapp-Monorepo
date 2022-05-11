@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { File, Info, Share, Star, TelevisionSimple } from "phosphor-react";
@@ -126,9 +126,12 @@ interface FundProfileProps {
 }
 
 const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
-  const { data: { fund } = {} } = useFund(fundId);
+  const { data } = useFund(fundId);
+  const fund = data?.fund;
   const { isWatching, toggleWatch } = useWatchFund(fundId);
-
+  const [more, setMore] = useState(false);
+  const [moreInvestor, setMoreInvestor] = useState(false);
+  const [moreOption, setMoreOption] = useState(false);
   if (!fund) {
     return <SkeletonFundProfilePage />;
   }
@@ -158,23 +161,12 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
               </div>
               <div className="flex flex-col flex-grow">
                 <div className="flex px-5">
-                  <div
-                    className={`w-24 h-24 flex-shrink-0 bg-purple-secondary
-                    rounded-b relative overflow-hidden`}
-                  >
-                    {companyAvatar && (
-                      <Image
-                        loader={() =>
-                          `${process.env.NEXT_PUBLIC_AVATAR_URL}/${companyAvatar}`
-                        }
-                        src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${companyAvatar}`}
-                        alt=""
-                        layout="fill"
-                        className="object-cover"
-                        unoptimized={true}
-                      />
-                    )}
-                  </div>
+                  <Avatar
+                    user={fund.company}
+                    size={96}
+                    shape="square"
+                    className="rounded-t-none"
+                  />
                   <div className="self-center flex-grow mx-4">
                     <div className="text-xl text-white font-medium">
                       {fund?.name}
@@ -416,7 +408,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                       Presentations
                     </div>
                     <div className="border-white/[.12] divide-y divide-inherit mt-5">
-                      {fundData.presentations.map((item, index) => (
+                      {fundData.presentations.slice(0, 5).map((item, index) => (
                         <div key={index} className="flex py-5">
                           <div className="text-white">
                             <File color="currentColor" size={24} />
@@ -429,14 +421,31 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                           </div>
                         </div>
                       ))}
-                      <div className="py-5">
-                        <Button
-                          variant="text"
-                          className="text-primary font-medium"
-                        >
-                          MORE PRESENTATIONS
-                        </Button>
-                      </div>
+                      {more &&
+                        fundData.presentations.slice(5).map((item, index) => (
+                          <div key={index} className="flex py-5">
+                            <div className="text-white">
+                              <File color="currentColor" size={24} />
+                            </div>
+                            <div className="ml-3">
+                              <div className="text-white">{item.title}</div>
+                              <div className="text-xs text-white opacity-60">
+                                {item.created}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      {fundData.presentations.length > 5 && (
+                        <div className="py-5">
+                          <Button
+                            variant="text"
+                            className="text-primary font-medium"
+                            onClick={() => setMore(!more)}
+                          >
+                            {more ? "LESS PRESENTATIONS" : "MORE PRESENTATIONS"}
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="mt-10">
@@ -465,7 +474,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                       Investor Letters
                     </div>
                     <div className="border-white/[.12] divide-y divide-inherit mt-5">
-                      {fundData.presentations.map((item, index) => (
+                      {fundData.presentations.slice(0, 5).map((item, index) => (
                         <div key={index} className="flex py-5">
                           <div className="text-white">
                             <File color="currentColor" size={24} />
@@ -478,14 +487,33 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                           </div>
                         </div>
                       ))}
-                      <div className="py-5">
-                        <Button
-                          variant="text"
-                          className="text-primary font-medium"
-                        >
-                          MORE INVESTOR LETTERS
-                        </Button>
-                      </div>
+                      {moreInvestor &&
+                        fundData.presentations.slice(5).map((item, index) => (
+                          <div key={index} className="flex py-5">
+                            <div className="text-white">
+                              <File color="currentColor" size={24} />
+                            </div>
+                            <div className="ml-3">
+                              <div className="text-white">{item.title}</div>
+                              <div className="text-xs text-white opacity-60">
+                                {item.created}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      {fundData.presentations.length > 5 && (
+                        <div className="py-5">
+                          <Button
+                            variant="text"
+                            className="text-primary font-medium"
+                            onClick={() => setMoreInvestor(!moreInvestor)}
+                          >
+                            {moreInvestor
+                              ? "LESS INVESTOR LETTERS"
+                              : "MORE INVESTOR LETTERS"}
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="mt-10">
@@ -493,7 +521,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                       Operational
                     </div>
                     <div className="border-white/[.12] divide-y divide-inherit mt-5">
-                      {fundData.operational.map((item, index) => (
+                      {fundData.operational.slice(0, 5).map((item, index) => (
                         <div key={index} className="flex py-5">
                           <div className="text-white">
                             <File color="currentColor" size={24} />
@@ -506,14 +534,33 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                           </div>
                         </div>
                       ))}
-                      <div className="py-5">
-                        <Button
-                          variant="text"
-                          className="text-primary font-medium"
-                        >
-                          MORE OPERATIONAL
-                        </Button>
-                      </div>
+                      {moreOption &&
+                        fundData.operational.slice(5).map((item, index) => (
+                          <div key={index} className="flex py-5">
+                            <div className="text-white">
+                              <File color="currentColor" size={24} />
+                            </div>
+                            <div className="ml-3">
+                              <div className="text-white">{item.title}</div>
+                              <div className="text-xs text-white opacity-60">
+                                {item.created}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      {fundData.operational.length > 5 && (
+                        <div className="py-5">
+                          <Button
+                            variant="text"
+                            className="text-primary font-medium"
+                            onClick={() => setMoreOption(!moreOption)}
+                          >
+                            {moreOption
+                              ? "LESS OPERATIONAL"
+                              : "MORE OPERATIONAL"}
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </Tab.Panel>
@@ -526,7 +573,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                 className="text-white opacity-60 flex items-center tracking-normal font-normal"
               >
                 <Info color="currentColor" weight="light" size={20} />
-                <span className="ml-2">Disclosure</span>
+                <span className="ml-2 underline">Disclosure</span>
               </Button>
             </div>
           </div>
@@ -538,7 +585,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                 <div className="flex flex-col items-center p-5 pt-1">
                   <Link href={`/profile/${fund?.manager?._id}`}>
                     <a>
-                      <Avatar size={128} src={fund?.manager?.avatar} />
+                      <Avatar user={fund?.manager} size={128} />
                     </a>
                   </Link>
                   <div className="flex items-center mt-2">
@@ -597,41 +644,8 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                   </div>
                   <div className="text-white">$10M</div>
                 </div>
-                <div className="p-4">
-                  <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
-                    Remaining Capacity
-                  </div>
-                  <div className="text-white">--</div>
-                </div>
               </div>
-              <div className="grid grid-cols-2">
-                <div className="p-4">
-                  <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
-                    Sharpe Ratio
-                  </div>
-                  <div className="text-white">2.5</div>
-                </div>
-                <div className="p-4">
-                  <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
-                    ann. volatility
-                  </div>
-                  <div className="text-white">7.8%</div>
-                </div>
-              </div>
-              <div className="grid grid-cols-2">
-                <div className="p-4">
-                  <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
-                    Target returns
-                  </div>
-                  <div className="text-white">8-10%</div>
-                </div>
-                <div className="p-4">
-                  <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
-                    volatility
-                  </div>
-                  <div className="text-white">Low</div>
-                </div>
-              </div>
+
               <div className="grid grid-cols-2">
                 <div className="p-4">
                   <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
@@ -664,7 +678,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
             </div>
           </Card>
           <div className="mt-9">
-            {fund?.team && <TeamMembersList members={fund?.team} />}
+            {fund?.team.length > 0 && <TeamMembersList members={fund?.team} />}
           </div>
         </div>
       </div>

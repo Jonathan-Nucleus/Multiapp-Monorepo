@@ -84,11 +84,16 @@ type HideUserData = {
  * @returns   GraphQL mutation.
  */
 export function useHideUser(): MutationTuple<HideUserData, HideUserVariables> {
-  return useMutation<HideUserData, HideUserVariables>(gql`
-    mutation HideUser($hide: Boolean!, $userId: ID!) {
-      hideUser(hide: $hide, userId: $userId)
-    }
-  `);
+  return useMutation<HideUserData, HideUserVariables>(
+    gql`
+      mutation HideUser($hide: Boolean!, $userId: ID!) {
+        hideUser(hide: $hide, userId: $userId)
+      }
+    `,
+    {
+      refetchQueries: ['Posts', 'Post'],
+    },
+  );
 }
 
 type SaveQuestionnaireVariables = {

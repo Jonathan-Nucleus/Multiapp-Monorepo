@@ -45,7 +45,7 @@ const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
     <>
       <div className="hidden lg:grid grid-cols-4 py-4">
         <div className="flex items-center">
-          <Avatar size={56} src={company.avatar} />
+          <Avatar user={company} size={56} />
           <div className="text-sm text-white ml-3">{company.name}</div>
         </div>
         <div className="flex flex-col justify-center px-1">
@@ -90,11 +90,7 @@ const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
         bg-primary-solid/[.07] px-5 py-3`}
       >
         <div className="flex items-center">
-          <Avatar
-            size={56}
-            src={company.avatar}
-            className="bg-white rounded-full overflow-hidden"
-          />
+          <Avatar user={company} size={56} shape="square" />
           <div className="w-14 ml-4">
             <div className="text-sm text-white font-medium">
               {company.postIds?.length ?? 0}
@@ -125,9 +121,9 @@ const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
           {company.funds.map((fund) => (
             <div key={fund._id} className="flex mt-2">
               <Avatar
+                user={managerLookup[fund.managerId]}
                 size={24}
-                src={managerLookup[fund.managerId]?.avatar}
-                className="bg-white rounded-full overflow-hidden"
+                className="overflow-hidden"
               />
               <div className="ml-2">
                 <div className="text-sm text-white">

@@ -41,7 +41,7 @@ const ProfileCardSmall: FC<ProfileProps> = ({ user }: ProfileProps) => {
       <Link href={`/profile/${user._id}`}>
         <a>
           <div className="h-24 flex items-center justify-center">
-            <Avatar src={user.avatar} size={88} />
+            <Avatar user={user} size={88} />
           </div>
         </a>
       </Link>

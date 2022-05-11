@@ -74,7 +74,11 @@ const FundCard: FC<FundCardProps> = ({
             <div className="flex">
               {showImages && (
                 <div className="w-24 h-24 rounded-b relative overflow-hidden mr-4">
-                  <Avatar src={fund.company.avatar} shape="square" size={96} />
+                  <Link href={`/company/${fund.company._id}`}>
+                    <a>
+                      <Avatar user={fund.company} shape="square" size={96} />
+                    </a>
+                  </Link>
                 </div>
               )}
               <div
@@ -82,10 +86,14 @@ const FundCard: FC<FundCardProps> = ({
                   !showImages ? "mt-3" : ""
                 }`}
               >
-                <div className="text-xl text-white font-medium">
-                  {fund.name}
-                </div>
-                <div className="text-primary">{fund.company.name}</div>
+                <Link href={`/company/${fund.company._id}`}>
+                  <a>
+                    <div className="text-xl text-white font-medium">
+                      {fund.name}
+                    </div>
+                    <div className="text-primary">{fund.company.name}</div>
+                  </a>
+                </Link>
               </div>
               <div className="self-start flex items-center mt-5">
                 <div className="w-3 h-3 bg-success rounded-full" />
@@ -117,17 +125,11 @@ const FundCard: FC<FundCardProps> = ({
           <div className="bg-white/[.12] w-px my-5" />
           {profileType === "manager" ? (
             <div className="w-64 flex-shrink-0 flex flex-col items-center p-4">
-              {fund.company.avatar && (
-                <Link href={`/company/${fund.company._id}`}>
-                  <a>
-                    <Avatar
-                      src={fund.company.avatar}
-                      size={128}
-                      shape="square"
-                    />
-                  </a>
-                </Link>
-              )}
+              <Link href={`/company/${fund.company._id}`}>
+                <a>
+                  <Avatar user={fund.company} size={128} shape="square" />
+                </a>
+              </Link>
               <Link href={`/company/${fund.company._id}`}>
                 <a className="text-sm text-white mt-2 tracking-wide">
                   {fund.company.name}
@@ -162,13 +164,11 @@ const FundCard: FC<FundCardProps> = ({
             </div>
           ) : (
             <div className="w-64 flex-shrink-0 flex flex-col items-center p-4">
-              {fund.manager.avatar && (
-                <Link href={`/profile/${fund.manager._id}`}>
-                  <a>
-                    <Avatar src={fund.manager.avatar} size={128} />
-                  </a>
-                </Link>
-              )}
+              <Link href={`/profile/${fund.manager._id}`}>
+                <a>
+                  <Avatar user={fund.manager} size={128} />
+                </a>
+              </Link>
               <Link href={`/profile/${fund.manager._id}`}>
                 <a className="text-sm text-white mt-2 tracking-wide">
                   {fund.manager.firstName} {fund.manager.lastName}
@@ -263,18 +263,26 @@ const FundCard: FC<FundCardProps> = ({
           )}
         </div>
         <div className="relative px-4 pt-8 bg-secondary/[.27]">
-          <Avatar
-            src={fund.company.avatar}
-            shape="square"
-            size={64}
-            className="w-16 h-16 relative overflow-hidden -mt-16"
-          />
+          <Link href={`/company/${fund.company._id}`}>
+            <a>
+              <Avatar
+                user={fund.company}
+                shape="square"
+                size={64}
+                className="w-16 h-16 relative overflow-hidden -mt-16"
+              />
+            </a>
+          </Link>
           <div className="flex items-center justify-end -mt-5">
             <div className="w-3 h-3 bg-success rounded-full" />
             <div className="text-xs text-success ml-1">{fund.status}</div>
           </div>
           <div className="text-white mt-2">{fund.name}</div>
-          <div className="text-sm text-primary">{fund.company.name}</div>
+          <Link href={`/company/${fund.company._id}`}>
+            <a>
+              <div className="text-sm text-primary">{fund.company.name}</div>
+            </a>
+          </Link>
           <div className="text-sm text-white py-3">{fund.overview}</div>
           <div className="flex flex-wrap -mx-1 py-2">
             {fund.tags.map((tag) => (
@@ -290,17 +298,19 @@ const FundCard: FC<FundCardProps> = ({
             <div className="border-t border-white/[.12] py-4">
               <div className="flex items-center">
                 <div className="w-12 h-12 relative flex rounded-lg overflow-hidden">
-                  {fund.company.avatar && (
-                    <Avatar
-                      src={fund.company.avatar}
-                      shape="square"
-                      size={48}
-                    />
-                  )}
+                  <Link href={`/company/${fund.company._id}`}>
+                    <a>
+                      <Avatar user={fund.company} shape="square" size={48} />
+                    </a>
+                  </Link>
                 </div>
                 <div className="ml-3">
                   <div className="text-sm text-white flex items-center">
-                    <div>{fund.company.name}</div>
+                    <Link href={`/company/${fund.company._id}`}>
+                      <a>
+                        <div>{fund.company.name}</div>
+                      </a>
+                    </Link>
                     {!isMyFund && (
                       <div className="flex items-center">
                         <span className="mx-1">•</span>
@@ -325,9 +335,9 @@ const FundCard: FC<FundCardProps> = ({
           ) : (
             <div className="border-t border-white/[.12] py-4">
               <div className="flex items-center">
-                <div className="w-12 h-12 relative flex rounded-full overflow-hidden">
+                <div className="overflow-hidden">
                   {fund.manager.avatar && (
-                    <Avatar src={fund.manager.avatar} size={48} />
+                    <Avatar user={fund.manager} size={48} />
                   )}
                 </div>
                 <div className="ml-3">
@@ -384,6 +394,9 @@ const FundCard: FC<FundCardProps> = ({
                 </Button>
               </a>
             </Link>
+            <Button variant="text" className="ml-3">
+              <Share color="white" weight="light" size={20} />
+            </Button>
             <Button variant="text" className="ml-3" onClick={toggleWatch}>
               <Star
                 className={isWatching ? "text-primary-medium" : "text-white"}

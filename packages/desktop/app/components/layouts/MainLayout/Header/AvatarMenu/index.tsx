@@ -38,7 +38,7 @@ const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
         </div>
       ),
       title: "Accredited Investor",
-      path: "/funds",
+      path: "/",
     },
     {
       icon: (
@@ -53,12 +53,6 @@ const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
       icon: <Gear color="white" weight="light" size={24} />,
       title: "Account Settings",
       path: "/settings",
-    },
-    {
-      icon: <EnvelopeOpen color="white" weight="light" size={24} />,
-      title: "Invite Your Friends",
-      path: "/",
-      onClick: () => setShowInviteModal(true),
     },
     {
       icon: <Lifebuoy color="white" weight="light" size={24} />,
@@ -96,7 +90,9 @@ const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
       <Popover as="div" className="relative">
         <Popover.Button>
           <div className="flex flex-row items-center cursor-pointer">
-            <Avatar size={32} src={account?.avatar} />
+            <div className="w-8 h-8 flex items-center justify-center">
+              <Avatar user={account} size={32} />
+            </div>
             <div className="ml-2">
               <CaretDown color="white" weight="bold" size={16} />
             </div>
@@ -117,7 +113,7 @@ const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
                 <Link href={"/profile/me"}>
                   <a>
                     <div className="flex flex-row items-center p-4">
-                      <Avatar size={64} src={account?.avatar} />
+                      <Avatar user={account} size={64} />
                       <div className="text-left ml-3">
                         <div className="text-xl text-white capitalize">
                           {account?.firstName} {account?.lastName}
@@ -132,14 +128,14 @@ const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
               </Popover.Button>
               {items.map((item, index) => (
                 <div key={index}>
-                  {item.onClick ?
+                  {item.onClick ? (
                     <MenuItem
                       key={index}
                       icon={item.icon}
                       title={item.title}
                       onClick={item.onClick}
                     />
-                    :
+                  ) : (
                     <Link href={item.path} passHref={item.external}>
                       <a target={item.external ? "_blank" : "_self"}>
                         <MenuItem
@@ -149,7 +145,7 @@ const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
                         />
                       </a>
                     </Link>
-                  }
+                  )}
                 </div>
               ))}
             </div>

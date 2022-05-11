@@ -187,6 +187,7 @@ const EditModal: FC<EditModalProps> = ({ show, onClose }) => {
                     variant="outline-primary"
                     className="w-full md:w-48 uppercase text-primary"
                     disabled={!isValid || loading}
+                    onClick={onClose}
                   >
                     Cancel
                   </Button>

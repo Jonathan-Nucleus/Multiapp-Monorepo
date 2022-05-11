@@ -7,22 +7,24 @@ import "emoji-mart/css/emoji-mart.css";
 import Button from "../Button";
 import Avatar from "../Avatar";
 import Input from "../Input";
+import { UserSummary } from "mobile/src/graphql/fragments/user";
 import { useAccount } from "mobile/src/graphql/query/account";
 
+type User = UserSummary;
 interface SendMessageProps {
-  onSend: (message: string, mediaUrl?: string) => void;
-  avatar?: string;
-  size: number;
-  placeholder?: string;
+  user?: User;
+  avatarSize?: number;
   message?: string;
+  placeholder?: string;
+  onSend: (message: string, mediaUrl?: string) => void;
 }
 
 const SendMessage: FC<SendMessageProps> = ({
   onSend,
-  avatar,
-  size,
+  avatarSize = 36,
   placeholder,
   message = "",
+  user,
 }: SendMessageProps) => {
   const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const [fetchUploadLink] = useFetchUploadLink();
@@ -77,7 +79,7 @@ const SendMessage: FC<SendMessageProps> = ({
   return (
     <div className="relative">
       <div className="flex items-center">
-        <Avatar src={avatar ?? account?.avatar} size={size} />
+        <Avatar user={user} size={avatarSize} />
         <div className="flex items-center justify-between p-4 flex-1 relative">
           <Input
             placeholder={placeholder}

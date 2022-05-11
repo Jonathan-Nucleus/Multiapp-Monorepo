@@ -43,7 +43,7 @@ const UserItem: FC<UserItemProps> = ({
     <div className="flex items-center">
       <Link href={`/profile/${user._id}`}>
         <a>
-          <Avatar src={user.avatar} size={56} />
+          <Avatar user={user} size={56} />
         </a>
       </Link>
       <div className="ml-2 flex-grow">

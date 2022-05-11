@@ -1,26 +1,28 @@
 import { FC } from "react";
 import Link from "next/link";
 import Card from "../../../common/Card";
-import { UserProfileProps } from "desktop/app/types/common-props";
+import { UserProfile } from "mobile/src/graphql/query/user/useProfile";
 import Avatar from "../../../common/Avatar";
 import Skeleton from "./Skeleton";
 
-const CompanyCard: FC<UserProfileProps> = ({ user }) => {
+interface CompanyCardProps {
+  user: UserProfile | undefined;
+}
+
+const CompanyCard: FC<CompanyCardProps> = ({ user }) => {
   if (!user) {
-    return <Skeleton />
+    return <Skeleton />;
   }
   const company = user.companies.length > 0 ? user.companies[0] : undefined;
   if (!company) {
-    return <></>
+    return <></>;
   }
   return (
     <div>
       <Link href={`/company/${company._id}`}>
         <a>
           <div className="h-24 flex items-center justify-center">
-            {company.avatar && (
-              <Avatar src={company.avatar} size={88} shape="square" />
-            )}
+            <Avatar user={company} size={88} shape="square" />
           </div>
         </a>
       </Link>

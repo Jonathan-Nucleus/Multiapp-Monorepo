@@ -5,11 +5,15 @@ import { Menu } from "@headlessui/react";
 import Button from "../../common/Button";
 import NotificationDetail from "./Notification";
 import { useNotifications } from "mobile/src/graphql/query/notification";
-import { useReadNotification } from "mobile/src/graphql/mutation/notification";
+import {
+  useReadNotification,
+  useReadNotifications,
+} from "mobile/src/graphql/mutation/notification";
 
 const NotificationPage: FC = () => {
-  const { data, refetch } = useNotifications();
+  const { data } = useNotifications();
   const [readNotification] = useReadNotification();
+  const [readNotifications] = useReadNotifications();
   const notifications = data?.notifications ?? [];
 
   const handleReadNotification = async (id?: string) => {
@@ -19,7 +23,14 @@ const NotificationPage: FC = () => {
           notificationId: id,
         },
       });
-      refetch();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleReadAllNotifications = async () => {
+    try {
+      await readNotifications();
     } catch (err) {
       console.log(err);
     }
@@ -32,7 +43,7 @@ const NotificationPage: FC = () => {
         <Button
           variant="text"
           className="flex items-center  hidden md:flex"
-          onClick={() => handleReadNotification()}
+          onClick={() => handleReadAllNotifications()}
         >
           <Checks size={24} color="#00AAE0" weight="fill" />
           <span className="ml-4">Mark all as read</span>
@@ -52,7 +63,7 @@ const NotificationPage: FC = () => {
                   <Button
                     variant="text"
                     className="py-0"
-                    onClick={() => handleReadNotification()}
+                    onClick={() => handleReadAllNotifications()}
                   >
                     <Checks size={24} color="#00AAE0" weight="fill" />
                     <span className="ml-4">Mark all as read</span>

@@ -1,24 +1,31 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { FC, Fragment } from "react";
-import { PostSummary } from "mobile/src/graphql/fragments/post";
+import { UserSummary } from "mobile/src/graphql/fragments/user";
 import Button from "../../Button";
 import { useHideUser } from "mobile/src/graphql/mutation/account";
 
+type User = Pick<UserSummary, "_id" | "firstName" | "lastName">;
 interface ConfirmHideUserModalProps {
-  post: PostSummary;
+  user: User;
   show: boolean;
   onClose: () => void;
 }
 
-const ConfirmHideUserModal: FC<ConfirmHideUserModalProps> = ({ post, show, onClose }) => {
+const ConfirmHideUserModal: FC<ConfirmHideUserModalProps> = ({
+  user,
+  show,
+  onClose,
+}) => {
   const [hideUser] = useHideUser();
   const hideUserCallback = async () => {
     const { data } = await hideUser({
-      variables: { hide: true, userId: post.user._id },
-      refetchQueries: ["Posts"],
+      variables: { hide: true, userId: user._id },
     });
     if (data?.hideUser) {
       onClose();
+    } else {
+      // TODO: Present error in UI
+      console.log("Error hiding user");
     }
   };
   return (
@@ -53,12 +60,12 @@ const ConfirmHideUserModal: FC<ConfirmHideUserModalProps> = ({ post, show, onClo
             >
               <div className="w-full bg-background-card max-w-md rounded-lg px-8 py-6">
                 <div className="text-xl text-white font-medium">
-                  Hide {post.user.firstName} {post.user.lastName}?
+                  Hide {user.firstName} {user.lastName}?
                 </div>
                 <div className="text-sm text-white mt-4">
-                  Are you sure you want to hide this user?
-                  You won&apos;t see posts from this user or be able to see their user profile, but they can still see
-                  your profile and posts.
+                  Are you sure you want to hide this user? You won&apos;t see
+                  posts from this user or be able to see their user profile, but
+                  they can still see your profile and posts.
                 </div>
                 <div className="text-sm text-white font-semibold mt-5">
                   This cannot be undone.

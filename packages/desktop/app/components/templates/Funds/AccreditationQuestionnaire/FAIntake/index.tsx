@@ -11,13 +11,18 @@ import ErrorMessage from "desktop/app/components/common/ErrorMessage";
 import SegmentedInput from "desktop/app/components/common/SegmentedInput";
 import type { WizardStepRenderProps } from "desktop/app/components/common/Wizard";
 
+import {
+  ContactMethod,
+  ContactMethodOptions,
+} from "mobile/src/graphql/mutation/account/useSaveQuestionnaire";
+
 export type FormData = {
   advisorRequest: {
-    firmName: string;
-    firmCrd: string;
+    firm: string;
+    crd: string;
     phone: string;
     email: string;
-    contactMethod: string;
+    contactMethod: ContactMethod;
   };
 };
 
@@ -25,8 +30,8 @@ export const formSchema = yup
   .object({
     advisorRequest: yup
       .object({
-        firmName: yup.string().required("Required").default(""),
-        firmCrd: yup.string().required("Required").default(""),
+        firm: yup.string().required("Required").default(""),
+        crd: yup.string().required("Required").default(""),
         phone: yup
           .string()
           .phone(undefined, false, "Oops, looks like an invalid phone number")
@@ -39,7 +44,7 @@ export const formSchema = yup
           .default(""),
         contactMethod: yup
           .mixed()
-          .oneOf(["PHONE", "EMAIL"])
+          .oneOf(ContactMethodOptions)
           .required("Required"),
       })
       .required(),
@@ -80,13 +85,13 @@ const FAIntake = ({
         <Field
           register={register}
           state={formState}
-          name="advisorRequest.firmName"
+          name="advisorRequest.firm"
           label="Firm Name"
         />
         <Field
           register={register}
           state={formState}
-          name="advisorRequest.firmCrd"
+          name="advisorRequest.crd"
           label="Firm CDR #"
         />
         <Field

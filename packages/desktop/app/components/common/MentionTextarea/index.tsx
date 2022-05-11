@@ -142,7 +142,7 @@ function MentionTextarea<
                 return (
                   <div className="flex items-center p-2">
                     <div className="flex items-center">
-                      <Avatar size={56} src={user?.avatar} />
+                      <Avatar user={user} size={56} />
                     </div>
                     <div className="ml-2">
                       <div className="flex items-center">

@@ -59,9 +59,8 @@ const CommentCard: FC<CommentCardProps> = ({
 
   const handleDeleteComment = async (): Promise<void> => {
     try {
-      const { data } = await deleteComment({
+      await deleteComment({
         variables: { commentId: comment._id },
-        refetchQueries: ["Posts"],
       });
     } catch (err) {
       console.log("delete comment", err);
@@ -84,7 +83,6 @@ const CommentCard: FC<CommentCardProps> = ({
             mediaUrl: mediaUrl ?? "",
           },
         },
-        refetchQueries: ["Posts"],
       });
 
       if (data?.editComment) {
@@ -112,7 +110,6 @@ const CommentCard: FC<CommentCardProps> = ({
             mediaUrl: mediaUrl ?? "",
           },
         },
-        refetchQueries: ["Posts"],
       });
     } catch (err) {
       console.log("send mesage error", err);
@@ -121,7 +118,7 @@ const CommentCard: FC<CommentCardProps> = ({
   return (
     <>
       <div className="flex items-start">
-        <Avatar src={comment.user.avatar} size={size ? size : 36} />
+        <Avatar user={comment.user} size={size ? size : 36} />
         <div className="ml-4 w-full">
           <div className="p-2 rounded-lg bg-background-popover">
             <div className="flex justify-between">
@@ -181,10 +178,11 @@ const CommentCard: FC<CommentCardProps> = ({
             </div>
             {isEditable ? (
               <SendMessage
-                size={24}
                 onSend={(val, mediaUrl) => handleEditComment(val, mediaUrl)}
                 placeholder="Edit comment..."
                 message={comment.body}
+                user={account}
+                avatarSize={24}
               />
             ) : (
               <div className="text text-sm text-white mt-4 flex flex-col">
@@ -235,7 +233,8 @@ const CommentCard: FC<CommentCardProps> = ({
       </div>
       {visibleReply && (
         <SendMessage
-          size={24}
+          user={account}
+          avatarSize={24}
           onSend={(val, mediaUrl) => handleReplyComment(val, mediaUrl)}
           placeholder="Reply comment..."
         />

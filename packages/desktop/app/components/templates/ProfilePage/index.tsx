@@ -6,7 +6,7 @@ import { UserProfileProps } from "../../../types/common-props";
 import { useSession } from "next-auth/react";
 import PostsSection from "./PostsSection";
 import FundsSection from "./FundsSection";
-import EditProfileModal from "./EditProfileModal";
+import EditProfileModal from "./ProfileCard/EditModal";
 import EditMediaModal from "./EditMediaModal";
 import { MediaType } from "backend/graphql/mutations.graphql";
 
@@ -26,7 +26,7 @@ const ProfilePage: FC<ProfilePageProps> = ({ user, userId }) => {
     <>
       <div className="lg:mt-12 mb-12 lg:px-14">
         <div className="flex justify-center mx-auto">
-          <div className="flex-grow max-w-4xl mx-4">
+          <div className="flex-grow max-w-full mx-4">
             <div className="divide-y divide-inherit border-white/[.12]">
               <div className="pb-5">
                 <ProfileCard
@@ -57,21 +57,20 @@ const ProfilePage: FC<ProfilePageProps> = ({ user, userId }) => {
           onClose={() => setShowPostModal(false)}
         />
       )}
-      {showEditProfile &&
+      {showEditProfile && (
         <EditProfileModal
-          account={user!}
           show={showEditProfile}
           onClose={() => setShowEditProfile(false)}
         />
-      }
-      {showEditMedia &&
+      )}
+      {showEditMedia && (
         <EditMediaModal
           type={mediaTypeToEdit!}
           user={user!}
           show={showEditMedia}
           onClose={() => setShowEditMedia(false)}
         />
-      }
+      )}
     </>
   );
 };

@@ -19,15 +19,12 @@ const AddPost: FC<AddPostProps> = ({ user, onClick }) => {
     <div className="cursor-pointer" onClick={onClick}>
       <Card className="pointer-events-none bg-background-blue p-4">
         <div className="flex items-center">
-          <Avatar size={56} src={user?.avatar} />
+          <Avatar user={user} size={56} />
           <Input
             placeholder="Create a Post"
             className="text-sm rounded-3xl mx-4 px-5 h-12"
           />
-          <Button
-            variant="gradient-primary"
-            className="w-12 h-12 rounded-full"
-          >
+          <Button variant="gradient-primary" className="w-12 h-12 rounded-full">
             <Plus color="white" size={24} />
           </Button>
         </div>
@@ -35,8 +32,8 @@ const AddPost: FC<AddPostProps> = ({ user, onClick }) => {
           <Button variant="text">
             <ImageIcon color="white" size={24} />
             <span className="text-white opacity-60 font-normal tracking-normal ml-2">
-            Photo/Video
-          </span>
+              Photo/Video
+            </span>
           </Button>
         </div>
       </Card>

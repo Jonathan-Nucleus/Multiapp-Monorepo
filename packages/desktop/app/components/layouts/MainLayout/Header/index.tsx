@@ -118,7 +118,7 @@ const Header: FC = () => {
           onClick={() => setShowSidebar(true)}
         >
           <div className="w-9 h-9 flex items-center justify-center relative">
-            <Avatar size={36} src={account?.avatar} className="z-10" />
+            <Avatar user={account} size={36} className="z-10" />
             {notifications.filter((v) => v.isNew).length > 0 && (
               <span className="bg-error-light rounded-full w-4 h-4 text-xs text-white absolute -top-1.5 -left-1.5 flex item-center justify-center font-medium z-50">
                 {notifications.filter((v) => v.isNew).length}

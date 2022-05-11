@@ -26,7 +26,7 @@ const AvatarGroup: FC<AvatarGroupProps> = ({ members, size = 48 }) => {
               <Circle weight="fill" size="16" color="#CD403A" />
             )}
           </div>
-        </div>        
+        </div>
       );
 
     case 2:

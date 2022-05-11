@@ -5,15 +5,18 @@ import Card from "../Card";
 
 import { useCommentPost } from "mobile/src/graphql/mutation/posts";
 import { Comment, usePost } from "mobile/src/graphql/query/post";
+import { useAccount } from "mobile/src/graphql/query/account";
 
 interface CommentPostProps {
   postId: string;
 }
 
 const CommentPost: FC<CommentPostProps> = ({ postId }) => {
-  const { data: postData } = usePost(postId);
+  const { data: postData, refetch } = usePost(postId);
+  const { data: accountData } = useAccount({ fetchPolicy: "cache-only" });
   const [commentPost] = useCommentPost();
 
+  const account = accountData?.account;
   const post = postData?.post;
   const allComments = post?.comments ?? [];
 
@@ -55,15 +58,16 @@ const CommentPost: FC<CommentPostProps> = ({ postId }) => {
         },
         refetchQueries: ["Posts"],
       });
+      refetch();
     } catch (err) {}
   };
 
   return (
-    <Card className="border-0 p-0 px-4 rounded-none relative">
+    <div className="px-4 relative">
       <SendMessage
-        size={36}
         onSend={(val, mediaUrl) => sendMessage(val, mediaUrl)}
         placeholder="Add a comment..."
+        user={account}
       />
       {comments.map((comment) => (
         <CommentCard
@@ -82,7 +86,7 @@ const CommentPost: FC<CommentPostProps> = ({ postId }) => {
           ))}
         </CommentCard>
       ))}
-    </Card>
+    </div>
   );
 };
 

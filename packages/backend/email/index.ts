@@ -64,7 +64,7 @@ async function sendEmail(
   sendTo: string | string[],
   template: string,
   templateData: EjsData
-): Promise<EmailResponse> {
+): Promise<EmailResponse | true> {
   if (!EMAIL_ENABLED) return true;
 
   // Render the HTML email and extract the subject from the title

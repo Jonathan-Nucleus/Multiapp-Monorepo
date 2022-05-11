@@ -35,19 +35,14 @@ const ManagerItem: FC<ManagerItemProps> = ({
         variables: { follow: !isFollowing, userId: manager._id },
         refetchQueries: ["Account"],
       });
-    } catch (err) {
-    }
+    } catch (err) {}
   };
 
   return (
     <>
       <div className="hidden lg:grid grid-cols-4 py-4">
         <div className="flex items-center">
-          <Avatar
-            size={56}
-            src={manager.avatar}
-            className="rounded-full overflow-hidden"
-          />
+          <Avatar user={manager} size={56} />
           <div className="ml-3">
             <div className="text-sm text-white">
               {manager.firstName} {manager.lastName}
@@ -58,11 +53,7 @@ const ManagerItem: FC<ManagerItemProps> = ({
           </div>
         </div>
         <div className="flex items-center px-1">
-          <Avatar
-            size={56}
-            src={manager.company.avatar}
-            className="rounded-full overflow-hidden"
-          />
+          <Avatar user={manager} size={56} />
           <div className="ml-3">
             <div className="text-sm text-white">{manager.company.name}</div>
           </div>
@@ -81,7 +72,7 @@ const ManagerItem: FC<ManagerItemProps> = ({
           )}
         </div>
         <div className="flex items-center justify-end">
-          {!isMyProfile &&
+          {!isMyProfile && (
             <Button
               variant="text"
               className="text-sm text-primary font-medium tracking-normal py-0"
@@ -89,7 +80,7 @@ const ManagerItem: FC<ManagerItemProps> = ({
             >
               {isFollowing ? "Unfollow" : "Follow"}
             </Button>
-          }
+          )}
           <Link href={isMyProfile ? "/profile/me" : `/profile/${manager._id}`}>
             <a>
               <Button
@@ -104,11 +95,7 @@ const ManagerItem: FC<ManagerItemProps> = ({
       </div>
       <Card className="block lg:hidden border-0 rounded-none bg-primary-solid/[.07] px-5 py-3">
         <div className="flex items-center">
-          <Avatar
-            size={56}
-            src={manager.avatar}
-            className="bg-white rounded-full overflow-hidden"
-          />
+          <Avatar user={manager} size={56} />
           <div className="w-14 ml-4">
             <div className="text-sm text-white font-medium">
               {manager.postIds?.length ?? 0}
@@ -122,7 +109,7 @@ const ManagerItem: FC<ManagerItemProps> = ({
             <div className="text-xs text-white">Followers</div>
           </div>
           <div className="ml-auto">
-            {!isMyProfile &&
+            {!isMyProfile && (
               <Button
                 variant="outline-primary"
                 className="text-sm text-white tracking-normal font-medium"
@@ -130,7 +117,7 @@ const ManagerItem: FC<ManagerItemProps> = ({
               >
                 {isFollowing ? "Unfollow" : "Follow"}
               </Button>
-            }
+            )}
           </div>
         </div>
         <div className="flex items-center mt-4">
