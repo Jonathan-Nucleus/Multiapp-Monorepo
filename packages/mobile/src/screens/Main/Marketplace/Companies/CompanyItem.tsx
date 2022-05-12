@@ -16,7 +16,7 @@ import {
 import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 import FundCompanyInfo from './FundCompanyInfo';
 
-import { Company } from 'mobile/src/graphql/query/marketplace/useFundCompanies';
+import { Company } from 'shared/graphql/query/marketplace/useFundCompanies';
 
 interface CompanyItemProps {
   company: Company;

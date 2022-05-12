@@ -23,8 +23,8 @@ import {
   WHITE87,
 } from 'shared/src/colors';
 
-import { useWatchFund } from 'mobile/src/graphql/mutation/funds/useWatchFund';
-import { useAccount } from 'mobile/src/graphql/query/account';
+import { useWatchFund } from 'shared/graphql/mutation/funds/useWatchFund';
+import { useAccount } from 'shared/graphql/query/account';
 import { WatchlistScreen } from 'mobile/src/navigations/MainTabNavigator';
 
 interface SelectItemProps {

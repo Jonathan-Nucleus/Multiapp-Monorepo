@@ -18,8 +18,8 @@ import {
 import Button from "../../../../common/Button";
 import SidebarItem from "./SidebarItem";
 import Avatar from "../../../../common/Avatar";
-import { useAccount } from "mobile/src/graphql/query/account";
-import { UserProfile } from "mobile/src/graphql/query/user/useProfile";
+import { useAccount } from "shared/graphql/query/account";
+import { UserProfile } from "shared/graphql/query/user/useProfile";
 import ModalDialog from "../../../../common/ModalDialog";
 
 interface SidebarProps {

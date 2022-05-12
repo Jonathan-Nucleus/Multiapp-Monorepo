@@ -25,9 +25,9 @@ import FundProfileInfo from './FundProfileInfo';
 import FundOverview from './FundOverview';
 import FundsPlaceholder from '../../../../components/placeholder/FundsPlaceholder';
 
-import { useFund } from 'mobile/src/graphql/query/marketplace/useFund';
-import { useAccount } from 'mobile/src/graphql/query/account';
-import { useWatchFund } from 'mobile/src/graphql/mutation/funds/useWatchFund';
+import { useFund } from 'shared/graphql/query/marketplace/useFund';
+import { useAccount } from 'shared/graphql/query/account';
+import { useWatchFund } from 'shared/graphql/mutation/funds/useWatchFund';
 
 import { FundDetailsScreen } from 'mobile/src/navigations/AppNavigator';
 import MainHeader from '../../../../components/main/Header';

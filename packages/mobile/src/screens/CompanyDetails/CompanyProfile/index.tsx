@@ -39,12 +39,12 @@ import CompanyDetail from './CompanyDetail';
 import Funds from 'mobile/src/components/main/Funds';
 import ProfilePlaceholder from '../../../components/placeholder/ProfilePlaceholder';
 
-import { Post } from 'mobile/src/graphql/query/post/usePosts';
-import { useAccount } from 'mobile/src/graphql/query/account';
-import { useCompany } from 'mobile/src/graphql/query/company/useCompany';
-import { useFunds } from 'mobile/src/graphql/query/company/useFunds';
-import { usePosts } from 'mobile/src/graphql/query/company/usePosts';
-import { useFeaturedPosts } from 'mobile/src/graphql/query/company/useFeaturedPosts';
+import { Post } from 'shared/graphql/query/post/usePosts';
+import { useAccount } from 'shared/graphql/query/account';
+import { useCompany } from 'shared/graphql/query/company/useCompany';
+import { useFunds } from 'shared/graphql/query/company/useFunds';
+import { usePosts } from 'shared/graphql/query/company/usePosts';
+import { useFeaturedPosts } from 'shared/graphql/query/company/useFeaturedPosts';
 
 import { CompanyProfileScreen } from 'mobile/src/navigations/CompanyDetailsStack';
 

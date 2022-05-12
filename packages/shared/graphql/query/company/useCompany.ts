@@ -1,13 +1,13 @@
 import { gql, useQuery, QueryResult } from '@apollo/client';
 import { Company as GraphQLCompany } from 'backend/graphql/companies.graphql';
 import { User as GraphQLUser } from 'backend/graphql/users.graphql';
-import { PostSummary } from 'mobile/src/graphql/fragments/post';
+import { PostSummary } from 'shared/graphql/fragments/post';
 import {
   FUND_SUMMARY_FRAGMENT,
   FUND_MANAGER_FRAGMENT,
   FundSummary,
   FundManager,
-} from 'mobile/src/graphql/fragments/fund';
+} from 'shared/graphql/fragments/fund';
 import { useEffect, useState } from 'react';
 
 export type CompanyMember = Pick<

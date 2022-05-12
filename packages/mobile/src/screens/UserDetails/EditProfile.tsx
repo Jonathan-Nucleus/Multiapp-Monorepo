@@ -17,8 +17,8 @@ import { Body1Bold, Body2, Body4 } from 'mobile/src/theme/fonts';
 import { PRIMARY, WHITE, WHITE12, WHITE60 } from 'shared/src/colors';
 import pStyles from 'mobile/src/theme/pStyles';
 
-import { useAccount } from 'mobile/src/graphql/query/account';
-import { useUpdateUserProfile } from 'mobile/src/graphql/mutation/account';
+import { useAccount } from 'shared/graphql/query/account';
+import { useUpdateUserProfile } from 'shared/graphql/mutation/account';
 
 import { EditUserProfileScreen } from 'mobile/src/navigations/UserDetailsStack';
 

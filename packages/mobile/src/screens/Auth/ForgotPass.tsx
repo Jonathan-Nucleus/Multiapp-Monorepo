@@ -18,7 +18,7 @@ import PGradientButton from '../../components/common/PGradientButton';
 import { Body2 } from '../../theme/fonts';
 import { BLACK, PRIMARY, WHITE } from 'shared/src/colors';
 import LogoSvg from '../../assets/icons/logo.svg';
-import { FORGOT_PASSWORD } from '../../graphql/mutation/auth';
+import { FORGOT_PASSWORD } from 'shared/graphql/mutation/auth';
 import SuccessText from '../../components/common/SuccessText';
 import ErrorText from '../../components/common/ErrorTxt';
 

@@ -1,14 +1,14 @@
 import React, { FC, useState, useRef } from "react";
 import { PaperPlaneRight, Image as PhotoImage, Smiley } from "phosphor-react";
 import { Picker } from "emoji-mart";
-import { useFetchUploadLink } from "mobile/src/graphql/mutation/posts";
+import { useFetchUploadLink } from "shared/graphql/mutation/posts";
 import "emoji-mart/css/emoji-mart.css";
 
 import Button from "../Button";
 import Avatar from "../Avatar";
 import Input from "../Input";
-import { UserSummary } from "mobile/src/graphql/fragments/user";
-import { useAccount } from "mobile/src/graphql/query/account";
+import { UserSummary } from "shared/graphql/fragments/user";
+import { useAccount } from "shared/graphql/query/account";
 
 type User = UserSummary;
 interface SendMessageProps {

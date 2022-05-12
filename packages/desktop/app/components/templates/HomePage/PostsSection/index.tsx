@@ -1,12 +1,12 @@
 import { FC, useState } from "react";
-import { PostSummary } from "mobile/src/graphql/fragments/post";
+import { PostSummary } from "shared/graphql/fragments/post";
 import PostsList from "../../../modules/posts/PostsList";
 import EditPostModal from "../../../modules/posts/EditPostModal";
 import AddPost from "../AddPost";
 import { UserProfileProps } from "../../../../types/common-props";
 import Button from "../../../common/Button";
 import { Plus } from "phosphor-react";
-import { usePosts } from "mobile/src/graphql/query/post/usePosts";
+import { usePosts } from "shared/graphql/query/post/usePosts";
 
 const PostsSection: FC<UserProfileProps> = ({ user }) => {
   const { data: { posts = [] } = {}, refetch } = usePosts();

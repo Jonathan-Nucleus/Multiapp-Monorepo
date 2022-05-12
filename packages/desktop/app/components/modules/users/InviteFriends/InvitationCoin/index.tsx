@@ -1,6 +1,6 @@
 import { FC } from "react";
 import Avatar from "desktop/app/components/common/Avatar";
-import { Invitee } from "mobile/src/graphql/query/account/useInvites";
+import { Invitee } from "shared/graphql/query/account/useInvites";
 
 interface InvitationCoin {
   user?: Invitee;

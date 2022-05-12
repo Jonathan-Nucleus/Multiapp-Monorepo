@@ -6,9 +6,9 @@ import Button from "../../../../../common/Button";
 import Card from "../../../../../common/Card";
 import { ShieldCheck } from "phosphor-react";
 
-import { useAccount } from "mobile/src/graphql/query/account";
-import { useFollowCompany } from "mobile/src/graphql/mutation/account";
-import { Company } from "mobile/src/graphql/query/marketplace/useFundCompanies";
+import { useAccount } from "shared/graphql/query/account";
+import { useFollowCompany } from "shared/graphql/mutation/account";
+import { Company } from "shared/graphql/query/marketplace/useFundCompanies";
 
 interface CompanyItemProps {
   company: Company;

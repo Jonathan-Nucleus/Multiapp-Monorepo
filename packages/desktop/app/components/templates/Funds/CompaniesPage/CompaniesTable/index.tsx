@@ -4,7 +4,7 @@ import { SortAscending } from "phosphor-react";
 import Paginator from "../../../../common/Paginator";
 import CompanyItem from "./CompanyItem";
 
-import { useFundCompanies } from "mobile/src/graphql/query/marketplace/useFundCompanies";
+import { useFundCompanies } from "shared/graphql/query/marketplace/useFundCompanies";
 
 const ManagersTable: FC = () => {
   const { data: { fundCompanies: companies = [] } = {} } = useFundCompanies();

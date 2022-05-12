@@ -13,7 +13,7 @@ import { WHITE, WHITE60 } from 'shared/src/colors';
 import { Body2Bold } from '../../../theme/fonts';
 
 import PostItem from 'mobile/src/components/main/PostItem';
-import { Post } from 'mobile/src/graphql/query/post/usePosts';
+import { Post } from 'shared/graphql/query/post/usePosts';
 import type {
   PostCategory,
   PostRoleFilter,
@@ -23,7 +23,7 @@ import { PostRoleFilterOptions } from 'backend/schemas/post';
 import UserPostActionModal from 'mobile/src/screens/Main/Home/UserPostActionModal';
 import OwnPostActionModal from 'mobile/src/screens/Main/Home/OwnPostActionModal';
 import FilterModal from 'mobile/src/screens/PostDetails/FilterModal';
-import { useAccount } from 'mobile/src/graphql/query/account';
+import { useAccount } from 'shared/graphql/query/account';
 import pStyles from 'mobile/src/theme/pStyles';
 
 interface PostProps {

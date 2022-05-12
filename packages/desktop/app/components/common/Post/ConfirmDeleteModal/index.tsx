@@ -2,7 +2,7 @@ import { FC, useState } from "react";
 import Button from "../../Button";
 import ModalDialog from "../../ModalDialog";
 import { DialogProps } from "../../../../types/common-props";
-import { useDeletePost } from "mobile/src/graphql/mutation/posts/useDeletePost";
+import { useDeletePost } from "shared/graphql/mutation/posts/useDeletePost";
 
 interface ConfirmDeleteModalProps extends DialogProps {
   postId: string;

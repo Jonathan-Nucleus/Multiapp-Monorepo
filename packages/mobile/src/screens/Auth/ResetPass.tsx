@@ -16,7 +16,7 @@ import PTitle from '../../components/common/PTitle';
 import PTextInput from '../../components/common/PTextInput';
 import PGradientButton from '../../components/common/PGradientButton';
 import ErrorText from '../../components/common/ErrorTxt';
-import { RESET_PASSWORD } from '../../graphql/mutation/auth';
+import { RESET_PASSWORD } from 'shared/graphql/mutation/auth';
 import { BGHEADER, BLACK, PRIMARY, WHITE, WHITE12 } from 'shared/src/colors';
 import { Body2 } from '../../theme/fonts';
 import LogoSvg from '../../assets/icons/logo.svg';

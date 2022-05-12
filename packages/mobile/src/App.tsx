@@ -8,7 +8,7 @@ import Toast from 'react-native-toast-message';
 import messaging from '@react-native-firebase/messaging';
 
 import AppNavigator from './navigations/AppNavigator';
-import { useInitializeClient } from './graphql/apolloClient';
+import { useInitializeClient } from './services/apolloClient';
 import { requestUserNotificationPermission } from './services/PushNotificationService';
 import { showMessage } from './services/utils';
 

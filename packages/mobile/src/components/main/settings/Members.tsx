@@ -14,7 +14,7 @@ import * as NavigationService from 'mobile/src/services/navigation/NavigationSer
 import { BGDARK, WHITE, WHITE60 } from 'shared/src/colors';
 import { Body1, Body2Bold, Body3 } from '../../../theme/fonts';
 
-import { CompanyMember } from '../../../graphql/query/company/useCompany';
+import { CompanyMember } from 'shared/graphql/query/company/useCompany';
 
 interface MemberProps {
   members: CompanyMember[];

@@ -17,9 +17,9 @@ import {
 import { Body1, Body3, Body4 } from 'mobile/src/theme/fonts';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 
-import { useWatchFund } from 'mobile/src/graphql/mutation/account';
-import { useAccount } from 'mobile/src/graphql/query/account';
-import { FundSummary } from 'mobile/src/graphql/fragments/fund';
+import { useWatchFund } from 'shared/graphql/mutation/account';
+import { useAccount } from 'shared/graphql/query/account';
+import { FundSummary } from 'shared/graphql/fragments/fund';
 
 interface FundItemProps {
   fund: FundSummary;

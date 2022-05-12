@@ -7,7 +7,7 @@ import FundUserInfo from './FundUserInfo';
 import PLabel from 'mobile/src/components/common/PLabel';
 import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 
-import { FundManager } from 'mobile/src/graphql/query/marketplace/useFundManagers';
+import { FundManager } from 'shared/graphql/query/marketplace/useFundManagers';
 
 interface ManagerItemProps {
   manager: FundManager;

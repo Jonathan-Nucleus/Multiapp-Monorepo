@@ -21,8 +21,8 @@ import pStyles from 'mobile/src/theme/pStyles';
 import UserPostActionModal from './UserPostActionModal';
 import OwnPostActionModal from './OwnPostActionModal';
 
-import { usePosts, Post } from 'mobile/src/graphql/query/post/usePosts';
-import { useAccount } from 'mobile/src/graphql/query/account';
+import { usePosts, Post } from 'shared/graphql/query/post/usePosts';
+import { useAccount } from 'shared/graphql/query/account';
 import { HomeScreen } from 'mobile/src/navigations/MainTabNavigator';
 import FilterModal from 'mobile/src/screens/PostDetails/FilterModal';
 import PostItemPlaceholder from '../../../components/placeholder/PostItemPlaceholder';

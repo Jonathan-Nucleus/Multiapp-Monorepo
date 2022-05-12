@@ -21,7 +21,7 @@ import {
   WHITE60,
 } from 'shared/src/colors';
 
-import { useSaveQuestionnaire } from 'mobile/src/graphql/mutation/account/useSaveQuestionnaire';
+import { useSaveQuestionnaire } from 'shared/graphql/mutation/account/useSaveQuestionnaire';
 import {
   FinancialStatusOptions,
   AdvancedFinancialStatusData,

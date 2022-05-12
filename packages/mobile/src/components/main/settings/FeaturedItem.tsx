@@ -7,7 +7,7 @@ import Media from '../../common/Media';
 import UserInfo from '../../common/UserInfo';
 import { WHITE12 } from 'shared/src/colors';
 
-import { Post } from 'mobile/src/graphql/query/post/usePosts';
+import { Post } from 'shared/graphql/query/post/usePosts';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 
 interface FeedItemProps {

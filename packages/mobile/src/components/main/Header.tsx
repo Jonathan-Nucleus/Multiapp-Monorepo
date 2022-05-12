@@ -11,7 +11,7 @@ import SearchSvg from 'shared/assets/images/search.svg';
 import BellSvg from 'shared/assets/images/bell.svg';
 import { GRAY900 } from 'shared/src/colors';
 import { H6 } from '../../theme/fonts';
-import { useAccount } from '../../graphql/query/account';
+import { useAccount } from 'shared/graphql/query/account';
 
 import { AVATAR_URL } from 'react-native-dotenv';
 

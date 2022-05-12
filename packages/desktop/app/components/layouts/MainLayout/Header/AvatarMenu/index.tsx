@@ -18,7 +18,7 @@ import Link from "next/link";
 import ModalDialog from "../../../../common/ModalDialog";
 import Button from "../../../../common/Button";
 import InviteFriends from "../../../../modules/users/InviteFriends";
-import { UserProfile } from "mobile/src/graphql/query/user/useProfile";
+import { UserProfile } from "shared/graphql/query/user/useProfile";
 
 interface AvatarMenuProps {
   account: UserProfile | undefined;

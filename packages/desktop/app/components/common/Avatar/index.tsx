@@ -1,7 +1,7 @@
 import { FC, HTMLProps } from "react";
 import Image from "next/image";
-import { UserSummary } from "mobile/src/graphql/fragments/user";
-import { CompanySummary } from "mobile/src/graphql/fragments/company";
+import { UserSummary } from "shared/graphql/fragments/user";
+import { CompanySummary } from "shared/graphql/fragments/company";
 
 type User = Pick<UserSummary, "firstName" | "lastName" | "avatar">;
 type Company = Pick<CompanySummary, "name" | "avatar">;

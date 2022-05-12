@@ -6,9 +6,9 @@ import { showMessage } from 'mobile/src/services/utils';
 import { WHITE } from 'shared/src/colors';
 import { SOMETHING_WRONG } from 'shared/src/constants';
 
-import { Post } from 'mobile/src/graphql/query/post/usePosts';
-import { useMutePost } from 'mobile/src/graphql/mutation/posts';
-import { useDeletePost } from 'mobile/src/graphql/mutation/posts/useDeletePost';
+import { Post } from 'shared/graphql/query/post/usePosts';
+import { useMutePost } from 'shared/graphql/mutation/posts';
+import { useDeletePost } from 'shared/graphql/mutation/posts/useDeletePost';
 
 interface OwnPostActionModalProps {
   post?: Post;

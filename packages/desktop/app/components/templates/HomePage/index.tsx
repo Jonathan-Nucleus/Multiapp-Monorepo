@@ -5,8 +5,8 @@ import InviteFriends from "../../modules/users/InviteFriends";
 import ProfileCardSmall from "../../modules/users/ProfileCardSmall";
 import Watchlist from "./Watchlist";
 import PostsSection from "./PostsSection";
-import { useAccount } from "mobile/src/graphql/query/account/useAccount";
-import { useWatchFund } from "mobile/src/graphql/mutation/funds/useWatchFund";
+import { useAccount } from "shared/graphql/query/account/useAccount";
+import { useWatchFund } from "shared/graphql/mutation/funds/useWatchFund";
 import Button from "../../common/Button";
 import { useEffect } from "react";
 

@@ -2,7 +2,7 @@ import { gql, useQuery, QueryResult } from '@apollo/client';
 import {
   USER_SUMMARY_FRAGMENT,
   UserSummary,
-} from 'mobile/src/graphql/fragments/user';
+} from 'shared/graphql/fragments/user';
 import { useEffect, useState } from 'react';
 
 type UsersVariables = never;

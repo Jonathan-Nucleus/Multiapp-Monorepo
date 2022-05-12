@@ -6,7 +6,7 @@ import Button from "../../../../common/Button";
 import Paginator from "../../../../common/Paginator";
 import ManagerItem from "./ManagerItem";
 
-import { useFundManagers } from "mobile/src/graphql/query/marketplace/useFundManagers";
+import { useFundManagers } from "shared/graphql/query/marketplace/useFundManagers";
 
 const ManagersTable: FC = () => {
   const { data: managersData } = useFundManagers(); // Temporarily use all managers

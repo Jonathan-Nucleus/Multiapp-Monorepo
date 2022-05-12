@@ -5,7 +5,7 @@ import "@splidejs/react-splide/css";
 import Button from "desktop/app/components/common/Button";
 import Card from "desktop/app/components/common/Card";
 import FeaturedManager from "./FeaturedManager";
-import { useFundManagers } from "mobile/src/graphql/query/marketplace/useFundManagers";
+import { useFundManagers } from "shared/graphql/query/marketplace/useFundManagers";
 
 const FeaturedManagers: FC = () => {
   const { data: managersData } = useFundManagers(); // Temporarily use all managers

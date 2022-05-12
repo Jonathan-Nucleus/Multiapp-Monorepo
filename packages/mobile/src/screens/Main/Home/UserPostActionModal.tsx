@@ -13,17 +13,17 @@ import { showMessage } from 'mobile/src/services/utils';
 import { WHITE } from 'shared/src/colors';
 import { SOMETHING_WRONG } from 'shared/src/constants';
 
-import { Post } from 'mobile/src/graphql/query/post/usePosts';
+import { Post } from 'shared/graphql/query/post/usePosts';
 import {
   useFollowUser,
   useHideUser,
-} from 'mobile/src/graphql/mutation/account';
-import { useAccount } from 'mobile/src/graphql/query/account';
+} from 'shared/graphql/mutation/account';
+import { useAccount } from 'shared/graphql/query/account';
 import {
   useHidePost,
   useMutePost,
   useReportPost,
-} from 'mobile/src/graphql/mutation/posts';
+} from 'shared/graphql/mutation/posts';
 
 import ReportPostModal from './ReportPostModal';
 

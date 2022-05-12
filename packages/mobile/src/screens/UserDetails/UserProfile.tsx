@@ -42,12 +42,12 @@ import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 import DotsThreeVerticalSvg from 'shared/assets/images/dotsThreeVertical.svg';
 import NoPostSvg from 'shared/assets/images/no-post.svg';
 
-import { useAccount } from 'mobile/src/graphql/query/account';
-import { useProfile } from 'mobile/src/graphql/query/user/useProfile';
-import { usePosts, Post } from 'mobile/src/graphql/query/user/usePosts';
-import { useManagedFunds } from 'mobile/src/graphql/query/user/useManagedFunds';
-import { useFollowUser } from 'mobile/src/graphql/mutation/account';
-import { useFeaturedPosts } from 'mobile/src/graphql/query/user/useFeaturedPosts';
+import { useAccount } from 'shared/graphql/query/account';
+import { useProfile } from 'shared/graphql/query/user/useProfile';
+import { usePosts, Post } from 'shared/graphql/query/user/usePosts';
+import { useManagedFunds } from 'shared/graphql/query/user/useManagedFunds';
+import { useFollowUser } from 'shared/graphql/mutation/account';
+import { useFeaturedPosts } from 'shared/graphql/query/user/useFeaturedPosts';
 
 import { UserProfileScreen } from 'mobile/src/navigations/UserDetailsStack';
 import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';

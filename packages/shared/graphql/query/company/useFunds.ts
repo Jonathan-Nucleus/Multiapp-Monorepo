@@ -3,7 +3,7 @@ import { Company } from 'backend/graphql/companies.graphql';
 import {
   FUND_SUMMARY_FRAGMENT,
   FundSummary,
-} from 'mobile/src/graphql/fragments/fund';
+} from 'shared/graphql/fragments/fund';
 
 type CompanyFundsVariables = {
   companyId: string;

@@ -11,7 +11,7 @@ import FundItem from './FundItem';
 import FundsPlaceholder from '../../../../components/placeholder/FundsPlaceholder';
 import { FundsScreen } from 'mobile/src/navigations/MarketplaceTabs';
 
-import { useFunds, Fund } from 'mobile/src/graphql/query/marketplace/useFunds';
+import { useFunds, Fund } from 'shared/graphql/query/marketplace/useFunds';
 
 const PLACE_HOLDERS = 7;
 

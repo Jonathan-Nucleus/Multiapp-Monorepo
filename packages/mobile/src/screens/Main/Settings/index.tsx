@@ -29,7 +29,7 @@ import MainHeader from 'mobile/src/components/main/Header';
 import PLabel from 'mobile/src/components/common/PLabel';
 import pStyles from 'mobile/src/theme/pStyles';
 import { Body3, H6Bold, Body4Bold, Body2Bold } from 'mobile/src/theme/fonts';
-import { useAccount } from 'mobile/src/graphql/query/account';
+import { useAccount } from 'shared/graphql/query/account';
 import AIProSvg from 'shared/assets/images/al.svg';
 import AIUserSvg from 'shared/assets/images/ai-user.svg';
 import QPSvg from 'shared/assets/images/QP.svg';

@@ -14,9 +14,9 @@ import {
   useEditCommentPost,
   useCommentPost,
   useLikeComment,
-} from "mobile/src/graphql/mutation/posts";
-import { useAccount } from "mobile/src/graphql/query/account";
-import type { Comment } from "mobile/src/graphql/query/post";
+} from "shared/graphql/mutation/posts";
+import { useAccount } from "shared/graphql/query/account";
+import type { Comment } from "shared/graphql/query/post";
 
 interface CommentCardProps extends React.PropsWithChildren<unknown> {
   comment: Comment;

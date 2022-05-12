@@ -6,7 +6,7 @@ import CompanyItem from './CompanyItem';
 import {
   useFundCompanies,
   Company,
-} from 'mobile/src/graphql/query/marketplace/useFundCompanies';
+} from 'shared/graphql/query/marketplace/useFundCompanies';
 import { FundCompaniesScreen } from 'mobile/src/navigations/MarketplaceTabs';
 
 const Companies: FundCompaniesScreen = () => {

@@ -4,7 +4,7 @@ import Image from "next/image";
 import Avatar from "../../../../common/Avatar";
 import Button from "../../../../common/Button";
 import { useSession } from "next-auth/react";
-import { useFollowCompany } from "mobile/src/graphql/mutation/account";
+import { useFollowCompany } from "shared/graphql/mutation/account";
 import { CompanyType } from "desktop/app/types/common-props";
 
 interface CompanyItemProps {

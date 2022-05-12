@@ -37,13 +37,13 @@ import * as yup from "yup";
 import {
   useCreatePost,
   useFetchUploadLink,
-} from "mobile/src/graphql/mutation/posts";
+} from "shared/graphql/mutation/posts";
 import { Audience, PostCategory } from "backend/graphql/posts.graphql";
 import { Audiences } from "backend/graphql/enumerations.graphql";
-import { PostSummary } from "mobile/src/graphql/fragments/post";
-import { useEditPost } from "mobile/src/graphql/mutation/posts/useEditPost";
+import { PostSummary } from "shared/graphql/fragments/post";
+import { useEditPost } from "shared/graphql/mutation/posts/useEditPost";
 import ModalDialog from "../../../common/ModalDialog";
-import { useAccount } from "mobile/src/graphql/query/account/useAccount";
+import { useAccount } from "shared/graphql/query/account/useAccount";
 
 const audienceOptions = [
   {

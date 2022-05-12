@@ -7,8 +7,8 @@ import Button from "../../../common/Button";
 import ContactPhone from "./Phone";
 import ContactEmail from "./Email";
 import Success from "./Success";
-import { useHelpRequest } from "mobile/src/graphql/mutation/account";
-import { useFunds } from "mobile/src/graphql/query/marketplace/useFunds";
+import { useHelpRequest } from "shared/graphql/mutation/account";
+import { useFunds } from "shared/graphql/query/marketplace/useFunds";
 
 interface ContactusModalProps {
   show: boolean;

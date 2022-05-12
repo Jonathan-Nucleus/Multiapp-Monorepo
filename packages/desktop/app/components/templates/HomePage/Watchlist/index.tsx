@@ -4,7 +4,7 @@ import Avatar from "../../../common/Avatar";
 import Card from "../../../common/Card";
 import Button from "../../../common/Button";
 import Link from "next/link";
-import { UserProfile } from "mobile/src/graphql/query/user/useProfile";
+import { UserProfile } from "shared/graphql/query/user/useProfile";
 import Skeleton from "./Skeleton";
 
 interface WatchProps {

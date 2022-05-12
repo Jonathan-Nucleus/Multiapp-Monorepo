@@ -17,9 +17,9 @@ import Card from "../../../../components/common/Card";
 import Avatar from "../../../common/Avatar";
 import FollowersModal from "../../../modules/users/FollowersModal";
 
-import { useFollowUser } from "mobile/src/graphql/mutation/account";
-import { useAccount } from "mobile/src/graphql/query/account";
-import { UserProfile } from "mobile/src/graphql/query/user/useProfile";
+import { useFollowUser } from "shared/graphql/mutation/account";
+import { useAccount } from "shared/graphql/query/account";
+import { UserProfile } from "shared/graphql/query/user/useProfile";
 
 import LinkedIn from "shared/assets/images/linkedin.svg";
 import Twitter from "shared/assets/images/twitter.svg";

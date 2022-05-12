@@ -5,7 +5,7 @@ import { Splide, SplideSlide, SplideTrack } from "@splidejs/react-splide";
 import ProfessionalItem from "./ProfessionalItem";
 import Button from "desktop/app/components/common/Button";
 import { ArrowCircleRight } from "phosphor-react";
-import { useProfessionalsStated } from "mobile/src/graphql/query/user/useProfessionals";
+import { useProfessionalsStated } from "shared/graphql/query/user/useProfessionals";
 import Skeleton from "./Skeleton";
 
 const FeaturedProfessionals: FC = () => {

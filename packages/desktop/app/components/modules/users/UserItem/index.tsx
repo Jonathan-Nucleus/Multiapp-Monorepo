@@ -4,8 +4,8 @@ import { Chats } from "phosphor-react";
 
 import Button from "desktop/app/components/common/Button";
 import Avatar from "desktop/app/components/common/Avatar";
-import { useFollowUser } from "mobile/src/graphql/mutation/account";
-import { useAccount } from "mobile/src/graphql/query/account/useAccount";
+import { useFollowUser } from "shared/graphql/mutation/account";
+import { useAccount } from "shared/graphql/query/account/useAccount";
 
 export type UserType = {
   _id: string;

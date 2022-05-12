@@ -12,8 +12,8 @@ import QCSvg from 'shared/assets/images/QC.svg';
 import AISvg from 'shared/assets/images/AI.svg';
 import GlobalSvg from 'shared/assets/images/global.svg';
 
-import { useFollowUser } from 'mobile/src/graphql/mutation/account';
-import { useAccount } from 'mobile/src/graphql/query/account';
+import { useFollowUser } from 'shared/graphql/mutation/account';
+import { useAccount } from 'shared/graphql/query/account';
 import { Audience } from 'backend/graphql/posts.graphql';
 import { UserProfile } from 'backend/graphql/users.graphql';
 import { Company as CompanyProfile } from 'backend/graphql/companies.graphql';

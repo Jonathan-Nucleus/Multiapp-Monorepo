@@ -1,8 +1,8 @@
 import { FC, useState } from "react";
-import { usePosts } from "mobile/src/graphql/query/user/usePosts";
+import { usePosts } from "shared/graphql/query/user/usePosts";
 import PostsList from "../../../modules/posts/PostsList";
 import EditPostModal from "../../../modules/posts/EditPostModal";
-import { PostSummary } from "mobile/src/graphql/fragments/post";
+import { PostSummary } from "shared/graphql/fragments/post";
 import Image from "next/image";
 import NoPostSvg from "shared/assets/images/no-post.svg";
 import Button from "../../../common/Button";

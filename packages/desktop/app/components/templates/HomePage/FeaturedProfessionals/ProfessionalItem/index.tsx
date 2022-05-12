@@ -1,10 +1,10 @@
-import { Professional } from "mobile/src/graphql/query/user/useProfessionals";
+import { Professional } from "shared/graphql/query/user/useProfessionals";
 import { FC } from "react";
-import { useFollowUser } from "mobile/src/graphql/mutation/account";
+import { useFollowUser } from "shared/graphql/mutation/account";
 import Image from "next/image";
 import Button from "desktop/app/components/common/Button";
 import Link from "next/link";
-import { useAccount } from "mobile/src/graphql/query/account/useAccount";
+import { useAccount } from "shared/graphql/query/account/useAccount";
 
 interface ProfessionalItemProps {
   professional: Professional;

@@ -1,8 +1,8 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { FC, Fragment } from "react";
-import { UserSummary } from "mobile/src/graphql/fragments/user";
+import { UserSummary } from "shared/graphql/fragments/user";
 import Button from "../../Button";
-import { useHideUser } from "mobile/src/graphql/mutation/account";
+import { useHideUser } from "shared/graphql/mutation/account";
 
 type User = Pick<UserSummary, "_id" | "firstName" | "lastName">;
 interface ConfirmHideUserModalProps {

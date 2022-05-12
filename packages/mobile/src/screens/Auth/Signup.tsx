@@ -18,7 +18,7 @@ import PTextInput from '../../components/common/PTextInput';
 import PGradientButton from '../../components/common/PGradientButton';
 import PTextLine from '../../components/common/PTextLine';
 import ErrorText from '../../components/common/ErrorTxt';
-import { REGISTER } from '../../graphql/mutation/auth';
+import { REGISTER } from 'shared/graphql/mutation/auth';
 import { Body2, Body2Bold } from '../../theme/fonts';
 import {
   BLACK,

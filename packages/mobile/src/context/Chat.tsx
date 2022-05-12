@@ -12,7 +12,7 @@ import pStyles from 'mobile/src/theme/pStyles';
 import { WHITE } from 'shared/src/colors';
 
 import type { Client, StreamType } from 'mobile/src/services/chat';
-import { useAccount, AccountData } from 'mobile/src/graphql/query/account';
+import { useAccount, AccountData } from 'shared/graphql/query/account';
 
 import { GETSTREAM_ACCESS_KEY, AVATAR_URL } from 'react-native-dotenv';
 

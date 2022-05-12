@@ -6,7 +6,7 @@ import {
   FundSummary,
   FundCompany,
   FundManager,
-} from 'mobile/src/graphql/fragments/fund';
+} from 'shared/graphql/fragments/fund';
 import { useEffect, useState } from "react";
 
 type FundsVariables = never;

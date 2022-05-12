@@ -13,7 +13,7 @@ import Avatar from 'mobile/src/components/common/Avatar';
 import { GRAY400, WHITE, PRIMARYSOLID, WHITE60 } from 'shared/src/colors';
 
 import { Fund } from 'backend/graphql/funds.graphql';
-import { useWatchFund } from 'mobile/src/graphql/mutation/account';
+import { useWatchFund } from 'shared/graphql/mutation/account';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 import { Body1Bold, Body3 } from '../../../theme/fonts';
 import pStyles from '../../../theme/pStyles';

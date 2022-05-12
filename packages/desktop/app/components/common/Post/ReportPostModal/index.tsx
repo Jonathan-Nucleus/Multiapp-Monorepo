@@ -1,11 +1,11 @@
 import { ChangeEvent, FC, Fragment, useState } from "react";
-import { PostSummary } from "mobile/src/graphql/fragments/post";
+import { PostSummary } from "shared/graphql/fragments/post";
 import { Dialog, Transition } from "@headlessui/react";
 import Button from "../../Button";
 import Checkbox from "../../Checkbox";
 import Label from "../../Label";
 import Textarea from "../../Textarea";
-import { useReportPost } from "mobile/src/graphql/mutation/posts";
+import { useReportPost } from "shared/graphql/mutation/posts";
 import { PostViolationOptions } from "backend/schemas/user";
 
 interface ReportPostModalProps {

@@ -7,11 +7,11 @@ import Card from "../../../common/Card";
 import Field from "../../../common/Field";
 import Button from "../../../common/Button";
 import InvitationCoin from "./InvitationCoin";
-import { INVITE_USER } from "mobile/src/graphql/mutation/account";
+import { INVITE_USER } from "shared/graphql/mutation/account";
 import { X } from "phosphor-react";
 import Skeleton from "./Skeleton";
-import { useInvites } from "mobile/src/graphql/query/account/useInvites";
-import { useAccount } from "mobile/src/graphql/query/account/useAccount";
+import { useInvites } from "shared/graphql/query/account/useInvites";
+import { useAccount } from "shared/graphql/query/account/useAccount";
 
 const MAX_INVITES = 10;
 

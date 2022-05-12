@@ -2,8 +2,8 @@ import { FC, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { useRouter } from "next/router";
 
-import { UserProfile } from "mobile/src/graphql/query/user/useProfile";
-import { useHideUser } from "mobile/src/graphql/mutation/account";
+import { UserProfile } from "shared/graphql/query/user/useProfile";
+import { useHideUser } from "shared/graphql/mutation/account";
 import Button from "desktop/app/components/common/Button";
 
 interface ConfirmHideUserModalProps {

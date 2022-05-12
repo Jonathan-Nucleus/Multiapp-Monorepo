@@ -11,8 +11,8 @@ import pStyles from 'mobile/src/theme/pStyles';
 import SearchSvg from 'mobile/src/assets/icons/search.svg';
 import BackSvg from 'mobile/src/assets/icons/back.svg';
 
-import { usePost } from 'mobile/src/graphql/query/post';
-import { Post } from 'mobile/src/graphql/query/post/usePosts';
+import { usePost } from 'shared/graphql/query/post';
+import { Post } from 'shared/graphql/query/post/usePosts';
 
 import type { NotificationDetailsScreen } from 'mobile/src/navigations/AppNavigator';
 

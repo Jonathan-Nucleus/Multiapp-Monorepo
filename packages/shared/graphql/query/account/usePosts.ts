@@ -4,7 +4,7 @@ import { User } from 'backend/graphql/users.graphql';
 import {
   POST_SUMMARY_FRAGMENT,
   PostSummary,
-} from 'mobile/src/graphql/fragments/post';
+} from 'shared/graphql/fragments/post';
 import { useEffect, useState } from 'react';
 
 type AccountPostsVariables = {

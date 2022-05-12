@@ -28,8 +28,8 @@ import {
   Body1Bold,
 } from 'mobile/src/theme/fonts';
 import MainHeader from 'mobile/src/components/main/Header';
-import { useAccount } from 'mobile/src/graphql/query/account';
-import { useDeleteAccount } from 'mobile/src/graphql/mutation/account';
+import { useAccount } from 'shared/graphql/query/account';
+import { useDeleteAccount } from 'shared/graphql/mutation/account';
 import { clearToken } from 'mobile/src/utils/auth-token';
 
 interface RouterProps {

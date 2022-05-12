@@ -1,7 +1,7 @@
 import { FC } from "react";
 import Link from "next/link";
 import Card from "../../../common/Card";
-import { UserProfile } from "mobile/src/graphql/query/user/useProfile";
+import { UserProfile } from "shared/graphql/query/user/useProfile";
 import Avatar from "../../../common/Avatar";
 import Skeleton from "./Skeleton";
 

@@ -50,13 +50,13 @@ import {
   useDeleteComment,
   useEditCommentPost,
   useLikeComment,
-} from 'mobile/src/graphql/mutation/posts';
-import { usePost, Comment } from 'mobile/src/graphql/query/post';
+} from 'shared/graphql/mutation/posts';
+import { usePost, Comment } from 'shared/graphql/query/post';
 import {
   useFollowUser,
   useHideUser,
-} from 'mobile/src/graphql/mutation/account';
-import { useAccount } from 'mobile/src/graphql/query/account/useAccount';
+} from 'shared/graphql/mutation/account';
+import { useAccount } from 'shared/graphql/query/account/useAccount';
 
 import { PostDetailScreen } from 'mobile/src/navigations/PostDetailsStack';
 
@@ -77,6 +77,15 @@ const CommentMenuDataArray = [
 const PostDetail: PostDetailScreen = ({ route }) => {
   const { postId } = route.params;
 
+  const { data: { account } = {} } = useAccount({ fetchPolicy: 'cache-only' });
+  const { data, refetch } = usePost(postId);
+  const [commentPost] = useCommentPost();
+  const [deleteComment] = useDeleteComment();
+  const [editComment] = useEditCommentPost();
+  const [followUser] = useFollowUser();
+  const [hideUser] = useHideUser();
+  const [likeComment] = useLikeComment();
+
   const [comment, setComment] = useState('');
   const [kebobMenuVisible, setKebobMenuVisible] = useState(false); // someone's comment
   const [commentMenuVisible, setCommentMenuVisible] = useState(false); // own comment
@@ -88,15 +97,6 @@ const PostDetail: PostDetailScreen = ({ route }) => {
   const inputRef = useRef<TextInput | null>(null);
   const [isReplyComment, setReplyComment] = useState(false);
   const [isEditComment, setEditComment] = useState(false);
-
-  const { data, refetch } = usePost(postId);
-  const [commentPost] = useCommentPost();
-  const [deleteComment] = useDeleteComment();
-  const [editComment] = useEditCommentPost();
-  const [followUser] = useFollowUser();
-  const [hideUser] = useHideUser();
-  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
-  const [likeComment] = useLikeComment();
 
   const isFollowing = account?.followingIds?.includes(selectedUser?._id ?? '');
 
@@ -128,10 +128,6 @@ const PostDetail: PostDetailScreen = ({ route }) => {
   const comments = post?.comments;
   const likes = post?.likes;
 
-  if (!post || !comments || !likes) {
-    return <SafeAreaView style={pStyles.globalContainer} />;
-  }
-
   const getComments = useMemo(() => {
     const parentComments = comments?.filter((item) => !item.commentId);
     const childComments = comments?.filter((item) => item.commentId !== null);
@@ -146,6 +142,10 @@ const PostDetail: PostDetailScreen = ({ route }) => {
     });
     return updatedComments;
   }, [comments]);
+
+  if (!post || !comments || !likes) {
+    return <SafeAreaView style={pStyles.globalContainer} />;
+  }
 
   const renderCommentItem: ListRenderItem<typeof getComments[number]> = ({
     item,

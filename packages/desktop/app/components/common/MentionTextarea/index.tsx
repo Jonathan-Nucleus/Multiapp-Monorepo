@@ -17,8 +17,8 @@ import {
 } from "react-hook-form";
 import * as yup from "yup";
 import Avatar from "../Avatar";
-import { useUsers } from "mobile/src/graphql/query/user/useUsers";
-import { useAccount } from "mobile/src/graphql/query/account/useAccount";
+import { useUsers } from "shared/graphql/query/user/useUsers";
+import { useAccount } from "shared/graphql/query/account/useAccount";
 
 // TODO: Stopgap measure to address breaking type changes for fragments ({})
 // in React 18.

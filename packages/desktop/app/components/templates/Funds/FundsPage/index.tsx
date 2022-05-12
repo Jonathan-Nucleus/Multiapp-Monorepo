@@ -2,9 +2,9 @@ import { FC, useState } from "react";
 import Navbar from "../../../modules/funds/Navbar";
 import { Info, Lock } from "phosphor-react";
 import Button from "../../../common/Button";
-import { useFunds } from "mobile/src/graphql/query/marketplace/useFunds";
+import { useFunds } from "shared/graphql/query/marketplace/useFunds";
 import FundsList from "./FundsList";
-import { useAccount } from "mobile/src/graphql/query/account/useAccount";
+import { useAccount } from "shared/graphql/query/account/useAccount";
 import AccreditationQuestionnaire from "../AccreditationQuestionnaire";
 
 const FundsPage: FC = () => {

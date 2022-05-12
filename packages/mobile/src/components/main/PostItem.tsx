@@ -28,12 +28,12 @@ import {
   GRAY900,
 } from 'shared/src/colors';
 
-import { Post } from 'mobile/src/graphql/query/post/usePosts';
+import { Post } from 'shared/graphql/query/post/usePosts';
 import { PostCategories } from 'backend/graphql/enumerations.graphql';
 
-import { useLikePost } from '../../graphql/mutation/posts';
-import { useCreatePost } from 'mobile/src/graphql/mutation/posts';
-import { useAccount } from '../../graphql/query/account/useAccount';
+import { useLikePost } from 'shared/graphql/mutation/posts';
+import { useCreatePost } from 'shared/graphql/mutation/posts';
+import { useAccount } from 'shared/graphql/query/account/useAccount';
 
 export interface PostItemProps {
   post: Post;
@@ -50,7 +50,7 @@ const PostItem: React.FC<PostItemProps> = ({
   const [liked, setLiked] = useState(false);
   const [likePost] = useLikePost();
   const [createPost] = useCreatePost();
-  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
+  const { data: { account } = {} } = useAccount({ fetchPolicy: 'cache-only' });
 
   useEffect(() => {
     account && setLiked(post.likeIds?.includes(account._id) ?? false);

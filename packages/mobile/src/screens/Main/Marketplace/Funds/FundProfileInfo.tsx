@@ -27,10 +27,10 @@ import {
   FundSummary,
   FundManager,
   FundCompany,
-} from 'mobile/src/graphql/fragments/fund';
+} from 'shared/graphql/fragments/fund';
 
-import { useAccount } from 'mobile/src/graphql/query/account';
-import { useFollowUser } from 'mobile/src/graphql/mutation/account';
+import { useAccount } from 'shared/graphql/query/account';
+import { useFollowUser } from 'shared/graphql/mutation/account';
 import PGradientButton from '../../../../components/common/PGradientButton';
 
 export type Fund = FundSummary & FundManager & FundCompany;

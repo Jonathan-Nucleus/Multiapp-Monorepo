@@ -7,8 +7,8 @@ import { CompositeScreenProps } from '@react-navigation/native';
 
 import { ChatProvider } from 'mobile/src/context/Chat';
 import { Channel as ChannelType } from 'mobile/src/services/chat';
-import { useAccount } from 'mobile/src/graphql/query/account';
-import { useChatToken } from 'mobile/src/graphql/query/account/useChatToken';
+import { useAccount } from 'shared/graphql/query/account';
+import { useChatToken } from 'shared/graphql/query/account/useChatToken';
 
 import ChannelList from 'mobile/src/screens/Main/Chat/ChannelList';
 import NewChat from 'mobile/src/screens/Main/Chat/NewChat';

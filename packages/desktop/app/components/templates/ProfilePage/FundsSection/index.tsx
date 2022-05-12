@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { useManagedFunds } from "mobile/src/graphql/query/user/useManagedFunds";
+import { useManagedFunds } from "shared/graphql/query/user/useManagedFunds";
 import FundCard from "../../../modules/funds/FundCard";
 
 interface FundsSectionProps {

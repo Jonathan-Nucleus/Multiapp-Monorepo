@@ -9,7 +9,7 @@ import type {
   InvestorClass as InvestorClassType,
   FinancialStatus,
 } from 'backend/graphql/enumerations.graphql';
-import { Accreditation } from 'mobile/src/graphql/mutation/account/useSaveQuestionnaire';
+import { Accreditation } from 'shared/graphql/mutation/account/useSaveQuestionnaire';
 
 import InvestorClass from '../screens/Accreditation/InvestorClass';
 import BaseFinancialStatus from '../screens/Accreditation/BaseFinancialStatus';
@@ -24,7 +24,7 @@ import type {
   Audience,
   Post,
   PostCategory,
-} from 'mobile/src/graphql/query/post/usePosts';
+} from 'shared/graphql/query/post/usePosts';
 
 const Stack = createStackNavigator();
 const AccreditationStack = () => {

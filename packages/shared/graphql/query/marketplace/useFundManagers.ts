@@ -4,7 +4,7 @@ import { Company } from 'backend/graphql/companies.graphql';
 import {
   FundSummary,
   FundManager as FundManagerFragment,
-} from 'mobile/src/graphql/fragments/fund';
+} from 'shared/graphql/fragments/fund';
 
 export type FundManager = FundManagerFragment['manager'] &
   Pick<UserProfile, 'managedFundsIds' | 'position' | 'role'> & {

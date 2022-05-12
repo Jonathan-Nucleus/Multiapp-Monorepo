@@ -13,9 +13,9 @@ import Card from "../../../../common/Card";
 import Button from "../../../../common/Button";
 import Field from "../../../../common/Field";
 import Alert from "../../../../common/Alert";
-import { useAccount } from "mobile/src/graphql/query/account";
+import { useAccount } from "shared/graphql/query/account";
 import WarningIcon from "shared/assets/images/warning-red.svg";
-import { useUpdateUserProfile } from "mobile/src/graphql/mutation/account";
+import { useUpdateUserProfile } from "shared/graphql/mutation/account";
 
 type FormValues = {
   firstName: string;

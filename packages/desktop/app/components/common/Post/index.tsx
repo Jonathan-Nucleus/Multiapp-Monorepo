@@ -6,12 +6,12 @@ import {
   ThumbsUp,
 } from "phosphor-react";
 import Media from "../Media";
-import { useLikePost } from "mobile/src/graphql/mutation/posts";
+import { useLikePost } from "shared/graphql/mutation/posts";
 import LikeModal from "./LikesModal";
 import CommentPost from "../Comment";
-import { PostSummary } from "mobile/src/graphql/fragments/post";
-import { useFollowCompany, useFollowUser } from "mobile/src/graphql/mutation/account";
-import { useAccount } from "mobile/src/graphql/query/account/useAccount";
+import { PostSummary } from "shared/graphql/fragments/post";
+import { useFollowCompany, useFollowUser } from "shared/graphql/mutation/account";
+import { useAccount } from "shared/graphql/query/account/useAccount";
 import ActionMenu from "./ActionMenu";
 import Header from "./Header";
 import PostBody from "./PostBody";

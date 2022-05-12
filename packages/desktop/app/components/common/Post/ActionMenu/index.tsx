@@ -14,8 +14,8 @@ import {
 } from "phosphor-react";
 import ConfirmHideUserModal from "../ConfirmHideUserModal";
 import ReportPostModal from "../ReportPostModal";
-import { PostSummary } from "mobile/src/graphql/fragments/post";
-import { useHidePost, useMutePost } from "mobile/src/graphql/mutation/posts";
+import { PostSummary } from "shared/graphql/fragments/post";
+import { useHidePost, useMutePost } from "shared/graphql/mutation/posts";
 import ConfirmDeleteModal from "../ConfirmDeleteModal";
 
 interface ActionMenuProps {

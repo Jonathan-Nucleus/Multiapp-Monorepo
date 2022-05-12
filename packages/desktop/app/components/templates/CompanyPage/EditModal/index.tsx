@@ -11,8 +11,8 @@ import Button from "../../../common/Button";
 import Field from "../../../common/Field";
 import Alert from "../../../common/Alert";
 
-import { CompanyProfile } from "mobile/src/graphql/query/company/useCompany";
-import { useUpdateCompanyProfile } from "mobile/src/graphql/mutation/account";
+import { CompanyProfile } from "shared/graphql/query/company/useCompany";
+import { useUpdateCompanyProfile } from "shared/graphql/mutation/account";
 
 interface CompanyEditModalProps {
   show: boolean;

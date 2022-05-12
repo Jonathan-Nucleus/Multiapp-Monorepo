@@ -7,7 +7,7 @@ import {
   FundSummary,
   FundCompany,
   FundManager,
-} from 'mobile/src/graphql/fragments/fund';
+} from 'shared/graphql/fragments/fund';
 
 export type FundDetails = FundSummary &
   FundManager &

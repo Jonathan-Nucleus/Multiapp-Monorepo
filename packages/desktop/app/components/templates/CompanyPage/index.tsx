@@ -8,8 +8,8 @@ import Avatar from "../../common/Avatar";
 import ProfileCard from "./ProfileCard";
 import TeamMembersList from "../../modules/teams/TeamMembersList";
 import FundCard from "../../modules/funds/FundCard";
-import { CompanyProfile } from "mobile/src/graphql/query/company/useCompany";
-import { useAccount } from "mobile/src/graphql/query/account/useAccount";
+import { CompanyProfile } from "shared/graphql/query/company/useCompany";
+import { useAccount } from "shared/graphql/query/account/useAccount";
 
 interface CompanyPageProps {
   company: CompanyProfile;

@@ -20,7 +20,7 @@ import PGradientButton from '../../components/common/PGradientButton';
 import { Body2 } from '../../theme/fonts';
 import PTextLine from '../../components/common/PTextLine';
 import LogoSvg from '../../assets/icons/logo.svg';
-import { VERIFY_INVITE } from '../../graphql/query/auth';
+import { VERIFY_INVITE } from 'shared/graphql/query/auth';
 
 import type { CodeScreen } from 'mobile/src/navigations/AuthStack';
 

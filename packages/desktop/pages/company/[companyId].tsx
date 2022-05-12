@@ -2,7 +2,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import CompanyPage from "../../app/components/templates/CompanyPage";
 import { NextPageWithLayout } from "../../app/types/next-page";
-import { useCompany } from "mobile/src/graphql/query/company/useCompany";
+import { useCompany } from "shared/graphql/query/company/useCompany";
 
 const Company: NextPageWithLayout = () => {
   const router = useRouter();

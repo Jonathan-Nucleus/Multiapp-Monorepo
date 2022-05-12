@@ -17,8 +17,8 @@ import Sidebar from "./Sidebar";
 import AvatarMenu from "./AvatarMenu";
 import Avatar from "../../../common/Avatar";
 import SearchInput from "../../../common/SearchInput";
-import { useAccount } from "mobile/src/graphql/query/account/useAccount";
-import { useNotificationsStated } from "mobile/src/graphql/query/notification/useNotifications";
+import { useAccount } from "shared/graphql/query/account/useAccount";
+import { useNotificationsStated } from "shared/graphql/query/notification/useNotifications";
 
 const navItems = [
   {

@@ -6,10 +6,10 @@ import { X, Trash, UploadSimple } from "phosphor-react";
 import Card from "../../../common/Card";
 import Button from "../../../common/Button";
 import Input from "../../../common/Input";
-import { useFetchUploadLink } from "mobile/src/graphql/mutation/posts";
-import { useUpdateUserProfile } from "mobile/src/graphql/mutation/account";
+import { useFetchUploadLink } from "shared/graphql/mutation/posts";
+import { useUpdateUserProfile } from "shared/graphql/mutation/account";
 import { MediaType } from "backend/graphql/mutations.graphql";
-import { UserProfile } from "mobile/src/graphql/query/user/useProfile";
+import { UserProfile } from "shared/graphql/query/user/useProfile";
 import ModalDialog from "../../../common/ModalDialog";
 
 interface EditMediaModalProps {

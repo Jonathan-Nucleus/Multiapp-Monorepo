@@ -35,9 +35,9 @@ import {
 import {
   useCompany,
   CompanyProfile,
-} from 'mobile/src/graphql/query/company/useCompany';
-import { useUpdateCompanyProfile } from 'mobile/src/graphql/mutation/account';
-import { useFetchUploadLink } from 'mobile/src/graphql/mutation/posts';
+} from 'shared/graphql/query/company/useCompany';
+import { useUpdateCompanyProfile } from 'shared/graphql/mutation/account';
+import { useFetchUploadLink } from 'shared/graphql/mutation/posts';
 
 import { EditCompanyPhotoScreen } from 'mobile/src/navigations/CompanyDetailsStack';
 

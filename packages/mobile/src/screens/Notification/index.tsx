@@ -40,11 +40,11 @@ import Avatar from 'mobile/src/components/common/Avatar';
 import MainHeader from 'mobile/src/components/main/Header';
 
 import type { NotificationScreen } from 'mobile/src/navigations/AppNavigator';
-import { useNotifications } from 'mobile/src/graphql/query/notification';
+import { useNotifications } from 'shared/graphql/query/notification';
 import {
   useReadNotification,
   useReadNotifications,
-} from 'mobile/src/graphql/mutation/notification';
+} from 'shared/graphql/mutation/notification';
 import { Notification } from 'backend/graphql/notifications.graphql';
 
 const Notifications: NotificationScreen = ({ navigation }) => {

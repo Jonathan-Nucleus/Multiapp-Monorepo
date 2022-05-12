@@ -1,5 +1,5 @@
 import { FC, ReactElement, useMemo } from "react";
-import { PostSummary } from "mobile/src/graphql/fragments/post";
+import { PostSummary } from "shared/graphql/fragments/post";
 import Link from "next/link";
 import { UserProfile } from "backend/graphql/users.graphql";
 

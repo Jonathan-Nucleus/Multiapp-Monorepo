@@ -5,7 +5,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 
 import Button from "../../../common/Button";
 import Field from "../../../common/Field";
-import { useProRequest } from "mobile/src/graphql/mutation/account";
+import { useProRequest } from "shared/graphql/mutation/account";
 import { ProRoleOptions } from "backend/schemas/user";
 import { useRef } from "react";
 

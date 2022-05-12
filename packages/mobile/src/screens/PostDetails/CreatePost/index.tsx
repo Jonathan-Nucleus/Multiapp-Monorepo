@@ -65,11 +65,11 @@ import {
 } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { useAccount } from 'mobile/src/graphql/query/account/useAccount';
-import { useUsers, User } from 'mobile/src/graphql/query/user/useUsers';
-import { useFetchUploadLink } from 'mobile/src/graphql/mutation/posts';
+import { useAccount } from 'shared/graphql/query/account/useAccount';
+import { useUsers, User } from 'shared/graphql/query/user/useUsers';
+import { useFetchUploadLink } from 'shared/graphql/mutation/posts';
 
-import type { Audience } from 'mobile/src/graphql/query/post/usePosts';
+import type { Audience } from 'shared/graphql/query/post/usePosts';
 import { Audiences } from 'backend/graphql/enumerations.graphql';
 
 import PostHeader from './PostHeader';

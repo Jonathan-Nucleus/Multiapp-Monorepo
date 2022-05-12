@@ -4,7 +4,7 @@ import Avatar from "../../Avatar";
 import moment from "moment";
 import { ShieldCheck } from "phosphor-react";
 import Button from "../../Button";
-import { PostSummary } from "mobile/src/graphql/fragments/post";
+import { PostSummary } from "shared/graphql/fragments/post";
 import { UserProfile } from "backend/graphql/users.graphql";
 
 interface HeaderProps {

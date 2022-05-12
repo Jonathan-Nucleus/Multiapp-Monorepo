@@ -4,11 +4,11 @@ import { Company } from 'backend/graphql/companies.graphql';
 import {
   POST_SUMMARY_FRAGMENT,
   PostSummary,
-} from 'mobile/src/graphql/fragments/post';
+} from 'shared/graphql/fragments/post';
 
 type CompanyPostsVariables = {
   companyId: string;
-  featured: boolean;
+  categories?: PostCategory[];
 };
 
 export type Post = PostSummary;
@@ -19,32 +19,31 @@ export type CompanyPostsData = {
 };
 
 /**
- * GraphQL query that fetches featured posts for the specified company.
+ * GraphQL query that fetches posts for the specified company.
  *
  * @param companyId   The ID of the company.
+ * @param categories  Optional list of post categories to filter by.
  *
  * @returns   GraphQL query.
  */
-export function useFeaturedPosts(
+export function usePosts(
   companyId: string,
+  categories?: PostCategory[],
 ): QueryResult<CompanyPostsData, CompanyPostsVariables> {
   return useQuery<CompanyPostsData, CompanyPostsVariables>(
     gql`
       ${POST_SUMMARY_FRAGMENT}
-      query CompanyFeaturedPosts($companyId: ID!, $featured: Boolean!) {
+      query CompanyPosts($companyId: ID!, $categories: [PostCategory!]) {
         companyProfile(companyId: $companyId) {
           _id
-          posts(featured: $featured) {
+          posts(categories: $categories) {
             ...PostSummaryFields
           }
         }
       }
     `,
     {
-      variables: {
-        companyId,
-        featured: true,
-      },
+      variables: { companyId, ...(categories ? { categories } : {}) },
     },
   );
 }

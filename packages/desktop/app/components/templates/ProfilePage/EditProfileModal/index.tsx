@@ -6,8 +6,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { SubmitHandler, useForm } from "react-hook-form";
 import Button from "../../../common/Button";
 import Field from "../../../common/Field";
-import { useUpdateUserProfile } from "mobile/src/graphql/mutation/account";
-import { UserProfile } from "mobile/src/graphql/query/user/useProfile";
+import { useUpdateUserProfile } from "shared/graphql/mutation/account";
+import { UserProfile } from "shared/graphql/query/user/useProfile";
 import ModalDialog from "../../../common/ModalDialog";
 
 type FormValues = {

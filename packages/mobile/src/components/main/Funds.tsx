@@ -17,7 +17,7 @@ import FundItem from './FundItem';
 import type {
   FundSummary,
   Accredidation,
-} from 'mobile/src/graphql/fragments/fund';
+} from 'shared/graphql/fragments/fund';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 
 interface FundProps {

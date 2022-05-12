@@ -1,6 +1,6 @@
 import { gql, useQuery, QueryHookOptions, QueryResult } from '@apollo/client';
 import { User } from 'backend/graphql/users.graphql';
-import { FundManager } from 'mobile/src/graphql/fragments/fund';
+import { FundManager } from 'shared/graphql/fragments/fund';
 import { NotificationEventOptions } from 'backend/schemas/user';
 
 type AccountVariables = never;

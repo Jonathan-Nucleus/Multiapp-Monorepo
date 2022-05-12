@@ -14,7 +14,7 @@ import type { WizardStepRenderProps } from "desktop/app/components/common/Wizard
 import {
   ContactMethod,
   ContactMethodOptions,
-} from "mobile/src/graphql/mutation/account/useSaveQuestionnaire";
+} from "shared/graphql/mutation/account/useSaveQuestionnaire";
 
 export type FormData = {
   advisorRequest: {

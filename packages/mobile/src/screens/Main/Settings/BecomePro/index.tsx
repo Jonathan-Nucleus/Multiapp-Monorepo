@@ -25,7 +25,7 @@ import {
 import { BLACK, WHITE, SUCCESS, GRAY700 } from 'shared/src/colors';
 import MainHeader from 'mobile/src/components/main/Header';
 import PFormLabel from 'mobile/src/components/common/PFormLabel';
-import { useProRequest } from 'mobile/src/graphql/mutation/account';
+import { useProRequest } from 'shared/graphql/mutation/account';
 import { ProRoleOptions } from 'backend/schemas/user';
 
 const ROLES = Object.keys(ProRoleOptions).map((option) => ({

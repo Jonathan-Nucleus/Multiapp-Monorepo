@@ -8,9 +8,9 @@ import { AVATAR_URL } from 'react-native-dotenv';
 import PLabel from 'mobile/src/components/common/PLabel';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
 
-import { useAccount } from 'mobile/src/graphql/query/account';
-import { useFollowUser } from 'mobile/src/graphql/mutation/account';
-import { FundManager } from 'mobile/src/graphql/query/marketplace/useFundManagers';
+import { useAccount } from 'shared/graphql/query/account';
+import { useFollowUser } from 'shared/graphql/mutation/account';
+import { FundManager } from 'shared/graphql/query/marketplace/useFundManagers';
 
 interface FundUserInfoProps {
   manager: FundManager;

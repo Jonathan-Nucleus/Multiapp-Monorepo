@@ -33,7 +33,7 @@ import {
   AppScreenProps,
   SearchScreen,
 } from 'mobile/src/navigations/AppNavigator';
-import { useGlobalSearch } from 'mobile/src/graphql/query/search';
+import { useGlobalSearch } from 'shared/graphql/query/search';
 
 const Tab = createMaterialTopTabNavigator();
 const SearchTabs: SearchScreen = ({ navigation }) => {

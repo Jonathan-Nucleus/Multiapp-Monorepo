@@ -6,7 +6,7 @@ import ManagerItem from './ManagerItem';
 import {
   useFundManagers,
   FundManager,
-} from 'mobile/src/graphql/query/marketplace/useFundManagers';
+} from 'shared/graphql/query/marketplace/useFundManagers';
 import { FundManagersScreen } from 'mobile/src/navigations/MarketplaceTabs';
 
 const Managers: FundManagersScreen = () => {

@@ -16,7 +16,7 @@ import type {
   Audience,
   Post,
   PostCategory,
-} from 'mobile/src/graphql/query/post/usePosts';
+} from 'shared/graphql/query/post/usePosts';
 
 const Stack = createStackNavigator();
 const PostDetailsStack = () => {

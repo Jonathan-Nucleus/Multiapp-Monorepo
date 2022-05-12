@@ -1,7 +1,7 @@
 import { FC, useState } from "react";
 import FilterDropdown, { FilterCategory } from "./FilterDropdown";
 import Post from "desktop/app/components/common/Post";
-import { PostSummary } from "mobile/src/graphql/fragments/post";
+import { PostSummary } from "shared/graphql/fragments/post";
 import { PostCategory } from "backend/graphql/posts.graphql";
 import Skeleton from "./Skeleton";
 

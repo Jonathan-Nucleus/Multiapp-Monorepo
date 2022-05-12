@@ -19,7 +19,7 @@ import PTextInput from '../../components/common/PTextInput';
 import PGradientButton from '../../components/common/PGradientButton';
 import PTextLine from '../../components/common/PTextLine';
 import ErrorText from '../../components/common/ErrorTxt';
-import { LOGIN } from '../../graphql/mutation/auth';
+import { LOGIN } from 'shared/graphql/mutation/auth';
 import { Body2 } from '../../theme/fonts';
 import { BLACK, PRIMARY, WHITE, BLUE200, WHITE12 } from 'shared/src/colors';
 import LogoSvg from '../../assets/icons/logo.svg';
@@ -33,7 +33,7 @@ import { setToken, TokenAction } from 'mobile/src/utils/auth-token';
 import type { LoginScreen } from 'mobile/src/navigations/AuthStack';
 
 import { authenticate } from 'mobile/src/services/auth/google-provider';
-import { useLoginOAuth } from 'mobile/src/graphql/mutation/auth/useLoginOAuth';
+import { useLoginOAuth } from 'shared/graphql/mutation/auth/useLoginOAuth';
 import CheckboxLabel from '../../components/common/CheckboxLabel';
 
 const Login: LoginScreen = ({ navigation }) => {

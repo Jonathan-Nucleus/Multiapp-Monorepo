@@ -1,7 +1,7 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
-import { useProfile } from "mobile/src/graphql/query/user/useProfile";
+import { useProfile } from "shared/graphql/query/user/useProfile";
 import ProfilePage from "../../app/components/templates/ProfilePage";
 import { NextPageWithLayout } from "../../app/types/next-page";
 

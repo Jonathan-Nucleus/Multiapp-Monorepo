@@ -3,5 +3,16 @@
   "version": "1.0.0",
   "description": "Prometheus Shared Resources",
   "main": "index.js",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "@apollo/client": "^3.5.10",
+    "react": "17.0.2",
+    "react-native": "0.68.0"
+  },
+  "resolutions": {
+    "@types/react": "^17"
+  },
+  "devDependencies": {
+    "@types/react": "17.0.2"
+  }
 }

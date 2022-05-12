@@ -8,11 +8,11 @@ import {
   FundSummary,
   FundCompany,
   FundManager,
-} from 'mobile/src/graphql/fragments/fund';
+} from 'shared/graphql/fragments/fund';
 import FundProfileInfo from './FundProfileInfo';
 
-import { useAccount } from 'mobile/src/graphql/query/account';
-import { useWatchFund } from 'mobile/src/graphql/mutation/funds/useWatchFund';
+import { useAccount } from 'shared/graphql/query/account';
+import { useWatchFund } from 'shared/graphql/mutation/funds/useWatchFund';
 
 type Fund = FundSummary & FundCompany & FundManager;
 export interface FundItemProps {

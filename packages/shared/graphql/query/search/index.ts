@@ -3,11 +3,11 @@ import { gql, QueryResult, useQuery } from '@apollo/client';
 import {
   POST_SUMMARY_FRAGMENT,
   PostSummary,
-} from 'mobile/src/graphql/fragments/post';
+} from 'shared/graphql/fragments/post';
 import {
   FUND_SUMMARY_FRAGMENT,
   FundSummary,
-} from 'mobile/src/graphql/fragments/fund';
+} from 'shared/graphql/fragments/fund';
 import { Company } from 'backend/graphql/companies.graphql';
 import { User } from 'backend/graphql/users.graphql';
 import { Fund } from 'backend/graphql/funds.graphql';

@@ -3,9 +3,9 @@ import SendMessage from "./SendMessage";
 import CommentCard from "./CommentCard";
 import Card from "../Card";
 
-import { useCommentPost } from "mobile/src/graphql/mutation/posts";
-import { Comment, usePost } from "mobile/src/graphql/query/post";
-import { useAccount } from "mobile/src/graphql/query/account";
+import { useCommentPost } from "shared/graphql/mutation/posts";
+import { Comment, usePost } from "shared/graphql/query/post";
+import { useAccount } from "shared/graphql/query/account";
 
 interface CommentPostProps {
   postId: string;

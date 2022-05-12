@@ -4,11 +4,11 @@ import { Menu } from "@headlessui/react";
 
 import Button from "../../common/Button";
 import NotificationDetail from "./Notification";
-import { useNotifications } from "mobile/src/graphql/query/notification";
+import { useNotifications } from "shared/graphql/query/notification";
 import {
   useReadNotification,
   useReadNotifications,
-} from "mobile/src/graphql/mutation/notification";
+} from "shared/graphql/mutation/notification";
 
 const NotificationPage: FC = () => {
   const { data } = useNotifications();

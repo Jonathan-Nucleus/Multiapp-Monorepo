@@ -7,11 +7,11 @@ import { X, Image as ImageIcon, Trash, UploadSimple } from "phosphor-react";
 import Card from "../../../common/Card";
 import Button from "../../../common/Button";
 import Input from "../../../common/Input";
-import { useAccount } from "mobile/src/graphql/query/account";
-import { useFetchUploadLink } from "mobile/src/graphql/mutation/posts";
-import { CompanyProfile } from "mobile/src/graphql/query/company/useCompany";
+import { useAccount } from "shared/graphql/query/account";
+import { useFetchUploadLink } from "shared/graphql/mutation/posts";
+import { CompanyProfile } from "shared/graphql/query/company/useCompany";
 import { MediaType } from "backend/graphql/mutations.graphql";
-import { useUpdateCompanyProfile } from "mobile/src/graphql/mutation/account";
+import { useUpdateCompanyProfile } from "shared/graphql/mutation/account";
 
 interface PhotoUploadProps {
   show: boolean;

@@ -17,7 +17,7 @@ import type { ChooseCategoryScreen } from 'mobile/src/navigations/PostDetailsSta
 import {
   PostCategory,
   PostCategories,
-} from 'mobile/src/graphql/mutation/posts';
+} from 'shared/graphql/mutation/posts';
 
 const CATEGORY_OPTIONS = Object.keys(PostCategories).map((option, index) => ({
   id: index,

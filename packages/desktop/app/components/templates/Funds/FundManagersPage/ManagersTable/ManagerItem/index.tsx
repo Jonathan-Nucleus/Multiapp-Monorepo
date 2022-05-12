@@ -7,12 +7,12 @@ import Card from "../../../../../common/Card";
 import { ShieldCheck } from "phosphor-react";
 import Avatar from "../../../../../common/Avatar";
 
-import { useAccount } from "mobile/src/graphql/query/account";
-import { useFollowUser } from "mobile/src/graphql/mutation/account";
+import { useAccount } from "shared/graphql/query/account";
+import { useFollowUser } from "shared/graphql/mutation/account";
 import type {
   FundManager,
   FundListItem,
-} from "mobile/src/graphql/query/marketplace/useFundManagers";
+} from "shared/graphql/query/marketplace/useFundManagers";
 
 type Fund = FundListItem;
 

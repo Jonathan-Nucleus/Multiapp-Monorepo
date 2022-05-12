@@ -7,8 +7,8 @@ import {
   LoadingIndicator,
 } from "stream-chat-react";
 import { useChecklist } from "./ChecklistTasks";
-import { useAccount } from "mobile/src/graphql/query/account";
-import { useChatToken } from "mobile/src/graphql/query/account/useChatToken";
+import { useAccount } from "shared/graphql/query/account";
+import { useChatToken } from "shared/graphql/query/account/useChatToken";
 
 import GetStartedChannel from "./GetStartedChannel";
 import CreateChannel from "./CreateChannel";

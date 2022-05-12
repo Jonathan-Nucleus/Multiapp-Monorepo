@@ -38,9 +38,9 @@ import {
   BLACK,
 } from 'shared/src/colors';
 
-import { useAccount } from 'mobile/src/graphql/query/account';
-import { useFollowCompany } from 'mobile/src/graphql/mutation/account';
-import type { CompanyProfile } from 'mobile/src/graphql/query/company/useCompany';
+import { useAccount } from 'shared/graphql/query/account';
+import { useFollowCompany } from 'shared/graphql/mutation/account';
+import type { CompanyProfile } from 'shared/graphql/query/company/useCompany';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 import { showMessage } from '../../../services/utils';
 

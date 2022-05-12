@@ -13,8 +13,8 @@ import {
   NotificationEventOptions,
   NotificationMethodEnum,
 } from "backend/schemas/user";
-import { useAccount } from "mobile/src/graphql/query/account";
-import { useUpdateSettings } from "mobile/src/graphql/mutation/account/useUpdateSettings";
+import { useAccount } from "shared/graphql/query/account";
+import { useUpdateSettings } from "shared/graphql/mutation/account/useUpdateSettings";
 import ToggleSwitch from "../../common/ToggleSwitch";
 import { useForm } from "react-hook-form";
 import { SettingsInput } from "backend/graphql/users.graphql";

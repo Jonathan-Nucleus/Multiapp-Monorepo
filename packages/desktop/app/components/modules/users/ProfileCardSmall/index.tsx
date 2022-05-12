@@ -7,7 +7,7 @@ import { getInitials } from "../../../../lib/utilities";
 import Avatar from "../../../common/Avatar";
 import Card from "../../../common/Card";
 import { AccreditationOptions } from "backend/schemas/user";
-import { UserProfile } from "mobile/src/graphql/query/user/useProfile";
+import { UserProfile } from "shared/graphql/query/user/useProfile";
 
 interface ProfileProps {
   user: UserProfile | undefined;

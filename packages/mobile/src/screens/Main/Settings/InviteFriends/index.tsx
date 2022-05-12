@@ -17,7 +17,7 @@ import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import MainHeader from 'mobile/src/components/main/Header';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import { showMessage } from 'mobile/src/services/utils';
-import { useAccount } from 'mobile/src/graphql/query/account';
+import { useAccount } from 'shared/graphql/query/account';
 import User1Svg from 'mobile/src/assets/images/user1.svg';
 import User2Svg from 'mobile/src/assets/images/user2.svg';
 import User3Svg from 'mobile/src/assets/images/user3.svg';

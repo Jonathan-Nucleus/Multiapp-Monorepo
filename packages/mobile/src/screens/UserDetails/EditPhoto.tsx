@@ -33,9 +33,9 @@ import {
   PRIMARY,
 } from 'shared/src/colors';
 
-import { useAccount } from 'mobile/src/graphql/query/account';
-import { useUpdateUserProfile } from 'mobile/src/graphql/mutation/account';
-import { useFetchUploadLink } from 'mobile/src/graphql/mutation/posts';
+import { useAccount } from 'shared/graphql/query/account';
+import { useUpdateUserProfile } from 'shared/graphql/mutation/account';
+import { useFetchUploadLink } from 'shared/graphql/mutation/posts';
 
 import { EditUserPhotoScreen } from 'mobile/src/navigations/UserDetailsStack';
 import Avatar from '../../components/common/Avatar';

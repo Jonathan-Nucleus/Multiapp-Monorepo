@@ -15,7 +15,7 @@ import PAppContainer from '../../components/common/PAppContainer';
 import PHeader from '../../components/common/PHeader';
 import PTitle from '../../components/common/PTitle';
 import ErrorText from '../../components/common/ErrorTxt';
-import { UPDATE_SETTINGS } from '../../graphql/mutation/account';
+import { UPDATE_SETTINGS } from 'shared/graphql/mutation/account';
 import { Body2, H6 } from '../../theme/fonts';
 import {
   BLACK,

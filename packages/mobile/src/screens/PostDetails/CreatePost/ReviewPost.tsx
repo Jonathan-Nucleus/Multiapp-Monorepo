@@ -19,12 +19,12 @@ import PostSelection from './PostSelection';
 import PostHeader from './PostHeader';
 import { AUDIENCE_OPTIONS } from './index';
 
-import { useAccount } from 'mobile/src/graphql/query/account';
+import { useAccount } from 'shared/graphql/query/account';
 import {
   useCreatePost,
   PostCategories,
   useEditPost,
-} from 'mobile/src/graphql/mutation/posts';
+} from 'shared/graphql/mutation/posts';
 
 import { ReviewPostScreen } from 'mobile/src/navigations/PostDetailsStack';
 

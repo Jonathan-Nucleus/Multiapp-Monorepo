@@ -9,8 +9,8 @@ import Button from "../../../common/Button";
 import Card from "../../../common/Card";
 import TeamMembersList from "../../../modules/teams/TeamMembersList";
 
-import { useFund } from "mobile/src/graphql/query/marketplace/useFund";
-import { useWatchFund } from "mobile/src/graphql/mutation/funds/useWatchFund";
+import { useFund } from "shared/graphql/query/marketplace/useFund";
+import { useWatchFund } from "shared/graphql/mutation/funds/useWatchFund";
 import Skeleton from "./Skeleton";
 
 const fundData = {

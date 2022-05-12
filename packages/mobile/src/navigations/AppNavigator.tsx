@@ -17,7 +17,7 @@ import {
   detachTokenObserver,
   TokenAction,
 } from 'mobile/src/utils/auth-token';
-import { useUpdateFcmToken } from 'mobile/src/graphql/mutation/account';
+import { useUpdateFcmToken } from 'shared/graphql/mutation/account';
 
 import AuthStack from './AuthStack';
 import MainTabNavigator from './MainTabNavigator';
@@ -41,7 +41,7 @@ import NotificationDetail from '../screens/Notification/Details';
 import Preferences from '../screens/Main/Settings/Preferences';
 
 import { MediaType } from 'backend/graphql/mutations.graphql';
-import { Accreditation } from 'mobile/src/graphql/mutation/account/useSaveQuestionnaire';
+import { Accreditation } from 'shared/graphql/mutation/account/useSaveQuestionnaire';
 import ContactSuccess from '../screens/Main/Settings/Contact/ContactSuccess';
 
 const defaultScreenOptions = {

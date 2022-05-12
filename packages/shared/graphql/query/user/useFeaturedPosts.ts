@@ -4,11 +4,11 @@ import { User } from 'backend/graphql/users.graphql';
 import {
   POST_SUMMARY_FRAGMENT,
   PostSummary,
-} from 'mobile/src/graphql/fragments/post';
+} from 'shared/graphql/fragments/post';
 
 type UserPostsVariables = {
   userId: string;
-  categories?: PostCategory[];
+  featured: boolean;
 };
 
 export type Post = PostSummary;
@@ -19,28 +19,32 @@ export type UserPostsData = {
 };
 
 /**
- * GraphQL query that fetches the account details for the current user
+ * GraphQL query that fetches featured posts for the specified User.
+ *
+ * @param userId   The ID of the User.
  *
  * @returns   GraphQL query.
  */
-export function usePosts(
+export function useFeaturedPosts(
   userId: string,
-  categories?: PostCategory[],
 ): QueryResult<UserPostsData, UserPostsVariables> {
   return useQuery<UserPostsData, UserPostsVariables>(
     gql`
       ${POST_SUMMARY_FRAGMENT}
-      query UserPosts($userId: ID!, $categories: [PostCategory!]) {
+      query UserFeaturedPosts($userId: ID!, $featured: Boolean!) {
         userProfile(userId: $userId) {
           _id
-          posts(categories: $categories) {
+          posts(featured: $featured) {
             ...PostSummaryFields
           }
         }
       }
     `,
     {
-      variables: { userId, ...(categories ? { categories } : {}) },
+      variables: {
+        userId,
+        featured: true,
+      },
     },
   );
 }

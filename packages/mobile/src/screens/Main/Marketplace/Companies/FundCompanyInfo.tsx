@@ -8,9 +8,9 @@ import PLabel from 'mobile/src/components/common/PLabel';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 
-import { Company } from 'mobile/src/graphql/query/marketplace/useFundCompanies';
-import { useAccount } from 'mobile/src/graphql/query/account';
-import { useFollowCompany } from 'mobile/src/graphql/mutation/account';
+import { Company } from 'shared/graphql/query/marketplace/useFundCompanies';
+import { useAccount } from 'shared/graphql/query/account';
+import { useFollowCompany } from 'shared/graphql/mutation/account';
 
 interface FundCompanyInfoProps {
   company: Company;

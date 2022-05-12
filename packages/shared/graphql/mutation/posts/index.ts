@@ -10,7 +10,7 @@ import { PostCategories } from 'backend/graphql/enumerations.graphql';
 import {
   POST_SUMMARY_FRAGMENT,
   PostSummary,
-} from 'mobile/src/graphql/fragments/post';
+} from 'shared/graphql/fragments/post';
 
 export type { PostCategory };
 export { PostCategories };
