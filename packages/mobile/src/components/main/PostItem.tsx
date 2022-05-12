@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Pressable,
+  Text,
+} from 'react-native';
 import { LinkPreview } from '@flyerhq/react-native-link-preview';
 import FastImage from 'react-native-fast-image';
 import dayjs from 'dayjs';
@@ -21,9 +27,11 @@ import { Body1, Body2Bold, Body3 } from '../../theme/fonts';
 import pStyles from '../../theme/pStyles';
 import {
   PRIMARYSTATE,
+  WHITE,
   WHITE12,
   WHITE60,
   BLACK,
+  BGDARK,
   PRIMARY,
   GRAY900,
 } from 'shared/src/colors';
@@ -34,6 +42,7 @@ import { PostCategories } from 'backend/graphql/enumerations.graphql';
 import { useLikePost } from 'shared/graphql/mutation/posts';
 import { useCreatePost } from 'shared/graphql/mutation/posts';
 import { useAccount } from 'shared/graphql/query/account/useAccount';
+import { tagSplit } from 'shared/src/patterns';
 
 export interface PostItemProps {
   post: Post;
@@ -122,6 +131,12 @@ const PostItem: React.FC<PostItemProps> = ({
     }
   };
 
+  const search = (text: string) => {
+    NavigationService.navigate('Search', {
+      searchString: text,
+    });
+  };
+
   return (
     <Pressable onPress={goToDetails}>
       <View style={styles.container}>
@@ -147,35 +162,47 @@ const PostItem: React.FC<PostItemProps> = ({
             <LinkPreview
               containerStyle={styles.previewContainer}
               renderLinkPreview={({ previewData }) => (
-                <Pressable onPress={goToDetails}>
-                  <PLabel label={body} textStyle={styles.body} />
+                <>
+                  <Text style={styles.body}>
+                    {tagSplit(body).map((split) =>
+                      split.startsWith('$') || split.startsWith('#') ? (
+                        <Text
+                          key={split}
+                          style={styles.tagLink}
+                          onPress={() => search(split)}>
+                          {split}
+                        </Text>
+                      ) : (
+                        <React.Fragment key={split}>{split}</React.Fragment>
+                      ),
+                    )}
+                  </Text>
                   {previewData?.link && (
                     <PLabel label={previewData.link} textStyle={styles.link} />
                   )}
-                  {(!mediaUrl ||
-                    previewData?.title ||
-                    previewData?.description) && (
-                    <View style={styles.metaDataContainer}>
-                      {mediaUrl ? (
-                        <></>
-                      ) : (
-                        <FastImage
-                          source={{ uri: previewData?.image?.url }}
-                          style={styles.previewImage}
+                  {!mediaUrl &&
+                    (previewData?.title || previewData?.description) && (
+                      <View style={styles.metaDataContainer}>
+                        {mediaUrl ? (
+                          <></>
+                        ) : (
+                          <FastImage
+                            source={{ uri: previewData?.image?.url }}
+                            style={styles.previewImage}
+                          />
+                        )}
+                        <PLabel
+                          label={previewData?.title || ''}
+                          textStyle={styles.title}
                         />
-                      )}
-                      <PLabel
-                        label={previewData?.title || ''}
-                        textStyle={styles.title}
-                      />
-                      <PLabel
-                        label={previewData?.description || ''}
-                        textStyle={styles.description}
-                        numberOfLines={2}
-                      />
-                    </View>
-                  )}
-                </Pressable>
+                        <PLabel
+                          label={previewData?.description || ''}
+                          textStyle={styles.description}
+                          numberOfLines={2}
+                        />
+                      </View>
+                    )}
+                </>
               )}
               textContainerStyle={styles.previewTextContainer}
               text={body}
@@ -271,7 +298,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   previewContainer: {
-    backgroundColor: BLACK,
+    backgroundColor: BGDARK,
     overflow: 'hidden',
   },
   previewTextContainer: {
@@ -314,6 +341,10 @@ const styles = StyleSheet.create({
   },
   body: {
     lineHeight: 20,
+    color: WHITE,
+  },
+  tagLink: {
+    color: PRIMARY,
   },
   link: {
     color: PRIMARY,

@@ -176,7 +176,9 @@ type AppParamList = {
   };
   Contact: undefined;
   VerificationSuccess: undefined;
-  Search: undefined;
+  Search: {
+    searchString?: string;
+  };
   Notifications: undefined;
   NotificationDetail: { postId: string; userId: string };
   AccreditationStack: undefined;

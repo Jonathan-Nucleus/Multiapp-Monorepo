@@ -8,7 +8,7 @@ import {
   StyleProp,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { BLACK } from 'shared/src/colors';
+import { BGDARK } from 'shared/src/colors';
 
 interface AppContainerProps extends PropsWithChildren<unknown> {
   style?: StyleProp<ViewStyle>;
@@ -26,17 +26,19 @@ const PAppContainer: React.FC<AppContainerProps> = (props) => {
     disableKeyboardScroll = false,
   } = props;
 
-  if (noScroll) {
-    return <View style={[styles.container, style]}>{children}</View>;
-  }
+  const content = (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={[styles.container, style]}>{children}</View>
+    </TouchableWithoutFeedback>
+  );
 
-  return (
+  return noScroll ? (
+    content
+  ) : (
     <KeyboardAwareScrollView
       contentContainerStyle={contentContainerStyle}
       enableAutomaticScroll={!disableKeyboardScroll}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <View style={[styles.container, style]}>{children}</View>
-      </TouchableWithoutFeedback>
+      {content}
     </KeyboardAwareScrollView>
   );
 };
@@ -48,6 +50,6 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     paddingHorizontal: 16,
-    backgroundColor: BLACK,
+    backgroundColor: BGDARK,
   },
 });

@@ -33,10 +33,18 @@ interface UserInfoProps {
   avatarSize?: number;
   auxInfo?: string;
   audienceInfo?: Audience;
+  showFollow?: boolean;
 }
 
 const UserInfo: React.FC<UserInfoProps> = (props) => {
-  const { user, viewStyle, avatarSize, auxInfo, audienceInfo } = props;
+  const {
+    user,
+    viewStyle,
+    avatarSize,
+    auxInfo,
+    audienceInfo,
+    showFollow = true,
+  } = props;
   if (!user) return null;
 
   let userData: User | undefined;
@@ -129,7 +137,7 @@ const UserInfo: React.FC<UserInfoProps> = (props) => {
           {audienceInfo ? (
             <View style={styles.audienceInfo}>{audienceIcon}</View>
           ) : null}
-          {!isSelf && (
+          {!isSelf && showFollow && (
             <>
               <View style={styles.separator} />
               <TouchableOpacity onPress={toggleFollow}>

@@ -9,10 +9,8 @@ import {
 } from 'react-native';
 import isEqual from 'react-fast-compare';
 import SplashScreen from 'react-native-splash-screen';
-import { useIsFocused } from '@react-navigation/native';
 import { SlidersHorizontal } from 'phosphor-react-native';
 
-import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import MainHeader from 'mobile/src/components/main/Header';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import PostItem from 'mobile/src/components/main/PostItem';
@@ -54,16 +52,6 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
 
   const account = userData?.account;
   const postData = data?.posts ?? [];
-
-  const isFocused = useIsFocused();
-  const [focusState, setFocusState] = useState(isFocused);
-  if (isFocused !== focusState) {
-    // Refetch whenever the focus state changes to avoid refetching during
-    // rerender cycles
-    console.log('refetching...');
-    refetch();
-    setFocusState(isFocused);
-  }
 
   useEffect(() => {
     SplashScreen.hide();
@@ -129,14 +117,12 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
           <SlidersHorizontal color={WHITE} size={24} />
         </TouchableOpacity>
       </View>
-      <PAppContainer style={styles.container}>
-        <FlatList
-          data={postData}
-          renderItem={renderItem}
-          keyExtractor={(item) => `${item._id}`}
-          listKey="post"
-        />
-      </PAppContainer>
+      <FlatList
+        contentContainerStyle={styles.container}
+        data={postData}
+        renderItem={renderItem}
+        keyExtractor={(item) => item._id}
+      />
       <PGradientButton
         label="+"
         btnContainer={styles.postButton}

@@ -7,7 +7,7 @@ import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import PLabel from 'mobile/src/components/common/PLabel';
 import AccreditationHeader from './AccreditationHeader';
 import pStyles from 'mobile/src/theme/pStyles';
-import { BGDARK } from 'shared/src/colors';
+import { BGDARK300 } from 'shared/src/colors';
 import { H6Bold } from 'mobile/src/theme/fonts';
 
 import {
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   greyButton: {
-    backgroundColor: BGDARK,
+    backgroundColor: BGDARK300,
     borderRadius: 7,
     height: 48,
     marginVertical: 10,

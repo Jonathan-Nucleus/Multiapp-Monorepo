@@ -60,18 +60,20 @@ const ChannelItem: React.FC<ChannelItemProps> = ({ channel }) => {
           <Text style={[styles.textWhite, Body2Bold]}>
             {channelName(channel, userId)}
           </Text>
-          <View style={[styles.preview]}>
-            <Text
-              numberOfLines={1}
-              ellipsizeMode="tail"
-              style={[styles.previewText, styles.flexShrink]}>
-              {lastMessage.text}
-            </Text>
-            <Text style={styles.previewText}>
-              {' '}
-              • {dayjs(lastMessage.created_at).fromNow()}
-            </Text>
-          </View>
+          {lastMessage && (
+            <View style={[styles.preview]}>
+              <Text
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                style={[styles.previewText, styles.flexShrink]}>
+                {lastMessage.text}
+              </Text>
+              <Text style={styles.previewText}>
+                {' '}
+                • {dayjs(lastMessage.created_at).fromNow()}
+              </Text>
+            </View>
+          )}
         </View>
       </View>
     </Pressable>

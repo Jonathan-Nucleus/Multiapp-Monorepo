@@ -1,9 +1,10 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
   Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -19,7 +20,7 @@ import {
   MentionSuggestionsProps,
   replaceMentionValues,
 } from 'react-native-controlled-mentions';
-import _ from 'lodash';
+import _debounce from 'lodash/debounce';
 import {
   Camera,
   VideoCamera,
@@ -55,6 +56,7 @@ import {
   WHITE,
   WHITE12,
   BGDARK,
+  BLACK,
 } from 'shared/src/colors';
 
 import {
@@ -66,7 +68,10 @@ import {
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useAccount } from 'shared/graphql/query/account/useAccount';
-import { useUsers, User } from 'shared/graphql/query/user/useUsers';
+import {
+  useMentionUsers,
+  User,
+} from 'shared/graphql/query/user/useMentionUsers';
 import { useFetchUploadLink } from 'shared/graphql/mutation/posts';
 
 import type { Audience } from 'shared/graphql/query/post/usePosts';
@@ -165,17 +170,21 @@ const schema = yup
 const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   const { post } = route.params;
 
-  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
-  const { data: usersData } = useUsers();
+  const { data: { account } = {} } = useAccount({ fetchPolicy: 'cache-only' });
+  const { data: usersData, refetch } = useMentionUsers();
   const [fetchUploadLink] = useFetchUploadLink();
 
+  const searchKeyword = useRef('');
+  const [showActionBar, setShowActionBar] = useState(true);
   const [postAsModalVisible, setPostAsModalVisible] = useState(false);
   const [audienceModalVisible, setAudienceModalVisible] = useState(false);
   const [imageData, setImageData] = useState<ImageOrVideo | undefined>(
     undefined,
   );
 
-  const users = usersData?.users ?? [];
+  const [mentionUsers, setMentionUsers] = useState(
+    usersData?.mentionUsers ?? [],
+  );
   const companies = account?.companies ?? [];
 
   const {
@@ -343,48 +352,64 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     })),
   ];
 
-  const renderSuggestions: (
-    users: User[],
-  ) => React.FC<MentionSuggestionsProps> =
-    (users) =>
-    ({ keyword, onSuggestionPress }) => {
-      if (keyword == null) {
+  const fetchMentionUsers = _debounce(
+    async (search?: string) => {
+      const { data } = await refetch({ search });
+
+      if (data.mentionUsers) {
+        setMentionUsers(data.mentionUsers);
+      }
+    },
+    500,
+    { leading: true, trailing: true },
+  );
+
+  const renderSuggestions = useCallback(
+    ({
+      keyword,
+      onSuggestionPress,
+    }: MentionSuggestionsProps): React.ReactNode => {
+      if (!keyword) {
+        setTimeout(() => setShowActionBar(true), 50);
         return null;
       }
 
-      const usersData = users.map((user) => ({
-        ...user,
-        name: `${user.firstName} ${user.lastName}`,
-      }));
+      setTimeout(() => setShowActionBar(false), 50);
+
+      // Search using updated search terms if keyword has changed
+      if (searchKeyword.current !== keyword) {
+        searchKeyword.current = keyword;
+        fetchMentionUsers(keyword);
+      }
+
+      if (mentionUsers.length === 0) return null;
 
       return (
-        <View style={styles.mentionList}>
-          {usersData
-            .filter((user) =>
-              user.name
-                .toLocaleLowerCase()
-                .includes(keyword.toLocaleLowerCase()),
-            )
-            .map((user) => (
+        <ScrollView
+          style={styles.mentionList}
+          contentContainerStyle={styles.mentionContentContainer}>
+          <View style={{ flex: 1 }}>
+            {mentionUsers.map((user) => (
               <Pressable
                 key={user._id}
                 onPress={() => {
-                  onSuggestionPress({ id: user._id, name: user.name });
+                  onSuggestionPress({
+                    id: user._id,
+                    name: `${user.firstName} ${user.lastName}`,
+                  });
                   mentionsField.onChange(
                     Array.from(new Set([...mentionsField.value, user._id])),
                   );
                 }}
                 style={styles.mentionItem}>
-                <UserInfo user={user} />
+                <UserInfo user={user} avatarSize={32} showFollow={false} />
               </Pressable>
             ))}
-        </View>
+          </View>
+        </ScrollView>
       );
-    };
-
-  const renderMentionSuggestions = useMemo(
-    () => renderSuggestions(users),
-    [users],
+    },
+    [mentionUsers],
   );
 
   return (
@@ -400,6 +425,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <PAppContainer
+          noScroll
           disableKeyboardScroll
           contentContainerStyle={styles.flex}>
           <View style={styles.usersPart}>
@@ -492,7 +518,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
                     isBottomMentionSuggestionsRender: true,
                     isInsertSpaceAfterMention: true,
                     trigger: '@',
-                    renderSuggestions: renderMentionSuggestions,
+                    renderSuggestions,
                     textStyle: {
                       color: SECONDARY,
                     },
@@ -510,36 +536,38 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
             />
           ) : null}
         </PAppContainer>
+        {showActionBar && (
+          <View style={styles.actionWrapper}>
+            <IconButton
+              icon={<Camera size={32} color={WHITE} />}
+              label="Take Photo"
+              textStyle={styles.iconText}
+              viewStyle={styles.iconButton}
+              onPress={takePhoto}
+            />
+            <IconButton
+              icon={<VideoCamera size={32} color={WHITE} />}
+              label="Take Video"
+              textStyle={styles.iconText}
+              viewStyle={styles.iconButton}
+              onPress={takeVideo}
+            />
+            <IconButton
+              icon={<GalleryImage size={32} color={WHITE} />}
+              label="Gallery"
+              textStyle={styles.iconText}
+              viewStyle={styles.iconButton}
+              onPress={openPicker}
+            />
+            <IconButton
+              icon={<CirclesFour size={32} color={WHITE} />}
+              label="Categories"
+              textStyle={styles.iconText}
+              viewStyle={styles.iconButton}
+            />
+          </View>
+        )}
       </KeyboardAvoidingView>
-      <View style={styles.actionWrapper}>
-        <IconButton
-          icon={<Camera size={32} color={WHITE} />}
-          label="Take Photo"
-          textStyle={styles.iconText}
-          viewStyle={styles.iconButton}
-          onPress={takePhoto}
-        />
-        <IconButton
-          icon={<VideoCamera size={32} color={WHITE} />}
-          label="Take Video"
-          textStyle={styles.iconText}
-          viewStyle={styles.iconButton}
-          onPress={takeVideo}
-        />
-        <IconButton
-          icon={<GalleryImage size={32} color={WHITE} />}
-          label="Gallery"
-          textStyle={styles.iconText}
-          viewStyle={styles.iconButton}
-          onPress={openPicker}
-        />
-        <IconButton
-          icon={<CirclesFour size={32} color={WHITE} />}
-          label="Categories"
-          textStyle={styles.iconText}
-          viewStyle={styles.iconButton}
-        />
-      </View>
     </View>
   );
 };
@@ -557,10 +585,10 @@ const styles = StyleSheet.create({
   },
   mentionInput: {
     paddingHorizontal: 8,
-    paddingTop: 8,
+    paddingVertical: 8,
     lineHeight: 20,
     color: 'white',
-    marginVertical: 16,
+    marginTop: 16,
     fontSize: 16,
     flex: 1,
   },
@@ -569,14 +597,17 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   mentionList: {
-    backgroundColor: BGDARK,
+    backgroundColor: BLACK,
     padding: 16,
     borderRadius: 16,
-    marginTop: 8,
+    marginVertical: 8,
+    maxHeight: 360,
+    flexGrow: 0,
   },
+  mentionContentContainer: {},
   mentionItem: {
     borderBottomWidth: 1,
-    borderBottomColor: DISABLED,
+    borderBottomColor: WHITE12,
   },
   postImage: {
     width: '100%',
@@ -585,7 +616,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   actionWrapper: {
-    backgroundColor: GRAY3,
+    backgroundColor: BGDARK,
     borderTopColor: WHITE12,
     borderTopWidth: 1,
     flexDirection: 'row',

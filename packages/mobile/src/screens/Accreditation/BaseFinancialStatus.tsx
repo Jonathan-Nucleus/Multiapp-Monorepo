@@ -11,7 +11,7 @@ import AccreditationHeader from './AccreditationHeader';
 import pStyles from 'mobile/src/theme/pStyles';
 import { Body1Bold, Body2, Body2Bold, H6Bold } from 'mobile/src/theme/fonts';
 import {
-  BGDARK,
+  BGDARK300,
   BLACK,
   GRAY100,
   PRIMARYSOLID,
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   greyButton: {
-    backgroundColor: BGDARK,
+    backgroundColor: BGDARK300,
     borderRadius: 7,
     height: 48,
     marginVertical: 10,
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   checkContainer: {
-    backgroundColor: BGDARK,
+    backgroundColor: BGDARK300,
     borderRadius: 8,
     borderWidth: 0,
     paddingVertical: 16,
