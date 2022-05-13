@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ListRenderItem, StyleSheet, FlatList, View } from 'react-native';
 
 import CheckboxLabel from 'mobile/src/components/common/CheckboxLabel';
@@ -14,10 +14,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
 import type { ChooseCategoryScreen } from 'mobile/src/navigations/PostDetailsStack';
-import {
-  PostCategory,
-  PostCategories,
-} from 'shared/graphql/mutation/posts';
+import { PostCategory, PostCategories } from 'shared/graphql/mutation/posts';
 
 const CATEGORY_OPTIONS = Object.keys(PostCategories).map((option, index) => ({
   id: index,
@@ -32,12 +29,12 @@ type FormValues = {
 const schema = yup
   .object({
     categories: yup
-      .array()
-      .of(
-        yup.string().oneOf(Object.keys(PostCategories)).required().default(''),
+      .array(
+        yup.mixed().oneOf(Object.keys(PostCategories)).required().default(''),
       )
       .default([])
-      .min(1),
+      .min(1)
+      .max(3),
   })
   .required();
 
@@ -61,6 +58,7 @@ const ChooseCategory: ChooseCategoryScreen = ({ route, navigation }) => {
     name: 'categories',
     control,
   });
+  const [disabled, setDisabled] = useState(false);
 
   const onSubmit = (values: FormValues): void => {
     navigation.navigate('ReviewPost', {
@@ -74,9 +72,17 @@ const ChooseCategory: ChooseCategoryScreen = ({ route, navigation }) => {
     let newValue = [...value];
 
     const index = value.indexOf(CATEGORY_OPTIONS[categoryIndex].value);
-    index >= 0
-      ? newValue.splice(index, 1)
-      : newValue.push(CATEGORY_OPTIONS[categoryIndex].value);
+    if (index >= 0) {
+      newValue.splice(index, 1);
+      if (newValue.length <= 2) {
+        setDisabled(false);
+      }
+    } else {
+      newValue.push(CATEGORY_OPTIONS[categoryIndex].value);
+      if (newValue.length >= 3) {
+        setDisabled(true);
+      }
+    }
 
     categoriesField.onChange(newValue);
   };
@@ -90,6 +96,7 @@ const ChooseCategory: ChooseCategoryScreen = ({ route, navigation }) => {
       showBackground
       value={categoriesField.value.includes(item.value)}
       handleChange={handleChange}
+      disabled={disabled && !categoriesField.value.includes(item.value)}
     />
   );
 
@@ -104,12 +111,13 @@ const ChooseCategory: ChooseCategoryScreen = ({ route, navigation }) => {
       />
       <PAppContainer>
         <PLabel
-          label="Select categories to make your post easier to find and visible to more people."
+          label="Select categories to make your post easier to find and visible to more people. Choose a max of 3."
           textStyle={styles.catLabel}
           viewStyle={styles.catWrapper}
         />
         <FlatList
           data={CATEGORY_OPTIONS}
+          extraData={disabled}
           numColumns={2}
           renderItem={renderItem}
           columnWrapperStyle={{ justifyContent: 'space-between' }}

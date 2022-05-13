@@ -8,10 +8,15 @@ type NotificationsData = {
 
 type NotificationsVariables = never;
 
-export function useNotifications(): QueryResult<NotificationsData,
-  NotificationsVariables> {
+export function useNotifications(): QueryResult<
+  NotificationsData,
+  NotificationsVariables
+> {
   const [state, setState] = useState<NotificationsData>();
-  const { data, loading, ...rest } = useQuery<NotificationsData, NotificationsVariables>(
+  const { data, loading, ...rest } = useQuery<
+    NotificationsData,
+    NotificationsVariables
+  >(
     gql`
       query Notifications {
         notifications {
@@ -25,6 +30,12 @@ export function useNotifications(): QueryResult<NotificationsData,
             userId
             postId
             commentId
+            user {
+              _id
+              firstName
+              lastName
+              avatar
+            }
           }
           user {
             _id
@@ -36,7 +47,7 @@ export function useNotifications(): QueryResult<NotificationsData,
           updatedAt
         }
       }
-    `,
+    `
   );
   useEffect(() => {
     if (!loading && data) {

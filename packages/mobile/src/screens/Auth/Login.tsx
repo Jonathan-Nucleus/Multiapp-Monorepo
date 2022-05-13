@@ -127,6 +127,8 @@ const Login: LoginScreen = ({ navigation }) => {
           label="Email"
           onChangeText={(val: string) => setEmail(val)}
           text={email}
+          autoCorrect={false}
+          autoCapitalize="none"
           keyboardType="email-address"
         />
         <PTextInput
@@ -137,6 +139,8 @@ const Login: LoginScreen = ({ navigation }) => {
           onPressText={() => setSecurePassEntry(!securePassEntry)}
           subLabelTextStyle={styles.subLabelText}
           text={pass}
+          autoCorrect={false}
+          autoCapitalize="none"
         />
         <TouchableOpacity onPress={() => navigation.navigate('ForgotPass')}>
           <Text style={styles.hyperText}>Forgot Password?</Text>

@@ -13,7 +13,7 @@ import Tag from 'mobile/src/components/common/Tag';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import { showMessage } from 'mobile/src/services/utils';
 import pStyles from 'mobile/src/theme/pStyles';
-import { SECONDARY } from 'shared/src/colors';
+import { SECONDARY, BGDARK } from 'shared/src/colors';
 
 import PostSelection from './PostSelection';
 import PostHeader from './PostHeader';
@@ -113,7 +113,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
         handleNext={handleSubmit}
         handleBack={() => navigation.navigate('Main')}
       />
-      <PAppContainer>
+      <PAppContainer style={styles.bgDark}>
         <View style={styles.usersPart}>
           <Avatar user={account} size={32} />
           <PostSelection
@@ -166,6 +166,9 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
 export default ReviewPost;
 
 const styles = StyleSheet.create({
+  bgDark: {
+    backgroundColor: BGDARK,
+  },
   usersPart: {
     marginTop: 16,
     flexDirection: 'row',

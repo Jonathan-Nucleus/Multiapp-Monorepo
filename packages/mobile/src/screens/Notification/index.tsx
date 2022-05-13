@@ -136,7 +136,7 @@ const Notifications: NotificationScreen = ({ navigation }) => {
         <View style={[styles.item, item.isNew && styles.unread]}>
           <View style={styles.avatarView}>
             {item.isNew && <View style={styles.dot} />}
-            <Avatar size={54} user={item.user} />
+            <Avatar size={54} user={item.data.user} />
             <View style={styles.chat}>{renderIcon(item)}</View>
           </View>
           <View style={styles.commentWrap}>

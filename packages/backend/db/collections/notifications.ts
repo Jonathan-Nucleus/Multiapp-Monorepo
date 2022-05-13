@@ -148,6 +148,7 @@ const createNotificationsCollection = (
         .find({
           userId: toObjectId(userId),
         })
+        .sort({ _id: -1 })
         .toArray();
     },
   };

@@ -8,7 +8,7 @@ import {
   StyleProp,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { BGDARK } from 'shared/src/colors';
+import { BLACK } from 'shared/src/colors';
 
 interface AppContainerProps extends PropsWithChildren<unknown> {
   style?: StyleProp<ViewStyle>;
@@ -50,6 +50,6 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     paddingHorizontal: 16,
-    backgroundColor: BGDARK,
+    backgroundColor: BLACK,
   },
 });

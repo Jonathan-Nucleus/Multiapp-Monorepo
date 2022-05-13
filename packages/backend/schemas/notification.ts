@@ -17,6 +17,9 @@ export namespace Notification {
   export type GraphQL = GraphQLEntity<Mongo> & {
     createdAt: Date;
     user: User.GraphQL;
+    data: {
+      user: User.GraphQL;
+    };
   };
 }
 
@@ -72,6 +75,8 @@ export const NotificationSchema = `
     userId: ID!
     postId: ID
     commentId: ID
+
+    user: UserProfile!
   }
 `;
 

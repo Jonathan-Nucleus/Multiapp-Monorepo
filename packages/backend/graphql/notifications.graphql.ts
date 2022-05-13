@@ -22,6 +22,13 @@ const resolvers = {
     acc[option] = NotificationTypeOptions[option].value;
     return acc;
   }, {}),
+  NotificationData: {
+    user: async (
+      parent: Notification.Mongo,
+      argsIgnored: NoArgs,
+      { db }: ApolloServerContext
+    ) => db.users.find({ _id: parent.userId }),
+  },
   Notification: {
     createdAt: async (
       parent: Notification.Mongo,

@@ -14,6 +14,7 @@ interface PostCategoryProps {
   children?: React.ReactNode;
   viewStyle?: object;
   handleChange: (id: number) => void;
+  disabled?: boolean;
 }
 
 const CheckboxLabel = forwardRef<CheckBox, PostCategoryProps>((props, ref) => {
@@ -25,18 +26,20 @@ const CheckboxLabel = forwardRef<CheckBox, PostCategoryProps>((props, ref) => {
     value,
     viewStyle,
     handleChange,
+    disabled = false,
   } = props;
 
-  const onChange = () => handleChange(id);
+  const onChange = () => !disabled && handleChange(id);
   return (
     <View
       style={[
         styles.wrapper,
         viewStyle,
         value && showBackground && styles.checkedWrapper,
+        disabled && styles.disabled,
       ]}>
       <CheckBox
-        disabled={false}
+        disabled={disabled}
         value={value}
         boxType="square"
         onCheckColor={PRIMARYSOLID}
@@ -84,5 +87,8 @@ const styles = StyleSheet.create({
   },
   flex: {
     flex: 1,
+  },
+  disabled: {
+    opacity: 0.3,
   },
 });

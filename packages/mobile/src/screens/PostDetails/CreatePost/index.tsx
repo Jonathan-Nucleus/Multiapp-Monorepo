@@ -433,7 +433,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
         <PAppContainer
           noScroll
           disableKeyboardScroll
-          contentContainerStyle={styles.flex}>
+          contentContainerStyle={[styles.flex, styles.bgDark]}>
           <View style={styles.usersPart}>
             <Avatar user={account} size={32} />
             <Controller
@@ -542,37 +542,29 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
             />
           ) : null}
         </PAppContainer>
-        {showActionBar && (
-          <View style={styles.actionWrapper}>
-            <IconButton
-              icon={<Camera size={32} color={WHITE} />}
-              label="Take Photo"
-              textStyle={styles.iconText}
-              viewStyle={styles.iconButton}
-              onPress={takePhoto}
-            />
-            <IconButton
-              icon={<VideoCamera size={32} color={WHITE} />}
-              label="Take Video"
-              textStyle={styles.iconText}
-              viewStyle={styles.iconButton}
-              onPress={takeVideo}
-            />
-            <IconButton
-              icon={<GalleryImage size={32} color={WHITE} />}
-              label="Gallery"
-              textStyle={styles.iconText}
-              viewStyle={styles.iconButton}
-              onPress={openPicker}
-            />
-            <IconButton
-              icon={<CirclesFour size={32} color={WHITE} />}
-              label="Categories"
-              textStyle={styles.iconText}
-              viewStyle={styles.iconButton}
-            />
-          </View>
-        )}
+        <View style={styles.actionWrapper}>
+          <IconButton
+            icon={<Camera size={32} color={WHITE} />}
+            label="Take Photo"
+            textStyle={styles.iconText}
+            viewStyle={styles.iconButton}
+            onPress={takePhoto}
+          />
+          <IconButton
+            icon={<VideoCamera size={32} color={WHITE} />}
+            label="Take Video"
+            textStyle={styles.iconText}
+            viewStyle={styles.iconButton}
+            onPress={takeVideo}
+          />
+          <IconButton
+            icon={<GalleryImage size={32} color={WHITE} />}
+            label="Gallery"
+            textStyle={styles.iconText}
+            viewStyle={styles.iconButton}
+            onPress={openPicker}
+          />
+        </View>
       </KeyboardAvoidingView>
     </View>
   );
@@ -583,6 +575,9 @@ export default CreatePost;
 const styles = StyleSheet.create({
   flex: {
     flex: 1,
+  },
+  bgDark: {
+    backgroundColor: BGDARK,
   },
   usersPart: {
     marginTop: 16,
@@ -622,7 +617,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   actionWrapper: {
-    backgroundColor: BGDARK,
+    backgroundColor: BLACK,
     borderTopColor: WHITE12,
     borderTopWidth: 1,
     flexDirection: 'row',
