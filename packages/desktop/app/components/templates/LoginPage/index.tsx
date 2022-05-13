@@ -36,7 +36,7 @@ type FormValues = {
 
 const schema = yup
   .object({
-    email: yup.string().email("Must be a valid email").required(),
+    email: yup.string().email("Must be a valid email").lowercase().required(),
     password: yup.string().min(8).required(),
     remember: yup.boolean().required().default(false),
   })

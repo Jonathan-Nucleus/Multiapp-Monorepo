@@ -20,7 +20,8 @@ describe("Mutations - register", () => {
   `;
 
   let server: ApolloServer;
-  let stub: User.Stub | null;
+  let stub: User.Stub;
+  let stub2: User.Stub;
   let user: User.Mongo;
   const userData = {
     email: faker.internet.email(),
@@ -33,6 +34,7 @@ describe("Mutations - register", () => {
   beforeAll(async () => {
     server = createTestApolloServer();
     stub = await createStub();
+    stub2 = await createStub();
     user = await createUser();
   });
 
@@ -182,5 +184,32 @@ describe("Mutations - register", () => {
 
     const newCount = await db.collection(DbCollection.USERS).countDocuments();
     expect(newCount).toBe(oldCount);
+  });
+
+  it("stores lowercase email in user record", async () => {
+    const { db } = await getIgniteDb();
+    const oldCount = await db.collection(DbCollection.USERS).countDocuments();
+
+    const res = await server.executeOperation({
+      query,
+      variables: {
+        user: {
+          ...userData,
+          email: stub2?.email.toUpperCase(),
+          inviteCode: stub2?.emailToken,
+        },
+      },
+    });
+
+    expect(res.data).toHaveProperty("register");
+    expect(res.data?.register?.length).toBeGreaterThan(0);
+
+    const newCount = await db.collection(DbCollection.USERS).countDocuments();
+    expect(newCount).toBe(oldCount);
+
+    const newUser = await db
+      .collection(DbCollection.USERS)
+      .findOne({ email: stub?.email.toLowerCase() });
+    expect(newUser).toBeDefined();
   });
 });

@@ -181,7 +181,7 @@ const resolvers = {
 
       const { email, password } = args;
 
-      const user = await db.users.authenticate(email, password);
+      const user = await db.users.authenticate(email.toLowerCase(), password);
 
       const deserializedUser = await db.users.deserialize(user._id);
 
@@ -235,10 +235,10 @@ const resolvers = {
 
       const { email } = args;
 
-      const stubUser = await db.users.requestInvite(email);
+      const stubUser = await db.users.requestInvite(email.toLowerCase());
 
       return PrometheusMailer.sendInviteCode(
-        email,
+        email.toLowerCase(),
         stubUser.emailToken as string
       );
     },
@@ -308,10 +308,10 @@ const resolvers = {
 
         const { email } = args;
 
-        const stubUser = await db.users.invite(user._id, email);
+        const stubUser = await db.users.invite(user._id, email.toLowerCase());
 
         return PrometheusMailer.sendInviteCode(
-          email,
+          email.toLowerCase(),
           stubUser.emailToken as string
         );
       }

@@ -57,7 +57,7 @@ export const createUser = async (
     firstName,
     lastName,
     fullName: `${firstName} ${lastName}`,
-    email: faker.internet.email(firstName, lastName),
+    email: faker.internet.email(firstName, lastName).toLowerCase(),
     salt,
     password: hashPassword("test-pass", salt),
     role,
@@ -83,7 +83,7 @@ export const createStub = async (): Promise<User.Stub> => {
 
   const user = {
     _id: toObjectId(),
-    email: faker.internet.email(),
+    email: faker.internet.email().toLowerCase(),
     role: "stub",
     emailToken: crypto.randomBytes(3).toString("hex").toUpperCase(),
   } as const;

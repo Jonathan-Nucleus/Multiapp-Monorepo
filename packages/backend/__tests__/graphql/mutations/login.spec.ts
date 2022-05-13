@@ -29,6 +29,16 @@ describe("Mutations - login", () => {
     expect(res.data?.login?.length).toBeGreaterThan(0);
   });
 
+  it("returns access token with wrong email case", async () => {
+    const res = await server.executeOperation({
+      query,
+      variables: { email: user?.email.toUpperCase(), password: "test-pass" },
+    });
+
+    expect(res.data).toHaveProperty("login");
+    expect(res.data?.login?.length).toBeGreaterThan(0);
+  });
+
   it("fails with empty variables", async () => {
     const res = await server.executeOperation({
       query,

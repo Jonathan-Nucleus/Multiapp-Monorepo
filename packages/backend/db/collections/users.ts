@@ -248,7 +248,8 @@ const createUsersCollection = (
      *            and null otherwise.
      */
     register: async (user: User.Input): Promise<ObjectId> => {
-      const { email, firstName, lastName, password, inviteCode } = user;
+      const { firstName, lastName, password, inviteCode } = user;
+      const email = user.email.toLowerCase();
 
       // Ensure user already already exists as a stub
       const userData = await collection.find({ email });
@@ -270,6 +271,7 @@ const createUsersCollection = (
 
       const newUser = {
         ...userData,
+        email: email.toLowerCase(),
         emailToken: "",
         password: hash,
         salt,
