@@ -40,7 +40,7 @@ import Avatar from 'mobile/src/components/common/Avatar';
 import MainHeader from 'mobile/src/components/main/Header';
 
 import type { NotificationScreen } from 'mobile/src/navigations/AppNavigator';
-import { useNotifications } from 'shared/graphql/query/notification';
+import { useNotifications } from 'shared/graphql/query/notification/useNotifications';
 import {
   useReadNotification,
   useReadNotifications,

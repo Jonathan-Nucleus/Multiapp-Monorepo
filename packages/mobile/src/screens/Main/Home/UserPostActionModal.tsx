@@ -14,11 +14,8 @@ import { WHITE } from 'shared/src/colors';
 import { SOMETHING_WRONG } from 'shared/src/constants';
 
 import { Post } from 'shared/graphql/query/post/usePosts';
-import {
-  useFollowUser,
-  useHideUser,
-} from 'shared/graphql/mutation/account';
-import { useAccount } from 'shared/graphql/query/account';
+import { useFollowUser, useHideUser } from 'shared/graphql/mutation/account';
+import { useAccount } from 'shared/graphql/query/account/useAccount';
 import {
   useHidePost,
   useMutePost,
@@ -38,7 +35,9 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
   visible,
   onClose,
 }) => {
-  if (!post) return null;
+  if (!post) {
+    return null;
+  }
 
   const { user, company } = post;
   const [reportPostModalVisible, setReportPostModalVisible] = useState(false);
@@ -108,7 +107,9 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
   }, [user, accountData, isMuted, isFollowing]);
 
   const handleFollowUser = async () => {
-    if (!user) return; // TODO: Update to support companies
+    if (!user) {
+      return;
+    } // TODO: Update to support companies
 
     try {
       const { data } = await followUser({
@@ -129,7 +130,9 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
   };
 
   const handleHideUser = async () => {
-    if (!user) return;
+    if (!user) {
+      return;
+    }
 
     try {
       const { data } = await hideUser({

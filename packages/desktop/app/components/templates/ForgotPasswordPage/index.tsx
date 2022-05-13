@@ -7,8 +7,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import AppAuthOptions from "../../../config/auth";
 import { useRouter } from "next/router";
-import { useRequestReset } from "desktop/app/queries/authentication.graphql";
 import { ArrowLeft } from "phosphor-react";
+import { useRequestPasswordReset } from "shared/graphql/mutation/auth/useRequestPasswordReset";
 
 type FormValues = {
   email: string;
@@ -31,7 +31,7 @@ const ForgotPasswordPage: FC = () => {
       "Enter your email below and we’ll send you a link to reset your password.",
     variant: "info",
   });
-  const [requestReset] = useRequestReset();
+  const [requestReset] = useRequestPasswordReset();
   const { register, handleSubmit, formState } = useForm<yup.InferType<typeof schema>>({
     resolver: yupResolver(schema),
     mode: "onChange",

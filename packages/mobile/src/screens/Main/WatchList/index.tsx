@@ -24,7 +24,7 @@ import {
 } from 'shared/src/colors';
 
 import { useWatchFund } from 'shared/graphql/mutation/funds/useWatchFund';
-import { useAccount } from 'shared/graphql/query/account';
+import { useAccount } from 'shared/graphql/query/account/useAccount';
 import { WatchlistScreen } from 'mobile/src/navigations/MainTabNavigator';
 
 interface SelectItemProps {

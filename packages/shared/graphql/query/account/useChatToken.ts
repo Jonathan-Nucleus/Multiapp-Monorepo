@@ -1,4 +1,5 @@
-import { gql, useQuery, QueryResult } from '@apollo/client';
+import { gql, useQuery, QueryResult } from "@apollo/client";
+import { useEffect, useState } from "react";
 
 type ChatTokenVariables = never;
 export type ChatTokenData = {
@@ -6,17 +7,24 @@ export type ChatTokenData = {
 };
 
 /**
- * GraphQL query that fetchs an access token for messaging.
+ * GraphQL query that fetches an access token for messaging.
  *
  * @returns   GraphQL query.
  */
 export function useChatToken(): QueryResult<ChatTokenData, ChatTokenVariables> {
-  return useQuery<ChatTokenData, ChatTokenVariables>(
+  const [state, setState] = useState<ChatTokenData>();
+  const { data, loading, ...rest } = useQuery<ChatTokenData, ChatTokenVariables>(
     gql`
       query ChatToken {
         chatToken
       }
     `,
-    { fetchPolicy: 'network-only' },
+    { fetchPolicy: "network-only" },
   );
+  useEffect(() => {
+    if (!loading && data) {
+      setState(data);
+    }
+  }, [data, loading]);
+  return { data: state, loading, ...rest };
 }

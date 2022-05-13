@@ -18,7 +18,7 @@ import AvatarMenu from "./AvatarMenu";
 import Avatar from "../../../common/Avatar";
 import SearchInput from "../../../common/SearchInput";
 import { useAccount } from "shared/graphql/query/account/useAccount";
-import { useNotificationsStated } from "shared/graphql/query/notification/useNotifications";
+import { useNotifications } from "shared/graphql/query/notification/useNotifications";
 
 const navItems = [
   {
@@ -42,8 +42,8 @@ const navItems = [
 
 const Header: FC = () => {
   const [showSidebar, setShowSidebar] = useState(false);
-  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
-  const notifications = useNotificationsStated() ?? [];
+  const { data: { account } = {} } = useAccount();
+  const { data: { notifications = [] } = {} } = useNotifications();
 
   return (
     <header className="bg-surface-light10 shadow shadow-black sticky top-0 z-20">

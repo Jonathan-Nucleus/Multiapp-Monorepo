@@ -16,8 +16,8 @@ import Alert from "../../common/Alert";
 import Checkbox from "../../common/Checkbox";
 
 import { PASSWORD_PATTERN } from "shared/src/patterns";
-import { useRegisterUser } from "desktop/app/queries/authentication.graphql";
 import { AppleLogo, GoogleLogo, LinkedinLogo, WarningCircle } from "phosphor-react";
+import { useRegister } from "shared/graphql/mutation/auth/useRegister";
 
 type FormValues = {
   firstName: string;
@@ -72,7 +72,7 @@ const SignupPage: FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [registerUser] = useRegisterUser();
+  const [registerUser] = useRegister();
   const { register, handleSubmit, formState } = useForm<
     yup.InferType<typeof schema>
   >({

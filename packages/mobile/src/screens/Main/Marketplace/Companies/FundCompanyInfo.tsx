@@ -9,7 +9,7 @@ import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 
 import { Company } from 'shared/graphql/query/marketplace/useFundCompanies';
-import { useAccount } from 'shared/graphql/query/account';
+import { useAccount } from 'shared/graphql/query/account/useAccount';
 import { useFollowCompany } from 'shared/graphql/mutation/account';
 
 interface FundCompanyInfoProps {
@@ -17,14 +17,16 @@ interface FundCompanyInfoProps {
 }
 
 const FundCompanyInfo: React.FC<FundCompanyInfoProps> = ({ company }) => {
-  const { data: accountData } = useAccount();
+  const { data: { account } = {} } = useAccount({ fetchPolicy: 'cache-only' });
   const [followCompany] = useFollowCompany();
 
   const isFollowingCompany =
-    !!accountData?.account?.companyFollowingIds?.includes(company._id);
+    account?.companyFollowingIds?.includes(company._id) ?? false;
   const [following, setFollowing] = useState(isFollowingCompany);
   const toggleFollow = async (): Promise<void> => {
-    if (!accountData) return;
+    if (!account) {
+      return;
+    }
 
     // Update state immediately for responsiveness
     setFollowing(!isFollowingCompany);

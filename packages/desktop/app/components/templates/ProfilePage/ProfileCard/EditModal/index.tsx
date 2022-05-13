@@ -1,5 +1,5 @@
-import React, { ChangeEvent, FC, useEffect, useState } from "react";
-import { Dialog, Tab } from "@headlessui/react";
+import React, { FC, useEffect, useState } from "react";
+import { Dialog } from "@headlessui/react";
 import { X } from "phosphor-react";
 import Image from "next/image";
 import * as yup from "yup";
@@ -13,7 +13,7 @@ import Card from "../../../../common/Card";
 import Button from "../../../../common/Button";
 import Field from "../../../../common/Field";
 import Alert from "../../../../common/Alert";
-import { useAccount } from "shared/graphql/query/account";
+import { useAccount } from "shared/graphql/query/account/useAccount";
 import WarningIcon from "shared/assets/images/warning-red.svg";
 import { useUpdateUserProfile } from "shared/graphql/mutation/account";
 
@@ -43,13 +43,10 @@ interface EditModalProps {
 }
 
 const EditModal: FC<EditModalProps> = ({ show, onClose }) => {
-  const { data: accountData } = useAccount();
-
+  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [updateUserProfile] = useUpdateUserProfile();
-
-  const account = accountData?.account;
   const { register, handleSubmit, reset, formState } = useForm<
     yup.InferType<typeof schema>
   >({
@@ -68,7 +65,7 @@ const EditModal: FC<EditModalProps> = ({ show, onClose }) => {
         )
       );
     }
-  }, [account]);
+  }, [account, reset]);
 
   const onSubmit: SubmitHandler<FormValues> = async (values) => {
     if (!account) return;

@@ -6,7 +6,6 @@ import {
   Text,
   TouchableOpacity,
 } from 'react-native';
-import { NavigationProp, RouteProp } from '@react-navigation/native';
 import { CaretLeft, LinkedinLogo, TwitterLogo } from 'phosphor-react-native';
 
 import MainHeader from 'mobile/src/components/main/Header';
@@ -17,7 +16,7 @@ import { Body1Bold, Body2, Body4 } from 'mobile/src/theme/fonts';
 import { PRIMARY, WHITE, WHITE12, WHITE60 } from 'shared/src/colors';
 import pStyles from 'mobile/src/theme/pStyles';
 
-import { useAccount } from 'shared/graphql/query/account';
+import { useAccount } from 'shared/graphql/query/account/useAccount';
 import { useUpdateUserProfile } from 'shared/graphql/mutation/account';
 
 import { EditUserProfileScreen } from 'mobile/src/navigations/UserDetailsStack';
@@ -49,10 +48,7 @@ const EditProfile: EditUserProfileScreen = ({ navigation }) => {
   }, [user]);
 
   const disabled = useMemo(() => {
-    if (firstName && lastName) {
-      return false;
-    }
-    return true;
+    return !(firstName && lastName);
   }, [firstName, lastName]);
 
   const handleUpdateProfile = async () => {

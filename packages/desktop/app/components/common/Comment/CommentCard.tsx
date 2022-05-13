@@ -9,14 +9,13 @@ import Button from "../Button";
 import Avatar from "../Avatar";
 
 import {
-  useLikePost,
   useDeleteComment,
   useEditCommentPost,
   useCommentPost,
   useLikeComment,
 } from "shared/graphql/mutation/posts";
-import { useAccount } from "shared/graphql/query/account";
-import type { Comment } from "shared/graphql/query/post";
+import { useAccount } from "shared/graphql/query/account/useAccount";
+import type { Comment } from "shared/graphql/query/post/usePost";
 
 interface CommentCardProps extends React.PropsWithChildren<unknown> {
   comment: Comment;
@@ -32,14 +31,11 @@ const CommentCard: FC<CommentCardProps> = ({
   parentId,
   children,
 }: CommentCardProps) => {
-  const { data: accountData } = useAccount();
-  const [likePost] = useLikePost();
+  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const [likeComment] = useLikeComment();
   const [deleteComment] = useDeleteComment();
   const [editComment] = useEditCommentPost();
   const [commentPost] = useCommentPost();
-  const account = accountData?.account;
-
   const [isEditable, setIsEditable] = useState(false);
   const [liked, setLiked] = useState(
     (account && comment.likeIds?.includes(account._id)) ?? false

@@ -1,11 +1,11 @@
-import { gql, useQuery, QueryHookOptions, QueryResult } from '@apollo/client';
-import { PostCategory } from 'backend/graphql/posts.graphql';
-import { User } from 'backend/graphql/users.graphql';
+import { gql, useQuery, QueryResult } from "@apollo/client";
+import { PostCategory } from "backend/graphql/posts.graphql";
+import { User } from "backend/graphql/users.graphql";
 import {
   POST_SUMMARY_FRAGMENT,
   PostSummary,
-} from 'shared/graphql/fragments/post';
-import { useEffect, useState } from 'react';
+} from "shared/graphql/fragments/post";
+import { useEffect, useState } from "react";
 
 type AccountPostsVariables = {
   categories?: PostCategory[];
@@ -13,7 +13,7 @@ type AccountPostsVariables = {
 
 export type Post = PostSummary;
 export type AccountPostsData = {
-  account?: Pick<User, '_id'> & {
+  account?: Pick<User, "_id"> & {
     posts: Post[];
   };
 };
@@ -26,7 +26,8 @@ export type AccountPostsData = {
 export function usePosts(
   categories?: PostCategory[],
 ): QueryResult<AccountPostsData, AccountPostsVariables> {
-  return useQuery<AccountPostsData, AccountPostsVariables>(
+  const [state, setState] = useState<AccountPostsData>();
+  const { data, loading, ...rest } = useQuery<AccountPostsData, AccountPostsVariables>(
     gql`
       ${POST_SUMMARY_FRAGMENT}
       query AccountPosts($categories: [PostCategory!]) {
@@ -42,15 +43,10 @@ export function usePosts(
       variables: { ...(categories ? { categories } : {}) },
     },
   );
-}
-
-export const usePostsStated = (categories?: PostCategory[]) => {
-  const { data, loading, refetch } = usePosts(categories);
-  const [state, setState] = useState<Post[]>();
   useEffect(() => {
-    if (!loading && data?.account?.posts) {
-      setState(data.account.posts);
+    if (!loading && data) {
+      setState(data);
     }
   }, [data, loading]);
-  return { data: state, refetch };
-};
+  return { data: state, loading, ...rest };
+}

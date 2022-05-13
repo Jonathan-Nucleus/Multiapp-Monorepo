@@ -1,10 +1,11 @@
-import { gql, useQuery, QueryHookOptions, QueryResult } from '@apollo/client';
-import { PostCategory } from 'backend/graphql/posts.graphql';
-import { Company } from 'backend/graphql/companies.graphql';
+import { gql, useQuery, QueryResult } from "@apollo/client";
+import { PostCategory } from "backend/graphql/posts.graphql";
+import { Company } from "backend/graphql/companies.graphql";
 import {
   POST_SUMMARY_FRAGMENT,
   PostSummary,
-} from 'shared/graphql/fragments/post';
+} from "shared/graphql/fragments/post";
+import { useEffect, useState } from "react";
 
 type CompanyPostsVariables = {
   companyId: string;
@@ -13,7 +14,7 @@ type CompanyPostsVariables = {
 
 export type Post = PostSummary;
 export type CompanyPostsData = {
-  companyProfile?: Pick<Company, '_id'> & {
+  companyProfile?: Pick<Company, "_id"> & {
     posts: Post[];
   };
 };
@@ -30,7 +31,8 @@ export function usePosts(
   companyId: string,
   categories?: PostCategory[],
 ): QueryResult<CompanyPostsData, CompanyPostsVariables> {
-  return useQuery<CompanyPostsData, CompanyPostsVariables>(
+  const [state, setState] = useState<CompanyPostsData>();
+  const { data, loading, ...rest } = useQuery<CompanyPostsData, CompanyPostsVariables>(
     gql`
       ${POST_SUMMARY_FRAGMENT}
       query CompanyPosts($companyId: ID!, $categories: [PostCategory!]) {
@@ -46,4 +48,10 @@ export function usePosts(
       variables: { companyId, ...(categories ? { categories } : {}) },
     },
   );
+  useEffect(() => {
+    if (!loading && data) {
+      setState(data);
+    }
+  }, [data, loading]);
+  return { data: state, loading, ...rest };
 }

@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   ListRenderItem,
   StyleSheet,
@@ -10,11 +10,7 @@ import {
   Linking,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import {
-  useIsFocused,
-  NavigationProp,
-  RouteProp,
-} from '@react-navigation/native';
+import { useIsFocused } from '@react-navigation/native';
 import { CaretLeft, Pencil } from 'phosphor-react-native';
 
 import MainHeader from 'mobile/src/components/main/Header';
@@ -42,7 +38,7 @@ import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 import DotsThreeVerticalSvg from 'shared/assets/images/dotsThreeVertical.svg';
 import NoPostSvg from 'shared/assets/images/no-post.svg';
 
-import { useAccount } from 'shared/graphql/query/account';
+import { useAccount } from 'shared/graphql/query/account/useAccount';
 import { useProfile } from 'shared/graphql/query/user/useProfile';
 import { usePosts, Post } from 'shared/graphql/query/user/usePosts';
 import { useManagedFunds } from 'shared/graphql/query/user/useManagedFunds';
@@ -50,7 +46,7 @@ import { useFollowUser } from 'shared/graphql/mutation/account';
 import { useFeaturedPosts } from 'shared/graphql/query/user/useFeaturedPosts';
 
 import { UserProfileScreen } from 'mobile/src/navigations/UserDetailsStack';
-import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
+import { BACKGROUND_URL } from 'react-native-dotenv';
 import Avatar from '../../components/common/Avatar';
 
 const UserProfile: UserProfileScreen = ({ navigation, route }) => {

@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { gql, useMutation, MutationTuple } from '@apollo/client';
 import { UserProfile } from 'backend/graphql/users.graphql';
-import { useAccount } from 'shared/graphql/query/account';
+import { useAccount } from 'shared/graphql/query/account/useAccount';
 
 type WatchFundVariables = {
   fundId: string;

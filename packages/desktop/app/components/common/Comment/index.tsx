@@ -1,11 +1,10 @@
 import { FC, useMemo } from "react";
 import SendMessage from "./SendMessage";
 import CommentCard from "./CommentCard";
-import Card from "../Card";
 
 import { useCommentPost } from "shared/graphql/mutation/posts";
-import { Comment, usePost } from "shared/graphql/query/post";
-import { useAccount } from "shared/graphql/query/account";
+import { Comment, usePost } from "shared/graphql/query/post/usePost";
+import { useAccount } from "shared/graphql/query/account/useAccount";
 
 interface CommentPostProps {
   postId: string;
@@ -13,10 +12,8 @@ interface CommentPostProps {
 
 const CommentPost: FC<CommentPostProps> = ({ postId }) => {
   const { data: postData, refetch } = usePost(postId);
-  const { data: accountData } = useAccount({ fetchPolicy: "cache-only" });
+  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const [commentPost] = useCommentPost();
-
-  const account = accountData?.account;
   const post = postData?.post;
   const allComments = post?.comments ?? [];
 
@@ -43,7 +40,7 @@ const CommentPost: FC<CommentPostProps> = ({ postId }) => {
 
   const sendMessage = async (
     message: string,
-    mediaUrl?: string
+    mediaUrl?: string,
   ): Promise<void> => {
     if ((!message || message.trim() === "") && !mediaUrl) return;
     try {

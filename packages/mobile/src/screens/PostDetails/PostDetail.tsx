@@ -51,11 +51,8 @@ import {
   useEditCommentPost,
   useLikeComment,
 } from 'shared/graphql/mutation/posts';
-import { usePost, Comment } from 'shared/graphql/query/post';
-import {
-  useFollowUser,
-  useHideUser,
-} from 'shared/graphql/mutation/account';
+import { usePost, Comment } from 'shared/graphql/query/post/usePost';
+import { useFollowUser, useHideUser } from 'shared/graphql/mutation/account';
 import { useAccount } from 'shared/graphql/query/account/useAccount';
 
 import { PostDetailScreen } from 'mobile/src/navigations/PostDetailsStack';

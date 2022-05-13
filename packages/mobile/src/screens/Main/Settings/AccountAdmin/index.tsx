@@ -28,7 +28,7 @@ import {
   Body1Bold,
 } from 'mobile/src/theme/fonts';
 import MainHeader from 'mobile/src/components/main/Header';
-import { useAccount } from 'shared/graphql/query/account';
+import { useAccount } from 'shared/graphql/query/account/useAccount';
 import { useDeleteAccount } from 'shared/graphql/mutation/account';
 import { clearToken } from 'mobile/src/utils/auth-token';
 

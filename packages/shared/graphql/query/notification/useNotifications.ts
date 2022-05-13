@@ -1,14 +1,47 @@
-import { useEffect, useState } from 'react';
-import { useNotifications } from './index';
-import { Notification } from 'backend/graphql/notifications.graphql';
+import { useEffect, useState } from "react";
+import { Notification } from "backend/graphql/notifications.graphql";
+import { gql, QueryResult, useQuery } from "@apollo/client";
 
-export const useNotificationsStated = () => {
-  const { data, loading } = useNotifications();
-  const [state, setState] = useState<Notification[]>();
+type NotificationsData = {
+  notifications: Notification[];
+};
+
+type NotificationsVariables = never;
+
+export function useNotifications(): QueryResult<NotificationsData,
+  NotificationsVariables> {
+  const [state, setState] = useState<NotificationsData>();
+  const { data, loading, ...rest } = useQuery<NotificationsData, NotificationsVariables>(
+    gql`
+      query Notifications {
+        notifications {
+          _id
+          type
+          userId
+          title
+          body
+          isNew
+          data {
+            userId
+            postId
+            commentId
+          }
+          user {
+            _id
+            firstName
+            lastName
+            avatar
+          }
+          createdAt
+          updatedAt
+        }
+      }
+    `,
+  );
   useEffect(() => {
-    if (!loading && data?.notifications) {
-      setState(data.notifications);
+    if (!loading && data) {
+      setState(data);
     }
   }, [data, loading]);
-  return state;
-};
+  return { data: state, loading, ...rest };
+}

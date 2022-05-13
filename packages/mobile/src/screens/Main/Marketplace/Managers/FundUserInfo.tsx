@@ -8,7 +8,7 @@ import { AVATAR_URL } from 'react-native-dotenv';
 import PLabel from 'mobile/src/components/common/PLabel';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
 
-import { useAccount } from 'shared/graphql/query/account';
+import { useAccount } from 'shared/graphql/query/account/useAccount';
 import { useFollowUser } from 'shared/graphql/mutation/account';
 import { FundManager } from 'shared/graphql/query/marketplace/useFundManagers';
 

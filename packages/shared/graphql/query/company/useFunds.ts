@@ -1,9 +1,10 @@
-import { gql, useQuery, QueryHookOptions, QueryResult } from '@apollo/client';
-import { Company } from 'backend/graphql/companies.graphql';
+import { gql, useQuery, QueryResult } from "@apollo/client";
+import { Company } from "backend/graphql/companies.graphql";
 import {
   FUND_SUMMARY_FRAGMENT,
   FundSummary,
-} from 'shared/graphql/fragments/fund';
+} from "shared/graphql/fragments/fund";
+import { useEffect, useState } from "react";
 
 type CompanyFundsVariables = {
   companyId: string;
@@ -11,7 +12,7 @@ type CompanyFundsVariables = {
 
 type Fund = FundSummary;
 export type CompanyFundsData = {
-  companyProfile?: Pick<Company, '_id'> & {
+  companyProfile?: Pick<Company, "_id"> & {
     funds: Fund[];
   };
 };
@@ -26,7 +27,8 @@ export type CompanyFundsData = {
 export function useFunds(
   companyId: string,
 ): QueryResult<CompanyFundsData, CompanyFundsVariables> {
-  return useQuery<CompanyFundsData, CompanyFundsVariables>(
+  const [state, setState] = useState<CompanyFundsData>();
+  const { data, loading, ...rest } = useQuery<CompanyFundsData, CompanyFundsVariables>(
     gql`
       ${FUND_SUMMARY_FRAGMENT}
       query CompanyFunds($companyId: ID!) {
@@ -42,4 +44,10 @@ export function useFunds(
       variables: { companyId },
     },
   );
+  useEffect(() => {
+    if (!loading && data) {
+      setState(data);
+    }
+  }, [data, loading]);
+  return { data: state, loading, ...rest };
 }

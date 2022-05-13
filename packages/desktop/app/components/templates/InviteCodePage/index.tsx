@@ -1,14 +1,11 @@
 import { FC, useState } from "react";
 import { useRouter } from "next/router";
 import Button from "../../common/Button";
-import Label from "../../common/Label";
-import Input from "../../common/Input";
 import Field from "../../common/Field";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { SubmitHandler, useForm } from "react-hook-form";
-
-import { useVerifyInvite } from "desktop/app/queries/authentication.graphql";
+import { useVerifyInviteLazy } from "shared/graphql/query/auth/useVerifyInvite";
 
 type FormValues = { code: string };
 const schema = yup
@@ -18,25 +15,25 @@ const schema = yup
 const InviteCodePage: FC = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [verifyInvite] = useVerifyInvite();
-  const { register, handleSubmit, setError, formState } = useForm<
-    yup.InferType<typeof schema>
-  >({
+  const [verifyInvite] = useVerifyInviteLazy();
+  const { register, handleSubmit, setError, formState } = useForm<yup.InferType<typeof schema>>({
     resolver: yupResolver(schema),
     mode: "onChange",
   });
   const onSubmit: SubmitHandler<FormValues> = async (formData) => {
     setLoading(true);
-
     const code = formData.code.trim();
-    const { data } = await verifyInvite({ variables: { code } });
-    data?.verifyInvite
-      ? router.push(`/signup/${code}`)
-      : setError("code", {
+    try {
+      const { data } = await verifyInvite({ variables: { code } });
+      data?.verifyInvite
+        ? await router.push(`/signup?code=${code}`)
+        : setError("code", {
           message:
             "Sorry, that code was invalid. Try again or request another code.",
         });
-
+    } catch (e) {
+      setError("code", { message: "Failed with error" });
+    }
     setLoading(false);
   };
 
@@ -61,15 +58,17 @@ const InviteCodePage: FC = () => {
             </Button>
           </div>
         </form>
-        <div className="text-center mt-12 text-white">Or, Log in with</div>
-        <div className="text-center mt-4">
-          <Button
-            variant="text"
-            className="text-primary"
-            loading={loading}
-          >
-            Request an Invite
-          </Button>
+        <div className="mt-12 invisible">
+          <div className="text-center text-white">Or, Log in with</div>
+          <div className="text-center mt-4">
+            <Button
+              variant="text"
+              className="text-primary"
+              disabled={loading}
+            >
+              Request an Invite
+            </Button>
+          </div>
         </div>
       </div>
     </div>

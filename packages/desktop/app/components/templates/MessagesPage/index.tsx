@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { ChannelFilters, ChannelSort, StreamChat } from "stream-chat";
 import {
   Chat,
@@ -7,7 +7,7 @@ import {
   LoadingIndicator,
 } from "stream-chat-react";
 import { useChecklist } from "./ChecklistTasks";
-import { useAccount } from "shared/graphql/query/account";
+import { useAccount } from "shared/graphql/query/account/useAccount";
 import { useChatToken } from "shared/graphql/query/account/useChatToken";
 
 import GetStartedChannel from "./GetStartedChannel";
@@ -33,7 +33,7 @@ const MessagesPage = () => {
   const [giphyState, setGiphyState] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [isMobileNavVisible, setMobileNav] = useState(false);
-  const { data: userData } = useAccount();
+  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const { data: chatData } = useChatToken();
   console.log("Received chat token", chatData);
   console.log("App key", API_KEY);
@@ -42,7 +42,7 @@ const MessagesPage = () => {
   useChecklist(chatClient.current, TARGET_ORIGIN);
 
   useEffect(() => {
-    if (API_KEY && !chatClient.current && chatData?.chatToken && userData) {
+    if (API_KEY && !chatClient.current && chatData?.chatToken && account) {
       console.log("initializing chat client");
       const initChat = async () => {
         const client = StreamChat.getInstance(API_KEY, {
@@ -52,9 +52,9 @@ const MessagesPage = () => {
         
         await client.connectUser(
           {
-            id: userData.account._id,
-            name: `${userData.account.firstName} ${userData.account.lastName}`,
-            image: `${process.env.NEXT_PUBLIC_AVATAR_URL}/${userData.account.avatar}`,
+            id: account._id,
+            name: `${account.firstName} ${account.lastName}`,
+            image: `${process.env.NEXT_PUBLIC_AVATAR_URL}/${account.avatar}`,
           },
           chatData.chatToken
         );
@@ -63,7 +63,7 @@ const MessagesPage = () => {
         chatClient.current = client;
         setChannelFilters({
           type: "messaging",
-          members: { $in: [userData.account._id] },
+          members: { $in: [account._id] },
         });
       };
 
@@ -76,7 +76,7 @@ const MessagesPage = () => {
         }
       };
     }
-  }, [chatData, userData]);
+  }, [chatData, account]);
 
   useEffect(() => {
     const mobileChannelList = document.querySelector("#mobile-channel-list");
@@ -105,11 +105,11 @@ const MessagesPage = () => {
   const toggleMobile = () => setMobileNav(!isMobileNavVisible);
 
   const onChannelSearch = (keyword: string): void => {
-    if (!userData) return;
+    if (!account) return;
 
     const criteria: ChannelFilters = {
       type: "messaging",
-      $and: [{ members: { $in: [userData.account._id] } }],
+      $and: [{ members: { $in: [account._id] } }],
     };
 
     if (keyword) {

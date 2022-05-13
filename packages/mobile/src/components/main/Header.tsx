@@ -9,11 +9,8 @@ import * as NavigationService from '../../services/navigation/NavigationService'
 import LogoSvg from 'shared/assets/images/logo-icon.svg';
 import SearchSvg from 'shared/assets/images/search.svg';
 import BellSvg from 'shared/assets/images/bell.svg';
-import { GRAY900 } from 'shared/src/colors';
 import { H6 } from '../../theme/fonts';
-import { useAccount } from 'shared/graphql/query/account';
-
-import { AVATAR_URL } from 'react-native-dotenv';
+import { useAccount } from 'shared/graphql/query/account/useAccount';
 
 interface HeaderProps {
   containerStyle?: ViewStyle;
@@ -33,8 +30,7 @@ const MainHeader: React.FC<HeaderProps> = (props) => {
     centerIcon,
     onPressLeft,
   } = props;
-
-  const { data } = useAccount();
+  const { data: { account } = {} } = useAccount();
 
   return (
     <PHeader
@@ -70,11 +66,11 @@ const MainHeader: React.FC<HeaderProps> = (props) => {
                 NavigationService.navigate('UserDetails', {
                   screen: 'UserProfile',
                   params: {
-                    userId: data?.account._id,
+                    userId: account?._id,
                   },
                 })
               }>
-              <Avatar user={data?.account} size={32} />
+              <Avatar user={account} size={32} />
             </TouchableOpacity>
           </View>
         )

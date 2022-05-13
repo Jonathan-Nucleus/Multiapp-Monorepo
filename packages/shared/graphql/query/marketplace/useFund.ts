@@ -1,5 +1,5 @@
-import { gql, useQuery, QueryResult } from '@apollo/client';
-import { Fund as GraphQLFund } from 'backend/graphql/funds.graphql';
+import { gql, useQuery, QueryResult } from "@apollo/client";
+import { Fund as GraphQLFund } from "backend/graphql/funds.graphql";
 import {
   FUND_SUMMARY_FRAGMENT,
   FUND_COMPANY_FRAGMENT,
@@ -7,17 +7,16 @@ import {
   FundSummary,
   FundCompany,
   FundManager,
-} from 'shared/graphql/fragments/fund';
+} from "shared/graphql/fragments/fund";
+import { useEffect, useState } from "react";
 
 export type FundDetails = FundSummary &
   FundManager &
   FundCompany & {
-    documents: GraphQLFund['documents'];
-    team: Pick<
-      GraphQLFund['team'][number],
-      '_id' | 'firstName' | 'lastName' | 'avatar' | 'position'
-    >[];
-  };
+  documents: GraphQLFund["documents"];
+  team: Pick<GraphQLFund["team"][number],
+    "_id" | "firstName" | "lastName" | "avatar" | "position">[];
+};
 
 export type FundData = {
   fund?: FundDetails;
@@ -33,7 +32,8 @@ type FundVariables = {
  * @returns   GraphQL query.
  */
 export function useFund(fundId?: string): QueryResult<FundData, FundVariables> {
-  return useQuery<FundData, FundVariables>(
+  const [state, setState] = useState<FundData>();
+  const { data, loading, ...rest } = useQuery<FundData, FundVariables>(
     gql`
       ${FUND_SUMMARY_FRAGMENT}
       ${FUND_COMPANY_FRAGMENT}
@@ -62,7 +62,13 @@ export function useFund(fundId?: string): QueryResult<FundData, FundVariables> {
     `,
     {
       skip: !fundId,
-      variables: { fundId: fundId ?? '' },
+      variables: { fundId: fundId ?? "" },
     },
   );
+  useEffect(() => {
+    if (!loading && data) {
+      setState(data);
+    }
+  }, [data, loading]);
+  return { data: state, loading, ...rest };
 }

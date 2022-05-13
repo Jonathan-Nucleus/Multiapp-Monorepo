@@ -12,7 +12,7 @@ import { Body1Bold, Body2, Body2Bold, Body3 } from 'mobile/src/theme/fonts';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import MainHeader from 'mobile/src/components/main/Header';
 import { useUpdateSettings } from 'shared/graphql/mutation/account/useUpdateSettings';
-import { useAccount } from 'shared/graphql/query/account';
+import { useAccount } from 'shared/graphql/query/account/useAccount';
 import { SettingsInput } from 'backend/graphql/users.graphql';
 import {
   NotificationEvent,

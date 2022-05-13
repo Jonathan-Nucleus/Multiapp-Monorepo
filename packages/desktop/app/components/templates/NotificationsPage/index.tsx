@@ -4,7 +4,7 @@ import { Menu } from "@headlessui/react";
 
 import Button from "../../common/Button";
 import NotificationDetail from "./Notification";
-import { useNotifications } from "shared/graphql/query/notification";
+import { useNotifications } from "shared/graphql/query/notification/useNotifications";
 import {
   useReadNotification,
   useReadNotifications,

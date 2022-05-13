@@ -7,7 +7,7 @@ import { CompositeScreenProps } from '@react-navigation/native';
 
 import { ChatProvider } from 'mobile/src/context/Chat';
 import { Channel as ChannelType } from 'mobile/src/services/chat';
-import { useAccount } from 'shared/graphql/query/account';
+import { useAccount } from 'shared/graphql/query/account/useAccount';
 import { useChatToken } from 'shared/graphql/query/account/useChatToken';
 
 import ChannelList from 'mobile/src/screens/Main/Chat/ChannelList';
@@ -15,7 +15,6 @@ import NewChat from 'mobile/src/screens/Main/Chat/NewChat';
 import Channel from 'mobile/src/screens/Main/Chat/Channel';
 
 import type { MainTabScreenProps } from './MainTabNavigator';
-import { GETSTREAM_ACCESS_KEY, AVATAR_URL } from 'react-native-dotenv';
 
 const Stack = createStackNavigator();
 const ChatStack = () => {

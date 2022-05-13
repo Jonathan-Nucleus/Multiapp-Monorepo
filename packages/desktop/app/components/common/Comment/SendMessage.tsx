@@ -1,5 +1,5 @@
-import React, { FC, useState, useRef } from "react";
-import { PaperPlaneRight, Image as PhotoImage, Smiley } from "phosphor-react";
+import React, { FC, useRef, useState } from "react";
+import { Image as PhotoImage, PaperPlaneRight, Smiley } from "phosphor-react";
 import { Picker } from "emoji-mart";
 import { useFetchUploadLink } from "shared/graphql/mutation/posts";
 import "emoji-mart/css/emoji-mart.css";
@@ -8,7 +8,6 @@ import Button from "../Button";
 import Avatar from "../Avatar";
 import Input from "../Input";
 import { UserSummary } from "shared/graphql/fragments/user";
-import { useAccount } from "shared/graphql/query/account";
 
 type User = UserSummary;
 interface SendMessageProps {
@@ -26,7 +25,6 @@ const SendMessage: FC<SendMessageProps> = ({
   message = "",
   user,
 }: SendMessageProps) => {
-  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const [fetchUploadLink] = useFetchUploadLink();
   const [comment, setComment] = useState(message);
   const [visibleEmoji, setVisibleEmoji] = useState(false);
@@ -36,7 +34,7 @@ const SendMessage: FC<SendMessageProps> = ({
   const sendMessage = async (): Promise<void> => {
     if ((!comment || comment.trim() === "") && !selectedFile.current) return;
     if (selectedFile.current) {
-      uploadMedia(selectedFile.current);
+      await uploadMedia(selectedFile.current);
     } else {
       await onSend(comment);
       setComment("");
@@ -107,8 +105,7 @@ const SendMessage: FC<SendMessageProps> = ({
                 type="file"
                 value=""
                 onInput={async (evt) => {
-                  const file = evt.currentTarget.files?.[0];
-                  selectedFile.current = file;
+                  selectedFile.current = evt.currentTarget.files?.[0];
                 }}
                 accept="image/*, video/*"
                 className="w-2 h-2 absolute right-0 top-3 opacity-0 cursor-pointer"
@@ -116,7 +113,12 @@ const SendMessage: FC<SendMessageProps> = ({
             </div>
           </div>
         </div>
-        <Button variant="text" className="flex-shrink-0" onClick={sendMessage}>
+        <Button
+          variant="text"
+          className="flex-shrink-0"
+          loading={loading}
+          onClick={sendMessage}
+        >
           <PaperPlaneRight size={32} />
         </Button>
       </div>

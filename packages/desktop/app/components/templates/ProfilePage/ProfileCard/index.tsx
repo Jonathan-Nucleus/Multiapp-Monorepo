@@ -18,7 +18,7 @@ import Avatar from "../../../common/Avatar";
 import FollowersModal from "../../../modules/users/FollowersModal";
 
 import { useFollowUser } from "shared/graphql/mutation/account";
-import { useAccount } from "shared/graphql/query/account";
+import { useAccount } from "shared/graphql/query/account/useAccount";
 import { UserProfile } from "shared/graphql/query/user/useProfile";
 
 import LinkedIn from "shared/assets/images/linkedin.svg";

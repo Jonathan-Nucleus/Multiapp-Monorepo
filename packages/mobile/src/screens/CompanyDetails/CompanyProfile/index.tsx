@@ -1,19 +1,13 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   ListRenderItem,
   StyleSheet,
   FlatList,
   View,
   Text,
-  Dimensions,
   TouchableOpacity,
-  Linking,
 } from 'react-native';
-import {
-  useIsFocused,
-  NavigationProp,
-  RouteProp,
-} from '@react-navigation/native';
+import { useIsFocused } from '@react-navigation/native';
 import { CaretLeft } from 'phosphor-react-native';
 
 import MainHeader from 'mobile/src/components/main/Header';
@@ -25,22 +19,14 @@ import PGradientOutlineButton from 'mobile/src/components/common/PGradientOutlin
 import NoPostSvg from 'shared/assets/images/no-post.svg';
 import pStyles from 'mobile/src/theme/pStyles';
 import { Body2Bold, Body3, H5Bold, H6Bold } from 'mobile/src/theme/fonts';
-import {
-  WHITE,
-  WHITE12,
-  BLUE300,
-  BGHEADER,
-  GRAY100,
-  PRIMARY,
-  PRIMARYSOLID,
-} from 'shared/src/colors';
+import { WHITE, GRAY100, PRIMARY, PRIMARYSOLID } from 'shared/src/colors';
 
 import CompanyDetail from './CompanyDetail';
 import Funds from 'mobile/src/components/main/Funds';
 import ProfilePlaceholder from '../../../components/placeholder/ProfilePlaceholder';
 
 import { Post } from 'shared/graphql/query/post/usePosts';
-import { useAccount } from 'shared/graphql/query/account';
+import { useAccount } from 'shared/graphql/query/account/useAccount';
 import { useCompany } from 'shared/graphql/query/company/useCompany';
 import { useFunds } from 'shared/graphql/query/company/useFunds';
 import { usePosts } from 'shared/graphql/query/company/usePosts';
@@ -51,30 +37,27 @@ import { CompanyProfileScreen } from 'mobile/src/navigations/CompanyDetailsStack
 const CompanyProfile: CompanyProfileScreen = ({ navigation, route }) => {
   const { companyId } = route.params;
 
-  const { data: accountData } = useAccount();
+  const { data: { account } = {} } = useAccount({ fetchPolicy: 'cache-only' });
   const { data: companyData, loading: companyLoading } = useCompany(companyId);
   const { data: fundsData } = useFunds(companyId);
   const { data: postsData, refetch } = usePosts(companyId);
   const { data: featuredPostsData } = useFeaturedPosts(companyId);
-
   const isFocused = useIsFocused();
   const [focusState, setFocusState] = useState(isFocused);
-
-  const account = accountData?.account;
   const funds = fundsData?.companyProfile?.funds ?? [];
   const posts = postsData?.companyProfile?.posts ?? [];
   const featuredPosts = featuredPostsData?.companyProfile?.posts ?? [];
   const company = companyData?.companyProfile;
 
   const isMyCompany = useMemo(() => {
-    if (route.params?.companyId && accountData?.account.companies) {
-      const index = accountData?.account.companies.findIndex(
-        (company) => company._id === route.params?.companyId,
+    if (route.params?.companyId && account?.companies) {
+      const index = account?.companies.findIndex(
+        (item) => item._id === route.params?.companyId,
       );
-      return index > -1 ? true : false;
+      return index > -1;
     }
     return false;
-  }, [accountData, route.params]);
+  }, [account, route.params]);
 
   if (isFocused !== focusState) {
     console.log('refetching...');
@@ -82,7 +65,7 @@ const CompanyProfile: CompanyProfileScreen = ({ navigation, route }) => {
     setFocusState(isFocused);
   }
 
-  if (!company || !accountData || companyLoading) {
+  if (!company || !account || companyLoading) {
     return (
       <View style={pStyles.globalContainer}>
         <MainHeader
@@ -103,7 +86,7 @@ const CompanyProfile: CompanyProfileScreen = ({ navigation, route }) => {
       onPress={() => {
         navigation.navigate('PostDetails', {
           screen: 'PostDetail',
-          params: { postId: item._id, userId: accountData.account._id },
+          params: { postId: item._id, userId: account?._id },
         });
       }}>
       <FeaturedItem post={item} />

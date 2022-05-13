@@ -1,16 +1,17 @@
-import { gql, useQuery, QueryResult } from '@apollo/client';
-import { UserProfile } from 'backend/graphql/users.graphql';
-import { Company } from 'backend/graphql/companies.graphql';
+import { gql, useQuery, QueryResult } from "@apollo/client";
+import { UserProfile } from "backend/graphql/users.graphql";
+import { Company } from "backend/graphql/companies.graphql";
 import {
   FundSummary,
   FundManager as FundManagerFragment,
-} from 'shared/graphql/fragments/fund';
+} from "shared/graphql/fragments/fund";
+import { useEffect, useState } from "react";
 
-export type FundManager = FundManagerFragment['manager'] &
-  Pick<UserProfile, 'managedFundsIds' | 'position' | 'role'> & {
-    company: Pick<Company, '_id' | 'name' | 'avatar'>;
-  };
-export type FundListItem = Pick<FundSummary, '_id' | 'name'>;
+export type FundManager = FundManagerFragment["manager"] &
+  Pick<UserProfile, "managedFundsIds" | "position" | "role"> & {
+  company: Pick<Company, "_id" | "name" | "avatar">;
+};
+export type FundListItem = Pick<FundSummary, "_id" | "name">;
 export type FundManagersData = {
   fundManagers?: {
     managers: FundManager[];
@@ -25,11 +26,10 @@ type FundManagersVariables = never;
  *
  * @returns   GraphQL query.
  */
-export function useFundManagers(): QueryResult<
-  FundManagersData,
-  FundManagersVariables
-> {
-  return useQuery<FundManagersData, FundManagersVariables>(
+export function useFundManagers(): QueryResult<FundManagersData,
+  FundManagersVariables> {
+  const [state, setState] = useState<FundManagersData>();
+  const { data, loading, ...rest } = useQuery<FundManagersData, FundManagersVariables>(
     gql`
       query FundManagers {
         fundManagers {
@@ -57,4 +57,10 @@ export function useFundManagers(): QueryResult<
       }
     `,
   );
+  useEffect(() => {
+    if (!loading && data) {
+      setState(data);
+    }
+  }, [data, loading]);
+  return { data: state, loading, ...rest };
 }

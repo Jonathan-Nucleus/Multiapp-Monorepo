@@ -26,7 +26,6 @@ import FundOverview from './FundOverview';
 import FundsPlaceholder from '../../../../components/placeholder/FundsPlaceholder';
 
 import { useFund } from 'shared/graphql/query/marketplace/useFund';
-import { useAccount } from 'shared/graphql/query/account';
 import { useWatchFund } from 'shared/graphql/mutation/funds/useWatchFund';
 
 import { FundDetailsScreen } from 'mobile/src/navigations/AppNavigator';
@@ -36,7 +35,6 @@ const Tab = createMaterialTopTabNavigator();
 const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
   const { fundId } = route.params;
   const { data, loading } = useFund(fundId);
-  const { data: accountData } = useAccount();
   const { isWatching, toggleWatch } = useWatchFund(fundId);
   const [tabviewHeight, setTabViewHeight] = useState<number>(500);
 

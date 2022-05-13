@@ -2,7 +2,7 @@ import React, { FC } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Share, Star } from "phosphor-react";
-import { useAccount } from "shared/graphql/query/account";
+import { useAccount } from "shared/graphql/query/account/useAccount";
 import { useWatchFund } from "shared/graphql/mutation/funds/useWatchFund";
 import { useFollowUser } from "shared/graphql/mutation/account";
 import { useFollowCompany } from "shared/graphql/mutation/account";
@@ -22,10 +22,9 @@ const FundCard: FC<FundCardProps> = ({
   showImages = true,
   profileType,
 }: FundCardProps) => {
-  const { data: { account } = {} } = useAccount();
+  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const [followUser] = useFollowUser();
   const [followCompany] = useFollowCompany();
-
   const { isWatching, toggleWatch } = useWatchFund(fund._id);
   const isFollowing =
     account?.followingIds?.includes(fund.manager._id) ?? false;
@@ -40,7 +39,6 @@ const FundCard: FC<FundCardProps> = ({
       });
     } catch (err) {}
   };
-
   const toggleFollowCompany = async (companyId: string) => {
     try {
       await followCompany({

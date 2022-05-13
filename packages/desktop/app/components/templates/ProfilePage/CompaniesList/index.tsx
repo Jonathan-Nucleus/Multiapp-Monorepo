@@ -1,11 +1,10 @@
 import { FC } from "react";
-
 import CompanyItem from "./CompanyItem";
-import { CompanyType } from "desktop/app/types/common-props";
 import Skeleton from "./Skeleton";
+import { UserProfile } from "shared/graphql/query/user/useProfile";
 
 interface CompaniesListProps {
-  companies: CompanyType[] | undefined;
+  companies: UserProfile["companies"] | undefined;
 }
 
 const CompaniesList: FC<CompaniesListProps> = ({ companies }) => {

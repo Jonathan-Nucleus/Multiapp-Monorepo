@@ -15,7 +15,7 @@ import { BLACK, WHITE12 } from 'shared/src/colors';
 import { Body1Bold } from 'mobile/src/theme/fonts';
 import pStyles from '../../theme/pStyles';
 
-import type { Like } from 'shared/graphql/query/post';
+import type { Like } from 'shared/graphql/query/post/usePost';
 
 interface ModalProps {
   isVisible: boolean;

@@ -19,7 +19,7 @@ import PostSelection from './PostSelection';
 import PostHeader from './PostHeader';
 import { AUDIENCE_OPTIONS } from './index';
 
-import { useAccount } from 'shared/graphql/query/account';
+import { useAccount } from 'shared/graphql/query/account/useAccount';
 import {
   useCreatePost,
   PostCategories,

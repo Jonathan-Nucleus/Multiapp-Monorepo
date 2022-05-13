@@ -18,7 +18,6 @@ import {
 import Button from "../../../../common/Button";
 import SidebarItem from "./SidebarItem";
 import Avatar from "../../../../common/Avatar";
-import { useAccount } from "shared/graphql/query/account";
 import { UserProfile } from "shared/graphql/query/user/useProfile";
 import ModalDialog from "../../../../common/ModalDialog";
 
@@ -28,10 +27,8 @@ interface SidebarProps {
   onClose: () => void;
 }
 
-const Sidebar: FC<SidebarProps> = ({ show, onClose }) => {
-  const { data: { account } = {} } = useAccount();
+const Sidebar: FC<SidebarProps> = ({ account, show, onClose }) => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-
   const sidebarItems = [
     {
       activeIcon: <House color="white" weight="fill" size={24} />,

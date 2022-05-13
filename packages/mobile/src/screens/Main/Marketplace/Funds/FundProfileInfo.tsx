@@ -29,7 +29,7 @@ import {
   FundCompany,
 } from 'shared/graphql/fragments/fund';
 
-import { useAccount } from 'shared/graphql/query/account';
+import { useAccount } from 'shared/graphql/query/account/useAccount';
 import { useFollowUser } from 'shared/graphql/mutation/account';
 import PGradientButton from '../../../../components/common/PGradientButton';
 

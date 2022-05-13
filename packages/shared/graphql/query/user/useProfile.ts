@@ -1,5 +1,6 @@
 import { gql, QueryResult, useQuery } from '@apollo/client';
 import { User } from 'backend/graphql/users.graphql';
+import { useEffect, useState } from "react";
 
 export type WatchlistFund = Pick<
   User['watchlist'][number],
@@ -72,7 +73,8 @@ type UserProfileData = {
 export function useProfile(
   userId?: string,
 ): QueryResult<UserProfileData, UserProfileVariables> {
-  return useQuery<UserProfileData, UserProfileVariables>(
+  const [state, setState] = useState<UserProfileData>();
+  const { data, loading, ...rest } = useQuery<UserProfileData, UserProfileVariables>(
     gql`
       query UserProfile($userId: ID!) {
         userProfile(userId: $userId) {
@@ -206,4 +208,10 @@ export function useProfile(
       variables: { userId: userId ?? '' },
     },
   );
+  useEffect(() => {
+    if (!loading && data) {
+      setState(data);
+    }
+  }, [data, loading]);
+  return { data: state, loading, ...rest };
 }

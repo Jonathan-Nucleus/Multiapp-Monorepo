@@ -13,7 +13,7 @@ import AISvg from 'shared/assets/images/AI.svg';
 import GlobalSvg from 'shared/assets/images/global.svg';
 
 import { useFollowUser } from 'shared/graphql/mutation/account';
-import { useAccount } from 'shared/graphql/query/account';
+import { useAccount } from 'shared/graphql/query/account/useAccount';
 import { Audience } from 'backend/graphql/posts.graphql';
 import { UserProfile } from 'backend/graphql/users.graphql';
 import { Company as CompanyProfile } from 'backend/graphql/companies.graphql';
@@ -55,10 +55,8 @@ const UserInfo: React.FC<UserInfoProps> = (props) => {
     companyData = user as Company;
   }
 
-  const { data: accountData } = useAccount();
+  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const [followUser] = useFollowUser();
-
-  const account = accountData?.account;
   const { role, company } = userData ?? {};
   const isPro = role === 'PROFESSIONAL' || role === 'VERIFIED';
   const isSelf = user?._id === account?._id;

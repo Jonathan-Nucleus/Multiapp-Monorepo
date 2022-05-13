@@ -6,7 +6,7 @@ import Button from "../../../../../common/Button";
 import Card from "../../../../../common/Card";
 import { ShieldCheck } from "phosphor-react";
 
-import { useAccount } from "shared/graphql/query/account";
+import { useAccount } from "shared/graphql/query/account/useAccount";
 import { useFollowCompany } from "shared/graphql/mutation/account";
 import { Company } from "shared/graphql/query/marketplace/useFundCompanies";
 
@@ -15,11 +15,9 @@ interface CompanyItemProps {
 }
 
 const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
-  const { data: accountData } = useAccount({ fetchPolicy: "cache-only" });
+  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const [followCompany] = useFollowCompany();
-
-  const isFollowing =
-    accountData?.account?.companyFollowingIds?.includes(company._id) ?? false;
+  const isFollowing = account?.companyFollowingIds?.includes(company._id) ?? false;
 
   const toggleFollowCompany = async (): Promise<void> => {
     try {

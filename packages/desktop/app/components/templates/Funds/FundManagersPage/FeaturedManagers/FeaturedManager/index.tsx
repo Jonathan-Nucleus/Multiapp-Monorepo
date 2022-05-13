@@ -3,7 +3,7 @@ import { FC } from "react";
 import Avatar from "desktop/app/components/common/Avatar";
 import Button from "desktop/app/components/common/Button";
 
-import { useAccount } from "shared/graphql/query/account";
+import { useAccount } from "shared/graphql/query/account/useAccount";
 import { useFollowUser } from "shared/graphql/mutation/account";
 import type { FundManager } from "shared/graphql/query/marketplace/useFundManagers";
 import Link from "next/link";

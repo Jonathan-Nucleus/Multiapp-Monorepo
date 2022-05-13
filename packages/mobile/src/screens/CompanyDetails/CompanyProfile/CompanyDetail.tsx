@@ -38,7 +38,7 @@ import {
   BLACK,
 } from 'shared/src/colors';
 
-import { useAccount } from 'shared/graphql/query/account';
+import { useAccount } from 'shared/graphql/query/account/useAccount';
 import { useFollowCompany } from 'shared/graphql/mutation/account';
 import type { CompanyProfile } from 'shared/graphql/query/company/useCompany';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';

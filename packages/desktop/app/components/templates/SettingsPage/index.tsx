@@ -13,7 +13,7 @@ import {
   NotificationEventOptions,
   NotificationMethodEnum,
 } from "backend/schemas/user";
-import { useAccount } from "shared/graphql/query/account";
+import { useAccount } from "shared/graphql/query/account/useAccount";
 import { useUpdateSettings } from "shared/graphql/mutation/account/useUpdateSettings";
 import ToggleSwitch from "../../common/ToggleSwitch";
 import { useForm } from "react-hook-form";
@@ -38,7 +38,7 @@ type FormValues = {
 };
 
 const SettingsPage: FC = () => {
-  const { data: { account } = {} } = useAccount();
+  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const [updateSettings] = useUpdateSettings();
   const { control, reset, getValues, watch, handleSubmit } =
     useForm<FormValues>({ mode: "onChange" });

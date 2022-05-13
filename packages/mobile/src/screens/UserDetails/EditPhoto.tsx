@@ -1,21 +1,19 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   View,
   Text,
-  Platform,
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import { NavigationProp, RouteProp } from '@react-navigation/native';
 import {
   CaretLeft,
   Camera,
   Image as ImagePhoto,
   Trash,
 } from 'phosphor-react-native';
-import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
+import { BACKGROUND_URL } from 'react-native-dotenv';
 import ImagePicker from 'react-native-image-crop-picker';
 const Buffer = global.Buffer || require('buffer').Buffer;
 
@@ -33,7 +31,7 @@ import {
   PRIMARY,
 } from 'shared/src/colors';
 
-import { useAccount } from 'shared/graphql/query/account';
+import { useAccount } from 'shared/graphql/query/account/useAccount';
 import { useUpdateUserProfile } from 'shared/graphql/mutation/account';
 import { useFetchUploadLink } from 'shared/graphql/mutation/posts';
 

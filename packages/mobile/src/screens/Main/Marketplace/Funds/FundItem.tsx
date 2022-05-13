@@ -11,7 +11,6 @@ import {
 } from 'shared/graphql/fragments/fund';
 import FundProfileInfo from './FundProfileInfo';
 
-import { useAccount } from 'shared/graphql/query/account';
 import { useWatchFund } from 'shared/graphql/mutation/funds/useWatchFund';
 
 type Fund = FundSummary & FundCompany & FundManager;
@@ -23,9 +22,7 @@ export interface FundItemProps {
 }
 
 const FundItem: FC<FundItemProps> = ({ fund, onClickFundDetails }) => {
-  const { data: accountData } = useAccount();
   const { isWatching, toggleWatch } = useWatchFund(fund._id);
-
   return (
     <View style={styles.fundItem}>
       <FundProfileInfo fund={fund} showOverview showTags />

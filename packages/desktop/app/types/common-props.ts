@@ -1,13 +1,5 @@
 import { PropsWithChildren } from "react";
-import { AccountData } from "shared/graphql/query/account";
 import { UserProfile } from "shared/graphql/query/user/useProfile";
-
-type CompanyType = AccountData["account"]["companies"][number];
-
-export type {
-  CompanyType,
-  UserProfile,
-};
 
 export interface UserProfileProps extends PropsWithChildren<unknown> {
   user: UserProfile | undefined;

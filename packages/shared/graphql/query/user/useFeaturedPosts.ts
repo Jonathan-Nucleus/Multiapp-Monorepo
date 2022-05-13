@@ -1,10 +1,10 @@
-import { gql, useQuery, QueryHookOptions, QueryResult } from '@apollo/client';
-import { PostCategory } from 'backend/graphql/posts.graphql';
-import { User } from 'backend/graphql/users.graphql';
+import { gql, useQuery, QueryResult } from "@apollo/client";
+import { User } from "backend/graphql/users.graphql";
 import {
   POST_SUMMARY_FRAGMENT,
   PostSummary,
-} from 'shared/graphql/fragments/post';
+} from "shared/graphql/fragments/post";
+import { useEffect, useState } from "react";
 
 type UserPostsVariables = {
   userId: string;
@@ -13,7 +13,7 @@ type UserPostsVariables = {
 
 export type Post = PostSummary;
 export type UserPostsData = {
-  userProfile?: Pick<User, '_id'> & {
+  userProfile?: Pick<User, "_id"> & {
     posts: Post[];
   };
 };
@@ -28,7 +28,8 @@ export type UserPostsData = {
 export function useFeaturedPosts(
   userId: string,
 ): QueryResult<UserPostsData, UserPostsVariables> {
-  return useQuery<UserPostsData, UserPostsVariables>(
+  const [state, setState] = useState<UserPostsData>();
+  const { data, loading, ...rest } = useQuery<UserPostsData, UserPostsVariables>(
     gql`
       ${POST_SUMMARY_FRAGMENT}
       query UserFeaturedPosts($userId: ID!, $featured: Boolean!) {
@@ -47,4 +48,10 @@ export function useFeaturedPosts(
       },
     },
   );
+  useEffect(() => {
+    if (!loading && data) {
+      setState(data);
+    }
+  }, [data, loading]);
+  return { data: state, loading, ...rest };
 }

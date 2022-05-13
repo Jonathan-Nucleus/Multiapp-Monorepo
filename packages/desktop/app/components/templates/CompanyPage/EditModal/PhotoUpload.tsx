@@ -1,13 +1,11 @@
-import React, { ChangeEvent, FC, useEffect, useState, useRef } from "react";
-import { Dialog, Tab } from "@headlessui/react";
-import { User } from "backend/graphql/users.graphql";
+import React, { FC, useState, useRef } from "react";
+import { Dialog } from "@headlessui/react";
 import Image from "next/image";
-import { X, Image as ImageIcon, Trash, UploadSimple } from "phosphor-react";
+import { X, Trash, UploadSimple } from "phosphor-react";
 
 import Card from "../../../common/Card";
 import Button from "../../../common/Button";
 import Input from "../../../common/Input";
-import { useAccount } from "shared/graphql/query/account";
 import { useFetchUploadLink } from "shared/graphql/mutation/posts";
 import { CompanyProfile } from "shared/graphql/query/company/useCompany";
 import { MediaType } from "backend/graphql/mutations.graphql";
@@ -26,24 +24,16 @@ const PhotoUploadModal: FC<PhotoUploadProps> = ({
   type,
   company,
 }: PhotoUploadProps) => {
-  const { data: accountData } = useAccount();
   const [fetchUploadLink] = useFetchUploadLink();
   const [updateCompanyProfile] = useUpdateCompanyProfile();
-
   const selectedFile = useRef<File | undefined>(undefined);
   const [localFileUrl, setLocalFileUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  useEffect(() => {
-    if (accountData?.account) {
-    }
-  }, [accountData?.account]);
-
   const uploadMedia = async () => {
     const file: File | undefined = selectedFile.current;
     if (!file) {
       return;
     }
-
     setLoading(true);
     try {
       const { data } = await fetchUploadLink({

@@ -7,7 +7,7 @@ import Card from "../../../../../common/Card";
 import { ShieldCheck } from "phosphor-react";
 import Avatar from "../../../../../common/Avatar";
 
-import { useAccount } from "shared/graphql/query/account";
+import { useAccount } from "shared/graphql/query/account/useAccount";
 import { useFollowUser } from "shared/graphql/mutation/account";
 import type {
   FundManager,
