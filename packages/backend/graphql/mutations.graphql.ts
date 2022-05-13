@@ -79,13 +79,29 @@ const schema = gql`
     proRequest(request: ProRequestInput!): Boolean
 
     watchFund(watch: Boolean!, fundId: ID!): UserProfile
-    followUser(follow: Boolean!, userId: ID!, asCompanyId: ID): Boolean
-    followCompany(follow: Boolean!, companyId: ID!, asCompanyId: ID): Boolean
+    followUser(follow: Boolean!, userId: ID!, asCompanyId: ID): FollowUserResult
+    followCompany(
+      follow: Boolean!
+      companyId: ID!
+      asCompanyId: ID
+    ): FollowCompanyResult
     hideUser(hide: Boolean!, userId: ID!): Boolean!
 
     readNotification(notificationId: ID): Boolean
     updateFcmToken(fcmToken: String): Boolean
     helpRequest(request: HelpRequestInput!): Boolean
+  }
+
+  type FollowUserResult {
+    account: UserProfile
+    accountCompany: Company
+    userAccount: UserProfile!
+  }
+
+  type FollowCompanyResult {
+    account: UserProfile
+    accountCompany: Company
+    company: Company!
   }
 
   type MediaUpload {
@@ -102,6 +118,18 @@ const schema = gql`
 
 export type MediaUpload = RemoteUpload;
 export type MediaType = "POST" | "AVATAR" | "BACKGROUND";
+
+type FollowUserResult = {
+  account?: User.Mongo;
+  accountCompany?: Company.Mongo;
+  userAccount: User.Mongo;
+};
+
+type FollowCompanyResult = {
+  account?: User.Mongo;
+  accountCompany?: Company.Mongo;
+  company: Company.Mongo;
+};
 
 const resolvers = {
   Mutation: {
@@ -1081,7 +1109,7 @@ const resolvers = {
         parentIgnored,
         args: { follow: boolean; userId: string; asCompanyId?: string },
         { db, user }
-      ): Promise<boolean> => {
+      ): Promise<FollowUserResult> => {
         const validator = yup
           .object()
           .shape({
@@ -1118,15 +1146,32 @@ const resolvers = {
             throw new NotFoundError("Company");
           }
 
-          return (
-            (await db.users.setFollowerCompany(follow, asCompanyId, userId)) &&
-            (await db.companies.setFollowingUser(follow, userId, asCompanyId))
-          );
+          return {
+            userAccount: await db.users.setFollowerCompany(
+              follow,
+              asCompanyId,
+              userId
+            ),
+            accountCompany: await db.companies.setFollowingUser(
+              follow,
+              userId,
+              asCompanyId
+            ),
+          };
         }
 
-        const followed =
-          (await db.users.setFollowingUser(follow, userId, user._id)) &&
-          (await db.users.setFollower(follow, user._id, userId));
+        const updatedAccount = await db.users.setFollowingUser(
+          follow,
+          userId,
+          user._id
+        );
+        const updatedUser = await db.users.setFollower(
+          follow,
+          user._id,
+          userId
+        );
+
+        const followed = !!updatedAccount && !!updatedUser;
 
         if (!followed) {
           throw new InternalServerError("Not able to follow.");
@@ -1137,7 +1182,10 @@ const resolvers = {
           db.notifications.create(user, "followed-by-user", userId);
         }
 
-        return true;
+        return {
+          account: updatedAccount,
+          userAccount: updatedUser,
+        };
       }
     ),
 
@@ -1146,7 +1194,7 @@ const resolvers = {
         parentIgnored,
         args: { follow: boolean; companyId: string; asCompanyId?: string },
         { db, user }
-      ): Promise<boolean> => {
+      ): Promise<FollowCompanyResult> => {
         const validator = yup
           .object()
           .shape({
@@ -1181,24 +1229,28 @@ const resolvers = {
             throw new NotFoundError("Company");
           }
 
-          return (
-            (await db.companies.setFollowingCompany(
+          return {
+            accountCompany: await db.companies.setFollowingCompany(
               follow,
               companyId,
               asCompanyId
-            )) &&
-            (await db.companies.setFollowerCompany(
+            ),
+            company: await db.companies.setFollowerCompany(
               follow,
               asCompanyId,
               companyId
-            ))
-          );
+            ),
+          };
         }
 
-        return (
-          (await db.companies.setFollower(follow, user._id, companyId)) &&
-          (await db.users.setFollowingCompany(follow, companyId, user._id))
-        );
+        return {
+          company: await db.companies.setFollower(follow, user._id, companyId),
+          account: await db.users.setFollowingCompany(
+            follow,
+            companyId,
+            user._id
+          ),
+        };
       }
     ),
 

@@ -8,8 +8,7 @@ import { AVATAR_URL } from 'react-native-dotenv';
 import PLabel from 'mobile/src/components/common/PLabel';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
 
-import { useAccount } from 'shared/graphql/query/account/useAccount';
-import { useFollowUser } from 'shared/graphql/mutation/account';
+import { useFollowUser } from 'shared/graphql/mutation/account/useFollowUser';
 import { FundManager } from 'shared/graphql/query/marketplace/useFundManagers';
 
 interface FundUserInfoProps {
@@ -17,32 +16,7 @@ interface FundUserInfoProps {
 }
 
 const FundUserInfo: React.FC<FundUserInfoProps> = ({ manager }) => {
-  const { data: accountData } = useAccount();
-  const [followUser] = useFollowUser();
-
-  const isFollowingManager = !!accountData?.account?.followingIds?.includes(
-    manager._id,
-  );
-  const [following, setFollowing] = useState(isFollowingManager);
-  const toggleFollow = async (): Promise<void> => {
-    if (!accountData) return;
-
-    // Update state immediately for responsiveness
-    setFollowing(!isFollowingManager);
-
-    const result = await followUser({
-      variables: {
-        userId: manager._id,
-        follow: !following,
-      },
-      refetchQueries: ['Account', 'FundManagers'],
-    });
-
-    if (!result.data?.followUser) {
-      // Revert back to original state on error
-      setFollowing(isFollowingManager);
-    }
-  };
+  const { isFollowing, toggleFollow } = useFollowUser(manager._id);
 
   return (
     <View style={styles.userInfoContainer}>
@@ -67,7 +41,7 @@ const FundUserInfo: React.FC<FundUserInfoProps> = ({ manager }) => {
           />
         </View>
         <PGradientButton
-          label={following ? 'Unfollow' : 'Follow'}
+          label={isFollowing ? 'Unfollow' : 'Follow'}
           textStyle={styles.buttonText}
           btnContainer={styles.buttonContainer}
           onPress={toggleFollow}

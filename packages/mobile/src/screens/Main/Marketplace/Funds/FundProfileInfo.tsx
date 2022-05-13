@@ -29,8 +29,7 @@ import {
   FundCompany,
 } from 'shared/graphql/fragments/fund';
 
-import { useAccount } from 'shared/graphql/query/account/useAccount';
-import { useFollowUser } from 'shared/graphql/mutation/account';
+import { useFollowUser } from 'shared/graphql/mutation/account/useFollowUser';
 import PGradientButton from '../../../../components/common/PGradientButton';
 
 export type Fund = FundSummary & FundManager & FundCompany;
@@ -45,32 +44,7 @@ const FundProfileInfo: FC<FundProfileInfo> = ({
   showOverview,
   showTags,
 }) => {
-  const { data: accountData } = useAccount();
-  const [followUser] = useFollowUser();
-
-  const isFollowingManager = !!accountData?.account?.followingIds?.includes(
-    fund.manager._id,
-  );
-  const [following, setFollowing] = useState(isFollowingManager);
-  const toggleFollow = async (): Promise<void> => {
-    if (!accountData) return;
-
-    // Update state immediately for responsiveness
-    setFollowing(!isFollowingManager);
-
-    const result = await followUser({
-      variables: {
-        userId: fund.manager._id,
-        follow: !following,
-      },
-      refetchQueries: ['Account'],
-    });
-
-    if (!result.data?.followUser) {
-      // Revert back to original state on error
-      setFollowing(isFollowingManager);
-    }
-  };
+  const { isFollowing, toggleFollow } = useFollowUser(fund.manager._id);
 
   const goToManager = () =>
     NavigationService.navigate('UserDetails', {
@@ -145,7 +119,7 @@ const FundProfileInfo: FC<FundProfileInfo> = ({
                   <View style={styles.separator} />
                   <TouchableOpacity onPress={toggleFollow}>
                     <Text style={[styles.follow, Body3]}>
-                      {following ? 'Unfollow' : 'Follow'}
+                      {isFollowing ? 'Unfollow' : 'Follow'}
                     </Text>
                   </TouchableOpacity>
                 </View>

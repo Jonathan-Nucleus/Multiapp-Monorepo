@@ -42,7 +42,7 @@ import { PostCategories } from 'backend/graphql/enumerations.graphql';
 import { useLikePost } from 'shared/graphql/mutation/posts';
 import { useCreatePost } from 'shared/graphql/mutation/posts';
 import { useAccount } from 'shared/graphql/query/account/useAccount';
-import { tagSplit } from 'shared/src/patterns';
+import { processPost } from 'shared/src/patterns';
 
 export interface PostItemProps {
   post: Post;
@@ -89,8 +89,15 @@ const PostItem: React.FC<PostItemProps> = ({
     });
   };
 
-  const goToProfile = () => {
-    if (user) {
+  const goToProfile = (userId?: string) => {
+    if (userId) {
+      NavigationService.navigate('UserDetails', {
+        screen: 'UserProfile',
+        params: {
+          userId,
+        },
+      });
+    } else if (user) {
       NavigationService.navigate('UserDetails', {
         screen: 'UserProfile',
         params: {
@@ -142,7 +149,7 @@ const PostItem: React.FC<PostItemProps> = ({
       <View style={styles.container}>
         <View style={[styles.headerWrapper, styles.contentPadding]}>
           <Pressable
-            onPress={goToProfile}
+            onPress={() => goToProfile()}
             style={({ pressed }) => (pressed ? pStyles.pressedStyle : {})}>
             <UserInfo
               user={user || company}
@@ -163,19 +170,35 @@ const PostItem: React.FC<PostItemProps> = ({
               containerStyle={styles.previewContainer}
               renderLinkPreview={({ previewData }) => (
                 <>
-                  <Text style={styles.body}>
-                    {tagSplit(body).map((split) =>
-                      split.startsWith('$') || split.startsWith('#') ? (
-                        <Text
-                          key={split}
-                          style={styles.tagLink}
-                          onPress={() => search(split)}>
-                          {split}
-                        </Text>
-                      ) : (
-                        <React.Fragment key={split}>{split}</React.Fragment>
-                      ),
-                    )}
+                  <Text style={styles.body} selectable={true}>
+                    {processPost(body).map((split, index) => {
+                      if (split.startsWith('$') || split.startsWith('#')) {
+                        return (
+                          <Text
+                            key={split}
+                            style={styles.tagLink}
+                            onPress={() => search(split)}>
+                            {split}
+                          </Text>
+                        );
+                      } else if (split.startsWith('@') && split.includes('|')) {
+                        const [name, id] = split.substring(1).split('|');
+                        return (
+                          <Text
+                            key={id}
+                            style={styles.tagLink}
+                            onPress={() => goToProfile(id)}>
+                            {name}
+                          </Text>
+                        );
+                      } else {
+                        return (
+                          <React.Fragment key={`${split}-${index}`}>
+                            {split}
+                          </React.Fragment>
+                        );
+                      }
+                    })}
                   </Text>
                   {previewData?.link && (
                     <PLabel label={previewData.link} textStyle={styles.link} />

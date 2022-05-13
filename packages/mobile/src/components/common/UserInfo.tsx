@@ -12,7 +12,7 @@ import QCSvg from 'shared/assets/images/QC.svg';
 import AISvg from 'shared/assets/images/AI.svg';
 import GlobalSvg from 'shared/assets/images/global.svg';
 
-import { useFollowUser } from 'shared/graphql/mutation/account';
+import { useFollowUser } from 'shared/graphql/mutation/account/useFollowUser';
 import { useAccount } from 'shared/graphql/query/account/useAccount';
 import { Audience } from 'backend/graphql/posts.graphql';
 import { UserProfile } from 'backend/graphql/users.graphql';
@@ -55,14 +55,11 @@ const UserInfo: React.FC<UserInfoProps> = (props) => {
     companyData = user as Company;
   }
 
-  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
-  const [followUser] = useFollowUser();
+  const { data: { account } = {} } = useAccount({ fetchPolicy: 'cache-only' });
+  const { isFollowing, toggleFollow } = useFollowUser(user._id);
   const { role, company } = userData ?? {};
   const isPro = role === 'PROFESSIONAL' || role === 'VERIFIED';
   const isSelf = user?._id === account?._id;
-  const following = account?.followingIds?.includes(user?._id ?? '');
-
-  const [isFollowing, setIsFollowing] = useState(following);
 
   let audienceIcon;
   switch (audienceInfo) {
@@ -86,20 +83,6 @@ const UserInfo: React.FC<UserInfoProps> = (props) => {
       audienceIcon = <GlobalSvg width={12} height={12} />;
       break;
   }
-
-  const toggleFollow = async () => {
-    if (!user || !user._id) return;
-
-    setIsFollowing(!isFollowing);
-
-    const result = await followUser({
-      variables: { follow: !following, userId: user._id },
-    });
-
-    if (!result.data?.followUser) {
-      setIsFollowing(following);
-    }
-  };
 
   return (
     <View style={[styles.wrapper, viewStyle]}>

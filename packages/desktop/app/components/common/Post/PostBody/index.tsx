@@ -1,7 +1,8 @@
-import { FC, ReactElement, useMemo } from "react";
+import { FC, Fragment, useMemo } from "react";
 import { PostSummary } from "shared/graphql/fragments/post";
 import Link from "next/link";
 import { UserProfile } from "backend/graphql/users.graphql";
+import { processPost } from "shared/src/patterns";
 
 interface PostBodyProps {
   account: Pick<UserProfile, "_id"> | undefined;
@@ -16,28 +17,29 @@ const PostBody: FC<PostBodyProps> = ({
     if (!body) {
       return [<></>];
     }
-    const elements: (string | ReactElement)[] = [];
-    const result = body.matchAll(/@\[[a-zA-Z\s]+]\([a-fA-F\d]+\)/g);
-    const matches = Array.from(result);
-    if (matches.length > 0) {
-      let startIndex = 0;
-      matches.forEach((match) => {
-        const text = match[0];
-        const name = text.match(/@\[([a-zA-Z\s]+)]/)![1];
-        const id = text.match(/\(([a-fA-F\d]+)\)/)![1];
-        const prefix = body.slice(startIndex, match.index);
-        elements.push(prefix);
-        elements.push(
-          <Link href={`/profile/${account?._id == id ? "me" : id}`}>
-            <a className="text-primary">{name}</a>
-          </Link>,
+
+    const splitBody = processPost(body);
+    const elements = splitBody.map((text, index) => {
+      if (text.startsWith("$") || text.startsWith("#")) {
+        return (
+          <Link key={`${text}-${index}`} href={`/search/${text}`}>
+            <a className="text-primary">{text}</a>
+          </Link>
         );
-        startIndex = match.index! + text.length;
-      });
-      elements.push(body.slice(startIndex, body.length));
-    } else {
-      elements.push(body);
-    }
+      } else if (text.startsWith("@") && text.includes("|")) {
+        const [name, id] = text.split("|");
+        return (
+          <Link
+            key={`${text}-${index}`}
+            href={`/profile/${account?._id == id ? "me" : id}`}
+          >
+            <a className="text-primary">{name}</a>
+          </Link>
+        );
+      } else {
+        return <Fragment key={`${text}-${index}`}>{text}</Fragment>;
+      }
+    });
     return elements;
   }, [account?._id, body]);
   return (

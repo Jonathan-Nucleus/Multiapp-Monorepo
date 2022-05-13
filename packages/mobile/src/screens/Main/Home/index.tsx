@@ -50,6 +50,21 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
     refetch,
   } = usePosts(selectedCategories, selectedRole);
 
+  const renderItem: ListRenderItem<Post> = useMemo(
+    () =>
+      ({ item }) =>
+        (
+          <PostItem
+            post={item}
+            onPressMenu={() => {
+              setSelectedPost(item);
+              setKebobMenuVisible(true);
+            }}
+          />
+        ),
+    [],
+  );
+
   const account = userData?.account;
   const postData = data?.posts ?? [];
 
@@ -61,8 +76,8 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
     return (
       <View style={pStyles.globalContainer}>
         <MainHeader />
-        {[...Array(PLACE_HOLDERS)].map(() => (
-          <PostItemPlaceholder />
+        {[...Array(PLACE_HOLDERS)].map((_, index) => (
+          <PostItemPlaceholder key={index} />
         ))}
       </View>
     );
@@ -90,16 +105,6 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
     setSelectedCategories(cateogies.length > 0 ? cateogies : undefined);
   };
 
-  const renderItem: ListRenderItem<Post> = ({ item }) => (
-    <PostItem
-      post={item}
-      onPressMenu={() => {
-        setSelectedPost(item);
-        setKebobMenuVisible(true);
-      }}
-    />
-  );
-
   const myPost =
     (selectedPost &&
       (selectedPost.userId === account._id ||
@@ -120,6 +125,7 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
       <FlatList
         contentContainerStyle={styles.container}
         data={postData}
+        extraData={account}
         renderItem={renderItem}
         keyExtractor={(item) => item._id}
       />

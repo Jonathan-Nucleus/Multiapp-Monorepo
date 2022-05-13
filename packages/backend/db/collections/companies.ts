@@ -87,23 +87,27 @@ const createCompaniesCollection = (
       follow: boolean,
       followUserId: MongoId,
       companyId: MongoId
-    ): Promise<boolean> => {
-      try {
-        const result = follow
-          ? await companiesCollection.updateOne(
-              { _id: toObjectId(companyId) },
-              { $addToSet: { followingIds: toObjectId(followUserId) } }
-            )
-          : await companiesCollection.updateOne(
-              { _id: toObjectId(companyId) },
-              { $pull: { followingIds: toObjectId(followUserId) } }
-            );
+    ): Promise<Company.Mongo> => {
+      const result = follow
+        ? await companiesCollection.findOneAndUpdate(
+            { _id: toObjectId(companyId) },
+            { $addToSet: { followingIds: toObjectId(followUserId) } },
+            { returnDocument: "after" }
+          )
+        : await companiesCollection.findOneAndUpdate(
+            { _id: toObjectId(companyId) },
+            { $pull: { followingIds: toObjectId(followUserId) } },
+            { returnDocument: "after" }
+          );
 
-        return result.acknowledged;
-      } catch (err) {
-        console.log(`Error following user ${followUserId}: ${err}`);
-        return false;
+      const { value } = result;
+      if (!result.ok || !value) {
+        throw new InternalServerError(
+          `Not able to follow user ${followUserId}.`
+        );
       }
+
+      return value as Company.Mongo;
     },
 
     /**
@@ -120,23 +124,27 @@ const createCompaniesCollection = (
       following: boolean,
       followerId: MongoId,
       companyId: MongoId
-    ): Promise<boolean> => {
-      try {
-        const result = following
-          ? await companiesCollection.updateOne(
-              { _id: toObjectId(companyId) },
-              { $addToSet: { followerIds: toObjectId(followerId) } }
-            )
-          : await companiesCollection.updateOne(
-              { _id: toObjectId(companyId) },
-              { $pull: { followerIds: toObjectId(followerId) } }
-            );
+    ): Promise<Company.Mongo> => {
+      const result = following
+        ? await companiesCollection.findOneAndUpdate(
+            { _id: toObjectId(companyId) },
+            { $addToSet: { followerIds: toObjectId(followerId) } },
+            { returnDocument: "after" }
+          )
+        : await companiesCollection.findOneAndUpdate(
+            { _id: toObjectId(companyId) },
+            { $pull: { followerIds: toObjectId(followerId) } },
+            { returnDocument: "after" }
+          );
 
-        return result.acknowledged;
-      } catch (err) {
-        console.log(`Error setting follower ${followerId}: ${err}`);
-        return false;
+      const { value } = result;
+      if (!result.ok || !value) {
+        throw new InternalServerError(
+          `Not able to add follower ${followerId}.`
+        );
       }
+
+      return value as Company.Mongo;
     },
 
     /**
@@ -153,25 +161,29 @@ const createCompaniesCollection = (
       follow: boolean,
       followCompanyId: MongoId,
       companyId: MongoId
-    ): Promise<boolean> => {
-      try {
-        const result = follow
-          ? await companiesCollection.updateOne(
-              { _id: toObjectId(companyId) },
-              {
-                $addToSet: { companyFollowingIds: toObjectId(followCompanyId) },
-              }
-            )
-          : await companiesCollection.updateOne(
-              { _id: toObjectId(companyId) },
-              { $pull: { companyFollowingIds: toObjectId(followCompanyId) } }
-            );
+    ): Promise<Company.Mongo> => {
+      const result = follow
+        ? await companiesCollection.findOneAndUpdate(
+            { _id: toObjectId(companyId) },
+            {
+              $addToSet: { companyFollowingIds: toObjectId(followCompanyId) },
+            },
+            { returnDocument: "after" }
+          )
+        : await companiesCollection.findOneAndUpdate(
+            { _id: toObjectId(companyId) },
+            { $pull: { companyFollowingIds: toObjectId(followCompanyId) } },
+            { returnDocument: "after" }
+          );
 
-        return result.acknowledged;
-      } catch (err) {
-        console.log(`Error following company ${followCompanyId}: ${err}`);
-        return false;
+      const { value } = result;
+      if (!result.ok || !value) {
+        throw new InternalServerError(
+          `Not able to follow company ${followCompanyId}.`
+        );
       }
+
+      return value as Company.Mongo;
     },
 
     /**
@@ -188,29 +200,31 @@ const createCompaniesCollection = (
       following: boolean,
       followerCompanyId: MongoId,
       companyId: MongoId
-    ): Promise<boolean> => {
-      try {
-        const result = following
-          ? await companiesCollection.updateOne(
-              { _id: toObjectId(companyId) },
-              {
-                $addToSet: {
-                  companyFollowerIds: toObjectId(followerCompanyId),
-                },
-              }
-            )
-          : await companiesCollection.updateOne(
-              { _id: toObjectId(companyId) },
-              { $pull: { companyFollowerIds: toObjectId(followerCompanyId) } }
-            );
+    ): Promise<Company.Mongo> => {
+      const result = following
+        ? await companiesCollection.findOneAndUpdate(
+            { _id: toObjectId(companyId) },
+            {
+              $addToSet: {
+                companyFollowerIds: toObjectId(followerCompanyId),
+              },
+            },
+            { returnDocument: "after" }
+          )
+        : await companiesCollection.findOneAndUpdate(
+            { _id: toObjectId(companyId) },
+            { $pull: { companyFollowerIds: toObjectId(followerCompanyId) } },
+            { returnDocument: "after" }
+          );
 
-        return result.acknowledged;
-      } catch (err) {
-        console.log(
-          `Error setting follower company ${followerCompanyId}: ${err}`
+      const { value } = result;
+      if (!result.ok || !value) {
+        throw new InternalServerError(
+          `Not able to add follower company ${followerCompanyId}.`
         );
-        return false;
       }
+
+      return value as Company.Mongo;
     },
 
     /**

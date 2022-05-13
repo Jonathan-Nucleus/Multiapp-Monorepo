@@ -17,7 +17,16 @@ import { Company } from "../../../schemas/company";
 describe("Mutations - followCompany", () => {
   const query = gql`
     mutation FollowCompany($follow: Boolean!, $companyId: ID!) {
-      followCompany(follow: $follow, companyId: $companyId)
+      followCompany(follow: $follow, companyId: $companyId) {
+        account {
+          _id
+          companyFollowingIds
+        }
+        company {
+          _id
+          followerIds
+        }
+      }
     }
   `;
 
@@ -67,7 +76,13 @@ describe("Mutations - followCompany", () => {
       },
     });
 
-    expect(res.data?.followCompany).toBeTruthy();
+    expect(res.data?.followCompany).toBeDefined();
+    expect(res.data?.followCompany.account.companyFollowingIds).toContain(
+      company1._id.toString()
+    );
+    expect(res.data?.followCompany.company.followerIds).toContain(
+      authUser._id.toString()
+    );
 
     const { users, companies } = await getIgniteDb();
 
@@ -92,7 +107,13 @@ describe("Mutations - followCompany", () => {
       },
     });
 
-    expect(res.data?.followCompany).toBeTruthy();
+    expect(res.data?.followCompany).toBeDefined();
+    expect(res.data?.followCompany.account.companyFollowingIds).not.toContain(
+      company1.toString()
+    );
+    expect(res.data?.followCompany.company.followerIds).not.toContain(
+      authUser._id.toString()
+    );
 
     const { users, companies } = await getIgniteDb();
 

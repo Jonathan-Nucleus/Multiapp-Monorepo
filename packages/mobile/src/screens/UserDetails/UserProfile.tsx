@@ -10,7 +10,6 @@ import {
   Linking,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import { useIsFocused } from '@react-navigation/native';
 import { CaretLeft, Pencil } from 'phosphor-react-native';
 
 import MainHeader from 'mobile/src/components/main/Header';
@@ -42,7 +41,7 @@ import { useAccount } from 'shared/graphql/query/account/useAccount';
 import { useProfile } from 'shared/graphql/query/user/useProfile';
 import { usePosts, Post } from 'shared/graphql/query/user/usePosts';
 import { useManagedFunds } from 'shared/graphql/query/user/useManagedFunds';
-import { useFollowUser } from 'shared/graphql/mutation/account';
+import { useFollowUser } from 'shared/graphql/mutation/account/useFollowUser';
 import { useFeaturedPosts } from 'shared/graphql/query/user/useFeaturedPosts';
 
 import { UserProfileScreen } from 'mobile/src/navigations/UserDetailsStack';
@@ -61,9 +60,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
   const { data: fundsData } = useManagedFunds(userId);
   const { data, refetch } = usePosts(userId);
   const { data: featuredPostsData } = useFeaturedPosts(userId);
-  const isFocused = useIsFocused();
-  const [focusState, setFocusState] = useState(isFocused);
-  const [followUser] = useFollowUser();
+  const { isFollowing, toggleFollow } = useFollowUser(userId);
 
   const account = accountData?.account;
   const following = account?.followingIds?.includes(userId ?? '');
@@ -72,33 +69,9 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
   const postData = data?.userProfile?.posts ?? [];
   const featuredPosts = featuredPostsData?.userProfile?.posts ?? [];
 
-  const [isFollowing, setIsFollowing] = useState(following);
-
-  // Refetch whenever the focus state changes to avoid refetching during
-  // rerender cycles
-  if (isFocused !== focusState) {
-    refetch();
-    refetchAccount();
-    setFocusState(isFocused);
-  }
-
   const isMyAccount = useMemo(() => {
     return userId === account?._id ? true : false;
   }, [account]);
-
-  const toggleFollow = async () => {
-    try {
-      const result = await followUser({
-        variables: { follow: !isFollowing, userId: userId },
-      });
-
-      if (result.data?.followUser) {
-        setIsFollowing(!isFollowing);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
 
   const renderItem: ListRenderItem<Post> = ({ item }) => (
     <TouchableOpacity>
@@ -106,7 +79,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
     </TouchableOpacity>
   );
 
-  if (!account || profileLoading) {
+  if (!account || !profile) {
     return (
       <View style={pStyles.globalContainer}>
         <MainHeader
@@ -117,22 +90,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
           }
           onPressLeft={() => navigation.goBack()}
         />
-        <ProfilePlaceholder variant="user" />
-      </View>
-    );
-  }
-
-  if (!profile) {
-    return (
-      <View style={pStyles.globalContainer}>
-        <MainHeader
-          leftIcon={
-            <View style={styles.backIcon}>
-              <CaretLeft color={WHITE} />
-            </View>
-          }
-          onPressLeft={() => navigation.goBack()}
-        />
+        {!profile && <ProfilePlaceholder variant="user" />}
       </View>
     );
   }
@@ -292,6 +250,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
               <Text style={styles.text}>Featured Posts</Text>
               <FlatList
                 data={featuredPosts || []}
+                extraData={account}
                 renderItem={renderItem}
                 keyExtractor={(item) => `${item._id}`}
                 listKey="post"
@@ -303,6 +262,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
           {postData && postData.length > 0 ? (
             <FlatList
               data={postData || []}
+              extraData={account}
               renderItem={({ item }) => <PostItem post={item} />}
               keyExtractor={(item) => `${item._id}`}
               listKey="post"

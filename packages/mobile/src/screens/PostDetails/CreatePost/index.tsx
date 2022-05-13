@@ -20,7 +20,7 @@ import {
   MentionSuggestionsProps,
   replaceMentionValues,
 } from 'react-native-controlled-mentions';
-import _debounce from 'lodash/debounce';
+import _isEqual from 'lodash/isEqual';
 import {
   Camera,
   VideoCamera,
@@ -174,7 +174,9 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   const { data: usersData, refetch } = useMentionUsers();
   const [fetchUploadLink] = useFetchUploadLink();
 
-  const searchKeyword = useRef('');
+  const currentSearch = useRef<string | undefined>(undefined);
+  const nextSearch = useRef<string | undefined>(undefined);
+
   const [showActionBar, setShowActionBar] = useState(true);
   const [postAsModalVisible, setPostAsModalVisible] = useState(false);
   const [audienceModalVisible, setAudienceModalVisible] = useState(false);
@@ -229,10 +231,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       ...(post ?? {}),
       userId,
       audience,
-      // TODO: Remove this and keep original body text. Add components that
-      // automatically parse this text in the post view and add links to
-      // their profile page.
-      body: replaceMentionValues(body ?? '', ({ name }) => `@${name}`),
+      body,
       mediaUrl,
       localMediaPath: imageData?.path,
       mentionIds, // TODO: Parse from body and add here
@@ -352,35 +351,41 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     })),
   ];
 
-  const fetchMentionUsers = _debounce(
-    async (search?: string) => {
-      const { data } = await refetch({ search });
-
-      if (data.mentionUsers) {
-        setMentionUsers(data.mentionUsers);
+  const fetchMentionUsers = async (search?: string) => {
+    if (!search) return;
+    if (currentSearch.current !== undefined) {
+      if (currentSearch.current !== search) {
+        nextSearch.current = search;
       }
-    },
-    500,
-    { leading: true, trailing: true },
-  );
+      return;
+    }
+
+    currentSearch.current = search;
+    const { data } = await refetch({ search });
+
+    if (data.mentionUsers && !_isEqual(mentionUsers, data.mentionUsers)) {
+      setMentionUsers(data.mentionUsers);
+    }
+
+    currentSearch.current = undefined;
+    if (nextSearch.current) {
+      fetchMentionUsers(nextSearch.current);
+      nextSearch.current = undefined;
+    }
+  };
 
   const renderSuggestions = useCallback(
     ({
       keyword,
       onSuggestionPress,
     }: MentionSuggestionsProps): React.ReactNode => {
-      if (!keyword) {
+      if (keyword === '') {
         setTimeout(() => setShowActionBar(true), 50);
         return null;
       }
 
       setTimeout(() => setShowActionBar(false), 50);
-
-      // Search using updated search terms if keyword has changed
-      if (searchKeyword.current !== keyword) {
-        searchKeyword.current = keyword;
-        fetchMentionUsers(keyword);
-      }
+      fetchMentionUsers(keyword);
 
       if (mentionUsers.length === 0) return null;
 
@@ -400,6 +405,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
                   mentionsField.onChange(
                     Array.from(new Set([...mentionsField.value, user._id])),
                   );
+                  setMentionUsers([]);
                 }}
                 style={styles.mentionItem}>
                 <UserInfo user={user} avatarSize={32} showFollow={false} />

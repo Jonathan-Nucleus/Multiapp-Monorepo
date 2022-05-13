@@ -13,7 +13,16 @@ jest.mock("firebase-admin");
 describe("Mutations - followUser", () => {
   const query = gql`
     mutation FollowUser($follow: Boolean!, $userId: ID!) {
-      followUser(follow: $follow, userId: $userId)
+      followUser(follow: $follow, userId: $userId) {
+        account {
+          _id
+          followingIds
+        }
+        userAccount {
+          _id
+          followerIds
+        }
+      }
     }
   `;
 
@@ -77,7 +86,13 @@ describe("Mutations - followUser", () => {
       },
     });
 
-    expect(res.data?.followUser).toBeTruthy();
+    expect(res.data?.followUser).toBeDefined();
+    expect(res.data?.followUser.account.followingIds).toContain(
+      user._id.toString()
+    );
+    expect(res.data?.followUser.userAccount.followerIds).toContain(
+      authUser._id.toString()
+    );
 
     const { users } = await getIgniteDb();
 
@@ -110,7 +125,13 @@ describe("Mutations - followUser", () => {
       },
     });
 
-    expect(res.data?.followUser).toBeTruthy();
+    expect(res.data?.followUser).toBeDefined();
+    expect(res.data?.followUser.account.followingIds).not.toContain(
+      user._id.toString()
+    );
+    expect(res.data?.followUser.userAccount.followerIds).not.toContain(
+      authUser._id.toString()
+    );
 
     const [newUser1, newUser2] = (await users.findAll([
       toObjectId(authUser._id),

@@ -14,7 +14,8 @@ import { WHITE } from 'shared/src/colors';
 import { SOMETHING_WRONG } from 'shared/src/constants';
 
 import { Post } from 'shared/graphql/query/post/usePosts';
-import { useFollowUser, useHideUser } from 'shared/graphql/mutation/account';
+import { useHideUser } from 'shared/graphql/mutation/account';
+import { useFollowUser } from 'shared/graphql/mutation/account/useFollowUser';
 import { useAccount } from 'shared/graphql/query/account/useAccount';
 import {
   useHidePost,
@@ -43,7 +44,7 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
   const [reportPostModalVisible, setReportPostModalVisible] = useState(false);
 
   const { data: accountData } = useAccount();
-  const [followUser] = useFollowUser();
+  const { isFollowing, toggleFollow } = useFollowUser(user?._id);
   const [hideUser] = useHideUser();
   const [hidePost] = useHidePost();
   const [mutePost] = useMutePost();
@@ -51,10 +52,6 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
 
   const isMuted =
     accountData?.account?.mutedPostIds?.includes(post._id) ?? false;
-
-  const isFollowing = accountData?.account?.followingIds?.includes(
-    user?._id ?? '',
-  );
 
   const menuData = useMemo(() => {
     const menuArray = [
@@ -107,26 +104,17 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
   }, [user, accountData, isMuted, isFollowing]);
 
   const handleFollowUser = async () => {
-    if (!user) {
-      return;
-    } // TODO: Update to support companies
+    if (!user) return;
 
-    try {
-      const { data } = await followUser({
-        variables: { follow: !isFollowing, userId: user._id },
-      });
-
-      data?.followUser
-        ? showMessage(
-            'success',
-            isFollowing
-              ? `You’re unfollowing ${user.firstName} ${user.lastName}`
-              : `You’re following ${user.firstName} ${user.lastName}`,
-          )
-        : showMessage('error', SOMETHING_WRONG);
-    } catch (err) {
-      showMessage('error', SOMETHING_WRONG);
-    }
+    const result = await toggleFollow();
+    result
+      ? showMessage(
+          'success',
+          isFollowing
+            ? `You’re unfollowing ${user.firstName} ${user.lastName}`
+            : `You’re following ${user.firstName} ${user.lastName}`,
+        )
+      : showMessage('error', SOMETHING_WRONG);
   };
 
   const handleHideUser = async () => {
