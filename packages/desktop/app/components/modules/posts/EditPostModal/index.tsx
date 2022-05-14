@@ -92,7 +92,10 @@ const audienceOptions = [
 type FormValues = {
   user: string;
   audience: Audience;
-  mediaUrl?: string;
+  media?: {
+    url: string;
+    aspectRatio: number;
+  };
   categories: PostCategory[];
   mentionInput: {
     body?: string;
@@ -111,7 +114,13 @@ const schema = yup
       .oneOf<Audience>(Audiences)
       .default("EVERYONE")
       .required(),
-    mediaUrl: yup.string().notRequired(),
+    media: yup
+      .object({
+        url: yup.string().required().default(""),
+        aspectRatio: yup.number().required().default(1.58),
+      })
+      .default(undefined)
+      .notRequired(),
     categories: categoriesSchema,
     mentionInput: mentionTextSchema,
   })
@@ -165,21 +174,19 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
       ]);
       if (post) {
         reset(
-          schema.cast(
-            {
-              user: account._id == post.userId ? account._id : post.userId,
-              mediaUrl: post.mediaUrl ?? "",
-              categories: post.categories,
-              mentionInput: {
-                body: post.body,
-              },
+          schema.cast({
+            user: account._id == post.userId ? account._id : post.userId,
+            media: post.media ?? "",
+            categories: post.categories,
+            mentionInput: {
+              body: post.body,
             },
-          ) as DefaultValues<FormValues>,
+          }) as DefaultValues<FormValues>
         );
         setLocalFileUrl(
-          post.mediaUrl
-            ? `${process.env.NEXT_PUBLIC_POST_URL}/${post.mediaUrl}`
-            : null,
+          post.media
+            ? `${process.env.NEXT_PUBLIC_POST_URL}/${post.media.url}`
+            : null
         );
       } else {
         reset(schema.cast({ user: account._id }) as DefaultValues<FormValues>);
@@ -196,7 +203,7 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
   const onSubmit: SubmitHandler<FormValues> = async ({
     user,
     audience,
-    mediaUrl,
+    media,
     categories,
     mentionInput,
   }) => {
@@ -208,7 +215,7 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
             post: {
               audience,
               categories,
-              mediaUrl,
+              media,
               body: mentionInput.body,
               mentionIds: mentionInput.mentions?.map((mention) => mention.id),
               ...(user != account?._id ? { companyId: user } : {}),
@@ -227,7 +234,7 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
               userId: post.userId,
               audience,
               categories,
-              mediaUrl,
+              media,
               body: mentionInput.body,
               mentionIds: mentionInput.mentions?.map((mention) => mention.id),
             },
@@ -331,7 +338,7 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
                           selectedFile.current = undefined;
                           URL.revokeObjectURL(localFileUrl);
                         } else {
-                          setValue("mediaUrl", undefined);
+                          setValue("media", undefined);
                         }
                         setLocalFileUrl(null);
                       }}
@@ -345,7 +352,7 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
                 <div className="flex items-center">
                   <Controller
                     control={control}
-                    name="mediaUrl"
+                    name="media"
                     render={({ field }) => (
                       <Input
                         id="image-select"
@@ -357,7 +364,10 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
 
                           if (file) {
                             const remoteFilename = await uploadMedia(file);
-                            field.onChange(remoteFilename);
+                            field.onChange({
+                              url: remoteFilename,
+                              aspectRatio: 1.58,
+                            });
                           }
                         }}
                         className="hidden"

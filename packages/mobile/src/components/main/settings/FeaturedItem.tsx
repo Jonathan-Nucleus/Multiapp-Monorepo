@@ -16,7 +16,7 @@ interface FeedItemProps {
 }
 
 const FeaturedItem: React.FC<FeedItemProps> = ({ post }) => {
-  const { user, company, body, mediaUrl } = post;
+  const { user, company, body, media } = post;
   const goToDetails = () => {
     NavigationService.navigate('PostDetails', {
       screen: 'PostDetail',
@@ -64,7 +64,7 @@ const FeaturedItem: React.FC<FeedItemProps> = ({ post }) => {
             numberOfLines={2}
           />
         ) : null}
-        {mediaUrl ? <Media style={styles.postImage} src={mediaUrl} /> : null}
+        {media ? <Media style={styles.postImage} media={media} /> : null}
       </View>
     </Pressable>
   );

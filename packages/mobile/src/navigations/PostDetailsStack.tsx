@@ -42,18 +42,18 @@ export type PostDetailsStackParamList = {
       | 'audience'
       | 'categories'
       | 'body'
-      | 'mediaUrl'
+      | 'media'
       | 'mentionIds'
       | 'userId'
     >;
   };
   ChooseCategory: {
     _id?: string;
-    userId: string;
-    audience: Audience;
-    body?: string;
-    mentionIds: string[];
-    mediaUrl?: string;
+    userId: Post['userId'];
+    audience: Post['audience'];
+    body?: Post['body'];
+    mentionIds: Post['mentionIds'];
+    media?: Post['media'];
     localMediaPath?: string;
     categories?: PostCategory[];
   };

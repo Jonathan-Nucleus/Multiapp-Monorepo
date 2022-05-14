@@ -44,11 +44,7 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
   const [selectedPost, setSelectedPost] = useState<Post | undefined>(undefined);
 
   const { data: userData } = useAccount();
-  const {
-    data,
-    loading: postsLoading,
-    refetch,
-  } = usePosts(selectedCategories, selectedRole);
+  const { data, refetch } = usePosts(selectedCategories, selectedRole);
 
   const renderItem: ListRenderItem<Post> = useMemo(
     () =>
@@ -91,7 +87,9 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
   };
 
   const handleEditPost = () => {
-    if (!selectedPost) return;
+    if (!selectedPost) {
+      return;
+    }
     navigation.navigate('PostDetails', {
       screen: 'CreatePost',
       params: {

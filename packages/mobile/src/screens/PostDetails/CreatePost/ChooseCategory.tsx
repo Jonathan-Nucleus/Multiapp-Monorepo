@@ -120,7 +120,7 @@ const ChooseCategory: ChooseCategoryScreen = ({ route, navigation }) => {
           extraData={disabled}
           numColumns={2}
           renderItem={renderItem}
-          columnWrapperStyle={{ justifyContent: 'space-between' }}
+          columnWrapperStyle={styles.catList}
         />
       </PAppContainer>
     </View>
@@ -134,6 +134,9 @@ const styles = StyleSheet.create({
   },
   catLabel: {
     color: WHITE60,
+  },
+  catList: {
+    justifyContent: 'space-between',
   },
 });
 

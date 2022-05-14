@@ -21,7 +21,10 @@ describe("Mutations - createPost", () => {
         _id
         isCompany
         body
-        mediaUrl
+        media {
+          url
+          aspectRatio
+        }
         likeIds
         commentIds
         createdAt
@@ -46,7 +49,10 @@ describe("Mutations - createPost", () => {
     audience: Object.keys(AudienceOptions)[0],
     categories: [Object.keys(PostCategoryOptions)[0]],
     body: "test post body",
-    mediaUrl: "test.png",
+    media: {
+      url: "test.png",
+      aspectRatio: 1.58,
+    },
     mentionIds: [toObjectId().toString()],
   };
 
@@ -83,6 +89,40 @@ describe("Mutations - createPost", () => {
       variables: {
         post: {
           ...postData,
+          categories: ["test"],
+        },
+      },
+    });
+
+    expect(getErrorCode(res)).toBe(ErrorCode.BAD_USER_INPUT);
+  });
+
+  it("fails without media aspect ratio", async () => {
+    const res = await server.executeOperation({
+      query,
+      variables: {
+        post: {
+          ...postData,
+          media: {
+            url: postData.media.url,
+          },
+          categories: ["test"],
+        },
+      },
+    });
+
+    expect(getErrorCode(res)).toBe(ErrorCode.BAD_USER_INPUT);
+  });
+
+  it("fails without media url", async () => {
+    const res = await server.executeOperation({
+      query,
+      variables: {
+        post: {
+          ...postData,
+          media: {
+            aspectRatio: postData.media.aspectRatio,
+          },
           categories: ["test"],
         },
       },
@@ -139,7 +179,9 @@ describe("Mutations - createPost", () => {
     expect(JSON.stringify(res.data?.createPost?.categories)).toBe(
       JSON.stringify(postData.categories)
     );
-    expect(res.data?.createPost?.mediaUrl).toBe(postData.mediaUrl);
+    expect(JSON.stringify(res.data?.createPost?.media)).toBe(
+      JSON.stringify(postData.media)
+    );
     expect(res.data?.createPost?.user._id).toBe(authUser._id.toString());
 
     const newUser = (await users.find({
@@ -179,7 +221,9 @@ describe("Mutations - createPost", () => {
     expect(JSON.stringify(res.data?.createPost?.categories)).toBe(
       JSON.stringify(postData.categories)
     );
-    expect(res.data?.createPost?.mediaUrl).toBe(postData.mediaUrl);
+    expect(JSON.stringify(res.data?.createPost?.media)).toBe(
+      JSON.stringify(postData.media)
+    );
     expect(res.data?.createPost?.company._id).toBe(authCompany._id.toString());
     expect(res.data?.createPost?.isCompany).toBe(true);
 

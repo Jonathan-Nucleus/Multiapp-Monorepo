@@ -30,7 +30,6 @@ import {
   WHITE,
   WHITE12,
   WHITE60,
-  BLACK,
   BGDARK,
   PRIMARY,
   GRAY900,
@@ -55,7 +54,7 @@ const PostItem: React.FC<PostItemProps> = ({
   onPressMenu,
   onPressLikes,
 }) => {
-  const { user, company, body, mediaUrl } = post;
+  const { user, company, body, media } = post;
   const [liked, setLiked] = useState(false);
   const [likePost] = useLikePost();
   const [createPost] = useCreatePost();
@@ -120,7 +119,7 @@ const PostItem: React.FC<PostItemProps> = ({
         body: 'Share post',
         likePost: post._id,
         categories: post.categories,
-        mediaUrl: post.mediaUrl,
+        media: post.media,
         mentionIds: post.mentionIds,
         audience: post.audience,
       };
@@ -203,35 +202,34 @@ const PostItem: React.FC<PostItemProps> = ({
                   {previewData?.link && (
                     <PLabel label={previewData.link} textStyle={styles.link} />
                   )}
-                  {!mediaUrl &&
-                    (previewData?.title || previewData?.description) && (
-                      <View style={styles.metaDataContainer}>
-                        {mediaUrl ? (
-                          <></>
-                        ) : (
-                          <FastImage
-                            source={{ uri: previewData?.image?.url }}
-                            style={styles.previewImage}
-                          />
-                        )}
-                        <PLabel
-                          label={previewData?.title || ''}
-                          textStyle={styles.title}
+                  {!media && (previewData?.title || previewData?.description) && (
+                    <View style={styles.metaDataContainer}>
+                      {media ? (
+                        <></>
+                      ) : (
+                        <FastImage
+                          source={{ uri: previewData?.image?.url }}
+                          style={styles.previewImage}
                         />
-                        <PLabel
-                          label={previewData?.description || ''}
-                          textStyle={styles.description}
-                          numberOfLines={2}
-                        />
-                      </View>
-                    )}
+                      )}
+                      <PLabel
+                        label={previewData?.title || ''}
+                        textStyle={styles.title}
+                      />
+                      <PLabel
+                        label={previewData?.description || ''}
+                        textStyle={styles.description}
+                        numberOfLines={2}
+                      />
+                    </View>
+                  )}
                 </>
               )}
               textContainerStyle={styles.previewTextContainer}
               text={body}
             />
           ) : null}
-          {mediaUrl ? <Media src={mediaUrl} /> : null}
+          {media ? <Media media={media} /> : null}
         </View>
         <View style={[styles.postInfo, styles.contentPadding]}>
           <View style={styles.tagWrapper}>

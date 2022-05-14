@@ -17,7 +17,7 @@ export namespace Post {
     isCompany: boolean;
     audience: Audience;
     body?: string;
-    mediaUrl?: string;
+    media?: Media;
     mentionIds?: ObjectId[];
     categories: PostCategory[];
     likeIds?: ObjectId[];
@@ -49,16 +49,21 @@ export namespace Post {
 
   // Defines the server-side input schema for posts after GraphQL enumarations
   // have been transformed to their Mongo types.
-  export type Input = Pick<GraphQL, "body" | "mediaUrl" | "mentionIds"> &
+  export type Input = Pick<GraphQL, "body" | "media" | "mentionIds"> &
     Pick<Mongo, "audience" | "categories"> & {
       companyId?: string;
     };
 
   export type Update = Pick<
     GraphQL,
-    "_id" | "body" | "mentionIds" | "mediaUrl" | "userId"
+    "_id" | "body" | "mentionIds" | "media" | "userId"
   > &
     Pick<Mongo, "audience" | "categories">;
+}
+
+interface Media {
+  url: string;
+  aspectRatio: number;
 }
 
 /** Enumeration describing the audience targeted by a post. */
@@ -196,7 +201,7 @@ export const PostSchema = `
     isCompany: Boolean!
     audience: Audience!
     body: String
-    mediaUrl: String
+    media: Media
     mentionIds: [ID!]
     categories: [PostCategory!]!
     likeIds: [ID!]
@@ -217,11 +222,21 @@ export const PostSchema = `
     sharedPost: Post
   }
 
+  type Media {
+    url: String!
+    aspectRatio: Float!
+  }
+
+  input MediaInput {
+    url: String!
+    aspectRatio: Float!
+  }
+
   input PostInput {
     companyId: ID
     audience: Audience!
     body: String
-    mediaUrl: String
+    media: MediaInput
     categories: [PostCategory!]!
     mentionIds: [ID!]
   }
@@ -231,7 +246,7 @@ export const PostSchema = `
     userId: ID!
     audience: Audience!
     body: String
-    mediaUrl: String
+    media: MediaInput
     categories: [PostCategory!]!
     mentionIds: [ID!]
   }

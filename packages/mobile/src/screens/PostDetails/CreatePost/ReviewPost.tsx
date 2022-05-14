@@ -36,7 +36,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
     categories,
     body,
     mentionIds,
-    mediaUrl,
+    media,
     localMediaPath,
   } = postData;
 
@@ -52,7 +52,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
       body,
       audience,
       categories,
-      mediaUrl,
+      media,
       mentionIds,
     };
 
@@ -140,9 +140,9 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
         {localMediaPath ? (
           <Image source={{ uri: localMediaPath }} style={styles.postImage} />
         ) : (
-          route.params?.mediaUrl && (
+          route.params?.media && (
             <Image
-              source={{ uri: `${POST_URL}/${route.params?.mediaUrl}` }}
+              source={{ uri: `${POST_URL}/${route.params?.media.url}` }}
               style={styles.postImage}
             />
           )

@@ -1,14 +1,15 @@
 import React, { FC, useState, useRef } from 'react';
-import { StyleProp, StyleSheet, Pressable, Text, View } from 'react-native';
+import { StyleProp, StyleSheet, Pressable, View } from 'react-native';
 import FastImage, { ImageStyle } from 'react-native-fast-image';
 import Video from 'react-native-video';
 import { Play } from 'phosphor-react-native';
 import { POST_URL } from 'react-native-dotenv';
+import { Media as MediaType } from 'shared/graphql/fragments/post';
 
 import { BLACK75, WHITE60 } from 'shared/src/colors';
 
 interface MediaProps {
-  src: string;
+  media: MediaType;
   style?: StyleProp<ImageStyle>;
 }
 
@@ -19,12 +20,14 @@ function isVideo(src: string): boolean {
   return SUPPORTED_EXTENSION.includes(ext);
 }
 
-const Media: FC<MediaProps> = ({ src, style }) => {
+const Media: FC<MediaProps> = ({ media, style }) => {
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const player = useRef<Video | null>(null);
 
   const playVideo = (): void => {
-    if (!isFirstLoad) return;
+    if (!isFirstLoad) {
+      return;
+    }
 
     setIsFirstLoad(false);
   };
@@ -36,12 +39,17 @@ const Media: FC<MediaProps> = ({ src, style }) => {
 
   // TODO: Need to potentially validate the src url before feeding it to
   // react-native-video as an invalid source seems to crash the app
-  return isVideo(src) ? (
+  return isVideo(media.url) ? (
     <Pressable onPress={playVideo}>
-      <View style={[styles.videoContainer, style]}>
+      <View
+        style={[
+          styles.videoContainer,
+          style,
+          { aspectRatio: media.aspectRatio },
+        ]}>
         <Video
           ref={(ref) => (player.current = ref)}
-          source={{ uri: `${POST_URL}/${src}` }}
+          source={{ uri: `${POST_URL}/${media.url}` }}
           onError={(err) => console.log('error', err)}
           onEnd={onVideoEnd}
           style={styles.media}
@@ -59,8 +67,8 @@ const Media: FC<MediaProps> = ({ src, style }) => {
     </Pressable>
   ) : (
     <FastImage
-      style={[styles.media, style]}
-      source={{ uri: `${POST_URL}/${src}` }}
+      style={[styles.media, style, { aspectRatio: media.aspectRatio }]}
+      source={{ uri: `${POST_URL}/${media.url}` }}
       resizeMode={FastImage.resizeMode.cover}
     />
   );
@@ -93,7 +101,6 @@ const styles = StyleSheet.create({
   },
   media: {
     width: '100%',
-    height: 226,
     marginVertical: 16,
     borderRadius: 16,
     overflow: 'hidden',

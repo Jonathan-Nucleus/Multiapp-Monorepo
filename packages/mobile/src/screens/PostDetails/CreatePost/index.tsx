@@ -18,7 +18,6 @@ import RadioGroup, { Option } from 'react-native-radio-button-group';
 import {
   MentionInput,
   MentionSuggestionsProps,
-  replaceMentionValues,
 } from 'react-native-controlled-mentions';
 import _isEqual from 'lodash/isEqual';
 import {
@@ -46,12 +45,9 @@ import PModal from 'mobile/src/components/common/PModal';
 import { showMessage } from 'mobile/src/services/utils';
 import pStyles from 'mobile/src/theme/pStyles';
 import {
-  GRAY3,
   SECONDARY,
   WHITE60,
-  DISABLED,
   PRIMARY,
-  PRIMARYSOLID7,
   PRIMARYSOLID,
   WHITE,
   WHITE12,
@@ -138,7 +134,10 @@ export const AUDIENCE_OPTIONS: Option<Audience>[] = [
 type FormValues = {
   userId: string;
   audience: Audience;
-  mediaUrl?: string;
+  media?: {
+    url: string;
+    aspectRatio: number;
+  };
   body?: string;
   mentionIds: string[];
 };
@@ -151,12 +150,17 @@ const schema = yup
       .oneOf<Audience>(Audiences)
       .default('EVERYONE')
       .required(),
-    mediaUrl: yup.string().notRequired(),
+    media: yup
+      .object({
+        url: yup.string().required().default(''),
+        aspectRatio: yup.number().required().default(1.58),
+      })
+      .notRequired(),
     body: yup
       .string()
       .notRequired()
-      .when('mediaUrl', {
-        is: (mediaUrl?: string) => !mediaUrl || mediaUrl.length === 0,
+      .when('media', {
+        is: (media: FormValues['media']) => !media,
         then: yup.string().required('Required'),
       }),
     mentionIds: yup
@@ -202,7 +206,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
             userId: post.userId,
             body: post.body ?? '',
             audience: post.audience,
-            mediaUrl: post.mediaUrl ?? undefined,
+            media: post.media ?? undefined,
             mentionIds: post.mentionIds ?? [],
           }
         : { user: account?._id },
@@ -215,24 +219,26 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     if (account && !post?._id) {
       setValue('userId', account._id);
     }
-  }, [account]);
+  }, [account, setValue, post]);
 
-  const { field: mediaField } = useController({ name: 'mediaUrl', control });
+  const { field: mediaField } = useController({ name: 'media', control });
   const { field: mentionsField } = useController({
     name: 'mentionIds',
     control,
   });
 
   const onSubmit = (values: FormValues): void => {
-    if (!account) return;
+    if (!account) {
+      return;
+    }
 
-    const { userId, audience, body, mediaUrl, mentionIds } = values;
+    const { userId, audience, body, media, mentionIds } = values;
     navigation.navigate('ChooseCategory', {
       ...(post ?? {}),
       userId,
       audience,
       body,
-      mediaUrl,
+      media,
       localMediaPath: imageData?.path,
       mentionIds, // TODO: Parse from body and add here
     });
@@ -293,7 +299,8 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       return;
     }
 
-    const rawData = (imageData as UploadImage).data;
+    const mediaFile = imageData as UploadImage;
+    const rawData = mediaFile.data;
     if (!rawData) {
       showMessage('error', 'Only images supported at this time');
       return;
@@ -315,7 +322,10 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       return;
     }
 
-    mediaField.onChange(remoteName);
+    mediaField.onChange({
+      url: remoteName,
+      aspectRatio: 1.58, // temp
+    });
     setImageData(imageData);
   };
 
@@ -351,28 +361,33 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     })),
   ];
 
-  const fetchMentionUsers = async (search?: string) => {
-    if (!search) return;
-    if (currentSearch.current !== undefined) {
-      if (currentSearch.current !== search) {
-        nextSearch.current = search;
+  const fetchMentionUsers = useCallback(
+    async (search?: string) => {
+      if (!search) {
+        return;
       }
-      return;
-    }
+      if (currentSearch.current !== undefined) {
+        if (currentSearch.current !== search) {
+          nextSearch.current = search;
+        }
+        return;
+      }
 
-    currentSearch.current = search;
-    const { data } = await refetch({ search });
+      currentSearch.current = search;
+      const { data } = await refetch({ search });
 
-    if (data.mentionUsers && !_isEqual(mentionUsers, data.mentionUsers)) {
-      setMentionUsers(data.mentionUsers);
-    }
+      if (data.mentionUsers && !_isEqual(mentionUsers, data.mentionUsers)) {
+        setMentionUsers(data.mentionUsers);
+      }
 
-    currentSearch.current = undefined;
-    if (nextSearch.current) {
-      fetchMentionUsers(nextSearch.current);
-      nextSearch.current = undefined;
-    }
-  };
+      currentSearch.current = undefined;
+      if (nextSearch.current) {
+        fetchMentionUsers(nextSearch.current);
+        nextSearch.current = undefined;
+      }
+    },
+    [mentionUsers, refetch],
+  );
 
   const renderSuggestions = useCallback(
     ({
@@ -387,13 +402,15 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       setTimeout(() => setShowActionBar(false), 50);
       fetchMentionUsers(keyword);
 
-      if (mentionUsers.length === 0) return null;
+      if (mentionUsers.length === 0) {
+        return null;
+      }
 
       return (
         <ScrollView
           style={styles.mentionList}
           contentContainerStyle={styles.mentionContentContainer}>
-          <View style={{ flex: 1 }}>
+          <View style={styles.flex}>
             {mentionUsers.map((user) => (
               <Pressable
                 key={user._id}
@@ -415,7 +432,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
         </ScrollView>
       );
     },
-    [mentionUsers],
+    [mentionUsers, fetchMentionUsers, mentionsField],
   );
 
   return (
@@ -535,9 +552,9 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
           />
           {imageData ? (
             <Image source={{ uri: imageData.path }} style={styles.postImage} />
-          ) : post?.mediaUrl ? (
+          ) : post?.media ? (
             <Image
-              source={{ uri: `${POST_URL}/${post.mediaUrl}` }}
+              source={{ uri: `${POST_URL}/${post.media.url}` }}
               style={styles.postImage}
             />
           ) : null}

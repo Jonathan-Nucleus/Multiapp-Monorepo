@@ -1,10 +1,6 @@
 import { FC, useState } from "react";
 import Card from "../Card";
-import {
-  ChatCenteredText,
-  Share,
-  ThumbsUp,
-} from "phosphor-react";
+import { ChatCenteredText, Share, ThumbsUp } from "phosphor-react";
 import Media from "../Media";
 import { useLikePost } from "shared/graphql/mutation/posts";
 import LikeModal from "./LikesModal";
@@ -25,8 +21,9 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
   const [likePost] = useLikePost();
   const [visiblePostLikeModal, setVisiblePostLikeModal] = useState(false);
   const [visibleComment, setVisibleComment] = useState(false);
-  const isMyPost = (post.user && post.user._id == account?._id)
-    || (post.company && account?.companyIds?.includes(post.company._id));
+  const isMyPost =
+    (post.user && post.user._id == account?._id) ||
+    (post.company && account?.companyIds?.includes(post.company._id));
   const isLiked = account && post.likeIds?.includes(account._id);
   const isMuted = account?.mutedPostIds?.includes(post._id) ?? false;
   const toggleLike = async () => {
@@ -64,9 +61,9 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
             </div>
           ))}
         </div>
-        {post.mediaUrl && (
+        {post.media && (
           <div className="relative h-auto mt-5 border-b border-white/[.12]">
-            <Media src={post.mediaUrl} />
+            <Media media={post.media} />
           </div>
         )}
         <div className="flex items-center p-4">

@@ -22,7 +22,10 @@ describe("Mutations - editPost", () => {
         _id
         audience
         body
-        mediaUrl
+        media {
+          url
+          aspectRatio
+        }
         categories
         mentionIds
         updatedAt
@@ -44,7 +47,10 @@ describe("Mutations - editPost", () => {
     body: faker.lorem.sentence(),
     audience: "EVERYONE",
     categories: ["NEWS"],
-    mediaUrl: "test.png",
+    media: {
+      url: "test.png",
+      aspectRatio: 1.58,
+    },
     mentionIds: [toObjectId().toString()],
   };
 

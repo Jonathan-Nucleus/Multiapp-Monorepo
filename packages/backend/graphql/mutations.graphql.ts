@@ -596,7 +596,10 @@ const resolvers = {
                   )
                   .required(),
                 body: yup.string(),
-                mediaUrl: yup.string(),
+                media: yup.object({
+                  url: yup.string().required(),
+                  aspectRatio: yup.number().required(),
+                }),
                 mentionIds: yup.array().of(
                   yup.string().test({
                     test: isObjectId,
