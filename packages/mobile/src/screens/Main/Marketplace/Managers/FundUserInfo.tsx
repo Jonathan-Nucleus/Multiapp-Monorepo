@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import Avatar from 'mobile/src/components/common/Avatar';
 import { WHITE, BLACK } from 'shared/src/colors';
 import { Body1Bold, Body3 } from 'mobile/src/theme/fonts';
@@ -13,14 +13,17 @@ import { FundManager } from 'shared/graphql/query/marketplace/useFundManagers';
 
 interface FundUserInfoProps {
   manager: FundManager;
+  onPress: () => void;
 }
 
-const FundUserInfo: React.FC<FundUserInfoProps> = ({ manager }) => {
+const FundUserInfo: React.FC<FundUserInfoProps> = ({ manager, onPress }) => {
   const { isFollowing, toggleFollow } = useFollowUser(manager._id);
 
   return (
     <View style={styles.userInfoContainer}>
-      <Avatar size={48} user={manager} style={styles.managerAvatar} />
+      <Pressable onPress={onPress}>
+        <Avatar size={64} user={manager} style={styles.managerAvatar} />
+      </Pressable>
       <View style={styles.managerInfo}>
         <View>
           <PLabel

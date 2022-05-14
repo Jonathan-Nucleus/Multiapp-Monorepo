@@ -12,23 +12,34 @@ import {
 import FundProfileInfo from './FundProfileInfo';
 
 import { useWatchFund } from 'shared/graphql/mutation/funds/useWatchFund';
+import PGradientOutlineButton from '../../../../components/common/PGradientOutlineButton';
 
 type Fund = FundSummary & FundCompany & FundManager;
+
 export interface FundItemProps {
   fund: Fund;
   showOverview?: boolean;
   showTags?: boolean;
-  onClickFundDetails?: () => void;
+  onClickFundDetails: () => void;
+  category?: string;
 }
 
-const FundItem: FC<FundItemProps> = ({ fund, onClickFundDetails }) => {
+const FundItem: FC<FundItemProps> = ({
+  fund,
+  category,
+  onClickFundDetails,
+}) => {
   const { isWatching, toggleWatch } = useWatchFund(fund._id);
   return (
     <View style={styles.fundItem}>
-      <FundProfileInfo fund={fund} showOverview showTags />
+      <FundProfileInfo fund={fund} category={category} />
       <View style={styles.actionBar}>
-        <PGradientButton
-          label="View Fund Details"
+        <PGradientOutlineButton
+          label={
+            category === 'equity'
+              ? 'View Strategy Overview'
+              : 'View Fund Details'
+          }
           textStyle={styles.button}
           btnContainer={styles.buttonContainer}
           onPress={onClickFundDetails}

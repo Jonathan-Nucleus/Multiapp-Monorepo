@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
 import { PRIMARY, WHITE, WHITE12, BLACK } from 'shared/src/colors';
 import { Body1Bold, Body2, Body3, Body3Bold } from 'mobile/src/theme/fonts';
 
@@ -8,20 +8,31 @@ import PLabel from 'mobile/src/components/common/PLabel';
 import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 
 import { FundManager } from 'shared/graphql/query/marketplace/useFundManagers';
+import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 
 interface ManagerItemProps {
   manager: FundManager;
 }
 
 const ManagerItem: FC<ManagerItemProps> = ({ manager }) => {
+  const goToProfile = () => {
+    NavigationService.navigate('UserDetails', {
+      screen: 'UserProfile',
+      params: {
+        userId: manager._id,
+      },
+    });
+  };
   return (
     <View style={styles.managerItem}>
-      <FundUserInfo manager={manager} />
+      <FundUserInfo manager={manager} onPress={goToProfile} />
       <View style={styles.nameWrapper}>
-        <PLabel
-          label={`${manager.firstName} ${manager.lastName}`}
-          textStyle={styles.nameLabel}
-        />
+        <Pressable onPress={goToProfile}>
+          <PLabel
+            label={`${manager.firstName} ${manager.lastName}`}
+            textStyle={styles.nameLabel}
+          />
+        </Pressable>
         {manager.role === 'PROFESSIONAL' && (
           <View style={styles.proWrapper}>
             <ShieldCheckSvg />
@@ -79,9 +90,6 @@ const styles = StyleSheet.create({
     ...Body2,
   },
   separator: {
-    width: '100%',
-    height: 1,
-    backgroundColor: WHITE12,
     marginVertical: 16,
   },
   titleLabel: {

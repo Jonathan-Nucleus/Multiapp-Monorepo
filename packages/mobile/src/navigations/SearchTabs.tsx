@@ -37,8 +37,7 @@ import { useGlobalSearch } from 'shared/graphql/query/search/useGlobalSearch';
 
 const Tab = createMaterialTopTabNavigator();
 const SearchTabs: SearchScreen = ({ navigation, route }) => {
-  const { searchString } = route.params;
-  const [search, setSearch] = useState(searchString ?? '');
+  const [search, setSearch] = useState(route.params?.searchString ?? '');
   const { data: searchData } = useGlobalSearch(search);
 
   return (

@@ -52,7 +52,7 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
   }
 
   return (
-    <View style={pStyles.globalContainer}>
+    <View style={styles.container}>
       <MainHeader
         leftIcon={<CaretLeft size={32} color={WHITE} />}
         onPressLeft={() => NavigationService.goBack()}
@@ -124,6 +124,10 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
 export default FundDetails;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: BLACK,
+  },
   actionBar: {
     padding: 16,
     flexDirection: 'row',

@@ -1,6 +1,7 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import {
   TouchableOpacity,
+  Image,
   Text,
   View,
   StyleSheet,
@@ -10,9 +11,7 @@ import FastImage from 'react-native-fast-image';
 
 import Avatar from 'mobile/src/components/common/Avatar';
 import Tag from 'mobile/src/components/common/Tag';
-import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
-import { Body1, Body2, Body3 } from 'mobile/src/theme/fonts';
 import {
   PRIMARY,
   WHITE,
@@ -20,29 +19,26 @@ import {
   DANGER,
   GRAY100,
   WHITE12,
+  SUCCESS30,
+  DANGER30,
 } from 'shared/src/colors';
+import { Body1, Body2, Body3, Body4 } from 'mobile/src/theme/fonts';
 
-import { useFollowUser } from 'shared/graphql/mutation/account/useFollowUser';
 import {
   FundSummary,
   FundManager,
   FundCompany,
 } from 'shared/graphql/fragments/fund';
 
-import { BACKGROUND_URL } from 'react-native-dotenv';
+import { useFollowUser } from 'shared/graphql/mutation/account/useFollowUser';
 
 export type Fund = FundSummary & FundManager & FundCompany;
 export interface FundProfileInfo {
   fund: Fund;
-  showOverview?: boolean;
-  showTags?: boolean;
+  category?: string;
 }
 
-const FundProfileInfo: FC<FundProfileInfo> = ({
-  fund,
-  showOverview,
-  showTags,
-}) => {
+const FundProfileInfo: FC<FundProfileInfo> = ({ fund, category }) => {
   const { isFollowing, toggleFollow } = useFollowUser(fund.manager._id);
 
   const goToManager = () =>
@@ -53,35 +49,22 @@ const FundProfileInfo: FC<FundProfileInfo> = ({
       },
     });
 
-  const goToCompany = () =>
-    NavigationService.navigate('CompanyDetails', {
-      screen: 'CompanyProfile',
-      params: {
-        companyId: fund.company._id,
-      },
-    });
-
-  const handleContact = () => {
-    NavigationService.navigate('Contact');
-  };
-
-  const { background, avatar } = fund.company;
   return (
     <View>
       <View style={styles.imagesContainer}>
-        {background && (
-          <FastImage
-            style={styles.backgroundImage}
-            source={{ uri: `${BACKGROUND_URL}/${background.url}` }}
-            resizeMode={FastImage.resizeMode.cover}
-          />
-        )}
-        {avatar && (
-          <Avatar user={{ avatar }} size={64} style={styles.avatarImage} />
-        )}
-      </View>
-      <View style={styles.fundDetailsContainer}>
-        <View style={styles.statusContainer}>
+        <View style={styles.companyInfo}>
+          <Avatar user={fund.company} size={40} style={styles.avatarImage} />
+          <Text style={[styles.whiteText, Body1, styles.fund]}>
+            {fund.name}
+          </Text>
+        </View>
+        <View
+          style={[
+            styles.statusContainer,
+            fund.status === 'OPEN'
+              ? styles.openContainer
+              : styles.closedContainer,
+          ]}>
           <View
             style={[
               styles.statusIndicator,
@@ -91,27 +74,31 @@ const FundProfileInfo: FC<FundProfileInfo> = ({
           <Text
             style={[
               styles.whiteText,
+              Body4,
               fund.status === 'OPEN' ? styles.successText : styles.dangerText,
             ]}>
             {fund.status}
           </Text>
         </View>
-        <Text style={[styles.whiteText, Body1, styles.fund]}>{fund.name}</Text>
-        <Pressable onPress={goToCompany}>
-          <Text style={[styles.company, Body2]}>{fund.company.name}</Text>
-        </Pressable>
-        {showOverview && (
-          <Text style={[styles.overview, styles.whiteText, Body2]}>
-            {fund.overview}
-          </Text>
-        )}
-        {showTags && (
-          <View style={styles.tags}>
-            {fund.tags.map((tag, index) => (
-              <Tag label={tag} viewStyle={styles.tagStyle} key={index} />
-            ))}
+        {/* <Text style={[styles.company, Body2]}>{fund.company.name}</Text> */}
+      </View>
+      <View style={styles.fundSummaryContainer}>
+        <View style={[styles.fundDescriptorContainer, styles.rightSeparator]}>
+          <Text style={[styles.title, styles.center]}>Asset Class</Text>
+          <Text style={[styles.whiteText, styles.center]}>Hedge Fund</Text>
+        </View>
+        <View style={[styles.fundDescriptorContainer]}>
+          <Text style={[styles.title, styles.center]}>Strategy</Text>
+          <Text style={[styles.whiteText, styles.center]}>Multi-Strategy</Text>
+        </View>
+        {category !== 'equity' && (
+          <View style={[styles.fundDescriptorContainer, styles.leftSeparator]}>
+            <Text style={[styles.title, styles.center]}>Minimum</Text>
+            <Text style={[styles.whiteText, styles.center]}>$500K</Text>
           </View>
         )}
+      </View>
+      <View style={styles.fundDetailsContainer}>
         {fund && fund.manager && (
           <Pressable onPress={goToManager}>
             <View style={styles.managerContainer}>
@@ -145,25 +132,11 @@ const FundProfileInfo: FC<FundProfileInfo> = ({
             </View>
           </Pressable>
         )}
-        <PGradientButton
-          label="contact specialist"
-          onPress={handleContact}
-          btnContainer={styles.contactBtn}
-        />
-      </View>
-      <View style={styles.fundSummaryContainer}>
-        <View style={[styles.fundDescriptorContainer, styles.rightSeparator]}>
-          <Text style={[styles.title, styles.center]}>Asset Class</Text>
-          <Text style={[styles.whiteText, styles.center]}>Hedge Fund</Text>
-        </View>
-        <View style={[styles.fundDescriptorContainer, styles.rightSeparator]}>
-          <Text style={[styles.title, styles.center]}>Strategy</Text>
-          <Text style={[styles.whiteText, styles.center]}>Multi-Strategy</Text>
-        </View>
-        <View style={styles.fundDescriptorContainer}>
-          <Text style={[styles.title, styles.center]}>Minimum</Text>
-          <Text style={[styles.whiteText, styles.center]}>$500K</Text>
-        </View>
+        <Text
+          style={[styles.overview, styles.whiteText, Body3]}
+          numberOfLines={2}>
+          {fund.overview}
+        </Text>
       </View>
     </View>
   );
@@ -176,27 +149,29 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   imagesContainer: {
-    width: '100%',
-    position: 'relative',
-    overflow: 'visible',
-    zIndex: 2,
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    backgroundColor: '#131313',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderTopColor: WHITE12,
+    borderBottomColor: WHITE12,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
   },
-  backgroundImage: {
-    width: '100%',
-    height: 80,
+  companyInfo: {
+    flex: 1,
+    marginRight: 50,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   avatarImage: {
-    aspectRatio: 1,
     borderRadius: 4,
-    position: 'absolute',
-    left: 16,
-    bottom: -32,
   },
   fundDetailsContainer: {
     padding: 16,
-    borderColor: WHITE12,
-    borderBottomWidth: 1,
-    zIndex: 1,
   },
   whiteText: {
     color: WHITE,
@@ -211,22 +186,29 @@ const styles = StyleSheet.create({
     color: DANGER,
   },
   fund: {
-    marginTop: 16,
-    lineHeight: 24,
+    lineHeight: 21,
+    marginLeft: 12,
   },
   company: {
     color: PRIMARY,
     marginBottom: 16,
   },
   overview: {
-    lineHeight: 20,
+    lineHeight: 16,
+    marginTop: 16,
   },
   statusContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-end',
-    marginTop: -8,
-    marginRight: 16,
+    borderRadius: 16,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+  },
+  openContainer: {
+    backgroundColor: SUCCESS30,
+  },
+  closedContainer: {
+    backgroundColor: DANGER30,
   },
   statusIndicator: {
     width: 12,
@@ -260,10 +242,6 @@ const styles = StyleSheet.create({
   managerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 16,
-    paddingTop: 16,
-    borderTopColor: WHITE12,
-    borderTopWidth: 1,
   },
   manager: {
     flexDirection: 'row',
@@ -297,6 +275,10 @@ const styles = StyleSheet.create({
   rightSeparator: {
     borderRightColor: WHITE12,
     borderRightWidth: 1,
+  },
+  leftSeparator: {
+    borderLeftColor: WHITE12,
+    borderLeftWidth: 1,
   },
   title: {
     textTransform: 'uppercase',
