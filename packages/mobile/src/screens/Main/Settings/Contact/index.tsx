@@ -71,62 +71,14 @@ const Contact: React.FC<ContactProps> = ({ navigation }) => {
       />
       <PAppContainer>
         <PTitle
-          title="Choose a contact method:"
+          title="Choose a fund specialist"
           style={styles.textContainer}
           textStyle={styles.title}
         />
-        <View style={styles.tabContainer}>
-          <TouchableOpacity onPress={() => setSelectTab('phone')}>
-            <View
-              style={[
-                styles.phoneTab,
-                selectTab === 'phone' && styles.selectedTab,
-              ]}>
-              <PhoneCall
-                size={18}
-                color={selectTab === 'phone' ? BLACK : WHITE}
-              />
-              <Text
-                style={[
-                  styles.text,
-                  selectTab === 'phone' && styles.selectedTxt,
-                ]}>
-                Phone
-              </Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setSelectTab('email')}>
-            <View
-              style={[
-                styles.emailTab,
-                selectTab === 'email' && styles.selectedTab,
-              ]}>
-              <Envelope
-                size={18}
-                color={selectTab === 'email' ? BLACK : WHITE}
-              />
-              <Text
-                style={[
-                  styles.text,
-                  selectTab === 'email' && styles.selectedTxt,
-                ]}>
-                Email
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-
-        {selectTab === 'phone' ? (
-          <PhoneContact
-            handleContact={(val) => handleContact(val)}
-            funds={FUNDS}
-          />
-        ) : (
-          <EmailContact
-            handleContact={(val) => handleContact(val)}
-            funds={FUNDS}
-          />
-        )}
+        <EmailContact
+          handleContact={(val) => handleContact(val)}
+          funds={FUNDS}
+        />
       </PAppContainer>
     </View>
   );

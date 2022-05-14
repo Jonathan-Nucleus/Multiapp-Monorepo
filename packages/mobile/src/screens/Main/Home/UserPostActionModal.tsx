@@ -84,11 +84,11 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
         icon: <XSquare size={26} color={WHITE} />,
         key: 'hidePost' as const,
       },
-      {
-        label: 'Report post',
-        icon: <WarningOctagon size={26} color={WHITE} />,
-        key: 'report' as const,
-      },
+      // {
+      //   label: 'Report post',
+      //   icon: <WarningOctagon size={26} color={WHITE} />,
+      //   key: 'report' as const,
+      // },
       ...(user // Only supported for users, not company posts
         ? [
             {
@@ -208,8 +208,6 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
               return handleHideUser();
             case 'hidePost':
               return handleHidePost();
-            case 'report':
-              return setTimeout(() => setReportPostModalVisible(true), 500);
             case 'mute':
               return handleMutePost();
           }
