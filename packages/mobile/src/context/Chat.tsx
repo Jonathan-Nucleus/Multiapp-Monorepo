@@ -52,21 +52,25 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
     if (!chatClient.current && user && token) {
       const client = StreamChat.getInstance<StreamType>(GETSTREAM_ACCESS_KEY);
       (async () => {
-        await client.connectUser(
-          {
-            id: user._id,
-            name: `${user.firstName} ${user.lastName}`,
-            image: `${AVATAR_URL}/${user.avatar}`,
-            company: user.companies?.[0]?.name,
-            position: user.position,
-          },
-          token,
-        );
+        try {
+          await client.connectUser(
+            {
+              id: user._id,
+              name: `${user.firstName} ${user.lastName}`,
+              image: `${AVATAR_URL}/${user.avatar}`,
+              company: user.companies?.[0]?.name,
+              position: user.position,
+            },
+            token,
+          );
 
-        console.log('Started chat');
+          console.log('Started chat', client);
 
-        chatClient.current = client;
-        setIsReady(true);
+          chatClient.current = client;
+          setIsReady(true);
+        } catch (err) {
+          console.log(err);
+        }
       })();
 
       return () => {

@@ -17,7 +17,12 @@ import {
   Text,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CaretLeft, ImageSquare } from 'phosphor-react-native';
+import {
+  CaretLeft,
+  ImageSquare,
+  PaperPlaneRight,
+  PaperPlaneTilt,
+} from 'phosphor-react-native';
 import {
   Channel as SCChannel,
   ChannelSort,
@@ -34,7 +39,13 @@ import PTextInput from 'mobile/src/components/common/PTextInput';
 import ChatAvatar from 'mobile/src/components/main/chat/ChatAvatar';
 import { Body1Bold, Body2, Body3 } from 'mobile/src/theme/fonts';
 import pStyles from 'mobile/src/theme/pStyles';
-import { WHITE, BGDARK, WHITE12, GRAY600 } from 'shared/src/colors';
+import {
+  WHITE,
+  BGDARK,
+  WHITE12,
+  GRAY600,
+  PRIMARYSOLID,
+} from 'shared/src/colors';
 
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
@@ -191,6 +202,13 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
           contentContainerStyle={styles.list}
         />
         <View style={styles.inputContainer}>
+          <View style={styles.imageButton}>
+            <Pressable
+              onPress={() => console.log('open gallery')}
+              style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}>
+              <ImageSquare size={20} color={WHITE} />
+            </Pressable>
+          </View>
           <Controller
             name="message"
             control={control}
@@ -211,11 +229,9 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
               />
             )}
           />
-          <View style={styles.imageButton}>
-            <Pressable
-              onPress={() => console.log('open gallery')}
-              style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}>
-              <ImageSquare size={20} color={WHITE} />
+          <View style={styles.sendButton}>
+            <Pressable onPress={handleSubmit(onSubmit)}>
+              <PaperPlaneRight size={20} color={WHITE} />
             </Pressable>
           </View>
         </View>
@@ -262,6 +278,11 @@ const styles = StyleSheet.create({
   inputContainer: {
     position: 'relative',
   },
+  sendButton: {
+    position: 'absolute',
+    right: 10,
+    top: 18,
+  },
   textInputContainer: {
     marginBottom: 8,
     marginTop: 0,
@@ -269,15 +290,15 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
   input: {
-    paddingLeft: 64,
-    paddingRight: 16,
-    lineHeight: 18,
+    paddingLeft: 32,
+    paddingRight: 32,
     ...Body2,
   },
   imageButton: {
     position: 'absolute',
-    height: '100%',
     justifyContent: 'center',
-    paddingLeft: 16,
+    left: 10,
+    zIndex: 99,
+    top: 18,
   },
 });

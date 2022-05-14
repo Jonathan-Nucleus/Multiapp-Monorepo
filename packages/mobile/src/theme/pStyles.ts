@@ -1,10 +1,10 @@
 import { StyleSheet } from 'react-native';
-import { BGDARK, GRAY800 } from 'shared/src/colors';
+import { BGDARK, BLACK, GRAY800 } from 'shared/src/colors';
 
 const pStyles = StyleSheet.create({
   globalContainer: {
     flex: 1,
-    backgroundColor: BGDARK,
+    backgroundColor: BLACK,
   },
   pressedStyle: {
     opacity: 0.6,
