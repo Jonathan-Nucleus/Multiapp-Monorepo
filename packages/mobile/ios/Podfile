@@ -22,6 +22,8 @@ target 'mobile' do
   pod 'React-RCTText', :path => '../node_modules/react-native/Libraries/Text', :modular_headers => true
 
 
+
+
   target 'mobileTests' do
     inherit! :complete
     # Pods for testing

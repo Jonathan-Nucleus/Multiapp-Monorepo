@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
+  ActivityIndicator,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -14,6 +15,9 @@ import ImagePicker, {
   ImageOrVideo,
   Image as UploadImage,
 } from 'react-native-image-crop-picker';
+import HeicConverter from 'react-native-heic-converter';
+import RNFS from 'react-native-fs';
+
 import RadioGroup, { Option } from 'react-native-radio-button-group';
 import {
   MentionInput,
@@ -185,6 +189,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   const [showActionBar, setShowActionBar] = useState(true);
   const [postAsModalVisible, setPostAsModalVisible] = useState(false);
   const [audienceModalVisible, setAudienceModalVisible] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [imageData, setImageData] = useState<ImageOrVideo | undefined>(
     undefined,
   );
@@ -248,25 +253,24 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   };
 
   const openPicker = async (): Promise<void> => {
-    const imageData = await ImagePicker.openPicker({
+    const image = await ImagePicker.openPicker({
       width: 300,
       height: 400,
       cropping: true,
-      includeBase64: true,
     });
 
-    await uploadImage(imageData);
+    await uploadImage(image);
   };
 
   const takePhoto = async (): Promise<void> => {
-    const imageData = await ImagePicker.openCamera({
+    const image = await ImagePicker.openCamera({
       width: 300,
       height: 400,
       cropping: false, // cropping caused error
       includeBase64: true,
     });
 
-    await uploadImage(imageData);
+    await uploadImage(image);
   };
 
   const takeVideo = async (): Promise<void> => {
@@ -277,19 +281,27 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     await uploadImage(videoData);
   };
 
-  const uploadImage = async (imageData: ImageOrVideo): Promise<void> => {
-    const extension = imageData.mime.substring(
-      imageData.mime.lastIndexOf('/') + 1,
-    );
+  const uploadImage = async (image: ImageOrVideo): Promise<void> => {
+    setUploading(true);
+    let fileUri = image.sourceURL ?? '';
 
-    let filename = imageData.filename ?? `image.${extension}`;
+    if (fileUri.toLowerCase().endsWith('.heic')) {
+      const { success, path, error } = await HeicConverter.convert({
+        path: fileUri,
+        quality: 0.9,
+        extension: 'jpg',
+      });
 
-    // Rename file extension if it an HEIC format on iOS
-    filename = filename.toLowerCase();
-    if (filename.endsWith('.heic')) {
-      filename = filename.replace('.heic', '.jpg');
+      if (!success) {
+        console.log('Error converting file', error);
+        showMessage('error', 'Image upload failed');
+        return;
+      }
+
+      fileUri = path;
     }
 
+    const filename = fileUri.substring(fileUri.lastIndexOf('/') + 1);
     const { data } = await fetchUploadLink({
       variables: {
         localFilename: filename,
@@ -302,14 +314,8 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       return;
     }
 
-    const mediaFile = imageData as UploadImage;
-    const rawData = mediaFile.data;
-    if (!rawData) {
-      showMessage('error', 'Only images supported at this time');
-      return;
-    }
-
     const { remoteName, uploadUrl } = data.uploadLink;
+    const rawData = await RNFS.readFile(fileUri, 'base64');
     const buffer = new Buffer(
       rawData.replace(/^data:image\/\w+;base64,/, ''),
       'base64',
@@ -327,9 +333,11 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
 
     mediaField.onChange({
       url: remoteName,
-      aspectRatio: 1.58, // temp
+      aspectRatio: image.width / image.height,
     });
-    setImageData(imageData);
+
+    setImageData(image);
+    setUploading(false);
   };
 
   const postAsData: Option[] = [
@@ -553,8 +561,17 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
               />
             )}
           />
+          {uploading ? (
+            <View style={[styles.postImage, styles.uploadIndicator]}>
+              <ActivityIndicator size="large" />
+            </View>
+          ) : null}
           {imageData ? (
-            <Image source={{ uri: imageData.path }} style={styles.postImage} />
+            <Image
+              source={{ uri: imageData.path }}
+              style={styles.postImage}
+              resizeMode="cover"
+            />
           ) : post?.media ? (
             <Image
               source={{ uri: `${POST_URL}/${post.media.url}` }}
@@ -632,6 +649,11 @@ const styles = StyleSheet.create({
   mentionItem: {
     borderBottomWidth: 1,
     borderBottomColor: WHITE12,
+  },
+  uploadIndicator: {
+    backgroundColor: BGDARK,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   postImage: {
     width: '100%',
