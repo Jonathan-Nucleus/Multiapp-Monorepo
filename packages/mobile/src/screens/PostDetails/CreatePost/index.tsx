@@ -75,6 +75,7 @@ import { Audiences } from 'backend/graphql/enumerations.graphql';
 
 import PostHeader from './PostHeader';
 import PostSelection from './PostSelection';
+import PreviewLink from './PreviewLink';
 
 import { CreatePostScreen } from 'mobile/src/navigations/PostDetailsStack';
 
@@ -196,6 +197,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   const {
     handleSubmit,
     setValue,
+    watch,
     control,
     formState: { isValid },
   } = useForm<yup.InferType<typeof schema>>({
@@ -226,6 +228,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     name: 'mentionIds',
     control,
   });
+  const watchBody = watch('body', '');
 
   const onSubmit = (values: FormValues): void => {
     if (!account) {
@@ -557,6 +560,9 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
               source={{ uri: `${POST_URL}/${post.media.url}` }}
               style={styles.postImage}
             />
+          ) : null}
+          {watchBody && !imageData && !post?.mediaUrl ? (
+            <PreviewLink body={watchBody} />
           ) : null}
         </PAppContainer>
         <View style={styles.actionWrapper}>

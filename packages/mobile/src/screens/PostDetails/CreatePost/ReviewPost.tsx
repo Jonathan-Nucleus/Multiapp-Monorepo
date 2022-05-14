@@ -15,6 +15,7 @@ import { showMessage } from 'mobile/src/services/utils';
 import pStyles from 'mobile/src/theme/pStyles';
 import { SECONDARY, BGDARK } from 'shared/src/colors';
 
+import PreviewLink from './PreviewLink';
 import PostSelection from './PostSelection';
 import PostHeader from './PostHeader';
 import { AUDIENCE_OPTIONS } from './index';
@@ -146,6 +147,9 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
               style={styles.postImage}
             />
           )
+        )}
+        {!localMediaPath && !route.params?.mediaUrl && (
+          <PreviewLink body={body ?? ''} />
         )}
         {categories && categories.length > 0 && (
           <View style={styles.tagContainer}>
