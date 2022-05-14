@@ -6,8 +6,9 @@ import Button from "../../../../../common/Button";
 import Card from "../../../../../common/Card";
 import { ShieldCheck } from "phosphor-react";
 
-import { useAccount } from "shared/graphql/query/account/useAccount";
-import { useFollowCompany } from "shared/graphql/mutation/account";
+import {
+  useFollowCompany,
+} from "shared/graphql/mutation/account/useFollowCompany";
 import { Company } from "shared/graphql/query/marketplace/useFundCompanies";
 
 interface CompanyItemProps {
@@ -15,25 +16,7 @@ interface CompanyItemProps {
 }
 
 const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
-  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
-  const [followCompany] = useFollowCompany();
-  const isFollowing = account?.companyFollowingIds?.includes(company._id) ?? false;
-
-  const toggleFollowCompany = async (): Promise<void> => {
-    try {
-      const { data } = await followCompany({
-        variables: { follow: !isFollowing, companyId: company._id },
-        refetchQueries: ["Account"],
-      });
-
-      if (!data?.followCompany) {
-        console.log("err", data);
-      }
-    } catch (err) {
-      console.log("err", err);
-    }
-  };
-
+  const { isFollowing, toggleFollow } = useFollowCompany(company._id);
   const managerLookup = company.fundManagers.reduce((acc, manager) => {
     acc[manager._id] = manager;
     return acc;
@@ -66,7 +49,7 @@ const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
           <Button
             variant="text"
             className="text-primary font-medium text-md py-0"
-            onClick={toggleFollowCompany}
+            onClick={toggleFollow}
           >
             {isFollowing ? "Unfollow" : "Follow"}
           </Button>
@@ -105,7 +88,7 @@ const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
             <Button
               variant="outline-primary"
               className="text-primary text-white"
-              onClick={toggleFollowCompany}
+              onClick={toggleFollow}
             >
               {isFollowing ? "Unfollow" : "Follow"}
             </Button>

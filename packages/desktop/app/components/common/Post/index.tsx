@@ -10,7 +10,6 @@ import { useLikePost } from "shared/graphql/mutation/posts";
 import LikeModal from "./LikesModal";
 import CommentPost from "../Comment";
 import { PostSummary } from "shared/graphql/fragments/post";
-import { useFollowCompany, useFollowUser } from "shared/graphql/mutation/account";
 import { useAccount } from "shared/graphql/query/account/useAccount";
 import ActionMenu from "./ActionMenu";
 import Header from "./Header";
@@ -24,30 +23,12 @@ interface PostProps {
 const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
   const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const [likePost] = useLikePost();
-  const [followUser] = useFollowUser();
-  const [followCompany] = useFollowCompany();
   const [visiblePostLikeModal, setVisiblePostLikeModal] = useState(false);
   const [visibleComment, setVisibleComment] = useState(false);
-  const { user, company, mediaUrl } = post;
-  const isFollowing = (user && account?.followingIds?.includes(user._id))
-    || (company && account?.companyFollowingIds?.includes(company._id));
+  const isMyPost = (post.user && post.user._id == account?._id)
+    || (post.company && account?.companyIds?.includes(post.company._id));
   const isLiked = account && post.likeIds?.includes(account._id);
-  const isMyPost = (user && user._id == account?._id)
-    || (company && account?.companyIds?.includes(company._id));
   const isMuted = account?.mutedPostIds?.includes(post._id) ?? false;
-  const toggleFollowing = async () => {
-    if (company) {
-      await followCompany({
-        variables: { follow: !isFollowing, companyId: company._id },
-        refetchQueries: ["Account"],
-      });
-    } else {
-      await followUser({
-        variables: { follow: !isFollowing, userId: user!._id },
-        refetchQueries: ["Account"],
-      });
-    }
-  };
   const toggleLike = async () => {
     await likePost({
       variables: { like: !isLiked, postId: post._id },
@@ -59,21 +40,13 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
       <Card className="border-0 p-0 rounded-none overflow-visible	md:rounded-2xl mb-6">
         <div className="flex px-4 pt-4">
           <div>
-            <Header
-              post={post}
-              account={account}
-              isMyPost={!!isMyPost}
-              isFollowing={!!isFollowing}
-              toggleFollowing={toggleFollowing}
-            />
+            <Header post={post} accountId={account?._id} />
           </div>
           <div className="ml-auto">
             <ActionMenu
               post={post}
-              isMyPost={!!isMyPost}
+              isMyPost={isMyPost ?? false}
               isMuted={isMuted}
-              isFollowing={!!isFollowing}
-              toggleFollowing={toggleFollowing}
               onClickToEdit={onClickToEdit}
             />
           </div>
@@ -91,9 +64,9 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
             </div>
           ))}
         </div>
-        {mediaUrl && (
+        {post.mediaUrl && (
           <div className="relative h-auto mt-5 border-b border-white/[.12]">
-            <Media src={mediaUrl} />
+            <Media src={post.mediaUrl} />
           </div>
         )}
         <div className="flex items-center p-4">

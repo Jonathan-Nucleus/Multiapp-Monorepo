@@ -50,7 +50,7 @@ function Field<TFieldValues = FieldValues>({
   ) as FieldError | undefined;
 
   return (
-    <div className={`mb-4 ${className}`}>
+    <div className={`mb-4 ${className ?? ""}`}>
       {label && (
         <Label htmlFor={name} name={name} errors={errors}>
           {label}
@@ -67,7 +67,7 @@ function Field<TFieldValues = FieldValues>({
         <Textarea
           id={name}
           {...register(name)}
-          className={textareaClassName}
+          className={textareaClassName ?? ""}
           rows={rows}
         />
       ) : (

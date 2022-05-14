@@ -18,8 +18,9 @@ import Card from "../../../../components/common/Card";
 import Avatar from "../../../common/Avatar";
 import { CompanyProfile } from "shared/graphql/query/company/useCompany";
 import FollowersModal from "../../../modules/users/FollowersModal";
-import { useFollowCompany } from "shared/graphql/mutation/account";
-import { useAccount } from "shared/graphql/query/account/useAccount";
+import {
+  useFollowCompany,
+} from "shared/graphql/mutation/account/useFollowCompany";
 import EditModal from "../EditModal";
 import PhotoUploadModal from "../EditModal/PhotoUpload";
 import { MediaType } from "backend/graphql/mutations.graphql";
@@ -38,13 +39,13 @@ const ProfileCard: FC<CompanyPageProps> = ({
   company,
   isEditable,
 }: CompanyPageProps) => {
-  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const [isVisible, setVisible] = useState(false);
   const [editableModal, setEditableModal] = useState(false);
   const [editablePhoto, setEditablePhoto] = useState<PothoProps>({
     type: "AVATAR",
     visible: false,
   });
+  const { isFollowing, toggleFollow } = useFollowCompany(company._id);
   let overviewShort: string | undefined = undefined;
   const [showFullOverView, setShowFullOverView] = useState(false);
   {
@@ -61,16 +62,6 @@ const ProfileCard: FC<CompanyPageProps> = ({
       }
     }
   }
-  const [followCompany] = useFollowCompany();
-  const isFollowing = account?.companyFollowingIds?.includes(company._id) ?? false;
-  const toggleFollowCompany = async () => {
-    try {
-      await followCompany({
-        variables: { follow: !isFollowing, companyId: company._id },
-        refetchQueries: ["Account"],
-      });
-    } catch (err) {}
-  };
 
   const { background: companyBackground } = company;
   return (
@@ -141,7 +132,7 @@ const ProfileCard: FC<CompanyPageProps> = ({
                     <Button
                       variant="gradient-primary"
                       className="w-40 text-sm font-medium"
-                      onClick={() => toggleFollowCompany()}
+                      onClick={toggleFollow}
                     >
                       {isFollowing ? "Unfollow" : "Follow"}
                     </Button>
@@ -281,7 +272,7 @@ const ProfileCard: FC<CompanyPageProps> = ({
                 <Button
                   variant="gradient-primary"
                   className="w-full text-sm font-medium"
-                  onClick={() => toggleFollowCompany()}
+                  onClick={toggleFollow}
                 >
                   {isFollowing ? "Unfollow" : "Follow"}
                 </Button>

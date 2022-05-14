@@ -4,8 +4,10 @@ import Avatar from "desktop/app/components/common/Avatar";
 import Button from "desktop/app/components/common/Button";
 
 import { useAccount } from "shared/graphql/query/account/useAccount";
-import { useFollowUser } from "shared/graphql/mutation/account";
-import type { FundManager } from "shared/graphql/query/marketplace/useFundManagers";
+import { useFollowUser } from "shared/graphql/mutation/account/useFollowUser";
+import type {
+  FundManager,
+} from "shared/graphql/query/marketplace/useFundManagers";
 import Link from "next/link";
 
 interface FeaturedManagerProps {
@@ -14,17 +16,11 @@ interface FeaturedManagerProps {
 
 const FeaturedManager: FC<FeaturedManagerProps> = ({ manager }) => {
   const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
-  const [followUser] = useFollowUser();
+  const {
+    isFollowing: isFollowingManager,
+    toggleFollow: toggleFollowManager,
+  } = useFollowUser(manager._id);
   const isMyProfile = account?._id == manager._id;
-  const isFollowing = account?.followingIds?.includes(manager._id) ?? false;
-  const toggleFollowUser = async (): Promise<void> => {
-    try {
-      await followUser({
-        variables: { follow: !isFollowing, userId: manager._id },
-        refetchQueries: ["Account"],
-      });
-    } catch (err) {}
-  };
 
   return (
     <div className="mx-2">
@@ -51,15 +47,15 @@ const FeaturedManager: FC<FeaturedManagerProps> = ({ manager }) => {
         </a>
       </Link>
       <div className="text-center mt-1.5">
-        {!isMyProfile && (
+        <div className={(!isMyProfile && !isFollowingManager) ? "" : "invisible"}>
           <Button
             variant="text"
             className="text-xs text-primary font-normal tracking-normal py-0"
-            onClick={toggleFollowUser}
+            onClick={toggleFollowManager}
           >
-            {isFollowing ? "Unfollow" : "Follow"}
+            {isFollowingManager ? "Unfollow" : "Follow"}
           </Button>
-        )}
+        </div>
       </div>
     </div>
   );

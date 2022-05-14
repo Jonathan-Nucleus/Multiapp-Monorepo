@@ -7,9 +7,11 @@ import Avatar from "desktop/app/components/common/Avatar";
 import { UserProfileProps } from "../../../../types/common-props";
 import Button from "../../../common/Button";
 import AccreditationQuestionnaire from "../../Funds/AccreditationQuestionnaire";
+import BecomeProModal from "../../../modules/account/BecomeProModal";
 
 const ProfileSettings: FC<UserProfileProps> = ({ user }) => {
   const [isVerifying, setIsVerifying] = useState(false);
+  const [showBecomePro, setShowBecomePro] = useState(false);
 
   return (
     <>
@@ -59,7 +61,7 @@ const ProfileSettings: FC<UserProfileProps> = ({ user }) => {
           <div>
             <div
               className="flex items-center cursor-pointer px-5 py-4"
-              onClick={() => {}}
+              onClick={() => setShowBecomePro(true)}
             >
               <div className="text-success">
                 <ShieldCheck size={30} color="currentColor" weight="fill" />
@@ -75,6 +77,12 @@ const ProfileSettings: FC<UserProfileProps> = ({ user }) => {
           onClose={() => setIsVerifying(false)}
         />
       )}
+      {showBecomePro &&
+        <BecomeProModal
+          show={showBecomePro}
+          onClose={() => setShowBecomePro(false)}
+        />
+      }
     </>
   );
 };

@@ -1,6 +1,6 @@
 import { Professional } from "shared/graphql/query/user/useProfessionals";
 import { FC } from "react";
-import { useFollowUser } from "shared/graphql/mutation/account";
+import { useFollowUser } from "shared/graphql/mutation/account/useFollowUser";
 import Image from "next/image";
 import Button from "desktop/app/components/common/Button";
 import Link from "next/link";
@@ -12,15 +12,8 @@ interface ProfessionalItemProps {
 
 const ProfessionalItem: FC<ProfessionalItemProps> = ({ professional }) => {
   const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
-  const [followUser] = useFollowUser();
+  const { isFollowing, toggleFollow } = useFollowUser(professional._id);
   const isMyProfile = account?._id == professional._id;
-  const isFollowing = account?.followingIds?.includes(professional._id) ?? false;
-  const toggleFollowing = async () => {
-    await followUser({
-      variables: { follow: !isFollowing, userId: professional._id },
-      refetchQueries: ["Account"],
-    });
-  };
   return (
     <>
       <Link href={`/profile/${isMyProfile ? "me" : professional._id}`}>
@@ -56,11 +49,11 @@ const ProfessionalItem: FC<ProfessionalItemProps> = ({ professional }) => {
         </a>
       </Link>
       <div className="text-center my-2">
-        <div className={isMyProfile ? "invisible" : ""}>
+        <div className={(isMyProfile || isFollowing) ? "invisible" : ""}>
           <Button
             variant="text"
             className="text-sm text-primary font-normal tracking-normal py-0"
-            onClick={() => toggleFollowing()}
+            onClick={toggleFollow}
           >
             {isFollowing ? "Unfollow" : "Follow"}
           </Button>

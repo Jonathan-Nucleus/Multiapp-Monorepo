@@ -25,7 +25,7 @@
 			<li>Role: <%= role %></li>
 			<li>Email: <%= email %></li>
 			<li>Position: <%= position %></li>
-			<li>Organization: <%= organization %></li>
+			<% if (typeof(organization) !== "undefined") { %><li>Organization: <%= organization %></li><% } %>
 			<% if (typeof(info) !== "undefined") { %><li>Other info: <%= info %></li><% } %>
 		</ul>
 	</body>

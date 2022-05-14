@@ -72,7 +72,7 @@ const Header: FC = () => {
         <div className="ml-auto flex flex-row items-center">
           <div className="relative">
             <SearchInput
-              className="leading-5 rounded-3xl bg-black text-white px-5 w-72"
+              className="leading-5 rounded-3xl bg-black text-white px-5 w-72 pr-10"
               placeholder="Search"
             />
             <MagnifyingGlass

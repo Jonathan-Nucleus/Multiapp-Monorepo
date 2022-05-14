@@ -26,7 +26,7 @@ type WatchFundData = {
 export function useWatchFund(): MutationTuple<
   WatchFundData,
   WatchFundVariables
-> {
+  > {
   return useMutation<WatchFundData, WatchFundVariables>(
     gql`
       mutation WatchFund($watch: Boolean!, $fundId: ID!) {
@@ -35,36 +35,6 @@ export function useWatchFund(): MutationTuple<
     `,
     {
       refetchQueries: ["Funds"],
-    }
-  );
-}
-
-type FollowUserVariables = {
-  follow: boolean;
-  userId: string;
-};
-
-type FollowUserData = {
-  followUser: boolean;
-};
-
-/**
- * GraphQL mutation that resets a user's password
- *
- * @returns   GraphQL mutation.
- */
-export function useFollowUser(): MutationTuple<
-  FollowUserData,
-  FollowUserVariables
-> {
-  return useMutation<FollowUserData, FollowUserVariables>(
-    gql`
-      mutation FollowUser($follow: Boolean!, $userId: ID!) {
-        followUser(follow: $follow, userId: $userId)
-      }
-    `,
-    {
-      refetchQueries: ["Account"],
     }
   );
 }
@@ -96,63 +66,6 @@ export function useHideUser(): MutationTuple<HideUserData, HideUserVariables> {
   );
 }
 
-type SaveQuestionnaireVariables = {
-  questionnaire: {
-    class: string;
-    status: string;
-    level: string;
-    date: Date;
-  };
-};
-
-type SaveQuestionnaireData = {
-  saveQuestionnaire: {
-    _id: string;
-  };
-};
-
-/**
- * GraphQL mutation that saves questionnarie
- *
- * @returns   GraphQL mutation.
- */
-export function useSaveQuestionnaire(): MutationTuple<
-  SaveQuestionnaireData,
-  SaveQuestionnaireVariables
-> {
-  return useMutation<SaveQuestionnaireData, SaveQuestionnaireVariables>(gql`
-    mutation SaveQuestionnaire($questionnaire: QuestionnaireInput!) {
-      saveQuestionnaire(questionnaire: $questionnaire) {
-        _id
-      }
-    }
-  `);
-}
-
-type FollowCompanyVariables = {
-  companyId: string;
-  follow: boolean;
-};
-
-type FollowCompanyData = {
-  followCompany: boolean;
-};
-
-/**
- *
- * @returns   GraphQL mutation.
- */
-export function useFollowCompany(): MutationTuple<
-  FollowCompanyData,
-  FollowCompanyVariables
-> {
-  return useMutation<FollowCompanyData, FollowCompanyVariables>(gql`
-    mutation FollowCompany($follow: Boolean!, $companyId: ID!) {
-      followCompany(follow: $follow, companyId: $companyId)
-    }
-  `);
-}
-
 type FollowUserAsCompanyVariables = {
   follow: boolean;
   userId: string;
@@ -171,7 +84,7 @@ type FollowUserAsCompanyData = {
 export function useFollowUserAsCompany(): MutationTuple<
   FollowUserAsCompanyData,
   FollowUserAsCompanyVariables
-> {
+  > {
   return useMutation<FollowUserAsCompanyData, FollowUserAsCompanyVariables>(gql`
     mutation FollowUserAsCompany(
       $follow: Boolean!
@@ -196,7 +109,7 @@ type ProfileData = Pick<
   | "website"
   | "twitter"
   | "linkedIn"
->;
+  >;
 type UpdateUserProfileVariables = {
   profile: Pick<ProfileData, "_id"> & Partial<ProfileData>;
 };
@@ -213,7 +126,7 @@ type UpdateUserProfileData = {
 export function useUpdateUserProfile(): MutationTuple<
   UpdateUserProfileData,
   UpdateUserProfileVariables
-> {
+  > {
   return useMutation<UpdateUserProfileData, UpdateUserProfileVariables>(gql`
     mutation UpdateUserProfile($profile: UserProfileInput!) {
       updateUserProfile(profile: $profile) {
@@ -251,7 +164,7 @@ type CompanyData = Pick<
   | "website"
   | "twitter"
   | "linkedIn"
->;
+  >;
 type UpdateCompanyProfileVariables = {
   profile: CompanyData;
 };
@@ -268,11 +181,11 @@ type UpdateCompanyProfileData = {
 export function useUpdateCompanyProfile(): MutationTuple<
   UpdateCompanyProfileData,
   UpdateCompanyProfileVariables
-> {
+  > {
   return useMutation<
     UpdateCompanyProfileData,
     UpdateCompanyProfileVariables
-  >(gql`
+    >(gql`
     mutation UpdateCompanyProfile($profile: CompanyProfileInput!) {
       updateCompanyProfile(profile: $profile) {
         _id
@@ -296,35 +209,6 @@ export function useUpdateCompanyProfile(): MutationTuple<
   `);
 }
 
-type ProRequestVariables = {
-  request: {
-    role: string;
-    email: string;
-    organization: string;
-    position: string;
-    info: string;
-  };
-};
-
-type ProRequestData = {
-  proRequest: boolean;
-};
-
-/**
- *
- * @returns   GraphQL mutation.
- */
-export function useProRequest(): MutationTuple<
-  ProRequestData,
-  ProRequestVariables
-> {
-  return useMutation<ProRequestData, ProRequestVariables>(gql`
-    mutation ProRequest($request: ProRequestInput!) {
-      proRequest(request: $request)
-    }
-  `);
-}
-
 type UpdateFcmTokenVariables = {
   fcmToken: string;
 };
@@ -341,7 +225,7 @@ type UpdateFcmTokenData = {
 export function useUpdateFcmToken(): MutationTuple<
   UpdateFcmTokenData,
   UpdateFcmTokenVariables
-> {
+  > {
   return useMutation<UpdateFcmTokenData, UpdateFcmTokenVariables>(gql`
     mutation UpdateFcmToken($fcmToken: String!) {
       updateFcmToken(fcmToken: $fcmToken)
@@ -362,7 +246,7 @@ type DeleteAccountData = {
 export function useDeleteAccount(): MutationTuple<
   DeleteAccountData,
   DeleteAccountVariables
-> {
+  > {
   return useMutation<DeleteAccountData, DeleteAccountVariables>(gql`
     mutation DeleteAccount {
       deleteAccount
@@ -392,7 +276,7 @@ type HelpRequestData = {
 export function useHelpRequest(): MutationTuple<
   HelpRequestData,
   HelpRequestVariables
-> {
+  > {
   return useMutation<HelpRequestData, HelpRequestVariables>(gql`
     mutation HelpRequest($request: HelpRequestInput!) {
       helpRequest(request: $request)

@@ -1,6 +1,6 @@
 import { FC, HTMLProps } from "react";
 
-interface ButtonProps extends HTMLProps<HTMLButtonElement> {
+export interface ButtonProps extends HTMLProps<HTMLButtonElement> {
   type?: "button" | "submit" | "reset" | undefined;
   variant: "primary" | "outline-primary" | "gradient-primary" | "text";
   loading?: boolean;

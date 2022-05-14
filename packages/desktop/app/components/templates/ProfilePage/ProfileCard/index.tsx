@@ -17,19 +17,18 @@ import Card from "../../../../components/common/Card";
 import Avatar from "../../../common/Avatar";
 import FollowersModal from "../../../modules/users/FollowersModal";
 
-import { useFollowUser } from "shared/graphql/mutation/account";
 import { useAccount } from "shared/graphql/query/account/useAccount";
-import { UserProfile } from "shared/graphql/query/user/useProfile";
 
 import LinkedIn from "shared/assets/images/linkedin.svg";
 import Twitter from "shared/assets/images/twitter.svg";
 import Globe from "shared/assets/images/globe.svg";
 import ConfirmHideUserModal from "./ConfirmHideUserModal";
-import Skeleton from "./Skeleton";
-import { UserProfileProps } from "../../../../types/common-props";
 import { MediaType } from "backend/graphql/mutations.graphql";
+import { UserProfile } from "shared/graphql/query/user/useProfile";
+import { useFollowUser } from "shared/graphql/mutation/account/useFollowUser";
 
-interface ProfileCardProps extends UserProfileProps {
+interface ProfileCardProps {
+  user: UserProfile;
   isEditable?: boolean;
   onSelectToEditProfile: () => void;
   onSelectToEditMedia: (mediaType: MediaType) => void;
@@ -43,9 +42,13 @@ const ProfileCard: FC<ProfileCardProps> = ({
 }) => {
   const [isVisible, setVisible] = useState(false);
   const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
-  const [followUser] = useFollowUser();
   const [followersModalTab, setFollowersModalTab] = useState(0);
   const [showHideUser, setShowHideUser] = useState(false);
+  const { isFollowing, toggleFollow } = useFollowUser(user._id);
+  const isMyProfile = account?._id == user._id;
+  const copyProfileLink = async () => {
+    await navigator.clipboard.writeText(user?.linkedIn ?? "");
+  };
   let overviewShort: string | undefined = undefined;
   const [showFullOverView, setShowFullOverView] = useState(false);
   {
@@ -57,30 +60,11 @@ const ProfileCard: FC<ProfileCardProps> = ({
       if (matches.length > wordsToSplit) {
         overviewShort = user?.overview?.substring(
           0,
-          matches[wordsToSplit].index!
+          matches[wordsToSplit].index!,
         );
       }
     }
   }
-
-  if (!user) {
-    return <Skeleton />;
-  }
-
-  const isFollowing = account?.followingIds?.includes(user._id);
-  const isMyProfile = account?._id == user._id;
-  const toggleFollowing = async () => {
-    try {
-      await followUser({
-        variables: { follow: !isFollowing, userId: user._id },
-        refetchQueries: ["Account", "UserProfile"],
-      });
-    } catch (error) {}
-  };
-
-  const copyProfileLink = () => {
-    navigator.clipboard.writeText(user.linkedIn ?? "");
-  };
 
   return (
     <>
@@ -140,7 +124,7 @@ const ProfileCard: FC<ProfileCardProps> = ({
                       <Button
                         variant="gradient-primary"
                         className="w-40 text-sm font-medium"
-                        onClick={toggleFollowing}
+                        onClick={toggleFollow}
                       >
                         {isFollowing ? "Unfollow" : "Follow"}
                       </Button>
@@ -310,7 +294,7 @@ const ProfileCard: FC<ProfileCardProps> = ({
                 <Button
                   variant="gradient-primary"
                   className="w-full text-sm font-medium"
-                  onClick={toggleFollowing}
+                  onClick={toggleFollow}
                 >
                   {isFollowing ? "Unfollow" : "Follow"}
                 </Button>

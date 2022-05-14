@@ -4,7 +4,7 @@ import { Chats } from "phosphor-react";
 
 import Button from "desktop/app/components/common/Button";
 import Avatar from "desktop/app/components/common/Avatar";
-import { useFollowUser } from "shared/graphql/mutation/account";
+import { useFollowUser } from "shared/graphql/mutation/account/useFollowUser";
 import { useAccount } from "shared/graphql/query/account/useAccount";
 
 export type UserType = {
@@ -28,17 +28,9 @@ const UserItem: FC<UserItemProps> = ({
   showChat = false,
 }: UserItemProps) => {
   const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
-  const [followUser] = useFollowUser();
-  const isFollowing = account?.followingIds?.includes(user._id);
+  const { isFollowing, toggleFollow } = useFollowUser(user._id);
   const isMyProfile = account?._id == user._id;
-  const toggleFollowing = async () => {
-    try {
-      await followUser({
-        variables: { follow: !isFollowing, userId: user._id },
-        refetchQueries: ["Account", "UserProfile", "CompanyProfile"],
-      });
-    } catch (error) {}
-  };
+
   return (
     <div className="flex items-center">
       <Link href={`/profile/${user._id}`}>
@@ -60,7 +52,7 @@ const UserItem: FC<UserItemProps> = ({
                 <Button
                   variant="text"
                   className="text-xs text-primary font-normal tracking-normal py-0"
-                  onClick={toggleFollowing}
+                  onClick={toggleFollow}
                 >
                   {isFollowing ? "Unfollow" : "Follow"}
                 </Button>

@@ -8,7 +8,7 @@ import { ShieldCheck } from "phosphor-react";
 import Avatar from "../../../../../common/Avatar";
 
 import { useAccount } from "shared/graphql/query/account/useAccount";
-import { useFollowUser } from "shared/graphql/mutation/account";
+import { useFollowUser } from "shared/graphql/mutation/account/useFollowUser";
 import type {
   FundManager,
   FundListItem,
@@ -26,17 +26,11 @@ const ManagerItem: FC<ManagerItemProps> = ({
   funds,
 }: ManagerItemProps) => {
   const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
-  const [followUser] = useFollowUser();
-  const isMyProfile = account?._id == manager?._id;
-  const isFollowing = account?.followingIds?.includes(manager._id) ?? false;
-  const toggleFollowUser = async () => {
-    try {
-      await followUser({
-        variables: { follow: !isFollowing, userId: manager._id },
-        refetchQueries: ["Account"],
-      });
-    } catch (err) {}
-  };
+  const {
+    isFollowing: isFollowingManager,
+    toggleFollow: toggleFollowManager,
+  } = useFollowUser(manager._id);
+  const isMyProfile = account?._id == manager._id;
 
   return (
     <>
@@ -72,13 +66,13 @@ const ManagerItem: FC<ManagerItemProps> = ({
           )}
         </div>
         <div className="flex items-center justify-end">
-          {!isMyProfile && (
+          {!isMyProfile && !isFollowingManager && (
             <Button
               variant="text"
               className="text-sm text-primary font-medium tracking-normal py-0"
-              onClick={toggleFollowUser}
+              onClick={toggleFollowManager}
             >
-              {isFollowing ? "Unfollow" : "Follow"}
+              {isFollowingManager ? "Unfollow" : "Follow"}
             </Button>
           )}
           <Link href={isMyProfile ? "/profile/me" : `/profile/${manager._id}`}>
@@ -109,13 +103,13 @@ const ManagerItem: FC<ManagerItemProps> = ({
             <div className="text-xs text-white">Followers</div>
           </div>
           <div className="ml-auto">
-            {!isMyProfile && (
+            {!isMyProfile && !isFollowingManager && (
               <Button
                 variant="outline-primary"
                 className="text-sm text-white tracking-normal font-medium"
-                onClick={toggleFollowUser}
+                onClick={toggleFollowManager}
               >
-                {isFollowing ? "Unfollow" : "Follow"}
+                {isFollowingManager ? "Unfollow" : "Follow"}
               </Button>
             )}
           </div>

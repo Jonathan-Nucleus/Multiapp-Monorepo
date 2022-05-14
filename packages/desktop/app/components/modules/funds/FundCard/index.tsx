@@ -4,8 +4,10 @@ import Link from "next/link";
 import { Share, Star } from "phosphor-react";
 import { useAccount } from "shared/graphql/query/account/useAccount";
 import { useWatchFund } from "shared/graphql/mutation/funds/useWatchFund";
-import { useFollowUser } from "shared/graphql/mutation/account";
-import { useFollowCompany } from "shared/graphql/mutation/account";
+import { useFollowUser } from "shared/graphql/mutation/account/useFollowUser";
+import {
+  useFollowCompany,
+} from "shared/graphql/mutation/account/useFollowCompany";
 import { Fund } from "shared/graphql/query/marketplace/useFunds";
 import Avatar from "desktop/app/components/common/Avatar";
 import Button from "desktop/app/components/common/Button";
@@ -23,30 +25,16 @@ const FundCard: FC<FundCardProps> = ({
   profileType,
 }: FundCardProps) => {
   const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
-  const [followUser] = useFollowUser();
-  const [followCompany] = useFollowCompany();
+  const {
+    isFollowing: isFollowingManager,
+    toggleFollow: toggleFollowManager,
+  } = useFollowUser(fund.manager._id);
+  const {
+    isFollowing: isFollowingCompany,
+    toggleFollow: toggleFollowCompany,
+  } = useFollowCompany(fund.company._id);
   const { isWatching, toggleWatch } = useWatchFund(fund._id);
-  const isFollowing =
-    account?.followingIds?.includes(fund.manager._id) ?? false;
   const isMyFund = account?._id == fund.manager._id;
-  const isFollowingCompany =
-    account?.companyFollowingIds?.includes(fund.company._id) ?? false;
-  const toggleFollowingUser = async (userId: string) => {
-    try {
-      await followUser({
-        variables: { follow: !isFollowing, userId },
-        refetchQueries: ["Account"],
-      });
-    } catch (err) {}
-  };
-  const toggleFollowCompany = async (companyId: string) => {
-    try {
-      await followCompany({
-        variables: { follow: !isFollowingCompany, companyId: companyId },
-        refetchQueries: ["Account"],
-      });
-    } catch (err) {}
-  };
 
   return (
     <>
@@ -143,7 +131,7 @@ const FundCard: FC<FundCardProps> = ({
                   <Button
                     variant="text"
                     className="text-sm text-primary tracking-normal font-normal"
-                    onClick={() => toggleFollowCompany(fund.company._id)}
+                    onClick={toggleFollowCompany}
                   >
                     {isFollowingCompany ? "Unfollow" : "Follow"}
                   </Button>
@@ -178,13 +166,13 @@ const FundCard: FC<FundCardProps> = ({
                 {fund.manager.postIds?.length ?? 0} Posts
               </div>
               <div className="text-center min-h-0 flex-grow mb-2">
-                <div className={isMyFund ? "invisible" : ""}>
+                <div className={(isMyFund || isFollowingManager) ? "invisible" : ""}>
                   <Button
                     variant="text"
                     className="text-sm text-primary tracking-normal font-normal"
-                    onClick={() => toggleFollowingUser(fund.manager._id)}
+                    onClick={toggleFollowManager}
                   >
-                    {isFollowing ? "Unfollow" : "Follow"}
+                    {isFollowingManager ? "Unfollow" : "Follow"}
                   </Button>
                 </div>
               </div>
@@ -315,9 +303,9 @@ const FundCard: FC<FundCardProps> = ({
                         <Button
                           variant="text"
                           className="text-primary text-xs tracking-normal font-normal py-0"
-                          onClick={() => toggleFollowCompany(fund.company._id)}
+                          onClick={toggleFollowCompany}
                         >
-                          {isFollowing ? "Unfollow" : "Follow"}
+                          {isFollowingCompany ? "Unfollow" : "Follow"}
                         </Button>
                       </div>
                     )}
@@ -343,15 +331,15 @@ const FundCard: FC<FundCardProps> = ({
                     <div>
                       {fund.manager.firstName} {fund.manager.lastName}
                     </div>
-                    {!isMyFund && (
+                    {(!isMyFund && !isFollowingManager) && (
                       <div className="flex items-center">
                         <span className="mx-1">•</span>
                         <Button
                           variant="text"
                           className="text-primary text-xs tracking-normal font-normal py-0"
-                          onClick={() => toggleFollowingUser(fund.manager._id)}
+                          onClick={toggleFollowManager}
                         >
-                          {isFollowing ? "Unfollow" : "Follow"}
+                          {isFollowingManager ? "Unfollow" : "Follow"}
                         </Button>
                       </div>
                     )}

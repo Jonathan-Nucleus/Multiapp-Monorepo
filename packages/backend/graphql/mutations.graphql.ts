@@ -548,7 +548,10 @@ const resolvers = {
                   )
                   .required(),
                 email: yup.string().email().required(),
-                organization: yup.string().required(),
+                organization: yup.string().when("role", {
+                  is: "other",
+                  then: yup.string().required(),
+                }),
                 position: yup.string().required(),
                 info: yup.string().notRequired(),
               })

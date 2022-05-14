@@ -7,8 +7,6 @@ import {
   EyeClosed,
   Pencil,
   Trash,
-  UserCircleMinus,
-  UserCirclePlus,
   WarningOctagon,
   XSquare,
 } from "phosphor-react";
@@ -17,13 +15,13 @@ import ReportPostModal from "../ReportPostModal";
 import { PostSummary } from "shared/graphql/fragments/post";
 import { useHidePost, useMutePost } from "shared/graphql/mutation/posts";
 import ConfirmDeleteModal from "../ConfirmDeleteModal";
+import FollowUserMenu from "./FollowUserMenu";
+import FollowCompanyMenu from "./FollowCompanyMenu";
 
 interface ActionMenuProps {
   post: PostSummary;
   isMyPost: boolean;
   isMuted: boolean;
-  isFollowing: boolean;
-  toggleFollowing: () => void;
   onClickToEdit?: () => void;
 }
 
@@ -31,8 +29,6 @@ const ActionMenu: FC<ActionMenuProps> = ({
   post,
   isMyPost,
   isMuted,
-  isFollowing,
-  toggleFollowing,
   onClickToEdit,
 }: ActionMenuProps) => {
   const [showHidePost, setShowHidePost] = useState(false);
@@ -72,36 +68,9 @@ const ActionMenu: FC<ActionMenuProps> = ({
             {!isMyPost ? (
               <>
                 <Menu.Item>
-                  <div
-                    className="flex items-center px-4 py-3 cursor-pointer  hover:bg-background-blue"
-                    onClick={() => toggleFollowing()}
-                  >
-                    {isFollowing ?
-                      <UserCircleMinus
-                        fill="currentColor"
-                        weight="light"
-                        size={24}
-                      />
-                      :
-                      <UserCirclePlus
-                        fill="currentColor"
-                        weight="light"
-                        size={24}
-                      />
-                    }
-                    {isFollowing ?
-                      <div className="ml-4">
-                        Unfollow
-                        {user && ` ${user.firstName} ${user.lastName}`}
-                        {company && ` ${company.name}`}
-                      </div>
-                      :
-                      <div className="ml-4">
-                        Follow
-                        {user && ` ${user.firstName} ${user.lastName}`}
-                        {company && ` ${company.name}`}
-                      </div>
-                    }
+                  <div>
+                    {user && <FollowUserMenu user={user} />}
+                    {company && <FollowCompanyMenu company={company} />}
                   </div>
                 </Menu.Item>
                 <Menu.Item>

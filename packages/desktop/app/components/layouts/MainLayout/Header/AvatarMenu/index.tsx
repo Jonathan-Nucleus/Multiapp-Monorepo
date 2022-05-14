@@ -6,7 +6,6 @@ import {
   CircleWavy,
   ShieldCheck,
   Gear,
-  EnvelopeOpen,
   Lifebuoy,
   FileText,
   SignOut,
@@ -19,6 +18,7 @@ import ModalDialog from "../../../../common/ModalDialog";
 import Button from "../../../../common/Button";
 import InviteFriends from "../../../../modules/users/InviteFriends";
 import { UserProfile } from "shared/graphql/query/user/useProfile";
+import BecomeProModal from "../../../../modules/account/BecomeProModal";
 
 interface AvatarMenuProps {
   account: UserProfile | undefined;
@@ -27,6 +27,7 @@ interface AvatarMenuProps {
 const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
+  const [showBecomeProModal, setShowBecomeProModal] = useState(false);
   const items = [
     {
       icon: (
@@ -47,7 +48,8 @@ const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
         </div>
       ),
       title: "Become a Pro",
-      path: "/become-a-pro",
+      path: "/",
+      onClick: () => setShowBecomeProModal(true),
     },
     {
       icon: <Gear color="white" weight="light" size={24} />,
@@ -184,6 +186,12 @@ const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
       >
         <InviteFriends onClose={() => setShowInviteModal(false)} />
       </ModalDialog>
+      {showBecomeProModal &&
+        <BecomeProModal
+          show={showBecomeProModal}
+          onClose={() => setShowBecomeProModal(false)}
+        />
+      }
     </>
   );
 };

@@ -9,6 +9,7 @@ import FundsSection from "./FundsSection";
 import EditProfileModal from "./ProfileCard/EditModal";
 import EditMediaModal from "./EditMediaModal";
 import { MediaType } from "backend/graphql/mutations.graphql";
+import ProfileCardSkeleton from "./ProfileCard/Skeleton";
 
 interface ProfilePageProps extends UserProfileProps {
   userId: string;
@@ -29,15 +30,19 @@ const ProfilePage: FC<ProfilePageProps> = ({ user, userId }) => {
           <div className="flex-grow max-w-full mx-4">
             <div className="divide-y divide-inherit border-white/[.12]">
               <div className="pb-5">
-                <ProfileCard
-                  user={user}
-                  isEditable={isMyProfile}
-                  onSelectToEditProfile={() => setShowEditProfile(true)}
-                  onSelectToEditMedia={(mediaType) => {
-                    setMediaTypeToEdit(mediaType);
-                    setShowEditMedia(true);
-                  }}
-                />
+                {user ?
+                  <ProfileCard
+                    user={user}
+                    isEditable={isMyProfile}
+                    onSelectToEditProfile={() => setShowEditProfile(true)}
+                    onSelectToEditMedia={(mediaType) => {
+                      setMediaTypeToEdit(mediaType);
+                      setShowEditMedia(true);
+                    }}
+                  />
+                  :
+                  <ProfileCardSkeleton />
+                }
               </div>
               <div className="lg:hidden mb-5 pt-5">
                 <CompaniesList companies={user?.companies} />

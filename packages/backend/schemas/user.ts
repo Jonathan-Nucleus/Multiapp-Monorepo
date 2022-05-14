@@ -238,7 +238,7 @@ export type QuestionnaireInput = {
 export interface ProRequest {
   role: ProRoleEnum;
   email: string;
-  organization: string;
+  organization?: string;
   position: string;
   info?: string;
 }
@@ -584,7 +584,7 @@ export const UserSchema = `
   input ProRequestInput {
     role: ProRole!
     email: String!
-    organization: String!
+    organization: String
     position: String!
     info: String
   }

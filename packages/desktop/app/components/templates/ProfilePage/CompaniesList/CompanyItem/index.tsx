@@ -2,8 +2,9 @@ import { FC } from "react";
 import Link from "next/link";
 import Avatar from "../../../../common/Avatar";
 import Button from "../../../../common/Button";
-import { useSession } from "next-auth/react";
-import { useFollowCompany } from "shared/graphql/mutation/account";
+import {
+  useFollowCompany,
+} from "shared/graphql/mutation/account/useFollowCompany";
 import { UserProfile } from "shared/graphql/query/user/useProfile";
 
 interface CompanyItemProps {
@@ -11,21 +12,8 @@ interface CompanyItemProps {
 }
 
 const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
-  const { data: session } = useSession();
-  const [followCompany] = useFollowCompany();
-  const userId = session?.user?._id;
-  if (!userId) {
-    return <></>;
-  }
-  const isFollowing = company.followerIds?.includes(userId) ?? false;
-  const toggleFollowing = async () => {
-    try {
-      await followCompany({
-        variables: { follow: !isFollowing, companyId: company._id },
-        refetchQueries: ["Account", "UserProfile"],
-      });
-    } catch (err) {}
-  };
+  const { isFollowing, toggleFollow } = useFollowCompany(company._id);
+
   return (
     <>
       <div className="flex items-center">
@@ -41,8 +29,8 @@ const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
         </Link>
         <Button
           variant="text"
-          className="text-xs text-primary tracking-normal font-normal ml-auto px-2 py-0"
-          onClick={toggleFollowing}
+          className="w-16 flex-shrink-0 text-xs text-primary tracking-normal font-normal ml-auto px-2 py-0"
+          onClick={toggleFollow}
         >
           {isFollowing ? "Unfollow" : "Follow"}
         </Button>
