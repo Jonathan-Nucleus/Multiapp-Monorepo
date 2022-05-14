@@ -1,6 +1,6 @@
-import { gql, useMutation, MutationTuple } from '@apollo/client';
-import { POST_SUMMARY_FRAGMENT, PostSummary } from '../../fragments/post';
-import { PostUpdate } from 'backend/graphql/posts.graphql';
+import { gql, useMutation, MutationTuple } from "@apollo/client";
+import { POST_SUMMARY_FRAGMENT, PostSummary } from "../../fragments/post";
+import { PostUpdate } from "backend/graphql/posts.graphql";
 
 type EditPostVariables = {
   post: PostUpdate;
@@ -26,7 +26,7 @@ export function useEditPost(): MutationTuple<EditPostData, EditPostVariables> {
       }
     `,
     {
-      refetchQueries: ['Posts', 'AccountPosts'],
-    },
+      refetchQueries: ["Posts", "AccountPosts"],
+    }
   );
 }

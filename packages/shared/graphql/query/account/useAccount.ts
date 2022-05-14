@@ -1,72 +1,72 @@
-import { useEffect, useState } from 'react';
-import _ from 'lodash';
-import { FundManager } from '../../fragments/fund';
-import { User } from 'backend/graphql/users.graphql';
-import { gql, QueryHookOptions, QueryResult, useQuery } from '@apollo/client';
-import { NotificationEventOptions } from 'backend/schemas/user';
+import { useEffect, useState } from "react";
+import _ from "lodash";
+import { FundManager } from "../../fragments/fund";
+import { User } from "backend/graphql/users.graphql";
+import { gql, QueryHookOptions, QueryResult, useQuery } from "@apollo/client";
+import { NotificationEventOptions } from "backend/schemas/user";
 
 type AccountVariables = never;
 export type WatchlistFund = FundManager &
   Pick<
-    User['watchlist'][number],
-    '_id' | 'name' | 'companyId' | 'managerId'
+    User["watchlist"][number],
+    "_id" | "name" | "companyId" | "managerId"
   > & {
     company: Pick<
-      User['watchlist'][number]['company'],
-      '_id' | 'name' | 'website' | 'linkedIn' | 'twitter' | 'avatar'
+      User["watchlist"][number]["company"],
+      "_id" | "name" | "website" | "linkedIn" | "twitter" | "avatar"
     >;
   };
 export type AccountData = {
   account: Pick<
     User,
-    | '_id'
-    | 'firstName'
-    | 'lastName'
-    | 'avatar'
-    | 'role'
-    | 'accreditation'
-    | 'position'
-    | 'tagline'
-    | 'overview'
-    | 'background'
-    | 'companyIds'
-    | 'followerIds'
-    | 'followers'
-    | 'followingIds'
-    | 'following'
-    | 'watchlistIds'
-    | 'companyFollowingIds'
-    | 'postIds'
-    | 'linkedIn'
-    | 'twitter'
-    | 'website'
-    | 'posts'
-    | 'managedFunds'
-    | 'mutedPostIds'
-    | 'settings'
+    | "_id"
+    | "firstName"
+    | "lastName"
+    | "avatar"
+    | "role"
+    | "accreditation"
+    | "position"
+    | "tagline"
+    | "overview"
+    | "background"
+    | "companyIds"
+    | "followerIds"
+    | "followers"
+    | "followingIds"
+    | "following"
+    | "watchlistIds"
+    | "companyFollowingIds"
+    | "postIds"
+    | "linkedIn"
+    | "twitter"
+    | "website"
+    | "posts"
+    | "managedFunds"
+    | "mutedPostIds"
+    | "settings"
   > & {
     watchlist: WatchlistFund[];
     company: Pick<
-      User['companies'][number],
-      | '_id'
-      | 'name'
-      | 'avatar'
-      | 'members'
-      | 'background'
-      | 'followerIds'
-      | 'postIds'
-      | 'followingIds'
+      User["companies"][number],
+      | "_id"
+      | "name"
+      | "avatar"
+      | "members"
+      | "background"
+      | "followerIds"
+      | "postIds"
+      | "followingIds"
     >;
     companies: Pick<
-      User['companies'][number],
-      | '_id'
-      | 'name'
-      | 'avatar'
-      | 'members'
-      | 'background'
-      | 'followerIds'
-      | 'postIds'
-      | 'followingIds'
+      User["companies"][number],
+      | "_id"
+      | "name"
+      | "avatar"
+      | "members"
+      | "background"
+      | "followerIds"
+      | "postIds"
+      | "followingIds"
     >[];
   };
 };
@@ -75,7 +75,7 @@ export type AccountData = {
  * GraphQL query that fetches the account details for the current user
  */
 export function useAccount(
-  options?: QueryHookOptions<AccountData, AccountVariables>,
+  options?: QueryHookOptions<AccountData, AccountVariables>
 ): QueryResult<AccountData, AccountVariables> {
   const [state, setState] = useState<AccountData>();
   const { data, loading, ...rest } = useQuery<AccountData, AccountVariables>(
@@ -213,7 +213,7 @@ export function useAccount(
         }
       }
     `,
-    { ...options },
+    { ...options }
   );
   useEffect(() => {
     if (!loading && data && !_.isEqual(data, state)) {

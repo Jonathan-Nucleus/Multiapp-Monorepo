@@ -13,8 +13,10 @@ type RequestResetData = {
  *
  * @returns   GraphQL mutation.
  */
-export function useRequestPasswordReset(): MutationTuple<RequestResetData,
-  RequestResetVariables> {
+export function useRequestPasswordReset(): MutationTuple<
+  RequestResetData,
+  RequestResetVariables
+> {
   return useMutation<RequestResetData, RequestResetVariables>(gql`
     mutation RequestPasswordReset($email: String!) {
       requestPasswordReset(email: $email)

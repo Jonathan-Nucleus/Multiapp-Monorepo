@@ -13,10 +13,12 @@ import { useEffect, useState } from "react";
 export type FundDetails = FundSummary &
   FundManager &
   FundCompany & {
-  documents: GraphQLFund["documents"];
-  team: Pick<GraphQLFund["team"][number],
-    "_id" | "firstName" | "lastName" | "avatar" | "position">[];
-};
+    documents: GraphQLFund["documents"];
+    team: Pick<
+      GraphQLFund["team"][number],
+      "_id" | "firstName" | "lastName" | "avatar" | "position"
+    >[];
+  };
 
 export type FundData = {
   fund?: FundDetails;
@@ -63,7 +65,7 @@ export function useFund(fundId?: string): QueryResult<FundData, FundVariables> {
     {
       skip: !fundId,
       variables: { fundId: fundId ?? "" },
-    },
+    }
   );
   useEffect(() => {
     if (!loading && data) {

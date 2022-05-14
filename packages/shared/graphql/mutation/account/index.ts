@@ -1,6 +1,6 @@
-import { gql, useMutation, MutationTuple } from '@apollo/client';
-import { UserProfile } from 'backend/graphql/users.graphql';
-import { Company } from 'backend/graphql/companies.graphql';
+import { gql, useMutation, MutationTuple } from "@apollo/client";
+import { UserProfile } from "backend/graphql/users.graphql";
+import { Company } from "backend/graphql/companies.graphql";
 
 export const UPDATE_SETTINGS = gql`
   mutation UpdateSettings($settings: SettingsInput!) {
@@ -34,8 +34,8 @@ export function useWatchFund(): MutationTuple<
       }
     `,
     {
-      refetchQueries: ['Funds'],
-    },
+      refetchQueries: ["Funds"],
+    }
   );
 }
 
@@ -64,8 +64,8 @@ export function useFollowUser(): MutationTuple<
       }
     `,
     {
-      refetchQueries: ['Account'],
-    },
+      refetchQueries: ["Account"],
+    }
   );
 }
 
@@ -91,8 +91,8 @@ export function useHideUser(): MutationTuple<HideUserData, HideUserVariables> {
       }
     `,
     {
-      refetchQueries: ['Posts', 'Post'],
-    },
+      refetchQueries: ["Posts", "Post"],
+    }
   );
 }
 
@@ -185,20 +185,20 @@ export function useFollowUserAsCompany(): MutationTuple<
 
 type ProfileData = Pick<
   UserProfile,
-  | '_id'
-  | 'firstName'
-  | 'lastName'
-  | 'position'
-  | 'avatar'
-  | 'background'
-  | 'tagline'
-  | 'overview'
-  | 'website'
-  | 'twitter'
-  | 'linkedIn'
+  | "_id"
+  | "firstName"
+  | "lastName"
+  | "position"
+  | "avatar"
+  | "background"
+  | "tagline"
+  | "overview"
+  | "website"
+  | "twitter"
+  | "linkedIn"
 >;
 type UpdateUserProfileVariables = {
-  profile: Pick<ProfileData, '_id'> & Partial<ProfileData>;
+  profile: Pick<ProfileData, "_id"> & Partial<ProfileData>;
 };
 
 type UpdateUserProfileData = {
@@ -242,15 +242,15 @@ export function useUpdateUserProfile(): MutationTuple<
 
 type CompanyData = Pick<
   Company,
-  | '_id'
-  | 'name'
-  | 'avatar'
-  | 'background'
-  | 'tagline'
-  | 'overview'
-  | 'website'
-  | 'twitter'
-  | 'linkedIn'
+  | "_id"
+  | "name"
+  | "avatar"
+  | "background"
+  | "tagline"
+  | "overview"
+  | "website"
+  | "twitter"
+  | "linkedIn"
 >;
 type UpdateCompanyProfileVariables = {
   profile: CompanyData;
@@ -349,8 +349,21 @@ export function useUpdateFcmToken(): MutationTuple<
   `);
 }
 
-export function useDeleteAccount() {
-  return useMutation(gql`
+type DeleteAccountVariables = never;
+type DeleteAccountData = {
+  deleteAccount: boolean;
+};
+
+/**
+ * GraphQL mutation that deletes the user account.
+ *
+ * @returns   GraphQL mutation.
+ */
+export function useDeleteAccount(): MutationTuple<
+  DeleteAccountData,
+  DeleteAccountVariables
+> {
+  return useMutation<DeleteAccountData, DeleteAccountVariables>(gql`
     mutation DeleteAccount {
       deleteAccount
     }

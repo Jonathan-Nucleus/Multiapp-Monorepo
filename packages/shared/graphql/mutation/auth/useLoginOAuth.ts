@@ -1,5 +1,5 @@
-import { gql, useMutation, MutationTuple } from '@apollo/client';
-import { OAuthInput } from 'backend/graphql/users.graphql';
+import { gql, useMutation, MutationTuple } from "@apollo/client";
+import { OAuthInput } from "backend/graphql/users.graphql";
 
 type LoginOAuthVariables = {
   user: OAuthInput;

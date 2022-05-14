@@ -26,10 +26,13 @@ export type UserPostsData = {
  * @returns   GraphQL query.
  */
 export function useFeaturedPosts(
-  userId: string,
+  userId: string
 ): QueryResult<UserPostsData, UserPostsVariables> {
   const [state, setState] = useState<UserPostsData>();
-  const { data, loading, ...rest } = useQuery<UserPostsData, UserPostsVariables>(
+  const { data, loading, ...rest } = useQuery<
+    UserPostsData,
+    UserPostsVariables
+  >(
     gql`
       ${POST_SUMMARY_FRAGMENT}
       query UserFeaturedPosts($userId: ID!, $featured: Boolean!) {
@@ -46,7 +49,7 @@ export function useFeaturedPosts(
         userId,
         featured: true,
       },
-    },
+    }
   );
   useEffect(() => {
     if (!loading && data) {

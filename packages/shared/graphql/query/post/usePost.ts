@@ -5,24 +5,34 @@ import { POST_SUMMARY_FRAGMENT, PostSummary } from "../../fragments/post";
 import { gql, QueryResult, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 
-export type Like = Pick<UserProfile,
-  "_id" | "firstName" | "lastName" | "avatar" | "position"> & {
-  company?: Pick<Exclude<GraphQLPost["likes"][number]["company"], undefined>,
-    "name">;
+export type Like = Pick<
+  UserProfile,
+  "_id" | "firstName" | "lastName" | "avatar" | "position"
+> & {
+  company?: Pick<
+    Exclude<GraphQLPost["likes"][number]["company"], undefined>,
+    "name"
+  >;
 };
 
-export type Comment = Pick<GraphQLPost["comments"][number],
-  "_id" | "body" | "commentId" | "mediaUrl" | "likeIds" | "createdAt"> & {
-  user: Pick<GraphQLPost["comments"][number]["user"],
-    "_id" | "firstName" | "lastName" | "avatar" | "position"> & {
+export type Comment = Pick<
+  GraphQLPost["comments"][number],
+  "_id" | "body" | "commentId" | "mediaUrl" | "likeIds" | "createdAt"
+> & {
+  user: Pick<
+    GraphQLPost["comments"][number]["user"],
+    "_id" | "firstName" | "lastName" | "avatar" | "position"
+  > & {
     company?: Pick<GraphQLCompany, "name">;
   };
   likes: Like[];
 };
 
 export type Post = PostSummary & {
-  mentions: Pick<GraphQLPost["mentions"][number],
-    "_id" | "firstName" | "lastName">[];
+  mentions: Pick<
+    GraphQLPost["mentions"][number],
+    "_id" | "firstName" | "lastName"
+  >[];
   likes: Like[];
   comments: Comment[];
 };
@@ -91,7 +101,7 @@ export function usePost(postId?: string): QueryResult<PostData, PostVariables> {
     {
       skip: !postId,
       variables: { postId: postId ?? "" },
-    },
+    }
   );
   useEffect(() => {
     if (!loading && data) {

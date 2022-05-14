@@ -1,4 +1,10 @@
-import { gql, QueryResult, QueryTuple, useLazyQuery, useQuery } from "@apollo/client";
+import {
+  gql,
+  QueryResult,
+  QueryTuple,
+  useLazyQuery,
+  useQuery,
+} from "@apollo/client";
 import { useEffect, useState } from "react";
 
 type VerifyInviteVariables = {
@@ -21,19 +27,23 @@ const VERIFY_INVITE_QUERY = gql`
  *
  * @returns   GraphQL query.
  */
-export function useVerifyInviteLazy(): QueryTuple<VerifyInviteData,
-  VerifyInviteVariables> {
+export function useVerifyInviteLazy(): QueryTuple<
+  VerifyInviteData,
+  VerifyInviteVariables
+> {
   return useLazyQuery<VerifyInviteData, VerifyInviteVariables>(
-    VERIFY_INVITE_QUERY,
+    VERIFY_INVITE_QUERY
   );
 }
 
 export function useVerifyInvite(
-  code: string,
+  code: string
 ): QueryResult<VerifyInviteData, VerifyInviteVariables> {
   const [state, setState] = useState<VerifyInviteData>();
-  const { data, loading, ...rest } = useQuery<VerifyInviteData,
-    VerifyInviteVariables>(VERIFY_INVITE_QUERY, { variables: { code } });
+  const { data, loading, ...rest } = useQuery<
+    VerifyInviteData,
+    VerifyInviteVariables
+  >(VERIFY_INVITE_QUERY, { variables: { code } });
   useEffect(() => {
     if (!loading && data) {
       setState(data);

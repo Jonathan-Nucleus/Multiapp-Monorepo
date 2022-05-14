@@ -1,17 +1,17 @@
-import { gql, useMutation, MutationTuple } from '@apollo/client';
+import { gql, useMutation, MutationTuple } from "@apollo/client";
 import {
   InvestorClassOptions,
   FinancialStatusOptions,
   HelpRequestType,
   HelpRequestTypeOptions,
-} from 'backend/graphql/enumerations.graphql';
-import { QuestionnaireInput } from 'backend/graphql/users.graphql';
+} from "backend/graphql/enumerations.graphql";
+import { QuestionnaireInput } from "backend/graphql/users.graphql";
 import {
   User,
   FinancialStatus,
   InvestorClass,
   Accreditation,
-} from 'backend/graphql/users.graphql';
+} from "backend/graphql/users.graphql";
 
 export { InvestorClassOptions, FinancialStatusOptions };
 export type { InvestorClass, FinancialStatus, Accreditation };
@@ -23,7 +23,7 @@ type SaveQuestionnaireVariables = {
 };
 
 type SaveQuestionnaireData = {
-  saveQuestionnaire: Pick<User, 'accreditation'>;
+  saveQuestionnaire: Pick<User, "accreditation">;
 };
 
 /**

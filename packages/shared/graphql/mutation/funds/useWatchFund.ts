@@ -1,7 +1,7 @@
-import { useRef, useEffect, useState, useCallback } from 'react';
-import { gql, useMutation, MutationTuple } from '@apollo/client';
-import { UserProfile } from 'backend/graphql/users.graphql';
-import { useAccount } from 'shared/graphql/query/account/useAccount';
+import { useRef, useEffect, useState, useCallback } from "react";
+import { gql, useMutation, MutationTuple } from "@apollo/client";
+import { UserProfile } from "backend/graphql/users.graphql";
+import { useAccount } from "shared/graphql/query/account/useAccount";
 
 type WatchFundVariables = {
   fundId: string;
@@ -9,7 +9,7 @@ type WatchFundVariables = {
 };
 
 type WatchFundData = {
-  watchFund: Pick<UserProfile, '_id' | 'watchlist'>;
+  watchFund: Pick<UserProfile, "_id" | "watchlist">;
 };
 
 interface WatchFundReturn {
@@ -43,14 +43,14 @@ export function useWatchFund(id: string): WatchFundReturn;
 
 export function useWatchFund(id?: unknown): unknown {
   const mutation = watchMutation();
-  if (typeof id === 'undefined') {
+  if (typeof id === "undefined") {
     return mutation;
   }
 
   const fundId = id as string;
   const [watchFund] = mutation;
 
-  const { data: accountData } = useAccount({ fetchPolicy: 'cache-only' });
+  const { data: accountData } = useAccount({ fetchPolicy: "cache-only" });
   const isWatched = !!accountData?.account?.watchlistIds?.includes(fundId);
   const [watching, setWatching] = useState(isWatched);
   const [loading, setLoading] = useState(false);
@@ -97,7 +97,7 @@ export function useWatchFund(id?: unknown): unknown {
         }
       }, 500);
     },
-    [isWatched],
+    [isWatched]
   );
 
   return {
@@ -118,7 +118,7 @@ function watchMutation(): MutationTuple<WatchFundData, WatchFundVariables> {
       }
     `,
     {
-      refetchQueries: ['Account', 'Funds', 'Fund'],
-    },
+      refetchQueries: ["Account", "Funds", "Fund"],
+    }
   );
 }

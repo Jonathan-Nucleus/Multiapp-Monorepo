@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -15,7 +15,7 @@ import {
   Pencil,
   Share as ShareIcon,
 } from 'phosphor-react-native';
-import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
+import { BACKGROUND_URL } from 'react-native-dotenv';
 import Share from 'react-native-share';
 
 import Avatar from 'mobile/src/components/common/Avatar';
@@ -30,16 +30,14 @@ import {
   WHITE,
   WHITE12,
   BLUE300,
-  WHITE87,
   GRAY100,
   PRIMARY,
-  BGDARK,
   PRIMARYSOLID,
   BLACK,
 } from 'shared/src/colors';
 
 import { useAccount } from 'shared/graphql/query/account/useAccount';
-import { useFollowCompany } from 'shared/graphql/mutation/account';
+import { useFollowCompany } from 'shared/graphql/mutation/account/useFollowCompany';
 import type { CompanyProfile } from 'shared/graphql/query/company/useCompany';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 import { showMessage } from '../../../services/utils';
@@ -52,12 +50,10 @@ interface CompanyDetailProps {
 const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [visibleFollow, setVisibleFollow] = useState(false);
-  const { data: accountData, refetch } = useAccount();
-  const [followCompany] = useFollowCompany();
-  const userId = accountData?.account._id;
+  const { data: accountData } = useAccount();
+  const { isFollowing, toggleFollow } = useFollowCompany(company._id);
 
   const {
-    _id,
     name,
     avatar,
     background,
@@ -68,29 +64,6 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
     linkedIn,
     twitter,
   } = company;
-
-  const isFollower = useMemo(() => {
-    if (followerIds && userId) {
-      return followerIds.indexOf(userId) > -1 ? true : false;
-    }
-    return false;
-  }, [followerIds]);
-
-  const toggleFollowCompany = async (id: string): Promise<void> => {
-    try {
-      const follow = isFollower ? false : true;
-      const { data } = await followCompany({
-        variables: { follow: follow, companyId: id },
-      });
-      if (data?.followCompany) {
-        refetch();
-      } else {
-        console.log('err', data);
-      }
-    } catch (err) {
-      console.log('err', err);
-    }
-  };
 
   const onShare = async () => {
     try {
@@ -208,8 +181,8 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
               gradientContainer={styles.button}
             />
             <PGradientButton
-              label={isFollower ? 'unfollow' : 'follow'}
-              onPress={() => toggleFollowCompany(company._id)}
+              label={isFollowing ? 'unfollow' : 'follow'}
+              onPress={toggleFollow}
               gradientContainer={styles.button}
             />
           </View>

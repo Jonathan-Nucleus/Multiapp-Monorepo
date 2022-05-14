@@ -1,16 +1,16 @@
-import { Company as GraphQLCompany } from 'backend/graphql/companies.graphql';
-import { gql, QueryResult, useQuery } from '@apollo/client';
-import { useEffect, useState } from 'react';
+import { Company as GraphQLCompany } from "backend/graphql/companies.graphql";
+import { gql, QueryResult, useQuery } from "@apollo/client";
+import { useEffect, useState } from "react";
 
 type FundCompaniesVariables = never;
 export type Company = Pick<
   GraphQLCompany,
-  '_id' | 'name' | 'avatar' | 'postIds' | 'followerIds'
+  "_id" | "name" | "avatar" | "postIds" | "followerIds"
 > & {
-  funds: Pick<GraphQLCompany['funds'][number], '_id' | 'name' | 'managerId'>[];
+  funds: Pick<GraphQLCompany["funds"][number], "_id" | "name" | "managerId">[];
   fundManagers: Pick<
-    GraphQLCompany['fundManagers'][number],
-    '_id' | 'firstName' | 'lastName' | 'avatar' | 'position' | 'role'
+    GraphQLCompany["fundManagers"][number],
+    "_id" | "firstName" | "lastName" | "avatar" | "position" | "role"
   >[];
 };
 export type FundCompaniesData = {
@@ -54,7 +54,7 @@ export function useFundCompanies(): QueryResult<
           }
         }
       }
-    `,
+    `
   );
   useEffect(() => {
     if (!loading && data) {

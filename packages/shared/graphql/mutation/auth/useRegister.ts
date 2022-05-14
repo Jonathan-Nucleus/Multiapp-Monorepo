@@ -14,8 +14,7 @@ type RegisterData = {
  *
  * @returns   GraphQL mutation.
  */
-export function useRegister(): MutationTuple<RegisterData,
-  RegisterVariables> {
+export function useRegister(): MutationTuple<RegisterData, RegisterVariables> {
   return useMutation<RegisterData, RegisterVariables>(gql`
     mutation Register($user: UserInput!) {
       register(user: $user)

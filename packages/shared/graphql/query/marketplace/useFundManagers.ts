@@ -9,8 +9,8 @@ import { useEffect, useState } from "react";
 
 export type FundManager = FundManagerFragment["manager"] &
   Pick<UserProfile, "managedFundsIds" | "position" | "role"> & {
-  company: Pick<Company, "_id" | "name" | "avatar">;
-};
+    company: Pick<Company, "_id" | "name" | "avatar">;
+  };
 export type FundListItem = Pick<FundSummary, "_id" | "name">;
 export type FundManagersData = {
   fundManagers?: {
@@ -26,10 +26,15 @@ type FundManagersVariables = never;
  *
  * @returns   GraphQL query.
  */
-export function useFundManagers(): QueryResult<FundManagersData,
-  FundManagersVariables> {
+export function useFundManagers(): QueryResult<
+  FundManagersData,
+  FundManagersVariables
+> {
   const [state, setState] = useState<FundManagersData>();
-  const { data, loading, ...rest } = useQuery<FundManagersData, FundManagersVariables>(
+  const { data, loading, ...rest } = useQuery<
+    FundManagersData,
+    FundManagersVariables
+  >(
     gql`
       query FundManagers {
         fundManagers {
@@ -55,7 +60,7 @@ export function useFundManagers(): QueryResult<FundManagersData,
           }
         }
       }
-    `,
+    `
   );
   useEffect(() => {
     if (!loading && data) {

@@ -1,4 +1,4 @@
-import { gql, MutationTuple, useMutation } from '@apollo/client';
+import { gql, MutationTuple, useMutation } from "@apollo/client";
 
 type ReadNotificationData = {
   readNotification: boolean;
@@ -19,20 +19,29 @@ export function useReadNotification(): MutationTuple<
       }
     `,
     {
-      refetchQueries: ['Notifications'],
-    },
+      refetchQueries: ["Notifications"],
+    }
   );
 }
 
-export function useReadNotifications() {
-  return useMutation(
+type ReadNotificationsData = {
+  readNotification: boolean;
+};
+
+type ReadNotificationsVariables = never;
+
+export function useReadNotifications(): MutationTuple<
+  ReadNotificationsData,
+  ReadNotificationsVariables
+> {
+  return useMutation<ReadNotificationsData, ReadNotificationsVariables>(
     gql`
       mutation ReadAllNotifications {
         readNotification
       }
     `,
     {
-      refetchQueries: ['Notifications'],
-    },
+      refetchQueries: ["Notifications"],
+    }
   );
 }

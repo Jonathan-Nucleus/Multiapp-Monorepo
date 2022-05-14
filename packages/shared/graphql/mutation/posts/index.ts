@@ -1,16 +1,16 @@
-import { gql, useMutation, MutationTuple } from '@apollo/client';
-import type { MediaUpload, MediaType } from 'backend/graphql/mutations.graphql';
+import { gql, useMutation, MutationTuple } from "@apollo/client";
+import type { MediaUpload, MediaType } from "backend/graphql/mutations.graphql";
 import type {
   PostInput,
   PostUpdate,
   PostCategory,
-} from 'backend/graphql/posts.graphql';
-import type { Comment } from 'backend/graphql/comments.graphql';
-import { PostCategories } from 'backend/graphql/enumerations.graphql';
+} from "backend/graphql/posts.graphql";
+import type { Comment, CommentInput } from "backend/graphql/comments.graphql";
+import { PostCategories } from "backend/graphql/enumerations.graphql";
 import {
   POST_SUMMARY_FRAGMENT,
   PostSummary,
-} from 'shared/graphql/fragments/post';
+} from "shared/graphql/fragments/post";
 
 export type { PostCategory };
 export { PostCategories };
@@ -71,8 +71,8 @@ export function useCreatePost(): MutationTuple<
       }
     `,
     {
-      refetchQueries: ['Posts', 'AccountPosts'],
-    },
+      refetchQueries: ["Posts", "AccountPosts"],
+    }
   );
 }
 
@@ -111,7 +111,7 @@ type LikePostVariables = {
 };
 
 type LikePostData = {
-  likePost: Pick<PostSummary, '_id' | 'likeIds'>;
+  likePost: Pick<PostSummary, "_id" | "likeIds">;
 };
 
 /**
@@ -141,7 +141,7 @@ type CommentPostVariables = {
 };
 
 type CommentPostData = {
-  comment: any;
+  comment: CommentInput;
 };
 
 /**
@@ -200,8 +200,8 @@ export function useEditCommentPost(): MutationTuple<
       }
     `,
     {
-      refetchQueries: ['Post'],
-    },
+      refetchQueries: ["Post"],
+    }
   );
 }
 
@@ -229,8 +229,8 @@ export function useDeleteComment(): MutationTuple<
       }
     `,
     {
-      refetchQueries: ['Post'],
-    },
+      refetchQueries: ["Post"],
+    }
   );
 }
 
@@ -265,8 +265,8 @@ export function useLikeComment(): MutationTuple<
       }
     `,
     {
-      refetchQueries: ['Post'],
-    },
+      refetchQueries: ["Post"],
+    }
   );
 }
 
@@ -291,7 +291,7 @@ export function useHidePost(): MutationTuple<HidePostData, HidePostVariables> {
         hidePost(hide: $hide, postId: $postId)
       }
     `,
-    { refetchQueries: ['Account', 'Posts', 'Post'] },
+    { refetchQueries: ["Account", "Posts", "Post"] }
   );
 }
 
@@ -317,8 +317,8 @@ export function useMutePost(): MutationTuple<MutePostData, MutePostVariables> {
       }
     `,
     {
-      refetchQueries: ['Account', 'Post'],
-    },
+      refetchQueries: ["Account", "Post"],
+    }
   );
 }
 

@@ -1,4 +1,4 @@
-import { gql, useMutation, MutationTuple } from '@apollo/client';
+import { gql, useMutation, MutationTuple } from "@apollo/client";
 
 type WatchFundVariables = {
   watch: boolean;

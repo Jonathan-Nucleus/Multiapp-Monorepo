@@ -2,20 +2,21 @@ import { useRef, useEffect, useState, useCallback } from "react";
 import { gql, useMutation } from "@apollo/client";
 import { useAccount } from "shared/graphql/query/account/useAccount";
 import { UserProfile } from "backend/graphql/users.graphql";
+import { Company } from "backend/graphql/companies.graphql";
 
-type FollowUserVariables = {
+type FollowCompanyVariables = {
+  companyId: string;
   follow: boolean;
-  userId: string;
 };
 
-type FollowUserData = {
-  followUser: {
-    account: Pick<UserProfile, "_id" | "followingIds">;
-    userAccount: Pick<UserProfile, "_id" | "followerIds">;
+type FollowCompanyData = {
+  followCompany: {
+    account: Pick<UserProfile, "_id" | "companyFollowingIds">;
+    company: Pick<Company, "_id" | "followerIds">;
   };
 };
 
-interface FollowUserReturn {
+interface FollowCompanyReturn {
   isFollowing: boolean;
   toggleFollow: () => Promise<boolean>;
   follow: (follow: boolean) => Promise<boolean>;
@@ -26,35 +27,35 @@ interface FollowUserReturn {
  *
  * @returns   GraphQL mutation.
  */
-export function useFollowUser(id?: string): FollowUserReturn {
+export function useFollowCompany(id?: string): FollowCompanyReturn {
   if (!id) {
     return {
       isFollowing: false,
       toggleFollow: async () => {
-        console.log("no user id provided to follow");
+        console.log("no company id provided to follow");
         return false;
       },
       follow: async (follow: boolean) => {
-        console.log("no user id provided to follow", follow);
+        console.log("no company id provided to follow", follow);
         return false;
       },
     };
   }
 
   const { data: accountData } = useAccount({ fetchPolicy: "cache-only" });
-  const isFollowing = !!accountData?.account?.followingIds?.includes(id);
+  const isFollowing = !!accountData?.account?.companyFollowingIds?.includes(id);
   const [following, setFollowing] = useState(isFollowing);
   const [loading, setLoading] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout>();
-  const mutation = useMutation<FollowUserData, FollowUserVariables>(
+  const mutation = useMutation<FollowCompanyData, FollowCompanyVariables>(
     gql`
-      mutation FollowUser($follow: Boolean!, $userId: ID!) {
-        followUser(follow: $follow, userId: $userId) {
+      mutation FollowCompany($follow: Boolean!, $companyId: ID!) {
+        followCompany(follow: $follow, companyId: $companyId) {
           account {
             _id
-            followingIds
+            companyFollowingIds
           }
-          userAccount {
+          company {
             _id
             followerIds
           }
@@ -62,7 +63,7 @@ export function useFollowUser(id?: string): FollowUserReturn {
       }
     `,
     {
-      refetchQueries: ["Account", "UserProfile"],
+      refetchQueries: ["Account", "CompanyProfile"],
     }
   );
 
@@ -93,12 +94,12 @@ export function useFollowUser(id?: string): FollowUserReturn {
       try {
         const result = await followUser({
           variables: {
-            userId: id,
+            companyId: id,
             follow,
           },
         });
 
-        if (!result.data?.followUser) {
+        if (!result.data?.followCompany) {
           // Revert back to original state on error
           setFollowing(isFollowing);
           success = false;
@@ -114,7 +115,6 @@ export function useFollowUser(id?: string): FollowUserReturn {
         clearTimeout(timeoutRef.current);
       }
 
-      // Allow time for graphql query for account to refetch and update
       timeoutRef.current = setTimeout(() => {
         setLoading(false);
       }, 250);

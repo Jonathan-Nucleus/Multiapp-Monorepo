@@ -22,10 +22,13 @@ type GlobalSearchVariables = {
 };
 
 export function useGlobalSearch(
-  search: string,
+  search: string
 ): QueryResult<GlobalSearchData, GlobalSearchVariables> {
   const [state, setState] = useState<GlobalSearchData>();
-  const { data, loading, ...rest } = useQuery<GlobalSearchData, GlobalSearchVariables>(
+  const { data, loading, ...rest } = useQuery<
+    GlobalSearchData,
+    GlobalSearchVariables
+  >(
     gql`
       ${FUND_SUMMARY_FRAGMENT}
       ${POST_SUMMARY_FRAGMENT}
@@ -59,7 +62,7 @@ export function useGlobalSearch(
     {
       skip: !search,
       variables: { search: search ?? "" },
-    },
+    }
   );
   useEffect(() => {
     if (!loading && data) {

@@ -1,14 +1,14 @@
-import { useState, useEffect } from 'react';
-import { gql, useQuery, QueryResult } from '@apollo/client';
+import { useState, useEffect } from "react";
+import { gql, useQuery, QueryResult } from "@apollo/client";
 import {
   PostCategory,
   Audience,
   PostRoleFilter,
-} from 'backend/graphql/posts.graphql';
+} from "backend/graphql/posts.graphql";
 import {
   POST_SUMMARY_FRAGMENT,
   PostSummary,
-} from 'shared/graphql/fragments/post';
+} from "shared/graphql/fragments/post";
 
 export type { Audience, PostCategory, PostRoleFilter };
 
@@ -28,7 +28,7 @@ type PostsVariables = {
  */
 export function usePosts(
   categories?: PostCategory[],
-  roleFilter?: PostRoleFilter,
+  roleFilter?: PostRoleFilter
 ): QueryResult<PostsData, PostsVariables> {
   const [state, setState] = useState<PostsData>();
   const { data, loading, ...rest } = useQuery<PostsData, PostsVariables>(
@@ -41,8 +41,11 @@ export function usePosts(
       }
     `,
     {
-      variables: { ...(categories ? { categories } : {}) },
-    },
+      variables: {
+        ...(categories ? { categories } : {}),
+        ...(roleFilter ? { roleFilter } : {}),
+      },
+    }
   );
 
   useEffect(() => {

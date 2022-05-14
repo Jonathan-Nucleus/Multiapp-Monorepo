@@ -38,7 +38,7 @@ const CompanyProfile: CompanyProfileScreen = ({ navigation, route }) => {
   const { companyId } = route.params;
 
   const { data: { account } = {} } = useAccount({ fetchPolicy: 'cache-only' });
-  const { data: companyData, loading: companyLoading } = useCompany(companyId);
+  const { data: companyData } = useCompany(companyId);
   const { data: fundsData } = useFunds(companyId);
   const { data: postsData, refetch } = usePosts(companyId);
   const { data: featuredPostsData } = useFeaturedPosts(companyId);
@@ -65,7 +65,7 @@ const CompanyProfile: CompanyProfileScreen = ({ navigation, route }) => {
     setFocusState(isFocused);
   }
 
-  if (!company || !account || companyLoading) {
+  if (!company || !account) {
     return (
       <View style={pStyles.globalContainer}>
         <MainHeader

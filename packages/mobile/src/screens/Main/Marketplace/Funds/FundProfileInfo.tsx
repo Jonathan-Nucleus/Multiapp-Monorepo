@@ -1,7 +1,6 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import {
   TouchableOpacity,
-  Image,
   Text,
   View,
   StyleSheet,
@@ -11,7 +10,9 @@ import FastImage from 'react-native-fast-image';
 
 import Avatar from 'mobile/src/components/common/Avatar';
 import Tag from 'mobile/src/components/common/Tag';
+import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
+import { Body1, Body2, Body3 } from 'mobile/src/theme/fonts';
 import {
   PRIMARY,
   WHITE,
@@ -20,17 +21,15 @@ import {
   GRAY100,
   WHITE12,
 } from 'shared/src/colors';
-import { Body1, Body2, Body3 } from 'mobile/src/theme/fonts';
 
-import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
+import { useFollowUser } from 'shared/graphql/mutation/account/useFollowUser';
 import {
   FundSummary,
   FundManager,
   FundCompany,
 } from 'shared/graphql/fragments/fund';
 
-import { useFollowUser } from 'shared/graphql/mutation/account/useFollowUser';
-import PGradientButton from '../../../../components/common/PGradientButton';
+import { BACKGROUND_URL } from 'react-native-dotenv';
 
 export type Fund = FundSummary & FundManager & FundCompany;
 export interface FundProfileInfo {
@@ -51,6 +50,14 @@ const FundProfileInfo: FC<FundProfileInfo> = ({
       screen: 'UserProfile',
       params: {
         userId: fund.manager._id,
+      },
+    });
+
+  const goToCompany = () =>
+    NavigationService.navigate('CompanyDetails', {
+      screen: 'CompanyProfile',
+      params: {
+        companyId: fund.company._id,
       },
     });
 
@@ -90,7 +97,9 @@ const FundProfileInfo: FC<FundProfileInfo> = ({
           </Text>
         </View>
         <Text style={[styles.whiteText, Body1, styles.fund]}>{fund.name}</Text>
-        <Text style={[styles.company, Body2]}>{fund.company.name}</Text>
+        <Pressable onPress={goToCompany}>
+          <Text style={[styles.company, Body2]}>{fund.company.name}</Text>
+        </Pressable>
         {showOverview && (
           <Text style={[styles.overview, styles.whiteText, Body2]}>
             {fund.overview}

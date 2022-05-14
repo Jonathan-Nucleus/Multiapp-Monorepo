@@ -1,4 +1,4 @@
-import { gql, useQuery, QueryResult } from '@apollo/client';
+import { gql, useQuery, QueryResult } from "@apollo/client";
 import {
   FUND_SUMMARY_FRAGMENT,
   FUND_COMPANY_FRAGMENT,
@@ -6,7 +6,7 @@ import {
   FundSummary,
   FundCompany,
   FundManager,
-} from 'shared/graphql/fragments/fund';
+} from "shared/graphql/fragments/fund";
 import { useEffect, useState } from "react";
 
 type FundsVariables = never;

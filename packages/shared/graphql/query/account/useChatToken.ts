@@ -13,13 +13,16 @@ export type ChatTokenData = {
  */
 export function useChatToken(): QueryResult<ChatTokenData, ChatTokenVariables> {
   const [state, setState] = useState<ChatTokenData>();
-  const { data, loading, ...rest } = useQuery<ChatTokenData, ChatTokenVariables>(
+  const { data, loading, ...rest } = useQuery<
+    ChatTokenData,
+    ChatTokenVariables
+  >(
     gql`
       query ChatToken {
         chatToken
       }
     `,
-    { fetchPolicy: "network-only" },
+    { fetchPolicy: "network-only" }
   );
   useEffect(() => {
     if (!loading && data) {

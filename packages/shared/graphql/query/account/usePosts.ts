@@ -24,10 +24,13 @@ export type AccountPostsData = {
  * @returns   GraphQL query.
  */
 export function usePosts(
-  categories?: PostCategory[],
+  categories?: PostCategory[]
 ): QueryResult<AccountPostsData, AccountPostsVariables> {
   const [state, setState] = useState<AccountPostsData>();
-  const { data, loading, ...rest } = useQuery<AccountPostsData, AccountPostsVariables>(
+  const { data, loading, ...rest } = useQuery<
+    AccountPostsData,
+    AccountPostsVariables
+  >(
     gql`
       ${POST_SUMMARY_FRAGMENT}
       query AccountPosts($categories: [PostCategory!]) {
@@ -41,7 +44,7 @@ export function usePosts(
     `,
     {
       variables: { ...(categories ? { categories } : {}) },
-    },
+    }
   );
   useEffect(() => {
     if (!loading && data) {

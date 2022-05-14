@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import Avatar from 'mobile/src/components/common/Avatar';
 import { WHITE, BLACK } from 'shared/src/colors';
@@ -9,41 +9,14 @@ import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 
 import { Company } from 'shared/graphql/query/marketplace/useFundCompanies';
-import { useAccount } from 'shared/graphql/query/account/useAccount';
-import { useFollowCompany } from 'shared/graphql/mutation/account';
+import { useFollowCompany } from 'shared/graphql/mutation/account/useFollowCompany';
 
 interface FundCompanyInfoProps {
   company: Company;
 }
 
 const FundCompanyInfo: React.FC<FundCompanyInfoProps> = ({ company }) => {
-  const { data: { account } = {} } = useAccount({ fetchPolicy: 'cache-only' });
-  const [followCompany] = useFollowCompany();
-
-  const isFollowingCompany =
-    account?.companyFollowingIds?.includes(company._id) ?? false;
-  const [following, setFollowing] = useState(isFollowingCompany);
-  const toggleFollow = async (): Promise<void> => {
-    if (!account) {
-      return;
-    }
-
-    // Update state immediately for responsiveness
-    setFollowing(!isFollowingCompany);
-
-    const result = await followCompany({
-      variables: {
-        companyId: company._id,
-        follow: !following,
-      },
-      refetchQueries: ['Account', 'FundCompanies'],
-    });
-
-    if (!result.data?.followCompany) {
-      // Revert back to original state on error
-      setFollowing(isFollowingCompany);
-    }
-  };
+  const { isFollowing, toggleFollow } = useFollowCompany(company._id);
 
   return (
     <TouchableOpacity
@@ -89,7 +62,7 @@ const FundCompanyInfo: React.FC<FundCompanyInfoProps> = ({ company }) => {
             />
           </View>
           <PGradientButton
-            label={following ? 'Unfollow' : 'Follow'}
+            label={isFollowing ? 'Unfollow' : 'Follow'}
             textStyle={styles.buttonText}
             btnContainer={styles.buttonContainer}
             onPress={toggleFollow}

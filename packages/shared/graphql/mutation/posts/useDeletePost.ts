@@ -1,4 +1,4 @@
-import { gql, useMutation, MutationTuple } from '@apollo/client';
+import { gql, useMutation, MutationTuple } from "@apollo/client";
 
 type DeletePostVariables = {
   postId: string;
@@ -24,7 +24,7 @@ export function useDeletePost(): MutationTuple<
       }
     `,
     {
-      refetchQueries: ['Posts', 'Post', 'AccountPosts'],
-    },
+      refetchQueries: ["Posts", "Post", "AccountPosts"],
+    }
   );
 }

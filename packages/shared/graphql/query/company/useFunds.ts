@@ -25,10 +25,13 @@ export type CompanyFundsData = {
  * @returns   GraphQL query.
  */
 export function useFunds(
-  companyId: string,
+  companyId: string
 ): QueryResult<CompanyFundsData, CompanyFundsVariables> {
   const [state, setState] = useState<CompanyFundsData>();
-  const { data, loading, ...rest } = useQuery<CompanyFundsData, CompanyFundsVariables>(
+  const { data, loading, ...rest } = useQuery<
+    CompanyFundsData,
+    CompanyFundsVariables
+  >(
     gql`
       ${FUND_SUMMARY_FRAGMENT}
       query CompanyFunds($companyId: ID!) {
@@ -42,7 +45,7 @@ export function useFunds(
     `,
     {
       variables: { companyId },
-    },
+    }
   );
   useEffect(() => {
     if (!loading && data) {

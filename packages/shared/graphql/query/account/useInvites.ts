@@ -1,11 +1,11 @@
-import { gql, QueryHookOptions, QueryResult, useQuery } from '@apollo/client';
-import { useEffect, useState } from 'react';
-import { User } from 'backend/graphql/users.graphql';
+import { gql, QueryHookOptions, QueryResult, useQuery } from "@apollo/client";
+import { useEffect, useState } from "react";
+import { User } from "backend/graphql/users.graphql";
 
-export type Invitee = Pick<User, 'avatar' | 'email' | 'firstName' | 'lastName'>;
+export type Invitee = Pick<User, "avatar" | "email" | "firstName" | "lastName">;
 export type InvitesVariables = never;
 export type InviteesData = {
-  account: Pick<User, '_id' | 'role'> & {
+  account: Pick<User, "_id" | "role"> & {
     invitees: Invitee[];
   };
 };
@@ -16,7 +16,7 @@ export type InviteesData = {
  * @returns   GraphQL query.
  */
 export function useInvites(
-  options?: QueryHookOptions<InviteesData, InvitesVariables>,
+  options?: QueryHookOptions<InviteesData, InvitesVariables>
 ): QueryResult<InviteesData, InvitesVariables> {
   const [state, setState] = useState<InviteesData>();
   const { data, loading, ...rest } = useQuery<InviteesData, InvitesVariables>(
@@ -40,7 +40,7 @@ export function useInvites(
         }
       }
     `,
-    { ...options },
+    { ...options }
   );
   useEffect(() => {
     if (!loading && data) {

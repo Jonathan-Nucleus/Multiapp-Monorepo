@@ -1,9 +1,9 @@
-import { gql, useQuery, QueryResult } from '@apollo/client';
+import { gql, useQuery, QueryResult } from "@apollo/client";
 import {
   USER_SUMMARY_FRAGMENT,
   UserSummary,
-} from 'shared/graphql/fragments/user';
-import { useEffect, useState } from 'react';
+} from "shared/graphql/fragments/user";
+import { useEffect, useState } from "react";
 
 type UsersVariables = never;
 
@@ -27,7 +27,7 @@ export function useUsers(): QueryResult<UsersData, UsersVariables> {
           ...UserSummaryFields
         }
       }
-    `,
+    `
   );
   useEffect(() => {
     if (!loading && data) {

@@ -1,62 +1,62 @@
-import { gql, QueryResult, useQuery } from '@apollo/client';
-import { User } from 'backend/graphql/users.graphql';
+import { gql, QueryResult, useQuery } from "@apollo/client";
+import { User } from "backend/graphql/users.graphql";
 import { useEffect, useState } from "react";
 
 export type WatchlistFund = Pick<
-  User['watchlist'][number],
-  '_id' | 'name' | 'companyId' | 'managerId'
+  User["watchlist"][number],
+  "_id" | "name" | "companyId" | "managerId"
 > & {
   company: Pick<
-    User['watchlist'][number]['company'],
-    '_id' | 'name' | 'website' | 'linkedIn' | 'twitter' | 'avatar'
+    User["watchlist"][number]["company"],
+    "_id" | "name" | "website" | "linkedIn" | "twitter" | "avatar"
   >;
 };
 export type UserProfile = Pick<
   User,
-  | '_id'
-  | 'firstName'
-  | 'lastName'
-  | 'avatar'
-  | 'role'
-  | 'position'
-  | 'tagline'
-  | 'overview'
-  | 'background'
-  | 'followerIds'
-  | 'followers'
-  | 'followingIds'
-  | 'following'
-  | 'watchlistIds'
-  | 'postIds'
-  | 'linkedIn'
-  | 'twitter'
-  | 'website'
-  | 'managedFunds'
-  | 'accreditation'
-  | 'mutedPostIds'
+  | "_id"
+  | "firstName"
+  | "lastName"
+  | "avatar"
+  | "role"
+  | "position"
+  | "tagline"
+  | "overview"
+  | "background"
+  | "followerIds"
+  | "followers"
+  | "followingIds"
+  | "following"
+  | "watchlistIds"
+  | "postIds"
+  | "linkedIn"
+  | "twitter"
+  | "website"
+  | "managedFunds"
+  | "accreditation"
+  | "mutedPostIds"
 > & {
   watchlist: WatchlistFund[];
   company?: Pick<
-    User['companies'][number],
-    | '_id'
-    | 'name'
-    | 'avatar'
-    | 'members'
-    | 'background'
-    | 'followerIds'
-    | 'postIds'
-    | 'followingIds'
+    User["companies"][number],
+    | "_id"
+    | "name"
+    | "avatar"
+    | "members"
+    | "background"
+    | "followerIds"
+    | "postIds"
+    | "followingIds"
   >;
   companies: Pick<
-    User['companies'][number],
-    | '_id'
-    | 'name'
-    | 'avatar'
-    | 'members'
-    | 'background'
-    | 'followerIds'
-    | 'postIds'
-    | 'followingIds'
+    User["companies"][number],
+    | "_id"
+    | "name"
+    | "avatar"
+    | "members"
+    | "background"
+    | "followerIds"
+    | "postIds"
+    | "followingIds"
   >[];
 };
 
@@ -71,10 +71,13 @@ type UserProfileData = {
 // TODO: Update to move followers and following to a separate query and just
 // fetch followerIds and followingIds here
 export function useProfile(
-  userId?: string,
+  userId?: string
 ): QueryResult<UserProfileData, UserProfileVariables> {
   const [state, setState] = useState<UserProfileData>();
-  const { data, loading, ...rest } = useQuery<UserProfileData, UserProfileVariables>(
+  const { data, loading, ...rest } = useQuery<
+    UserProfileData,
+    UserProfileVariables
+  >(
     gql`
       query UserProfile($userId: ID!) {
         userProfile(userId: $userId) {
@@ -205,8 +208,8 @@ export function useProfile(
     `,
     {
       skip: !userId,
-      variables: { userId: userId ?? '' },
-    },
+      variables: { userId: userId ?? "" },
+    }
   );
   useEffect(() => {
     if (!loading && data) {

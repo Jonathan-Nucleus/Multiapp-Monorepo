@@ -22,10 +22,13 @@ type UserManagedFundsVariables = {
 };
 
 export function useManagedFunds(
-  userId: string,
+  userId: string
 ): QueryResult<UserManagedFundsData, UserManagedFundsVariables> {
   const [state, setState] = useState<UserManagedFundsData>();
-  const { data, loading, ...rest } = useQuery<UserManagedFundsData, UserManagedFundsVariables>(
+  const { data, loading, ...rest } = useQuery<
+    UserManagedFundsData,
+    UserManagedFundsVariables
+  >(
     gql`
       ${FUND_SUMMARY_FRAGMENT}
       ${FUND_COMPANY_FRAGMENT}
@@ -41,7 +44,7 @@ export function useManagedFunds(
         }
       }
     `,
-    { variables: { userId } },
+    { variables: { userId } }
   );
   useEffect(() => {
     if (!loading && data) {

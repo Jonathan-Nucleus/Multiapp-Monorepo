@@ -14,8 +14,10 @@ type ResetPasswordData = {
  *
  * @returns   GraphQL mutation.
  */
-export function useResetPassword(): MutationTuple<ResetPasswordData,
-  ResetPasswordVariables> {
+export function useResetPassword(): MutationTuple<
+  ResetPasswordData,
+  ResetPasswordVariables
+> {
   return useMutation<ResetPasswordData, ResetPasswordVariables>(gql`
     mutation ResetPassword($password: String!, $token: String!) {
       resetPassword(password: $password, token: $token)

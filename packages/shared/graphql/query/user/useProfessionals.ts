@@ -3,8 +3,10 @@ import { gql, QueryResult, useQuery } from "@apollo/client";
 import { Company } from "backend/graphql/companies.graphql";
 import { useEffect, useState } from "react";
 
-export type Professional = Pick<User,
-  "_id" | "firstName" | "lastName" | "avatar" | "position"> & {
+export type Professional = Pick<
+  User,
+  "_id" | "firstName" | "lastName" | "avatar" | "position"
+> & {
   company: Pick<Company, "_id" | "name">;
 };
 
@@ -17,10 +19,13 @@ type ProfessionalsVariables = {
 };
 
 export function useProfessionals(
-  featured: boolean,
+  featured: boolean
 ): QueryResult<ProfessionalsData, ProfessionalsVariables> {
   const [state, setState] = useState<ProfessionalsData>();
-  const { data, loading, ...rest } = useQuery<ProfessionalsData, ProfessionalsVariables>(
+  const { data, loading, ...rest } = useQuery<
+    ProfessionalsData,
+    ProfessionalsVariables
+  >(
     gql`
       query Professionals($featured: Boolean) {
         professionals(featured: $featured) {
@@ -36,7 +41,7 @@ export function useProfessionals(
         }
       }
     `,
-    { variables: { featured } },
+    { variables: { featured } }
   );
   useEffect(() => {
     if (!loading && data) {

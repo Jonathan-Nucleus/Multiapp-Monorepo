@@ -1,5 +1,5 @@
-import { gql, MutationTuple, useMutation } from '@apollo/client';
-import { SettingsInput } from 'backend/graphql/users.graphql';
+import { gql, MutationTuple, useMutation } from "@apollo/client";
+import { SettingsInput } from "backend/graphql/users.graphql";
 
 type UpdateSettingsData = {
   updateSettings: boolean;
@@ -20,7 +20,7 @@ export function useUpdateSettings(): MutationTuple<
       }
     `,
     {
-      refetchQueries: ['Account'],
-    },
+      refetchQueries: ["Account"],
+    }
   );
 }

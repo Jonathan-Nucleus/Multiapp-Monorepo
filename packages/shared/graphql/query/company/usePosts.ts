@@ -29,10 +29,13 @@ export type CompanyPostsData = {
  */
 export function usePosts(
   companyId: string,
-  categories?: PostCategory[],
+  categories?: PostCategory[]
 ): QueryResult<CompanyPostsData, CompanyPostsVariables> {
   const [state, setState] = useState<CompanyPostsData>();
-  const { data, loading, ...rest } = useQuery<CompanyPostsData, CompanyPostsVariables>(
+  const { data, loading, ...rest } = useQuery<
+    CompanyPostsData,
+    CompanyPostsVariables
+  >(
     gql`
       ${POST_SUMMARY_FRAGMENT}
       query CompanyPosts($companyId: ID!, $categories: [PostCategory!]) {
@@ -46,7 +49,7 @@ export function usePosts(
     `,
     {
       variables: { companyId, ...(categories ? { categories } : {}) },
-    },
+    }
   );
   useEffect(() => {
     if (!loading && data) {

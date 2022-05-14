@@ -1,41 +1,41 @@
-import { gql, useQuery, QueryResult } from '@apollo/client';
-import { Company as GraphQLCompany } from 'backend/graphql/companies.graphql';
-import { User as GraphQLUser } from 'backend/graphql/users.graphql';
-import { PostSummary } from 'shared/graphql/fragments/post';
+import { gql, useQuery, QueryResult } from "@apollo/client";
+import { Company as GraphQLCompany } from "backend/graphql/companies.graphql";
+import { User as GraphQLUser } from "backend/graphql/users.graphql";
+import { PostSummary } from "shared/graphql/fragments/post";
 import {
   FUND_SUMMARY_FRAGMENT,
   FUND_MANAGER_FRAGMENT,
   FundSummary,
   FundManager,
-} from 'shared/graphql/fragments/fund';
-import { useEffect, useState } from 'react';
+} from "shared/graphql/fragments/fund";
+import { useEffect, useState } from "react";
 
 export type CompanyMember = Pick<
-  GraphQLCompany['members'][number],
-  '_id' | 'firstName' | 'lastName' | 'avatar' | 'position'
+  GraphQLCompany["members"][number],
+  "_id" | "firstName" | "lastName" | "avatar" | "position"
 >;
 export type FollowUser = Pick<
   GraphQLUser,
-  '_id' | 'firstName' | 'lastName' | 'position' | 'avatar'
+  "_id" | "firstName" | "lastName" | "position" | "avatar"
 >;
 export type Fund = FundSummary & FundManager;
 export type CompanyProfile = Pick<
   GraphQLCompany,
-  | '_id'
-  | 'name'
-  | 'tagline'
-  | 'overview'
-  | 'avatar'
-  | 'background'
-  | 'postIds'
-  | 'followerIds'
-  | 'followingIds'
-  | 'website'
-  | 'linkedIn'
-  | 'twitter'
-  | 'posts'
-  | 'followers'
-  | 'following'
+  | "_id"
+  | "name"
+  | "tagline"
+  | "overview"
+  | "avatar"
+  | "background"
+  | "postIds"
+  | "followerIds"
+  | "followingIds"
+  | "website"
+  | "linkedIn"
+  | "twitter"
+  | "posts"
+  | "followers"
+  | "following"
 > & {
   followers: FollowUser[];
   following: FollowUser[];
@@ -58,7 +58,7 @@ type CompanyVariables = {
  * @returns   GraphQL query.
  */
 export function useCompany(
-  companyId?: string,
+  companyId?: string
 ): QueryResult<CompanyData, CompanyVariables> {
   const [state, setState] = useState<CompanyData>();
   const { data, loading, ...rest } = useQuery<CompanyData, CompanyVariables>(
@@ -122,8 +122,8 @@ export function useCompany(
     `,
     {
       skip: !companyId,
-      variables: { companyId: companyId ?? '' },
-    },
+      variables: { companyId: companyId ?? "" },
+    }
   );
   useEffect(() => {
     if (!loading && data) {
