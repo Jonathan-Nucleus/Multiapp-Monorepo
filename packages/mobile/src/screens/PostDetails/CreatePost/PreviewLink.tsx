@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { LinkPreview } from '@flyerhq/react-native-link-preview';
+import {
+  getPreviewData,
+  PreviewData,
+} from '@flyerhq/react-native-link-preview';
 import FastImage from 'react-native-fast-image';
 
 import PLabel from 'mobile/src/components/common/PLabel';
@@ -12,29 +15,37 @@ interface PostHeaderProps {
   body: string;
 }
 
-const PreviewLink: React.FC<PostHeaderProps> = (props) => {
-  const { body } = props;
+const PreviewLink: React.FC<PostHeaderProps> = ({ body }) => {
+  const [dataPreview, setDataPreview] = useState<PreviewData>({});
 
-  return (
-    <LinkPreview
-      containerStyle={styles.previewContainer}
-      renderLinkPreview={({ previewData }) => (
-        <View style={styles.metaDataContainer}>
-          <FastImage
-            source={{ uri: previewData?.image?.url }}
-            style={styles.previewImage}
-          />
-          <PLabel label={previewData?.title || ''} textStyle={styles.title} />
-          <PLabel
-            label={previewData?.description || ''}
-            textStyle={styles.description}
-            numberOfLines={2}
-          />
-        </View>
-      )}
-      text={body || ''}
-    />
+  useEffect(() => {
+    const getData = async () => {
+      const data: PreviewData = await getPreviewData(body);
+      setDataPreview(data);
+    };
+
+    getData();
+  }, [body]);
+
+  const renderMetaData = useCallback(
+    () => (
+      <View style={styles.metaDataContainer}>
+        <FastImage
+          source={{ uri: dataPreview?.image?.url }}
+          style={styles.previewImage}
+        />
+        <PLabel label={dataPreview?.title || ''} textStyle={styles.title} />
+        <PLabel
+          label={dataPreview?.description || ''}
+          textStyle={styles.description}
+          numberOfLines={2}
+        />
+      </View>
+    ),
+    [dataPreview.link],
   );
+
+  return <View style={styles.previewContainer}>{renderMetaData()}</View>;
 };
 
 const styles = StyleSheet.create({
@@ -46,7 +57,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     borderColor: WHITE12,
     borderRadius: 8,
-    marginTop: 24,
   },
   title: {
     marginHorizontal: 16,

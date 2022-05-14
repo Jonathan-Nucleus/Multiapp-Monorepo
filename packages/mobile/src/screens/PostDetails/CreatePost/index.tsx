@@ -156,7 +156,7 @@ const schema = yup
         url: yup.string().required().default(''),
         aspectRatio: yup.number().required().default(1.58),
       })
-      .notRequired(),
+      .default(undefined),
     body: yup
       .string()
       .notRequired()
@@ -561,7 +561,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
               style={styles.postImage}
             />
           ) : null}
-          {watchBody && !imageData && !post?.mediaUrl ? (
+          {watchBody && !imageData && !post?.media?.url ? (
             <PreviewLink body={watchBody} />
           ) : null}
         </PAppContainer>

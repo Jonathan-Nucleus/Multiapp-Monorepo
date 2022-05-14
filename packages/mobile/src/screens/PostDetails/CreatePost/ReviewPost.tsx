@@ -148,7 +148,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
             />
           )
         )}
-        {!localMediaPath && !route.params?.mediaUrl && (
+        {!localMediaPath && !route.params?.media?.url && (
           <PreviewLink body={body ?? ''} />
         )}
         {categories && categories.length > 0 && (
