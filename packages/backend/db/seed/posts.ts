@@ -65,7 +65,10 @@ export default async function (
           visible: true,
           isCompany: false,
           body: faker.lorem.paragraph(),
-          mediaUrl: stockImages[randomInt(0, stockImages.length - 1)],
+          media: {
+            url: stockImages[randomInt(0, stockImages.length - 1)],
+            aspectRatio: 1,
+          },
           audience: audienceValues[randomInt(0, audienceValues.length - 1)],
           categories: Array.from(
             new Set(

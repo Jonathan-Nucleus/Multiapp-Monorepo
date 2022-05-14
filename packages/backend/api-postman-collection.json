@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "920e2456-2e67-42f0-b97d-405fd07eb98f",
+		"_postman_id": "9b22e078-b0b6-4872-b80a-fb8333604504",
 		"name": "Prometheus API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -55,7 +55,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query Posts {\n  posts {\n      _id\n      body\n      mediaUrl\n      mentionIds\n      likeIds\n      commentIds\n      createdAt\n      user {\n          _id\n          firstName\n          lastName\n      }\n  }\n}",
+								"query": "query Posts {\n  posts {\n      _id\n      body\n      media {\n          url\n          aspectRatio\n      }\n      mentionIds\n      likeIds\n      commentIds\n      createdAt\n      user {\n          _id\n          firstName\n          lastName\n      }\n  }\n}",
 								"variables": ""
 							}
 						},
@@ -91,7 +91,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query Post($postId: ID!) {\n  post(postId: $postId) {\n      _id\n      body\n      mediaUrl\n      mentions {\n          _id\n          firstName\n          lastName\n      }\n      likes {\n          _id\n          firstName\n          lastName\n          avatar\n      }\n      comments {\n          body\n          user {\n              _id\n              firstName\n              lastName\n              avatar\n          }\n          comment {\n              body\n              user {\n                _id\n                firstName\n                lastName\n                avatar\n              }\n              likes {\n                  _id\n                  firstName\n                  lastName\n                  avatar\n              }\n          }\n          likes {\n              _id\n              firstName\n              lastName\n              avatar\n          }\n      }\n      createdAt\n      user {\n          _id\n          firstName\n          lastName\n          avatar\n      }\n  }\n}",
+								"query": "query Post($postId: ID!) {\n  post(postId: $postId) {\n      _id\n      body\n      media {\n          url\n          aspectRatio\n      }\n      mentions {\n          _id\n          firstName\n          lastName\n      }\n      likes {\n          _id\n          firstName\n          lastName\n          avatar\n      }\n      comments {\n          body\n          user {\n              _id\n              firstName\n              lastName\n              avatar\n          }\n          comment {\n              body\n              user {\n                _id\n                firstName\n                lastName\n                avatar\n              }\n              likes {\n                  _id\n                  firstName\n                  lastName\n                  avatar\n              }\n          }\n          likes {\n              _id\n              firstName\n              lastName\n              avatar\n          }\n      }\n      createdAt\n      user {\n          _id\n          firstName\n          lastName\n          avatar\n      }\n  }\n}",
 								"variables": "{\n    \"postId\": \"625c02fe6838ddfb66c17ffa\"\n}"
 							}
 						},
@@ -415,7 +415,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query Posts($categories: [PostCategory!]) {\n  posts(categories: $categories) {\n      _id\n      body\n      mediaUrl\n      mentionIds\n      likeIds\n      commentIds\n      createdAt\n      user {\n          _id\n          firstName\n          lastName\n      }\n  }\n}",
+								"query": "query Posts($categories: [PostCategory!]) {\n  posts(categories: $categories) {\n      _id\n      body\n      media {\n          url\n          aspectRatio\n      }\n      mentionIds\n      likeIds\n      commentIds\n      createdAt\n      user {\n          _id\n          firstName\n          lastName\n      }\n  }\n}",
 								"variables": "{\n  \"categories\": [\n      \"NEWS\",\n      \"POLITICS\",\n      \"IDEAS\"\n  ]\n}"
 							}
 						},
@@ -1312,8 +1312,8 @@
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "mutation CreatePost($post: PostInput!) {\n  createPost(post: $post) {\n      _id\n      body\n      mediaUrl\n      likeIds\n      commentIds\n      createdAt\n      categories\n  }\n}",
-										"variables": "{\n     \"post\": {\n        \"categories\": [\n            \"NEWS\",\n            \"POLITICS\"\n        ],\n        \"audience\": \"EVERYONE\",\n        \"body\": \"This is my post\",\n        \"mediaUrl\": \"https://www.postmedia.com/this/is/my/image/or/video\",\n        \"mentionIds\": [\n          \"624f1a2eed55addaea6b4499\", \n          \"624f1a2eed55addaea6b4498\"\n        ]\n  }\n}"
+										"query": "mutation CreatePost($post: PostInput!) {\n  createPost(post: $post) {\n      _id\n      body\n      media {\n          url\n          aspectRatio\n      }\n      likeIds\n      commentIds\n      createdAt\n      categories\n  }\n}",
+										"variables": "{\n     \"post\": {\n        \"categories\": [\n            \"NEWS\",\n            \"POLITICS\"\n        ],\n        \"audience\": \"EVERYONE\",\n        \"body\": \"This is my post\",\n        \"media\": {\n            \"url\": \"https://www.postmedia.com/this/is/my/image/or/video\",\n            \"aspectRatio\": 1\n        },\n        \"mentionIds\": [\n          \"624f1a2eed55addaea6b4499\", \n          \"624f1a2eed55addaea6b4498\"\n        ]\n  }\n}"
 									}
 								},
 								"url": {
@@ -1348,7 +1348,7 @@
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "mutation EditPost($post: PostUpdate!) {\n    editPost(post: $post) {\n        _id\n        audience\n        body\n        mediaUrl\n        categories\n        mentionIds\n        updatedAt\n    }\n}",
+										"query": "mutation EditPost($post: PostUpdate!) {\n    editPost(post: $post) {\n        _id\n        audience\n        body\n        media {\n            url\n            aspectRatio\n        }\n        categories\n        mentionIds\n        updatedAt\n    }\n}",
 										"variables": "{\n    \"post\": {\n        \"_id\": \"6272c5b9d82e1d8cc95c3c02\",\n        \"categories\": [\n            \"NEWS\",\n            \"POLITICS\"\n        ],\n        \"audience\": \"EVERYONE\",\n        \"body\": \"This is my post\"\n    }\n}"
 									}
 								},
@@ -1403,7 +1403,7 @@
 							"response": []
 						},
 						{
-							"name": "LIke Post",
+							"name": "Like Post",
 							"request": {
 								"auth": {
 									"type": "bearer",
