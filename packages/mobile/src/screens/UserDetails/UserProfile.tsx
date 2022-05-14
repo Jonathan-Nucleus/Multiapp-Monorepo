@@ -26,9 +26,9 @@ import { Body2, Body3, H6Bold, H5Bold } from 'mobile/src/theme/fonts';
 import {
   WHITE,
   BLUE300,
-  GRAY100,
   PRIMARY,
   PRIMARYSOLID,
+  WHITE12,
 } from 'shared/src/colors';
 
 import LinkedinSvg from 'shared/assets/images/linkedin.svg';
@@ -214,34 +214,39 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
             </View>
           )}
         </View>
-        <View style={[styles.row, styles.social]}>
-          <View style={styles.row}>
+        <View
+          style={[
+            styles.row,
+            styles.social,
+            !linkedIn && !twitter && !website && styles.hide,
+          ]}>
+          {linkedIn ? (
             <TouchableOpacity
-              onPress={() =>
-                Linking.openURL(linkedIn ?? 'https://www.linkedin.com/')
-              }>
+              onPress={() => Linking.openURL(linkedIn)}
+              style={styles.socialIcon}>
               <LinkedinSvg />
             </TouchableOpacity>
+          ) : null}
+          {twitter ? (
             <TouchableOpacity
-              onPress={() => Linking.openURL(twitter ?? 'https://twitter.com/')}
-              style={styles.icon}>
+              onPress={() => Linking.openURL(twitter)}
+              style={styles.socialIcon}>
               <TwitterSvg />
             </TouchableOpacity>
-          </View>
-          {website ? (
-            <>
-              <View style={styles.verticalLine} />
-              <TouchableOpacity
-                onPress={() => website && Linking.openURL(website)}>
-                <Text style={styles.website} numberOfLines={1}>
-                  {website}
-                </Text>
-              </TouchableOpacity>
-            </>
           ) : null}
-          <TouchableOpacity>
+
+          {website ? (
+            <TouchableOpacity
+              style={linkedIn || twitter ? styles.websiteContainer : {}}
+              onPress={() => website && Linking.openURL(website)}>
+              <Text style={styles.website} numberOfLines={1}>
+                {website}
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+          {/* <TouchableOpacity>
             <DotsThreeVerticalSvg />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         <Funds accredited={profile.accreditation} funds={funds} />
         <View>
@@ -358,26 +363,29 @@ const styles = StyleSheet.create({
     ...Body3,
   },
   social: {
-    paddingVertical: 8,
-    borderTopColor: GRAY100,
-    borderBottomColor: GRAY100,
+    borderTopColor: WHITE12,
+    borderBottomColor: WHITE12,
     borderBottomWidth: 1,
     borderTopWidth: 1,
     marginBottom: 24,
     alignItems: 'center',
-    paddingLeft: 16,
-    justifyContent: 'space-between',
+    height: 60,
   },
-  verticalLine: {
-    height: 32,
-    backgroundColor: GRAY100,
-    width: 1,
-    marginLeft: 40,
-    marginRight: 20,
+  hide: {
+    height: 0,
+    paddingVertical: 0,
+    borderBottomWidth: 0,
+  },
+  websiteContainer: {
+    borderLeftWidth: 1,
+    borderLeftColor: WHITE12,
+    height: '100%',
+    justifyContent: 'center',
   },
   website: {
     color: PRIMARY,
     ...Body3,
+    marginLeft: 16,
   },
   text: {
     color: WHITE,
@@ -391,8 +399,8 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 40,
   },
-  icon: {
-    marginLeft: 32,
+  socialIcon: {
+    marginHorizontal: 16,
   },
   proWrapper: {
     flexDirection: 'row',
