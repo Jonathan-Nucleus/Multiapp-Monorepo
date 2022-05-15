@@ -6,6 +6,9 @@ const pStyles = StyleSheet.create({
     flex: 1,
     backgroundColor: BLACK,
   },
+  modal: {
+    backgroundColor: BGDARK,
+  },
   pressedStyle: {
     opacity: 0.6,
   },

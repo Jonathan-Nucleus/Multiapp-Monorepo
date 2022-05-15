@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import PLabel from 'mobile/src/components/common/PLabel';
 import { PRIMARYSOLID, PRIMARYOVERLAY } from 'shared/src/colors';
@@ -15,12 +15,18 @@ interface PostSelectionProps {
 const PostSelection: React.FC<PostSelectionProps> = (props) => {
   const { icon, label, viewStyle, onPress } = props;
 
-  return (
-    <TouchableOpacity style={[styles.wrapper, viewStyle]} onPress={onPress}>
+  const content = (
+    <View style={[styles.wrapper, viewStyle]}>
       {icon}
       <PLabel label={label} viewStyle={styles.labelWrapper} />
-      <ArrowDownSvg />
-    </TouchableOpacity>
+      {onPress ? <ArrowDownSvg /> : null}
+    </View>
+  );
+
+  return onPress ? (
+    <TouchableOpacity onPress={onPress}>{content}</TouchableOpacity>
+  ) : (
+    content
   );
 };
 
@@ -35,6 +41,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 12,
+    marginLeft: 8,
   },
   labelWrapper: {
     marginHorizontal: 8,

@@ -1,7 +1,6 @@
 import React from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View, Text } from 'react-native';
 import { MentionInput } from 'react-native-controlled-mentions';
-import _ from 'lodash';
 const Buffer = global.Buffer || require('buffer').Buffer;
 
 import { POST_URL } from 'react-native-dotenv';
@@ -13,7 +12,7 @@ import Tag from 'mobile/src/components/common/Tag';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import { showMessage } from 'mobile/src/services/utils';
 import pStyles from 'mobile/src/theme/pStyles';
-import { SECONDARY, BGDARK } from 'shared/src/colors';
+import { BGDARK, WHITE, PRIMARY } from 'shared/src/colors';
 
 import PreviewLink from './PreviewLink';
 import PostSelection from './PostSelection';
@@ -26,6 +25,7 @@ import {
   PostCategories,
   useEditPost,
 } from 'shared/graphql/mutation/posts';
+import { processPost } from 'shared/src/patterns';
 
 import { ReviewPostScreen } from 'mobile/src/navigations/PostDetailsStack';
 
@@ -111,38 +111,46 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
     AUDIENCE_OPTIONS.find((option) => option.id === audience)?.value ?? '';
 
   return (
-    <View style={pStyles.globalContainer}>
+    <View style={[pStyles.globalContainer, pStyles.modal]}>
       <PostHeader
         centerLabel="Preview Post"
         rightLabel="POST"
         rightValidation={true}
         handleNext={handleSubmit}
-        handleBack={() => navigation.navigate('Main')}
+        handleBack={() => navigation.goBack()}
       />
-      <PAppContainer style={styles.bgDark}>
+      <PAppContainer modal>
         <View style={styles.usersPart}>
           <Avatar user={account} size={32} />
-          <PostSelection
-            icon={<UserSvg />}
-            label={postAsLabel}
-            viewStyle={{ marginHorizontal: 8 }}
-          />
+          <PostSelection icon={<UserSvg />} label={postAsLabel} />
           <PostSelection icon={<GlobalSvg />} label={selectedAudienceLabel} />
         </View>
-        <MentionInput
-          value={body ?? ''}
-          onChange={() => {}}
-          editable={false}
-          style={styles.mentionInput}
-          partTypes={[
-            {
-              trigger: '@',
-              textStyle: {
-                color: SECONDARY,
-              },
-            },
-          ]}
-        />
+        <Text style={styles.body} selectable={true}>
+          {body
+            ? processPost(body).map((split, index) => {
+                if (split.startsWith('$') || split.startsWith('#')) {
+                  return (
+                    <Text key={split} style={styles.tagLink}>
+                      {split}
+                    </Text>
+                  );
+                } else if (split.startsWith('@') && split.includes('|')) {
+                  const [name, id] = split.substring(1).split('|');
+                  return (
+                    <Text key={id} style={styles.tagLink}>
+                      @{name}
+                    </Text>
+                  );
+                } else {
+                  return (
+                    <React.Fragment key={`${split}-${index}`}>
+                      {split}
+                    </React.Fragment>
+                  );
+                }
+              })
+            : null}
+        </Text>
         {localMediaPath ? (
           <Image source={{ uri: localMediaPath }} style={styles.postImage} />
         ) : (
@@ -194,9 +202,18 @@ const styles = StyleSheet.create({
     marginVertical: 16,
     borderRadius: 16,
   },
+  body: {
+    marginTop: 16,
+    lineHeight: 20,
+    color: WHITE,
+  },
+  tagLink: {
+    color: PRIMARY,
+  },
   tagContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    marginTop: 16,
   },
   tagStyle: {
     paddingHorizontal: 15,

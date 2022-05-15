@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ListRenderItem, StyleSheet, FlatList, View } from 'react-native';
 
 import CheckboxLabel from 'mobile/src/components/common/CheckboxLabel';
@@ -39,7 +39,7 @@ const schema = yup
   .required();
 
 const ChooseCategory: ChooseCategoryScreen = ({ route, navigation }) => {
-  const { categories = [] } = route.params;
+  const { categories: defaultCategories = [] } = route.params;
 
   const {
     handleSubmit,
@@ -48,7 +48,7 @@ const ChooseCategory: ChooseCategoryScreen = ({ route, navigation }) => {
   } = useForm<yup.InferType<typeof schema>>({
     resolver: yupResolver(schema),
     defaultValues: schema.cast(
-      { categories },
+      { categories: defaultCategories },
       { assert: false },
     ) as DefaultValues<FormValues>,
     mode: 'onChange',
@@ -60,10 +60,10 @@ const ChooseCategory: ChooseCategoryScreen = ({ route, navigation }) => {
   });
   const [disabled, setDisabled] = useState(false);
 
-  const onSubmit = (values: FormValues): void => {
+  const onSubmit = ({ categories }: FormValues): void => {
     navigation.navigate('ReviewPost', {
       ...route.params,
-      categories: categoriesField.value,
+      categories,
     });
   };
 
@@ -101,15 +101,15 @@ const ChooseCategory: ChooseCategoryScreen = ({ route, navigation }) => {
   );
 
   return (
-    <View style={pStyles.globalContainer}>
+    <View style={[pStyles.globalContainer, pStyles.modal]}>
       <PostHeader
         centerLabel="Choose Categories"
         rightLabel="NEXT"
         rightValidation={isValid}
         handleNext={handleSubmit(onSubmit)}
-        handleBack={() => navigation.navigate('Main')}
+        handleBack={() => navigation.goBack()}
       />
-      <PAppContainer>
+      <PAppContainer modal>
         <PLabel
           label="Select categories to make your post easier to find and visible to more people. Choose a max of 3."
           textStyle={styles.catLabel}

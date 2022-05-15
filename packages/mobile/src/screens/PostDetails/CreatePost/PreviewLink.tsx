@@ -16,19 +16,22 @@ interface PostHeaderProps {
 }
 
 const PreviewLink: React.FC<PostHeaderProps> = ({ body }) => {
-  const [dataPreview, setDataPreview] = useState<PreviewData>({});
-
+  const [dataPreview, setDataPreview] = useState<PreviewData>();
   useEffect(() => {
     const getData = async () => {
       const data: PreviewData = await getPreviewData(body);
-      setDataPreview(data);
+      setDataPreview(data.title ? data : undefined);
     };
 
     getData();
   }, [body]);
 
-  const renderMetaData = useCallback(
-    () => (
+  if (!dataPreview) {
+    return null;
+  }
+
+  return (
+    <View style={styles.previewContainer}>
       <View style={styles.metaDataContainer}>
         <FastImage
           source={{ uri: dataPreview?.image?.url }}
@@ -41,11 +44,8 @@ const PreviewLink: React.FC<PostHeaderProps> = ({ body }) => {
           numberOfLines={2}
         />
       </View>
-    ),
-    [dataPreview.link],
+    </View>
   );
-
-  return <View style={styles.previewContainer}>{renderMetaData()}</View>;
 };
 
 const styles = StyleSheet.create({

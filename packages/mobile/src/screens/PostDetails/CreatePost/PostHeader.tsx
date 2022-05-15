@@ -1,14 +1,14 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
-import { X } from 'phosphor-react-native';
+import { StyleSheet, Pressable } from 'react-native';
+import { CaretLeft } from 'phosphor-react-native';
 
 import PLabel from 'mobile/src/components/common/PLabel';
 import PHeader from 'mobile/src/components/common/PHeader';
-import RoundIcon from 'mobile/src/components/common/RoundIcon';
 import { Body1Bold } from 'mobile/src/theme/fonts';
 import { GRAY800, WHITE } from 'shared/src/colors';
 
 interface PostHeaderProps {
+  leftIcon?: React.ReactNode;
   centerLabel: string;
   rightLabel: string;
   rightValidation: boolean;
@@ -17,22 +17,30 @@ interface PostHeaderProps {
 }
 
 const PostHeader: React.FC<PostHeaderProps> = (props) => {
-  const { centerLabel, rightLabel, rightValidation, handleNext, handleBack } =
-    props;
+  const {
+    leftIcon,
+    centerLabel,
+    rightLabel,
+    rightValidation,
+    handleNext,
+    handleBack,
+  } = props;
 
   return (
     <PHeader
       leftIcon={
-        <RoundIcon icon={<X size={20} color={WHITE} />} onPress={handleBack} />
+        <Pressable onPress={handleBack}>
+          {leftIcon ? leftIcon : <CaretLeft size={32} color={WHITE} />}
+        </Pressable>
       }
       centerIcon={<PLabel label={centerLabel} textStyle={styles.headerTitle} />}
       rightIcon={
-        <TouchableOpacity onPress={handleNext}>
+        <Pressable onPress={handleNext}>
           <PLabel
             label={rightLabel}
             textStyle={rightValidation ? styles.rightText : styles.disabledText}
           />
-        </TouchableOpacity>
+        </Pressable>
       }
     />
   );
