@@ -9,6 +9,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import moment from 'moment';
@@ -118,14 +119,25 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply, onEdit }) => {
       : console.log('Error liking comment');
   };
 
+  const goToProfile = () => {
+    NavigationService.navigate('UserDetails', {
+      screen: 'UserProfile',
+      params: {
+        userId: user._id,
+      },
+    });
+  };
+
   return (
     <View style={commentItemContainer}>
       <View style={styles.userItemContainer}>
-        <UserInfo
-          user={user}
-          avatarSize={32}
-          viewStyle={styles.userInfoContainer}
-        />
+        <Pressable onPress={goToProfile}>
+          <UserInfo
+            user={user}
+            avatarSize={32}
+            viewStyle={styles.userInfoContainer}
+          />
+        </Pressable>
         <TouchableOpacity onPress={() => setKebobMenuVisible(true)}>
           <DotsThreeVertical size={24} color={WHITE} />
         </TouchableOpacity>

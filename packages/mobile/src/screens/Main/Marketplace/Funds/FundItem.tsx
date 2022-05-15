@@ -12,6 +12,7 @@ import {
 import FundProfileInfo from './FundProfileInfo';
 
 import { useWatchFund } from 'shared/graphql/mutation/funds/useWatchFund';
+import { useAccount } from 'shared/graphql/query/account/useAccount';
 
 type Fund = FundSummary & FundCompany & FundManager;
 
@@ -28,7 +29,10 @@ const FundItem: FC<FundItemProps> = ({
   category,
   onClickFundDetails,
 }) => {
-  const { isWatching, toggleWatch } = useWatchFund(fund._id);
+  const { toggleWatch } = useWatchFund(fund._id);
+  const { data: accountData } = useAccount({ fetchPolicy: 'cache-only' });
+  const isWatched = !!accountData?.account?.watchlistIds?.includes(fund._id);
+
   return (
     <View style={styles.fundItem}>
       <FundProfileInfo fund={fund} category={category} />
@@ -48,9 +52,9 @@ const FundItem: FC<FundItemProps> = ({
           style={({ pressed }) => [pressed ? styles.onPress : undefined]}>
           <Star
             size={24}
-            color={isWatching ? PRIMARYSTATE : WHITE}
+            color={isWatched ? PRIMARYSTATE : WHITE}
             style={styles.favorite}
-            weight={isWatching ? 'fill' : 'regular'}
+            weight={isWatched ? 'fill' : 'regular'}
           />
         </Pressable>
       </View>

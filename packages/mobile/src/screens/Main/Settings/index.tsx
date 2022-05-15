@@ -103,20 +103,15 @@ const Settings: SettingsScreen = ({ navigation }) => {
       icon: <EnvelopeSimple size={26} color={WHITE} />,
     },
   ];
-  MENU_ITEMS.push({
-    id: 'Contact',
-    label: 'Contact Fund Specialist',
-    onPress: () => navigation.navigate('Contact'),
-    icon: <Headset size={26} color={WHITE} />,
-  });
-  if (account?.role === 'PROFESSIONAL') {
+  if (account?.accreditation !== 'NONE') {
     MENU_ITEMS.push({
       id: 'Contact',
       label: 'Contact Fund Specialist',
       onPress: () => navigation.navigate('Contact'),
       icon: <Headset size={26} color={WHITE} />,
     });
-  } else {
+  }
+  if (account?.role === 'USER') {
     MENU_ITEMS.push({
       id: 'Become',
       label: 'Become a Verified Pro',
@@ -166,7 +161,9 @@ const Settings: SettingsScreen = ({ navigation }) => {
   };
 
   const renderListHeaderComponent = () => {
-    if (!account) return <></>;
+    if (!account) {
+      return <></>;
+    }
 
     return (
       <>

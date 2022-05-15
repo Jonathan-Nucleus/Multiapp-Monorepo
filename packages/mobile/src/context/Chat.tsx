@@ -64,8 +64,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
             token,
           );
 
-          console.log('Started chat', client);
-
           chatClient.current = client;
           setIsReady(true);
         } catch (err) {

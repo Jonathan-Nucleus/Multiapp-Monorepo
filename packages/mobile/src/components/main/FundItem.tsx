@@ -1,7 +1,8 @@
-import React, { useMemo } from 'react';
-import { TouchableOpacity, Text, View, StyleSheet } from 'react-native';
+import React from 'react';
+import { Text, View, StyleSheet, Pressable } from 'react-native';
 import { Star } from 'phosphor-react-native';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
+import pStyles from 'mobile/src/theme/pStyles';
 import {
   PRIMARY,
   WHITE,
@@ -12,13 +13,12 @@ import {
   WHITE12,
   SUCCESS30,
   GRAY900,
-  PRIMARYSOLID,
+  PRIMARYSTATE,
 } from 'shared/src/colors';
 import { Body1, Body3, Body4 } from 'mobile/src/theme/fonts';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 
-import { useWatchFund } from 'shared/graphql/mutation/account';
-import { useAccount } from 'shared/graphql/query/account/useAccount';
+import { useWatchFund } from 'shared/graphql/mutation/funds/useWatchFund';
 import { FundSummary } from 'shared/graphql/fragments/fund';
 
 interface FundItemProps {
@@ -26,31 +26,7 @@ interface FundItemProps {
 }
 
 const FundItem: React.FC<FundItemProps> = ({ fund }) => {
-  const { data: accountData, refetch } = useAccount();
-  const [watchFund] = useWatchFund();
-  const watchList = accountData?.account.watchlist ?? [];
-
-  const isWatch = useMemo(() => {
-    if (fund && watchList.length) {
-      return watchList.find((v) => v._id === fund._id) ? true : false;
-    }
-    return false;
-  }, [fund, watchList]);
-
-  const handleRemoveWahchList = async (id: string): Promise<void> => {
-    try {
-      const { data } = await watchFund({
-        variables: { watch: isWatch ? false : true, fundId: id },
-      });
-      if (data?.watchFund) {
-        refetch();
-      } else {
-        console.log('err', data);
-      }
-    } catch (err) {
-      console.log('err', err);
-    }
-  };
+  const { isWatching, toggleWatch } = useWatchFund(fund._id);
 
   return (
     <View style={styles.container}>
@@ -101,14 +77,16 @@ const FundItem: React.FC<FundItemProps> = ({ fund }) => {
             })
           }
         />
-        <TouchableOpacity onPress={() => handleRemoveWahchList(fund._id)}>
+        <Pressable
+          onPress={toggleWatch}
+          style={({ pressed }) => [pressed ? pStyles.pressedStyle : undefined]}>
           <Star
             size={24}
-            color={isWatch ? PRIMARYSOLID : WHITE}
+            color={isWatching ? PRIMARYSTATE : WHITE}
             style={styles.favorite}
-            weight={isWatch ? 'fill' : 'duotone'}
+            weight={isWatching ? 'fill' : 'regular'}
           />
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );

@@ -11,7 +11,6 @@ import AccountAdmin from '../screens/Main/Settings/AccountAdmin';
 import InviteFriends from '../screens/Main/Settings/InviteFriends';
 import ChangePass from '../screens/Main/Settings/AccountAdmin/ChangePass';
 import BecomePro from '../screens/Main/Settings/BecomePro';
-import Contact from '../screens/Main/Settings/Contact';
 
 import { MainTabScreenProps } from './MainTabNavigator';
 
@@ -27,7 +26,6 @@ const MoreStack = () => {
       <Stack.Screen name="InviteFriends" component={InviteFriends} />
       <Stack.Screen name="ChangePass" component={ChangePass} />
       <Stack.Screen name="BecomePro" component={BecomePro} />
-      <Stack.Screen name="Contact" component={Contact} />
     </Stack.Navigator>
   );
 };
