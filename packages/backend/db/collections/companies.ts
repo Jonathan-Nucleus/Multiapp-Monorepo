@@ -7,6 +7,7 @@ import { Collection } from "mongodb";
 import { MongoId, toObjectId, toObjectIds } from "../../lib/mongo-helper";
 import type { Company } from "../../schemas/company";
 import { InternalServerError, NotFoundError } from "../../lib/validate";
+import { createSearchStage } from "../../lib/utils";
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 const createCompaniesCollection = (
@@ -239,15 +240,15 @@ const createCompaniesCollection = (
       search = "",
       limit = 10
     ): Promise<Company.Mongo[]> => {
+      const stage = createSearchStage("name", search);
+      if (!stage) {
+        return [];
+      }
+
       const companies = (await companiesCollection
         .aggregate([
           {
-            $search: {
-              regex: {
-                query: `(.*)${search.split(" ").join("(.*)")}(.*)`,
-                path: "name",
-              },
-            },
+            $search: { ...stage },
           },
           {
             $limit: limit,

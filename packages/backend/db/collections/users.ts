@@ -25,6 +25,7 @@ import {
   ProRequest,
   isUser,
 } from "../../schemas/user";
+import { createSearchStage } from "../../lib/utils";
 import {
   BadRequestError,
   InternalServerError,
@@ -1000,16 +1001,15 @@ const createUsersCollection = (
      * @returns The list of users.
      */
     findByKeyword: async (search = "", limit = 10): Promise<User.Mongo[]> => {
+      const stage = createSearchStage("fullName", search);
+      if (!stage) {
+        return [];
+      }
+
       const users = (await usersCollection
         .aggregate([
           {
-            $search: {
-              index: "fullName",
-              regex: {
-                query: `(.*)${search.split(" ").join("(.*)")}(.*)`,
-                path: "fullName",
-              },
-            },
+            $search: { ...stage },
           },
           {
             $match: {

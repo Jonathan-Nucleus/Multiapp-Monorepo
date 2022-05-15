@@ -19,6 +19,7 @@ import {
 } from "../../lib/validate";
 import { User } from "../../schemas/user";
 import { Company } from "../../schemas/company";
+import { createSearchStage } from "../../lib/utils";
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 const createPostsCollection = (
@@ -355,15 +356,15 @@ const createPostsCollection = (
      * @returns The list of posts.
      */
     findByKeyword: async (search = "", limit = 10): Promise<Post.Mongo[]> => {
+      const stage = createSearchStage("body", search);
+      if (!stage) {
+        return [];
+      }
+
       const posts = (await postsCollection
         .aggregate([
           {
-            $search: {
-              regex: {
-                query: `(.*)${search.split(" ").join("(.*)")}(.*)`,
-                path: "body",
-              },
-            },
+            $search: { ...stage },
           },
           {
             $match: {

@@ -5,6 +5,7 @@
 
 import { Collection } from "mongodb";
 import { MongoId, toObjectId, toObjectIds } from "../../lib/mongo-helper";
+import { createSearchStage } from "../../lib/utils";
 import type { Fund } from "../../schemas/fund";
 import type { Accreditation } from "../../schemas/user";
 
@@ -71,15 +72,15 @@ const createFundsCollection = (fundsCollection: Collection<Fund.Mongo>) => {
      * @returns The list of funds.
      */
     findByKeyword: async (search = "", limit = 10): Promise<Fund.Mongo[]> => {
+      const stage = createSearchStage("name", search);
+      if (!stage) {
+        return [];
+      }
+
       const funds = (await fundsCollection
         .aggregate([
           {
-            $search: {
-              regex: {
-                query: `(.*)${search.split(" ").join("(.*)")}(.*)`,
-                path: "name",
-              },
-            },
+            $search: { ...stage },
           },
           {
             $limit: limit,
