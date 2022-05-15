@@ -57,43 +57,48 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
       mentionIds,
     };
 
-    if (postData._id) {
-      const result = await editPost({
-        variables: {
-          post: {
-            _id: postData._id.toString(),
-            userId,
-            ...finalPostData,
+    try {
+      if (postData._id) {
+        const result = await editPost({
+          variables: {
+            post: {
+              _id: postData._id.toString(),
+              userId,
+              ...finalPostData,
+            },
           },
-        },
-      });
+        });
 
-      if (result && result.data && result.data.editPost) {
-        showMessage('success', 'Successfully edited!');
-        success = true;
-      }
-    } else {
-      const result = await createPost({
-        variables: {
-          post: {
-            ...finalPostData,
-            ...(userId !== account?._id ? { companyId: userId } : {}),
+        if (result && result.data && result.data.editPost) {
+          showMessage('success', 'Successfully edited!');
+          success = true;
+        }
+      } else {
+        const result = await createPost({
+          variables: {
+            post: {
+              ...finalPostData,
+              ...(userId !== account?._id ? { companyId: userId } : {}),
+            },
           },
-        },
-      });
+        });
 
-      if (result && result.data && result.data.createPost) {
-        showMessage('success', 'Successfully posted!');
-        success = true;
+        if (result && result.data && result.data.createPost) {
+          showMessage('success', 'Successfully posted!');
+          success = true;
+        }
       }
-    }
 
-    if (success) {
-      navigation.pop(2);
-      // it should go to different stack
-      navigation.navigate('Main');
-    } else {
-      showMessage('Error', 'Uh oh! We encountered a problem.');
+      if (success) {
+        navigation.pop(2);
+        // it should go to different stack
+        navigation.navigate('Main');
+      } else {
+        showMessage('Error', 'Uh oh! We encountered a problem.');
+      }
+    } catch (err) {
+      console.log('Error', err);
+      showMessage('error', 'Uh oh! We encountered a problem.');
     }
   };
 

@@ -160,6 +160,21 @@ describe("Mutations - createPost", () => {
     expect(getErrorCode(res)).toBe(ErrorCode.BAD_REQUEST);
   });
 
+  it("fails with no body or media", async () => {
+    const res = await server.executeOperation({
+      query,
+      variables: {
+        post: {
+          ...postData,
+          body: undefined,
+          media: undefined,
+        },
+      },
+    });
+
+    expect(getErrorCode(res)).toBe(ErrorCode.BAD_USER_INPUT);
+  });
+
   it("returns new post data", async () => {
     const { users, db } = await getIgniteDb();
     const oldPostCount = await db
@@ -176,6 +191,88 @@ describe("Mutations - createPost", () => {
     });
 
     expect(res.data?.createPost?.body).toBe(postData.body);
+    expect(JSON.stringify(res.data?.createPost?.categories)).toBe(
+      JSON.stringify(postData.categories)
+    );
+    expect(JSON.stringify(res.data?.createPost?.media)).toBe(
+      JSON.stringify(postData.media)
+    );
+    expect(res.data?.createPost?.user._id).toBe(authUser._id.toString());
+
+    const newUser = (await users.find({
+      _id: authUser._id,
+    })) as User.Mongo | null;
+    if (!newUser) {
+      throw new Error("Cannot find original post creator");
+    }
+
+    const newPostCount = await db
+      .collection(DbCollection.POSTS)
+      .countDocuments();
+
+    expect(newUser.postIds?.map((id) => id.toString())).toContain(
+      res.data?.createPost._id
+    );
+    expect(newPostCount).toBe(oldPostCount + 1);
+  });
+
+  it("posts with body and no media", async () => {
+    const { users, db } = await getIgniteDb();
+    const oldPostCount = await db
+      .collection(DbCollection.POSTS)
+      .countDocuments();
+
+    const res = await server.executeOperation({
+      query,
+      variables: {
+        post: {
+          ...postData,
+          media: undefined,
+        },
+      },
+    });
+
+    expect(res.data?.createPost?.body).toBe(postData.body);
+    expect(JSON.stringify(res.data?.createPost?.categories)).toBe(
+      JSON.stringify(postData.categories)
+    );
+    expect(res.data?.createPost?.media).toBeNull();
+    expect(res.data?.createPost?.user._id).toBe(authUser._id.toString());
+
+    const newUser = (await users.find({
+      _id: authUser._id,
+    })) as User.Mongo | null;
+    if (!newUser) {
+      throw new Error("Cannot find original post creator");
+    }
+
+    const newPostCount = await db
+      .collection(DbCollection.POSTS)
+      .countDocuments();
+
+    expect(newUser.postIds?.map((id) => id.toString())).toContain(
+      res.data?.createPost._id
+    );
+    expect(newPostCount).toBe(oldPostCount + 1);
+  });
+
+  it("posts with media and no body", async () => {
+    const { users, db } = await getIgniteDb();
+    const oldPostCount = await db
+      .collection(DbCollection.POSTS)
+      .countDocuments();
+
+    const res = await server.executeOperation({
+      query,
+      variables: {
+        post: {
+          ...postData,
+          body: undefined,
+        },
+      },
+    });
+
+    expect(res.data?.createPost?.body).toBeNull();
     expect(JSON.stringify(res.data?.createPost?.categories)).toBe(
       JSON.stringify(postData.categories)
     );
