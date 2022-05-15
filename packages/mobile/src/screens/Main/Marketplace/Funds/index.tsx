@@ -16,23 +16,13 @@ import { useFunds, Fund } from 'shared/graphql/query/marketplace/useFunds';
 const PLACE_HOLDERS = 7;
 
 const Funds: FundsScreen = ({ navigation }) => {
-  const { data, refetch, loading } = useFunds();
+  const { data } = useFunds();
 
-  const isFocused = useIsFocused();
-  const [focusState, setFocusState] = useState(isFocused);
-  if (isFocused !== focusState) {
-    // Refetch whenever the focus state changes to avoid refetching during
-    // rerender cycles
-    console.log('refetching...');
-    refetch();
-    setFocusState(isFocused);
-  }
-
-  if (!data?.funds && loading) {
+  if (!data?.funds) {
     return (
       <View style={pStyles.globalContainer}>
-        {[...Array(PLACE_HOLDERS)].map(() => (
-          <FundsPlaceholder />
+        {[...Array(PLACE_HOLDERS)].map((_, index) => (
+          <FundsPlaceholder key={index} />
         ))}
       </View>
     );

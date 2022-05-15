@@ -20,20 +20,12 @@ const NotificationDetail: NotificationDetailsScreen = ({
   navigation,
   route,
 }) => {
-  const { postId, userId } = route.params;
+  const { postId } = route.params;
   const { data: postData } = usePost(postId);
 
   const posts = postData?.post ? [postData.post] : [];
   const renderItem: ListRenderItem<Post> = ({ item }) => (
-    <PostItem
-      post={item}
-      onPressMenu={() =>
-        navigation.navigate('PostDetails', {
-          screen: 'PostDetail',
-          params: { postId },
-        })
-      }
-    />
+    <PostItem post={item} />
   );
 
   return (

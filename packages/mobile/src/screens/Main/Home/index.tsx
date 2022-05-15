@@ -16,9 +16,6 @@ import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import PostItem from 'mobile/src/components/main/PostItem';
 import pStyles from 'mobile/src/theme/pStyles';
 
-import UserPostActionModal from './UserPostActionModal';
-import OwnPostActionModal from './OwnPostActionModal';
-
 import { usePosts, Post } from 'shared/graphql/query/post/usePosts';
 import { useAccount } from 'shared/graphql/query/account/useAccount';
 import { HomeScreen } from 'mobile/src/navigations/MainTabNavigator';
@@ -40,8 +37,6 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
   >(undefined);
   const [selectedRole, setSelectedRole] = useState<PostRoleFilter>('EVERYONE');
   const [visibleFilter, setVisibleFilter] = useState(false);
-  const [kebobMenuVisible, setKebobMenuVisible] = useState(false);
-  const [selectedPost, setSelectedPost] = useState<Post | undefined>(undefined);
 
   const { data: userData } = useAccount();
   const { data, refetch } = usePosts(selectedCategories, selectedRole);
@@ -49,15 +44,7 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
   const renderItem: ListRenderItem<Post> = useMemo(
     () =>
       ({ item }) =>
-        (
-          <PostItem
-            post={item}
-            onPressMenu={() => {
-              setSelectedPost(item);
-              setKebobMenuVisible(true);
-            }}
-          />
-        ),
+        <PostItem post={item} />,
     [],
   );
 
@@ -86,28 +73,10 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
     });
   };
 
-  const handleEditPost = () => {
-    if (!selectedPost) {
-      return;
-    }
-    navigation.navigate('PostDetails', {
-      screen: 'CreatePost',
-      params: {
-        post: selectedPost,
-      },
-    });
-  };
-
   const postFilter = (role: PostRoleFilter, cateogies: PostCategory[]) => {
     setSelectedRole(role);
     setSelectedCategories(cateogies.length > 0 ? cateogies : undefined);
   };
-
-  const myPost =
-    (selectedPost &&
-      (selectedPost.userId === account._id ||
-        account.companyIds?.includes(selectedPost.userId))) ??
-    false;
 
   return (
     <View style={pStyles.globalContainer}>
@@ -133,17 +102,6 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
         gradientContainer={styles.gradientContainer}
         textStyle={styles.postLabel}
         onPress={handleCreatePost}
-      />
-      <UserPostActionModal
-        post={selectedPost}
-        visible={kebobMenuVisible && !myPost}
-        onClose={() => setKebobMenuVisible(false)}
-      />
-      <OwnPostActionModal
-        post={selectedPost}
-        visible={kebobMenuVisible && myPost}
-        onClose={() => setKebobMenuVisible(false)}
-        onEditPost={() => handleEditPost()}
       />
       <FilterModal
         isVisible={visibleFilter}

@@ -1,105 +1,109 @@
-import React, { useMemo, useState } from 'react';
-import {
-  StyleSheet,
-  Keyboard,
-  View,
-  TouchableOpacity,
-  Text,
-} from 'react-native';
-import RNPickerSelect from 'react-native-picker-select';
+import React from 'react';
+import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
+import { useForm, DefaultValues, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 
 import PTextInput from 'mobile/src/components/common/PTextInput';
-import {
-  Body2,
-  Body1,
-  H6Bold,
-  Body1Bold,
-  Body2Bold,
-} from 'mobile/src/theme/fonts';
-import { BLACK, WHITE, GRAY700 } from 'shared/src/colors';
-import { CaretDown } from 'phosphor-react-native';
-import PFormLabel from 'mobile/src/components/common/PFormLabel';
+import { Body2, H6Bold, Body1Bold, Body2Bold } from 'mobile/src/theme/fonts';
+import { BLACK, WHITE, GRAY600, GRAY900 } from 'shared/src/colors';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
-import { validateEmail } from '../../../../utils/utils';
+import PPicker from 'mobile/src/components/common/PPicker';
+
+import { HelpRequest } from 'shared/graphql/mutation/account';
 
 interface Fund {
   value: string;
   label: string;
 }
 
-interface HelpRequestVariables {
-  request: {
-    type: string;
-    email?: string;
-    phone?: string;
-    fundId: string;
-    message: string;
-    preferredTimeOfDay?: string;
-  };
-}
+type FormValues = {
+  email: string;
+  fundId: string;
+  message: string;
+};
+
+const schema = yup
+  .object({
+    email: yup.string().email().required('Required').default(''),
+    fundId: yup.string().required('Required').default(''),
+    message: yup.string().required('Required').default(''),
+  })
+  .required();
 
 interface Props {
-  handleContact: (request: HelpRequestVariables) => void;
+  handleContact: (request: HelpRequest) => void;
   funds: Fund[];
 }
 
 const EmailContact: React.FC<Props> = ({ handleContact, funds }) => {
-  const [email, setEmail] = useState('');
-  const [interest, setInterest] = useState('');
-  const [message, setMessage] = useState('');
+  const {
+    handleSubmit,
+    control,
+    formState: { isValid },
+  } = useForm<yup.InferType<typeof schema>>({
+    resolver: yupResolver(schema),
+    mode: 'onChange',
+    defaultValues: schema.cast(
+      {},
+      { assert: false, stripUnknown: true },
+    ) as DefaultValues<FormValues>,
+  });
 
-  const handleContactEmail = async () => {
-    Keyboard.dismiss();
+  const onSubmit = ({ email, fundId, message }: FormValues) => {
     handleContact({
-      request: {
-        type: 'EMAIL',
-        email: email,
-        fundId: interest,
-        message: message,
-      },
+      fundId,
+      message,
+      email,
+      type: 'EMAIL',
     });
   };
 
-  const disabled = useMemo(() => {
-    if (message && email && interest && validateEmail(email)) {
-      return false;
-    }
-    return true;
-  }, [email, interest, message]);
-
   return (
     <View style={styles.container}>
-      <PTextInput
-        label="Email Address"
-        onChangeText={(val: string) => setEmail(val)}
-        text={email}
-        keyboardType="email-address"
-        labelTextStyle={styles.label}
-      />
-      <PFormLabel label="Fund of Interest" textStyle={styles.label} />
-      <RNPickerSelect
-        onValueChange={(val: string) => setInterest(val)}
-        items={funds}
-        value={interest}
-        style={{
-          ...pickerSelectStyles,
-          iconContainer: {
-            top: 16,
-            right: 16,
-          },
-        }}
-        Icon={() => <CaretDown size={14} color={WHITE} weight="fill" />}
-        placeholder={{ label: null, value: null }}
-      />
-      <PTextInput
-        label="Additional Information"
-        onChangeText={(val: string) => setMessage(val)}
-        text={message}
-        multiline={true}
-        underlineColorAndroid="transparent"
-        numberOfLines={4}
-        labelTextStyle={styles.label}
-      />
+      <View style={styles.formContainer}>
+        <Controller
+          control={control}
+          name="email"
+          render={({ field }) => (
+            <PTextInput
+              label="Email Address"
+              onChangeText={field.onChange}
+              text={field.value}
+              keyboardType="email-address"
+              labelTextStyle={styles.label}
+              autoCapitalize="none"
+              autoCorrect={false}
+              errorStyle={styles.errorStyle}
+              textContainerStyle={styles.inputContainerStyle}
+            />
+          )}
+        />
+        <PPicker
+          control={control}
+          name="fundId"
+          label="Fund of Interest"
+          options={funds}
+          errorStyle={styles.errorStyle}
+        />
+        <Controller
+          control={control}
+          name="message"
+          render={({ field }) => (
+            <PTextInput
+              label="Additional Information"
+              onChangeText={field.onChange}
+              text={field.value}
+              multiline={true}
+              underlineColorAndroid="transparent"
+              numberOfLines={4}
+              labelTextStyle={[styles.label]}
+              errorStyle={styles.errorStyle}
+              textContainerStyle={[styles.textArea, styles.inputContainerStyle]}
+            />
+          )}
+        />
+      </View>
       <View style={styles.bottom}>
         <TouchableOpacity>
           <Text style={styles.cancel}>Cancel</Text>
@@ -107,8 +111,8 @@ const EmailContact: React.FC<Props> = ({ handleContact, funds }) => {
         <PGradientButton
           label="Submit"
           btnContainer={styles.btnContainer}
-          onPress={handleContactEmail}
-          disabled={disabled}
+          onPress={handleSubmit(onSubmit)}
+          disabled={!isValid}
         />
       </View>
     </View>
@@ -121,11 +125,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: BLACK,
+    paddingTop: 16,
+  },
+  formContainer: {
+    flex: 1,
   },
   textContainer: {
     textAlign: 'center',
     alignSelf: 'center',
     marginTop: 26,
+  },
+  errorStyle: {
+    height: 0,
   },
   title: {
     ...H6Bold,
@@ -146,6 +157,14 @@ const styles = StyleSheet.create({
     fontSize: 24,
     paddingHorizontal: 12,
   },
+  inputContainerStyle: {
+    backgroundColor: GRAY900,
+    borderColor: GRAY600,
+  },
+  textArea: {
+    height: 150,
+    justifyContent: 'flex-start',
+  },
   cancel: {
     ...Body1Bold,
     color: WHITE,
@@ -155,35 +174,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-around',
     marginTop: 32,
-    marginBottom: 20,
+    marginBottom: 24,
   },
   btnContainer: {
     width: 220,
-  },
-});
-
-const pickerSelectStyles = StyleSheet.create({
-  inputIOS: {
-    ...Body1,
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    color: WHITE,
-    width: '100%',
-    borderColor: WHITE,
-    backgroundColor: GRAY700,
-    borderWidth: 1,
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-  inputAndroid: {
-    ...Body1,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    color: WHITE,
-    borderColor: WHITE,
-    backgroundColor: GRAY700,
-    borderWidth: 1,
-    borderRadius: 8,
-    marginBottom: 16,
   },
 });

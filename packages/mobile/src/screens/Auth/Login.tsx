@@ -9,7 +9,6 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useMutation } from '@apollo/client';
 import { NavigationProp } from '@react-navigation/native';
-import EncryptedStorage from 'react-native-encrypted-storage';
 import SplashScreen from 'react-native-splash-screen';
 
 import PAppContainer from '../../components/common/PAppContainer';
@@ -21,13 +20,11 @@ import PTextLine from '../../components/common/PTextLine';
 import ErrorText from '../../components/common/ErrorTxt';
 import { LOGIN } from 'shared/graphql/mutation/auth';
 import { Body2 } from '../../theme/fonts';
-import { BLACK, PRIMARY, WHITE, BLUE200, WHITE12 } from 'shared/src/colors';
+import { BLACK, PRIMARY, WHITE, WHITE12 } from 'shared/src/colors';
 import LogoSvg from '../../assets/icons/logo.svg';
 import AppleSvg from '../../assets/icons/apple.svg';
 import GoogleSvg from '../../assets/icons/google.svg';
 import LinkedinSvg from '../../assets/icons/linkedin.svg';
-import CheckedSvg from '../../assets/icons/checked.svg';
-import UncheckedSvg from '../../assets/icons/unchecked.svg';
 
 import { setToken, TokenAction } from 'mobile/src/utils/auth-token';
 import type { LoginScreen } from 'mobile/src/navigations/AuthStack';

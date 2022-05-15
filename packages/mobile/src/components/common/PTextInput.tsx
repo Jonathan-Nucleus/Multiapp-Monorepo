@@ -16,7 +16,6 @@ import PFormLabel from './PFormLabel';
 import { Body1, Body2, Body3 } from '../../theme/fonts';
 import {
   WHITE,
-  PRIMARY,
   BLACK,
   GRAY800,
   GRAY700,
@@ -133,6 +132,7 @@ const PTextInput = forwardRef<React.FC<PTextInputProps>, PTextInputProps>(
             multiline={multiline}
             autoCorrect={autoCorrect}
             numberOfLines={numberOfLines}
+            keyboardAppearance="dark"
           />
           {children}
           {!!icon && (
@@ -153,6 +153,7 @@ const styles = StyleSheet.create({
     color: WHITE,
     paddingTop: 0,
     textAlignVertical: 'top',
+    flex: 1,
   },
   errorInput: {
     borderColor: DANGER,
@@ -169,7 +170,7 @@ const styles = StyleSheet.create({
   container: {},
   view: {
     position: 'relative',
-    minHeight: 44,
+    minHeight: 40,
     maxHeight: 140,
     borderColor: GRAY800,
     borderWidth: 1,

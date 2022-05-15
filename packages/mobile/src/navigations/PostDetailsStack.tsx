@@ -60,7 +60,7 @@ export type PostDetailsStackParamList = {
   ReviewPost: PostDetailsStackParamList['ChooseCategory'] & {
     categories: PostCategory[];
   };
-  PostDetail: { postId: string };
+  PostDetail: { postId: string; focusComment?: boolean };
 };
 
 export type PostDetailsScreenProps<

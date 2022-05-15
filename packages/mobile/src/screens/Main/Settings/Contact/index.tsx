@@ -1,44 +1,21 @@
-import React, { useMemo, useState } from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  TouchableOpacity,
-  Dimensions,
-} from 'react-native';
-import { NavigationProp, ParamListBase } from '@react-navigation/native';
-import { CaretLeft, PhoneCall, Envelope } from 'phosphor-react-native';
+import React, { useMemo } from 'react';
+import { StyleSheet, View, Dimensions } from 'react-native';
+import { CaretLeft } from 'phosphor-react-native';
 
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import PTitle from 'mobile/src/components/common/PTitle';
 import { Body2, H6Bold } from 'mobile/src/theme/fonts';
 import MainHeader from 'mobile/src/components/main/Header';
-import { useHelpRequest } from 'shared/graphql/mutation/account';
+import { useHelpRequest, HelpRequest } from 'shared/graphql/mutation/account';
 import { useFunds } from 'shared/graphql/query/marketplace/useFunds';
 import { BLACK, WHITE, GRAY600 } from 'shared/src/colors';
-import PhoneContact from './PhoneContact';
 import EmailContact from './EmailContact';
 
-interface ContactProps {
-  navigation: NavigationProp<ParamListBase>;
-}
+import { ContactScreen } from 'mobile/src/navigations/AppNavigator';
 
-type HelpRequestVariables = {
-  request: {
-    type: string;
-    email?: string;
-    phone?: string;
-    fundId: string;
-    message: string;
-    preferredTimeOfDay?: string;
-  };
-};
-
-const Contact: React.FC<ContactProps> = ({ navigation }) => {
-  const [selectTab, setSelectTab] = useState('phone');
-  const [helpRequest] = useHelpRequest();
-
+const Contact: ContactScreen = ({ navigation }) => {
   const { data } = useFunds();
+  const [helpRequest] = useHelpRequest();
 
   const FUNDS = useMemo(() => {
     if (data?.funds && data?.funds?.length > 0) {
@@ -50,10 +27,12 @@ const Contact: React.FC<ContactProps> = ({ navigation }) => {
     return [];
   }, [data]);
 
-  const handleContact = async (value: HelpRequestVariables) => {
+  const handleContact = async (value: HelpRequest) => {
     try {
       const { data: requestData } = await helpRequest({
-        variables: value,
+        variables: {
+          request: value,
+        },
       });
       if (requestData?.helpRequest) {
         navigation.navigate('ContactSuccess');
@@ -69,7 +48,7 @@ const Contact: React.FC<ContactProps> = ({ navigation }) => {
         leftIcon={<CaretLeft size={28} color={WHITE} />}
         onPressLeft={() => navigation.goBack()}
       />
-      <PAppContainer>
+      <PAppContainer contentContainerStyle={styles.flex}>
         <PTitle
           title="Choose a fund specialist"
           style={styles.textContainer}
@@ -87,6 +66,9 @@ const Contact: React.FC<ContactProps> = ({ navigation }) => {
 export default Contact;
 
 const styles = StyleSheet.create({
+  flex: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: BLACK,

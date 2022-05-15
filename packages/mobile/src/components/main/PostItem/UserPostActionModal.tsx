@@ -4,7 +4,6 @@ import {
   BellSlash,
   EyeClosed,
   UserCirclePlus,
-  WarningOctagon,
   XSquare,
 } from 'phosphor-react-native';
 
@@ -36,11 +35,7 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
   visible,
   onClose,
 }) => {
-  if (!post) {
-    return null;
-  }
-
-  const { user, company } = post;
+  const { user, company } = post || {};
   const [reportPostModalVisible, setReportPostModalVisible] = useState(false);
 
   const { data: accountData } = useAccount();
@@ -51,7 +46,7 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
   const [reportPost] = useReportPost();
 
   const isMuted =
-    accountData?.account?.mutedPostIds?.includes(post._id) ?? false;
+    (post && accountData?.account?.mutedPostIds?.includes(post._id)) ?? false;
 
   const menuData = useMemo(() => {
     const menuArray = [
@@ -101,10 +96,16 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
     ];
 
     return menuArray;
-  }, [user, accountData, isMuted, isFollowing]);
+  }, [user, isMuted, isFollowing, company?.name]);
+
+  if (!post) {
+    return null;
+  }
 
   const handleFollowUser = async () => {
-    if (!user) return;
+    if (!user) {
+      return;
+    }
 
     const result = await toggleFollow();
     result

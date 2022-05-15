@@ -54,3 +54,7 @@ export type MoreScreenProps<
 export type SettingsScreen = (
   props: MoreScreenProps<'Settings'>,
 ) => ReactElement;
+
+export type BecomeProScreen = (
+  props: MoreScreenProps<'BecomePro'>,
+) => ReactElement;

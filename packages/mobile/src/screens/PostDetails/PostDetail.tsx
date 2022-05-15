@@ -11,25 +11,13 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import moment from 'moment';
-import {
-  CaretLeft,
-  DotsThreeVertical,
-  EyeClosed,
-  PaperPlaneRight,
-  Pencil,
-  Trash,
-  UserCirclePlus,
-  WarningOctagon,
-} from 'phosphor-react-native';
+import { CaretLeft, PaperPlaneRight } from 'phosphor-react-native';
 
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import Header from 'mobile/src/components/main/Header';
 import PLabel from 'mobile/src/components/common/PLabel';
 import PostItem from 'mobile/src/components/main/PostItem';
-import UserInfo from 'mobile/src/components/common/UserInfo';
-import SelectionModal from 'mobile/src/components/common/SelectionModal';
-import { showMessage } from 'mobile/src/services/utils';
+import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 import {
   BLACK,
   PRIMARY,
@@ -39,41 +27,23 @@ import {
 } from 'shared/src/colors';
 import pStyles from 'mobile/src/theme/pStyles';
 import { Body2Bold, Body3, Body3Bold } from 'mobile/src/theme/fonts';
-import { SOMETHING_WRONG } from 'shared/src/constants';
 
 import LikesModal from './LikesModal';
 import CommentItem from './CommentItem';
-
-import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 
 import {
   useCommentPost,
   useEditCommentPost,
 } from 'shared/graphql/mutation/posts';
 import { usePost, Comment } from 'shared/graphql/query/post/usePost';
-import { useHideUser } from 'shared/graphql/mutation/account';
-import { useAccount } from 'shared/graphql/query/account/useAccount';
 
 import { PostDetailScreen } from 'mobile/src/navigations/PostDetailsStack';
 
 type CommentUser = Comment['user'];
-const CommentMenuDataArray = [
-  {
-    label: 'Edit Comment',
-    icon: <Pencil size={26} color={WHITE} />,
-    key: 'edit',
-  },
-  {
-    label: 'Delete Comment',
-    icon: <Trash size={26} color={WHITE} />,
-    key: 'delete',
-  },
-];
 
 const PostDetail: PostDetailScreen = ({ route }) => {
-  const { postId } = route.params;
+  const { postId, focusComment } = route.params;
 
-  const { data: { account } = {} } = useAccount({ fetchPolicy: 'cache-only' });
   const { data, refetch } = usePost(postId);
   const [commentPost] = useCommentPost();
   const [editComment] = useEditCommentPost();
@@ -231,7 +201,13 @@ const PostDetail: PostDetailScreen = ({ route }) => {
               styles.input,
               isEditComment ? { width: '100%' } : { width: '90%' },
             ]}
-            ref={inputRef}
+            ref={(ref) => {
+              inputRef.current = ref;
+              if (focusComment && ref) {
+                ref.focus();
+              }
+            }}
+            keyboardAppearance="dark"
           />
           {!isEditComment && (
             <TouchableOpacity onPress={handleAddComment}>
@@ -309,6 +285,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 8,
     height: 40,
+    marginBottom: 8,
   },
   input: {
     backgroundColor: WHITE,

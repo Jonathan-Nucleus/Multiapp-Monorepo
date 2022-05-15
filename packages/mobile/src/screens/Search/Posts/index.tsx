@@ -20,8 +20,6 @@ import type {
 } from 'backend/graphql/posts.graphql';
 import { PostRoleFilterOptions } from 'backend/schemas/post';
 
-import UserPostActionModal from 'mobile/src/screens/Main/Home/UserPostActionModal';
-import OwnPostActionModal from 'mobile/src/screens/Main/Home/OwnPostActionModal';
 import FilterModal from 'mobile/src/screens/PostDetails/FilterModal';
 import { useAccount } from 'shared/graphql/query/account/useAccount';
 import pStyles from 'mobile/src/theme/pStyles';
@@ -33,8 +31,6 @@ interface PostProps {
 
 const Posts: React.FC<PostProps> = ({ posts, search }: PostProps) => {
   const [visibleFilter, setVisibleFilter] = useState(false);
-  const [kebobMenuVisible, setKebobMenuVisible] = useState(false);
-  const [selectedPost, setSelectedPost] = useState<Post | undefined>(undefined);
   const [selectedCategories, setSelectedCategories] = useState<
     PostCategory[] | undefined
   >(undefined);
@@ -69,20 +65,8 @@ const Posts: React.FC<PostProps> = ({ posts, search }: PostProps) => {
   }
 
   const renderItem: ListRenderItem<Post> = ({ item }) => (
-    <PostItem
-      post={item}
-      onPressMenu={() => {
-        setSelectedPost(item);
-        setKebobMenuVisible(true);
-      }}
-    />
+    <PostItem post={item} />
   );
-
-  const myPost =
-    (selectedPost &&
-      (selectedPost.userId === account._id ||
-        account.companyIds?.includes(selectedPost.userId))) ??
-    false;
 
   return (
     <View style={pStyles.globalContainer}>
@@ -106,16 +90,6 @@ const Posts: React.FC<PostProps> = ({ posts, search }: PostProps) => {
         data={allPosts}
         keyExtractor={(item) => item._id}
         renderItem={renderItem}
-      />
-      <UserPostActionModal
-        post={selectedPost}
-        visible={kebobMenuVisible && !myPost}
-        onClose={() => setKebobMenuVisible(false)}
-      />
-      <OwnPostActionModal
-        post={selectedPost}
-        visible={kebobMenuVisible && myPost}
-        onClose={() => setKebobMenuVisible(false)}
       />
       <FilterModal
         isVisible={visibleFilter}

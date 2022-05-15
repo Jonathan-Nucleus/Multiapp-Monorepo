@@ -39,10 +39,10 @@ import AccreditationResult from '../screens/Accreditation/AccreditationResult';
 import Notification from '../screens/Notification';
 import NotificationDetail from '../screens/Notification/Details';
 import Preferences from '../screens/Main/Settings/Preferences';
+import ContactSuccess from '../screens/Main/Settings/Contact/ContactSuccess';
 
 import { MediaType } from 'backend/graphql/mutations.graphql';
 import { Accreditation } from 'shared/graphql/mutation/account/useSaveQuestionnaire';
-import ContactSuccess from '../screens/Main/Settings/Contact/ContactSuccess';
 
 const defaultScreenOptions = {
   headerShown: false,
@@ -92,7 +92,9 @@ const AppNavigator = () => {
     attachTokenObserver(tokenObserver);
     return () => {
       detachTokenObserver(tokenObserver);
-      if (updateFcmHandle) clearTimeout(updateFcmHandle);
+      if (updateFcmHandle) {
+        clearTimeout(updateFcmHandle);
+      }
     };
   }, []);
 
@@ -174,7 +176,6 @@ type AppParamList = {
   FundDetails: {
     fundId: string;
   };
-  Contact: undefined;
   VerificationSuccess: undefined;
   Search: {
     searchString?: string;
@@ -187,6 +188,8 @@ type AppParamList = {
     accreditation: Accreditation;
   };
   Preferences: undefined;
+  Contact: undefined;
+  ContactSuccess: undefined;
 };
 
 export type AppScreenProps<
@@ -203,6 +206,10 @@ export type FundDetailsScreen = (
 
 export type ContactScreen = (
   props: AppScreenProps<'Contact'>,
+) => ReactElement | null;
+
+export type ContactSuccessScreen = (
+  props: AppScreenProps<'ContactSuccess'>,
 ) => ReactElement | null;
 
 export type VerificationSuccessScreen = (

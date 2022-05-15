@@ -26,7 +26,7 @@ type WatchFundData = {
 export function useWatchFund(): MutationTuple<
   WatchFundData,
   WatchFundVariables
-  > {
+> {
   return useMutation<WatchFundData, WatchFundVariables>(
     gql`
       mutation WatchFund($watch: Boolean!, $fundId: ID!) {
@@ -84,7 +84,7 @@ type FollowUserAsCompanyData = {
 export function useFollowUserAsCompany(): MutationTuple<
   FollowUserAsCompanyData,
   FollowUserAsCompanyVariables
-  > {
+> {
   return useMutation<FollowUserAsCompanyData, FollowUserAsCompanyVariables>(gql`
     mutation FollowUserAsCompany(
       $follow: Boolean!
@@ -109,7 +109,7 @@ type ProfileData = Pick<
   | "website"
   | "twitter"
   | "linkedIn"
-  >;
+>;
 type UpdateUserProfileVariables = {
   profile: Pick<ProfileData, "_id"> & Partial<ProfileData>;
 };
@@ -126,7 +126,7 @@ type UpdateUserProfileData = {
 export function useUpdateUserProfile(): MutationTuple<
   UpdateUserProfileData,
   UpdateUserProfileVariables
-  > {
+> {
   return useMutation<UpdateUserProfileData, UpdateUserProfileVariables>(gql`
     mutation UpdateUserProfile($profile: UserProfileInput!) {
       updateUserProfile(profile: $profile) {
@@ -164,7 +164,7 @@ type CompanyData = Pick<
   | "website"
   | "twitter"
   | "linkedIn"
-  >;
+>;
 type UpdateCompanyProfileVariables = {
   profile: CompanyData;
 };
@@ -181,11 +181,11 @@ type UpdateCompanyProfileData = {
 export function useUpdateCompanyProfile(): MutationTuple<
   UpdateCompanyProfileData,
   UpdateCompanyProfileVariables
-  > {
+> {
   return useMutation<
     UpdateCompanyProfileData,
     UpdateCompanyProfileVariables
-    >(gql`
+  >(gql`
     mutation UpdateCompanyProfile($profile: CompanyProfileInput!) {
       updateCompanyProfile(profile: $profile) {
         _id
@@ -225,7 +225,7 @@ type UpdateFcmTokenData = {
 export function useUpdateFcmToken(): MutationTuple<
   UpdateFcmTokenData,
   UpdateFcmTokenVariables
-  > {
+> {
   return useMutation<UpdateFcmTokenData, UpdateFcmTokenVariables>(gql`
     mutation UpdateFcmToken($fcmToken: String!) {
       updateFcmToken(fcmToken: $fcmToken)
@@ -246,7 +246,7 @@ type DeleteAccountData = {
 export function useDeleteAccount(): MutationTuple<
   DeleteAccountData,
   DeleteAccountVariables
-  > {
+> {
   return useMutation<DeleteAccountData, DeleteAccountVariables>(gql`
     mutation DeleteAccount {
       deleteAccount
@@ -254,15 +254,17 @@ export function useDeleteAccount(): MutationTuple<
   `);
 }
 
+export type HelpRequest = {
+  type: string;
+  email?: string;
+  phone?: string;
+  fundId: string;
+  message: string;
+  preferredTimeOfDay?: string;
+};
+
 type HelpRequestVariables = {
-  request: {
-    type: string;
-    email?: string;
-    phone?: string;
-    fundId: string;
-    message: string;
-    preferredTimeOfDay?: string;
-  };
+  request: HelpRequest;
 };
 
 type HelpRequestData = {
@@ -276,7 +278,7 @@ type HelpRequestData = {
 export function useHelpRequest(): MutationTuple<
   HelpRequestData,
   HelpRequestVariables
-  > {
+> {
   return useMutation<HelpRequestData, HelpRequestVariables>(gql`
     mutation HelpRequest($request: HelpRequestInput!) {
       helpRequest(request: $request)

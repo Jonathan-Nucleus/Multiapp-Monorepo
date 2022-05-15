@@ -1,8 +1,8 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
 import { Star } from 'phosphor-react-native';
 
-import PGradientButton from 'mobile/src/components/common/PGradientButton';
+import PGradientOutlineButton from '../../../../components/common/PGradientOutlineButton';
 import { PRIMARYSTATE, WHITE } from 'shared/src/colors';
 import {
   FundSummary,
@@ -12,7 +12,6 @@ import {
 import FundProfileInfo from './FundProfileInfo';
 
 import { useWatchFund } from 'shared/graphql/mutation/funds/useWatchFund';
-import PGradientOutlineButton from '../../../../components/common/PGradientOutlineButton';
 
 type Fund = FundSummary & FundCompany & FundManager;
 

@@ -89,13 +89,65 @@ export type AudienceEnum =
 
 /** Enumeration describing the possible cateogories of a post. */
 export const PostCategoryOptions = {
-  MATERIALS: {
-    value: "materials",
-    label: "Materials",
+  MACRO: {
+    value: "macro",
+    label: "Macro",
+  },
+  CRYTPO: {
+    value: "crypto",
+    label: "Crypto",
+  },
+  IDEAS: {
+    value: "ideas",
+    label: "Ideas",
+  },
+  CONSUMER: {
+    value: "consumer",
+    label: "Consumer",
   },
   NEWS: {
     value: "news",
     label: "News",
+  },
+  TECHNOLOGY: {
+    value: "tech",
+    label: "Technology",
+  },
+  EDUCATION: {
+    value: "education",
+    label: "Education",
+  },
+  INDUSTRIALS: {
+    value: "industrials",
+    label: "Industrials",
+  },
+  QUESTIONS: {
+    value: "questions",
+    label: "Questions",
+  },
+  HEALTHCARE: {
+    value: "healthcare",
+    label: "Healthcare",
+  },
+  HEDGE: {
+    value: "hedge",
+    label: "Hedge Funds",
+  },
+  FINANCIALS: {
+    value: "financials",
+    label: "Financials",
+  },
+  VENTURE: {
+    value: "venture",
+    label: "Venture Capital",
+  },
+  MATERIALS: {
+    value: "materials",
+    label: "Materials",
+  },
+  PE: {
+    value: "pe",
+    label: "Private Equity",
   },
   ENERGY: {
     value: "energy",
@@ -105,69 +157,17 @@ export const PostCategoryOptions = {
     value: "politics",
     label: "Politics",
   },
-  CRYPTO: {
-    value: "crypto",
-    label: "Crypto",
-  },
-  IDEAS: {
-    value: "ideas",
-    label: "Ideas",
-  },
-  ESG: {
-    value: "esg",
-    label: "ESG",
-  },
-  EDUCATION: {
-    value: "education",
-    label: "Education",
-  },
-  VENTURE: {
-    value: "venture",
-    label: "Venture Capital",
-  },
-  QUESTIONS: {
-    value: "questions",
-    label: "Questions",
-  },
-  PE: {
-    value: "pe",
-    label: "Private Equity",
-  },
-  TECH: {
-    value: "tech",
-    label: "Technology",
-  },
-  HEDGE: {
-    value: "hedge",
-    label: "Hedge Funds",
-  },
-  CONSUMER: {
-    value: "consumer",
-    label: "Consumer",
+  REAL_ESTATE: {
+    value: "real-estate",
+    label: "Real Estate",
   },
   ENTERTAINMENT: {
     value: "entertainment",
     label: "Entertainment",
   },
-  INDUSTRIALS: {
-    value: "industrials",
-    label: "Industrials",
-  },
-  REAL_ESTATE: {
-    value: "real-estate",
-    label: "Real Estate",
-  },
-  HEALTHCARE: {
-    value: "healthcare",
-    label: "Healthcare",
-  },
-  OP_ED: {
-    value: "op-ed",
-    label: "Op-Ed",
-  },
-  FINANCIALS: {
-    value: "financials",
-    label: "Financials",
+  ESG: {
+    value: "esg",
+    label: "ESG",
   },
 } as const;
 export type PostCategory = ValueOf<typeof PostCategoryOptions>["value"];

@@ -1,20 +1,17 @@
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, View, ScrollView } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import {
-  CaretLeft,
-  DotsThreeOutlineVertical,
-  Star,
-} from 'phosphor-react-native';
+import { CaretLeft, Star } from 'phosphor-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import PHeader from 'mobile/src/components/common/PHeader';
-
+import MainHeader from 'mobile/src/components/main/Header';
+import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import pStyles from 'mobile/src/theme/pStyles';
 import { Body2 } from 'mobile/src/theme/fonts';
 import {
   BLACK,
   PRIMARYSTATE,
+  PRIMARYDARK,
   WHITE,
   WHITE12,
   WHITE60,
@@ -23,23 +20,22 @@ import {
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 import FundProfileInfo from './FundProfileInfo';
 import FundOverview from './FundOverview';
-import FundsPlaceholder from '../../../../components/placeholder/FundsPlaceholder';
+import FundsPlaceholder from 'mobile/src/components/placeholder/FundsPlaceholder';
 
 import { useFund } from 'shared/graphql/query/marketplace/useFund';
 import { useWatchFund } from 'shared/graphql/mutation/funds/useWatchFund';
 
 import { FundDetailsScreen } from 'mobile/src/navigations/AppNavigator';
-import MainHeader from '../../../../components/main/Header';
 
 const Tab = createMaterialTopTabNavigator();
 const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
   const { fundId } = route.params;
-  const { data, loading } = useFund(fundId);
+  const { data } = useFund(fundId);
   const { isWatching, toggleWatch } = useWatchFund(fundId);
   const [tabviewHeight, setTabViewHeight] = useState<number>(500);
 
   const fund = data?.fund;
-  if (!fund || loading) {
+  if (!fund) {
     return (
       <View style={pStyles.globalContainer}>
         <MainHeader
@@ -51,13 +47,17 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
     );
   }
 
+  const contactSpecialist = () => {
+    navigation.navigate('Contact');
+  };
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <MainHeader
         leftIcon={<CaretLeft size={32} color={WHITE} />}
         onPressLeft={() => NavigationService.goBack()}
       />
-      <ScrollView>
+      <ScrollView scrollIndicatorInsets={{ right: 1 }}>
         <FundProfileInfo fund={fund} />
         <View style={styles.actionBar}>
           <Pressable
@@ -101,9 +101,8 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
               ),
             })}
             initialRouteName="FundOverview">
-            <Tab.Screen
-              name="Overview"
-              component={() => (
+            <Tab.Screen name="Overview">
+              {() => (
                 <FundOverview
                   fund={fund}
                   onLayout={(event) => {
@@ -112,12 +111,18 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
                   }}
                 />
               )}
-            />
-            <Tab.Screen name="Documents" component={() => <></>} />
+            </Tab.Screen>
+            <Tab.Screen name="Documents">{() => <></>}</Tab.Screen>
           </Tab.Navigator>
         </View>
       </ScrollView>
-    </View>
+      <View style={styles.contactContainer}>
+        <PGradientButton
+          label="Contact Fund Specialist"
+          onPress={contactSpecialist}
+        />
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -165,5 +170,10 @@ const styles = StyleSheet.create({
   },
   onPress: {
     opacity: 0.5,
+  },
+  contactContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    backgroundColor: PRIMARYDARK,
   },
 });

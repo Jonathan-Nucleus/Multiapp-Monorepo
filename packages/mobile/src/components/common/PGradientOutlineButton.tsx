@@ -6,17 +6,18 @@ import {
   TouchableOpacity,
   TextStyle,
   ViewStyle,
+  StyleProp,
 } from 'react-native';
 import { UIActivityIndicator } from 'react-native-indicators';
 import LinearGradient from 'react-native-linear-gradient';
 
 import { Body2 } from '../../theme/fonts';
-import { WHITE, DISABLED, DISABLEDTXT, BLACK } from 'shared/src/colors';
+import { WHITE, DISABLEDTXT, BLACK } from 'shared/src/colors';
 
 interface ButtonProps {
-  btnContainer?: ViewStyle;
-  gradientContainer?: ViewStyle;
-  textStyle?: TextStyle;
+  btnContainer?: StyleProp<ViewStyle>;
+  gradientContainer?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
   label: string;
   onPress: () => void;
   disabled?: boolean;
@@ -70,7 +71,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
-    paddingVertical: 12,
+    paddingVertical: 0,
     borderRadius: 32,
     height: 40,
   },
@@ -89,7 +90,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     width: '99%',
-    paddingVertical: 12,
+    paddingVertical: 0,
     borderRadius: 80,
     height: 38,
     backgroundColor: BLACK,

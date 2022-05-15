@@ -151,7 +151,7 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply, onEdit }) => {
           </TouchableOpacity>
         )}
       </View>
-      {(kebobMenuVisible || !kebobIsClosing) &&
+      {(kebobMenuVisible || kebobIsClosing) &&
         (isMyComment ? (
           <OwnCommentActionModal
             comment={comment}

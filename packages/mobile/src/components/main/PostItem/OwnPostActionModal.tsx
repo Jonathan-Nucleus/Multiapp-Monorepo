@@ -3,6 +3,7 @@ import { Pencil, Trash, BellSlash } from 'phosphor-react-native';
 
 import SelectionModal from 'mobile/src/components/common/SelectionModal';
 import { showMessage } from 'mobile/src/services/utils';
+import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 import { WHITE } from 'shared/src/colors';
 import { SOMETHING_WRONG } from 'shared/src/constants';
 
@@ -14,18 +15,13 @@ interface OwnPostActionModalProps {
   post?: Post;
   visible: boolean;
   onClose?: () => void;
-  onEditPost?: () => void;
 }
 
 const OwnPostActionModal: React.FC<OwnPostActionModalProps> = ({
   post,
   visible,
   onClose,
-  onEditPost,
 }) => {
-  if (!post) return null;
-
-  const { user } = post;
   const [mutePost] = useMutePost();
   const [deletePost] = useDeletePost();
 
@@ -47,12 +43,20 @@ const OwnPostActionModal: React.FC<OwnPostActionModalProps> = ({
         key: 'mute' as const,
       },
     ],
-    [user],
+    [],
   );
 
+  if (!post) {
+    return null;
+  }
+
   const handleEditPost = () => {
-    console.log('Editing post');
-    onEditPost && onEditPost();
+    NavigationService.navigate('PostDetails', {
+      screen: 'CreatePost',
+      params: {
+        post,
+      },
+    });
   };
 
   const handleDeletePost = async () => {
@@ -62,7 +66,7 @@ const OwnPostActionModal: React.FC<OwnPostActionModalProps> = ({
       });
 
       data?.deletePost
-        ? showMessage('success', `This post has been succesfully deleted.`)
+        ? showMessage('success', 'This post has been succesfully deleted.')
         : showMessage('error', SOMETHING_WRONG);
     } catch (err) {
       showMessage('error', SOMETHING_WRONG);
