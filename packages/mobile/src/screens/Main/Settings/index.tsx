@@ -41,6 +41,7 @@ interface RenderItemProps {
     comment?: string;
     id: string;
     icon: any;
+    disabled?: boolean;
     onPress: (() => void) | undefined;
   };
 }
@@ -77,6 +78,7 @@ const Settings: SettingsScreen = ({ navigation }) => {
     {
       id: 'Preferences',
       label: 'Preferences',
+      disabled: true,
       onPress: () => navigation.navigate('Preferences'),
       icon: <SlidersHorizontal size={26} color={WHITE} />,
     },
@@ -139,7 +141,13 @@ const Settings: SettingsScreen = ({ navigation }) => {
         style={({ pressed }) => [
           pressed && item.onPress ? pStyles.pressedStyle : null,
         ]}>
-        <View style={[styles.item, styles.between, styles.border]}>
+        <View
+          style={[
+            styles.item,
+            styles.between,
+            styles.border,
+            item.disabled ? styles.disabled : {},
+          ]}>
           <View style={[styles.row, styles.alignCenter]}>
             {item.icon}
             <View style={styles.rightItem}>
@@ -303,5 +311,8 @@ const styles = StyleSheet.create({
   alignCenter: {
     alignItems: 'center',
     flex: 1,
+  },
+  disabled: {
+    opacity: 0.5,
   },
 });
