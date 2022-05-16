@@ -1,7 +1,7 @@
 import { gql } from "apollo-server";
 import * as yup from "yup";
 import _ from "lodash";
-import { getChatToken } from "../lib/tokens";
+import { getChatToken, decodeToken, AccessTokenPayload } from "../lib/tokens";
 import {
   PartialSchema,
   ApolloServerContext,
@@ -28,6 +28,7 @@ import type { Notification } from "../schemas/notification";
 
 const schema = gql`
   type Query {
+    verifyToken(token: String!): Boolean!
     verifyInvite(code: String!): Boolean!
     account: User
     chatToken: String
@@ -73,6 +74,31 @@ export type GlobalSearchResult = {
 
 const resolvers = {
   Query: {
+    verifyToken: async (
+      parentIgnored: unknown,
+      args: { token: string },
+      { db }: ApolloServerContext
+    ): Promise<boolean> => {
+      const validator = yup
+        .object()
+        .shape({
+          token: yup.string().required(),
+        })
+        .required();
+
+      validateArgs(validator, args);
+
+      const { token } = args;
+
+      try {
+        const payload = decodeToken(token) as AccessTokenPayload;
+        const user = await db.users.find({ _id: payload._id });
+        return !!user;
+      } catch {
+        return false;
+      }
+    },
+
     verifyInvite: async (
       parentIgnored: unknown,
       args: { code: string },
