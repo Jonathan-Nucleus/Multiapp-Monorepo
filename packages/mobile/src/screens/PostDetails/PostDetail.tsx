@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CaretLeft, PaperPlaneRight } from 'phosphor-react-native';
 
@@ -57,6 +58,8 @@ const PostDetail: PostDetailScreen = ({ route }) => {
   const [isReplyComment, setReplyComment] = useState(false);
   const [isEditComment, setEditComment] = useState(false);
   const inputRef = useRef<TextInput | null>(null);
+  const flatListRef = useRef<KeyboardAwareScrollView | null>(null);
+  const focusCommentRef = useRef(focusComment);
 
   const post = data?.post;
   const comments = post?.comments;
@@ -98,7 +101,9 @@ const PostDetail: PostDetailScreen = ({ route }) => {
 
       if (data?.comment) {
         initInputComment();
-        refetch();
+        await refetch();
+
+        setTimeout(() => flatListRef.current?.scrollToEnd(true), 500);
       }
     } catch (err) {
       console.log('add comment error:', err);
@@ -139,6 +144,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
     setFocusCommentId(null);
     setReplyComment(false);
     setEditComment(false);
+    focusCommentRef.current = false;
     inputRef?.current?.blur();
   };
 
@@ -168,7 +174,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
         leftIcon={<CaretLeft size={32} color={WHITE} />}
         onPressLeft={() => NavigationService.goBack()}
       />
-      <PAppContainer style={styles.container}>
+      <PAppContainer ref={flatListRef} style={styles.container}>
         <PostItem post={post} onPressLikes={() => setLikesModalVisible(true)} />
         <FlatList
           data={getComments || []}
@@ -203,8 +209,9 @@ const PostDetail: PostDetailScreen = ({ route }) => {
             ]}
             ref={(ref) => {
               inputRef.current = ref;
-              if (focusComment && ref) {
+              if (focusCommentRef.current && ref) {
                 ref.focus();
+                flatListRef.current?.scrollToEnd(true);
               }
             }}
             keyboardAppearance="dark"
@@ -284,13 +291,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 8,
-    height: 40,
-    marginBottom: 8,
   },
   input: {
     backgroundColor: WHITE,
-    padding: 16,
-    paddingTop: 16, // important
+    paddingHorizontal: 16,
+    paddingTop: 12, // important
     minHeight: 36,
     maxHeight: 200,
     borderRadius: 24,

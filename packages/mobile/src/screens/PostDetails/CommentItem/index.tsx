@@ -1,36 +1,10 @@
 import React, { FC, useRef, useState, useEffect, memo } from 'react';
-import {
-  ListRenderItem,
-  FlatList,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-  Pressable,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StyleSheet, TouchableOpacity, View, Pressable } from 'react-native';
 import moment from 'moment';
-import {
-  CaretLeft,
-  DotsThreeVertical,
-  EyeClosed,
-  PaperPlaneRight,
-  Pencil,
-  Trash,
-  UserCirclePlus,
-  WarningOctagon,
-} from 'phosphor-react-native';
+import { DotsThreeVertical } from 'phosphor-react-native';
 
-import PAppContainer from 'mobile/src/components/common/PAppContainer';
-import Header from 'mobile/src/components/main/Header';
 import PLabel from 'mobile/src/components/common/PLabel';
-import PostItem from 'mobile/src/components/main/PostItem';
 import UserInfo from 'mobile/src/components/common/UserInfo';
-import SelectionModal from 'mobile/src/components/common/SelectionModal';
-import { showMessage } from 'mobile/src/services/utils';
 import {
   BLACK,
   PRIMARY,
@@ -38,21 +12,12 @@ import {
   PRIMARYSOLID7,
   WHITE,
 } from 'shared/src/colors';
-import pStyles from 'mobile/src/theme/pStyles';
-import { Body2Bold, Body3, Body3Bold } from 'mobile/src/theme/fonts';
-import { SOMETHING_WRONG } from 'shared/src/constants';
+import { Body2Bold, Body3 } from 'mobile/src/theme/fonts';
 
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 
-import {
-  useCommentPost,
-  useDeleteComment,
-  useEditCommentPost,
-  useLikeComment,
-} from 'shared/graphql/mutation/posts';
-import { usePost, Comment } from 'shared/graphql/query/post/usePost';
-import { useHideUser } from 'shared/graphql/mutation/account';
-import { useFollowUser } from 'shared/graphql/mutation/account/useFollowUser';
+import { useLikeComment } from 'shared/graphql/mutation/posts';
+import { Comment } from 'shared/graphql/query/post/usePost';
 import { useAccount } from 'shared/graphql/query/account/useAccount';
 
 import UserCommentActionModal from './UserCommentActionModal';
@@ -67,10 +32,9 @@ interface CommentItemProps {
 }
 
 const CommentItem: FC<CommentItemProps> = ({ comment, onReply, onEdit }) => {
-  const { _id, commentId, user, body, createdAt } = comment;
+  const { commentId, user, body, createdAt } = comment;
 
   const { data: { account } = {} } = useAccount({ fetchPolicy: 'cache-only' });
-  const { isFollowing, toggleFollow } = useFollowUser(user._id);
   const [likeComment] = useLikeComment();
   const [liked, setLiked] = useState<boolean | undefined>(undefined);
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -91,7 +55,7 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply, onEdit }) => {
     if (liked === undefined && account) {
       setLiked((account && comment.likeIds?.includes(account._id)) ?? false);
     }
-  }, [account]);
+  }, [account, comment.likeIds, liked]);
 
   const closeKebobMenu = () => {
     setKebobIsClosing(true);
@@ -185,16 +149,6 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply, onEdit }) => {
 export default memo(CommentItem);
 
 const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 0,
-  },
-  headerContainer: {
-    backgroundColor: BLACK,
-    marginBottom: 0,
-  },
-  commentContainer: {
-    paddingHorizontal: 16,
-  },
   userItemContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -202,40 +156,6 @@ const styles = StyleSheet.create({
   },
   userInfoContainer: {
     paddingVertical: 12,
-  },
-  replyContainer: {
-    flexDirection: 'row',
-    backgroundColor: BLACK,
-    alignItems: 'center',
-    marginLeft: 16,
-  },
-  headerReply: {
-    color: WHITE,
-  },
-  nameReply: {
-    ...Body2Bold,
-  },
-  cancelReply: {
-    marginLeft: 12,
-    padding: 8,
-  },
-  inputContainer: {
-    backgroundColor: BLACK,
-    marginLeft: 16,
-    marginRight: 12,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 8,
-    height: 40,
-  },
-  input: {
-    backgroundColor: WHITE,
-    padding: 16,
-    paddingTop: 16, // important
-    minHeight: 36,
-    maxHeight: 200,
-    borderRadius: 24,
   },
   bodyContent: {
     marginLeft: 40,
@@ -252,30 +172,5 @@ const styles = StyleSheet.create({
   },
   likedLabel: {
     color: PRIMARY,
-  },
-  updateContainer: {
-    backgroundColor: BLACK,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    paddingBottom: 6,
-    marginRight: 16,
-  },
-  // TODO: global component for button
-  updateBtn: {
-    width: 100,
-    height: 45,
-    marginLeft: 16,
-    borderRadius: 22,
-    borderColor: PRIMARYSOLID,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: PRIMARYSOLID7,
-  },
-  cancelBtn: {
-    width: 80,
-    height: 45,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });

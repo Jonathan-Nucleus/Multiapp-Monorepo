@@ -1,11 +1,4 @@
-import React, {
-  FC,
-  useRef,
-  useState,
-  useEffect,
-  useMemo,
-  useCallback,
-} from 'react';
+import React, { FC, useRef, useState, useEffect, useCallback } from 'react';
 import {
   KeyboardAvoidingView,
   ListRenderItem,
@@ -17,12 +10,7 @@ import {
   Text,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  CaretLeft,
-  ImageSquare,
-  PaperPlaneRight,
-  PaperPlaneTilt,
-} from 'phosphor-react-native';
+import { CaretLeft, ImageSquare, PaperPlaneRight } from 'phosphor-react-native';
 import {
   Channel as SCChannel,
   ChannelSort,
@@ -34,18 +22,11 @@ import dayjs from 'dayjs';
 dayjs.extend(relativeTime);
 
 import PHeader from 'mobile/src/components/common/PHeader';
-import MainHeader from 'mobile/src/components/main/Header';
 import PTextInput from 'mobile/src/components/common/PTextInput';
 import ChatAvatar from 'mobile/src/components/main/chat/ChatAvatar';
 import { Body1Bold, Body2, Body3 } from 'mobile/src/theme/fonts';
 import pStyles from 'mobile/src/theme/pStyles';
-import {
-  WHITE,
-  BGDARK,
-  WHITE12,
-  GRAY600,
-  PRIMARYSOLID,
-} from 'shared/src/colors';
+import { WHITE, WHITE12, GRAY600 } from 'shared/src/colors';
 
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
@@ -95,7 +76,7 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
     defaultValues: { message: '' },
   });
 
-  const fetchChannel = async () => {
+  const fetchChannel = useCallback(async () => {
     const channelData = (
       await client.queryChannels({
         type: 'messaging',
@@ -105,16 +86,18 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
 
     channel.current = channelData;
     setMessages(processMessages(channelData.state.messages));
-  };
+  }, [client, channelId]);
 
   useEffect(() => {
     if (!initialData) {
       fetchChannel();
     }
-  }, []);
+  }, [fetchChannel, initialData]);
 
   useEffect(() => {
-    if (!channel.current) return;
+    if (!channel.current) {
+      return;
+    }
     const listener = channel.current.on((event) => {
       switch (event.type) {
         case 'message.new':
@@ -126,7 +109,7 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
     });
 
     return () => listener.unsubscribe();
-  }, [channel.current, messages]);
+  }, [messages]);
 
   const onSubmit = async ({ message }: FormValues) => {
     if (!channel.current) {

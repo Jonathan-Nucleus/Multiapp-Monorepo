@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from 'react';
+import React, { LegacyRef, PropsWithChildren, forwardRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -18,34 +18,37 @@ interface AppContainerProps extends PropsWithChildren<unknown> {
   contentContainerStyle?: StyleProp<ViewStyle>;
 }
 
-const PAppContainer: React.FC<AppContainerProps> = (props) => {
-  const {
-    children,
-    style,
-    noScroll,
-    contentContainerStyle,
-    disableKeyboardScroll = false,
-    modal = false,
-  } = props;
+const PAppContainer = forwardRef<KeyboardAwareScrollView, AppContainerProps>(
+  (props, ref) => {
+    const {
+      children,
+      style,
+      noScroll,
+      contentContainerStyle,
+      disableKeyboardScroll = false,
+      modal = false,
+    } = props;
 
-  const content = (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={[styles.container, modal ? styles.modal : null, style]}>
-        {children}
-      </View>
-    </TouchableWithoutFeedback>
-  );
+    const content = (
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View style={[styles.container, modal ? styles.modal : null, style]}>
+          {children}
+        </View>
+      </TouchableWithoutFeedback>
+    );
 
-  return noScroll ? (
-    content
-  ) : (
-    <KeyboardAwareScrollView
-      contentContainerStyle={contentContainerStyle}
-      enableAutomaticScroll={!disableKeyboardScroll}>
-      {content}
-    </KeyboardAwareScrollView>
-  );
-};
+    return noScroll ? (
+      content
+    ) : (
+      <KeyboardAwareScrollView
+        ref={ref as LegacyRef<KeyboardAwareScrollView>}
+        contentContainerStyle={contentContainerStyle}
+        enableAutomaticScroll={!disableKeyboardScroll}>
+        {content}
+      </KeyboardAwareScrollView>
+    );
+  },
+);
 
 export default PAppContainer;
 

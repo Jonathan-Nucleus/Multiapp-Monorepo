@@ -76,35 +76,6 @@ export function useCreatePost(): MutationTuple<
   );
 }
 
-type EditPostVariables = {
-  post: PostUpdate;
-};
-
-type EditPostData = {
-  editPost?: Post;
-};
-
-/**
- * GraphQL mutation that edit post
- *
- * @returns   GraphQL mutation.
- */
-export function useEditPost(): MutationTuple<EditPostData, EditPostVariables> {
-  return useMutation<EditPostData, EditPostVariables>(gql`
-    mutation EditPost($post: PostUpdate!) {
-      editPost(post: $post) {
-        _id
-        audience
-        body
-        mediaUrl
-        categories
-        mentionIds
-        updatedAt
-      }
-    }
-  `);
-}
-
 type LikePostVariables = {
   like: boolean;
   postId: string;

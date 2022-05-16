@@ -61,7 +61,7 @@ const AppNavigator = () => {
     null,
   );
   const [updateFcmToken] = useUpdateFcmToken();
-  const [verifyToken] = useVerifyToken();
+  //const [verifyToken] = useVerifyToken();
 
   useEffect(() => {
     NavigationService.setNavigator(navigationRef.current);
@@ -101,7 +101,7 @@ const AppNavigator = () => {
         clearTimeout(updateFcmHandle);
       }
     };
-  }, [updateFcmToken]);
+  }, [updateFcmToken, authenticated]);
 
   // Fetch authentication token to check whether or not the current user is
   // already logged in

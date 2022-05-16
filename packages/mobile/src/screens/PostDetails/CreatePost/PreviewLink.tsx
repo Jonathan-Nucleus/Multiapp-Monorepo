@@ -52,11 +52,13 @@ const styles = StyleSheet.create({
   previewContainer: {
     overflow: 'hidden',
     marginVertical: 16,
+    height: 224,
   },
   metaDataContainer: {
     flexDirection: 'column',
     borderColor: WHITE12,
     borderRadius: 8,
+    flex: 1,
   },
   title: {
     marginHorizontal: 16,
@@ -72,7 +74,8 @@ const styles = StyleSheet.create({
   },
   previewImage: {
     width: '100%',
-    height: 200,
+    flex: 1,
+    flexGrow: 1,
     borderTopRightRadius: 8,
     borderTopLeftRadius: 8,
     overflow: 'hidden',

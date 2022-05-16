@@ -20,11 +20,8 @@ import PostHeader from './PostHeader';
 import { AUDIENCE_OPTIONS } from './index';
 
 import { useAccount } from 'shared/graphql/query/account/useAccount';
-import {
-  useCreatePost,
-  PostCategories,
-  useEditPost,
-} from 'shared/graphql/mutation/posts';
+import { useCreatePost, PostCategories } from 'shared/graphql/mutation/posts';
+import { useEditPost } from 'shared/graphql/mutation/posts/useEditPost';
 import { processPost } from 'shared/src/patterns';
 
 import { ReviewPostScreen } from 'mobile/src/navigations/PostDetailsStack';

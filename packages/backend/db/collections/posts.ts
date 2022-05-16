@@ -60,6 +60,7 @@ const createPostsCollection = (
           ...(featured ? { featured } : {}),
           deleted: { $exists: false },
         })
+        .sort({ _id: -1 })
         .toArray();
     },
 

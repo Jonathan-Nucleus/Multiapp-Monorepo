@@ -190,6 +190,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   const lastSearch = useRef<string | undefined>(undefined);
   const nextSearch = useRef<string | undefined>(undefined);
 
+  const [keyboardShowing, setKeyboardShowing] = useState(false);
   const [postAsModalVisible, setPostAsModalVisible] = useState(false);
   const [audienceModalVisible, setAudienceModalVisible] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -226,6 +227,19 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   });
 
   useEffect(() => {
+    const onShow = () => setKeyboardShowing(true);
+    const onHide = () => setKeyboardShowing(false);
+
+    Keyboard.addListener('keyboardWillShow', onShow);
+    Keyboard.addListener('keyboardWillHide', onHide);
+
+    return () => {
+      Keyboard.removeListener('keyboardWillShow', onShow);
+      Keyboard.removeListener('keyboardWillHide', onHide);
+    };
+  }, []);
+
+  useEffect(() => {
     if (account && !post?._id) {
       setValue('userId', account._id);
     }
@@ -259,7 +273,8 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     const image = await ImagePicker.openPicker({
       width: 300,
       height: 400,
-      cropping: true,
+      cropping: false,
+      compressImageQuality: 0.8,
     });
 
     await uploadImage(image);
@@ -271,6 +286,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       height: 400,
       cropping: false, // cropping caused error
       includeBase64: true,
+      compressImageQuality: 0.8,
     });
 
     await uploadImage(image);
@@ -286,23 +302,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
 
   const uploadImage = async (image: ImageOrVideo): Promise<void> => {
     setUploading(true);
-    let fileUri = image.sourceURL ?? '';
-
-    if (fileUri.toLowerCase().endsWith('.heic')) {
-      const { success, path, error } = await HeicConverter.convert({
-        path: fileUri,
-        quality: 0.9,
-        extension: 'jpg',
-      });
-
-      if (!success) {
-        console.log('Error converting file', error);
-        showMessage('error', 'Image upload failed');
-        return;
-      }
-
-      fileUri = path;
-    }
+    let fileUri = image.path;
 
     const filename = fileUri.substring(fileUri.lastIndexOf('/') + 1);
     const { data } = await fetchUploadLink({
@@ -324,6 +324,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       'base64',
     );
 
+    console.log('uploadUrl', uploadUrl);
     const result = await fetch(uploadUrl, {
       method: 'PUT',
       body: buffer,
@@ -404,10 +405,14 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   );
 
   const clearMentions = () => {
-    setMentionUsers([]);
-    lastSearch.current = undefined;
-    currentSearch.current = undefined;
-    nextSearch.current = undefined;
+    // Avoid issue with setting state from inside renderSuggestion render
+    // cycle
+    setTimeout(() => {
+      setMentionUsers([]);
+      lastSearch.current = undefined;
+      currentSearch.current = undefined;
+      nextSearch.current = undefined;
+    }, 10);
   };
 
   const renderSuggestions = useCallback(
@@ -442,7 +447,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
         mentionsField.onChange(
           Array.from(new Set([...mentionsField.value, user._id])),
         );
-        setMentionUsers([]);
+        clearMentions();
       };
 
       return (
@@ -594,29 +599,13 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
                 )}
               />
             </GestureDetector>
-            {uploading ? (
-              <View style={[styles.postImage, styles.uploadIndicator]}>
-                <ActivityIndicator size="large" />
-              </View>
-            ) : null}
-            {imageData ? (
-              <Image
-                source={{ uri: imageData.path }}
-                style={styles.postImage}
-                resizeMode="cover"
-              />
-            ) : post?.media ? (
-              <Image
-                source={{ uri: `${POST_URL}/${post.media.url}` }}
-                style={styles.postImage}
-              />
-            ) : null}
-            {watchBody && !imageData && !post?.media?.url ? (
-              <PreviewLink body={watchBody} />
-            ) : null}
           </PAppContainer>
           {mentionUsers.length === 0 ? (
-            <View style={styles.actionWrapper}>
+            <View
+              style={[
+                styles.actionWrapper,
+                keyboardShowing ? styles.clearMargin : null,
+              ]}>
               <IconButton
                 icon={<Camera size={32} color={WHITE} />}
                 label="Take Photo"
@@ -642,6 +631,28 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
           ) : null}
         </View>
       </KeyboardAvoidingView>
+      {uploading ? (
+        <View style={[styles.postImage, styles.uploadIndicator]}>
+          <ActivityIndicator size="large" />
+        </View>
+      ) : null}
+      {imageData ? (
+        <Image
+          source={{ uri: imageData.path }}
+          style={styles.postImage}
+          resizeMode="cover"
+        />
+      ) : post?.media ? (
+        <Image
+          source={{ uri: `${POST_URL}/${post.media.url}` }}
+          style={styles.postImage}
+        />
+      ) : null}
+      {watchBody && !uploading && !imageData && !post?.media?.url ? (
+        <View style={styles.postImage}>
+          <PreviewLink body={watchBody} />
+        </View>
+      ) : null}
     </View>
   );
 };
@@ -679,7 +690,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 16,
     marginVertical: 8,
-    maxHeight: 300,
+    maxHeight: 270,
     flexGrow: 0,
     width: '100%',
     bottom: 0,
@@ -695,12 +706,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   postImage: {
-    width: '100%',
+    position: 'absolute',
+    bottom: 96,
+    left: 16,
+    right: 16,
     height: 224,
     marginVertical: 16,
     borderRadius: 16,
+    zIndex: -1,
   },
   actionWrapper: {
+    marginTop: 240,
     backgroundColor: BGDARK,
     borderTopColor: WHITE12,
     borderTopWidth: 1,
@@ -709,6 +725,9 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: 25,
     height: 96,
+  },
+  clearMargin: {
+    marginTop: 0,
   },
   iconButton: {
     flexDirection: 'column',
