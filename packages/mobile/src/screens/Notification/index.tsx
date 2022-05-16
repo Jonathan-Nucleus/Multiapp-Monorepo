@@ -4,14 +4,12 @@ import {
   FlatList,
   View,
   Text,
-  TouchableOpacity,
   ListRenderItem,
   Pressable,
 } from 'react-native';
 import {
   Gear,
   Checks,
-  Chats,
   DotsThreeOutlineVertical,
   ChatCenteredText,
   UserCirclePlus,
@@ -39,13 +37,16 @@ import { Body1, Body2, Body3, H5Bold } from 'mobile/src/theme/fonts';
 import Avatar from 'mobile/src/components/common/Avatar';
 import MainHeader from 'mobile/src/components/main/Header';
 
-import type { NotificationScreen } from 'mobile/src/navigations/AppNavigator';
-import { useNotifications } from 'shared/graphql/query/notification/useNotifications';
+import {
+  useNotifications,
+  Notification,
+} from 'shared/graphql/query/notification/useNotifications';
 import {
   useReadNotification,
   useReadNotifications,
 } from 'shared/graphql/mutation/notification';
-import { Notification } from 'backend/graphql/notifications.graphql';
+
+import type { NotificationScreen } from 'mobile/src/navigations/AppNavigator';
 
 const Notifications: NotificationScreen = ({ navigation }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -55,50 +56,42 @@ const Notifications: NotificationScreen = ({ navigation }) => {
   const notifications = data?.notifications || [];
 
   const renderIcon = (val: Notification) => {
-    if (val.type === 'comment-post') {
+    if (val.type === 'COMMENT_POST') {
       return <ChatCenteredText size={18} color={WHITE} />;
     }
-    if (val.type === 'like-post') {
+    if (val.type === 'LIKE_POST') {
       return <ThumbsUp size={18} color={WHITE} />;
     }
-    if (val.type === 'followed-by-user') {
-      return <UserCirclePlus size={18} color={WHITE} />;
-    }
-    // if (val.type === 'comment-post') {
-    //   return <ThumbsUp size={18} color={WHITE} />;
-    // }
-    // if (val.mentioned) {
-    //   return <At size={18} color={WHITE} />;
-    // }
-    // if (val.shared) {
-    //   return <Share size={18} color={WHITE} />;
-    // }
-    return <Chats size={18} color={WHITE} />;
+    return <UserCirclePlus size={18} color={WHITE} />;
   };
 
-  const handleReadNotification = async (
-    id: string,
-    type: string,
-    postId?: string,
-    userId?: string,
-  ) => {
+  const handleReadNotification = async (notification: Notification) => {
+    const { _id, type, data: notificationData, isNew } = notification;
     try {
-      await readNotification({
-        variables: {
-          notificationId: id,
-        },
-      });
-      refetch();
+      if (isNew) {
+        await readNotification({
+          variables: {
+            notificationId: _id,
+          },
+        });
+        refetch();
+      }
+      console.log(notification);
       if (
-        (type === 'comment-post' || type === 'like-post') &&
-        postId &&
-        userId
+        (type === 'COMMENT_POST' || type === 'LIKE_POST') &&
+        notificationData.postId
       ) {
         navigation.navigate('PostDetails', {
           screen: 'PostDetail',
           params: {
-            postId: postId,
-            userId: userId,
+            postId: notificationData.postId,
+          },
+        });
+      } else if (type === 'FOLLOWED_BY_USER') {
+        navigation.navigate('UserDetails', {
+          screen: 'UserProfile',
+          params: {
+            userId: notificationData.userId,
           },
         });
       }
@@ -125,14 +118,8 @@ const Notifications: NotificationScreen = ({ navigation }) => {
   }) => {
     return (
       <Pressable
-        onPress={() =>
-          handleReadNotification(
-            item._id,
-            item.type,
-            item.data.postId,
-            item.data.userId,
-          )
-        }>
+        style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}
+        onPress={() => handleReadNotification(item)}>
         <View style={[styles.item, item.isNew && styles.unread]}>
           <View style={styles.avatarView}>
             {item.isNew && <View style={styles.dot} />}
@@ -158,9 +145,11 @@ const Notifications: NotificationScreen = ({ navigation }) => {
       />
       <View style={[styles.row, styles.between]}>
         <Text style={styles.title}>Notifications</Text>
-        <TouchableOpacity onPress={() => setIsVisible(true)}>
+        <Pressable
+          onPress={() => setIsVisible(true)}
+          style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}>
           <DotsThreeOutlineVertical size={28} color={GRAY100} weight="fill" />
-        </TouchableOpacity>
+        </Pressable>
       </View>
       <FlatList
         data={notifications}
@@ -174,15 +163,18 @@ const Notifications: NotificationScreen = ({ navigation }) => {
         onBackdropPress={() => setIsVisible(false)}
         style={styles.bottomHalfModal}>
         <View style={styles.modalContent}>
-          <TouchableOpacity onPress={() => handleReadAllNotifications()}>
+          <Pressable
+            style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}
+            onPress={() => handleReadAllNotifications()}>
             <View style={styles.row}>
               <Checks color={WHITE} size={28} />
               <View style={styles.commentWrap}>
                 <Text style={styles.label}>Mark All as Read</Text>
               </View>
             </View>
-          </TouchableOpacity>
-          <TouchableOpacity
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}
             onPress={() => {
               setIsVisible(false);
               navigation.navigate('Preferences');
@@ -193,13 +185,14 @@ const Notifications: NotificationScreen = ({ navigation }) => {
                 <Text style={styles.label}>Notification Settings</Text>
               </View>
             </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => setIsVisible(false)}>
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}
+            onPress={() => setIsVisible(false)}>
             <View style={styles.btn}>
               <Text style={styles.btnTxt}>Cancel</Text>
             </View>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </Modal>
     </View>

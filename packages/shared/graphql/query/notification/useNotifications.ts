@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Notification } from "backend/graphql/notifications.graphql";
 import { gql, QueryResult, useQuery } from "@apollo/client";
 
+export type { Notification };
+
 type NotificationsData = {
   notifications: Notification[];
 };

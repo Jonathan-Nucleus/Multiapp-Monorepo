@@ -14,7 +14,8 @@ export namespace Notification {
     updatedAt?: Date;
   }
 
-  export type GraphQL = GraphQLEntity<Mongo> & {
+  export type GraphQL = GraphQLEntity<Omit<Mongo, "type">> & {
+    type: NotificationTypeEnum;
     createdAt: Date;
     user: User.GraphQL;
     data: {
