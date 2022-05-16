@@ -9,6 +9,7 @@ import {
   StackScreenProps,
 } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import SplashScreen from 'react-native-splash-screen';
 
 import * as NavigationService from '../services/navigation/NavigationService';
 import {
@@ -43,6 +44,7 @@ import ContactSuccess from '../screens/Main/Settings/Contact/ContactSuccess';
 
 import { MediaType } from 'backend/graphql/mutations.graphql';
 import { Accreditation } from 'shared/graphql/mutation/account/useSaveQuestionnaire';
+import { useVerifyToken } from 'shared/graphql/query/account/useVerifyToken';
 
 const defaultScreenOptions = {
   headerShown: false,
@@ -50,6 +52,8 @@ const defaultScreenOptions = {
 };
 
 const Stack = createStackNavigator();
+let verifying = false;
+
 const AppNavigator = () => {
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const routeNameRef = useRef<string | undefined>(undefined);
@@ -57,6 +61,7 @@ const AppNavigator = () => {
     null,
   );
   const [updateFcmToken] = useUpdateFcmToken();
+  const [verifyToken] = useVerifyToken();
 
   useEffect(() => {
     NavigationService.setNavigator(navigationRef.current);
@@ -96,18 +101,21 @@ const AppNavigator = () => {
         clearTimeout(updateFcmHandle);
       }
     };
-  }, []);
+  }, [updateFcmToken]);
 
   // Fetch authentication token to check whether or not the current user is
   // already logged in
-  (async (): Promise<void> => {
-    const token = await getToken();
-    setAuthenticated(!!token);
-  })();
+  if (authenticated === null || !verifying) {
+    (async (): Promise<void> => {
+      const token = await getToken();
+      setAuthenticated(!!token);
+    })();
+  }
 
   const onReady = () => {
     routeNameRef.current = navigationRef?.current?.getCurrentRoute()?.name;
     console.log('Running', routeNameRef.current);
+    SplashScreen.hide();
   };
 
   const onStateChange = async () => {
@@ -123,17 +131,19 @@ const AppNavigator = () => {
     }
   }, [authenticated]);
 
+  if (authenticated === null) {
+    return <></>;
+  }
+
   return (
     <NavigationContainer
       ref={navigationRef}
       onReady={onReady}
       onStateChange={onStateChange}>
-      <Stack.Navigator screenOptions={defaultScreenOptions}>
-        <Stack.Screen
-          name="Auth"
-          component={AuthStack}
-          options={{ gestureEnabled: false }}
-        />
+      <Stack.Navigator
+        screenOptions={defaultScreenOptions}
+        initialRouteName={authenticated ? 'Main' : 'Auth'}>
+        <Stack.Screen name="Auth" component={AuthStack} />
         <Stack.Screen name="Main" component={MainTabNavigator} />
         <Stack.Screen name="UserDetails" component={UserDetailsStack} />
         <Stack.Screen name="CompanyDetails" component={CompanyDetailsStack} />

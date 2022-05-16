@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo, useMemo } from 'react';
+import React, { useState, memo, useMemo } from 'react';
 import {
   ListRenderItem,
   FlatList,
@@ -8,7 +8,6 @@ import {
   Text,
 } from 'react-native';
 import isEqual from 'react-fast-compare';
-import SplashScreen from 'react-native-splash-screen';
 import { SlidersHorizontal } from 'phosphor-react-native';
 
 import MainHeader from 'mobile/src/components/main/Header';
@@ -50,10 +49,6 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
 
   const account = userData?.account;
   const postData = data?.posts ?? [];
-
-  useEffect(() => {
-    SplashScreen.hide();
-  }, []);
 
   if (!postData || !account) {
     return (

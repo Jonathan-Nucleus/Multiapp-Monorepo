@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   Keyboard,
@@ -9,7 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useMutation } from '@apollo/client';
 import { NavigationProp } from '@react-navigation/native';
-import SplashScreen from 'react-native-splash-screen';
+import { CommonActions } from '@react-navigation/native';
 
 import PAppContainer from '../../components/common/PAppContainer';
 import PHeader from '../../components/common/PHeader';
@@ -42,13 +42,14 @@ const Login: LoginScreen = ({ navigation }) => {
   const [login] = useMutation(LOGIN);
   const [loginOAuth] = useLoginOAuth();
 
-  useEffect(() => {
-    SplashScreen.hide();
-  }, []);
-
   const saveAuthToken = async (token: string) => {
     await setToken(token);
-    navigation.navigate('Main');
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: 'Main' }],
+      }),
+    );
   };
 
   const handleNextPage = async () => {
@@ -154,7 +155,7 @@ const Login: LoginScreen = ({ navigation }) => {
           btnContainer={styles.btnContainer}
           onPress={handleNextPage}
         />
-        <PTextLine title="LOG IN WITH" containerStyle={styles.bottom} />
+        <PTextLine title="LOG IN WITHH" containerStyle={styles.bottom} />
         <View style={styles.row}>
           <TouchableOpacity style={styles.icon}>
             <AppleSvg />

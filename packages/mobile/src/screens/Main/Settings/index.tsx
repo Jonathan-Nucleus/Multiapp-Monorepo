@@ -19,6 +19,7 @@ import {
   Headset,
   ShieldCheck,
 } from 'phosphor-react-native';
+import { CommonActions } from '@react-navigation/native';
 
 import { GRAY100, WHITE, WHITE12, SUCCESS } from 'shared/src/colors';
 
@@ -122,8 +123,8 @@ const Settings: SettingsScreen = ({ navigation }) => {
 
   const handleLogout = async () => {
     try {
-      navigation.navigate('Auth');
-      await clearToken();
+      clearToken();
+      navigation.replace('Auth');
     } catch (err) {
       console.log('logout err', err);
     }
