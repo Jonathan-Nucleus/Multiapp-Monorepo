@@ -56,7 +56,7 @@ const OwnCommentActionModal: React.FC<OwnCommentActionModalProps> = ({
       });
 
       data?.deleteComment
-        ? showMessage('success', `This comment has been succesfully deleted.`)
+        ? showMessage('success', 'This comment has been successfully deleted.')
         : showMessage('error', SOMETHING_WRONG);
     } catch (err) {
       showMessage('error', SOMETHING_WRONG);

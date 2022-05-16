@@ -55,6 +55,7 @@ const PostItem: React.FC<PostItemProps> = ({ post, onPressLikes }) => {
   const { user, company, body, media } = post;
 
   const [liked, setLiked] = useState(false);
+  const [more, setMore] = useState(false);
   const [likePost] = useLikePost();
   const [createPost] = useCreatePost();
   const { data: { account } = {} } = useAccount({ fetchPolicy: 'cache-only' });
@@ -69,6 +70,13 @@ const PostItem: React.FC<PostItemProps> = ({ post, onPressLikes }) => {
   useEffect(() => {
     account && setLiked(post.likeIds?.includes(account._id) ?? false);
   }, [post, account]);
+
+  useEffect(() => {
+    if (body && body.length > 200) {
+      return setMore(true);
+    }
+    setMore(false);
+  }, [body]);
 
   useEffect(() => {
     return () => {
@@ -196,7 +204,10 @@ const PostItem: React.FC<PostItemProps> = ({ post, onPressLikes }) => {
                 containerStyle={styles.previewContainer}
                 renderLinkPreview={({ previewData }) => (
                   <>
-                    <Text style={styles.body} selectable={true}>
+                    <Text
+                      numberOfLines={more ? 3 : undefined}
+                      style={styles.body}
+                      selectable={true}>
                       {processPost(body).map((split, index) => {
                         if (split.startsWith('$') || split.startsWith('#')) {
                           return (
@@ -263,6 +274,12 @@ const PostItem: React.FC<PostItemProps> = ({ post, onPressLikes }) => {
                 text={body}
               />
             ) : null}
+            {more && (
+              <Pressable onPress={() => setMore(false)}>
+                <Text style={styles.more}>read more...</Text>
+              </Pressable>
+            )}
+
             {media ? <Media media={media} /> : null}
           </View>
           <View style={[styles.postInfo, styles.contentPadding]}>
@@ -451,6 +468,9 @@ const styles = StyleSheet.create({
     marginTop: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  more: {
+    color: PRIMARY,
   },
 });
 
