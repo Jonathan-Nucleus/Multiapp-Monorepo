@@ -6,9 +6,11 @@ import {
   View,
   TouchableOpacity,
   Text,
+  RefreshControl,
 } from 'react-native';
 import isEqual from 'react-fast-compare';
 import { SlidersHorizontal } from 'phosphor-react-native';
+import { UIActivityIndicator } from 'react-native-indicators';
 
 import MainHeader from 'mobile/src/components/main/Header';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
@@ -36,7 +38,7 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
   >(undefined);
   const [selectedRole, setSelectedRole] = useState<PostRoleFilter>('EVERYONE');
   const [visibleFilter, setVisibleFilter] = useState(false);
-
+  const [refreshing, setRefreshing] = useState(false);
   const { data: userData } = useAccount();
   const { data, refetch } = usePosts(selectedCategories, selectedRole);
 
@@ -73,6 +75,11 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
     setSelectedCategories(cateogies.length > 0 ? cateogies : undefined);
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
   return (
     <View style={pStyles.globalContainer}>
       <MainHeader />
@@ -84,13 +91,22 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
           <SlidersHorizontal color={WHITE} size={24} />
         </TouchableOpacity>
       </View>
+      {refreshing && (
+        <View style={styles.refreshIndicator}>
+          <UIActivityIndicator color={WHITE} size={24} />
+        </View>
+      )}
       <FlatList
         contentContainerStyle={styles.container}
         data={postData}
         extraData={account}
         renderItem={renderItem}
         keyExtractor={(item) => item._id}
+        refreshControl={
+          <RefreshControl onRefresh={onRefresh} refreshing={refreshing} />
+        }
       />
+
       <PGradientButton
         label="+"
         btnContainer={styles.postButton}
@@ -115,6 +131,10 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 16,
     paddingHorizontal: 0,
+  },
+  refreshIndicator: {
+    paddingTop: 40,
+    marginBottom: -40,
   },
   tagStyle: {
     paddingHorizontal: 15,

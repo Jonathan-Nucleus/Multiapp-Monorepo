@@ -45,7 +45,9 @@ const UserInfo: React.FC<UserInfoProps> = (props) => {
     audienceInfo,
     showFollow = true,
   } = props;
-  if (!user) return null;
+  if (!user) {
+    return null;
+  }
 
   let userData: User | undefined;
   let companyData: Company | undefined;
@@ -120,10 +122,10 @@ const UserInfo: React.FC<UserInfoProps> = (props) => {
           ) : null}
           {!isSelf && showFollow && (
             <>
-              <View style={styles.separator} />
+              {!isFollowing ? <View style={styles.separator} /> : null}
               <TouchableOpacity onPress={toggleFollow}>
                 <Text style={[styles.smallLabel, styles.follow]}>
-                  {isFollowing ? 'Unfollow' : 'Follow'}
+                  {!isFollowing ? 'Follow' : null}
                 </Text>
               </TouchableOpacity>
             </>
