@@ -8,6 +8,7 @@ import {
   Dimensions,
   TouchableOpacity,
   Linking,
+  Pressable,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { CaretLeft, Pencil } from 'phosphor-react-native';
@@ -18,6 +19,7 @@ import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import PLabel from 'mobile/src/components/common/PLabel';
 import PostItem from 'mobile/src/components/main/PostItem';
 import FeaturedItem from 'mobile/src/components/main/settings/FeaturedItem';
+import FollowModal from 'mobile/src/components/main/FollowModal';
 import Funds from 'mobile/src/components/main/Funds';
 import PGradientOutlineButton from 'mobile/src/components/common/PGradientOutlineButton';
 import ProfilePlaceholder from '../../components/placeholder/ProfilePlaceholder';
@@ -51,6 +53,9 @@ import Avatar from '../../components/common/Avatar';
 const UserProfile: UserProfileScreen = ({ navigation, route }) => {
   const { userId } = route.params;
 
+  const [visibleFollowerModal, setVisibleFollowerModal] = useState(false);
+  const [visibleFollowingModal, setVisibleFollowingModal] = useState(false);
+
   const { data: accountData } = useAccount({ fetchPolicy: 'cache-only' });
   const {
     data: profileData,
@@ -63,7 +68,6 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
   const { isFollowing, toggleFollow } = useFollowUser(userId);
 
   const account = accountData?.account;
-  const following = account?.followingIds?.includes(userId ?? '');
   const funds = fundsData?.userProfile?.managedFunds ?? [];
   const profile = profileData?.userProfile;
   const postData = data?.userProfile?.posts ?? [];
@@ -106,7 +110,9 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
     linkedIn,
     twitter,
     followerIds,
+    followers,
     followingIds,
+    following,
     postIds,
   } = profile;
 
@@ -174,24 +180,37 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
               <PLabel label="PRO" textStyle={styles.proLabel} />
             </View>
           </View>
-          <Text style={styles.comment}>
-            {role}
-            {position ? ` - ${position}` : ''}
+          <Text style={styles.positionInfo}>
+            {/* {role} */}
+            {position ? `${position}` : ''}
           </Text>
           <View style={[styles.row, styles.justifyAround]}>
-            <View style={styles.follow}>
+            <Pressable
+              onPress={() => setVisibleFollowerModal(followers?.length > 0)}
+              style={({ pressed }) => [
+                styles.follow,
+                pressed ? pStyles.pressedStyle : {},
+              ]}>
               <Text style={styles.val}>{followerIds?.length ?? 0}</Text>
               <Text style={styles.comment}>Followers</Text>
-            </View>
-            <View style={styles.follow}>
+            </Pressable>
+            <Pressable
+              onPress={() => setVisibleFollowingModal(following?.length > 0)}
+              style={({ pressed }) => [
+                styles.follow,
+                pressed ? pStyles.pressedStyle : {},
+              ]}>
               <Text style={styles.val}>{followingIds?.length ?? 0}</Text>
               <Text style={styles.comment}>Following</Text>
-            </View>
+            </Pressable>
             <View style={styles.follow}>
               <Text style={styles.val}>{postIds?.length ?? 0}</Text>
               <Text style={styles.comment}>Posts</Text>
             </View>
           </View>
+          {profile.tagline ? (
+            <Text style={styles.tagline}>{profile.tagline}</Text>
+          ) : null}
           <Text style={styles.decription}>{profile.overview}</Text>
           {isMyAccount ? (
             <PGradientOutlineButton
@@ -295,6 +314,16 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
               </View>
             )
           )}
+          <FollowModal
+            onClose={() => {
+              setVisibleFollowerModal(false);
+              setVisibleFollowingModal(false);
+            }}
+            following={following ?? []}
+            followers={followers ?? []}
+            isVisible={visibleFollowerModal || visibleFollowingModal}
+            tab={visibleFollowingModal ? 'following' : 'follower'}
+          />
         </View>
       </PAppContainer>
     </View>
@@ -357,8 +386,17 @@ const styles = StyleSheet.create({
     ...Body3,
     marginLeft: 8,
   },
-  decription: {
+  positionInfo: {
+    color: WHITE,
+    ...Body3,
+  },
+  tagline: {
     marginVertical: 16,
+    color: WHITE,
+    ...Body3,
+  },
+  decription: {
+    marginBottom: 16,
     color: WHITE,
     ...Body3,
   },

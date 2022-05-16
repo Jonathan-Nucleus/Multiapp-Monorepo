@@ -1,23 +1,27 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import {
   ListRenderItem,
   StyleSheet,
   View,
   Text,
-  Dimensions,
   TouchableOpacity,
   FlatList,
   ScrollView,
+  Pressable,
 } from 'react-native';
 import Modal from 'react-native-modal';
-import { AVATAR_URL } from 'react-native-dotenv';
 
 import UserInfo from 'mobile/src/components/common/UserInfo';
 import { Body2Bold } from 'mobile/src/theme/fonts';
+import pStyles from 'mobile/src/theme/pStyles';
 import { WHITE, WHITE60, PRIMARYSTATE, BLACK } from 'shared/src/colors';
+import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
+import { appHeight, appWidth } from 'mobile/src/utils/utils';
+
 import type { UserProfile } from 'backend/graphql/users.graphql';
 
 interface ModalProps {
+  tab?: string;
   isVisible: boolean;
   onClose: () => void;
   following: UserProfile[];
@@ -25,12 +29,17 @@ interface ModalProps {
 }
 
 const FollowModal: FC<ModalProps> = ({
+  tab,
   isVisible,
   followers,
   following,
   onClose,
 }) => {
   const [currentTab, setCurrentTab] = useState('follower');
+
+  useEffect(() => {
+    setCurrentTab(tab || 'follower');
+  }, [tab]);
 
   const members = useMemo(() => {
     if (currentTab === 'follower') {
@@ -39,19 +48,44 @@ const FollowModal: FC<ModalProps> = ({
     return following;
   }, [currentTab, followers, following]);
 
+  const goToProfile = (userId: string) => {
+    NavigationService.navigate('UserDetails', {
+      screen: 'UserProfile',
+      params: {
+        userId,
+      },
+    });
+  };
+
   const renderItem: ListRenderItem<typeof members[number]> = ({ item }) => {
-    return <UserInfo user={item} avatarSize={32} />;
+    return (
+      <Pressable
+        onPress={() => {
+          onClose();
+          setTimeout(() => goToProfile(item._id), 200);
+        }}
+        style={({ pressed }) => (pressed ? pStyles.pressedStyle : {})}>
+        <UserInfo user={item} avatarSize={32} showFollow={false} />
+      </Pressable>
+    );
   };
 
   return (
     <Modal
       isVisible={isVisible}
       swipeDirection="down"
+      animationIn="slideInUp"
+      animationInTiming={400}
+      animationOut="slideOutDown"
+      animationOutTiming={400}
       onBackdropPress={() => onClose()}
       style={styles.bottomHalfModal}
       propagateSwipe={true}
       backdropOpacity={0.5}>
       <View style={styles.modalContent}>
+        <View style={pStyles.modalKnobContainer}>
+          <View style={pStyles.modalKnob} />
+        </View>
         <View style={styles.topTab}>
           <TouchableOpacity onPress={() => setCurrentTab('follower')}>
             <View
@@ -116,7 +150,8 @@ const styles = StyleSheet.create({
     backgroundColor: BLACK,
     padding: 20,
     borderRadius: 32,
-    maxHeight: Dimensions.get('screen').height - 100,
+    maxHeight: appHeight - 100,
+    height: appHeight * 0.6,
   },
   topTab: {
     flexDirection: 'row',
@@ -132,6 +167,8 @@ const styles = StyleSheet.create({
   tab: {
     paddingVertical: 16,
     paddingHorizontal: 25,
+    width: (appWidth - 40) / 2,
+    alignItems: 'center',
   },
   selectedTab: {
     borderBottomColor: PRIMARYSTATE,

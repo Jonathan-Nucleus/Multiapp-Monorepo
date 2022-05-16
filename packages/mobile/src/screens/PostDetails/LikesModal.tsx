@@ -6,6 +6,7 @@ import {
   Dimensions,
   FlatList,
   ScrollView,
+  Pressable,
 } from 'react-native';
 import Modal from 'react-native-modal';
 
@@ -14,6 +15,7 @@ import PLabel from 'mobile/src/components/common/PLabel';
 import { BLACK, WHITE12 } from 'shared/src/colors';
 import { Body1Bold } from 'mobile/src/theme/fonts';
 import pStyles from '../../theme/pStyles';
+import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 
 import type { Like } from 'shared/graphql/query/post/usePost';
 
@@ -24,8 +26,26 @@ interface ModalProps {
 }
 
 const LikesModal: FC<ModalProps> = ({ isVisible, likes, onClose }) => {
+  const goToProfile = (userId: string) => {
+    NavigationService.navigate('UserDetails', {
+      screen: 'UserProfile',
+      params: {
+        userId,
+      },
+    });
+  };
+
   const renderItem: ListRenderItem<Like> = ({ item: user }) => {
-    return <UserInfo user={user} avatarSize={32} />;
+    return (
+      <Pressable
+        onPress={() => {
+          onClose();
+          setTimeout(() => goToProfile(user._id), 200);
+        }}
+        style={({ pressed }) => (pressed ? pStyles.pressedStyle : {})}>
+        <UserInfo user={user} avatarSize={32} showFollow={false} />
+      </Pressable>
+    );
   };
 
   return (
