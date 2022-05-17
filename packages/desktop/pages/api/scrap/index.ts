@@ -4,7 +4,14 @@ import metascraperLogoFavIcon from "metascraper-logo-favicon";
 import metascraperTitle from "metascraper-title";
 import metascraperImage from "metascraper-image";
 
-const api = async (req: NextApiRequest, res: NextApiResponse) => {
+export type SiteMetadata = {
+  logo?: string;
+  title?: string;
+  image?: string;
+  error?: string;
+}
+
+const api = async (req: NextApiRequest, res: NextApiResponse<SiteMetadata>) => {
   const body = JSON.parse(req.body);
   const { url } = body as Record<string, string>;
   try {
@@ -16,9 +23,9 @@ const api = async (req: NextApiRequest, res: NextApiResponse) => {
       metascraperImage(),
     ]);
     const metadata = await metascraper({ html, url });
-    res.status(200).json(metadata);
-  } catch ({ message }) {
-    res.status(200).json({ error: message });
+    res.status(200).json(metadata as SiteMetadata);
+  } catch (error) {
+    res.status(200).json({ error: JSON.stringify(error) });
   }
 };
 

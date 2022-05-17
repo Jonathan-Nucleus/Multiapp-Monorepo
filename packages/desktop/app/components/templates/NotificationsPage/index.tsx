@@ -3,19 +3,21 @@ import { Gear, Checks, DotsThreeOutlineVertical } from "phosphor-react";
 import { Menu } from "@headlessui/react";
 
 import Button from "../../common/Button";
-import NotificationDetail from "./Notification";
-import { useNotifications } from "shared/graphql/query/notification/useNotifications";
+import NotificationItem from "./NotificationItem";
+import {
+  useNotifications,
+} from "shared/graphql/query/notification/useNotifications";
 import {
   useReadNotification,
   useReadNotifications,
 } from "shared/graphql/mutation/notification";
+import Card from "../../common/Card";
 
 const NotificationPage: FC = () => {
   const { data } = useNotifications();
   const [readNotification] = useReadNotification();
   const [readNotifications] = useReadNotifications();
   const notifications = data?.notifications ?? [];
-
   const handleReadNotification = async (id?: string) => {
     try {
       await readNotification({
@@ -27,7 +29,6 @@ const NotificationPage: FC = () => {
       console.log(err);
     }
   };
-
   const handleReadAllNotifications = async () => {
     try {
       await readNotifications();
@@ -37,58 +38,69 @@ const NotificationPage: FC = () => {
   };
 
   return (
-    <div className="w-full max-w-4xl m-auto mt-8">
-      <div className="flex items-center justify-between mb-4 p-2 md:p-0">
-        <div className="text-lg">Notifications</div>
+    <div className="max-w-2xl m-auto mt-8">
+      <div className="flex items-center justify-between mb-4 px-2 md:p-0">
+        <div className="text-2xl">Notifications</div>
         <Button
           variant="text"
-          className="flex items-center  hidden md:flex"
+          className="flex items-center text-sm text-primary font-medium tracking-wider hidden md:flex"
           onClick={() => handleReadAllNotifications()}
         >
-          <Checks size={24} color="#00AAE0" weight="fill" />
-          <span className="ml-4">Mark all as read</span>
+          <Checks size={24} color="currentColor" weight="fill" />
+          <span className="ml-2">Mark all as read</span>
         </Button>
-        <Button variant="text" className="flex items-center hidden md:flex">
-          <Gear size={24} color="#00AAE0" weight="fill" />
-          <span className="ml-4">Notification settings</span>
+        <Button
+          variant="text"
+          className="flex items-center text-sm text-primary font-medium tracking-wider hidden md:flex"
+        >
+          <Gear size={24} color="currentColor" weight="fill" />
+          <span className="ml-2">Notification settings</span>
         </Button>
-        <div className="flex items-center  block md:hidden">
+        <div className="flex md:hidden items-center">
           <Menu as="div" className="relative">
             <Menu.Button>
-              <DotsThreeOutlineVertical size={24} />
+              <DotsThreeOutlineVertical
+                size={24}
+                weight="fill"
+                className="opacity-60"
+              />
             </Menu.Button>
-            <Menu.Items className="z-10	absolute right-0 w-64 bg-surface-light10 shadow-md shadow-black rounded">
-              <div className="divide-y border-white/[.12] divide-inherit pb-2">
-                <div className="flex items-center p-4">
-                  <Button
-                    variant="text"
-                    className="py-0"
+            <Menu.Items className="z-20	absolute right-0 w-64 bg-background-popover shadow-md shadow-black rounded overflow-hidden">
+              <div className="py-2">
+                <Menu.Item>
+                  <div
+                    className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
                     onClick={() => handleReadAllNotifications()}
                   >
-                    <Checks size={24} color="#00AAE0" weight="fill" />
-                    <span className="ml-4">Mark all as read</span>
-                  </Button>
-                </div>
-                <div className="flex items-center p-4">
-                  <Button variant="text" className="py-0">
-                    <Gear size={24} color="#00AAE0" weight="fill" />
-                    <span className="ml-4">Notification settings</span>
-                  </Button>
-                </div>
+                    <Checks size={24} color="currentColor" weight="fill" />
+                    <span className="ml-2">Mark all as read</span>
+                  </div>
+                </Menu.Item>
+                <Menu.Item>
+                  <div
+                    className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
+                    onClick={() => {}}
+                  >
+                    <Gear size={24} color="currentColor" weight="fill" />
+                    <span className="ml-2">Notification settings</span>
+                  </div>
+                </Menu.Item>
               </div>
             </Menu.Items>
           </Menu>
         </div>
       </div>
-      <div className="w-full rounded-sm bg-purple divide-y divide-gray-800 rounded-xl border-background-card py-6 bg-background-card">
-        {notifications.map((v) => (
-          <NotificationDetail
-            notification={v}
-            key={v._id}
-            handleReadNotification={(id) => handleReadNotification(id)}
-          />
-        ))}
-      </div>
+      <Card className="bg-background-cardDark border-none rounded-none sm:rounded-2xl mb-8 px-0 py-4">
+        <div className="divide-y divide-inherit border-white/[.12]">
+          {notifications.map((notification) => (
+            <NotificationItem
+              notification={notification}
+              key={notification._id}
+              handleReadNotification={(id) => handleReadNotification(id)}
+            />
+          ))}
+        </div>
+      </Card>
     </div>
   );
 };

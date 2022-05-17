@@ -1,15 +1,21 @@
 import { FC, PropsWithChildren } from "react";
 import Header from "./Header";
+import Container from "../Container";
 
-type MainLayoutProps = PropsWithChildren<unknown>;
+type MainLayoutProps = PropsWithChildren<unknown> & {
+  fluid?: boolean;
+};
 
-const MainLayout: FC<MainLayoutProps> = ({ children }) => {
+const MainLayout: FC<MainLayoutProps> = ({
+  fluid,
+  children,
+}: MainLayoutProps) => {
   return (
     <div>
       <Header />
-      <div className="max-w-screen-2xl mx-auto">
+      <Container fluid={fluid}>
         {children}
-      </div>
+      </Container>
     </div>
   );
 };

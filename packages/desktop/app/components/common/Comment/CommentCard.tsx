@@ -38,7 +38,7 @@ const CommentCard: FC<CommentCardProps> = ({
   const [commentPost] = useCommentPost();
   const [isEditable, setIsEditable] = useState(false);
   const [liked, setLiked] = useState(
-    (account && comment.likeIds?.includes(account._id)) ?? false
+    (account && comment.likeIds?.includes(account._id)) ?? false,
   );
   const [visibleReply, setVisibleReply] = useState(false);
 
@@ -65,10 +65,9 @@ const CommentCard: FC<CommentCardProps> = ({
 
   const handleEditComment = async (
     message: string,
-    mediaUrl?: string
+    mediaUrl?: string,
   ): Promise<void> => {
     if ((!message || message.trim() === "") && !mediaUrl) return;
-
     try {
       const { data } = await editComment({
         variables: {
@@ -80,22 +79,19 @@ const CommentCard: FC<CommentCardProps> = ({
           },
         },
       });
-
       if (data?.editComment) {
         setIsEditable(false);
       }
     } catch (err) {
-      console.log("send mesage error", err);
     }
   };
   const handleReplyComment = async (
     reply: string,
-    mediaUrl?: string
+    mediaUrl?: string,
   ): Promise<void> => {
     if ((!reply || reply.trim() === "") && !mediaUrl) return;
     try {
       setVisibleReply(false);
-
       await commentPost({
         variables: {
           comment: {
@@ -108,7 +104,6 @@ const CommentCard: FC<CommentCardProps> = ({
         },
       });
     } catch (err) {
-      console.log("send mesage error", err);
     }
   };
   return (
@@ -136,37 +131,28 @@ const CommentCard: FC<CommentCardProps> = ({
                   <Menu as="div" className="relative">
                     <Menu.Button>
                       <DotsThreeOutlineVertical
-                        size={18}
+                        size={16}
+                        weight="fill"
                         className="opacity-60"
                       />
                     </Menu.Button>
-                    <Menu.Items
-                      className={`z-10	absolute right-0 w-32 bg-surface-light10 shadow-md shadow-black rounded`}
-                    >
-                      <Menu.Item>
-                        <div className="divide-y border-white/[.12] divide-inherit pb-2">
-                          <div className="flex items-center p-2">
-                            <Button
-                              variant="text"
-                              className="py-0"
-                              onClick={handleDeleteComment}
-                            >
-                              <Trash size={18} />
-                              <span className="ml-4">Delete</span>
-                            </Button>
-                          </div>
-                          <div className="flex items-center p-2">
-                            <Button
-                              variant="text"
-                              className="py-0"
-                              onClick={() => setIsEditable(true)}
-                            >
-                              <Pen size={18} color="#00AAE0" />
-                              <span className="ml-4">Edit</span>
-                            </Button>
-                          </div>
+                    <Menu.Items className="z-10 absolute right-0 w-48 bg-background-popover shadow-md shadow-black rounded">
+                      <div className="py-2">
+                        <div
+                          className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
+                          onClick={handleDeleteComment}
+                        >
+                          <Trash size={16} />
+                          <span className="text-sm ml-3">Delete</span>
                         </div>
-                      </Menu.Item>
+                        <div
+                          className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
+                          onClick={() => setIsEditable(true)}
+                        >
+                          <Pen size={18} color="currentColor" />
+                          <span className="text-sm ml-3">Edit</span>
+                        </div>
+                      </div>
                     </Menu.Items>
                   </Menu>
                 </div>

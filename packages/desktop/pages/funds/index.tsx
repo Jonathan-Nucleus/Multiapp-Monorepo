@@ -15,7 +15,7 @@ const Funds: NextPageWithLayout = () => {
   );
 };
 
-Funds.layout = "main";
+Funds.layout = "main-fluid";
 Funds.middleware = "auth";
 
 export default Funds;

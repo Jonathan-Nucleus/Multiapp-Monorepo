@@ -16,7 +16,7 @@ function videoType(src: string): VideoType | null {
 const Media: FC<MediaProps> = ({ media }) => {
   const type = videoType(media.url);
   return type ? (
-    <video controls>
+    <video controls className="w-full">
       <source
         src={`${process.env.NEXT_PUBLIC_POST_URL}/${media.url}`}
         type={type}

@@ -59,10 +59,14 @@ const FundCard: FC<FundCardProps> = ({
           <div className="flex flex-col flex-grow px-5">
             <div className="flex">
               {showImages && (
-                <div className="w-24 h-24 rounded-b relative overflow-hidden mr-4">
+                <div className="w-24 h-24 flex-shrink-0 mr-4">
                   <Link href={`/company/${fund.company._id}`}>
                     <a>
-                      <Avatar user={fund.company} shape="square" size={96} />
+                      <Avatar
+                        user={fund.company}
+                        className="rounded-t-none rounded-b shadow-none"
+                        size={96}
+                      />
                     </a>
                   </Link>
                 </div>
@@ -89,17 +93,17 @@ const FundCard: FC<FundCardProps> = ({
             {fund.highlights && (
               <div className="min-h-0 flex-grow text-sm text-white py-3 flex">
                 <ul className="self-center list-disc ml-4">
-                  {fund.highlights.map((highlight) => (
-                    <li key={highlight}>{highlight}</li>
+                  {fund.highlights.map((highlight, index) => (
+                    <li key={index}>{highlight}</li>
                   ))}
                 </ul>
               </div>
             )}
 
             <div className="flex flex-wrap -mx-1 py-2">
-              {fund.tags.map((tag) => (
+              {fund.tags.map((tag, index) => (
                 <div
-                  key={tag}
+                  key={index}
                   className={`bg-white/[.12] text-xs text-white font-medium
                     rounded-full uppercase m-1 px-3 py-1 tracking-widest`}
                 >
@@ -218,7 +222,7 @@ const FundCard: FC<FundCardProps> = ({
               </div>
             </div>
             <div className="w-64 text-right p-2 flex align-center justify-end">
-              <Button variant="text">
+              <Button variant="text" className="hidden">
                 <Share color="white" weight="light" size={20} />
               </Button>
               <Button variant="text" className="ml-2" onClick={toggleWatch}>
@@ -271,9 +275,9 @@ const FundCard: FC<FundCardProps> = ({
           </Link>
           <div className="text-sm text-white py-3">{fund.overview}</div>
           <div className="flex flex-wrap -mx-1 py-2">
-            {fund.tags.map((tag) => (
+            {fund.tags.map((tag, index) => (
               <div
-                key={tag}
+                key={index}
                 className="bg-white/[.12] text-xs text-white font-medium rounded-full uppercase m-1 px-3 py-1"
               >
                 {tag}
@@ -380,7 +384,7 @@ const FundCard: FC<FundCardProps> = ({
                 </Button>
               </a>
             </Link>
-            <Button variant="text" className="ml-3">
+            <Button variant="text" className="hidden ml-3">
               <Share color="white" weight="light" size={20} />
             </Button>
             <Button variant="text" className="ml-3" onClick={toggleWatch}>

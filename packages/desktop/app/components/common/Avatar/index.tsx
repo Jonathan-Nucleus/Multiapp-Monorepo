@@ -5,6 +5,7 @@ import { CompanySummary } from "shared/graphql/fragments/company";
 
 type User = Pick<UserSummary, "firstName" | "lastName" | "avatar">;
 type Company = Pick<CompanySummary, "name" | "avatar">;
+
 interface AvatarProps extends HTMLProps<HTMLDivElement> {
   user?: User | Company;
   size?: number;
@@ -17,14 +18,9 @@ const Avatar: FC<AvatarProps> = ({
   shape = "circle",
   ...divProps
 }: AvatarProps) => {
-  if (!user) {
-    // TODO: return skeleton
-    return null;
-  }
-
   let initials = "";
-  const { avatar } = user;
-  if (!avatar) {
+  const avatar = user?.avatar;
+  if (!avatar && user) {
     initials =
       "firstName" in user
         ? user.firstName.charAt(0) + user.lastName.charAt(0)
@@ -38,7 +34,7 @@ const Avatar: FC<AvatarProps> = ({
           flex-shrink-0 relative shadow
           ${shape === "circle" ? "rounded-full" : "rounded-lg"}
           ${divProps.className ?? ""}
-          ${!avatar ? "bg-gray-200" : ""}
+          ${!avatar ? "bg-gray-200" : "bg-background"}
           overflow-hidden
         `}
       style={{ width: `${size}px`, height: `${size}px` }}

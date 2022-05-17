@@ -6,6 +6,7 @@ import { useFunds } from "shared/graphql/query/marketplace/useFunds";
 import FundsList from "./FundsList";
 import { useAccount } from "shared/graphql/query/account/useAccount";
 import AccreditationQuestionnaire from "../AccreditationQuestionnaire";
+import Container from "../../../layouts/Container";
 
 const FundsPage: FC = () => {
   const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
@@ -14,16 +15,13 @@ const FundsPage: FC = () => {
   return (
     <>
       <Navbar />
-      <div className="container mx-auto my-6 max-w-screen-xl lg:px-4">
+      <Container className="my-6">
         <div className={!funds ? "invisible" : ""}>
           <header className="flex items-center px-4 lg:px-0">
             <h1 className="text-2xl text-white">Browse by Fund</h1>
             <div className="text-xs text-white opacity-60 ml-2 mt-2">
               {funds?.length ?? 0} Funds
             </div>
-            <Button variant="text" className="text-gray-600 ml-auto">
-              <Info color="currentColor" weight="light" size={24} />
-            </Button>
           </header>
         </div>
         <div className="my-9">
@@ -64,7 +62,7 @@ const FundsPage: FC = () => {
             <span className="ml-2">Disclosure</span>
           </Button>
         </footer>
-      </div>
+      </Container>
     </>
   );
 };

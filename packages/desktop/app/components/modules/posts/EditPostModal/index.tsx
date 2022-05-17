@@ -44,6 +44,9 @@ import { PostSummary } from "shared/graphql/fragments/post";
 import { useEditPost } from "shared/graphql/mutation/posts/useEditPost";
 import ModalDialog from "../../../common/ModalDialog";
 import { useAccount } from "shared/graphql/query/account/useAccount";
+import { LINK_PATTERN } from "shared/src/patterns";
+import LinkPreview from "../LinkPreview";
+import _ from "lodash";
 
 const audienceOptions = [
   {
@@ -134,9 +137,7 @@ interface EditPostModalProps {
 
 const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
   const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
-  const [userOptions, setUserOptions] = useState<
-    DropdownProps["items"][number][]
-  >([]);
+  const [userOptions, setUserOptions] = useState<DropdownProps["items"][number][]>([]);
   const selectedFile = useRef<File | undefined>(undefined);
   const [localFileUrl, setLocalFileUrl] = useState<string | null>(null);
   const [showCategories, setShowCategories] = useState(!!post);
@@ -145,12 +146,30 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
   const [fetchUploadLink] = useFetchUploadLink();
   const [loading, setLoading] = useState(false);
   const [visibleEmoji, setVisibleEmoji] = useState(false);
+  const [linkPreview, setLinkPreview] = useState<string>();
+  const changeCallback = useRef(_.debounce((body: string | undefined) => {
+    if (!body) {
+      setLinkPreview(undefined);
+      return;
+    }
+    const result = body.matchAll(LINK_PATTERN);
+    const matches = Array.from(result);
+    if (matches.length > 0) {
+      const link = matches[0][0];
+      if (link != linkPreview) {
+        setLinkPreview(link);
+      }
+    } else {
+      setLinkPreview(undefined);
+    }
+  }, 500)).current;
   const {
     handleSubmit,
     control,
     reset,
     getValues,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<yup.InferType<typeof schema>>({
     resolver: yupResolver(schema),
@@ -181,12 +200,12 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
             mentionInput: {
               body: post.body,
             },
-          }) as DefaultValues<FormValues>
+          }) as DefaultValues<FormValues>,
         );
         setLocalFileUrl(
           post.media
             ? `${process.env.NEXT_PUBLIC_POST_URL}/${post.media.url}`
-            : null
+            : null,
         );
       } else {
         reset(schema.cast({ user: account._id }) as DefaultValues<FormValues>);
@@ -199,6 +218,15 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
     setValue("mentionInput.body", body + emojiObject.native);
     setVisibleEmoji(false);
   };
+
+  useEffect(() => {
+    const subscription = watch(({ mentionInput, media }, { name }) => {
+      if (name == "mentionInput.body" && !media) {
+        changeCallback(mentionInput?.body);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [changeCallback, watch]);
 
   const onSubmit: SubmitHandler<FormValues> = async ({
     user,
@@ -308,11 +336,16 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
                   />
                 </div>
               </div>
-              <div className="mx-4 mt-2 caret-primary min-h-[100px] flex-grow">
+              <div className="mx-4 mt-2 caret-primary min-h-0 flex-grow">
                 <MentionTextarea control={control} name="mentionInput" />
               </div>
-              <div className="my-2">
-                {localFileUrl && (
+              {linkPreview &&
+                <div className="mx-4 my-2">
+                  <LinkPreview link={linkPreview} size="sm" />
+                </div>
+              }
+              {localFileUrl && (
+                <div className="my-2">
                   <div className="relative px-4">
                     <div className="h-64 relative">
                       <Image
@@ -346,9 +379,9 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
                       <XCircle size={32} color="#5F5F5F" weight="fill" />
                     </Button>
                   </div>
-                )}
-              </div>
-              <div className="mx-4 mt-2 mb-2">
+                </div>
+              )}
+              <div className="mx-4 my-2">
                 <div className="flex items-center">
                   <Controller
                     control={control}

@@ -111,8 +111,12 @@ const ProfileCard: FC<ProfileCardProps> = ({
                     {user.firstName} {user.lastName}
                   </div>
                   <div className="text-sm text-white">{user.position}</div>
-                  <div className="text-sm text-primary">
-                    {user.company?.name}
+                  <div>
+                    <Link href={`/company/${user.company?._id}`}>
+                      <a className="text-sm text-primary">
+                        {user.company?.name}
+                      </a>
+                    </Link>
                   </div>
                 </div>
                 {!isMyProfile && (
@@ -203,8 +207,12 @@ const ProfileCard: FC<ProfileCardProps> = ({
                 <div className="text-sm text-white opacity-60">
                   {user.position}
                 </div>
-                <div className="text-sm text-white opacity-60">
-                  {user.company?.name}
+                <div>
+                  <Link href={`/company/${user.company?._id}`}>
+                    <a className="text-sm text-primary">
+                      {user.company?.name}
+                    </a>
+                  </Link>
                 </div>
               </div>
               {isEditable && isMyProfile && (
@@ -325,7 +333,7 @@ const ProfileCard: FC<ProfileCardProps> = ({
                 <Link href={user.website ?? "/"}>
                   <a className="flex items-center text-white" target="_blank">
                     <Image src={Globe} alt="" layout={"intrinsic"} />
-                    <div className="text-sm text-primary ml-2">Website</div>
+                    <div className="text-sm text-primary ml-1">Website</div>
                   </a>
                 </Link>
               </div>
@@ -334,49 +342,51 @@ const ProfileCard: FC<ProfileCardProps> = ({
                   <Menu.Button>
                     <div className="flex items-center">
                       <DotsThreeOutlineVertical
-                        color="#808080"
+                        color="currentColor"
                         size={24}
                         weight="fill"
+                        className="text-white opacity-60"
                       />
                     </div>
                   </Menu.Button>
-                  <Menu.Items className="z-10	absolute right-0 w-64 bg-surface-light10 shadow-md shadow-black rounded">
-                    <Menu.Item>
-                      <div className="divide-y border-white/[.12] divide-inherit pb-2">
-                        <div
-                          className="flex items-center text-sm text-white cursor-pointer p-4"
-                          onClick={() => {
-                            setFollowersModalTab(0);
-                            setVisible(true);
-                          }}
-                        >
-                          <Users color="currentColor" size={24} />
-                          <span className="ml-4">View All Followers</span>
-                        </div>
-                        {!isMyProfile && (
-                          <>
-                            <div
-                              className="flex items-center text-sm text-white cursor-pointer p-4"
-                              onClick={() => setShowHideUser(true)}
-                            >
-                              <MinusCircle color="currentColor" size={24} />
-                              <span className="ml-4">Hide User</span>
-                            </div>
-                            <div className="flex items-center text-sm text-white cursor-pointer p-4">
-                              <WarningCircle color="currentColor" size={24} />
-                              <span className="ml-4">Report Profile</span>
-                            </div>
-                          </>
-                        )}
-                        <div
-                          className="flex items-center text-sm text-white cursor-pointer p-4"
-                          onClick={() => copyProfileLink()}
-                        >
-                          <Copy color="currentColor" size={24} />
-                          <span className="ml-4">Copy Profile Link</span>
-                        </div>
+                  <Menu.Items className="z-10	absolute right-0 w-64 bg-background-popover shadow-md shadow-black rounded">
+                    <div className="py-2">
+                      <div
+                        className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
+                        onClick={() => {
+                          setFollowersModalTab(0);
+                          setVisible(true);
+                        }}
+                      >
+                        <Users color="currentColor" size={24} />
+                        <span className="ml-4">View All Followers</span>
                       </div>
-                    </Menu.Item>
+                      {!isMyProfile && (
+                        <>
+                          <div
+                            className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
+                            onClick={() => setShowHideUser(true)}
+                          >
+                            <MinusCircle color="currentColor" size={24} />
+                            <span className="ml-4">Hide User</span>
+                          </div>
+                          <div
+                            className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
+                            onClick={() => {}}
+                          >
+                            <WarningCircle color="currentColor" size={24} />
+                            <span className="ml-4">Report Profile</span>
+                          </div>
+                        </>
+                      )}
+                      <div
+                        className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
+                        onClick={() => copyProfileLink()}
+                      >
+                        <Copy color="currentColor" size={24} />
+                        <span className="ml-4">Copy Profile Link</span>
+                      </div>
+                    </div>
                   </Menu.Items>
                 </Menu>
               </div>

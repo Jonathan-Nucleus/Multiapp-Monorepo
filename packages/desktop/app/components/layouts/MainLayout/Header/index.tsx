@@ -16,9 +16,12 @@ import NavItem from "./NavItem";
 import Sidebar from "./Sidebar";
 import AvatarMenu from "./AvatarMenu";
 import Avatar from "../../../common/Avatar";
-import SearchInput from "../../../common/SearchInput";
 import { useAccount } from "shared/graphql/query/account/useAccount";
-import { useNotifications } from "shared/graphql/query/notification/useNotifications";
+import {
+  useNotifications,
+} from "shared/graphql/query/notification/useNotifications";
+import SearchView from "./SearchView";
+import Container from "../../Container";
 
 const navItems = [
   {
@@ -46,72 +49,64 @@ const Header: FC = () => {
   const { data: { notifications = [] } = {} } = useNotifications();
 
   return (
-    <header className="bg-surface-light10 shadow shadow-black sticky top-0 z-20">
-      <nav className="hidden md:flex flex-row items-center p-5">
-        <div>
-          <div className="w-80 hidden lg:block mr-5">
-            <Link href="/">
-              <a className="flex items-center">
-                <Image src={Logo} alt="" layout={"intrinsic"} />
-              </a>
-            </Link>
-          </div>
-        </div>
-        <div className="flex flex-row items-center">
-          {navItems.map((item) => (
-            <div key={item.path} className="mx-3">
-              <NavItem
-                icon={item.icon}
-                title={item.title}
-                path={item.path}
-                activePath={item.active}
-              />
+    <header className="bg-surface-light10 shadow sticky top-0 z-20">
+      <Container>
+        <nav className="hidden md:flex flex-row items-center py-5">
+          <div>
+            <div className="w-80 hidden lg:block mr-5">
+              <Link href="/">
+                <a className="flex items-center">
+                  <Image src={Logo} alt="" layout={"intrinsic"} />
+                </a>
+              </Link>
             </div>
-          ))}
-        </div>
-        <div className="ml-auto flex flex-row items-center">
-          <div className="relative">
-            <SearchInput
-              className="leading-5 rounded-3xl bg-black text-white px-5 w-72 pr-10"
-              placeholder="Search"
-            />
-            <MagnifyingGlass
-              color="grey"
-              size={16}
-              className="absolute right-5 top-0 h-full"
-            />
           </div>
-          <Link href="/messages">
-            <a className="relative ml-8">
-              <ChatCircleDots color="white" size={24} />
-              <span
-                className={`bg-error-light rounded-full w-4 h-4 text-tiny
-                  text-white absolute -top-1.5 -right-1.5 flex items-center
-                  justify-center font-medium`}
-              >
-                1
-              </span>
-            </a>
-          </Link>
-          <Link href="/notifications">
-            <a className="relative ml-4">
-              <Bell color="white" size={24} />
-              {notifications.filter((v) => v.isNew).length > 0 && (
+          <div className="flex flex-row items-center">
+            {navItems.map((item) => (
+              <div key={item.path} className="mx-3">
+                <NavItem
+                  icon={item.icon}
+                  title={item.title}
+                  path={item.path}
+                  activePath={item.active}
+                />
+              </div>
+            ))}
+          </div>
+          <div className="ml-auto flex flex-row items-center">
+            <SearchView />
+            <Link href="/messages">
+              <a className="relative ml-8">
+                <ChatCircleDots color="white" size={24} />
                 <span
                   className={`bg-error-light rounded-full w-4 h-4 text-tiny
+                  text-white absolute -top-1.5 -right-1.5 flex items-center
+                  justify-center font-medium`}
+                >
+                1
+              </span>
+              </a>
+            </Link>
+            <Link href="/notifications">
+              <a className="relative ml-4">
+                <Bell color="white" size={24} />
+                {notifications.filter((v) => v.isNew).length > 0 && (
+                  <span
+                    className={`bg-error-light rounded-full w-4 h-4 text-tiny
                     text-white absolute -top-1.5 -right-1.5 flex items-center
                     justify-center font-medium`}
-                >
+                  >
                   {notifications.filter((v) => v.isNew).length}
                 </span>
-              )}
-            </a>
-          </Link>
-          <div className="ml-6">
-            <AvatarMenu account={account} />
+                )}
+              </a>
+            </Link>
+            <div className="ml-6">
+              <AvatarMenu account={account} />
+            </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      </Container>
       <nav className="p-5 md:hidden flex items-center justify-between">
         <div
           className="flex flex-row items-center cursor-pointer"

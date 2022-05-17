@@ -90,14 +90,12 @@ const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
   return (
     <>
       <Popover as="div" className="relative">
-        <Popover.Button>
-          <div className="flex flex-row items-center cursor-pointer">
-            <div className="w-8 h-8 flex items-center justify-center">
-              <Avatar user={account} size={32} />
-            </div>
-            <div className="ml-2">
-              <CaretDown color="white" weight="bold" size={16} />
-            </div>
+        <Popover.Button className="flex items-center">
+          <div className="w-8 h-8">
+            <Avatar user={account} size={32} />
+          </div>
+          <div className="ml-2">
+            <CaretDown color="white" weight="bold" size={16} />
           </div>
         </Popover.Button>
         <Transition

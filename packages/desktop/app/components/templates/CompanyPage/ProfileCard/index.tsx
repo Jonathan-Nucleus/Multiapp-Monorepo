@@ -337,29 +337,37 @@ const ProfileCard: FC<CompanyPageProps> = ({
                   <Menu.Button>
                     <div className="flex items-center">
                       <DotsThreeOutlineVertical
-                        color="#808080"
+                        color="currentColor"
                         size={24}
                         weight="fill"
+                        className="text-white opacity-60"
                       />
                     </div>
                   </Menu.Button>
-                  <Menu.Items className="z-10	absolute right-0 w-44 bg-surface-light10 shadow-md shadow-black rounded">
-                    <Menu.Item>
-                      <div className="divide-y border-white/[.12] divide-inherit py-2">
-                        <div className="flex items-center text-sm text-white cursor-pointer px-2.5 py-1.5">
-                          <Chats color="currentColor" size={24} />
-                          <span className="ml-4">Message</span>
-                        </div>
-                        <div className="flex items-center text-sm text-white cursor-pointer px-2.5 py-1.5">
-                          <Share color="currentColor" size={24} />
-                          <span className="ml-4">Share</span>
-                        </div>
-                        <div className="flex items-center text-sm text-white cursor-pointer px-2.5 py-1.5">
-                          <Copy color="currentColor" size={24} />
-                          <span className="ml-4">Copy Link</span>
-                        </div>
+                  <Menu.Items className="z-10	absolute right-0 w-48 bg-background-popover shadow-md shadow-black rounded">
+                    <div className="py-2">
+                      <div
+                        className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
+                        onClick={() => {}}
+                      >
+                        <Chats color="currentColor" size={24} />
+                        <span className="ml-4">Message</span>
                       </div>
-                    </Menu.Item>
+                      <div
+                        className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
+                        onClick={() => {}}
+                      >
+                        <Share color="currentColor" size={24} />
+                        <span className="ml-4">Share</span>
+                      </div>
+                      <div
+                        className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
+                        onClick={() => {}}
+                      >
+                        <Copy color="currentColor" size={24} />
+                        <span className="ml-4">Copy Link</span>
+                      </div>
+                    </div>
                   </Menu.Items>
                 </Menu>
               </div>

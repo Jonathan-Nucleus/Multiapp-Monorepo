@@ -4,24 +4,21 @@ import Avatar from "../../../common/Avatar";
 import Card from "../../../common/Card";
 import Button from "../../../common/Button";
 import Link from "next/link";
-import { UserProfile } from "shared/graphql/query/user/useProfile";
 import Skeleton from "./Skeleton";
+import { UserProfileProps } from "../../../../types/common-props";
+import { useWatchFund } from "shared/graphql/mutation/funds/useWatchFund";
 
-interface WatchProps {
-  id: string;
-  name: string;
-}
-interface WatchListProps {
-  user: UserProfile | undefined;
-  setWatchItem: (val: WatchProps) => void;
-  handleToggleWatchList: (id: string, watch: boolean) => void;
-}
-
-const Watchlist: FC<WatchListProps> = ({
-  user,
-  setWatchItem,
-  handleToggleWatchList,
-}) => {
+const Watchlist: FC<UserProfileProps> = ({ user }) => {
+  const [watchFund] = useWatchFund();
+  const handleRemoveWatchList = async (id: string) => {
+    try {
+      await watchFund({
+        variables: { watch: false, fundId: id },
+        refetchQueries: ["Account"],
+      });
+    } catch (err) {
+    }
+  };
   if (!user) {
     return <Skeleton />;
   }
@@ -55,13 +52,7 @@ const Watchlist: FC<WatchListProps> = ({
             <Button
               variant="text"
               className={"text-primary-medium"}
-              onClick={() => {
-                setWatchItem({
-                  id: item._id,
-                  name: item.name,
-                });
-                handleToggleWatchList(item._id, false);
-              }}
+              onClick={() => handleRemoveWatchList(item._id)}
             >
               <Star color="currentColor" weight={"fill"} size={16} />
             </Button>

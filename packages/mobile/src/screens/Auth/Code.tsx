@@ -7,8 +7,6 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { NavigationProp } from '@react-navigation/native';
-import { useApolloClient } from '@apollo/client';
 
 import PAppContainer from '../../components/common/PAppContainer';
 import PHeader from '../../components/common/PHeader';
@@ -18,26 +16,22 @@ import ErrorText from '../../components/common/ErrorTxt';
 import { BLACK, PRIMARY, WHITE } from 'shared/src/colors';
 import PGradientButton from '../../components/common/PGradientButton';
 import { Body2 } from '../../theme/fonts';
-import PTextLine from '../../components/common/PTextLine';
 import LogoSvg from '../../assets/icons/logo.svg';
-import { VERIFY_INVITE } from 'shared/graphql/query/auth';
 
 import type { CodeScreen } from 'mobile/src/navigations/AuthStack';
+import { useVerifyInviteLazy } from 'shared/graphql/query/auth/useVerifyInvite';
 
 const CodeView: CodeScreen = ({ navigation }) => {
   const [code, setCode] = useState('');
   const [error, setError] = useState(false);
-  const client = useApolloClient();
+  const [verifyInvite] = useVerifyInviteLazy();
 
   const handleVerifyCode = async () => {
     Keyboard.dismiss();
     setError(false);
     try {
-      const { data } = await client.query({
-        query: VERIFY_INVITE,
-        variables: { code },
-      });
-      if (data.verifyInvite) {
+      const { data } = await verifyInvite({ variables: { code } });
+      if (data?.verifyInvite) {
         navigation.navigate('Signup', { code });
         return;
       }

@@ -6,6 +6,7 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useVerifyInviteLazy } from "shared/graphql/query/auth/useVerifyInvite";
+import Link from "next/link";
 
 type FormValues = { code: string };
 const schema = yup
@@ -58,16 +59,20 @@ const InviteCodePage: FC = () => {
             </Button>
           </div>
         </form>
-        <div className="mt-12 invisible">
+        <div className="mt-12">
           <div className="text-center text-white">Or, Log in with</div>
           <div className="text-center mt-4">
-            <Button
-              variant="text"
-              className="text-primary"
-              disabled={loading}
-            >
-              Request an Invite
-            </Button>
+            <Link href="https://prometheusalts.com/#invite-form">
+              <a>
+                <Button
+                  variant="text"
+                  className="text-primary"
+                  disabled={loading}
+                >
+                  Request an Invite
+                </Button>
+              </a>
+            </Link>
           </div>
         </div>
       </div>

@@ -19,6 +19,7 @@ const NavItem: FC<NavItemProps> = ({ path, icon, title }: NavItemProps) => {
             (router.pathname == path
               ? "text-white font-bold border-purple-secondary"
               : "text-primary font-medium border-transparent")
+            + " hover:text-white transition-all"
           }
         >
           {icon && <span className="mr-3">{icon}</span>}

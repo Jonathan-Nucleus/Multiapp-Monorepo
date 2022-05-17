@@ -25,11 +25,10 @@ const FundsSection: FC<FundsSectionProps> = ({ userId, showNoFundsLabel }) => {
       return <></>;
     }
   }
-  const funds = userProfile.managedFunds;
   return (
     <>
       <div className="py-5">
-        {funds.map((fund) => (
+        {userProfile.managedFunds.map((fund) => (
           <div key={fund._id} className="mb-5">
             <FundCard
               fund={fund}

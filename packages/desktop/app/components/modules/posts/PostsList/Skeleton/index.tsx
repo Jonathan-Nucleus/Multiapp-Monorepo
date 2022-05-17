@@ -3,7 +3,7 @@ import Card from "../../../../common/Card";
 
 const Skeleton: FC = () => {
   return (
-    <Card>
+    <Card className="animate-pulse">
       <div className="flex items-center">
         <div className="w-[88px] h-[88px] rounded-full bg-skeleton" />
         <div className="flex-1 p-4">

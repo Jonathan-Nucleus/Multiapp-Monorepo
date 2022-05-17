@@ -15,7 +15,7 @@ const Companies: NextPageWithLayout = () => {
   );
 };
 
-Companies.layout = "main";
+Companies.layout = "main-fluid";
 Companies.middleware = "auth";
 
 export default Companies;

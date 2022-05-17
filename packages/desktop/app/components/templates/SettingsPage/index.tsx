@@ -118,7 +118,7 @@ const SettingsPage: FC = () => {
   }
 
   return (
-    <div className="px-2 md:px-8 pt-8 pb-20">
+    <div className="px-2 pt-8 pb-20">
       <h1 className="text-white text-2xl">Settings</h1>
       <div className="flex mt-8">
         <div className="flex-grow">

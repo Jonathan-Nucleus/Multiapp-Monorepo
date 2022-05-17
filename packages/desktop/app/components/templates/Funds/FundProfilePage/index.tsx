@@ -126,20 +126,19 @@ interface FundProfileProps {
 }
 
 const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
-  const { data } = useFund(fundId);
-  const fund = data?.fund;
+  const { data: { fund } = {} } = useFund(fundId);
   const { isWatching, toggleWatch } = useWatchFund(fundId);
   const [more, setMore] = useState(false);
   const [moreInvestor, setMoreInvestor] = useState(false);
   const [moreOption, setMoreOption] = useState(false);
-  const companyBackground = fund?.company?.background?.url
+  const companyBackground = fund?.company?.background?.url;
 
   if (!fund) {
     return <Skeleton />;
   }
 
   return (
-    <div className="container mx-auto mt-5 lg:px-4 max-w-screen-xl">
+    <div className="mt-5 px-2">
       <div className="lg:grid grid-cols-3">
         <div className="col-span-2">
           <Card className="bg-secondary/[.27] overflow-visible rounded p-0">
@@ -187,7 +186,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                   </ul>
                 </div>
                 <div className="border-t border-white/[.12] text-right px-3 py-2">
-                  <Button variant="text">
+                  <Button variant="text" className="hidden">
                     <Share color="white" weight="light" size={24} />
                   </Button>
                   <Button variant="text" className="ml-2" onClick={toggleWatch}>
@@ -219,7 +218,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                       <div
                         className={`text-sm ${
                           selected ? "text-white/[.87]" : "text-primary"
-                        } font-medium py-4`}
+                        } hover:text-white transition-all font-medium py-4`}
                       >
                         Overview
                       </div>
@@ -238,7 +237,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                       <div
                         className={`text-sm ${
                           selected ? "text-white/[.87]" : "text-primary"
-                        } font-medium py-4`}
+                        } hover:text-white transition-all font-medium py-4`}
                       >
                         Documents
                       </div>

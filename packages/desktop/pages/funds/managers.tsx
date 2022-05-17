@@ -15,7 +15,7 @@ const FundManagers: NextPageWithLayout = () => {
   );
 };
 
-FundManagers.layout = "main";
+FundManagers.layout = "main-fluid";
 FundManagers.middleware = "auth";
 
 export default FundManagers;

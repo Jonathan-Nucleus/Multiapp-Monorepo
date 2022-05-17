@@ -3,7 +3,7 @@ import Card from "../../../../common/Card";
 
 const Skeleton: FC = () => {
   return (
-    <Card className="p-0">
+    <Card className="p-0 animate-pulse">
       <div className="border-b border-white/[.12] p-4">
         <div className="text-white invisible">Invite Your Friends</div>
       </div>

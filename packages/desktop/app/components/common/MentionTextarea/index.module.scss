@@ -3,8 +3,13 @@
 }
 
 .mentions--multiLine .mentions__input {
-  min-height: 100px;
-  @apply h-full outline-none border border-transparent;
+  @apply outline-none border border-transparent;
+  overflow-y: auto !important;
+}
+
+.mentions__highlighter {
+  @apply box-border overflow-hidden inset-0;
+  position: absolute !important;
 }
 
 .mentions__suggestions__list {

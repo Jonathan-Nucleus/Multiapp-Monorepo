@@ -24,7 +24,7 @@ const CompanyPage: FC<CompanyPageProps> = ({ company }: CompanyPageProps) => {
     -1;
 
   return (
-    <div className="lg:mt-12 mb-12 lg:px-14">
+    <div className="lg:mt-12 mb-12">
       <div className="lg:grid grid-cols-6 gap-8">
         <div className="col-span-4">
           <div className="pb-5">

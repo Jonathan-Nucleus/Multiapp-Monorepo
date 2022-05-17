@@ -2,12 +2,13 @@ import { FC } from "react";
 import Navbar from "../../../modules/funds/Navbar";
 import FeaturedManagers from "./FeaturedManagers";
 import ManagersTable from "./ManagersTable";
+import Container from "../../../layouts/Container";
 
 const FundManagersPage: FC = () => {
   return (
     <>
       <Navbar />
-      <div className="container mx-auto my-6 max-w-screen-xl lg:px-4">
+      <Container className="my-6">
         <header className="hidden lg:flex items-center px-4 lg:px-0">
           <h1 className="text-2xl text-white">Browse by Fund Manager</h1>
         </header>
@@ -17,7 +18,7 @@ const FundManagersPage: FC = () => {
         <div className="mt-8">
           <ManagersTable />
         </div>
-      </div>
+      </Container>
     </>
   );
 };

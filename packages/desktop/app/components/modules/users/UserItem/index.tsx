@@ -21,11 +21,13 @@ export type UserType = {
 export interface UserItemProps {
   user: UserType;
   showChat?: boolean;
+  showFollow?: boolean;
 }
 
 const UserItem: FC<UserItemProps> = ({
   user,
   showChat = false,
+  showFollow = true,
 }: UserItemProps) => {
   const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const { isFollowing, toggleFollow } = useFollowUser(user._id);
@@ -45,7 +47,7 @@ const UserItem: FC<UserItemProps> = ({
               {user.firstName} {user.lastName}
             </a>
           </Link>
-          {!isMyProfile && !isFollowing && (
+          {!isMyProfile && !isFollowing && showFollow && (
             <>
               <div className="flex items-center">
                 <div className="text-white opacity-60 mx-2">•</div>

@@ -7,7 +7,7 @@ export const PHONE_PATTERN = /^\d{3}-\d{3}-\d{4}$/i;
 export const PASSWORD_PATTERN =
   /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&.^]).{8,}$/;
 export const LINK_PATTERN =
-  /https?:\/\/(www\.)?[-a-zA-Z\d@:%._+~#=]{1,256}\.[a-zA-Z\d()]{1,6}\b([-a-zA-Z\d()@:%_+.~#?&/=]*)/g;
+  /https?:\/\/(www\.)?[-a-zA-Z\d@:%._+~#=]{1,256}\.[a-zA-Z\d()]{1,6}\b([-a-zA-Z\d()@:%_+.~#?&/=]*)[^. (\r\n)]/g;
 export const POST_PATTERN =
   /(^|\W)([$|#]\w+)|(?<original>(?<trigger>.)\[(?<name>([^[]*))]\((?<id>([\d\w-]*))\))/gi;
 

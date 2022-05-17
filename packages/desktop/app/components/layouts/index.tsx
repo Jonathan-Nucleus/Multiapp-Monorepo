@@ -39,7 +39,7 @@ const RootLayout: FC<RootLayoutProps> = ({
     }
     if (middleware == "auth" && status == "unauthenticated") {
       router.replace(
-        `${AppAuthOptions.pages?.signIn}?redirect=${router.asPath}`
+        `${AppAuthOptions.pages?.signIn}?redirect=${router.asPath}`,
       );
       return <></>;
     }
@@ -60,8 +60,15 @@ const RootLayout: FC<RootLayoutProps> = ({
           <></>
           :
           <>
-            {layout == "auth" && <AuthLayout>{children}</AuthLayout>}
-            {layout == "main" && <MainLayout>{children}</MainLayout>}
+            {layout == "auth" &&
+              <AuthLayout>{children}</AuthLayout>
+            }
+            {layout == "main" &&
+              <MainLayout fluid={false}>{children}</MainLayout>
+            }
+            {layout == "main-fluid" &&
+              <MainLayout fluid={true}>{children}</MainLayout>
+            }
             {layout == undefined && children}
           </>
         }

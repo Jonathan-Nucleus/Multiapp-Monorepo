@@ -7,7 +7,7 @@ export interface ButtonProps extends HTMLProps<HTMLButtonElement> {
 }
 
 const Button: FC<ButtonProps> = ({
-  type,
+  type = "button",
   variant,
   disabled,
   className,
