@@ -174,6 +174,6 @@ const styles = StyleSheet.create({
   contactContainer: {
     paddingHorizontal: 20,
     paddingVertical: 12,
-    backgroundColor: PRIMARYDARK,
+    backgroundColor: BLACK,
   },
 });

@@ -175,13 +175,14 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
             <Text style={styles.val}>
               {firstName} {lastName}
             </Text>
-            <View style={styles.proWrapper}>
-              <ShieldCheckSvg />
-              <PLabel label="PRO" textStyle={styles.proLabel} />
-            </View>
+            {role !== 'USER' ? (
+              <View style={styles.proWrapper}>
+                <ShieldCheckSvg />
+                <PLabel label="PRO" textStyle={styles.proLabel} />
+              </View>
+            ) : null}
           </View>
           <Text style={styles.positionInfo}>
-            {/* {role} */}
             {position ? `${position}` : ''}
           </Text>
           <View style={[styles.row, styles.justifyAround]}>

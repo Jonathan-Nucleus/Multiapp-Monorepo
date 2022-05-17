@@ -51,7 +51,7 @@ const Funds: FundsScreen = ({ navigation }) => {
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         ListHeaderComponent={
-          // TODO Private Equity Start
+          <></> /* TODO Private Equity Start
           <View>
             {data?.funds && data?.funds.length > 0 && (
               <>
@@ -68,9 +68,10 @@ const Funds: FundsScreen = ({ navigation }) => {
                 />
               </>
             )}
-            {/* TODO Private Equity End */}
+            {/* TODO Private Equity End }
             <Text style={[styles.listHeaderText, H6]}>Hedge Funds</Text>
           </View>
+        */
         }
         listKey="hedge_funds"
       />
