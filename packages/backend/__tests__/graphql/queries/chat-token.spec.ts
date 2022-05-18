@@ -5,7 +5,7 @@ import { createTestApolloServer } from "../../../lib/server";
 import { User } from "../../../schemas/user";
 import { createUser } from "../../config/utils";
 
-jest.mock("getstream");
+jest.mock("stream-chat");
 
 describe("Query - chatToken", () => {
   const query = gql`
