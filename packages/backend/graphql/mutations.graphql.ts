@@ -16,6 +16,7 @@ import {
   AccessToken,
   ResetTokenPayload,
 } from "../lib/tokens";
+import { registerUser } from "../lib/get-stream";
 import { getUploadUrl, RemoteUpload } from "../lib/s3-helper";
 import {
   isObjectId,
@@ -158,10 +159,14 @@ const resolvers = {
       validateArgs(validator, args);
 
       const { user } = args;
+      const userData = await db.users.register(user);
 
-      const userId = await db.users.register(user);
+      const userCompany = userData.companyIds?.[0]
+        ? await db.companies.find(userData.companyIds[0])
+        : null;
+      await registerUser(userData, userCompany);
 
-      const deserializedUser = await db.users.deserialize(userId);
+      const deserializedUser = await db.users.deserialize(userData._id);
       return getAccessToken(deserializedUser);
     },
 
@@ -183,6 +188,10 @@ const resolvers = {
       const { email, password } = args;
 
       const user = await db.users.authenticate(email.toLowerCase(), password);
+      const userCompany = user.companyIds?.[0]
+        ? await db.companies.find(user.companyIds[0])
+        : null;
+      await registerUser(user, userCompany);
 
       const deserializedUser = await db.users.deserialize(user._id);
 
@@ -215,6 +224,10 @@ const resolvers = {
       const { user } = args;
 
       const authUser = await db.users.authenticateOAuth(user);
+      const userCompany = authUser.companyIds?.[0]
+        ? await db.companies.find(authUser.companyIds[0])
+        : null;
+      await registerUser(authUser, userCompany);
 
       const deserializedUser = await db.users.deserialize(authUser._id);
       return getAccessToken(deserializedUser);

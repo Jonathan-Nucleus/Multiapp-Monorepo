@@ -245,10 +245,9 @@ const createUsersCollection = (
      *
      * @param user  User data for new account.
      *
-     * @returns   Record id for the new account if registration was successful
-     *            and null otherwise.
+     * @returns   The new user record.
      */
-    register: async (user: User.Input): Promise<ObjectId> => {
+    register: async (user: User.Input): Promise<User.Mongo> => {
       const { firstName, lastName, password, inviteCode } = user;
       const email = user.email.toLowerCase();
 
@@ -283,7 +282,7 @@ const createUsersCollection = (
       };
 
       await usersCollection.replaceOne({ _id: userData._id }, newUser);
-      return newUser._id;
+      return newUser;
     },
 
     /**

@@ -155,7 +155,7 @@ const Login: LoginScreen = ({ navigation }) => {
           btnContainer={styles.btnContainer}
           onPress={handleNextPage}
         />
-        <PTextLine title="LOG IN WITHH" containerStyle={styles.bottom} />
+        <PTextLine title="LOG IN WITH" containerStyle={styles.bottom} />
         <View style={styles.row}>
           <TouchableOpacity style={styles.icon}>
             <AppleSvg />

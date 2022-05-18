@@ -1,6 +1,6 @@
 import faker from "@faker-js/faker";
 import { ApolloServer, gql } from "apollo-server";
-import * as GetStreamModule from "getstream";
+import { StreamChat } from "stream-chat";
 import { createTestApolloServer } from "../../../lib/server";
 import { User } from "../../../schemas/user";
 import { createUser } from "../../config/utils";
@@ -25,10 +25,10 @@ describe("Query - chatToken", () => {
   it("succeeds to get a token", async () => {
     const testToken = faker.datatype.uuid();
 
-    const spy = jest.spyOn(GetStreamModule, "connect").mockImplementation(
+    const spy = jest.spyOn(StreamChat, "getInstance").mockImplementation(
       () =>
         ({
-          createUserToken: jest.fn().mockImplementation(() => testToken),
+          createToken: jest.fn().mockImplementation(() => testToken),
         } as never)
     );
 

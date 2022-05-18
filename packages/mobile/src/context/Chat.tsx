@@ -50,6 +50,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
 
   useEffect(() => {
     if (!chatClient.current && user && token) {
+      console.log('IN HERE');
       const client = StreamChat.getInstance<StreamType>(GETSTREAM_ACCESS_KEY);
       (async () => {
         try {
@@ -72,7 +73,9 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
       })();
 
       return () => {
-        if (!chatClient.current) return;
+        if (!chatClient.current) {
+          return;
+        }
         chatClient.current.disconnectUser();
         chatClient.current = null;
         console.log('Stopped chat');

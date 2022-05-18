@@ -1,7 +1,8 @@
 import { gql } from "apollo-server";
 import * as yup from "yup";
 import _ from "lodash";
-import { getChatToken, decodeToken, AccessTokenPayload } from "../lib/tokens";
+import { decodeToken, AccessTokenPayload } from "../lib/tokens";
+import { getChatToken } from "../lib/get-stream";
 import {
   PartialSchema,
   ApolloServerContext,
