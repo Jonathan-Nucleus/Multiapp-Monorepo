@@ -24,11 +24,13 @@ type PostUpdate = Omit<Post.Update, "audience" | "categories"> & {
   audience: AudienceEnum;
   categories: PostCategoryEnum[];
 };
+type SharePostInput = Post.ShareInput;
 
 export type {
   GraphQLPost as Post,
   PostInput,
   PostUpdate,
+  SharePostInput,
   PostCategoryEnum as PostCategory,
   AudienceEnum as Audience,
   PostRoleFilterEnum as PostRoleFilter,
@@ -64,6 +66,12 @@ const resolvers = {
       argsIgnored: NoArgs,
       { db }: ApolloServerContext
     ) => (parent.isCompany ? null : db.users.find({ _id: parent.userId })),
+
+    sharedPost: async (
+      parent: Post.Mongo,
+      argsIgnored: NoArgs,
+      { db }: ApolloServerContext
+    ) => (parent.sharedPostId ? db.posts.find(parent.sharedPostId) : null),
 
     company: async (
       parent: Post.Mongo,

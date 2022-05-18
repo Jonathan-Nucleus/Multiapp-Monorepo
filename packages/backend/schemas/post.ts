@@ -54,6 +54,9 @@ export namespace Post {
       companyId?: string;
     };
 
+  export type ShareInput = Required<Pick<Input, "body">> &
+    Pick<Input, "mentionIds" | "companyId">;
+
   export type Update = Pick<
     GraphQL,
     "_id" | "body" | "mentionIds" | "media" | "userId"
@@ -248,6 +251,12 @@ export const PostSchema = `
     body: String
     media: MediaInput
     categories: [PostCategory!]!
+    mentionIds: [ID!]
+  }
+
+  input SharePostInput {
+    companyId: ID
+    body: String!
     mentionIds: [ID!]
   }
 

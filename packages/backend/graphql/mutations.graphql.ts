@@ -64,6 +64,7 @@ const schema = gql`
 
     createPost(post: PostInput!): Post
     editPost(post: PostUpdate!): Post
+    sharePost(postId: ID!, post: SharePostInput!): Post
     deletePost(postId: ID!): Boolean
     featurePost(postId: ID!, feature: Boolean!): Post
     likePost(like: Boolean!, postId: ID!): Post
@@ -709,6 +710,58 @@ const resolvers = {
         }
 
         return db.posts.edit(post, post.userId);
+      }
+    ),
+
+    sharePost: secureEndpoint(
+      async (
+        parentIgnored,
+        args: { postId: string; post: Post.ShareInput },
+        { db, user }
+      ): Promise<Post.Mongo> => {
+        const validator = yup
+          .object()
+          .shape({
+            postId: yup.string().required().test({
+              test: isObjectId,
+              message: "Invalid post id",
+            }),
+            post: yup
+              .object()
+              .shape({
+                body: yup.string().required(),
+                mentionIds: yup.array().of(
+                  yup.string().test({
+                    test: isObjectId,
+                    message: "Invalid mention id",
+                  })
+                ),
+                companyId: yup
+                  .string()
+                  .test({
+                    test: isObjectId,
+                    message: "Invalid company id",
+                  })
+                  .notRequired(),
+              })
+              .required(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { postId, post } = args;
+        if (
+          post.companyId &&
+          !user.companyIds?.find(
+            (companyId) => companyId.toString() === post.companyId
+          )
+        ) {
+          throw new BadRequestError("Not authorized");
+        }
+
+        const postData = await db.posts.share(postId, post, user._id);
+        return postData;
       }
     ),
 

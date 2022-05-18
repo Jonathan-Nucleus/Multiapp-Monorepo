@@ -133,6 +133,7 @@ const Settings: SettingsScreen = ({ navigation }) => {
   const renderListItem = ({ item }: RenderItemProps) => {
     return (
       <Pressable
+        disabled={item.disabled || false}
         onPress={item.onPress}
         style={({ pressed }) => [
           pressed && item.onPress ? pStyles.pressedStyle : null,

@@ -14,7 +14,7 @@ import UserInfo from 'mobile/src/components/common/UserInfo';
 import PLabel from 'mobile/src/components/common/PLabel';
 import { BLACK, WHITE12 } from 'shared/src/colors';
 import { Body1Bold } from 'mobile/src/theme/fonts';
-import pStyles from '../../theme/pStyles';
+import pStyles from 'mobile/src/theme/pStyles';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 
 import type { Like } from 'shared/graphql/query/post/usePost';
@@ -71,7 +71,9 @@ const LikesModal: FC<ModalProps> = ({ isVisible, likes, onClose }) => {
               style={styles.flatList}
               ListHeaderComponent={() => (
                 <PLabel
-                  label={`${likes?.length?.toString()} Likes`}
+                  label={`${likes.length} ${
+                    likes.length === 1 ? 'Like' : 'Likes'
+                  }`}
                   textStyle={styles.likeCountLabel}
                 />
               )}

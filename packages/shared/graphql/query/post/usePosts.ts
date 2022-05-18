@@ -12,7 +12,9 @@ import {
 
 export type { Audience, PostCategory, PostRoleFilter };
 
-export type Post = PostSummary;
+export type Post = PostSummary & {
+  sharedPost?: PostSummary;
+};
 export type PostsData = {
   posts?: Post[];
 };
@@ -37,6 +39,9 @@ export function usePosts(
       query Posts($categories: [PostCategory!], $roleFilter: PostRoleFilter) {
         posts(categories: $categories, roleFilter: $roleFilter) {
           ...PostSummaryFields
+          sharedPost {
+            ...PostSummaryFields
+          }
         }
       }
     `,

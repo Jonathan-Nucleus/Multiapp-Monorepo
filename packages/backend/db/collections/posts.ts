@@ -222,6 +222,78 @@ const createPostsCollection = (
     },
 
     /**
+     * Shares an existing post with an additional message from the user.
+     *
+     * @param postId  The ID of the post to share.
+     * @param post    Additional informtion the user would like to include with
+     *                the shared post.
+     * @param userId  The ID of the user sharing the post.
+     *
+     * @returns   Persisted shared post data with id.
+     */
+    share: async (
+      postId: MongoId,
+      post: Post.ShareInput,
+      userId: MongoId
+    ): Promise<Post.Mongo> => {
+      const postOid = toObjectId(postId);
+      const originalPost = await postsCollection.findOne({
+        _id: postOid,
+      });
+      if (!originalPost) {
+        throw new UnprocessableEntityError("Post not found.");
+      }
+
+      const { companyId, mentionIds, ...otherData } = post;
+      const isCompany = !!companyId;
+      const postData: Post.Mongo = {
+        ...otherData,
+        _id: new ObjectId(),
+        mentionIds: mentionIds ? toObjectIds(mentionIds) : undefined,
+        visible: true,
+        userId: toObjectId(companyId ?? userId),
+        isCompany,
+        categories: originalPost.categories,
+        audience: originalPost.audience,
+        sharedPostId: postOid,
+      };
+
+      const insertResult = await postsCollection.insertOne(postData);
+      if (!insertResult.acknowledged) {
+        throw new InternalServerError("Not able to add a post.");
+      }
+
+      const updateResult = await postsCollection.updateOne(
+        { _id: postOid },
+        { $addToSet: { shareIds: postData._id } }
+      );
+
+      if (!updateResult.acknowledged || updateResult.modifiedCount !== 1) {
+        throw new InternalServerError("Not able to update original post.");
+      }
+
+      if (isCompany) {
+        const updateResult = await companiesCollection.updateOne(
+          { _id: toObjectId(companyId), deletedAt: { $exists: false } },
+          { $addToSet: { postIds: postData._id } }
+        );
+        if (!updateResult.acknowledged || updateResult.modifiedCount === 0) {
+          throw new InternalServerError("Not able assign company.");
+        }
+      } else {
+        const updateResult = await usersCollection.updateOne(
+          { _id: toObjectId(userId), deletedAt: { $exists: false } },
+          { $addToSet: { postIds: postData._id } }
+        );
+        if (!updateResult.acknowledged || updateResult.modifiedCount === 0) {
+          throw new InternalServerError("Not able to assign user.");
+        }
+      }
+
+      return postData;
+    },
+
+    /**
      * Soft delete an existing post.
      *
      * @param postId  The id of the postt.

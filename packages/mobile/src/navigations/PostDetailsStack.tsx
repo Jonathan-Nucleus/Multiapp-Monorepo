@@ -6,6 +6,7 @@ import {
 import { CompositeScreenProps } from '@react-navigation/native';
 
 import CreatePost from '../screens/PostDetails/CreatePost';
+import SharePost from '../screens/PostDetails/SharePost';
 import PostDetail from '../screens/PostDetails/PostDetail';
 import ChooseCategory from '../screens/PostDetails/CreatePost/ChooseCategory';
 import ReviewPost from '../screens/PostDetails/CreatePost/ReviewPost';
@@ -25,6 +26,7 @@ const PostDetailsStack = () => {
       screenOptions={{ headerShown: false, gestureEnabled: true }}
       initialRouteName="CreatePost">
       <Stack.Screen name="CreatePost" component={CreatePost} />
+      <Stack.Screen name="SharePost" component={SharePost} />
       <Stack.Screen name="ChooseCategory" component={ChooseCategory} />
       <Stack.Screen name="ReviewPost" component={ReviewPost} />
       <Stack.Screen name="PostDetail" component={PostDetail} />
@@ -46,6 +48,9 @@ export type PostDetailsStackParamList = {
       | 'mentionIds'
       | 'userId'
     >;
+  };
+  SharePost: {
+    sharePostId: string;
   };
   ChooseCategory: {
     _id?: string;
@@ -72,6 +77,10 @@ export type PostDetailsScreenProps<
 
 export type CreatePostScreen = (
   props: PostDetailsScreenProps<'CreatePost'>,
+) => ReactElement | null;
+
+export type SharePostScreen = (
+  props: PostDetailsScreenProps<'SharePost'>,
 ) => ReactElement | null;
 
 export type ChooseCategoryScreen = (

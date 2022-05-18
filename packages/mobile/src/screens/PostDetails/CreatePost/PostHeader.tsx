@@ -5,6 +5,7 @@ import { CaretLeft } from 'phosphor-react-native';
 import PLabel from 'mobile/src/components/common/PLabel';
 import PHeader from 'mobile/src/components/common/PHeader';
 import { Body1Bold } from 'mobile/src/theme/fonts';
+import pStyles from 'mobile/src/theme/pStyles';
 import { GRAY800, WHITE } from 'shared/src/colors';
 
 interface PostHeaderProps {
@@ -29,13 +30,17 @@ const PostHeader: React.FC<PostHeaderProps> = (props) => {
   return (
     <PHeader
       leftIcon={
-        <Pressable onPress={handleBack}>
+        <Pressable
+          onPress={handleBack}
+          style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}>
           {leftIcon ? leftIcon : <CaretLeft size={32} color={WHITE} />}
         </Pressable>
       }
       centerIcon={<PLabel label={centerLabel} textStyle={styles.headerTitle} />}
       rightIcon={
-        <Pressable onPress={handleNext}>
+        <Pressable
+          onPress={handleNext}
+          style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}>
           <PLabel
             label={rightLabel}
             textStyle={rightValidation ? styles.rightText : styles.disabledText}

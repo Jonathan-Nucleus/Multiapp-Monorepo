@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "9b22e078-b0b6-4872-b80a-fb8333604504",
+		"_postman_id": "e51c092e-9774-4a17-a93a-934e3da708d9",
 		"name": "Prometheus API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -8,6 +8,30 @@
 		{
 			"name": "Queries",
 			"item": [
+				{
+					"name": "Verify Token",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query VerifyToken($token: String!) {\n  verifyToken(token: $token)\n}",
+								"variables": "{\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjdlYTk0ODczZTgyMTVkZmE4YjA2MjkiLCJyb2xlIjoidXNlciIsImFjYyI6InB1cmNoYXNlciIsImlhdCI6MTY1MjY4Nzc4MX0.wjaBc1uKz6mSNAsycuolWUNCL3zgSvhCTlRQWaGqao4\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{GRAPHQL_URI}}",
+							"host": [
+								"{{GRAPHQL_URI}}"
+							]
+						}
+					},
+					"response": []
+				},
 				{
 					"name": "Verify Invite",
 					"request": {
@@ -24,14 +48,9 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:4000/",
-							"protocol": "http",
+							"raw": "{{GRAPHQL_URI}}",
 							"host": [
-								"localhost"
-							],
-							"port": "4000",
-							"path": [
-								""
+								"{{GRAPHQL_URI}}"
 							]
 						}
 					},
@@ -40,34 +59,19 @@
 				{
 					"name": "Posts",
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4MDc2OWJjOGE3MDFkYjJkNjFiMTMiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk5MzYzMzB9.mlZBY5TUdliHkrEkRxYkjXSvEh5fVW88kmYMiMiTGSk",
-									"type": "string"
-								}
-							]
-						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query Posts {\n  posts {\n      _id\n      body\n      media {\n          url\n          aspectRatio\n      }\n      mentionIds\n      likeIds\n      commentIds\n      createdAt\n      user {\n          _id\n          firstName\n          lastName\n      }\n  }\n}",
-								"variables": ""
+								"query": "query Posts($categories: [PostCategory!], $roleFilter: PostRoleFilter) {\n    posts(categories: $categories, roleFilter: $roleFilter) {\n      _id\n      body\n      media {\n          url\n          aspectRatio\n      }\n      mentionIds\n      likeIds\n      commentIds\n      createdAt\n      user {\n          _id\n          firstName\n          lastName\n      }\n  }\n}",
+								"variables": "{\n    \"filterFilter\": \"FOLLOW_ONLY\"\n}"
 							}
 						},
 						"url": {
-							"raw": "http://localhost:4000/",
-							"protocol": "http",
+							"raw": "{{GRAPHQL_URI}}",
 							"host": [
-								"localhost"
-							],
-							"port": "4000",
-							"path": [
-								""
+								"{{GRAPHQL_URI}}"
 							]
 						}
 					},
@@ -91,19 +95,14 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query Post($postId: ID!) {\n  post(postId: $postId) {\n      _id\n      body\n      media {\n          url\n          aspectRatio\n      }\n      mentions {\n          _id\n          firstName\n          lastName\n      }\n      likes {\n          _id\n          firstName\n          lastName\n          avatar\n      }\n      comments {\n          body\n          user {\n              _id\n              firstName\n              lastName\n              avatar\n          }\n          comment {\n              body\n              user {\n                _id\n                firstName\n                lastName\n                avatar\n              }\n              likes {\n                  _id\n                  firstName\n                  lastName\n                  avatar\n              }\n          }\n          likes {\n              _id\n              firstName\n              lastName\n              avatar\n          }\n      }\n      createdAt\n      user {\n          _id\n          firstName\n          lastName\n          avatar\n      }\n  }\n}",
+								"query": "query Post($postId: ID!) {\n  post(postId: $postId) {\n      _id\n      body\n      mediaUrl\n      mentions {\n          _id\n          firstName\n          lastName\n      }\n      likes {\n          _id\n          firstName\n          lastName\n          avatar\n      }\n      comments {\n          body\n          user {\n              _id\n              firstName\n              lastName\n              avatar\n          }\n          comment {\n              body\n              user {\n                _id\n                firstName\n                lastName\n                avatar\n              }\n              likes {\n                  _id\n                  firstName\n                  lastName\n                  avatar\n              }\n          }\n          likes {\n              _id\n              firstName\n              lastName\n              avatar\n          }\n      }\n      createdAt\n      user {\n          _id\n          firstName\n          lastName\n          avatar\n      }\n  }\n}",
 								"variables": "{\n    \"postId\": \"625c02fe6838ddfb66c17ffa\"\n}"
 							}
 						},
 						"url": {
-							"raw": "http://localhost:4000/",
-							"protocol": "http",
+							"raw": "{{GRAPHQL_URI}}",
 							"host": [
-								"localhost"
-							],
-							"port": "4000",
-							"path": [
-								""
+								"{{GRAPHQL_URI}}"
 							]
 						}
 					},
@@ -132,50 +131,9 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:4000/",
-							"protocol": "http",
+							"raw": "{{GRAPHQL_URI}}",
 							"host": [
-								"localhost"
-							],
-							"port": "4000",
-							"path": [
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Notifications",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjZlZjM0MzhjMDRiNzNlMTc1MjkzZDUiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NTE2ODc2MTB9.5_yIxDBcxHjMg7PdHCvbYujPmRg44H5ovB78mtDFW-g",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "query Notifications {\n    notifications {\n        _id\n        type\n        title\n        body\n        isNew\n        data {\n            userId\n        }\n        user {\n            _id\n            firstName\n            lastName\n        }\n    }\n}",
-								"variables": ""
-							}
-						},
-						"url": {
-							"raw": "http://localhost:4000/",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "4000",
-							"path": [
-								""
+								"{{GRAPHQL_URI}}"
 							]
 						}
 					},
@@ -204,14 +162,9 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:4000/",
-							"protocol": "http",
+							"raw": "{{GRAPHQL_URI}}",
 							"host": [
-								"localhost"
-							],
-							"port": "4000",
-							"path": [
-								""
+								"{{GRAPHQL_URI}}"
 							]
 						}
 					},
@@ -240,14 +193,9 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:4000/",
-							"protocol": "http",
+							"raw": "{{GRAPHQL_URI}}",
 							"host": [
-								"localhost"
-							],
-							"port": "4000",
-							"path": [
-								""
+								"{{GRAPHQL_URI}}"
 							]
 						}
 					},
@@ -276,14 +224,9 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:4000/",
-							"protocol": "http",
+							"raw": "{{GRAPHQL_URI}}",
 							"host": [
-								"localhost"
-							],
-							"port": "4000",
-							"path": [
-								""
+								"{{GRAPHQL_URI}}"
 							]
 						}
 					},
@@ -312,86 +255,9 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:4000/",
-							"protocol": "http",
+							"raw": "{{GRAPHQL_URI}}",
 							"host": [
-								"localhost"
-							],
-							"port": "4000",
-							"path": [
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Mention Users",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4YTZjMjg5ZTAxN2YzYmVjNjUxNDciLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk5NzcxMDR9.2lITm_YcEXUwbojZUPnkJSNyN-mm2-0v4Jdao544nDc",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "query MentionUsers($search: String) {\n    mentionUsers(search: $search) {\n        _id\n        firstName\n        lastName\n    }\n}",
-								"variables": "{\n    \"search\": \"a\"\n}"
-							}
-						},
-						"url": {
-							"raw": "http://localhost:4000/",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "4000",
-							"path": [
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Global Search",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4YTZjMjg5ZTAxN2YzYmVjNjUxNDciLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk5NzcxMDR9.2lITm_YcEXUwbojZUPnkJSNyN-mm2-0v4Jdao544nDc",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "query GlobalSearch($search: String) {\n    globalSearch(search: $search) {\n        users {\n            _id\n            firstName\n            lastName\n        }\n        companies {\n            _id\n            name\n        }\n        posts {\n            _id\n            body\n        }\n        funds {\n            _id\n            name\n        }\n    }\n}",
-								"variables": "{\n    \"search\": \"a\"\n}"
-							}
-						},
-						"url": {
-							"raw": "http://localhost:4000/",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "4000",
-							"path": [
-								""
+								"{{GRAPHQL_URI}}"
 							]
 						}
 					},
@@ -415,19 +281,14 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query Posts($categories: [PostCategory!]) {\n  posts(categories: $categories) {\n      _id\n      body\n      media {\n          url\n          aspectRatio\n      }\n      mentionIds\n      likeIds\n      commentIds\n      createdAt\n      user {\n          _id\n          firstName\n          lastName\n      }\n  }\n}",
+								"query": "query Posts($categories: [PostCategory!]) {\n  posts(categories: $categories) {\n      _id\n      body\n      mediaUrl\n      mentionIds\n      likeIds\n      commentIds\n      createdAt\n      user {\n          _id\n          firstName\n          lastName\n      }\n  }\n}",
 								"variables": "{\n  \"categories\": [\n      \"NEWS\",\n      \"POLITICS\",\n      \"IDEAS\"\n  ]\n}"
 							}
 						},
 						"url": {
-							"raw": "http://localhost:4000/",
-							"protocol": "http",
+							"raw": "{{GRAPHQL_URI}}",
 							"host": [
-								"localhost"
-							],
-							"port": "4000",
-							"path": [
-								""
+								"{{GRAPHQL_URI}}"
 							]
 						}
 					},
@@ -456,14 +317,9 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:4000/",
-							"protocol": "http",
+							"raw": "{{GRAPHQL_URI}}",
 							"host": [
-								"localhost"
-							],
-							"port": "4000",
-							"path": [
-								""
+								"{{GRAPHQL_URI}}"
 							]
 						}
 					},
@@ -492,14 +348,9 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:4000/",
-							"protocol": "http",
+							"raw": "{{GRAPHQL_URI}}",
 							"host": [
-								"localhost"
-							],
-							"port": "4000",
-							"path": [
-								""
+								"{{GRAPHQL_URI}}"
 							]
 						}
 					},
@@ -528,14 +379,9 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:4000/",
-							"protocol": "http",
+							"raw": "{{GRAPHQL_URI}}",
 							"host": [
-								"localhost"
-							],
-							"port": "4000",
-							"path": [
-								""
+								"{{GRAPHQL_URI}}"
 							]
 						}
 					},
@@ -565,14 +411,9 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -581,6 +422,9 @@
 						{
 							"name": "Register",
 							"request": {
+								"auth": {
+									"type": "noauth"
+								},
 								"method": "POST",
 								"header": [],
 								"body": {
@@ -591,14 +435,9 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -607,6 +446,9 @@
 						{
 							"name": "Login",
 							"request": {
+								"auth": {
+									"type": "noauth"
+								},
 								"method": "POST",
 								"header": [],
 								"body": {
@@ -617,14 +459,9 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -633,6 +470,9 @@
 						{
 							"name": "Login OAuth",
 							"request": {
+								"auth": {
+									"type": "noauth"
+								},
 								"method": "POST",
 								"header": [],
 								"body": {
@@ -643,14 +483,9 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -669,14 +504,9 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -695,14 +525,9 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -736,14 +561,9 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -772,230 +592,9 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Delete Account",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjUwNjUzNGIwYzA0NjI4NDhlM2U5MmEiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk0MzY4NDh9.aj-aOShwh7CtREU0uHpxDnNzqypxCORea4QodaaTgVU",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "graphql",
-									"graphql": {
-										"query": "mutation DeleteAccount {\n    deleteAccount\n}",
-										"variables": ""
-									}
-								},
-								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Help Request (Email)",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjUwNjUzNGIwYzA0NjI4NDhlM2U5MmEiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk0MzY4NDh9.aj-aOShwh7CtREU0uHpxDnNzqypxCORea4QodaaTgVU",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "graphql",
-									"graphql": {
-										"query": "mutation HelpRequest($request: HelpRequestInput!) {\n    helpRequest(request: $request)\n}",
-										"variables": "{\n    \"request\": {\n        \"type\": \"EMAIL\",\n        \"email\": \"Alessandro73@gmail.com\",\n        \"fundId\": \"6272c45c3bf185f6f613572c\",\n        \"message\": \"Accusamus et porro architecto dolores ea ratione dolorem quos.\"\n    }\n}"
-									}
-								},
-								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Help Request (Phone)",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjUwNjUzNGIwYzA0NjI4NDhlM2U5MmEiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk0MzY4NDh9.aj-aOShwh7CtREU0uHpxDnNzqypxCORea4QodaaTgVU",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "graphql",
-									"graphql": {
-										"query": "mutation HelpRequest($request: HelpRequestInput!) {\n    helpRequest(request: $request)\n}",
-										"variables": "{\n    \"request\": {\n        \"type\": \"PHONE\",\n        \"phone\": \"453.861.6947\",\n        \"fundId\": \"6272c45c3bf185f6f613572c\",\n        \"preferredTimeOfDay\": \"MORNING\",\n        \"message\": \"Et optio ipsum fuga quo.\"\n    }\n}"
-									}
-								},
-								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Update FCM Token",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjUwNjUzNGIwYzA0NjI4NDhlM2U5MmEiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk0MzY4NDh9.aj-aOShwh7CtREU0uHpxDnNzqypxCORea4QodaaTgVU",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "graphql",
-									"graphql": {
-										"query": "mutation UpdateFcmToken($fcmToken: String!) {\n    updateFcmToken(fcmToken: $fcmToken)\n}",
-										"variables": "{\n  \"fcmToken\": \"fcmToken\"\n}"
-									}
-								},
-								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Read All Notification",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjZlZjM0MzhjMDRiNzNlMTc1MjkzZDUiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NTE2ODgxMDN9.KvWOBq5bEocNlZfyLjJlbaD7UOA7v9DmFiouxJLM9F0",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "graphql",
-									"graphql": {
-										"query": "mutation readNotification {\n    readNotification\n}",
-										"variables": ""
-									}
-								},
-								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Read One Notification",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjZlZjM0MzhjMDRiNzNlMTc1MjkzZDUiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NTE2ODgxMDN9.KvWOBq5bEocNlZfyLjJlbaD7UOA7v9DmFiouxJLM9F0",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "graphql",
-									"graphql": {
-										"query": "mutation readNotification($notificationId: ID) {\n    readNotification(notificationId: $notificationId)\n}",
-										"variables": "{\n  \"notificationId\": \"6258c7d5a3382b28c7ae29d3\"\n}"
-									}
-								},
-								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -1024,14 +623,9 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -1040,34 +634,19 @@
 						{
 							"name": "Watch Fund",
 							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4MDc2OWJjOGE3MDFkYjJkNjFiMTMiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk5MzYzMzB9.mlZBY5TUdliHkrEkRxYkjXSvEh5fVW88kmYMiMiTGSk",
-											"type": "string"
-										}
-									]
-								},
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "mutation WatchFund($watch: Boolean!, $fundId: ID!) {\n    watchFund(watch: $watch, fundId: $fundId)\n}",
-										"variables": "{\n  \"fundId\": \"6258071f0dbb6820e20f9b15\",\n  \"watch\": false\n}"
+										"query": "mutation WatchFund($watch: Boolean!, $fundId: ID!) {\n    watchFund(watch: $watch, fundId: $fundId) {\n        _id\n        watchlistIds\n    }\n}",
+										"variables": "{\n  \"fundId\": \"626f495fbe6ae5137f096faa\",\n  \"watch\": false\n}"
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -1096,14 +675,9 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -1112,16 +686,6 @@
 						{
 							"name": "Chat Token",
 							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4YTZjMjg5ZTAxN2YzYmVjNjUxNDciLCJyb2xlIjoidXNlciIsImFjYyI6ImFjY3JlZGl0ZWQiLCJpYXQiOjE2NDk5ODQ0Mzh9.vDYRBkQP9k3oT3HeNFYFqmF1VzCCQ8P1GDfEV3iXahE",
-											"type": "string"
-										}
-									]
-								},
 								"method": "POST",
 								"header": [],
 								"body": {
@@ -1132,14 +696,9 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -1153,7 +712,7 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjVjYjc5Zjc0NmNiNmM5ODE3ODE3M2EiLCJyb2xlIjoidXNlciIsImFjYyI6ImFjY3JlZGl0ZWQiLCJpYXQiOjE2NTA0MzQxMjd9.5CpyL8lLiElFC2YsMIu9v9PgN5GvmNy6Umoa7Cy4Wis",
+											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjY1YmQ5NDE4YzFmODY0NzIxNGUxYWQiLCJyb2xlIjoidXNlciIsImFjYyI6InB1cmNoYXNlciIsImlhdCI6MTY1MDkzMzU0N30.UkuQJtmn48-HwEK2jFROwUzpYwhJDwY5m7hlssCBsDg",
 											"type": "string"
 										}
 									]
@@ -1164,18 +723,13 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "mutation SaveQuestionnaire($questionnaire: QuestionnaireInput!) {\n    saveQuestionnaire(questionnaire: $questionnaire) {\n        _id\n    }\n}",
-										"variables": "{\n    \"questionnaire\": {\n        \"class\": \"INDIVIDUAL\",\n        \"status\": \"MIN_INCOME\",\n        \"level\": \"TIER2\",\n        \"date\": \"01 Jan 1970 00:00:00 GMT\"\n    }\n}"
+										"variables": "{\n    \"questionnaire\": {\n        \"class\": \"INDIVIDUAL\",\n        \"status\": [\"MIN_INCOME\"],\n        \"level\": \"TIER2\",\n        \"date\": \"01 Jan 1970 00:00:00 GMT\"\n    }\n}"
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -1204,14 +758,9 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -1240,14 +789,9 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -1256,34 +800,19 @@
 						{
 							"name": "Become Pro",
 							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjY1YmQ5NDE4YzFmODY0NzIxNGUxYWQiLCJyb2xlIjoidXNlciIsImFjYyI6InB1cmNoYXNlciIsImlhdCI6MTY1MDkwNzYzOX0.rjKE3Id85naoFa3DXZYRt11c0ptkAYaB21LTKHKNQfs",
-											"type": "string"
-										}
-									]
-								},
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "graphql",
 									"graphql": {
 										"query": "mutation ProRequest($request: ProRequestInput!) {\n    proRequest(request: $request)\n}",
-										"variables": "{\n    \"request\": {\n        \"role\": \"MANAGER\",\n        \"email\": \"darash@test.com\",\n        \"organization\": \"test org\",\n        \"position\": \"tired man\",\n        \"info\": \"other info\"        \n    }\n}"
+										"variables": "{\n    \"request\": {\n        \"role\": \"MANAGER\",\n        \"email\": \"darash@test.com\", \n        \"position\": \"tired man\",\n        \"info\": \"other info\"        \n    }\n}"
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -1297,70 +826,40 @@
 						{
 							"name": "Create Post",
 							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4YTZjMjg5ZTAxN2YzYmVjNjUxNDciLCJyb2xlIjoidXNlciIsImFjYyI6ImFjY3JlZGl0ZWQiLCJpYXQiOjE2NDk5ODQ0Mzh9.vDYRBkQP9k3oT3HeNFYFqmF1VzCCQ8P1GDfEV3iXahE",
-											"type": "string"
-										}
-									]
-								},
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "mutation CreatePost($post: PostInput!) {\n  createPost(post: $post) {\n      _id\n      body\n      media {\n          url\n          aspectRatio\n      }\n      likeIds\n      commentIds\n      createdAt\n      categories\n  }\n}",
-										"variables": "{\n     \"post\": {\n        \"categories\": [\n            \"NEWS\",\n            \"POLITICS\"\n        ],\n        \"audience\": \"EVERYONE\",\n        \"body\": \"This is my post\",\n        \"media\": {\n            \"url\": \"https://www.postmedia.com/this/is/my/image/or/video\",\n            \"aspectRatio\": 1\n        },\n        \"mentionIds\": [\n          \"624f1a2eed55addaea6b4499\", \n          \"624f1a2eed55addaea6b4498\"\n        ]\n  }\n}"
+										"query": "mutation CreatePost($post: PostInput!) {\n  createPost(post: $post) {\n      _id\n      body\n      media {\n          url\n          aspectRatio\n      }\n      likeIds\n      commentIds\n      createdAt\n      categories\n      user {\n          _id\n      }\n      company {\n          _id\n      }\n  }\n}",
+										"variables": "{\n    \"post\": {\n        \"audience\": \"EVERYONE\",\n        \"body\": \"Testing create post\",\n        \"categories\": [\n            \"MACRO\",\n            \"CONSUMER\", \n            \"TECHNOLOGY\"\n        ], \n        \"mentionIds\": []\n    }\n}"
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
 							"response": []
 						},
 						{
-							"name": "Edit Post",
+							"name": "Share Post",
 							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjcyYzViOGQ4MmUxZDhjYzk1YzNiZjgiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NTE2ODg5MDd9.BD3cBepN5BpFEMU9kMM79BIaZLfNmiBpxKLPpbiCN8c",
-											"type": "string"
-										}
-									]
-								},
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "mutation EditPost($post: PostUpdate!) {\n    editPost(post: $post) {\n        _id\n        audience\n        body\n        media {\n            url\n            aspectRatio\n        }\n        categories\n        mentionIds\n        updatedAt\n    }\n}",
-										"variables": "{\n    \"post\": {\n        \"_id\": \"6272c5b9d82e1d8cc95c3c02\",\n        \"categories\": [\n            \"NEWS\",\n            \"POLITICS\"\n        ],\n        \"audience\": \"EVERYONE\",\n        \"body\": \"This is my post\"\n    }\n}"
+										"query": "mutation SharePost($postId: ID!, $post: SharePostInput!) {\n      sharePost(postId: $postId, post: $post) {\n        _id\n        isCompany\n        audience\n        body\n        createdAt\n        categories\n        user {\n          _id\n        }\n        company {\n          _id\n        }\n        sharedPost {\n          _id\n          categories\n          audience\n        }\n      }\n    }",
+										"variables": "{\n    \"postId\": \"627ea94873e8215dfa8b0633\",\n     \"post\": {\n        \"body\": \"This is my post\",\n        \"mentionIds\": [\n          \"624f1a2eed55addaea6b4499\", \n          \"624f1a2eed55addaea6b4498\"\n        ]\n  }\n}"
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -1369,16 +868,6 @@
 						{
 							"name": "Upload Link",
 							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjVjYWUyODc0NmNiNmM5ODE3ODE3MzciLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NTAyNDEwNjR9.S7rxbCKLZ9Cedz22ZxUHMZiRIZXsiJKlhCQW4GhJAhY",
-											"type": "string"
-										}
-									]
-								},
 								"method": "POST",
 								"header": [],
 								"body": {
@@ -1389,21 +878,16 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
 							"response": []
 						},
 						{
-							"name": "Like Post",
+							"name": "LIke Post",
 							"request": {
 								"auth": {
 									"type": "bearer",
@@ -1425,14 +909,9 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -1461,14 +940,9 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -1497,14 +971,9 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -1533,14 +1002,9 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -1569,14 +1033,9 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -1605,14 +1064,9 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -1641,14 +1095,9 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -1677,14 +1126,9 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -1693,6 +1137,9 @@
 						{
 							"name": "AWS Upload Test",
 							"request": {
+								"auth": {
+									"type": "noauth"
+								},
 								"method": "PUT",
 								"header": [],
 								"body": {
@@ -1702,7 +1149,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://prometheus-user-media.s3.us-east-1.amazonaws.com/logos/b014c86b-743e-46de-8304-a54494461c15.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIATWMGEWB6JFUTUX6P%2F20220409%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20220409T183550Z&X-Amz-Expires=60&X-Amz-Signature=da835ed87c8e8a9c0a80ef8d7dd6c00543787841016ffaef44a1524e589a1f80&X-Amz-SignedHeaders=host&x-id=PutObject",
+									"raw": "https://prometheus-user-media.s3.us-east-1.amazonaws.com/posts/9f3e57de-c26d-4302-b53f-d51e568ea739.jpg?X-\nAmz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIATWMGEWB6JUB36GUK%2F20220508%2Fu\ns-east-1%2Fs3%2Faws4_request&X-Amz-Date=20220508T215402Z&X-Amz-Expires=60&X-Amz-Signature=bf4b47e488a2e7b27e354e5110ae41f\n641bf9456b3acfffbe1c389663f1996a7&X-Amz-SignedHeaders=host&x-id=PutObject",
 									"protocol": "https",
 									"host": [
 										"prometheus-user-media",
@@ -1712,12 +1159,12 @@
 										"com"
 									],
 									"path": [
-										"logos",
-										"b014c86b-743e-46de-8304-a54494461c15.png"
+										"posts",
+										"9f3e57de-c26d-4302-b53f-d51e568ea739.jpg"
 									],
 									"query": [
 										{
-											"key": "X-Amz-Algorithm",
+											"key": "X-\nAmz-Algorithm",
 											"value": "AWS4-HMAC-SHA256"
 										},
 										{
@@ -1726,11 +1173,11 @@
 										},
 										{
 											"key": "X-Amz-Credential",
-											"value": "AKIATWMGEWB6JFUTUX6P%2F20220409%2Fus-east-1%2Fs3%2Faws4_request"
+											"value": "AKIATWMGEWB6JUB36GUK%2F20220508%2Fu\ns-east-1%2Fs3%2Faws4_request"
 										},
 										{
 											"key": "X-Amz-Date",
-											"value": "20220409T183550Z"
+											"value": "20220508T215402Z"
 										},
 										{
 											"key": "X-Amz-Expires",
@@ -1738,7 +1185,7 @@
 										},
 										{
 											"key": "X-Amz-Signature",
-											"value": "da835ed87c8e8a9c0a80ef8d7dd6c00543787841016ffaef44a1524e589a1f80"
+											"value": "bf4b47e488a2e7b27e354e5110ae41f\n641bf9456b3acfffbe1c389663f1996a7"
 										},
 										{
 											"key": "X-Amz-SignedHeaders",
@@ -1761,34 +1208,19 @@
 						{
 							"name": "Follow User",
 							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjRhNjYzZmZiZDVmZmJlODcxNjAzNTAiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDkwNDM2Mjd9.8sUii0pTi2PnVu_-rWIRHx1hmBfMG26OV-Gen5Ne-QM",
-											"type": "string"
-										}
-									]
-								},
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "mutation FollowUser($follow: Boolean!, $userId: ID!) {\n    followUser(follow: $follow, userId: $userId)\n}",
-										"variables": "{\n  \"follow\": true,\n  \"userId\": \"624f1a2ded55addaea6b4492\"\n}"
+										"query": "mutation FollowUser($follow: Boolean!, $userId: ID!) {\n    followUser(follow: $follow, userId: $userId) {\n        account {\n            _id\n            followingIds\n        }\n        userAccount {\n            _id\n            followerIds\n        }\n    }\n}",
+										"variables": "{\n  \"follow\": true,\n  \"userId\": \"6261ba294f5b5408e6abd091\"\n}"
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -1817,14 +1249,9 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -1853,14 +1280,9 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -1889,14 +1311,9 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:4000/",
-									"protocol": "http",
+									"raw": "{{GRAPHQL_URI}}",
 									"host": [
-										"localhost"
-									],
-									"port": "4000",
-									"path": [
-										""
+										"{{GRAPHQL_URI}}"
 									]
 								}
 							},
@@ -1905,6 +1322,36 @@
 					]
 				}
 			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjdlYTk0ODczZTgyMTVkZmE4YjA2MjkiLCJyb2xlIjoidXNlciIsImFjYyI6InB1cmNoYXNlciIsImlhdCI6MTY1MjYzNDgzN30.kIioX8twcaIOXClaOmPJe6yS-FP4HDm0InXovxaZZTE",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
 		}
 	]
 }

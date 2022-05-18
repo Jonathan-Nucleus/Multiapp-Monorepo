@@ -57,6 +57,9 @@ export function usePost(postId?: string): QueryResult<PostData, PostVariables> {
       query Post($postId: ID!) {
         post(postId: $postId) {
           ...PostSummaryFields
+          sharedPost {
+            ...PostSummaryFields
+          }
           mentions {
             _id
             firstName

@@ -27,9 +27,8 @@ import {
   WHITE,
 } from 'shared/src/colors';
 import pStyles from 'mobile/src/theme/pStyles';
-import { Body2Bold, Body3, Body3Bold } from 'mobile/src/theme/fonts';
+import { Body2Bold, Body3Bold } from 'mobile/src/theme/fonts';
 
-import LikesModal from './LikesModal';
 import CommentItem from './CommentItem';
 
 import {
@@ -53,7 +52,6 @@ const PostDetail: PostDetailScreen = ({ route }) => {
   const [selectedUser, setSelectedUser] = useState<CommentUser | undefined>(
     undefined,
   );
-  const [likesModalVisible, setLikesModalVisible] = useState(false);
   const [focusCommentId, setFocusCommentId] = useState<string | null>(null);
   const [isReplyComment, setReplyComment] = useState(false);
   const [isEditComment, setEditComment] = useState(false);
@@ -63,7 +61,6 @@ const PostDetail: PostDetailScreen = ({ route }) => {
 
   const post = data?.post;
   const comments = post?.comments;
-  const likes = post?.likes;
 
   const getComments = useMemo(() => {
     const parentComments = comments?.filter((item) => !item.commentId);
@@ -80,7 +77,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
     return updatedComments;
   }, [comments]);
 
-  if (!post || !comments || !likes) {
+  if (!post) {
     return <SafeAreaView style={pStyles.globalContainer} />;
   }
 
@@ -175,7 +172,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
         onPressLeft={() => NavigationService.goBack()}
       />
       <PAppContainer ref={flatListRef} style={styles.container}>
-        <PostItem post={post} onPressLikes={() => setLikesModalVisible(true)} />
+        <PostItem post={post} />
         <FlatList
           data={getComments || []}
           renderItem={renderCommentItem}
@@ -237,11 +234,6 @@ const PostDetail: PostDetailScreen = ({ route }) => {
           </View>
         )}
       </KeyboardAvoidingView>
-      <LikesModal
-        likes={likes}
-        isVisible={likesModalVisible}
-        onClose={() => setLikesModalVisible(false)}
-      />
     </SafeAreaView>
   );
 };
@@ -307,11 +299,6 @@ const styles = StyleSheet.create({
     marginLeft: 32,
     flexDirection: 'row',
     marginVertical: 8,
-  },
-  smallLabel: {
-    ...Body3,
-    marginRight: 8,
-    padding: 8,
   },
   likedLabel: {
     color: PRIMARY,

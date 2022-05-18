@@ -36,6 +36,7 @@ export const POST_SUMMARY_FRAGMENT = gql`
     _id
     body
     categories
+    audience
     media {
       url
       aspectRatio

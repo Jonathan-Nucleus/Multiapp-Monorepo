@@ -11,7 +11,9 @@ type AccountPostsVariables = {
   categories?: PostCategory[];
 };
 
-export type Post = PostSummary;
+export type Post = PostSummary & {
+  sharedPost?: PostSummary;
+};
 export type AccountPostsData = {
   account?: Pick<User, "_id"> & {
     posts: Post[];
@@ -38,6 +40,9 @@ export function usePosts(
           _id
           posts(categories: $categories) {
             ...PostSummaryFields
+            sharedPost {
+              ...PostSummaryFields
+            }
           }
         }
       }

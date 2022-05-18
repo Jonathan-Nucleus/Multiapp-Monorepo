@@ -15,7 +15,7 @@ import ImagePicker, {
   ImageOrVideo,
   Image as UploadImage,
 } from 'react-native-image-crop-picker';
-import { X } from 'phosphor-react-native';
+import { X, XCircle } from 'phosphor-react-native';
 import HeicConverter from 'react-native-heic-converter';
 import RNFS from 'react-native-fs';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -59,6 +59,7 @@ import {
   WHITE12,
   BGDARK,
   BLACK,
+  BLACK75,
 } from 'shared/src/colors';
 
 import {
@@ -117,22 +118,22 @@ export const AUDIENCE_OPTIONS: Option<Audience>[] = [
     ),
   },
   {
-    id: 'QUALIFIED_PURCHASER',
-    value: 'Qualified Purchasers',
-    labelView: (
-      <RadioBodyView
-        icon={<QPSvg width={24} height={24} />}
-        label="Qualified Purchasers"
-      />
-    ),
-  },
-  {
     id: 'QUALIFIED_CLIENT',
     value: 'Qualified Clients',
     labelView: (
       <RadioBodyView
         icon={<QCSvg width={24} height={24} />}
         label="Qualified Clients"
+      />
+    ),
+  },
+  {
+    id: 'QUALIFIED_PURCHASER',
+    value: 'Qualified Purchasers',
+    labelView: (
+      <RadioBodyView
+        icon={<QPSvg width={24} height={24} />}
+        label="Qualified Purchasers"
       />
     ),
   },
@@ -208,10 +209,19 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     setValue,
     watch,
     control,
+    reset,
     formState: { isValid },
   } = useForm<yup.InferType<typeof schema>>({
     resolver: yupResolver(schema),
     defaultValues: schema.cast(
+      {},
+      { assert: false, stripUnknown: true },
+    ) as DefaultValues<FormValues>,
+    mode: 'onChange',
+  });
+
+  useEffect(() => {
+    reset(
       post
         ? {
             userId: post.userId,
@@ -220,11 +230,9 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
             media: post.media ?? undefined,
             mentionIds: post.mentionIds ?? [],
           }
-        : { user: account?._id },
-      { assert: false, stripUnknown: true },
-    ) as DefaultValues<FormValues>,
-    mode: 'onChange',
-  });
+        : { userId: account?._id },
+    );
+  }, [post, account?._id, reset]);
 
   useEffect(() => {
     const onShow = () => setKeyboardShowing(true);
@@ -263,7 +271,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       userId,
       audience,
       body,
-      media,
+      media: media ?? undefined,
       localMediaPath: imageData?.path,
       mentionIds, // TODO: Parse from body and add here
     });
@@ -324,7 +332,6 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       'base64',
     );
 
-    console.log('uploadUrl', uploadUrl);
     const result = await fetch(uploadUrl, {
       method: 'PUT',
       body: buffer,
@@ -342,6 +349,11 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
 
     setImageData(image);
     setUploading(false);
+  };
+
+  const clearImage = () => {
+    mediaField.onChange(undefined);
+    setImageData(undefined);
   };
 
   const postAsData: Option[] = [
@@ -637,16 +649,26 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
         </View>
       ) : null}
       {imageData ? (
-        <Image
-          source={{ uri: imageData.path }}
-          style={styles.postImage}
-          resizeMode="cover"
-        />
-      ) : post?.media ? (
-        <Image
-          source={{ uri: `${POST_URL}/${post.media.url}` }}
-          style={styles.postImage}
-        />
+        <View style={styles.postImage}>
+          <Image
+            source={{ uri: imageData.path }}
+            style={styles.flex}
+            resizeMode="cover"
+          />
+          <Pressable onPress={clearImage} style={styles.closeButton}>
+            <X color={WHITE} size={24} />
+          </Pressable>
+        </View>
+      ) : mediaField.value ? (
+        <View style={styles.postImage}>
+          <Image
+            source={{ uri: `${POST_URL}/${mediaField.value.url}` }}
+            style={styles.flex}
+          />
+          <Pressable onPress={clearImage} style={styles.closeButton}>
+            <X color={WHITE} size={24} />
+          </Pressable>
+        </View>
       ) : null}
       {watchBody && !uploading && !imageData && !post?.media?.url ? (
         <View style={styles.postImage}>
@@ -713,7 +735,12 @@ const styles = StyleSheet.create({
     height: 224,
     marginVertical: 16,
     borderRadius: 16,
-    zIndex: -1,
+    overflow: 'hidden',
+  },
+  closeButton: {
+    position: 'absolute',
+    right: 8,
+    top: 8,
   },
   actionWrapper: {
     marginTop: 240,
