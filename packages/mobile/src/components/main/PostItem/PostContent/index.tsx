@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   Pressable,
   Text,
+  Linking,
 } from 'react-native';
 import { LinkPreview } from '@flyerhq/react-native-link-preview';
 import FastImage from 'react-native-fast-image';
@@ -155,6 +156,15 @@ const PostContent: React.FC<PostContentProps> = ({
                           style={styles.tagLink}
                           onPress={() => goToProfile(id)}>
                           {name}
+                        </Text>
+                      );
+                    } else if (split.startsWith('%%')) {
+                      return (
+                        <Text
+                          key={`${split}-${index}`}
+                          style={styles.tagLink}
+                          onPress={() => Linking.openURL(split.substring(2))}>
+                          {split.substring(2)}
                         </Text>
                       );
                     } else {

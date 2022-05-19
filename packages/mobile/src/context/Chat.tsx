@@ -5,7 +5,7 @@ import React, {
   useState,
   PropsWithChildren,
 } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View, Text } from 'react-native';
 import { StreamChat } from 'stream-chat';
 
 import pStyles from 'mobile/src/theme/pStyles';
@@ -46,11 +46,10 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
   children,
 }) => {
   const chatClient = useRef<Client | null>(null);
-  const [isReady, setIsReady] = useState(false);
+  const [isReady, setIsReady] = useState<boolean>();
 
   useEffect(() => {
     if (!chatClient.current && user && token) {
-      console.log('IN HERE');
       const client = StreamChat.getInstance<StreamType>(GETSTREAM_ACCESS_KEY);
       (async () => {
         try {
@@ -69,6 +68,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
           setIsReady(true);
         } catch (err) {
           console.log(err);
+          setIsReady(false);
         }
       })();
 
@@ -83,10 +83,18 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
     }
   }, [user, token]);
 
-  if (!chatClient.current || !user || !token) {
+  if (isReady === undefined) {
     return (
       <View style={[pStyles.globalContainer, styles.container]}>
         <ActivityIndicator size="large" color={WHITE} />
+      </View>
+    );
+  }
+
+  if (!chatClient.current) {
+    return (
+      <View style={[pStyles.globalContainer, styles.container]}>
+        <Text>Error connecting to messenger</Text>
       </View>
     );
   }

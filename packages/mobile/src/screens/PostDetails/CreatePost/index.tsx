@@ -19,6 +19,7 @@ import { X, XCircle } from 'phosphor-react-native';
 import HeicConverter from 'react-native-heic-converter';
 import RNFS from 'react-native-fs';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Video from 'react-native-video';
 
 import RadioGroup, { Option } from 'react-native-radio-button-group';
 import {
@@ -48,10 +49,10 @@ import IconButton from 'mobile/src/components/common/IconButton';
 import UserInfo from 'mobile/src/components/common/UserInfo';
 import PModal from 'mobile/src/components/common/PModal';
 import RoundIcon from 'mobile/src/components/common/RoundIcon';
+import Media from 'mobile/src/components/common/Media';
 import { showMessage } from 'mobile/src/services/utils';
 import pStyles from 'mobile/src/theme/pStyles';
 import {
-  SECONDARY,
   WHITE60,
   PRIMARY,
   PRIMARYSOLID,
@@ -59,7 +60,6 @@ import {
   WHITE12,
   BGDARK,
   BLACK,
-  BLACK75,
 } from 'shared/src/colors';
 
 import {
@@ -85,6 +85,7 @@ import PostSelection from './PostSelection';
 import PreviewLink from './PreviewLink';
 
 import { CreatePostScreen } from 'mobile/src/navigations/PostDetailsStack';
+import { POST_PATTERN, LINK_PATTERN } from 'shared/src/patterns';
 
 const RadioBodyView = (props: any) => {
   const { icon, label } = props;
@@ -603,7 +604,19 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
                         trigger: '@',
                         renderSuggestions,
                         textStyle: {
-                          color: SECONDARY,
+                          color: PRIMARY,
+                        },
+                      },
+                      {
+                        pattern: POST_PATTERN,
+                        textStyle: {
+                          color: PRIMARY,
+                        },
+                      },
+                      {
+                        pattern: LINK_PATTERN,
+                        textStyle: {
+                          color: PRIMARY,
                         },
                       },
                     ]}
@@ -648,22 +661,17 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
           <ActivityIndicator size="large" />
         </View>
       ) : null}
-      {imageData ? (
+      {imageData || mediaField.value ? (
         <View style={styles.postImage}>
-          <Image
-            source={{ uri: imageData.path }}
-            style={styles.flex}
-            resizeMode="cover"
-          />
-          <Pressable onPress={clearImage} style={styles.closeButton}>
-            <X color={WHITE} size={24} />
-          </Pressable>
-        </View>
-      ) : mediaField.value ? (
-        <View style={styles.postImage}>
-          <Image
-            source={{ uri: `${POST_URL}/${mediaField.value.url}` }}
-            style={styles.flex}
+          <Media
+            media={
+              mediaField.value || {
+                uri: imageData.path,
+                aspectRatio: imageData.width / imageData.height,
+              }
+            }
+            resizeMode="contain"
+            style={styles.preview}
           />
           <Pressable onPress={clearImage} style={styles.closeButton}>
             <X color={WHITE} size={24} />
@@ -671,9 +679,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
         </View>
       ) : null}
       {watchBody && !uploading && !imageData && !post?.media?.url ? (
-        <View style={styles.postImage}>
-          <PreviewLink body={watchBody} />
-        </View>
+        <PreviewLink body={watchBody} containerStyle={styles.postImage} />
       ) : null}
     </View>
   );
@@ -736,6 +742,12 @@ const styles = StyleSheet.create({
     marginVertical: 16,
     borderRadius: 16,
     overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: undefined,
+  },
+  preview: {
+    marginVertical: 0,
   },
   closeButton: {
     position: 'absolute',

@@ -1,6 +1,6 @@
 import React, { FC, useState, useRef } from 'react';
 import { StyleProp, StyleSheet, Pressable, View } from 'react-native';
-import FastImage, { ImageStyle } from 'react-native-fast-image';
+import FastImage, { ResizeMode, ImageStyle } from 'react-native-fast-image';
 import Video from 'react-native-video';
 import { Play } from 'phosphor-react-native';
 import { POST_URL } from 'react-native-dotenv';
@@ -11,16 +11,17 @@ import { BLACK75, WHITE60 } from 'shared/src/colors';
 interface MediaProps {
   media: MediaType;
   style?: StyleProp<ImageStyle>;
+  resizeMode?: ResizeMode;
 }
 
 const SUPPORTED_EXTENSION = ['mp4'];
 
 function isVideo(src: string): boolean {
-  const ext = src.substring(src.lastIndexOf('.') + 1);
+  const ext = src.toLowerCase().substring(src.lastIndexOf('.') + 1);
   return SUPPORTED_EXTENSION.includes(ext);
 }
 
-const Media: FC<MediaProps> = ({ media, style }) => {
+const Media: FC<MediaProps> = ({ media, style, resizeMode = 'cover' }) => {
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const player = useRef<Video | null>(null);
 
@@ -29,32 +30,32 @@ const Media: FC<MediaProps> = ({ media, style }) => {
       return;
     }
 
+    player.current?.seek(0);
     setIsFirstLoad(false);
   };
 
   const onVideoEnd = (): void => {
-    player.current?.seek(0);
     setIsFirstLoad(true);
   };
 
   // TODO: Need to potentially validate the src url before feeding it to
   // react-native-video as an invalid source seems to crash the app
   return isVideo(media.url) ? (
-    <Pressable onPress={playVideo}>
-      <View
-        style={[
-          styles.videoContainer,
-          style,
-          { aspectRatio: media.aspectRatio },
-        ]}>
+    <Pressable onPress={playVideo} style={styles.container}>
+      <View style={[styles.videoContainer, style]}>
         <Video
           ref={(ref) => (player.current = ref)}
-          source={{ uri: `${POST_URL}/${media.url}` }}
+          source={{
+            uri: media.url.includes('/')
+              ? media.url
+              : `${POST_URL}/${media.url}`,
+          }}
           onError={(err) => console.log('error', err)}
           onEnd={onVideoEnd}
-          style={styles.media}
+          controls={true}
           paused={isFirstLoad}
-          controls={!isFirstLoad}
+          repeat={false}
+          style={[styles.media, { aspectRatio: media.aspectRatio }]}
         />
         {isFirstLoad && (
           <View style={styles.overlay} pointerEvents="none">
@@ -67,9 +68,18 @@ const Media: FC<MediaProps> = ({ media, style }) => {
     </Pressable>
   ) : (
     <FastImage
-      style={[styles.media, style, { aspectRatio: media.aspectRatio }]}
-      source={{ uri: `${POST_URL}/${media.url}` }}
-      resizeMode={FastImage.resizeMode.cover}
+      style={[
+        styles.media,
+        style,
+        { aspectRatio: media.aspectRatio },
+        media.aspectRatio < 1 && resizeMode === 'contain'
+          ? styles.contain
+          : null,
+      ]}
+      source={{
+        uri: media.url.includes('/') ? media.url : `${POST_URL}/${media.url}`,
+      }}
+      resizeMode={resizeMode}
     />
   );
 };
@@ -104,6 +114,10 @@ const styles = StyleSheet.create({
     marginVertical: 16,
     borderRadius: 16,
     overflow: 'hidden',
+  },
+  contain: {
+    height: '100%',
+    width: undefined,
   },
 });
 

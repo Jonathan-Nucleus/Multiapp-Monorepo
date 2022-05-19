@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, StyleProp, ViewStyle } from 'react-native';
 import {
   getPreviewData,
   PreviewData,
@@ -13,9 +13,10 @@ import { WHITE12 } from 'shared/src/colors';
 
 interface PostHeaderProps {
   body: string;
+  containerStyle: StyleProp<ViewStyle>;
 }
 
-const PreviewLink: React.FC<PostHeaderProps> = ({ body }) => {
+const PreviewLink: React.FC<PostHeaderProps> = ({ body, containerStyle }) => {
   const [dataPreview, setDataPreview] = useState<PreviewData>();
   useEffect(() => {
     const getData = async () => {
@@ -31,28 +32,34 @@ const PreviewLink: React.FC<PostHeaderProps> = ({ body }) => {
   }
 
   return (
-    <View style={styles.previewContainer}>
-      <View style={styles.metaDataContainer}>
-        <FastImage
-          source={{ uri: dataPreview?.image?.url }}
-          style={styles.previewImage}
-        />
-        <PLabel label={dataPreview?.title || ''} textStyle={styles.title} />
-        <PLabel
-          label={dataPreview?.description || ''}
-          textStyle={styles.description}
-          numberOfLines={2}
-        />
+    <View style={[styles.containerStyle, containerStyle]}>
+      <View style={styles.previewContainer}>
+        <View style={styles.metaDataContainer}>
+          <FastImage
+            source={{ uri: dataPreview?.image?.url }}
+            style={styles.previewImage}
+          />
+          <PLabel label={dataPreview?.title || ''} textStyle={styles.title} />
+          <PLabel
+            label={dataPreview?.description || ''}
+            textStyle={styles.description}
+            numberOfLines={2}
+          />
+        </View>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  containerStyle: {
+    height: 224,
+    marginVertical: 16,
+    width: '100%',
+  },
   previewContainer: {
     overflow: 'hidden',
-    marginVertical: 16,
-    height: 224,
+    flex: 1,
   },
   metaDataContainer: {
     flexDirection: 'column',

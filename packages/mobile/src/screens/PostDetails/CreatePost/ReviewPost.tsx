@@ -12,11 +12,12 @@ import Tag from 'mobile/src/components/common/Tag';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import { showMessage } from 'mobile/src/services/utils';
 import pStyles from 'mobile/src/theme/pStyles';
-import { BGDARK, WHITE, PRIMARY } from 'shared/src/colors';
+import { BGDARK, WHITE, PRIMARY, BLACK } from 'shared/src/colors';
 
 import PreviewLink from './PreviewLink';
 import PostSelection from './PostSelection';
 import PostHeader from './PostHeader';
+import Media from 'mobile/src/components/common/Media';
 import { AUDIENCE_OPTIONS } from './index';
 
 import { useAccount } from 'shared/graphql/query/account/useAccount';
@@ -138,6 +139,12 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
                       @{name}
                     </Text>
                   );
+                } else if (split.startsWith('%%')) {
+                  return (
+                    <Text key={`${split}-${index}`} style={styles.tagLink}>
+                      {split.substring(2)}
+                    </Text>
+                  );
                 } else {
                   return (
                     <React.Fragment key={`${split}-${index}`}>
@@ -148,16 +155,16 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
               })
             : null}
         </Text>
-        {localMediaPath ? (
-          <Image source={{ uri: localMediaPath }} style={styles.postImage} />
-        ) : (
-          route.params?.media && (
-            <Image
-              source={{ uri: `${POST_URL}/${route.params?.media.url}` }}
-              style={styles.postImage}
+        {console.log('path', route.params.media, localMediaPath)}
+        {route.params.media ? (
+          <View style={styles.postImage}>
+            <Media
+              media={route.params.media}
+              style={styles.preview}
+              resizeMode="contain"
             />
-          )
-        )}
+          </View>
+        ) : null}
         {!localMediaPath && !route.params?.media?.url && (
           <PreviewLink body={body ?? ''} />
         )}
@@ -198,6 +205,10 @@ const styles = StyleSheet.create({
     height: 224,
     marginVertical: 16,
     borderRadius: 16,
+    backgroundColor: 'red',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: BLACK,
   },
   body: {
     marginTop: 16,
@@ -217,5 +228,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
     marginBottom: 8,
     borderRadius: 16,
+  },
+  preview: {
+    marginVertical: 0,
   },
 });
