@@ -38,44 +38,25 @@ const FundCard: FC<FundCardProps> = ({
 
   return (
     <>
-      <Card className="hidden lg:block rounded-xl p-0 border-0">
-        <div className="flex flex-row bg-secondary/[.27]">
-          {showImages && (
-            <div className="flex-shrink-0 w-72 h-72 bg-white relative">
-              {fund.company?.background?.url && (
-                <Image
-                  loader={() =>
-                    `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund?.company?.background?.url}`
-                  }
-                  src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund?.company?.background?.url}`}
-                  alt=""
-                  layout="fill"
-                  className="object-cover"
-                  unoptimized={true}
-                />
-              )}
-            </div>
-          )}
-          <div className="flex flex-col flex-grow px-5">
-            <div className="flex">
+      <div className="hidden lg:block border border-white/[.12] rounded-lg">
+        <div className="flex">
+          <div className="flex flex-col flex-grow mt-4 px-4">
+            <div className="flex items-center">
               {showImages && (
                 <div className="w-24 h-24 flex-shrink-0 mr-4">
                   <Link href={`/company/${fund.company._id}`}>
                     <a>
                       <Avatar
                         user={fund.company}
-                        className="rounded-t-none rounded-b shadow-none"
+                        className="shadow-none"
                         size={96}
+                        shape="square"
                       />
                     </a>
                   </Link>
                 </div>
               )}
-              <div
-                className={`self-center flex-grow mr-4 ${
-                  !showImages ? "mt-3" : ""
-                }`}
-              >
+              <div>
                 <Link href={`/company/${fund.company._id}`}>
                   <a>
                     <div className="text-xl text-white font-medium">
@@ -85,31 +66,20 @@ const FundCard: FC<FundCardProps> = ({
                   </a>
                 </Link>
               </div>
-              <div className="self-start flex items-center mt-5">
-                <div className="w-3 h-3 bg-success rounded-full" />
-                <div className="text-xs text-success ml-1">{fund.status}</div>
-              </div>
             </div>
             {fund.highlights && (
-              <div className="min-h-0 flex-grow text-sm text-white py-3 flex">
-                <ul className="self-center list-disc ml-4">
+              <div className="min-h-0 flex-grow text-sm text-white mt-4">
+                <ul className="list-disc ml-4">
                   {fund.highlights.map((highlight, index) => (
                     <li key={index}>{highlight}</li>
                   ))}
                 </ul>
               </div>
             )}
-
-            <div className="flex flex-wrap -mx-1 py-2">
-              {fund.tags.map((tag, index) => (
-                <div
-                  key={index}
-                  className={`bg-white/[.12] text-xs text-white font-medium
-                    rounded-full uppercase m-1 px-3 py-1 tracking-widest`}
-                >
-                  {tag}
-                </div>
-              ))}
+            <div className="uppercase truncate mt-2 mb-6">
+              <div className="text-xs font-medium text-white/[.6]">
+                {fund.tags.join(" • ")}
+              </div>
             </div>
           </div>
           <div className="bg-white/[.12] w-px my-5" />
@@ -193,38 +163,39 @@ const FundCard: FC<FundCardProps> = ({
             </div>
           )}
         </div>
-        <div className="bg-secondary/[.12] border-t border-white/[.12]">
+        <div className="border-t border-white/[.12]">
           <div className="flex border-white/[.12] divide-x divide-inherit">
             <div className="flex-grow grid grid-cols-4 border-white/[.12] divide-x divide-inherit">
               <div className="flex flex-col items-center justify-center py-2">
-                <div className="text-tiny text-white opacity-60 tracking-widest mb-1">
+                <div className="text-tiny text-white opacity-60 tracking-widest">
                   ASSET CLASS
                 </div>
                 <div className="text-white">Hedge Fund</div>
               </div>
               <div className="flex flex-col items-center justify-center py-2">
-                <div className="text-tiny text-white opacity-60 tracking-widest mb-1">
+                <div className="text-tiny text-white opacity-60 tracking-widest">
                   STRATEGY
                 </div>
                 <div className="text-white">L/S Equity</div>
               </div>
               <div className="flex flex-col items-center justify-center py-2">
-                <div className="text-tiny text-white opacity-60 tracking-widest mb-1">
+                <div className="text-tiny text-white opacity-60 tracking-widest">
                   AUM
                 </div>
                 <div className="text-white">$5M</div>
               </div>
               <div className="flex flex-col items-center justify-center py-2">
-                <div className="text-tiny text-white opacity-60 tracking-widest mb-1">
+                <div className="text-tiny text-white opacity-60 tracking-widest">
                   MIN INVESTMENT
                 </div>
                 <div className="text-white">$100K</div>
               </div>
             </div>
-            <div className="w-64 text-right p-2 flex align-center justify-end">
-              <Button variant="text" className="hidden">
-                <Share color="white" weight="light" size={20} />
-              </Button>
+            <div className="w-64 text-right flex items-center justify-between px-4">
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-success rounded-full" />
+                <div className="text-xs text-success ml-1">{fund.status}</div>
+              </div>
               <Button variant="text" className="ml-2" onClick={toggleWatch}>
                 <Star
                   className={isWatching ? "text-primary-medium" : "text-white"}
@@ -236,168 +207,84 @@ const FundCard: FC<FundCardProps> = ({
             </div>
           </div>
         </div>
-      </Card>
-      <Card className="block lg:hidden rounded-none p-0">
-        <div className="h-20 bg-white relative">
-          {fund.company?.background?.url && (
-            <Image
-              loader={() =>
-                `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund?.company?.background?.url}`
-              }
-              src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${fund?.company?.background?.url}`}
-              alt=""
-              layout="fill"
-              className="object-cover"
-              unoptimized={true}
-            />
-          )}
-        </div>
-        <div className="relative px-4 pt-8 bg-secondary/[.27]">
+      </div>
+      <div className="block lg:hidden border border-white/[.12]">
+        <div className="flex items-center py-3">
           <Link href={`/company/${fund.company._id}`}>
-            <a>
+            <a className="ml-4">
               <Avatar
                 user={fund.company}
                 shape="square"
                 size={64}
-                className="w-16 h-16 relative overflow-hidden -mt-16"
               />
             </a>
           </Link>
-          <div className="flex items-center justify-end -mt-5">
-            <div className="w-3 h-3 bg-success rounded-full" />
-            <div className="text-xs text-success ml-1">{fund.status}</div>
-          </div>
-          <div className="text-white mt-2">{fund.name}</div>
           <Link href={`/company/${fund.company._id}`}>
-            <a>
-              <div className="text-sm text-primary">{fund.company.name}</div>
+            <a className="ml-3">
+              <div className="text-sm text-white font-medium">{fund.name}</div>
             </a>
           </Link>
-          <div className="text-sm text-white py-3">{fund.overview}</div>
-          <div className="flex flex-wrap -mx-1 py-2">
-            {fund.tags.map((tag, index) => (
-              <div
-                key={index}
-                className="bg-white/[.12] text-xs text-white font-medium rounded-full uppercase m-1 px-3 py-1"
-              >
-                {tag}
-              </div>
-            ))}
+          <div className="self-start ml-auto mr-2">
+            <div className="flex items-center bg-success/[.3] rounded-full px-2 py-1">
+              <div className="w-2 h-2 bg-success rounded-full" />
+              <div className="text-tiny text-success ml-1">{fund.status}</div>
+            </div>
           </div>
-          {profileType === "manager" ? (
-            <div className="border-t border-white/[.12] py-4">
-              <div className="flex items-center">
-                <div className="w-12 h-12 relative flex rounded-lg overflow-hidden">
-                  <Link href={`/company/${fund.company._id}`}>
-                    <a>
-                      <Avatar user={fund.company} shape="square" size={48} />
-                    </a>
-                  </Link>
-                </div>
-                <div className="ml-3">
-                  <div className="text-sm text-white flex items-center">
-                    <Link href={`/company/${fund.company._id}`}>
-                      <a>
-                        <div>{fund.company.name}</div>
-                      </a>
-                    </Link>
-                    {!isMyFund && (
-                      <div className="flex items-center">
-                        <span className="mx-1">•</span>
-                        <Button
-                          variant="text"
-                          className="text-primary text-xs tracking-normal font-normal py-0"
-                          onClick={toggleFollowCompany}
-                        >
-                          {isFollowingCompany ? "Unfollow" : "Follow"}
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                  <div className="text-xs text-white opacity-60">
-                    {fund.company.followerIds?.length ?? 0} Followers
-                    {" • "}
-                    {fund.company.postIds?.length ?? 0} Posts
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="border-t border-white/[.12] py-4">
-              <div className="flex items-center">
-                <div className="overflow-hidden">
-                  {fund.manager.avatar && (
-                    <Avatar user={fund.manager} size={48} />
-                  )}
-                </div>
-                <div className="ml-3">
-                  <div className="text-sm text-white flex items-center">
-                    <div>
-                      {fund.manager.firstName} {fund.manager.lastName}
-                    </div>
-                    {(!isMyFund && !isFollowingManager) && (
-                      <div className="flex items-center">
-                        <span className="mx-1">•</span>
-                        <Button
-                          variant="text"
-                          className="text-primary text-xs tracking-normal font-normal py-0"
-                          onClick={toggleFollowManager}
-                        >
-                          {isFollowingManager ? "Unfollow" : "Follow"}
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                  <div className="text-xs text-white opacity-60">
-                    {fund.manager.followerIds?.length ?? 0} Followers
-                    {" • "}
-                    {fund.manager.postIds?.length ?? 0} Posts
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
-        <div className="bg-secondary/[.12]">
-          <div className="grid grid-cols-3 border-y border-white/[.12] divide-x divide-inherit">
-            <div className="flex flex-col items-center justify-center py-2">
-              <div className="text-xs text-white opacity-60">ASSET CLASS</div>
-              <div className="text-white">Hedge Fund</div>
-            </div>
-            <div className="flex flex-col items-center justify-center py-2">
-              <div className="text-xs text-white opacity-60">STRATEGY</div>
-              <div className="text-white">L/S Equity</div>
-            </div>
-            <div className="flex flex-col items-center justify-center py-2">
-              <div className="text-xs text-white opacity-60">AUM</div>
-              <div className="text-white">$5M</div>
-            </div>
+        <div className="grid grid-cols-3 border-y border-white/[.12] divide-x divide-inherit">
+          <div className="flex flex-col items-center justify-center py-2">
+            <div className="text-tiny text-white opacity-60">ASSET CLASS</div>
+            <div className="text-xs text-white">Hedge Fund</div>
           </div>
-          <div className="flex items-center px-4 py-3">
+          <div className="flex flex-col items-center justify-center py-2">
+            <div className="text-tiny text-white opacity-60">STRATEGY</div>
+            <div className="text-xs text-white">L/S Equity</div>
+          </div>
+          <div className="flex flex-col items-center justify-center py-2">
+            <div className="text-tiny text-white opacity-60">MINIMUM</div>
+            <div className="text-xs text-white">$500K</div>
+          </div>
+        </div>
+        <div className="flex items-center mt-4 px-5">
+          <Link href={`/profile/${isMyFund ? "me" : fund.manager._id}`}>
+            <a>
+              <Avatar user={fund.manager} size={24} />
+            </a>
+          </Link>
+          <div className="text-xs text-white ml-2">
+            <Link href={`/profile/${isMyFund ? "me" : fund.manager._id}`}>
+              <a>
+                {fund.manager.firstName} {fund.manager.lastName}
+              </a>
+            </Link>
+          </div>
+        </div>
+        <div className="text-xs text-white ml-5 mr-3 mt-4">
+          {fund.overview}
+        </div>
+        <div className="flex items-center mx-5 my-4">
+          <div className="flex-grow">
             <Link href={`/funds/${fund._id}`}>
-              <a className="w-full">
+              <a>
                 <Button
-                  variant="gradient-primary"
-                  className="w-full flex-grow text-sm font-medium"
+                  variant="outline-primary"
+                  className="w-full text-xs text-white font-bold"
                 >
                   View Fund Details
                 </Button>
               </a>
             </Link>
-            <Button variant="text" className="hidden ml-3">
-              <Share color="white" weight="light" size={20} />
-            </Button>
-            <Button variant="text" className="ml-3" onClick={toggleWatch}>
-              <Star
-                className={isWatching ? "text-primary-medium" : "text-white"}
-                color="currentColor"
-                weight={isWatching ? "fill" : "light"}
-                size={20}
-              />
-            </Button>
           </div>
+          <Button variant="text" className="ml-5" onClick={toggleWatch}>
+            <Star
+              className={isWatching ? "text-primary-medium" : "text-white"}
+              color="currentColor"
+              weight={isWatching ? "fill" : "light"}
+              size={20}
+            />
+          </Button>
         </div>
-      </Card>
+      </div>
     </>
   );
 };

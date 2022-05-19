@@ -1,14 +1,17 @@
-import { FC } from "react";
-import { Star } from "phosphor-react";
+import React, { FC } from "react";
+import { Star, X } from "phosphor-react";
 import Avatar from "../../../common/Avatar";
-import Card from "../../../common/Card";
 import Button from "../../../common/Button";
 import Link from "next/link";
 import Skeleton from "./Skeleton";
 import { UserProfileProps } from "../../../../types/common-props";
 import { useWatchFund } from "shared/graphql/mutation/funds/useWatchFund";
 
-const Watchlist: FC<UserProfileProps> = ({ user }) => {
+interface WatchlistProps extends UserProfileProps {
+  onClose?: () => void;
+}
+
+const Watchlist: FC<WatchlistProps> = ({ user, onClose }) => {
   const [watchFund] = useWatchFund();
   const handleRemoveWatchList = async (id: string) => {
     try {
@@ -22,12 +25,22 @@ const Watchlist: FC<UserProfileProps> = ({ user }) => {
   if (!user) {
     return <Skeleton />;
   }
-  if (user.watchlist.length == 0) {
-    return <></>;
-  }
   return (
-    <Card className="p-0 border-white/[.12] divide-y divide-inherit">
-      <div className="text-white  p-4">Watch List</div>
+    <div className="border-white/[.12] divide-y divide-inherit">
+      <div className="text-white flex items-center p-4">
+        <div>Watch List</div>
+        {onClose && (
+          <div className="flex ml-auto">
+            <Button
+              variant="text"
+              className="opacity-60 py-0"
+              onClick={onClose}
+            >
+              <X color="currentColor" weight="bold" size={24} />
+            </Button>
+          </div>
+        )}
+      </div>
       {user.watchlist.map((item) => (
         <div
           key={item._id}
@@ -59,7 +72,10 @@ const Watchlist: FC<UserProfileProps> = ({ user }) => {
           </div>
         </div>
       ))}
-    </Card>
+      {user.watchlist.length == 0 &&
+        <div className="text-xs text-gray-500 text-center p-4"></div>
+      }
+    </div>
   );
 };
 

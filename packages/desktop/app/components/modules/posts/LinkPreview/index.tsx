@@ -30,9 +30,10 @@ const LinkPreview: FC<LinkPreviewProps> = ({
   useEffect(() => {
     const fetchPreview = async (link: string) => {
       setLoading(true);
-      const response = await fetch("/api/scrap",
-        { method: "POST", body: JSON.stringify({ url: link }) },
-      );
+      const response = await fetch("/api/scrap", {
+        method: "POST",
+        body: JSON.stringify({ url: link }),
+      });
       const json = await response.json();
       setPreview(json);
       setLoading(false);
@@ -42,14 +43,12 @@ const LinkPreview: FC<LinkPreviewProps> = ({
   return (
     <>
       <div className="border-l-2 border-primary pl-2">
-        {loading &&
-          <Spinner />
-        }
-        {!loading && preview &&
+        {loading && <Spinner />}
+        {!loading && preview && (
           <>
             <div className="flex items-center relative pb-1">
               <div className="w-4 h-4 flex items-center flex-shrink-0">
-                {preview.logo &&
+                {preview.logo && (
                   <Image
                     loader={() => preview.logo!}
                     src={preview.logo}
@@ -59,13 +58,11 @@ const LinkPreview: FC<LinkPreviewProps> = ({
                     unoptimized={true}
                     objectFit="cover"
                   />
-                }
+                )}
               </div>
               <div className="text-sm text-white flex-grow truncate mx-2 pr-3">
                 <Link href={link}>
-                  <a target="_blank">
-                    {preview.title}
-                  </a>
+                  <a target="_blank">{preview.title}</a>
                 </Link>
               </div>
               <div className="flex ml-auto">
@@ -74,21 +71,21 @@ const LinkPreview: FC<LinkPreviewProps> = ({
                   className="py-0"
                   onClick={() => setShowImage(!showImage)}
                 >
-                  {showImage ?
+                  {showImage ? (
                     <CaretDown
                       size={16}
                       weight="bold"
                       color="currentColor"
                       className="text-white"
                     />
-                    :
+                  ) : (
                     <CaretUp
                       size={16}
                       weight="bold"
                       color="currentColor"
                       className="text-white"
                     />
-                  }
+                  )}
                 </Button>
               </div>
             </div>
@@ -104,7 +101,7 @@ const LinkPreview: FC<LinkPreviewProps> = ({
             >
               <div className={`${sizeClass} relative overflow-hidden`}>
                 <div className="flex items-center justify-center">
-                  {preview.image &&
+                  {preview.image && (
                     <Link href={link}>
                       <a target="_blank">
                         <Image
@@ -118,17 +115,17 @@ const LinkPreview: FC<LinkPreviewProps> = ({
                         />
                       </a>
                     </Link>
-                  }
-                  {!preview.image &&
+                  )}
+                  {!preview.image && (
                     <div className="text-sm text-gray-400">
                       Preview not available
                     </div>
-                  }
+                  )}
                 </div>
               </div>
             </Transition>
           </>
-        }
+        )}
       </div>
     </>
   );

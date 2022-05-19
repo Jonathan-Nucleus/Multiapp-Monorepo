@@ -17,5 +17,6 @@ const Home: NextPageWithLayout = () => {
 
 Home.layout = "main";
 Home.middleware = "auth";
+Home.background = "radial";
 
 export default Home;

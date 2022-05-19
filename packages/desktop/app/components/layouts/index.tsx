@@ -6,13 +6,14 @@ import AppAuthOptions from "../../config/auth";
 import { AppPageProps } from "../../types/next-page";
 import AuthLayout from "./AuthLayout";
 import MainLayout from "./MainLayout";
-import styles from "./index.module.css";
+import Background from "./Background";
 
 type RootLayoutProps = PropsWithChildren<AppPageProps>;
 
 const RootLayout: FC<RootLayoutProps> = ({
   middleware,
   layout,
+  background = (layout == "auth" ? "radial" : "default"),
   children,
 }: RootLayoutProps) => {
   const { status } = useSession();
@@ -55,11 +56,11 @@ const RootLayout: FC<RootLayoutProps> = ({
         options={{ easing: "ease", speed: 500, showSpinner: false }}
         nonce=""
       />
-      <main className={styles.main}>
+      <main>
         {(status == "loading" || routeChangeStarted) ?
           <></>
           :
-          <>
+          <Background type={background}>
             {layout == "auth" &&
               <AuthLayout>{children}</AuthLayout>
             }
@@ -70,7 +71,7 @@ const RootLayout: FC<RootLayoutProps> = ({
               <MainLayout fluid={true}>{children}</MainLayout>
             }
             {layout == undefined && children}
-          </>
+          </Background>
         }
       </main>
     </>

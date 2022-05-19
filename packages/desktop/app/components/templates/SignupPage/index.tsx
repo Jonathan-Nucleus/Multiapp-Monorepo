@@ -16,8 +16,12 @@ import Alert from "../../common/Alert";
 import Checkbox from "../../common/Checkbox";
 
 import { PASSWORD_PATTERN } from "shared/src/patterns";
-import { AppleLogo, GoogleLogo, LinkedinLogo, WarningCircle } from "phosphor-react";
+import { WarningCircle } from "phosphor-react";
 import { useRegister } from "shared/graphql/mutation/auth/useRegister";
+import Apple from "shared/assets/images/apple.svg";
+import LinkedIn from "shared/assets/images/linkedin.svg";
+import Google from "shared/assets/images/google.svg";
+import Image from "next/image";
 
 type FormValues = {
   firstName: string;
@@ -277,24 +281,69 @@ const SignupPage: FC = () => {
         <div className="flex items-center justify-center md:grid grid-cols-3 gap-7">
           <Button
             variant="outline-primary"
-            className="w-12 h-12 md:w-full md:h-auto rounded-lg md:rounded-full border border-gray-400 md:border-primary"
+            className="w-12 h-12 md:w-full md:h-auto rounded-lg md:rounded-full border border-white/[.12] md:border-primary px-0 py-0 md:py-2"
           >
-            <AppleLogo color="white" weight="fill" size={20} />
-            <span className="ml-2 hidden md:inline-block">APPLE</span>
+            <span className="hidden md:inline-flex items-center">
+              <Image
+                src={Apple}
+                alt=""
+                width={16}
+                height={16}
+              />
+            </span>
+            <span className="inline-flex md:hidden items-center">
+              <Image
+                src={Apple}
+                alt=""
+                width={24}
+                height={24}
+              />
+            </span>
+            <span className="ml-2 hidden md:inline-block">Apple</span>
           </Button>
           <Button
             variant="outline-primary"
-            className="w-12 h-12 md:w-full md:h-auto rounded-lg md:rounded-full border border-gray-400 md:border-primary"
+            className="w-12 h-12 md:w-full md:h-auto rounded-lg md:rounded-full border border-white/[.12] md:border-primary px-0 py-0 md:py-2"
           >
-            <GoogleLogo color="white" weight="bold" size={20} />
-            <span className="ml-2 hidden md:inline-block">GOOGLE</span>
+            <span className="hidden md:inline-flex items-center">
+              <Image
+                src={Google}
+                alt=""
+                width={16}
+                height={16}
+              />
+            </span>
+            <span className="inline-flex md:hidden items-center">
+              <Image
+                src={Google}
+                alt=""
+                width={24}
+                height={24}
+              />
+            </span>
+            <span className="ml-2 hidden md:inline-block">Google</span>
           </Button>
           <Button
             variant="outline-primary"
-            className="w-12 h-12 md:w-full md:h-auto rounded-lg md:rounded-full border border-gray-400 md:border-primary"
+            className="w-12 h-12 md:w-full md:h-auto rounded-lg md:rounded-full border border-white/[.12] md:border-primary px-0 py-0 md:py-2"
           >
-            <LinkedinLogo color="white" weight="fill" size={20} />
-            <span className="ml-2 hidden md:inline-block">LINKEDIN</span>
+            <span className="hidden md:inline-flex items-center">
+              <Image
+                src={LinkedIn}
+                alt=""
+                width={16}
+                height={16}
+              />
+            </span>
+            <span className="inline-flex md:hidden items-center">
+              <Image
+                src={LinkedIn}
+                alt=""
+                width={24}
+                height={24}
+              />
+            </span>
+            <span className="ml-2 hidden md:inline-block">Linkedin</span>
           </Button>
         </div>
       </div>

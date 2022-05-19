@@ -1,37 +1,40 @@
 import { FC } from "react";
-import { ArrowCircleRight } from "phosphor-react";
+import { ArrowRight } from "phosphor-react";
 import { Splide, SplideSlide, SplideTrack } from "@splidejs/react-splide";
 import "@splidejs/react-splide/css";
 import Button from "desktop/app/components/common/Button";
 import Card from "desktop/app/components/common/Card";
 import FeaturedManager from "./FeaturedManager";
-import { useFundManagers } from "shared/graphql/query/marketplace/useFundManagers";
+import {
+  useFundManagers,
+} from "shared/graphql/query/marketplace/useFundManagers";
 
 const FeaturedManagers: FC = () => {
-  const { data: managersData } = useFundManagers(); // Temporarily use all managers
-  const { managers } = managersData?.fundManagers ?? {
-    managers: [],
-  };
+  const { data: { fundManagers } = {} } = useFundManagers(); // Temporarily use all managers
+
+  if (!fundManagers?.managers) {
+    return <></>;
+  }
 
   return (
     <>
-      <Card className="overflow-visible">
+      <Card className="overflow-visible border-brand-overlay/[.1] rounded">
         <div className="flex items-center font-medium text-xs">
-          <div className="text-white uppercase text-tiny tracking-widest ml-2">
-            Featured Fund managers •
+          <div className="text-white text-tiny tracking-widest ml-2">
+            Featured Fund Managers •
           </div>
           <Button
             variant="text"
-            className="text-tiny text-primary font-medium ml-1 py-0 uppercase"
+            className="text-tiny text-primary font-medium ml-1 py-0"
           >
-            follow all
+            Follow All
           </Button>
         </div>
         <div className="mt-3">
           <Splide
             options={{
               autoWidth: true,
-              rewind: true,
+              rewind: false,
               lazyLoad: "nearby",
               cover: true,
               pagination: false,
@@ -39,7 +42,7 @@ const FeaturedManagers: FC = () => {
             hasTrack={false}
           >
             <SplideTrack>
-              {managers?.map((manager) => (
+              {fundManagers?.managers.map((manager) => (
                 <SplideSlide key={manager._id}>
                   <FeaturedManager manager={manager} />
                 </SplideSlide>
@@ -48,22 +51,22 @@ const FeaturedManagers: FC = () => {
             <div className="splide__arrows">
               <Button
                 variant="text"
-                className="splide__arrow--prev text-gray-600 py-0 absolute !-left-10 top-16"
+                className="splide__arrow--prev w-12 h-12 flex items-center bg-gradient-to-r from-[#844AFF] to-primary disabled:bg-none disabled:bg-gray-600 rounded-full py-0 absolute !-left-10 top-12 text-background"
               >
-                <ArrowCircleRight
+                <ArrowRight
                   color="currentColor"
-                  weight="fill"
-                  size={50}
+                  weight="bold"
+                  size={30}
                 />
               </Button>
               <Button
                 variant="text"
-                className="splide__arrow--next text-gray-600 py-0 absolute !-right-10 top-16"
+                className="splide__arrow--next w-12 h-12 flex items-center bg-gradient-to-r from-[#844AFF] to-primary disabled:bg-none disabled:bg-gray-600 rounded-full py-0 absolute !-right-10 top-12 text-background"
               >
-                <ArrowCircleRight
+                <ArrowRight
                   color="currentColor"
-                  weight="fill"
-                  size={50}
+                  weight="bold"
+                  size={30}
                 />
               </Button>
             </div>

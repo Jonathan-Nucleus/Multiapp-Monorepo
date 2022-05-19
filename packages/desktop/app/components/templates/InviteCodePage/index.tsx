@@ -43,17 +43,21 @@ const InviteCodePage: FC = () => {
       <div className="container mx-auto max-w-xl">
         <h1 className="text-white text-2xl mt-6">Join the inner circle!</h1>
         <form className="mt-8" onSubmit={handleSubmit(onSubmit)}>
-          <Field
-            register={register}
-            state={formState}
-            name="code"
-            label="Enter code"
-          />
-          <div className="text-right mt-8">
+          <div className="sm:h-20">
+            <Field
+              register={register}
+              state={formState}
+              name="code"
+              label="Enter code"
+            />
+          </div>
+          <div className="text-right mt-4">
             <Button
               type="submit"
               variant="gradient-primary"
-              className="px-6 w-full md:w-auto"
+              className="px-6 w-full md:w-24"
+              disabled={loading}
+              loading={loading}
             >
               Next
             </Button>

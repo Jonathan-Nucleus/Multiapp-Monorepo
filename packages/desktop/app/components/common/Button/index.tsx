@@ -34,14 +34,14 @@ const Button: FC<ButtonProps> = ({
       "text-sm font-bold rounded-full tracking-widest " +
       "inline-flex justify-center items-center px-4 py-2 " +
       "bg-gradient-to-r from-[#844AFF] to-primary " +
-      "disabled:bg-white disabled:bg-none disabled:text-black disabled:opacity-30 " +
-      "hover:opacity-80 active:opacity-80 focus:outline-none transition ";
+      "disabled:bg-gray-500 disabled:bg-none disabled:text-black " +
+      "hover:opacity-80 disabled:hover:opacity-100 focus:outline-none transition ";
   } else if (variant == "text") {
     buttonClass =
       "text-sm font-bold tracking-widest " +
       "inline-flex justify-center items-center py-2 " +
-      "disabled:text-gray " +
-      "hover:opacity-80 active:opacity-80 focus:outline-none transition ";
+      "disabled:text-gray-500 " +
+      "hover:opacity-80 disabled:hover:opacity-100 active:opacity-80 focus:outline-none transition ";
   }
   buttonClass += className ?? "";
   return (

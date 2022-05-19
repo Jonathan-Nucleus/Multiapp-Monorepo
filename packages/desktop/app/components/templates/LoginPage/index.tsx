@@ -18,10 +18,10 @@ import Apple from "shared/assets/images/apple.svg";
 import LinkedIn from "shared/assets/images/linkedin.svg";
 import Google from "shared/assets/images/google.svg";
 
-const PROVIDER_ICONS: Record<string, ReactElement> = {
-  apple: <Image src={Apple} alt="" layout={"intrinsic"} />,
-  google: <Image src={Google} alt="" layout={"intrinsic"} />,
-  linkedin: <Image src={LinkedIn} alt="" layout={"intrinsic"} />,
+const PROVIDER_ICONS: Record<string, string> = {
+  apple: Apple,
+  google: Google,
+  linkedin: LinkedIn,
 };
 
 interface LoginPageProps {
@@ -157,21 +157,51 @@ const LoginPage: FC<LoginPageProps> = ({ providers }: LoginPageProps) => {
               <Button
                 key={provider}
                 variant="outline-primary"
-                className="w-12 h-12 md:w-full md:h-auto rounded-lg md:rounded-full border border-gray-400 md:border-primary"
+                className="w-12 h-12 md:w-full md:h-auto rounded-lg md:rounded-full border border-white/[.12] md:border-primary px-0 py-0 md:py-2"
                 onClick={() => signIn(provider)}
               >
-                {PROVIDER_ICONS[provider]}
+                <span className="hidden md:inline-flex items-center">
+                  <Image
+                    src={PROVIDER_ICONS[provider]}
+                    alt=""
+                    width={16}
+                    height={16}
+                  />
+                </span>
+                <span className="inline-flex md:hidden items-center">
+                  <Image
+                    src={PROVIDER_ICONS[provider]}
+                    alt=""
+                    width={24}
+                    height={24}
+                  />
+                </span>
                 <span className="ml-2 capitalize hidden md:inline-block">
                   {provider}
                 </span>
               </Button>
-            )
+            ),
           )}
           <Button
             variant="outline-primary"
-            className="w-12 h-12 md:w-full md:h-auto rounded-lg md:rounded-full border border-gray-400 md:border-primary"
+            className="w-12 h-12 md:w-full md:h-auto rounded-lg md:rounded-full border border-white/[.12] md:border-primary px-0 py-0 md:py-2"
           >
-            {PROVIDER_ICONS["apple"]}
+            <span className="hidden md:inline-flex items-center">
+              <Image
+                src={PROVIDER_ICONS["apple"]}
+                alt=""
+                width={16}
+                height={16}
+              />
+            </span>
+            <span className="inline-flex md:hidden items-center">
+              <Image
+                src={PROVIDER_ICONS["apple"]}
+                alt=""
+                width={24}
+                height={24}
+              />
+            </span>
             <span className="ml-2 hidden md:inline-block">Apple</span>
           </Button>
         </div>

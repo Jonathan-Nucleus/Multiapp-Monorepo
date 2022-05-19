@@ -53,7 +53,7 @@ const Header: FC = () => {
       <Container>
         <nav className="hidden md:flex flex-row items-center py-5">
           <div>
-            <div className="w-80 hidden lg:block mr-5">
+            <div className="lg:w-48 xl:w-80 hidden lg:block mr-5">
               <Link href="/">
                 <a className="flex items-center">
                   <Image src={Logo} alt="" layout={"intrinsic"} />

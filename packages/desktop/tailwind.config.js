@@ -2,6 +2,9 @@ module.exports = {
   content: ["./pages/**/*.{js,ts,jsx,tsx}", "./app/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      backgroundImage: {
+        radial: "url('~shared/assets/images/background.png')",
+      },
       fontSize: {
         tiny: "0.625rem",
       },

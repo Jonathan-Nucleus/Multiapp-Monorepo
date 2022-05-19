@@ -3,9 +3,10 @@ import CompanyCard from "./CompanyCard";
 import FeaturedProfessionals from "./FeaturedProfessionals";
 import InviteFriends from "../../modules/users/InviteFriends";
 import ProfileCardSmall from "../../modules/users/ProfileCardSmall";
-import Watchlist from "./Watchlist";
+import Watchlist from "../../modules/funds/Watchlist";
 import PostsSection from "./PostsSection";
 import { useAccount } from "shared/graphql/query/account/useAccount";
+import Card from "../../common/Card";
 
 const HomePage: FC = () => {
   const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
@@ -27,9 +28,13 @@ const HomePage: FC = () => {
         </div>
         <div className="w-80 hidden lg:block flex-shrink-0">
           <InviteFriends />
-          <div className="mt-5">
-            <Watchlist user={account} />
-          </div>
+          {(!account || account.watchlist.length > 0) &&
+            <div className="mt-5">
+              <Card className="p-0">
+                <Watchlist user={account} />
+              </Card>
+            </div>
+          }
         </div>
       </div>
     </div>

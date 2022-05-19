@@ -566,13 +566,17 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
             </Tab.Group>
             <div className="border-t border-white/[.12] mt-6" />
             <div className="mt-2 mb-24">
-              <Button
-                variant="text"
-                className="text-white opacity-60 flex items-center tracking-normal font-normal"
-              >
-                <Info color="currentColor" weight="light" size={20} />
-                <span className="ml-2 underline">Disclosure</span>
-              </Button>
+              <Link href="https://prometheusalts.com/legals/disclosure-library">
+                <a target="_blank">
+                  <Button
+                    variant="text"
+                    className="text-white opacity-60 flex items-center tracking-normal font-normal"
+                  >
+                    <Info color="currentColor" weight="light" size={20} />
+                    <span className="ml-2 underline">Disclosure</span>
+                  </Button>
+                </a>
+              </Link>
             </div>
           </div>
         </div>

@@ -7,6 +7,7 @@ import FundsList from "./FundsList";
 import { useAccount } from "shared/graphql/query/account/useAccount";
 import AccreditationQuestionnaire from "../AccreditationQuestionnaire";
 import Container from "../../../layouts/Container";
+import Link from "next/link";
 
 const FundsPage: FC = () => {
   const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
@@ -54,13 +55,17 @@ const FundsPage: FC = () => {
           )}
         </div>
         <footer className="border-t border-white/[.12] mt-6 px-4 lg:px-0 pt-3">
-          <Button
-            variant="text"
-            className="text-white opacity-60 flex items-center tracking-normal font-normal"
-          >
-            <Info color="currentColor" weight="light" size={20} />
-            <span className="ml-2">Disclosure</span>
-          </Button>
+          <Link href="https://prometheusalts.com/legals/disclosure-library">
+            <a target="_blank">
+              <Button
+                variant="text"
+                className="text-white opacity-60 flex items-center tracking-normal font-normal"
+              >
+                <Info color="currentColor" weight="light" size={20} />
+                <span className="ml-2">Disclosure</span>
+              </Button>
+            </a>
+          </Link>
         </footer>
       </Container>
     </>

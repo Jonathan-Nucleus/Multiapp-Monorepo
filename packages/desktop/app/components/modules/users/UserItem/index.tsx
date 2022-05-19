@@ -22,12 +22,14 @@ export interface UserItemProps {
   user: UserType;
   showChat?: boolean;
   showFollow?: boolean;
+  showCompany?: boolean;
 }
 
 const UserItem: FC<UserItemProps> = ({
   user,
   showChat = false,
   showFollow = true,
+  showCompany = true,
 }: UserItemProps) => {
   const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const { isFollowing, toggleFollow } = useFollowUser(user._id);
@@ -35,14 +37,14 @@ const UserItem: FC<UserItemProps> = ({
 
   return (
     <div className="flex items-center">
-      <Link href={`/profile/${user._id}`}>
+      <Link href={`/profile/${isMyProfile ? "me" : user._id}`}>
         <a>
           <Avatar user={user} size={56} />
         </a>
       </Link>
       <div className="ml-2 flex-grow">
         <div className="flex items-center">
-          <Link href={`/profile/${user._id}`}>
+          <Link href={`/profile/${isMyProfile ? "me" : user._id}`}>
             <a className="text-white">
               {user.firstName} {user.lastName}
             </a>
@@ -62,7 +64,9 @@ const UserItem: FC<UserItemProps> = ({
             </>
           )}
         </div>
-        <div className="text-xs text-white opacity-60">{user.position}</div>
+        {showCompany &&
+          <div className="text-xs text-white opacity-60">{user.position}</div>
+        }
         <div className="text-xs text-white opacity-60">
           {user.company?.name}
         </div>

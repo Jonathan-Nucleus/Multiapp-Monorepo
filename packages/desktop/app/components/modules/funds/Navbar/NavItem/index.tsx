@@ -1,14 +1,13 @@
-import { FC, ReactElement } from "react";
+import { FC } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
 interface NavItemProps {
   path: string;
-  icon?: ReactElement;
   title: string;
 }
 
-const NavItem: FC<NavItemProps> = ({ path, icon, title }: NavItemProps) => {
+const NavItem: FC<NavItemProps> = ({ path, title }: NavItemProps) => {
   const router = useRouter();
   return (
     <>
@@ -22,7 +21,6 @@ const NavItem: FC<NavItemProps> = ({ path, icon, title }: NavItemProps) => {
             + " hover:text-white transition-all"
           }
         >
-          {icon && <span className="mr-3">{icon}</span>}
           {title}
         </a>
       </Link>
