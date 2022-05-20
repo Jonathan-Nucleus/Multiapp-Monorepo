@@ -155,7 +155,7 @@ const PostContent: React.FC<PostContentProps> = ({
                           key={id}
                           style={styles.tagLink}
                           onPress={() => goToProfile(id)}>
-                          {name}
+                          @{name}
                         </Text>
                       );
                     } else if (split.startsWith('%%')) {
@@ -163,7 +163,9 @@ const PostContent: React.FC<PostContentProps> = ({
                         <Text
                           key={`${split}-${index}`}
                           style={styles.tagLink}
-                          onPress={() => Linking.openURL(split.substring(2))}>
+                          onPress={() =>
+                            Linking.openURL(split.substring(2).trim())
+                          }>
                           {split.substring(2)}
                         </Text>
                       );

@@ -408,7 +408,7 @@ const CreatePost: SharePostScreen = ({ navigation, route }) => {
                   keyboardAppearance="dark"
                   value={field.value ?? ''}
                   onChange={field.onChange}
-                  placeholder="Shareasdf a post"
+                  placeholder="Share a post"
                   placeholderTextColor={WHITE60}
                   style={styles.mentionInput}
                   partTypes={[

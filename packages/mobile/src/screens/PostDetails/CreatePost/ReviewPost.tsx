@@ -155,7 +155,6 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
               })
             : null}
         </Text>
-        {console.log('path', route.params.media, localMediaPath)}
         {route.params.media ? (
           <View style={styles.postImage}>
             <Media
@@ -205,10 +204,8 @@ const styles = StyleSheet.create({
     height: 224,
     marginVertical: 16,
     borderRadius: 16,
-    backgroundColor: 'red',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: BLACK,
   },
   body: {
     marginTop: 16,

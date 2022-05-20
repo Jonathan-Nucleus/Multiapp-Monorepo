@@ -60,7 +60,7 @@ const ProfileCard: FC<ProfileCardProps> = ({
       if (matches.length > wordsToSplit) {
         overviewShort = user?.overview?.substring(
           0,
-          matches[wordsToSplit].index!,
+          matches[wordsToSplit].index!
         );
       }
     }
@@ -209,9 +209,7 @@ const ProfileCard: FC<ProfileCardProps> = ({
                 </div>
                 <div>
                   <Link href={`/company/${user.company?._id}`}>
-                    <a className="text-sm text-primary">
-                      {user.company?.name}
-                    </a>
+                    <a className="text-sm text-primary">{user.company?.name}</a>
                   </Link>
                 </div>
               </div>
@@ -311,7 +309,11 @@ const ProfileCard: FC<ProfileCardProps> = ({
             <div className="flex items-center p-4 border-t border-white/[.12]">
               <div className="flex items-center cursor-pointer">
                 <Link href={user.linkedIn ?? "/"}>
-                  <a className="flex items-center text-white" target="_blank">
+                  <a
+                    className="flex items-center text-white"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <Image src={LinkedIn} alt="" layout={"intrinsic"} />
                     <div className="text-sm text-primary ml-1 hidden md:block">
                       Linkedin
@@ -321,7 +323,11 @@ const ProfileCard: FC<ProfileCardProps> = ({
               </div>
               <div className="flex items-center cursor-pointer ml-8">
                 <Link href={user.twitter ?? "/"}>
-                  <a className="flex items-center text-white" target="_blank">
+                  <a
+                    className="flex items-center text-white"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <Image src={Twitter} alt="" layout={"intrinsic"} />
                     <div className="text-sm text-primary ml-1 hidden md:block">
                       Twitter
@@ -331,7 +337,11 @@ const ProfileCard: FC<ProfileCardProps> = ({
               </div>
               <div className="flex items-center cursor-pointer ml-8">
                 <Link href={user.website ?? "/"}>
-                  <a className="flex items-center text-white" target="_blank">
+                  <a
+                    className="flex items-center text-white"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <Image src={Globe} alt="" layout={"intrinsic"} />
                     <div className="text-sm text-primary ml-1">Website</div>
                   </a>

@@ -7,11 +7,15 @@ export const PHONE_PATTERN = /^\d{3}-\d{3}-\d{4}$/i;
 export const PASSWORD_PATTERN =
   /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&.^]).{8,}$/;
 export const LINK_PATTERN =
-  /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/gi;
-export const PREVIEW_LINK_PATTERN =
-  /((http|ftp|https):\/\/)?([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?/gi;
-export const POST_PATTERN =
-  /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)|((http|ftp|https):\/\/)?([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?|(^|\W)([$|#]\w+)|(?<original>(?<trigger>.)\[(?<name>([^[]*))]\((?<id>([\d\w-]*))\))/gi;
+  /((?:(?:https|http|ftp):\/\/)?(?:www\.)?(?:[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b)*(?:\/[\/\d\w\.\-\?=&%\+#]*)*\s+)/gi;
+export const TAG_PATTERN = /(^|\W)([\$|#]\w+\s+)/gi;
+export const MENTION_PATTERN =
+  /(?<original>(?<trigger>.)\[(?<name>([^[]*))]\((?<id>([\d\w-]*))\))/gi;
+
+export const POST_PATTERN = new RegExp(
+  `${LINK_PATTERN.source}|${TAG_PATTERN.source}|${MENTION_PATTERN.source}`,
+  "gi"
+);
 
 export const processPost = (text: string): string[] => {
   const splits = text.split(POST_PATTERN);
@@ -25,13 +29,11 @@ export const processPost = (text: string): string[] => {
     if (val.startsWith("@[")) {
       processedSplits.push(`@${splits[index + 2]}|${splits[index + 4]}`);
       index += 5;
-    } else if (val.match(PREVIEW_LINK_PATTERN) || val.match(LINK_PATTERN)) {
+    } else if (val.trim() !== "" && val.match(LINK_PATTERN)) {
       numLinks++;
+      if (numLinks === 1) continue; // Skip the first link in the body
 
-      if (numLinks === 1) continue; // Hide the first link
       processedSplits.push(`%%${val}`);
-
-      index += 2;
     } else {
       processedSplits.push(val);
     }

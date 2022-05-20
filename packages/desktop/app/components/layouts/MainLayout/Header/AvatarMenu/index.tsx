@@ -137,7 +137,10 @@ const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
                     />
                   ) : (
                     <Link href={item.path} passHref={item.external}>
-                      <a target={item.external ? "_blank" : "_self"}>
+                      <a
+                        target={item.external ? "_blank" : "_self"}
+                        rel="noopener noreferrer"
+                      >
                         <MenuItem
                           key={index}
                           icon={item.icon}
@@ -184,12 +187,12 @@ const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
       >
         <InviteFriends onClose={() => setShowInviteModal(false)} />
       </ModalDialog>
-      {showBecomeProModal &&
+      {showBecomeProModal && (
         <BecomeProModal
           show={showBecomeProModal}
           onClose={() => setShowBecomeProModal(false)}
         />
-      }
+      )}
     </>
   );
 };

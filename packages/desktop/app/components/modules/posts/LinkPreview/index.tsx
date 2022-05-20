@@ -62,7 +62,9 @@ const LinkPreview: FC<LinkPreviewProps> = ({
               </div>
               <div className="text-sm text-white flex-grow truncate mx-2 pr-3">
                 <Link href={link}>
-                  <a target="_blank">{preview.title}</a>
+                  <a target="_blank" rel="noopener noreferrer">
+                    {preview.title}
+                  </a>
                 </Link>
               </div>
               <div className="flex ml-auto">
@@ -103,7 +105,7 @@ const LinkPreview: FC<LinkPreviewProps> = ({
                 <div className="flex items-center justify-center">
                   {preview.image && (
                     <Link href={link}>
-                      <a target="_blank">
+                      <a target="_blank" rel="noopener noreferrer">
                         <Image
                           loader={() => preview.image!}
                           src={preview.image}

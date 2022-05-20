@@ -1,7 +1,7 @@
 import React, { FC, useState, useRef } from 'react';
 import { StyleProp, StyleSheet, Pressable, View } from 'react-native';
 import FastImage, { ResizeMode, ImageStyle } from 'react-native-fast-image';
-import Video from 'react-native-video';
+import Video, { VideoProperties } from 'react-native-video';
 import { Play } from 'phosphor-react-native';
 import { POST_URL } from 'react-native-dotenv';
 import { Media as MediaType } from 'shared/graphql/fragments/post';
@@ -11,7 +11,8 @@ import { BLACK75, WHITE60 } from 'shared/src/colors';
 interface MediaProps {
   media: MediaType;
   style?: StyleProp<ImageStyle>;
-  resizeMode?: ResizeMode;
+  resizeMode?: 'contain' | 'cover';
+  onLoad?: VideoProperties['onLoad'];
 }
 
 const SUPPORTED_EXTENSION = ['mp4'];
@@ -21,7 +22,12 @@ function isVideo(src: string): boolean {
   return SUPPORTED_EXTENSION.includes(ext);
 }
 
-const Media: FC<MediaProps> = ({ media, style, resizeMode = 'cover' }) => {
+const Media: FC<MediaProps> = ({
+  media,
+  style,
+  onLoad,
+  resizeMode = 'cover',
+}) => {
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const player = useRef<Video | null>(null);
 
@@ -41,7 +47,16 @@ const Media: FC<MediaProps> = ({ media, style, resizeMode = 'cover' }) => {
   // TODO: Need to potentially validate the src url before feeding it to
   // react-native-video as an invalid source seems to crash the app
   return isVideo(media.url) ? (
-    <Pressable onPress={playVideo} style={styles.container}>
+    <Pressable
+      onPress={playVideo}
+      style={[
+        styles.media,
+        style,
+        { aspectRatio: media.aspectRatio },
+        media.aspectRatio < 1 && resizeMode === 'contain'
+          ? styles.contain
+          : null,
+      ]}>
       <View style={[styles.videoContainer, style]}>
         <Video
           ref={(ref) => (player.current = ref)}
@@ -50,12 +65,15 @@ const Media: FC<MediaProps> = ({ media, style, resizeMode = 'cover' }) => {
               ? media.url
               : `${POST_URL}/${media.url}`,
           }}
+          resizeMode={resizeMode}
+          onLoad={onLoad}
           onError={(err) => console.log('error', err)}
           onEnd={onVideoEnd}
           controls={true}
+          ignoreSilentSwitch="ignore"
           paused={isFirstLoad}
           repeat={false}
-          style={[styles.media, { aspectRatio: media.aspectRatio }]}
+          style={{ aspectRatio: media.aspectRatio }}
         />
         {isFirstLoad && (
           <View style={styles.overlay} pointerEvents="none">

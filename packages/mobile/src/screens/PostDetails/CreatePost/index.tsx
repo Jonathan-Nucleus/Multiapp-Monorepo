@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
   ActivityIndicator,
-  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -15,11 +14,10 @@ import ImagePicker, {
   ImageOrVideo,
   Image as UploadImage,
 } from 'react-native-image-crop-picker';
-import { X, XCircle } from 'phosphor-react-native';
-import HeicConverter from 'react-native-heic-converter';
+import { X } from 'phosphor-react-native';
 import RNFS from 'react-native-fs';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Video from 'react-native-video';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import RadioGroup, { Option } from 'react-native-radio-button-group';
 import {
@@ -34,8 +32,6 @@ import {
 } from 'phosphor-react-native';
 const Buffer = global.Buffer || require('buffer').Buffer;
 
-import { POST_URL } from 'react-native-dotenv';
-
 import UserSvg from 'shared/assets/images/user.svg';
 import GlobalSvg from 'shared/assets/images/global.svg';
 import AISvg from 'shared/assets/images/AI.svg';
@@ -43,7 +39,6 @@ import QPSvg from 'shared/assets/images/QP.svg';
 import QCSvg from 'shared/assets/images/QC.svg';
 
 import Avatar from 'mobile/src/components/common/Avatar';
-import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import PLabel from 'mobile/src/components/common/PLabel';
 import IconButton from 'mobile/src/components/common/IconButton';
 import UserInfo from 'mobile/src/components/common/UserInfo';
@@ -85,7 +80,7 @@ import PostSelection from './PostSelection';
 import PreviewLink from './PreviewLink';
 
 import { CreatePostScreen } from 'mobile/src/navigations/PostDetailsStack';
-import { POST_PATTERN, LINK_PATTERN } from 'shared/src/patterns';
+import { TAG_PATTERN, LINK_PATTERN } from 'shared/src/patterns';
 
 const RadioBodyView = (props: any) => {
   const { icon, label } = props;
@@ -191,6 +186,8 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   const currentSearch = useRef<string | undefined>(undefined);
   const lastSearch = useRef<string | undefined>(undefined);
   const nextSearch = useRef<string | undefined>(undefined);
+  const suggestionCallback =
+    useRef<MentionSuggestionsProps['onSuggestionPress']>();
 
   const [keyboardShowing, setKeyboardShowing] = useState(false);
   const [postAsModalVisible, setPostAsModalVisible] = useState(false);
@@ -236,15 +233,16 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   }, [post, account?._id, reset]);
 
   useEffect(() => {
-    const onShow = () => setKeyboardShowing(true);
-    const onHide = () => setKeyboardShowing(false);
-
-    Keyboard.addListener('keyboardWillShow', onShow);
-    Keyboard.addListener('keyboardWillHide', onHide);
+    const willShowSubscription = Keyboard.addListener('keyboardWillShow', () =>
+      setKeyboardShowing(true),
+    );
+    const willHideSubscription = Keyboard.addListener('keyboardWillHide', () =>
+      setKeyboardShowing(false),
+    );
 
     return () => {
-      Keyboard.removeListener('keyboardWillShow', onShow);
-      Keyboard.removeListener('keyboardWillHide', onHide);
+      willShowSubscription.remove();
+      willHideSubscription.remove();
     };
   }, []);
 
@@ -296,6 +294,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       cropping: false, // cropping caused error
       includeBase64: true,
       compressImageQuality: 0.8,
+      includeExif: true,
     });
 
     await uploadImage(image);
@@ -428,6 +427,21 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     }, 10);
   };
 
+  const onPress = (user: User) => {
+    if (!suggestionCallback.current) {
+      return;
+    }
+
+    suggestionCallback.current({
+      id: user._id,
+      name: `${user.firstName} ${user.lastName}`,
+    });
+    mentionsField.onChange(
+      Array.from(new Set([...mentionsField.value, user._id])),
+    );
+    clearMentions();
+  };
+
   const renderSuggestions = useCallback(
     ({
       keyword,
@@ -452,41 +466,16 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
         return null;
       }
 
-      const onPress = (user: User) => {
-        onSuggestionPress({
-          id: user._id,
-          name: `${user.firstName} ${user.lastName}`,
-        });
-        mentionsField.onChange(
-          Array.from(new Set([...mentionsField.value, user._id])),
-        );
-        clearMentions();
-      };
-
-      return (
-        <ScrollView
-          style={styles.mentionList}
-          contentContainerStyle={styles.mentionContentContainer}>
-          <View style={styles.flex}>
-            {mentionUsers.map((user) => (
-              <Pressable
-                key={user._id}
-                onPress={() => onPress(user)}
-                style={styles.mentionItem}>
-                <UserInfo user={user} avatarSize={32} showFollow={false} />
-              </Pressable>
-            ))}
-          </View>
-        </ScrollView>
-      );
+      suggestionCallback.current = onSuggestionPress;
+      return null;
     },
-    [mentionUsers, fetchMentionUsers, mentionsField],
+    [mentionUsers, fetchMentionUsers],
   );
 
-  const dragGesture = Gesture.Pan().onStart(() => Keyboard.dismiss());
-
   return (
-    <View style={[pStyles.globalContainer, pStyles.modal]}>
+    <SafeAreaView
+      style={[pStyles.globalContainer, pStyles.modal]}
+      edges={['bottom']}>
       <PostHeader
         leftIcon={
           <RoundIcon
@@ -494,209 +483,253 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
             onPress={() => navigation.goBack()}
           />
         }
-        centerLabel="Create Post"
-        rightLabel="NEXT"
+        centerLabel={'Create a Post'}
+        rightLabel={'NEXT'}
         rightValidation={isValid}
         handleNext={handleSubmit(onSubmit)}
       />
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <View style={styles.contentContainer}>
-          <PAppContainer
-            noScroll
-            disableKeyboardScroll
-            modal
-            contentContainerStyle={styles.flex}>
-            <View style={styles.usersPart}>
-              <Avatar user={account} size={32} />
-              <Controller
-                control={control}
-                name="userId"
-                render={({ field }) => (
-                  <>
-                    <PostSelection
-                      icon={<UserSvg />}
-                      label={
-                        postAsData.find((option) => option.id === field.value)
-                          ?.value ?? ''
-                      }
-                      onPress={
-                        postAsData.length > 1
-                          ? () => setPostAsModalVisible(true)
-                          : undefined
-                      }
-                    />
-                    <PModal
-                      isVisible={postAsModalVisible}
-                      title="Post As"
-                      subTitle="You can post as yourself or a company you manage.">
-                      <View style={styles.radioGroupStyle}>
-                        <RadioGroup
-                          options={postAsData}
-                          activeButtonId={field.value}
-                          circleStyle={styles.radioCircle}
-                          onChange={(option) => field.onChange(option.id)}
-                        />
-                      </View>
-                      <TouchableOpacity
-                        onPress={() => setPostAsModalVisible(false)}
-                        style={styles.doneBtn}>
-                        <PLabel label="DONE" />
-                      </TouchableOpacity>
-                    </PModal>
-                  </>
-                )}
+      <View style={[styles.usersPart, styles.container]}>
+        <Avatar user={account} size={32} />
+        <Controller
+          control={control}
+          name="userId"
+          render={({ field }) => (
+            <>
+              <PostSelection
+                icon={<UserSvg />}
+                label={
+                  postAsData.find((option) => option.id === field.value)
+                    ?.value ?? ''
+                }
+                onPress={
+                  postAsData.length > 1
+                    ? () => setPostAsModalVisible(true)
+                    : undefined
+                }
               />
-              <Controller
-                control={control}
-                name="audience"
-                render={({ field }) => (
-                  <>
-                    <PostSelection
-                      icon={<GlobalSvg />}
-                      label={
-                        AUDIENCE_OPTIONS.find(
-                          (option) => option.id === field.value,
-                        )?.value ?? ''
-                      }
-                      onPress={() => setAudienceModalVisible(true)}
-                    />
-                    <PModal
-                      isVisible={audienceModalVisible}
-                      title="Audience"
-                      subTitle="Who can see your post?">
-                      <View style={styles.radioGroupStyle}>
-                        <RadioGroup
-                          options={AUDIENCE_OPTIONS}
-                          activeButtonId={field.value}
-                          circleStyle={styles.radioCircle}
-                          onChange={(option) => field.onChange(option.id)}
-                        />
-                      </View>
-                      <TouchableOpacity
-                        onPress={() => setAudienceModalVisible(false)}
-                        style={styles.doneBtn}>
-                        <PLabel label="DONE" />
-                      </TouchableOpacity>
-                    </PModal>
-                  </>
-                )}
-              />
-            </View>
-            <GestureDetector gesture={dragGesture}>
-              <Controller
-                control={control}
-                name="body"
-                render={({ field }) => (
-                  <MentionInput
-                    keyboardAppearance="dark"
-                    value={field.value ?? ''}
-                    onChange={field.onChange}
-                    placeholder="Create a post"
-                    placeholderTextColor={WHITE60}
-                    style={styles.mentionInput}
-                    containerStyle={[styles.mentionContainer]}
-                    partTypes={[
-                      {
-                        isBottomMentionSuggestionsRender: true,
-                        isInsertSpaceAfterMention: true,
-                        trigger: '@',
-                        renderSuggestions,
-                        textStyle: {
-                          color: PRIMARY,
-                        },
-                      },
-                      {
-                        pattern: POST_PATTERN,
-                        textStyle: {
-                          color: PRIMARY,
-                        },
-                      },
-                      {
-                        pattern: LINK_PATTERN,
-                        textStyle: {
-                          color: PRIMARY,
-                        },
-                      },
-                    ]}
+              <PModal
+                isVisible={postAsModalVisible}
+                title="Post As"
+                subTitle="You can post as yourself or a company you manage.">
+                <View style={styles.radioGroupStyle}>
+                  <RadioGroup
+                    options={postAsData}
+                    activeButtonId={field.value}
+                    circleStyle={styles.radioCircle}
+                    onChange={(option) => field.onChange(option.id)}
                   />
-                )}
+                </View>
+                <TouchableOpacity
+                  onPress={() => setPostAsModalVisible(false)}
+                  style={styles.doneBtn}>
+                  <PLabel label="DONE" />
+                </TouchableOpacity>
+              </PModal>
+            </>
+          )}
+        />
+        <Controller
+          control={control}
+          name="audience"
+          render={({ field }) => (
+            <>
+              <PostSelection
+                icon={<GlobalSvg />}
+                label={
+                  AUDIENCE_OPTIONS.find((option) => option.id === field.value)
+                    ?.value ?? ''
+                }
+                onPress={() => setAudienceModalVisible(true)}
               />
-            </GestureDetector>
-          </PAppContainer>
-          {mentionUsers.length === 0 ? (
-            <View
-              style={[
-                styles.actionWrapper,
-                keyboardShowing ? styles.clearMargin : null,
-              ]}>
-              <IconButton
-                icon={<Camera size={32} color={WHITE} />}
-                label="Take Photo"
-                textStyle={styles.iconText}
-                viewStyle={styles.iconButton}
-                onPress={takePhoto}
+              <PModal
+                isVisible={audienceModalVisible}
+                title="Audience"
+                subTitle="Who can see your post?">
+                <View style={styles.radioGroupStyle}>
+                  <RadioGroup
+                    options={AUDIENCE_OPTIONS}
+                    activeButtonId={field.value}
+                    circleStyle={styles.radioCircle}
+                    onChange={(option) => field.onChange(option.id)}
+                  />
+                </View>
+                <TouchableOpacity
+                  onPress={() => setAudienceModalVisible(false)}
+                  style={styles.doneBtn}>
+                  <PLabel label="DONE" />
+                </TouchableOpacity>
+              </PModal>
+            </>
+          )}
+        />
+      </View>
+      <KeyboardAvoidingView
+        style={[styles.flex]}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <View style={[styles.contentContainer, styles.container]}>
+          <ScrollView
+            keyboardDismissMode="interactive"
+            style={styles.contentContainer}
+            contentContainerStyle={styles.grow}>
+            <Controller
+              control={control}
+              name="body"
+              render={({ field }) => (
+                <MentionInput
+                  keyboardAppearance="dark"
+                  value={field.value ?? ''}
+                  onChange={field.onChange}
+                  placeholder="Create a post"
+                  placeholderTextColor={WHITE60}
+                  style={styles.mentionInput}
+                  containerStyle={[styles.mentionContainer]}
+                  partTypes={[
+                    {
+                      isBottomMentionSuggestionsRender: true,
+                      isInsertSpaceAfterMention: true,
+                      trigger: '@',
+                      renderSuggestions,
+                      textStyle: {
+                        color: PRIMARY,
+                      },
+                    },
+                    {
+                      pattern: TAG_PATTERN,
+                      textStyle: {
+                        color: PRIMARY,
+                      },
+                    },
+                    {
+                      pattern: LINK_PATTERN,
+                      textStyle: {
+                        color: PRIMARY,
+                      },
+                    },
+                  ]}
+                />
+              )}
+            />
+            {uploading ? (
+              <View style={[styles.attachment, styles.uploadIndicator]}>
+                <ActivityIndicator size="large" />
+              </View>
+            ) : null}
+            {imageData || mediaField.value ? (
+              <View style={styles.attachment}>
+                <Media
+                  media={
+                    mediaField.value || {
+                      url: imageData!.path,
+                      aspectRatio: imageData!.width / imageData!.height,
+                    }
+                  }
+                  onLoad={({ naturalSize }) => {
+                    if (naturalSize.orientation === 'portrait') {
+                      mediaField.onChange({
+                        ...mediaField.value,
+                        aspectRatio:
+                          Math.min(naturalSize.width, naturalSize.height) /
+                          Math.max(naturalSize.width, naturalSize.height),
+                      });
+                    }
+                  }}
+                  style={styles.preview}
+                />
+                <Pressable onPress={clearImage} style={styles.closeButton}>
+                  <X color={WHITE} size={24} />
+                </Pressable>
+              </View>
+            ) : null}
+            {watchBody && !uploading && !imageData && !post?.media?.url ? (
+              <PreviewLink
+                body={watchBody}
+                containerStyle={styles.attachment}
               />
-              <IconButton
-                icon={<VideoCamera size={32} color={WHITE} />}
-                label="Take Video"
-                textStyle={styles.iconText}
-                viewStyle={styles.iconButton}
-                onPress={takeVideo}
-              />
-              <IconButton
-                icon={<GalleryImage size={32} color={WHITE} />}
-                label="Gallery"
-                textStyle={styles.iconText}
-                viewStyle={styles.iconButton}
-                onPress={openPicker}
-              />
-            </View>
-          ) : null}
+            ) : null}
+          </ScrollView>
+          <View style={styles.mentionsContainer}>
+            {mentionUsers.length > 0 && (
+              <ScrollView
+                style={styles.mentionList}
+                contentContainerStyle={styles.mentionContentContainer}
+                keyboardShouldPersistTaps="handled">
+                <View style={styles.flex}>
+                  {mentionUsers.map((user, index) => (
+                    <Pressable
+                      key={user._id}
+                      onPress={() => onPress(user)}
+                      style={({ pressed }) => [
+                        index < mentionUsers.length - 1
+                          ? styles.mentionItem
+                          : null,
+                        pressed ? pStyles.pressedStyle : null,
+                      ]}>
+                      <UserInfo
+                        user={user}
+                        avatarSize={32}
+                        showFollow={false}
+                      />
+                    </Pressable>
+                  ))}
+                </View>
+              </ScrollView>
+            )}
+          </View>
         </View>
+        {mentionUsers.length === 0 ? (
+          <View
+            style={[
+              styles.actionWrapper,
+              keyboardShowing ? styles.clearMargin : null,
+            ]}>
+            <IconButton
+              icon={<Camera size={32} color={WHITE} />}
+              label="Take Photo"
+              textStyle={styles.iconText}
+              viewStyle={styles.iconButton}
+              onPress={takePhoto}
+            />
+            <IconButton
+              icon={<VideoCamera size={32} color={WHITE} />}
+              label="Take Video"
+              textStyle={styles.iconText}
+              viewStyle={styles.iconButton}
+              onPress={takeVideo}
+            />
+            <IconButton
+              icon={<GalleryImage size={32} color={WHITE} />}
+              label="Gallery"
+              textStyle={styles.iconText}
+              viewStyle={styles.iconButton}
+              onPress={openPicker}
+            />
+          </View>
+        ) : null}
       </KeyboardAvoidingView>
-      {uploading ? (
-        <View style={[styles.postImage, styles.uploadIndicator]}>
-          <ActivityIndicator size="large" />
-        </View>
-      ) : null}
-      {imageData || mediaField.value ? (
-        <View style={styles.postImage}>
-          <Media
-            media={
-              mediaField.value || {
-                uri: imageData.path,
-                aspectRatio: imageData.width / imageData.height,
-              }
-            }
-            resizeMode="contain"
-            style={styles.preview}
-          />
-          <Pressable onPress={clearImage} style={styles.closeButton}>
-            <X color={WHITE} size={24} />
-          </Pressable>
-        </View>
-      ) : null}
-      {watchBody && !uploading && !imageData && !post?.media?.url ? (
-        <PreviewLink body={watchBody} containerStyle={styles.postImage} />
-      ) : null}
-    </View>
+    </SafeAreaView>
   );
 };
 
 export default CreatePost;
 
 const styles = StyleSheet.create({
+  container: {
+    paddingHorizontal: 16,
+  },
   flex: {
     flex: 1,
+  },
+  grow: {
+    flexGrow: 1,
   },
   contentContainer: {
     flex: 1,
     position: 'relative',
+    zIndex: 1,
   },
   usersPart: {
     marginTop: 16,
+    marginLeft: 8,
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -715,47 +748,51 @@ const styles = StyleSheet.create({
   },
   mentionList: {
     backgroundColor: BLACK,
-    padding: 16,
+    paddingHorizontal: 16,
     borderRadius: 16,
-    marginVertical: 8,
     maxHeight: 270,
     flexGrow: 0,
     width: '100%',
     bottom: 0,
   },
-  mentionContentContainer: {},
+  mentionContentContainer: {
+    marginVertical: 8,
+  },
   mentionItem: {
     borderBottomWidth: 1,
     borderBottomColor: WHITE12,
   },
   uploadIndicator: {
-    backgroundColor: BLACK,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  postImage: {
-    position: 'absolute',
-    bottom: 96,
-    left: 16,
-    right: 16,
-    height: 224,
+  attachment: {
     marginVertical: 16,
     borderRadius: 16,
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
-    width: undefined,
+    position: 'relative',
   },
   preview: {
     marginVertical: 0,
+    marginTop: 0,
+    width: '100%',
+    backgroundColor: BLACK,
   },
   closeButton: {
     position: 'absolute',
     right: 8,
     top: 8,
   },
+  mentionsContainer: {
+    position: 'absolute',
+    left: 16,
+    right: 16,
+    bottom: 4,
+    zIndex: 20,
+  },
   actionWrapper: {
-    marginTop: 240,
     backgroundColor: BGDARK,
     borderTopColor: WHITE12,
     borderTopWidth: 1,
@@ -764,6 +801,7 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: 25,
     height: 96,
+    zIndex: 2,
   },
   clearMargin: {
     marginTop: 0,

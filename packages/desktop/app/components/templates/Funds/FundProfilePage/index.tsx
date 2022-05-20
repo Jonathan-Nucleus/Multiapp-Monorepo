@@ -567,7 +567,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
             <div className="border-t border-white/[.12] mt-6" />
             <div className="mt-2 mb-24">
               <Link href="https://prometheusalts.com/legals/disclosure-library">
-                <a target="_blank">
+                <a target="_blank" rel="noopener noreferrer">
                   <Button
                     variant="text"
                     className="text-white opacity-60 flex items-center tracking-normal font-normal"

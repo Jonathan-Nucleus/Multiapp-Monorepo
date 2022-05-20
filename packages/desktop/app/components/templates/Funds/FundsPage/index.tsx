@@ -56,7 +56,7 @@ const FundsPage: FC = () => {
         </div>
         <footer className="border-t border-white/[.12] mt-6 px-4 lg:px-0 pt-3">
           <Link href="https://prometheusalts.com/legals/disclosure-library">
-            <a target="_blank">
+            <a target="_blank" rel="noopener noreferrer">
               <Button
                 variant="text"
                 className="text-white opacity-60 flex items-center tracking-normal font-normal"

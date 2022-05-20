@@ -91,7 +91,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
     );
   }
 
-  if (!chatClient.current) {
+  if (!chatClient.current || !user) {
     return (
       <View style={[pStyles.globalContainer, styles.container]}>
         <Text>Error connecting to messenger</Text>

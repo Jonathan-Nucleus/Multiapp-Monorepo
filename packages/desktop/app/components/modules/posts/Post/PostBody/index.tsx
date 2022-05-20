@@ -2,7 +2,7 @@ import { FC, ReactElement, useEffect, useMemo, useState } from "react";
 import { PostSummary } from "shared/graphql/fragments/post";
 import Link from "next/link";
 import { UserProfile } from "backend/graphql/users.graphql";
-import { LINK_PATTERN, processPost } from "shared/src/patterns";
+import { processPost } from "shared/src/patterns";
 import LinkPreview from "../../LinkPreview";
 import Media from "../../../../common/Media";
 
@@ -11,40 +11,15 @@ interface PostBodyProps {
   post: PostSummary;
 }
 
-const PostBody: FC<PostBodyProps> = ({
-  account,
-  post,
-}: PostBodyProps) => {
-  const [links, setLinks] = useState<string[]>([]);
-  const processLinks = (body: string) => {
-    const result = body.matchAll(LINK_PATTERN);
-    const matches = Array.from(result);
-    if (matches.length > 0) {
-      let startIndex = 0;
-      const elements: (string | ReactElement)[] = [];
-      matches.forEach((match) => {
-        const text = match[0];
-        const prefix = body.slice(startIndex, match.index);
-        elements.push(prefix);
-        elements.push(
-          <Link href={text}>
-            <a className="text-primary" target="_blank">{text}</a>
-          </Link>,
-        );
-        startIndex = match.index! + text.length;
-      });
-      elements.push(body.slice(startIndex, body.length));
-      return elements;
-    } else {
-      return [body];
-    }
-  };
+const PostBody: FC<PostBodyProps> = ({ account, post }: PostBodyProps) => {
+  const [previewLink, setPreviewLink] = useState<string>();
   const elements = useMemo(() => {
     if (!post.body) {
       return [<></>];
     }
     const splitBody = processPost(post.body);
     const _elements: (string | ReactElement)[] = [];
+    let numLinks = 0;
     splitBody.map((text, index) => {
       if (text.startsWith("$")) {
         _elements.push(
@@ -53,7 +28,7 @@ const PostBody: FC<PostBodyProps> = ({
             href={`/search/posts?query=${text.slice(1)}`}
           >
             <a className="text-primary">{text}</a>
-          </Link>,
+          </Link>
         );
       } else if (text.startsWith("#")) {
         _elements.push(
@@ -62,7 +37,7 @@ const PostBody: FC<PostBodyProps> = ({
             href={`/search/posts?query=${text.slice(1)}`}
           >
             <a className="text-primary">{text}</a>
-          </Link>,
+          </Link>
         );
       } else if (text.startsWith("@") && text.includes("|")) {
         const [name, id] = text.split("|");
@@ -72,23 +47,29 @@ const PostBody: FC<PostBodyProps> = ({
             href={`/profile/${account?._id == id ? "me" : id}`}
           >
             <a className="text-primary">{name}</a>
-          </Link>,
+          </Link>
         );
-      } else {
-        _elements.push(...processLinks(text));
+      } else if (text.startsWith("%%")) {
+        const link = text.substring(2).trim();
+        numLinks++;
+        if (numLinks === 1) {
+          setPreviewLink(link);
+        }
+        return (
+          <Link href={link}>
+            <a
+              className="text-primary"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {link}
+            </a>
+          </Link>
+        );
       }
     });
     return _elements;
   }, [account?._id, post.body]);
-  useEffect(() => {
-    const result = post.body?.matchAll(LINK_PATTERN);
-    if (result) {
-      const matches = Array.from(result).map(match => match[0]);
-      if (matches.length > 0) {
-        setLinks(matches);
-      }
-    }
-  }, [post.body]);
   return (
     <>
       <div className="text-sm text-white opacity-90 whitespace-pre-wrap break-all">
@@ -96,11 +77,11 @@ const PostBody: FC<PostBodyProps> = ({
           <span key={index}>{element}</span>
         ))}
       </div>
-      {links.length > 0 && !post.media &&
+      {previewLink && !post.media && (
         <div className="my-4">
-          <LinkPreview link={links[0]} size="lg" />
+          <LinkPreview link={previewLink} size="lg" />
         </div>
-      }
+      )}
       <div className="flex flex-wrap -mx-1 mt-3 px-4">
         {post.categories.map((category) => (
           <div

@@ -18,9 +18,7 @@ import Card from "../../../../components/common/Card";
 import Avatar from "../../../common/Avatar";
 import { CompanyProfile } from "shared/graphql/query/company/useCompany";
 import FollowersModal from "../../../modules/users/FollowersModal";
-import {
-  useFollowCompany,
-} from "shared/graphql/mutation/account/useFollowCompany";
+import { useFollowCompany } from "shared/graphql/mutation/account/useFollowCompany";
 import EditModal from "../EditModal";
 import PhotoUploadModal from "../EditModal/PhotoUpload";
 import { MediaType } from "backend/graphql/mutations.graphql";
@@ -57,7 +55,7 @@ const ProfileCard: FC<CompanyPageProps> = ({
       if (matches.length > wordsToSplit) {
         overviewShort = company.overview?.substring(
           0,
-          matches[wordsToSplit].index!,
+          matches[wordsToSplit].index!
         );
       }
     }
@@ -285,6 +283,7 @@ const ProfileCard: FC<CompanyPageProps> = ({
                     <Link href={company.linkedIn}>
                       <a
                         target="_blank"
+                        rel="noopener noreferrer"
                         className="flex items-center text-white"
                       >
                         <LinkedinLogo
@@ -304,6 +303,7 @@ const ProfileCard: FC<CompanyPageProps> = ({
                     <Link href={company.twitter}>
                       <a
                         target="_blank"
+                        rel="noopener noreferrer"
                         className="flex items-center text-white"
                       >
                         <TwitterLogo
@@ -323,6 +323,7 @@ const ProfileCard: FC<CompanyPageProps> = ({
                     <Link href={company.website}>
                       <a
                         target="_blank"
+                        rel="noopener noreferrer"
                         className="flex items-center text-white"
                       >
                         <Globe color="currentColor" size={24} weight="fill" />

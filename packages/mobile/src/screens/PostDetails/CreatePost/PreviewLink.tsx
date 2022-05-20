@@ -13,7 +13,7 @@ import { WHITE12 } from 'shared/src/colors';
 
 interface PostHeaderProps {
   body: string;
-  containerStyle: StyleProp<ViewStyle>;
+  containerStyle?: StyleProp<ViewStyle>;
 }
 
 const PreviewLink: React.FC<PostHeaderProps> = ({ body, containerStyle }) => {
