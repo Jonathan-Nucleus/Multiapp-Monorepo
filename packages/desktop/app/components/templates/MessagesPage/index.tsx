@@ -18,7 +18,7 @@ import PThreadHeader from "./PChannel/PThreadHeader";
 import { PChannel } from "./PChannel";
 import { GiphyContext } from "../../../types/message";
 
-const API_KEY = "2xhrce9kvxbt"; //process.env.NEXT_PUBLIC_GETSTREAM_ACCESS_KEY as string;
+const API_KEY = "tr4bpwdeccc6"; //process.env.NEXT_PUBLIC_GETSTREAM_ACCESS_KEY as string;
 const TARGET_ORIGIN = "https://getstream.io"; //process.env.NEXT_PUBLIC_STREAM_TARGET_ORIGIN as string;
 const options = { state: true, watch: true, presence: true };
 
@@ -49,7 +49,7 @@ const MessagesPage = () => {
           enableInsights: true,
           enableWSFallback: true,
         });
-        
+
         await client.connectUser(
           {
             id: account._id,
@@ -121,11 +121,12 @@ const MessagesPage = () => {
     setChannelFilters(criteria);
   };
 
-  if (!chatClient.current) return (
-    <div className="flex items-center justify-center h-[calc(100vh-82px)]">
-      <LoadingIndicator size={40} />
-    </div>
-  );
+  if (!chatClient.current)
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-82px)]">
+        <LoadingIndicator size={40} />
+      </div>
+    );
 
   return (
     <Chat client={chatClient.current} theme="prometheus-messages dark">
