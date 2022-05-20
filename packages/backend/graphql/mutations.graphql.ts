@@ -251,7 +251,7 @@ const resolvers = {
 
       const stubUser = await db.users.requestInvite(email.toLowerCase());
 
-      return PrometheusMailer.sendInviteCode(
+      return await PrometheusMailer.sendInviteCode(
         email.toLowerCase(),
         stubUser.emailToken as string
       );
@@ -276,7 +276,7 @@ const resolvers = {
       const emailToken = await db.users.requestPasswordReset(email);
 
       const token = getResetToken(email, emailToken);
-      return PrometheusMailer.sendForgotPassword(email, token);
+      return await PrometheusMailer.sendForgotPassword(email, token);
     },
 
     resetPassword: async (
@@ -324,7 +324,7 @@ const resolvers = {
 
         const stubUser = await db.users.invite(user._id, email.toLowerCase());
 
-        return PrometheusMailer.sendInviteCode(
+        return await PrometheusMailer.sendInviteCode(
           email.toLowerCase(),
           stubUser.emailToken as string
         );
@@ -578,7 +578,7 @@ const resolvers = {
         const { request } = args;
 
         const userData = await db.users.saveProRequest(request, user._id);
-        PrometheusMailer.sendProRequest(userData);
+        await PrometheusMailer.sendProRequest(userData);
 
         return true;
       }
@@ -1487,7 +1487,7 @@ const resolvers = {
 
         const requestData = await db.helpRequests.create(request, user._id);
 
-        PrometheusMailer.sendHelpRequest(user, requestData, fund);
+        await PrometheusMailer.sendHelpRequest(user, requestData, fund);
 
         return true;
       }

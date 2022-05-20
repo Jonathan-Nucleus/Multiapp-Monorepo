@@ -25,6 +25,10 @@ const sesInstance = new SES({
   region: process.env.REGION,
 });
 
+if (process.env.NODE_ENV !== "test" && (CS_EMAIL || !SENDER || MAILER_TEMPLATE_PATH || !PROMETHEUS_URL)) {
+  throw new Error("Invalid sever configuration for email");
+}
+
 /**
  * Renders an html template using the given template data.
  *
