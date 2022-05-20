@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { StyleSheet, Text, View, Pressable } from 'react-native';
 import { Channel } from 'stream-chat';
+import { X } from 'phosphor-react-native';
 
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 import { WHITE } from 'shared/src/colors';
@@ -13,9 +14,10 @@ import { channelName, User } from 'mobile/src/services/chat';
 interface UserItemProps {
   user: User;
   onPress?: (user: User) => void;
+  onRemove?: (user: User) => void;
 }
 
-const UserItem: React.FC<UserItemProps> = ({ user, onPress }) => {
+const UserItem: React.FC<UserItemProps> = ({ user, onPress, onRemove }) => {
   return (
     <Pressable
       onPress={() => onPress?.(user)}
@@ -30,6 +32,13 @@ const UserItem: React.FC<UserItemProps> = ({ user, onPress }) => {
             }`}</Text>
           ) : null}
         </View>
+        {onRemove ? (
+          <Pressable
+            style={({ pressed }) => (pressed ? styles.pressed : null)}
+            onPress={() => onRemove(user)}>
+            <X size={24} color={WHITE} />
+          </Pressable>
+        ) : null}
       </View>
     </Pressable>
   );
@@ -41,6 +50,7 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
     paddingVertical: 16,
+    marginRight: 8,
   },
   row: {
     flexDirection: 'row',
@@ -57,5 +67,6 @@ const styles = StyleSheet.create({
   },
   userInfo: {
     paddingLeft: 16,
+    flex: 1,
   },
 });

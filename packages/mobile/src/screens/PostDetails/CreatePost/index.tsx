@@ -80,7 +80,7 @@ import PostSelection from './PostSelection';
 import PreviewLink from './PreviewLink';
 
 import { CreatePostScreen } from 'mobile/src/navigations/PostDetailsStack';
-import { TAG_PATTERN, LINK_PATTERN } from 'shared/src/patterns';
+import { TAG_PATTERN, LINK_PATTERN, POST_PATTERN } from 'shared/src/patterns';
 
 const RadioBodyView = (props: any) => {
   const { icon, label } = props;
@@ -310,7 +310,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
 
   const uploadImage = async (image: ImageOrVideo): Promise<void> => {
     setUploading(true);
-    let fileUri = image.path;
+    const fileUri = image.path;
 
     const filename = fileUri.substring(fileUri.lastIndexOf('/') + 1);
     const { data } = await fetchUploadLink({
@@ -351,7 +351,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     setUploading(false);
   };
 
-  const clearImage = () => {
+  const clearImage = (): void => {
     mediaField.onChange(undefined);
     setImageData(undefined);
   };
@@ -416,7 +416,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     [mentionUsers, refetch],
   );
 
-  const clearMentions = () => {
+  const clearMentions = (): void => {
     // Avoid issue with setting state from inside renderSuggestion render
     // cycle
     setTimeout(() => {
@@ -427,7 +427,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     }, 10);
   };
 
-  const onPress = (user: User) => {
+  const onPress = (user: User): void => {
     if (!suggestionCallback.current) {
       return;
     }
@@ -594,13 +594,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
                       },
                     },
                     {
-                      pattern: TAG_PATTERN,
-                      textStyle: {
-                        color: PRIMARY,
-                      },
-                    },
-                    {
-                      pattern: LINK_PATTERN,
+                      pattern: POST_PATTERN,
                       textStyle: {
                         color: PRIMARY,
                       },

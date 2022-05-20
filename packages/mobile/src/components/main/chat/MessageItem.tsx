@@ -1,9 +1,10 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import FastImage, { ResizeMode, ImageStyle } from 'react-native-fast-image';
 import dayjs from 'dayjs';
 
 import { WHITE, PRIMARYSOLID, GRAY700 } from 'shared/src/colors';
-import { Body2, Body2Bold, Body3, Body4Thin } from 'mobile/src/theme/fonts';
+import { Body2, Body4Thin } from 'mobile/src/theme/fonts';
 
 import { Message } from 'mobile/src/services/chat';
 import ChatAvatar from 'mobile/src/components/main/chat/ChatAvatar';
@@ -19,7 +20,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
   isMine,
   finalMessage = true,
 }) => {
-  const { created_at } = message;
+  const { created_at, attachments } = message;
   return (
     <View
       style={[
@@ -38,13 +39,31 @@ const MessageItem: React.FC<MessageItemProps> = ({
       )}
       <View
         style={[styles.message, !finalMessage ? styles.avatarSpacer : null]}>
-        <View
-          style={[
-            styles.messageBubble,
-            isMine ? styles.myMessage : styles.theirMessage,
-          ]}>
-          <Text style={[styles.textWhite, Body3]}>{message.text}</Text>
-        </View>
+        {message.text ? (
+          <View
+            style={[
+              styles.messageBubble,
+              isMine ? styles.myMessage : styles.theirMessage,
+              attachments ? styles.messageSpacer : null,
+            ]}>
+            <Text style={styles.messageText}>{message.text}</Text>
+          </View>
+        ) : null}
+        {attachments && attachments.length > 0 ? (
+          <View style={[styles.imageContainer, isMine ? styles.flexEnd : null]}>
+            {attachments.map((attachment) => {
+              return (
+                <FastImage
+                  key={attachment.image_url}
+                  style={styles.image}
+                  source={{
+                    uri: attachment.image_url,
+                  }}
+                />
+              );
+            })}
+          </View>
+        ) : null}
         {finalMessage && (
           <View
             style={[
@@ -75,14 +94,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-end',
   },
+  col: {
+    flexDirection: 'column',
+  },
+  flexEnd: {
+    alignSelf: 'flex-end',
+  },
   justifyStart: {
     justifyContent: 'flex-start',
   },
   justifyEnd: {
     justifyContent: 'flex-end',
-  },
-  col: {
-    flexDirection: 'column',
   },
   textWhite: {
     color: WHITE,
@@ -92,6 +114,14 @@ const styles = StyleSheet.create({
   },
   message: {
     maxWidth: '75%',
+  },
+  messageText: {
+    color: WHITE,
+    lineHeight: 20,
+    ...Body2,
+  },
+  messageSpacer: {
+    marginBottom: 8,
   },
   messageBubble: {
     borderRadius: 16,
@@ -105,6 +135,19 @@ const styles = StyleSheet.create({
   theirMessage: {
     backgroundColor: GRAY700,
     borderBottomLeftRadius: 0,
+  },
+  imageContainer: {
+    flexDirection: 'row',
+    borderRadius: 16,
+    overflow: 'hidden',
+    flexWrap: 'wrap',
+    maxWidth: 210,
+  },
+  image: {
+    flexBasis: 100,
+    flex: 1,
+    height: 100,
+    margin: 1,
   },
   avatarSpacer: {
     marginLeft: 44,

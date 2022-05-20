@@ -33,9 +33,12 @@ const CHANNEL_TYPE = 'messaging';
 export function channelName(channel: Channel, userId: string): string {
   const { members } = channel.state;
   const users = Object.keys(members).filter((key) => key !== userId);
-  const firstUser = members[users[0]];
+  const userNames = users
+    .slice(0, 3)
+    .map((id) => members[id].user?.name)
+    .join(', ');
 
-  return (channel.data?.name || firstUser.user?.name) ?? '';
+  return (channel.data?.name || userNames) ?? '';
 }
 
 /**
@@ -46,7 +49,7 @@ export function channelName(channel: Channel, userId: string): string {
  */
 function shouldGroupMessages(first: Message, second: Message): boolean {
   return (
-    second.user?.id == first.user?.id &&
+    second.user?.id === first.user?.id &&
     dayjs(second.created_at).diff(first.created_at, 'minute') < 15
   );
 }
@@ -115,7 +118,9 @@ export const findUsers = _.debounce(
     sort: UserSort<StreamType> = [],
     options: UserOptions = {},
   ): Promise<User[]> => {
-    if (!client.userID) throw new Error('No user defined in chat session.');
+    if (!client.userID) {
+      throw new Error('No user defined in chat session.');
+    }
 
     try {
       const response = await client.queryUsers(

@@ -95,7 +95,9 @@ const NewChat: NewChatScreen = ({ navigation }) => {
   }, []);
 
   const onSubmit = async () => {
-    if (selectedUsers.length === 0) return;
+    if (selectedUsers.length === 0) {
+      return;
+    }
 
     const members = [userId, ...selectedUsers.map((user) => user.id)];
     const channel = await createChannel(client, members);
@@ -113,6 +115,12 @@ const NewChat: NewChatScreen = ({ navigation }) => {
 
   const onSelected = (user: User) => {
     setSelectedUsers([...selectedUsers, user]);
+  };
+
+  const onRemove = (user: User) => {
+    setSelectedUsers([
+      ...selectedUsers.filter((selectedUser) => selectedUser.id !== user.id),
+    ]);
   };
 
   const renderItem: ListRenderItem<User> = ({ item }) => (
@@ -169,7 +177,7 @@ const NewChat: NewChatScreen = ({ navigation }) => {
         <View style={styles.sendingToContainer}>
           <Text style={styles.sendingTo}>Sending to:</Text>
           {selectedUsers.map((user) => (
-            <UserItem key={user.id} user={user} />
+            <UserItem key={user.id} user={user} onRemove={onRemove} />
           ))}
           <View style={styles.separator} />
         </View>
@@ -178,7 +186,10 @@ const NewChat: NewChatScreen = ({ navigation }) => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <FlatList
           data={users.filter(
-            (user) => !selectedUsers.some((u) => u.id == user.id),
+            (user) =>
+              !selectedUsers.some(
+                (selectedUser) => selectedUser.id === user.id,
+              ),
           )}
           renderItem={renderItem}
           keyExtractor={(item) => `${item.id}`}

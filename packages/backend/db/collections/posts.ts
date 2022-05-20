@@ -68,6 +68,7 @@ const createPostsCollection = (
      * Provides a list of all posts in the DB that match a specific set of
      * categories.
      *
+     * @param userId         Id of the user requesting posts.
      * @param audience        Audience level of posts to fetch.
      * @param categories      Optional list of categories to match.
      * @param ignorePosts     List of post ids that should not be fetched.
@@ -80,6 +81,7 @@ const createPostsCollection = (
      * @returns   An array of matching Post objects.
      */
     findByFilters: async (
+      userId: MongoId,
       audience: Audience,
       categories?: PostCategory[],
       ignorePosts: MongoId[] = [],
@@ -124,14 +126,26 @@ const createPostsCollection = (
         .find({
           _id: { $nin: toObjectIds(ignorePosts) },
           deleted: { $exists: false },
-          audience: { $in: audienceLevels },
-          userId: {
-            $nin: toObjectIds(ignoreUsers),
-            ...(roleFilter !== "everyone" ? { $in: toObjectIds(userIds) } : {}),
-          },
-          ...(categories !== undefined
-            ? { categories: { $in: categories } }
-            : {}),
+          $or: [
+            {
+              userId: toObjectId(userId),
+              ...(categories !== undefined
+                ? { categories: { $in: categories } }
+                : {}),
+            },
+            {
+              audience: { $in: audienceLevels },
+              userId: {
+                $nin: toObjectIds(ignoreUsers),
+                ...(roleFilter !== "everyone"
+                  ? { $in: toObjectIds(userIds) }
+                  : {}),
+              },
+              ...(categories !== undefined
+                ? { categories: { $in: categories } }
+                : {}),
+            },
+          ],
         })
         .sort({ _id: -1 })
         .skip(offset)

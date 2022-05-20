@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect } from 'react';
+import React, { FC, useState, useEffect, useCallback } from 'react';
 import { ListRenderItem, StyleSheet, FlatList, View, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MagnifyingGlass, NotePencil } from 'phosphor-react-native';
@@ -31,30 +31,31 @@ const ChannelList: ChannelListScreen = ({ navigation }) => {
   const [channels, setChannels] = useState<Channel[]>([]);
   const [search, setSearch] = useState('');
 
-  const fetchChannels = async () => {
+  const fetchChannels = useCallback(async () => {
     const newChannels = await client.queryChannels(filters, DEFAULT_SORT, {
       limit: 12,
       watch: true,
     });
     setChannels(newChannels);
-  };
+  }, [client, filters]);
 
   useEffect(() => {
     fetchChannels();
     const handler = client.on((event) => {
       const { channel, message, member, user } = event;
-      //console.log('received event', event.type, channel, message, member, user);
+      console.log('received event', event.type, channel, message, member, user);
       switch (event.type) {
         case 'user.watching.start':
         case 'user.watching.stop':
         case 'message.new':
+        case 'notification.added_to_channel':
           fetchChannels();
           break;
       }
     });
 
     return () => handler.unsubscribe();
-  }, []);
+  }, [client, fetchChannels]);
 
   const renderItem: ListRenderItem<Channel> = ({ item }) => (
     <ChannelItem channel={item} />

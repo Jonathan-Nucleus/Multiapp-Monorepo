@@ -1,5 +1,6 @@
 import React, { FC, useRef, useState, useEffect, useCallback } from 'react';
 import {
+  ActivityIndicator,
   KeyboardAvoidingView,
   ListRenderItem,
   StyleSheet,
@@ -10,25 +11,41 @@ import {
   Text,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CaretLeft, ImageSquare, PaperPlaneRight } from 'phosphor-react-native';
+import { CaretLeft, ImageSquare, X } from 'phosphor-react-native';
 import {
   Channel as SCChannel,
   ChannelSort,
   FormatMessageResponse as SCMessage,
 } from 'stream-chat';
+import ImagePicker, {
+  ImageOrVideo,
+  Image as UploadImage,
+} from 'react-native-image-crop-picker';
+import FastImage, { ResizeMode, ImageStyle } from 'react-native-fast-image';
 
 import relativeTime from 'dayjs/plugin/relativeTime';
 import dayjs from 'dayjs';
 dayjs.extend(relativeTime);
 
 import PHeader from 'mobile/src/components/common/PHeader';
-import PTextInput from 'mobile/src/components/common/PTextInput';
+import ExpandingInput from 'mobile/src/components/common/ExpandingInput';
 import ChatAvatar from 'mobile/src/components/main/chat/ChatAvatar';
-import { Body1Bold, Body2, Body3 } from 'mobile/src/theme/fonts';
+import { Body1Bold, Body3, Body2Bold } from 'mobile/src/theme/fonts';
 import pStyles from 'mobile/src/theme/pStyles';
-import { WHITE, WHITE12, GRAY600 } from 'shared/src/colors';
+import {
+  PRIMARYSOLID,
+  WHITE,
+  WHITE12,
+  GRAY600,
+  GRAY900,
+} from 'shared/src/colors';
 
-import { useForm, Controller } from 'react-hook-form';
+import {
+  useForm,
+  Controller,
+  useController,
+  DefaultValues,
+} from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 
@@ -44,12 +61,17 @@ import MessageItem from 'mobile/src/components/main/chat/MessageItem';
 import { ChannelScreen } from 'mobile/src/navigations/ChatStack';
 
 type FormValues = {
-  message: string;
+  message?: string;
+  images: string[];
 };
 
 const schema = yup
   .object({
-    message: yup.string().trim().required('Required'),
+    images: yup.array(yup.string().required()).default([]),
+    message: yup.string().when('images', {
+      is: (images: string[]) => images.length === 0,
+      then: yup.string().trim().required('Required'),
+    }),
   })
   .required();
 
@@ -58,10 +80,14 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
 
   const { client, userId } = useChatContext();
   const channel = useRef(initialData);
+  const [uploading, setUploading] = useState(false);
   const [messages, setMessages] = useState(
     initialData?.state.messages
       ? processMessages(initialData?.state.messages)
       : [],
+  );
+  const [images, setImages] = useState<{ uri: string; data: ImageOrVideo }[]>(
+    [],
   );
 
   const { members } = channel.current?.state ?? {};
@@ -73,7 +99,14 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
   const { control, handleSubmit, reset } = useForm<FormValues>({
     resolver: yupResolver(schema),
     mode: 'onSubmit',
-    defaultValues: { message: '' },
+    defaultValues: schema.cast(
+      {},
+      { assert: false, stripUnknown: true },
+    ) as DefaultValues<FormValues>,
+  });
+  const { field: imagesField } = useController({
+    control,
+    name: 'images',
   });
 
   const fetchChannel = useCallback(async () => {
@@ -117,8 +150,22 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
       return;
     }
 
-    await channel.current.sendMessage({ text: message });
-    reset({ message: '' });
+    const attachments =
+      images.length === 0
+        ? undefined
+        : images.map((image) => ({
+            image_url: image.uri,
+            type: 'image',
+          }));
+
+    await channel.current.sendMessage({ text: message, attachments });
+    reset(
+      schema.cast(
+        {},
+        { assert: false, stripUnknown: true },
+      ) as DefaultValues<FormValues>,
+    );
+    setImages([]);
   };
 
   const renderItem: ListRenderItem<PMessage> = useCallback(
@@ -131,6 +178,42 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
     ),
     [userId],
   );
+
+  const openPicker = async (): Promise<void> => {
+    const image = await ImagePicker.openPicker({
+      width: 300,
+      height: 400,
+      cropping: false,
+      compressImageQuality: 0.8,
+    });
+
+    await uploadImage(image);
+  };
+
+  const uploadImage = async (image: ImageOrVideo): Promise<void> => {
+    if (!channel.current) {
+      return;
+    }
+
+    setUploading(true);
+
+    const result = await channel.current.sendImage(image.path);
+    setImages([...images, { uri: result.file, data: image }]);
+    imagesField.onChange([...imagesField.value, result.file]);
+
+    setUploading(false);
+  };
+
+  const removeImage = (index: number) => {
+    const newImages = [...images];
+    const newValues = [...imagesField.value];
+
+    newImages.splice(index, 1);
+    newValues.splice(index, 1);
+
+    imagesField.onChange(newValues);
+    setImages(newImages);
+  };
 
   return (
     <View style={pStyles.globalContainer}>
@@ -183,40 +266,76 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
           keyExtractor={(item) => `${item.id}`}
           inverted
           contentContainerStyle={styles.list}
+          keyboardDismissMode="interactive"
         />
         <View style={styles.inputContainer}>
-          <View style={styles.imageButton}>
-            <Pressable
-              onPress={() => console.log('open gallery')}
-              style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}>
-              <ImageSquare size={20} color={WHITE} />
-            </Pressable>
-          </View>
           <Controller
             name="message"
             control={control}
             render={({ field }) => (
-              <PTextInput
+              <ExpandingInput
                 {...field}
                 placeholder="Type a message..."
-                label=""
-                labelStyle={styles.label}
-                subLabelStyle={styles.label}
-                textContainerStyle={styles.textInputContainer}
-                textInputStyle={styles.input}
-                text={field.value}
+                containerStyle={styles.input}
+                value={field.value}
                 onChangeText={field.onChange}
-                onSubmitEditing={handleSubmit(onSubmit)}
                 keyboardAppearance="dark"
-                multiline={true}
+                viewAbove={
+                  images.length === 0 && !uploading ? undefined : (
+                    <View style={styles.imageContainer}>
+                      {images.map((image, index) => (
+                        <View key={image.uri} style={styles.imageView}>
+                          <FastImage
+                            style={styles.image}
+                            source={{
+                              uri: image.uri,
+                            }}
+                          />
+                          <Pressable
+                            style={styles.removeImage}
+                            onPress={() => removeImage(index)}>
+                            <X size={24} color={WHITE} />
+                          </Pressable>
+                        </View>
+                      ))}
+                      {uploading ? (
+                        <View style={styles.imageView}>
+                          <ActivityIndicator
+                            size="small"
+                            color={WHITE}
+                            animating={true}
+                            style={styles.flex}
+                          />
+                        </View>
+                      ) : null}
+                    </View>
+                  )
+                }
+                viewLeft={
+                  <View style={styles.imageButton}>
+                    <Pressable
+                      onPress={openPicker}
+                      style={({ pressed }) =>
+                        pressed ? pStyles.pressedStyle : null
+                      }>
+                      <ImageSquare size={20} color={WHITE} />
+                    </Pressable>
+                  </View>
+                }
+                viewRight={
+                  <View style={styles.sendButton}>
+                    <Pressable
+                      onPress={handleSubmit(onSubmit)}
+                      style={({ pressed }) =>
+                        pressed ? pStyles.pressedStyle : null
+                      }>
+                      <Text style={styles.sendText}>Send</Text>
+                    </Pressable>
+                  </View>
+                }
               />
             )}
           />
-          <View style={styles.sendButton}>
-            <Pressable onPress={handleSubmit(onSubmit)}>
-              <PaperPlaneRight size={20} color={WHITE} />
-            </Pressable>
-          </View>
         </View>
       </KeyboardAvoidingView>
     </View>
@@ -257,31 +376,47 @@ const styles = StyleSheet.create({
   },
   label: {
     height: 0,
+    marginBottom: 0,
   },
   inputContainer: {
     position: 'relative',
   },
-  sendButton: {
-    position: 'absolute',
-    right: 10,
-    top: 18,
+  imageContainer: {
+    flexDirection: 'row',
+    marginVertical: 4,
   },
-  textInputContainer: {
-    marginBottom: 8,
-    marginTop: 0,
+  imageView: {
+    width: 72,
+    height: 72,
+    margin: 4,
     borderRadius: 16,
-    borderWidth: 0,
+    position: 'relative',
+    overflow: 'hidden',
+    backgroundColor: GRAY900,
+  },
+  image: {
+    flex: 1,
+  },
+  removeImage: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+  },
+  sendButton: {
+    marginHorizontal: 8,
+    justifyContent: 'flex-start',
+    height: '100%',
+  },
+  sendText: {
+    color: PRIMARYSOLID,
+    ...Body2Bold,
+    padding: 8,
   },
   input: {
-    paddingLeft: 32,
-    paddingRight: 32,
-    ...Body2,
+    margin: 16,
   },
   imageButton: {
-    position: 'absolute',
     justifyContent: 'center',
-    left: 10,
-    zIndex: 99,
-    top: 18,
+    marginHorizontal: 16,
   },
 });

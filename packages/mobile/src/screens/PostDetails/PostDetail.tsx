@@ -81,9 +81,9 @@ const PostDetail: PostDetailScreen = ({ route }) => {
     return <SafeAreaView style={pStyles.globalContainer} />;
   }
 
-  const handleAddComment = async () => {
+  const handleAddComment = async (): Promise<void> => {
     try {
-      let commentData = {
+      const commentData = {
         body: comment,
         postId: post._id,
         mentionIds: [],
@@ -107,7 +107,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
     }
   };
 
-  const handleEditComment = async () => {
+  const handleEditComment = async (): Promise<void> => {
     if (!focusCommentId) {
       return;
     }
@@ -136,7 +136,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
     }
   };
 
-  const initInputComment = () => {
+  const initInputComment = (): void => {
     setComment('');
     setFocusCommentId(null);
     setReplyComment(false);

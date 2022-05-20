@@ -128,7 +128,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
             ? processPost(body).map((split, index) => {
                 if (split.startsWith('$') || split.startsWith('#')) {
                   return (
-                    <Text key={split} style={styles.tagLink}>
+                    <Text key={`${split}-${index}`} style={styles.tagLink}>
                       {split}
                     </Text>
                   );

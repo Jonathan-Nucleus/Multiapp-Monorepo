@@ -183,6 +183,7 @@ const resolvers = {
         }
 
         return db.posts.findByFilters(
+          user._id,
           userData.accreditation === "none"
             ? "everyone"
             : userData.accreditation,

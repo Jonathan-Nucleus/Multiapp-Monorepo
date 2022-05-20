@@ -76,7 +76,7 @@ const PostContent: React.FC<PostContentProps> = ({
     timeoutRef.current = setTimeout(() => setKebobIsClosing(false), 500);
   };
 
-  const goToProfile = (userId?: string) => {
+  const goToProfile = (userId?: string): void => {
     if (userId) {
       NavigationService.navigate('UserDetails', {
         screen: 'UserProfile',
@@ -101,7 +101,7 @@ const PostContent: React.FC<PostContentProps> = ({
     }
   };
 
-  const search = (text: string) => {
+  const search = (text: string): void => {
     NavigationService.navigate('Search', {
       searchString: text,
     });
@@ -142,7 +142,7 @@ const PostContent: React.FC<PostContentProps> = ({
                     if (split.startsWith('$') || split.startsWith('#')) {
                       return (
                         <Text
-                          key={split}
+                          key={`${split}-${index}`}
                           style={styles.tagLink}
                           onPress={() => search(split)}>
                           {split}

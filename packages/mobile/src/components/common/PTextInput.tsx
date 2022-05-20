@@ -1,4 +1,4 @@
-import React, { useEffect, useState, forwardRef } from 'react';
+import React, { LegacyRef, useEffect, useState, forwardRef } from 'react';
 import {
   View,
   ViewStyle,
@@ -23,7 +23,7 @@ import {
   DANGER30,
 } from 'shared/src/colors';
 
-interface PTextInputProps extends TextInputProps {
+export interface PTextInputProps extends TextInputProps {
   label: string;
   text: string;
   icon?: string;
@@ -42,110 +42,105 @@ interface PTextInputProps extends TextInputProps {
   textInputStyle?: StyleProp<TextStyle>;
 }
 
-const PTextInput = forwardRef<React.FC<PTextInputProps>, PTextInputProps>(
-  (props, ref) => {
-    const {
-      containerStyle,
-      label,
-      labelStyle,
-      labelTextStyle,
-      text,
-      textInputStyle,
-      textContainerStyle,
-      subLabel,
-      subLabelStyle,
-      subLabelTextStyle,
-      onChangeText,
-      onPressText,
-      onPress,
-      onFocus,
-      onBlur,
-      onSubmitEditing,
-      icon,
-      placeholder,
-      secureTextEntry = false,
-      keyboardType = 'default',
-      editable = true,
-      autoCapitalize = 'none',
-      autoFocus = false,
-      children,
-      placeholderTextColor = '#888',
-      multiline = false,
-      autoCorrect = true,
-      error,
-      errorStyle,
-      numberOfLines = 1,
-      ...textInputProps
-    } = props;
+const PTextInput = forwardRef<TextInput, PTextInputProps>((props, ref) => {
+  const {
+    containerStyle,
+    label,
+    labelStyle,
+    labelTextStyle,
+    text,
+    textInputStyle,
+    textContainerStyle,
+    subLabel,
+    subLabelStyle,
+    subLabelTextStyle,
+    onChangeText,
+    onPressText,
+    onPress,
+    onFocus,
+    onBlur,
+    onSubmitEditing,
+    icon,
+    placeholder,
+    secureTextEntry = false,
+    keyboardType = 'default',
+    editable = true,
+    autoCapitalize = 'none',
+    autoFocus = false,
+    children,
+    placeholderTextColor = '#888',
+    multiline = false,
+    autoCorrect = true,
+    error,
+    errorStyle,
+    numberOfLines = 1,
+    ...textInputProps
+  } = props;
 
-    const [isFocused, setIsFocused] = useState(false);
-    const handleOnChangeText = (val: string): void => {
-      onChangeText?.(val);
-    };
+  const [isFocused, setIsFocused] = useState(false);
+  const handleOnChangeText = (val: string): void => {
+    onChangeText?.(val);
+  };
 
-    return (
-      <View style={[styles.container, containerStyle]}>
-        <View style={styles.row}>
-          <PFormLabel
-            label={label}
-            style={labelStyle}
-            textStyle={[styles.defaultLabelText, labelTextStyle]}
-          />
-          <PFormLabel
-            label={subLabel ?? ''}
-            style={subLabelStyle}
-            textStyle={subLabelTextStyle}
-            onPress={onPressText}
-          />
-        </View>
-        <View
-          style={[
-            styles.view,
-            textContainerStyle,
-            !!error && styles.errorInput,
-          ]}>
-          <TextInput
-            {...textInputProps}
-            placeholder={placeholder}
-            placeholderTextColor={placeholderTextColor}
-            onChangeText={handleOnChangeText}
-            secureTextEntry={secureTextEntry}
-            style={[
-              styles.textInput,
-              textInputStyle,
-              isFocused && styles.focused,
-            ]}
-            value={text}
-            keyboardType={keyboardType}
-            editable={editable}
-            autoCapitalize={autoCapitalize}
-            onSubmitEditing={onSubmitEditing}
-            onFocus={(evt) => {
-              onFocus?.(evt);
-              setIsFocused(true);
-            }}
-            onBlur={(evt) => {
-              onBlur?.(evt);
-              setIsFocused(false);
-            }}
-            autoFocus={autoFocus}
-            multiline={multiline}
-            autoCorrect={autoCorrect}
-            numberOfLines={numberOfLines}
-            keyboardAppearance="dark"
-          />
-          {children}
-          {!!icon && (
-            <TouchableOpacity onPress={onPress}>
-              <View style={styles.icon}>{icon}</View>
-            </TouchableOpacity>
-          )}
-        </View>
-        <Text style={[styles.error, errorStyle]}>{error ? error : null}</Text>
+  return (
+    <View style={[styles.container, containerStyle]}>
+      <View style={styles.row}>
+        <PFormLabel
+          label={label}
+          style={labelStyle}
+          textStyle={[styles.defaultLabelText, labelTextStyle]}
+        />
+        <PFormLabel
+          label={subLabel ?? ''}
+          style={subLabelStyle}
+          textStyle={subLabelTextStyle}
+          onPress={onPressText}
+        />
       </View>
-    );
-  },
-);
+      <View
+        style={[styles.view, textContainerStyle, !!error && styles.errorInput]}>
+        <TextInput
+          ref={ref as LegacyRef<TextInput>}
+          {...textInputProps}
+          placeholder={placeholder}
+          placeholderTextColor={placeholderTextColor}
+          onChangeText={handleOnChangeText}
+          secureTextEntry={secureTextEntry}
+          style={[
+            styles.textInput,
+            textInputStyle,
+            isFocused && styles.focused,
+          ]}
+          value={text}
+          keyboardType={keyboardType}
+          editable={editable}
+          autoCapitalize={autoCapitalize}
+          onSubmitEditing={onSubmitEditing}
+          onFocus={(evt) => {
+            onFocus?.(evt);
+            setIsFocused(true);
+          }}
+          onBlur={(evt) => {
+            onBlur?.(evt);
+            setIsFocused(false);
+          }}
+          autoFocus={autoFocus}
+          multiline={multiline}
+          autoCorrect={autoCorrect}
+          numberOfLines={numberOfLines}
+          keyboardAppearance="dark"
+        />
+        {children}
+        {!!icon && (
+          <TouchableOpacity onPress={onPress}>
+            <View style={styles.icon}>{icon}</View>
+          </TouchableOpacity>
+        )}
+      </View>
+      <Text style={[styles.error, errorStyle]}>{error ? error : null}</Text>
+    </View>
+  );
+});
 
 const styles = StyleSheet.create({
   textInput: {
