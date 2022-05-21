@@ -41,8 +41,9 @@ export async function registerUser(
     await client.upsertUsers([
       {
         id: user._id.toString(),
-        name: user.fullName,
-        image: user.avatar,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        avatar: user.avatar,
         company: company?.name,
         position: user.position,
       },
