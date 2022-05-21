@@ -80,7 +80,7 @@ import PostSelection from './PostSelection';
 import PreviewLink from './PreviewLink';
 
 import { CreatePostScreen } from 'mobile/src/navigations/PostDetailsStack';
-import { TAG_PATTERN, LINK_PATTERN, POST_PATTERN } from 'shared/src/patterns';
+import { POST_PATTERN } from 'shared/src/patterns';
 
 const RadioBodyView = (props: any) => {
   const { icon, label } = props;
@@ -485,7 +485,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
         }
         centerLabel={'Create a Post'}
         rightLabel={'NEXT'}
-        rightValidation={isValid}
+        rightValidation={isValid && !uploading}
         handleNext={handleSubmit(onSubmit)}
       />
       <View style={[styles.usersPart, styles.container]}>

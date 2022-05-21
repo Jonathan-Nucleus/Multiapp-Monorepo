@@ -691,9 +691,21 @@ const resolvers = {
                   )
                   .required(),
                 body: yup.string(),
-                media: yup.object({
-                  url: yup.string().required(),
-                  aspectRatio: yup.number().required(),
+                media: yup.object().when("body", {
+                  is: (body?: string) => body && body.length > 0,
+                  then: yup
+                    .object({
+                      url: yup.string().required(),
+                      aspectRatio: yup.number().required(),
+                    })
+                    .notRequired()
+                    .default(undefined),
+                  otherwise: yup
+                    .object({
+                      url: yup.string().required(),
+                      aspectRatio: yup.number().required(),
+                    })
+                    .required(),
                 }),
                 mentionIds: yup.array().of(
                   yup.string().test({

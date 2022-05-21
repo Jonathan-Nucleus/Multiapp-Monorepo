@@ -1,6 +1,5 @@
-import React, { FC, useState, useEffect } from 'react';
+import React, { FC, useState, useEffect, useCallback } from 'react';
 import {
-  Button,
   KeyboardAvoidingView,
   Platform,
   ListRenderItem,
@@ -11,19 +10,17 @@ import {
   Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CaretLeft, ImageSquare } from 'phosphor-react-native';
+import { CaretLeft } from 'phosphor-react-native';
 import { CommonActions } from '@react-navigation/native';
 
 import PHeader from 'mobile/src/components/common/PHeader';
 import SearchInput from 'mobile/src/components/common/SearchInput';
-import PTextInput from 'mobile/src/components/common/PTextInput';
 import { Body1Bold, Body2, Body3Bold } from 'mobile/src/theme/fonts';
 import pStyles from 'mobile/src/theme/pStyles';
 import {
   PRIMARY,
   WHITE,
   WHITE12,
-  BGDARK,
   GRAY700,
   GRAY600,
   GRAY900,
@@ -46,12 +43,6 @@ import UserItem from 'mobile/src/components/main/chat/UserItem';
 
 import { NewChatScreen } from 'mobile/src/navigations/ChatStack';
 
-const DEFAULT_SORT: ChannelSort = [
-  { last_message_at: -1 },
-  { updated_at: -1 },
-  { cid: 1 },
-];
-
 type FormValues = {
   search?: string;
 };
@@ -67,7 +58,7 @@ const NewChat: NewChatScreen = ({ navigation }) => {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
 
-  const { control, handleSubmit, reset, getValues } = useForm<
+  const { control, handleSubmit, getValues } = useForm<
     yup.InferType<typeof schema>
   >({
     resolver: yupResolver(schema),
@@ -78,23 +69,23 @@ const NewChat: NewChatScreen = ({ navigation }) => {
     ) as DefaultValues<FormValues>,
   });
 
-  const performSearch = async () => {
+  const performSearch = useCallback(async () => {
     const searchText = getValues('search') ?? '';
-    const users = await findUsers(client, searchText, [
+    const searchResults = await findUsers(client, searchText, [
       { last_active: -1 },
       { id: 1 },
     ]);
 
-    if (users) {
-      setUsers(users);
+    if (searchResults) {
+      setUsers(searchResults);
     }
-  };
+  }, [client, getValues]);
 
   useEffect(() => {
     performSearch();
-  }, []);
+  }, [performSearch]);
 
-  const onSubmit = async () => {
+  const onSubmit = async (): Promise<void> => {
     if (selectedUsers.length === 0) {
       return;
     }
@@ -113,11 +104,11 @@ const NewChat: NewChatScreen = ({ navigation }) => {
     );
   };
 
-  const onSelected = (user: User) => {
+  const onSelected = (user: User): void => {
     setSelectedUsers([...selectedUsers, user]);
   };
 
-  const onRemove = (user: User) => {
+  const onRemove = (user: User): void => {
     setSelectedUsers([
       ...selectedUsers.filter((selectedUser) => selectedUser.id !== user.id),
     ]);
@@ -183,6 +174,7 @@ const NewChat: NewChatScreen = ({ navigation }) => {
         </View>
       ) : null}
       <KeyboardAvoidingView
+        style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <FlatList
           data={users.filter(
@@ -202,6 +194,9 @@ const NewChat: NewChatScreen = ({ navigation }) => {
 export default NewChat;
 
 const styles = StyleSheet.create({
+  flex: {
+    flex: 1,
+  },
   header: {
     borderColor: WHITE12,
     borderBottomWidth: 1,
@@ -223,12 +218,8 @@ const styles = StyleSheet.create({
   disabled: {
     color: GRAY600,
   },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   textContainerStyle: {
-    marginTop: 16,
+    marginVertical: 16,
   },
   textStyle: {
     backgroundColor: GRAY700,
@@ -244,30 +235,6 @@ const styles = StyleSheet.create({
     paddingLeft: 16,
     color: WHITE,
     ...Body3Bold,
-  },
-  label: {
-    height: 0,
-  },
-  inputContainer: {
-    position: 'relative',
-  },
-  textInputContainer: {
-    marginBottom: 8,
-    marginTop: 0,
-    borderRadius: 16,
-    borderWidth: 0,
-  },
-  input: {
-    paddingLeft: 64,
-    paddingRight: 16,
-    lineHeight: 18,
-    ...Body2,
-  },
-  imageButton: {
-    position: 'absolute',
-    height: '100%',
-    justifyContent: 'center',
-    paddingLeft: 16,
   },
   separator: {
     height: 24,

@@ -41,7 +41,7 @@ export interface FundProfileInfo {
 const FundProfileInfo: FC<FundProfileInfo> = ({ fund, category }) => {
   const { isFollowing, toggleFollow } = useFollowUser(fund.manager._id);
 
-  const goToManager = () =>
+  const goToManager = (): void =>
     NavigationService.navigate('UserDetails', {
       screen: 'UserProfile',
       params: {
@@ -112,12 +112,14 @@ const FundProfileInfo: FC<FundProfileInfo> = ({ fund, category }) => {
                   <Text style={[styles.whiteText, styles.name]}>
                     {`${fund.manager.firstName} ${fund.manager.lastName}`}
                   </Text>
-                  <View style={styles.separator} />
-                  <TouchableOpacity onPress={toggleFollow}>
-                    <Text style={[styles.follow, Body3]}>
-                      {isFollowing ? 'Unfollow' : 'Follow'}
-                    </Text>
-                  </TouchableOpacity>
+                  {!isFollowing ? (
+                    <>
+                      <View style={styles.separator} />
+                      <TouchableOpacity onPress={toggleFollow}>
+                        <Text style={[styles.follow, Body3]}>Follow</Text>
+                      </TouchableOpacity>
+                    </>
+                  ) : null}
                 </View>
                 <View style={styles.managerInfo}>
                   <Text style={[styles.grayText, Body2]}>

@@ -45,13 +45,18 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
 
   const account = accountData?.account;
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (): Promise<void> => {
     let success = false;
-    let finalPostData = {
+    const finalPostData = {
       body,
       audience,
       categories,
-      media,
+      media: media
+        ? {
+            url: media.url,
+            aspectRatio: media.aspectRatio,
+          }
+        : undefined,
       mentionIds,
     };
 

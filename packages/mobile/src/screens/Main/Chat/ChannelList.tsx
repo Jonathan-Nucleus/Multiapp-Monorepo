@@ -1,5 +1,13 @@
 import React, { FC, useState, useEffect, useCallback } from 'react';
-import { ListRenderItem, StyleSheet, FlatList, View, Text } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  ListRenderItem,
+  Platform,
+  StyleSheet,
+  FlatList,
+  View,
+  Text,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MagnifyingGlass, NotePencil } from 'phosphor-react-native';
 
@@ -73,12 +81,15 @@ const ChannelList: ChannelListScreen = ({ navigation }) => {
         placeholder="Search messages"
         placeholderTextColor={GRAY600}
       />
-      <FlatList
-        data={channels}
-        renderItem={renderItem}
-        keyExtractor={(item) => `${item.data?.cid}`}
-        contentContainerStyle={styles.list}
-      />
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <FlatList
+          data={channels}
+          renderItem={renderItem}
+          keyExtractor={(item) => `${item.data?.cid}`}
+        />
+      </KeyboardAvoidingView>
       <PGradientButton
         icon={<NotePencil color={WHITE} size={24} />}
         btnContainer={styles.chatButton}
@@ -93,19 +104,11 @@ const ChannelList: ChannelListScreen = ({ navigation }) => {
 export default ChannelList;
 
 const styles = StyleSheet.create({
-  headerTitle: {
-    ...Body1,
-    color: WHITE,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  list: {
-    paddingTop: 16,
+  flex: {
+    flex: 1,
   },
   textContainerStyle: {
-    marginTop: 16,
+    marginVertical: 16,
   },
   textStyle: {
     backgroundColor: GRAY700,

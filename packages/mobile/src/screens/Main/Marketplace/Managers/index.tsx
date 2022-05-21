@@ -11,17 +11,22 @@ import { FundManagersScreen } from 'mobile/src/navigations/MarketplaceTabs';
 
 const Managers: FundManagersScreen = () => {
   const { data } = useFundManagers();
-  const managers = data?.fundManagers?.managers;
+  const managers = data?.fundManagers?.managers ?? [];
+  const funds = data?.fundManagers?.funds ?? [];
 
   const keyExtractor = (item: FundManager): string => item._id;
   const renderItem: ListRenderItem<FundManager> = ({ item }) => {
-    return <ManagerItem manager={item} />;
+    const fundManager = {
+      ...item,
+      funds: funds.filter((fund) => item.managedFundsIds?.includes(fund._id)),
+    };
+    return <ManagerItem manager={fundManager} />;
   };
 
   return (
     <View style={styles.container}>
       <FlatList
-        data={managers ?? []}
+        data={managers}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
       />

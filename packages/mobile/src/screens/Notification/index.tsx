@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { ReactElement, useState } from 'react';
 import {
   StyleSheet,
   FlatList,
@@ -55,7 +55,7 @@ const Notifications: NotificationScreen = ({ navigation }) => {
   const [readNotifications] = useReadNotifications();
   const notifications = data?.notifications || [];
 
-  const renderIcon = (val: Notification) => {
+  const renderIcon = (val: Notification): ReactElement => {
     if (val.type === 'COMMENT_POST') {
       return <ChatCenteredText size={18} color={WHITE} />;
     }
@@ -65,7 +65,9 @@ const Notifications: NotificationScreen = ({ navigation }) => {
     return <UserCirclePlus size={18} color={WHITE} />;
   };
 
-  const handleReadNotification = async (notification: Notification) => {
+  const handleReadNotification = async (
+    notification: Notification,
+  ): Promise<void> => {
     const { _id, type, data: notificationData, isNew } = notification;
     try {
       if (isNew) {
@@ -76,7 +78,7 @@ const Notifications: NotificationScreen = ({ navigation }) => {
         });
         refetch();
       }
-      console.log(notification);
+
       if (
         (type === 'COMMENT_POST' || type === 'LIKE_POST') &&
         notificationData.postId
@@ -102,7 +104,7 @@ const Notifications: NotificationScreen = ({ navigation }) => {
     }
   };
 
-  const handleReadAllNotifications = async () => {
+  const handleReadAllNotifications = async (): Promise<void> => {
     try {
       await readNotifications();
       refetch();
@@ -173,7 +175,8 @@ const Notifications: NotificationScreen = ({ navigation }) => {
               </View>
             </View>
           </Pressable>
-          <Pressable
+          {/* Hide preferences for now until they are properly hooked up.
+            <Pressable
             style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}
             onPress={() => {
               setIsVisible(false);
@@ -186,6 +189,7 @@ const Notifications: NotificationScreen = ({ navigation }) => {
               </View>
             </View>
           </Pressable>
+          */}
           <Pressable
             style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}
             onPress={() => setIsVisible(false)}>
