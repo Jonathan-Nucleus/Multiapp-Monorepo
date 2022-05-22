@@ -56,7 +56,7 @@ const MarketplaceTabs = () => {
 
 export default MarketplaceTabs;
 
-type MarketplaceTabsParamList = {
+export type MarketplaceTabsParamList = {
   Funds: undefined;
   Managers: undefined;
   Companies: undefined;

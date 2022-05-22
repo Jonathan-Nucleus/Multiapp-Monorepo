@@ -32,7 +32,7 @@ const AuthStacks = () => {
 
 export default AuthStacks;
 
-type AuthStackParamList = {
+export type AuthStackParamList = {
   Login: undefined;
   Code: undefined;
   Signup: { code: string };

@@ -47,7 +47,7 @@ const Login: LoginScreen = ({ navigation }) => {
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
-        routes: [{ name: 'Main' }],
+        routes: [{ name: 'Authenticated' }],
       }),
     );
   };

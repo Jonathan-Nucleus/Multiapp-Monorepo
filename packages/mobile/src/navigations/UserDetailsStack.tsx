@@ -10,7 +10,7 @@ import EditUserProfile from 'mobile/src/screens/UserDetails/EditProfile';
 import EditUserPhoto from 'mobile/src/screens/UserDetails/EditPhoto';
 
 import type { MediaType } from 'backend/graphql/mutations.graphql';
-import type { AppScreenProps } from './AppNavigator';
+import type { AuthenticatedScreenProps } from './AuthenticatedStack';
 
 const Stack = createStackNavigator();
 const UserDetailsStack = () => {
@@ -41,7 +41,7 @@ export type UserDetailsScreenProps<
   RouteName extends keyof UserDetailsStackParamList = keyof UserDetailsStackParamList,
 > = CompositeScreenProps<
   StackScreenProps<UserDetailsStackParamList, RouteName>,
-  AppScreenProps
+  AuthenticatedScreenProps
 >;
 
 export type UserProfileScreen = (

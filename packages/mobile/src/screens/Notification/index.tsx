@@ -46,7 +46,7 @@ import {
   useReadNotifications,
 } from 'shared/graphql/mutation/notification';
 
-import type { NotificationScreen } from 'mobile/src/navigations/AppNavigator';
+import type { NotificationScreen } from 'mobile/src/navigations/AuthenticatedStack';
 
 const Notifications: NotificationScreen = ({ navigation }) => {
   const [isVisible, setIsVisible] = useState(false);

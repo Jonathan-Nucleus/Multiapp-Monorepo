@@ -54,7 +54,7 @@ const Topic: TopicScreen = ({ navigation }) => {
       });
 
       if (data.updateSettings) {
-        navigation.navigate('Main');
+        navigation.navigate('Authenticated');
         return;
       } else {
         setError('Something went wrong, Please try again later');
@@ -65,7 +65,7 @@ const Topic: TopicScreen = ({ navigation }) => {
   };
 
   const handleSkip = (): void => {
-    navigation.navigate('Main');
+    navigation.navigate('Authenticated');
   };
 
   const handleToggleCheck = (val: string): void => {

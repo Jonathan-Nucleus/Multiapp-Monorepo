@@ -29,10 +29,10 @@ import People from '../screens/Search/People';
 import Companies from '../screens/Search/Companies';
 import Posts from '../screens/Search/Posts';
 
-import {
-  AppScreenProps,
+import type {
+  AuthenticatedScreenProps,
   SearchScreen,
-} from 'mobile/src/navigations/AppNavigator';
+} from './AuthenticatedStack';
 import { useGlobalSearch } from 'shared/graphql/query/search/useGlobalSearch';
 
 const Tab = createMaterialTopTabNavigator();
@@ -106,7 +106,7 @@ const SearchTabs: SearchScreen = ({ navigation, route }) => {
 
 export default SearchTabs;
 
-type SearchTabsParamList = {
+export type SearchTabsParamList = {
   People: undefined;
   Companies: undefined;
   Posts: undefined;
@@ -117,7 +117,7 @@ export type SearchScreenProps<
   RouteName extends keyof SearchTabsParamList = keyof SearchTabsParamList,
 > = CompositeScreenProps<
   MaterialTopTabScreenProps<SearchTabsParamList, RouteName>,
-  AppScreenProps
+  AuthenticatedScreenProps
 >;
 
 export type PeopleScreen = (props: SearchScreenProps<'People'>) => ReactElement;

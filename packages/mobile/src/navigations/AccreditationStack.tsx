@@ -18,7 +18,7 @@ import EntityAdvancedStatus from '../screens/Accreditation/EntityAdvancedStatus'
 import AccreditationResult from '../screens/Accreditation/AccreditationResult';
 import FAIntake from '../screens/Accreditation/FAIntake';
 
-import type { AppScreenProps } from './AppNavigator';
+import type { AuthenticatedScreenProps } from './AuthenticatedStack';
 
 import type {
   Audience,
@@ -82,7 +82,7 @@ export type AccreditationScreenProps<
   RouteName extends keyof AccreditationStackParamList = keyof AccreditationStackParamList,
 > = CompositeScreenProps<
   StackScreenProps<AccreditationStackParamList, RouteName>,
-  AppScreenProps
+  AuthenticatedScreenProps
 >;
 
 export type InvestorClassScreen = (

@@ -10,7 +10,7 @@ import EditCompanyProfile from 'mobile/src/screens/CompanyDetails/EditProfile';
 import EditCompanyPhoto from 'mobile/src/screens/CompanyDetails/EditPhoto';
 
 import type { MediaType } from 'backend/graphql/mutations.graphql';
-import type { AppScreenProps } from './AppNavigator';
+import type { AuthenticatedScreenProps } from './AuthenticatedStack';
 
 const Stack = createStackNavigator();
 const CompanyDetailsStack = () => {
@@ -44,7 +44,7 @@ export type CompanyDetailsScreenProps<
   RouteName extends keyof CompanyDetailsStackParamList = keyof CompanyDetailsStackParamList,
 > = CompositeScreenProps<
   StackScreenProps<CompanyDetailsStackParamList, RouteName>,
-  AppScreenProps
+  AuthenticatedScreenProps
 >;
 
 export type CompanyProfileScreen = (

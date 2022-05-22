@@ -31,7 +31,7 @@ export const processPost = (text: string): string[] => {
       index += 5;
     } else if (val.trim() !== "" && val.match(LINK_PATTERN)) {
       numLinks++;
-      if (numLinks === 1) continue; // Skip the first link in the body
+      //if (numLinks === 1) continue; // Skip the first link in the body
 
       processedSplits.push(`%%${val}`);
     } else {

@@ -12,18 +12,22 @@ import { House, Star, Chats, DotsThreeCircle } from 'phosphor-react-native';
 
 import FundsSVG from 'shared/assets/images/fund.svg';
 import GreyFundsSVG from 'shared/assets/images/grey-fund.svg';
-import { WHITE, BLACK, BGDARK, GRAY400, WHITE12 } from 'shared/src/colors';
+import { WHITE, BLACK, GRAY400, GRAY700, WHITE12 } from 'shared/src/colors';
 
 import { Home } from 'mobile/src/screens/Main/Home';
 import WatchList from 'mobile/src/screens/Main/WatchList';
-import MarketplaceTabs from './MarketplaceTabs';
-import ChatStack from './ChatStack';
+import MarketplaceTabs, { MarketplaceTabsParamList } from './MarketplaceTabs';
+import ChatStack, { ChatStackParamList } from './ChatStack';
 import MoreStack, { MoreStackParamList } from './MoreStack';
-import { AppScreenProps } from './AppNavigator';
 import { Body5Bold, Body5 } from '../theme/fonts';
+
+import { useChatContext } from 'mobile/src/context/Chat';
+
+import type { AuthenticatedScreenProps } from './AuthenticatedStack';
 
 const Tab = createBottomTabNavigator();
 const MainTabNavigator = () => {
+  const client = useChatContext();
   return (
     <Tab.Navigator
       screenOptions={{
@@ -90,8 +94,16 @@ const MainTabNavigator = () => {
             focused ? (
               <Chats size={size} color={WHITE} weight="fill" />
             ) : (
-              <Chats size={size} color={GRAY400} />
+              <Chats size={size} color={client ? GRAY400 : GRAY700} />
             ),
+        }}
+        listeners={{
+          tabPress: (evt) => {
+            if (!client) {
+              console.log('Messenger disabled');
+              evt.preventDefault();
+            }
+          },
         }}
       />
       <Tab.Screen
@@ -118,16 +130,16 @@ export default MainTabNavigator;
 export type MainTabParamList = {
   Home: undefined;
   Watchlist: undefined;
-  Marketplace: undefined;
-  Chat: undefined;
-  More: NavigatorScreenParams<MoreStackParamList>;
+  Marketplace: NavigatorScreenParams<MarketplaceTabsParamList> | undefined;
+  Chat: NavigatorScreenParams<ChatStackParamList> | undefined;
+  More: NavigatorScreenParams<MoreStackParamList> | undefined;
 };
 
 export type MainTabScreenProps<
   RouteName extends keyof MainTabParamList = keyof MainTabParamList,
 > = CompositeScreenProps<
   BottomTabScreenProps<MainTabParamList, RouteName>,
-  AppScreenProps
+  AuthenticatedScreenProps
 >;
 
 export type HomeScreen = (

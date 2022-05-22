@@ -20,31 +20,16 @@ import {
 } from 'mobile/src/utils/auth-token';
 import { useUpdateFcmToken } from 'shared/graphql/mutation/account';
 
-import AuthStack from './AuthStack';
-import MainTabNavigator from './MainTabNavigator';
-import UserDetailsStack, {
-  UserDetailsStackParamList,
-} from './UserDetailsStack';
-import CompanyDetailsStack, {
-  CompanyDetailsStackParamList,
-} from './CompanyDetailsStack';
-import PostDetailsStack, {
-  PostDetailsStackParamList,
-} from './PostDetailsStack';
-import Contact from '../screens/Main/Settings/Contact';
-import VerificationSuccess from '../screens/Main/Settings/BecomePro/VerificationSuccess';
-import FundDetails from '../screens/Main/Marketplace/Funds/FundDetails';
-import SearchTabs from './SearchTabs';
-import AccreditationStack from './AccreditationStack';
-import AccreditationResult from '../screens/Accreditation/AccreditationResult';
-import Notification from '../screens/Notification';
-import NotificationDetail from '../screens/Notification/Details';
-import Preferences from '../screens/Main/Settings/Preferences';
-import ContactSuccess from '../screens/Main/Settings/Contact/ContactSuccess';
+import AuthStack, { AuthStackParamList } from './AuthStack';
+import AuthenticatedStack, {
+  AuthenticatedStackParamList,
+} from './AuthenticatedStack';
 
 import { MediaType } from 'backend/graphql/mutations.graphql';
 import { Accreditation } from 'shared/graphql/mutation/account/useSaveQuestionnaire';
 import { useVerifyToken } from 'shared/graphql/query/account/useVerifyToken';
+
+import { AccountProvider } from 'mobile/src/context/Account';
 
 const defaultScreenOptions = {
   headerShown: false,
@@ -52,7 +37,7 @@ const defaultScreenOptions = {
 };
 
 const Stack = createStackNavigator();
-let verifying = false;
+const verifying = false;
 
 const AppNavigator = () => {
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
@@ -112,13 +97,13 @@ const AppNavigator = () => {
     })();
   }
 
-  const onReady = () => {
+  const onReady = (): void => {
     routeNameRef.current = navigationRef?.current?.getCurrentRoute()?.name;
     console.log('Running', routeNameRef.current);
     SplashScreen.hide();
   };
 
-  const onStateChange = async () => {
+  const onStateChange = async (): Promise<void> => {
     const prev = routeNameRef.current;
     const current = navigationRef.current?.getCurrentRoute()?.name;
     console.log('Current: ', current);
@@ -142,34 +127,9 @@ const AppNavigator = () => {
       onStateChange={onStateChange}>
       <Stack.Navigator
         screenOptions={defaultScreenOptions}
-        initialRouteName={authenticated ? 'Main' : 'Auth'}>
+        initialRouteName={authenticated ? 'Authenticated' : 'Auth'}>
         <Stack.Screen name="Auth" component={AuthStack} />
-        <Stack.Screen name="Main" component={MainTabNavigator} />
-        <Stack.Screen name="UserDetails" component={UserDetailsStack} />
-        <Stack.Screen name="CompanyDetails" component={CompanyDetailsStack} />
-        <Stack.Screen name="PostDetails" component={PostDetailsStack} />
-        <Stack.Screen name="FundDetails" component={FundDetails} />
-        <Stack.Screen name="Contact" component={Contact} />
-        <Stack.Screen
-          name="VerificationSuccess"
-          component={VerificationSuccess}
-        />
-        <Stack.Screen name="Search" component={SearchTabs} />
-        <Stack.Screen name="Notification" component={Notification} />
-        <Stack.Screen name="Preferences" component={Preferences} />
-        <Stack.Screen
-          name="NotificationDetail"
-          component={NotificationDetail}
-        />
-        <Stack.Screen
-          name="AccreditationStack"
-          component={AccreditationStack}
-        />
-        <Stack.Screen
-          name="AccreditationResult"
-          component={AccreditationResult}
-        />
-        <Stack.Screen name="ContactSuccess" component={ContactSuccess} />
+        <Stack.Screen name="Authenticated" component={AuthenticatedStack} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -178,28 +138,8 @@ const AppNavigator = () => {
 export default AppNavigator;
 
 type AppParamList = {
-  Auth: undefined;
-  Main: undefined;
-  UserDetails: NavigatorScreenParams<UserDetailsStackParamList>;
-  CompanyDetails: NavigatorScreenParams<CompanyDetailsStackParamList>;
-  PostDetails: NavigatorScreenParams<PostDetailsStackParamList>;
-  FundDetails: {
-    fundId: string;
-  };
-  VerificationSuccess: undefined;
-  Search: {
-    searchString?: string;
-  };
-  Notifications: undefined;
-  NotificationDetail: { postId: string; userId: string };
-  AccreditationStack: undefined;
-  Accreditation: undefined;
-  AccreditationResult: {
-    accreditation: Accreditation;
-  };
-  Preferences: undefined;
-  Contact: undefined;
-  ContactSuccess: undefined;
+  Auth: NavigatorScreenParams<AuthStackParamList> | undefined;
+  Authenticated: NavigatorScreenParams<AuthenticatedStackParamList> | undefined;
 };
 
 export type AppScreenProps<
@@ -208,40 +148,6 @@ export type AppScreenProps<
 
 export type AuthScreen = (props: AppScreenProps<'Auth'>) => ReactElement;
 
-export type MainScreen = (props: AppScreenProps<'Main'>) => ReactElement;
-
-export type FundDetailsScreen = (
-  props: AppScreenProps<'FundDetails'>,
-) => ReactElement | null;
-
-export type ContactScreen = (
-  props: AppScreenProps<'Contact'>,
-) => ReactElement | null;
-
-export type ContactSuccessScreen = (
-  props: AppScreenProps<'ContactSuccess'>,
-) => ReactElement | null;
-
-export type VerificationSuccessScreen = (
-  props: AppScreenProps<'VerificationSuccess'>,
-) => ReactElement | null;
-
-export type SearchScreen = (
-  props: AppScreenProps<'Search'>,
-) => ReactElement | null;
-
-export type AccreditationScreen = (
-  props: AppScreenProps<'Accreditation'>,
-) => ReactElement;
-
-export type NotificationScreen = (
-  props: AppScreenProps<'Notifications'>,
-) => ReactElement;
-
-export type NotificationDetailsScreen = (
-  props: AppScreenProps<'NotificationDetail'>,
-) => ReactElement;
-
-export type PreferencesScreen = (
-  props: AppScreenProps<'Preferences'>,
+export type AuthenticatedScreen = (
+  props: AppScreenProps<'Authenticated'>,
 ) => ReactElement;

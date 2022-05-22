@@ -1,6 +1,5 @@
 import React from 'react';
-import { StyleSheet, StyleProp, Text, View, ViewStyle } from 'react-native';
-import FastImage from 'react-native-fast-image';
+import { StyleSheet, StyleProp, View, ViewStyle } from 'react-native';
 
 import Avatar from 'mobile/src/components/common/Avatar';
 import { WHITE } from 'shared/src/colors';
@@ -21,13 +20,7 @@ const ChatAvatar: React.FC<ChatAvatarProps> = ({
   onlineStatusSize = 16,
   style,
 }) => {
-  const { name, online, image } = user;
-  const initials =
-    name
-      ?.toUpperCase()
-      .split(' ')
-      .map((word) => word.charAt(0))
-      .join('') ?? '';
+  const { online } = user;
 
   const sizeStyle = {
     width: size,
@@ -43,18 +36,7 @@ const ChatAvatar: React.FC<ChatAvatarProps> = ({
 
   return (
     <View style={[styles.avatarContainer, sizeStyle, style]}>
-      {image ? (
-        <FastImage
-          style={sizeStyle}
-          source={{
-            uri: image,
-          }}
-          resizeMode={FastImage.resizeMode.cover}
-        />
-      ) : (
-        <Text>{initials}</Text>
-      )}
-
+      <Avatar user={user} size={size} />
       {showOnlineStatus && online && (
         <View style={[styles.onlineIndicator, indicatorSizeStyle]} />
       )}
@@ -66,7 +48,6 @@ export default ChatAvatar;
 
 const styles = StyleSheet.create({
   avatarContainer: {
-    backgroundColor: WHITE,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

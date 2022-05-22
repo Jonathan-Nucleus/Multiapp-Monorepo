@@ -11,7 +11,7 @@ import { useFunds } from 'shared/graphql/query/marketplace/useFunds';
 import { BLACK, WHITE, GRAY600 } from 'shared/src/colors';
 import EmailContact from './EmailContact';
 
-import { ContactScreen } from 'mobile/src/navigations/AppNavigator';
+import { ContactScreen } from 'mobile/src/navigations/AuthenticatedStack';
 
 const Contact: ContactScreen = ({ navigation }) => {
   const { data } = useFunds();

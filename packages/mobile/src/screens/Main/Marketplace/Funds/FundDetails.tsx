@@ -25,7 +25,7 @@ import FundsPlaceholder from 'mobile/src/components/placeholder/FundsPlaceholder
 import { useFund } from 'shared/graphql/query/marketplace/useFund';
 import { useWatchFund } from 'shared/graphql/mutation/funds/useWatchFund';
 
-import { FundDetailsScreen } from 'mobile/src/navigations/AppNavigator';
+import { FundDetailsScreen } from 'mobile/src/navigations/AuthenticatedStack';
 
 const Tab = createMaterialTopTabNavigator();
 const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
@@ -140,14 +140,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderBottomColor: WHITE12,
     borderBottomWidth: 1,
-  },
-  headerContainer: {
-    backgroundColor: BLACK,
-    marginBottom: 0,
-    height: 62,
-  },
-  sideStyle: {
-    top: 16,
   },
   favorite: {},
   tabContainer: {

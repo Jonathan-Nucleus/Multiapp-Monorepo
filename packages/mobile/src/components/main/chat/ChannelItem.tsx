@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View, Pressable } from 'react-native';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import updateLocale from 'dayjs/plugin/updateLocale';
@@ -27,7 +27,7 @@ import * as NavigationService from 'mobile/src/services/navigation/NavigationSer
 import { WHITE, GRAY100 } from 'shared/src/colors';
 import { Body2, Body2Bold } from 'mobile/src/theme/fonts';
 
-import { useChatContext } from 'mobile/src/context/Chat';
+import { useAccountContext } from 'mobile/src/context/Account';
 import ChatAvatar from 'mobile/src/components/main/chat/ChatAvatar';
 import { channelName, Channel } from 'mobile/src/services/chat';
 
@@ -36,7 +36,8 @@ interface ChannelItemProps {
 }
 
 const ChannelItem: React.FC<ChannelItemProps> = ({ channel }) => {
-  const { userId } = useChatContext();
+  const account = useAccountContext();
+  const { _id: userId } = account;
   const { members } = channel.state;
 
   const users = Object.keys(members).filter((key) => key !== userId);
@@ -86,9 +87,6 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
     paddingVertical: 16,
-  },
-  flex: {
-    flex: 1,
   },
   flexShrink: {
     flexShrink: 1,

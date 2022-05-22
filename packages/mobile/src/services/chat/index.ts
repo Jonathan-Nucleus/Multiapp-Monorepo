@@ -35,7 +35,7 @@ export function channelName(channel: Channel, userId: string): string {
   const users = Object.keys(members).filter((key) => key !== userId);
   const userNames = users
     .slice(0, 3)
-    .map((id) => members[id].user?.name)
+    .map((id) => `${members[id].user?.firstName} ${members[id].user?.lastName}`)
     .join(', ');
 
   return (channel.data?.name || userNames) ?? '';

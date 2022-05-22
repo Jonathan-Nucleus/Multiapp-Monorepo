@@ -11,7 +11,7 @@ import PostDetail from '../screens/PostDetails/PostDetail';
 import ChooseCategory from '../screens/PostDetails/CreatePost/ChooseCategory';
 import ReviewPost from '../screens/PostDetails/CreatePost/ReviewPost';
 
-import type { AppScreenProps } from './AppNavigator';
+import type { AuthenticatedScreenProps } from './AuthenticatedStack';
 
 import type {
   Audience,
@@ -72,7 +72,7 @@ export type PostDetailsScreenProps<
   RouteName extends keyof PostDetailsStackParamList = keyof PostDetailsStackParamList,
 > = CompositeScreenProps<
   StackScreenProps<PostDetailsStackParamList, RouteName>,
-  AppScreenProps
+  AuthenticatedScreenProps
 >;
 
 export type CreatePostScreen = (

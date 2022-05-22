@@ -76,7 +76,7 @@ const ResetPass: ResetPassScreen = ({ navigation, route }) => {
     }
   }, [pass]);
 
-  const handleNextPage = async () => {
+  const handleNextPage = async (): Promise<void> => {
     Keyboard.dismiss();
     setError('');
     if (pass !== confirmPass) {
@@ -92,7 +92,7 @@ const ResetPass: ResetPassScreen = ({ navigation, route }) => {
         },
       });
       if (data.login) {
-        navigation.navigate('Main');
+        navigation.navigate('Authenticated');
         return;
       }
     } catch (e) {

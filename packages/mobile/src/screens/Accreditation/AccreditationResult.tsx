@@ -55,12 +55,12 @@ const AccreditationResult: AccreditationResultScreen = ({
 }) => {
   const { accreditation, baseStatus, investorClass, nextRoute } = route.params;
   const { icon, title, subtitle } =
-    investorClass === 'ADVISOR'
-      ? RESPONSES['ADVISOR']
-      : RESPONSES[accreditation];
+    investorClass === 'ADVISOR' ? RESPONSES.ADVISOR : RESPONSES[accreditation];
 
   const next = () => {
-    if (!nextRoute || investorClass === 'ADVISOR') return;
+    if (!nextRoute || investorClass === 'ADVISOR') {
+      return;
+    }
     if (nextRoute === 'IndividualAdvancedStatus') {
       navigation.navigate(nextRoute, {
         investorClass,

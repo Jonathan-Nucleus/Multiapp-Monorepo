@@ -12,15 +12,19 @@ type UserType = Pick<
   SCUser<DefaultGenerics>,
   'id' | 'name' | 'online' | 'created_at' | 'last_active'
 > & {
-  image?: string;
+  firstName: string;
+  lastName: string;
+  avatar?: string;
   company?: string;
   position?: string;
 };
 
 type MessageType = Pick<
   SCMessage<DefaultGenerics>,
-  'id' | 'userId' | 'attachments' | 'parent_id' | 'text' | 'user' | 'created_at'
->;
+  'id' | 'userId' | 'attachments' | 'parent_id' | 'text' | 'created_at'
+> & {
+  user: UserType;
+};
 
 export interface StreamType extends DefaultGenerics {
   messageType: MessageType;

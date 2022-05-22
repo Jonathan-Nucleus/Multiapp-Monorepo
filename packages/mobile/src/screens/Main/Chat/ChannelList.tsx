@@ -9,14 +9,14 @@ import {
   Text,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { MagnifyingGlass, NotePencil } from 'phosphor-react-native';
+import { NotePencil } from 'phosphor-react-native';
 
 import MainHeader from 'mobile/src/components/main/Header';
 import SearchInput from 'mobile/src/components/common/SearchInput';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import { Body1, Body2, Body3 } from 'mobile/src/theme/fonts';
 import pStyles from 'mobile/src/theme/pStyles';
-import { WHITE, BGDARK, GRAY700, GRAY600 } from 'shared/src/colors';
+import { WHITE, GRAY700, GRAY600 } from 'shared/src/colors';
 
 import { useChatContext } from 'mobile/src/context/Chat';
 import ChannelItem from 'mobile/src/components/main/chat/ChannelItem';
@@ -31,15 +31,20 @@ const DEFAULT_SORT: ChannelSort = [
 ];
 
 const ChannelList: ChannelListScreen = ({ navigation }) => {
-  const { client, userId } = useChatContext();
+  const { client, userId } = useChatContext() || {};
+
   const [filters, setFilters] = useState<ChannelFilters>({
     type: 'messaging',
-    members: { $in: [userId] },
+    members: { $in: userId ? [userId] : [] },
   });
   const [channels, setChannels] = useState<Channel[]>([]);
   const [search, setSearch] = useState('');
 
   const fetchChannels = useCallback(async () => {
+    if (!client) {
+      return;
+    }
+
     const newChannels = await client.queryChannels(filters, DEFAULT_SORT, {
       limit: 12,
       watch: true,
@@ -48,22 +53,36 @@ const ChannelList: ChannelListScreen = ({ navigation }) => {
   }, [client, filters]);
 
   useEffect(() => {
-    fetchChannels();
-    const handler = client.on((event) => {
-      const { channel, message, member, user } = event;
-      console.log('received event', event.type, channel, message, member, user);
-      switch (event.type) {
-        case 'user.watching.start':
-        case 'user.watching.stop':
-        case 'message.new':
-        case 'notification.added_to_channel':
-          fetchChannels();
-          break;
-      }
-    });
+    if (client) {
+      fetchChannels();
+      const handler = client.on((event) => {
+        const { channel, message, member, user } = event;
+        console.log(
+          'received event',
+          event.type,
+          channel,
+          message,
+          member,
+          user,
+        );
+        switch (event.type) {
+          case 'user.watching.start':
+          case 'user.watching.stop':
+          case 'message.new':
+          case 'notification.added_to_channel':
+            fetchChannels();
+            break;
+        }
+      });
 
-    return () => handler.unsubscribe();
+      return () => handler.unsubscribe();
+    }
   }, [client, fetchChannels]);
+
+  if (!client || !userId) {
+    // Return error state
+    return <View style={pStyles.globalContainer} />;
+  }
 
   const renderItem: ListRenderItem<Channel> = ({ item }) => (
     <ChannelItem channel={item} />

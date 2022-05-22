@@ -78,7 +78,7 @@ const schema = yup
 const Channel: ChannelScreen = ({ navigation, route }) => {
   const { channelId, initialData } = route.params;
 
-  const { client, userId } = useChatContext();
+  const { client, userId } = useChatContext() || {};
   const channel = useRef(initialData);
   const [uploading, setUploading] = useState(false);
   const [messages, setMessages] = useState(
@@ -110,15 +110,17 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
   });
 
   const fetchChannel = useCallback(async () => {
-    const channelData = (
-      await client.queryChannels({
-        type: 'messaging',
-        cid: channelId,
-      })
-    )[0];
+    if (client) {
+      const channelData = (
+        await client.queryChannels({
+          type: 'messaging',
+          cid: channelId,
+        })
+      )[0];
 
-    channel.current = channelData;
-    setMessages(processMessages(channelData.state.messages));
+      channel.current = channelData;
+      setMessages(processMessages(channelData.state.messages));
+    }
   }, [client, channelId]);
 
   useEffect(() => {
@@ -144,7 +146,23 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
     return () => listener.unsubscribe();
   }, [messages]);
 
-  const onSubmit = async ({ message }: FormValues) => {
+  const renderItem: ListRenderItem<PMessage> = useCallback(
+    ({ item }) => (
+      <MessageItem
+        message={item}
+        isMine={item.user?.id === userId}
+        finalMessage={item.lastMessage}
+      />
+    ),
+    [userId],
+  );
+
+  if (!client || !userId) {
+    // Return error state
+    return null;
+  }
+
+  const onSubmit = async ({ message }: FormValues): Promise<void> => {
     if (!channel.current) {
       console.log('No channel available.');
       return;
@@ -167,17 +185,6 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
     );
     setImages([]);
   };
-
-  const renderItem: ListRenderItem<PMessage> = useCallback(
-    ({ item }) => (
-      <MessageItem
-        message={item}
-        isMine={item.user?.id === userId}
-        finalMessage={item.lastMessage}
-      />
-    ),
-    [userId],
-  );
 
   const openPicker = async (): Promise<void> => {
     const image = await ImagePicker.openPicker({
@@ -204,7 +211,7 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
     setUploading(false);
   };
 
-  const removeImage = (index: number) => {
+  const removeImage = (index: number): void => {
     const newImages = [...images];
     const newValues = [...imagesField.value];
 

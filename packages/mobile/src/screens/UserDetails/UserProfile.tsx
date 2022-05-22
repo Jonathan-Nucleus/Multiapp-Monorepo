@@ -36,15 +36,16 @@ import {
 import LinkedinSvg from 'shared/assets/images/linkedin.svg';
 import TwitterSvg from 'shared/assets/images/twitter.svg';
 import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
-import DotsThreeVerticalSvg from 'shared/assets/images/dotsThreeVertical.svg';
 import NoPostSvg from 'shared/assets/images/no-post.svg';
 
-import { useAccount } from 'shared/graphql/query/account/useAccount';
 import { useProfile } from 'shared/graphql/query/user/useProfile';
 import { usePosts, Post } from 'shared/graphql/query/user/usePosts';
 import { useManagedFunds } from 'shared/graphql/query/user/useManagedFunds';
 import { useFollowUser } from 'shared/graphql/mutation/account/useFollowUser';
 import { useFeaturedPosts } from 'shared/graphql/query/user/useFeaturedPosts';
+import { useAccountContext } from 'mobile/src/context/Account';
+import { useChatContext } from 'mobile/src/context/Chat';
+import { createChannel } from 'mobile/src/services/chat';
 
 import { UserProfileScreen } from 'mobile/src/navigations/UserDetailsStack';
 import { BACKGROUND_URL } from 'react-native-dotenv';
@@ -53,21 +54,17 @@ import Avatar from '../../components/common/Avatar';
 const UserProfile: UserProfileScreen = ({ navigation, route }) => {
   const { userId } = route.params;
 
+  const { client } = useChatContext() || {};
   const [visibleFollowerModal, setVisibleFollowerModal] = useState(false);
   const [visibleFollowingModal, setVisibleFollowingModal] = useState(false);
 
-  const { data: accountData } = useAccount({ fetchPolicy: 'cache-only' });
-  const {
-    data: profileData,
-    loading: profileLoading,
-    refetch: refetchAccount,
-  } = useProfile(userId);
+  const account = useAccountContext();
+  const { data: profileData } = useProfile(userId);
   const { data: fundsData } = useManagedFunds(userId);
-  const { data, refetch } = usePosts(userId);
+  const { data } = usePosts(userId);
   const { data: featuredPostsData } = useFeaturedPosts(userId);
   const { isFollowing, toggleFollow } = useFollowUser(userId);
 
-  const account = accountData?.account;
   const funds = fundsData?.userProfile?.managedFunds ?? [];
   const profile = profileData?.userProfile;
   const postData = data?.userProfile?.posts ?? [];
@@ -75,7 +72,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
 
   const isMyAccount = useMemo(() => {
     return userId === account?._id ? true : false;
-  }, [account]);
+  }, [account, userId]);
 
   const renderItem: ListRenderItem<Post> = ({ item }) => (
     <TouchableOpacity>
@@ -99,8 +96,25 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
     );
   }
 
+  const messageUser = async (): Promise<void> => {
+    if (!client) {
+      return;
+    }
+
+    const channel = await createChannel(client, [account._id, userId]);
+    navigation.navigate('Main', {
+      screen: 'Chat',
+      params: {
+        screen: 'Channel',
+        params: {
+          channelId: channel.cid,
+          initialData: channel,
+        },
+      },
+    });
+  };
+
   const {
-    avatar,
     background,
     firstName,
     lastName,
@@ -223,8 +237,9 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
             <View style={[styles.row, styles.between]}>
               <PGradientOutlineButton
                 label="Message"
-                onPress={() => console.log(11)}
+                onPress={messageUser}
                 gradientContainer={styles.button}
+                disabled={!client}
               />
               <PGradientButton
                 label={isFollowing ? 'Unfollow' : 'Follow'}
@@ -306,9 +321,12 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
                   label="Create a Post"
                   btnContainer={styles.createPostBtn}
                   onPress={() =>
-                    navigation.navigate('PostDetails', {
-                      screen: 'CreatePost',
-                      params: {},
+                    navigation.navigate('Authenticated', {
+                      screen: 'PostDetails',
+                      params: {
+                        screen: 'CreatePost',
+                        params: {},
+                      },
                     })
                   }
                 />
@@ -348,10 +366,6 @@ const styles = StyleSheet.create({
   backgroundImg: {
     width: Dimensions.get('screen').width,
     height: 65,
-  },
-  logo: {
-    width: 80,
-    height: 80,
   },
   row: {
     flexDirection: 'row',

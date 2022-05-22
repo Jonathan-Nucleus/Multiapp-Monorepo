@@ -9,10 +9,9 @@ import { ActivityIndicator, StyleSheet, View, Text } from 'react-native';
 import { StreamChat } from 'stream-chat';
 
 import pStyles from 'mobile/src/theme/pStyles';
-import { WHITE } from 'shared/src/colors';
 
 import type { Client, StreamType } from 'mobile/src/services/chat';
-import { AccountData } from 'shared/graphql/query/account/useAccount';
+import { useAccountContext } from 'mobile/src/context/Account';
 
 import { GETSTREAM_ACCESS_KEY, AVATAR_URL } from 'react-native-dotenv';
 
@@ -22,76 +21,68 @@ export interface ChatSession {
 }
 
 const ChatContext = React.createContext<ChatSession | undefined>(undefined);
-export function useChatContext(): ChatSession {
-  const chatSession = useContext(ChatContext);
-  if (!chatSession) {
-    throw new Error(
-      'Chat session context not properly initializeed, Please check to ' +
-        'ensure that you have included the approprate Context Provider',
-    );
-  }
-
-  return chatSession;
+export function useChatContext(): ChatSession | undefined {
+  return useContext(ChatContext);
 }
 
-type Account = AccountData['account'];
 interface ChatProviderProps extends PropsWithChildren<unknown> {
-  user?: Account;
   token?: string;
 }
 
 export const ChatProvider: React.FC<ChatProviderProps> = ({
-  user,
   token,
   children,
 }) => {
-  const chatClient = useRef<Client | null>(null);
-  const [isReady, setIsReady] = useState<boolean>();
+  const user = useAccountContext();
+  const chatClient = useRef<Client>();
+  const fetchingClient = useRef(false);
+  const [isReady, setReady] = useState<boolean>();
+
+  const retryCount = useRef(0);
 
   useEffect(() => {
-    if (!chatClient.current && user && token) {
+    if (!chatClient.current && !fetchingClient.current) {
       const client = StreamChat.getInstance<StreamType>(GETSTREAM_ACCESS_KEY);
       (async () => {
         try {
+          fetchingClient.current = true;
           await client.connectUser(
             {
               id: user._id,
-              name: `${user.firstName} ${user.lastName}`,
-              image: `${AVATAR_URL}/${user.avatar}`,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              avatar: user.avatar,
               company: user.companies?.[0]?.name,
               position: user.position,
             },
             token,
           );
-
+          console.log('Client created');
           chatClient.current = client;
-          setIsReady(true);
+          setReady(true);
         } catch (err) {
           console.log(err);
-          setIsReady(false);
+          setReady(false);
+        }
+
+        fetchingClient.current = false;
+
+        if (!chatClient.current && retryCount.current < 3) {
+          retryCount.current++;
+          setReady(undefined);
+          console.log('Retrying');
         }
       })();
 
       return () => {
-        if (!chatClient.current) {
-          return;
-        }
-        chatClient.current.disconnectUser();
-        chatClient.current = null;
+        chatClient.current?.disconnectUser();
+        chatClient.current = undefined;
         console.log('Stopped chat');
       };
     }
   }, [user, token]);
 
-  if (isReady === undefined) {
-    return (
-      <View style={[pStyles.globalContainer, styles.container]}>
-        <ActivityIndicator size="large" color={WHITE} />
-      </View>
-    );
-  }
-
-  if (!chatClient.current || !user) {
+  if (isReady !== undefined && !chatClient) {
     return (
       <View style={[pStyles.globalContainer, styles.container]}>
         <Text>Error connecting to messenger</Text>
@@ -101,7 +92,11 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
 
   return (
     <ChatContext.Provider
-      value={{ client: chatClient.current, userId: user._id }}>
+      value={
+        chatClient.current
+          ? { client: chatClient.current, userId: user._id }
+          : undefined
+      }>
       {children}
     </ChatContext.Provider>
   );

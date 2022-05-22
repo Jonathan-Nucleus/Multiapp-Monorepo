@@ -14,7 +14,7 @@ import BackSvg from 'mobile/src/assets/icons/back.svg';
 import { usePost } from 'shared/graphql/query/post/usePost';
 import { Post } from 'shared/graphql/query/post/usePosts';
 
-import type { NotificationDetailsScreen } from 'mobile/src/navigations/AppNavigator';
+import type { NotificationDetailsScreen } from 'mobile/src/navigations/AuthenticatedStack';
 
 const NotificationDetail: NotificationDetailsScreen = ({
   navigation,

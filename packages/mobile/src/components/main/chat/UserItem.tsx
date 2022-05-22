@@ -25,7 +25,11 @@ const UserItem: React.FC<UserItemProps> = ({ user, onPress, onRemove }) => {
       <View style={[styles.row, styles.container]}>
         <ChatAvatar user={user} />
         <View style={[styles.col, styles.userInfo]}>
-          <Text style={[styles.textWhite, Body2Bold]}>{user.name}</Text>
+          <Text
+            style={[
+              styles.textWhite,
+              Body2Bold,
+            ]}>{`${user.firstName} ${user.lastName}`}</Text>
           {user.position ? (
             <Text style={[styles.textWhite, Body2]}>{`${user.position}${
               user.company ? ` @ ${user.company}` : ''

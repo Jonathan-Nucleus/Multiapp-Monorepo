@@ -121,10 +121,12 @@ const Settings: SettingsScreen = ({ navigation }) => {
     });
   }
 
-  const handleLogout = async () => {
+  const handleLogout = async (): Promise<void> => {
     try {
       clearToken();
-      navigation.replace('Auth');
+      navigation.replace('Auth', {
+        screen: 'Login',
+      });
     } catch (err) {
       console.log('logout err', err);
     }
@@ -245,9 +247,6 @@ const Settings: SettingsScreen = ({ navigation }) => {
 export default Settings;
 
 const styles = StyleSheet.create({
-  globalContainer: {
-    flex: 1,
-  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -264,11 +263,6 @@ const styles = StyleSheet.create({
   border: {
     borderTopColor: WHITE12,
     borderTopWidth: 1,
-  },
-
-  commentWrap: {
-    marginLeft: 15,
-    flex: 1,
   },
   label: {
     ...Body2Bold,

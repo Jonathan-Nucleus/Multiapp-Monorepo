@@ -9,13 +9,12 @@ import {
   Text,
   Pressable,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { CaretLeft } from 'phosphor-react-native';
 import { CommonActions } from '@react-navigation/native';
 
 import PHeader from 'mobile/src/components/common/PHeader';
 import SearchInput from 'mobile/src/components/common/SearchInput';
-import { Body1Bold, Body2, Body3Bold } from 'mobile/src/theme/fonts';
+import { Body1Bold, Body3Bold } from 'mobile/src/theme/fonts';
 import pStyles from 'mobile/src/theme/pStyles';
 import {
   PRIMARY,
@@ -54,7 +53,7 @@ const schema = yup
   .required();
 
 const NewChat: NewChatScreen = ({ navigation }) => {
-  const { client, userId } = useChatContext();
+  const { client, userId } = useChatContext() || {};
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
 
@@ -70,6 +69,10 @@ const NewChat: NewChatScreen = ({ navigation }) => {
   });
 
   const performSearch = useCallback(async () => {
+    if (!client) {
+      return;
+    }
+
     const searchText = getValues('search') ?? '';
     const searchResults = await findUsers(client, searchText, [
       { last_active: -1 },
@@ -85,8 +88,13 @@ const NewChat: NewChatScreen = ({ navigation }) => {
     performSearch();
   }, [performSearch]);
 
+  if (!client || !userId) {
+    // Return error state
+    return null;
+  }
+
   const onSubmit = async (): Promise<void> => {
-    if (selectedUsers.length === 0) {
+    if (!client || selectedUsers.length === 0) {
       return;
     }
 
