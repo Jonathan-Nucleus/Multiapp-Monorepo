@@ -3,33 +3,33 @@ import { StyleSheet, Text, View } from 'react-native';
 import FastImage, { ResizeMode, ImageStyle } from 'react-native-fast-image';
 import dayjs from 'dayjs';
 
-import { WHITE, PRIMARYSOLID, GRAY700 } from 'shared/src/colors';
+import { WHITE, PRIMARYSOLID, GRAY700, GRAY600 } from 'shared/src/colors';
 import { Body2, Body4Thin } from 'mobile/src/theme/fonts';
 
-import { Message } from 'mobile/src/services/chat';
+import { PMessage } from 'mobile/src/services/chat';
 import ChatAvatar from 'mobile/src/components/main/chat/ChatAvatar';
 
 interface MessageItemProps {
-  message: Message;
+  message: PMessage;
   isMine: boolean;
-  finalMessage?: boolean;
+  isGroupChat?: boolean;
 }
 
 const MessageItem: React.FC<MessageItemProps> = ({
   message,
   isMine,
-  finalMessage = true,
+  isGroupChat = false,
 }) => {
-  const { created_at, attachments } = message;
+  const { created_at, attachments, lastMessage, firstMessage } = message;
   return (
     <View
       style={[
         styles.row,
         styles.container,
         isMine ? styles.justifyEnd : styles.justifyStart,
-        finalMessage ? styles.finalMessage : null,
+        lastMessage ? styles.finalMessage : null,
       ]}>
-      {finalMessage && !isMine && message.user && (
+      {lastMessage && !isMine && message.user && (
         <ChatAvatar
           user={message.user}
           size={32}
@@ -37,8 +37,13 @@ const MessageItem: React.FC<MessageItemProps> = ({
           style={styles.avatar}
         />
       )}
-      <View
-        style={[styles.message, !finalMessage ? styles.avatarSpacer : null]}>
+      <View style={[styles.message, !lastMessage ? styles.avatarSpacer : null]}>
+        {isGroupChat && firstMessage && !isMine ? (
+          <Text
+            style={
+              styles.info
+            }>{`${message.user.firstName} ${message.user.lastName}`}</Text>
+        ) : null}
         {message.text ? (
           <View
             style={[
@@ -64,15 +69,13 @@ const MessageItem: React.FC<MessageItemProps> = ({
             })}
           </View>
         ) : null}
-        {finalMessage && (
+        {lastMessage && (
           <View
             style={[
               styles.row,
               isMine ? styles.justifyEnd : styles.justifyStart,
             ]}>
-            <Text style={styles.timestamp}>
-              {dayjs(created_at).format('h:mmA')}
-            </Text>
+            <Text style={styles.info}>{dayjs(created_at).format('h:mmA')}</Text>
           </View>
         )}
       </View>
@@ -94,9 +97,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-end',
   },
-  col: {
-    flexDirection: 'column',
-  },
   flexEnd: {
     alignSelf: 'flex-end',
   },
@@ -105,12 +105,6 @@ const styles = StyleSheet.create({
   },
   justifyEnd: {
     justifyContent: 'flex-end',
-  },
-  textWhite: {
-    color: WHITE,
-  },
-  userInfo: {
-    paddingLeft: 8,
   },
   message: {
     maxWidth: '75%',
@@ -156,10 +150,11 @@ const styles = StyleSheet.create({
     marginRight: 12,
     marginBottom: 18,
   },
-  timestamp: {
-    marginTop: 6,
+  info: {
+    marginBottom: 4,
+    marginTop: -2,
     height: 12,
-    color: WHITE,
+    color: GRAY600,
     ...Body4Thin,
   },
 });

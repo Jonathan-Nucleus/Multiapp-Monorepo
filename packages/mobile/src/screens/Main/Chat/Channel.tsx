@@ -151,10 +151,10 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
       <MessageItem
         message={item}
         isMine={item.user?.id === userId}
-        finalMessage={item.lastMessage}
+        isGroupChat={users.length > 2}
       />
     ),
-    [userId],
+    [userId, users.length],
   );
 
   if (!client || !userId) {

@@ -62,16 +62,26 @@ function shouldGroupMessages(first: Message, second: Message): boolean {
  * @param messages  Array of stream chat messages.
  */
 export function processMessages(messages: Message[]): PMessage[] {
-  return messages
-    .map((message, index) => ({
+  const processedMessages: PMessage[] = [];
+
+  for (let index = 0; index < messages.length; index++) {
+    const message = messages[index];
+    processedMessages.push({
       ...message,
       lastMessage: messages[index + 1]
         ? !shouldGroupMessages(message, messages[index + 1])
         : true,
-    }))
-    .reverse();
+      firstMessage:
+        index === 0 ? true : processedMessages[index - 1].lastMessage,
+    });
+  }
+
+  return processedMessages.reverse();
 }
-export type PMessage = Message & { lastMessage: boolean };
+export type PMessage = Message & {
+  lastMessage: boolean;
+  firstMessage: boolean;
+};
 
 /**
  * Adds a new stream chat message to an existing list of processed messages.
@@ -87,6 +97,7 @@ export function addMessage(message: Message, messages: PMessage[]): PMessage[] {
     return [
       {
         ...message,
+        firstMessage: true,
         lastMessage: true,
       },
     ];
@@ -105,6 +116,7 @@ export function addMessage(message: Message, messages: PMessage[]): PMessage[] {
     {
       ...message,
       lastMessage: true,
+      firstMessage: prevMessage.lastMessage,
     },
     prevMessage,
     ...otherMessages,
