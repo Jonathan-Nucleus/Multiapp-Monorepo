@@ -29,7 +29,9 @@ const ChatStack = () => {
 export default ChatStack;
 
 export type ChatStackParamList = {
-  ChannelList: undefined;
+  ChannelList: {
+    channelId?: string;
+  };
   NewChat: undefined;
   Channel: {
     channelId: string;

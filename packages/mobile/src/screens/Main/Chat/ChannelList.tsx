@@ -6,15 +6,12 @@ import {
   StyleSheet,
   FlatList,
   View,
-  Text,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { NotePencil } from 'phosphor-react-native';
 
 import MainHeader from 'mobile/src/components/main/Header';
 import SearchInput from 'mobile/src/components/common/SearchInput';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
-import { Body1, Body2, Body3 } from 'mobile/src/theme/fonts';
 import pStyles from 'mobile/src/theme/pStyles';
 import { WHITE, GRAY700, GRAY600 } from 'shared/src/colors';
 
@@ -30,7 +27,8 @@ const DEFAULT_SORT: ChannelSort = [
   { cid: 1 },
 ];
 
-const ChannelList: ChannelListScreen = ({ navigation }) => {
+const ChannelList: ChannelListScreen = ({ navigation, route }) => {
+  const { channelId } = route.params || {};
   const { client, userId } = useChatContext() || {};
 
   const [filters, setFilters] = useState<ChannelFilters>({
@@ -53,6 +51,11 @@ const ChannelList: ChannelListScreen = ({ navigation }) => {
   }, [client, filters]);
 
   useEffect(() => {
+    if (channelId) {
+      navigation.navigate('Channel', {
+        channelId,
+      });
+    }
     if (client) {
       fetchChannels();
       const handler = client.on((event) => {
@@ -77,7 +80,7 @@ const ChannelList: ChannelListScreen = ({ navigation }) => {
 
       return () => handler.unsubscribe();
     }
-  }, [client, fetchChannels]);
+  }, [client, fetchChannels, channelId, navigation]);
 
   if (!client || !userId) {
     // Return error state

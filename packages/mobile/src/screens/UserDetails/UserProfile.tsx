@@ -24,7 +24,7 @@ import Funds from 'mobile/src/components/main/Funds';
 import PGradientOutlineButton from 'mobile/src/components/common/PGradientOutlineButton';
 import ProfilePlaceholder from '../../components/placeholder/ProfilePlaceholder';
 import pStyles from 'mobile/src/theme/pStyles';
-import { Body2, Body3, H6Bold, H5Bold } from 'mobile/src/theme/fonts';
+import { Body2, Body3, H6Bold } from 'mobile/src/theme/fonts';
 import {
   WHITE,
   BLUE300,
@@ -479,19 +479,6 @@ const styles = StyleSheet.create({
   gradientContainer: {
     borderRadius: 0,
     height: 65,
-  },
-  noAvatarContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: WHITE,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  noAvatar: {
-    color: PRIMARYSOLID,
-    ...H5Bold,
-    textTransform: 'uppercase',
   },
   pencil: {
     position: 'absolute',

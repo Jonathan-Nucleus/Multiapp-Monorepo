@@ -10,6 +10,7 @@ import {
   View,
   Text,
 } from 'react-native';
+import { CommonActions } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CaretLeft, ImageSquare, X } from 'phosphor-react-native';
 import {
@@ -124,10 +125,10 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
   }, [client, channelId]);
 
   useEffect(() => {
-    if (!initialData) {
+    if (!initialData || channel.current?.cid !== channelId) {
       fetchChannel();
     }
-  }, [fetchChannel, initialData]);
+  }, [fetchChannel, initialData, channelId]);
 
   useEffect(() => {
     if (!channel.current) {
@@ -222,12 +223,23 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
     setImages(newImages);
   };
 
+  const backToChannelList = (): void => {
+    navigation.dispatch(CommonActions.reset({
+      index: 1,
+      routes: [
+        { name: "ChannelList" },
+        { name: "Channel", params: route.params}
+      ]
+    }));
+    navigation.goBack();
+  }
+
   return (
     <View style={pStyles.globalContainer}>
       <PHeader
         leftIcon={
           <Pressable
-            onPress={() => navigation.goBack()}
+            onPress={backToChannelList}
             style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}>
             <CaretLeft size={32} color={WHITE} />
           </Pressable>
