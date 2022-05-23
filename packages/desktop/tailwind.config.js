@@ -1,3 +1,5 @@
+const primaryHighlight = "#333087";
+
 module.exports = {
   content: ["./pages/**/*.{js,ts,jsx,tsx}", "./app/**/*.{js,ts,jsx,tsx}"],
   theme: {
@@ -15,7 +17,7 @@ module.exports = {
       colors: {
         skeleton: {
           DEFAULT: "#22204A",
-          light: "#333087",
+          light: primaryHighlight,
           background: "#1D1C38",
         },
         background: {
@@ -36,6 +38,7 @@ module.exports = {
           solid: "#544EFD",
           overlay: "#57B1FF",
           medium: "#A5A1FF",
+          highlight: primaryHighlight,
         },
         secondary: {
           DEFAULT: "#0067E0",

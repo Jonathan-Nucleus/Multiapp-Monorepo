@@ -12,6 +12,7 @@ import TeamMembersList from "../../../modules/teams/TeamMembersList";
 import { useFund } from "shared/graphql/query/marketplace/useFund";
 import { useWatchFund } from "shared/graphql/mutation/funds/useWatchFund";
 import Skeleton from "./Skeleton";
+import ContactSpecialist from "../../../modules/funds/ContactSpecialist";
 
 const fundData = {
   mtd: "3.2%",
@@ -131,6 +132,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
   const [more, setMore] = useState(false);
   const [moreInvestor, setMoreInvestor] = useState(false);
   const [moreOption, setMoreOption] = useState(false);
+  const [showContactSpecialist, setShowContactSpecialist] = useState(false);
   const companyBackground = fund?.company?.background?.url;
 
   if (!fund) {
@@ -613,16 +615,19 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                   </div>
                 </div>
                 <div className="my-2">
-                  <Link href={"mailto:"}>
-                    <a>
-                      <Button
-                        variant="gradient-primary"
-                        className="w-full font-medium h-12"
-                      >
-                        Contact Specialist
-                      </Button>
-                    </a>
-                  </Link>
+                  <Button
+                    variant="gradient-primary"
+                    className="w-full font-medium h-12"
+                    onClick={() => setShowContactSpecialist(true)}
+                  >
+                    Contact Specialist
+                  </Button>
+                  {showContactSpecialist && (
+                    <ContactSpecialist
+                      show={showContactSpecialist}
+                      onClose={() => setShowContactSpecialist(false)}
+                    />
+                  )}
                 </div>
               </div>
               <div className="grid grid-cols-2">

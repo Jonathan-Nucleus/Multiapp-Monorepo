@@ -27,7 +27,7 @@ const Button: FC<ButtonProps> = ({
       "text-primary border border-primary " +
       "text-sm font-bold rounded-full tracking-widest " +
       "inline-flex justify-center items-center px-4 py-2 " +
-      "hover:bg-primary/25 active:bg-transparent focus:outline-none transition ";
+      "hover:bg-primary/25 disabled:hover:bg-transparent disabled:border-gray-500 disabled:text-gray-500 active:bg-transparent focus:outline-none transition ";
   } else if (variant == "gradient-primary") {
     buttonClass =
       "text-white " +
