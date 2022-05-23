@@ -417,7 +417,7 @@ const resolvers = {
       async (
         parentIgnored,
         args: { search?: string },
-        { db }
+        { db, user }
       ): Promise<GlobalSearchResult> => {
         const validator = yup
           .object()
@@ -433,8 +433,10 @@ const resolvers = {
         const [users, companies, posts, funds] = await Promise.all([
           db.users.findByKeyword(search),
           db.companies.findByKeyword(search),
-          db.posts.findByKeyword(search),
-          db.funds.findByKeyword(search),
+          db.posts.findByKeyword(user.accreditation === "none"
+            ? "everyone"
+            : user.accreditation, search),
+          db.funds.findByKeyword(user.accreditation, search),
         ]);
 
         return { users, companies, posts, funds };

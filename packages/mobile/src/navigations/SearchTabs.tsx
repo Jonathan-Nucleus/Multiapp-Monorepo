@@ -40,6 +40,9 @@ const SearchTabs: SearchScreen = ({ navigation, route }) => {
   const [search, setSearch] = useState(route.params?.searchString ?? '');
   const { data: searchData } = useGlobalSearch(search);
 
+  const initialRoute =
+    search.startsWith('#') || search.startsWith('$') ? 'Posts' : 'People';
+
   return (
     <View style={styles.globalContainer}>
       <PHeader
@@ -66,7 +69,7 @@ const SearchTabs: SearchScreen = ({ navigation, route }) => {
             </Text>
           ),
         })}
-        initialRouteName="People">
+        initialRouteName={initialRoute}>
         <Tab.Screen name="People">
           {() => (
             <People

@@ -15,6 +15,10 @@ import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import pStyles from 'mobile/src/theme/pStyles';
 import { WHITE, GRAY700, GRAY600 } from 'shared/src/colors';
 
+import { useForm, Controller, DefaultValues } from 'react-hook-form';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+
 import { useChatContext } from 'mobile/src/context/Chat';
 import ChannelItem from 'mobile/src/components/main/chat/ChannelItem';
 import { Channel, ChannelSort, ChannelFilters } from 'mobile/src/services/chat';
@@ -27,28 +31,56 @@ const DEFAULT_SORT: ChannelSort = [
   { cid: 1 },
 ];
 
+type FormValues = {
+  search?: string;
+};
+
+const schema = yup
+  .object({
+    search: yup.string().notRequired().default(''),
+  })
+  .required();
+
 const ChannelList: ChannelListScreen = ({ navigation, route }) => {
   const { channelId } = route.params || {};
   const { client, userId } = useChatContext() || {};
 
-  const [filters, setFilters] = useState<ChannelFilters>({
-    type: 'messaging',
-    members: { $in: userId ? [userId] : [] },
-  });
   const [channels, setChannels] = useState<Channel[]>([]);
-  const [search, setSearch] = useState('');
+  const { control, handleSubmit, getValues } = useForm<
+    yup.InferType<typeof schema>
+  >({
+    resolver: yupResolver(schema),
+    mode: 'onSubmit',
+    defaultValues: schema.cast(
+      {},
+      { assert: false },
+    ) as DefaultValues<FormValues>,
+  });
 
   const fetchChannels = useCallback(async () => {
     if (!client) {
       return;
     }
 
-    const newChannels = await client.queryChannels(filters, DEFAULT_SORT, {
+    const searchText = getValues('search') ?? '';
+    const filter = {
+      type: 'messaging',
+      members: { $in: userId ? [userId] : [] },
+      ...(searchText !== ''
+        ? {
+            'member.user.name': {
+              $autocomplete: searchText,
+            },
+          }
+        : {}),
+    };
+
+    const newChannels = await client.queryChannels(filter, DEFAULT_SORT, {
       limit: 12,
       watch: true,
     });
     setChannels(newChannels);
-  }, [client, filters]);
+  }, [client, getValues, userId]);
 
   useEffect(() => {
     if (channelId) {
@@ -94,14 +126,26 @@ const ChannelList: ChannelListScreen = ({ navigation, route }) => {
   return (
     <View style={pStyles.globalContainer}>
       <MainHeader />
-      <SearchInput
-        value={search}
-        onChangeText={setSearch}
-        onClear={() => setSearch('')}
-        containerStyle={styles.textContainerStyle}
-        style={styles.textStyle}
-        placeholder="Search messages"
-        placeholderTextColor={GRAY600}
+      <Controller
+        name="search"
+        control={control}
+        render={({ field }) => (
+          <SearchInput
+            {...field}
+            onChangeText={(text) => {
+              field.onChange(text);
+              fetchChannels();
+            }}
+            onClear={() => {
+              field.onChange('');
+              fetchChannels();
+            }}
+            containerStyle={styles.textContainerStyle}
+            style={styles.textStyle}
+            placeholder="Search messages"
+            placeholderTextColor={GRAY600}
+          />
+        )}
       />
       <KeyboardAvoidingView
         style={styles.flex}

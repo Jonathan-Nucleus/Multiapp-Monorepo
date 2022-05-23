@@ -11,18 +11,9 @@ import {
   Text,
 } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { CaretLeft, ImageSquare, X } from 'phosphor-react-native';
-import {
-  Channel as SCChannel,
-  ChannelSort,
-  FormatMessageResponse as SCMessage,
-} from 'stream-chat';
-import ImagePicker, {
-  ImageOrVideo,
-  Image as UploadImage,
-} from 'react-native-image-crop-picker';
-import FastImage, { ResizeMode, ImageStyle } from 'react-native-fast-image';
+import ImagePicker, { ImageOrVideo } from 'react-native-image-crop-picker';
+import FastImage from 'react-native-fast-image';
 
 import relativeTime from 'dayjs/plugin/relativeTime';
 import dayjs from 'dayjs';
@@ -31,6 +22,7 @@ dayjs.extend(relativeTime);
 import PHeader from 'mobile/src/components/common/PHeader';
 import ExpandingInput from 'mobile/src/components/common/ExpandingInput';
 import ChatAvatar from 'mobile/src/components/main/chat/ChatAvatar';
+import { isVideo } from 'mobile/src/components/common/Media';
 import { Body1Bold, Body3, Body2Bold } from 'mobile/src/theme/fonts';
 import pStyles from 'mobile/src/theme/pStyles';
 import {
@@ -56,6 +48,7 @@ import {
   processMessages,
   addMessage,
   PMessage,
+  Message,
 } from 'mobile/src/services/chat';
 import MessageItem from 'mobile/src/components/main/chat/MessageItem';
 
@@ -63,14 +56,14 @@ import { ChannelScreen } from 'mobile/src/navigations/ChatStack';
 
 type FormValues = {
   message?: string;
-  images: string[];
+  media: string[];
 };
 
 const schema = yup
   .object({
-    images: yup.array(yup.string().required()).default([]),
-    message: yup.string().when('images', {
-      is: (images: string[]) => images.length === 0,
+    media: yup.array(yup.string().required()).default([]),
+    message: yup.string().when('media', {
+      is: (media: string[]) => media.length === 0,
       then: yup.string().trim().required('Required'),
     }),
   })
@@ -87,9 +80,7 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
       ? processMessages(initialData?.state.messages)
       : [],
   );
-  const [images, setImages] = useState<{ uri: string; data: ImageOrVideo }[]>(
-    [],
-  );
+  const [media, setMedia] = useState<{ uri: string; data: ImageOrVideo }[]>([]);
 
   const { members } = channel.current?.state ?? {};
   const users = members
@@ -105,9 +96,9 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
       { assert: false, stripUnknown: true },
     ) as DefaultValues<FormValues>,
   });
-  const { field: imagesField } = useController({
+  const { field: mediaField } = useController({
     control,
-    name: 'images',
+    name: 'media',
   });
 
   const fetchChannel = useCallback(async () => {
@@ -141,6 +132,17 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
             setMessages(addMessage(event.message, messages));
           }
           break;
+
+        case 'message.updated':
+          if (event.message) {
+            const updatedMessages: Message[] = messages.reverse();
+            const index = updatedMessages.findIndex(
+              (message) => message.id === event.message?.id,
+            );
+            updatedMessages[index] = event.message;
+            setMessages(processMessages(updatedMessages));
+          }
+          break;
       }
     });
 
@@ -170,21 +172,25 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
     }
 
     const attachments =
-      images.length === 0
+      media.length === 0
         ? undefined
-        : images.map((image) => ({
+        : media.map((image) => ({
             image_url: image.uri,
-            type: 'image',
+            type: isVideo(image.uri) ? 'video' : 'image',
           }));
 
-    await channel.current.sendMessage({ text: message, attachments });
+    await channel.current.sendMessage({
+      text: message,
+      attachments,
+    });
+
     reset(
       schema.cast(
         {},
         { assert: false, stripUnknown: true },
       ) as DefaultValues<FormValues>,
     );
-    setImages([]);
+    setMedia([]);
   };
 
   const openPicker = async (): Promise<void> => {
@@ -193,46 +199,52 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
       height: 400,
       cropping: false,
       compressImageQuality: 0.8,
+      compressVideoPreset: '1920x1080',
     });
 
     await uploadImage(image);
   };
 
-  const uploadImage = async (image: ImageOrVideo): Promise<void> => {
+  const uploadImage = async (mediaFile: ImageOrVideo): Promise<void> => {
     if (!channel.current) {
       return;
     }
 
     setUploading(true);
 
-    const result = await channel.current.sendImage(image.path);
-    setImages([...images, { uri: result.file, data: image }]);
-    imagesField.onChange([...imagesField.value, result.file]);
+    const result = isVideo(mediaFile.path)
+      ? await channel.current.sendFile(mediaFile.path)
+      : await channel.current.sendImage(mediaFile.path);
+
+    setMedia([...media, { uri: result.file, data: mediaFile }]);
+    mediaField.onChange([...mediaField.value, result.file]);
 
     setUploading(false);
   };
 
   const removeImage = (index: number): void => {
-    const newImages = [...images];
-    const newValues = [...imagesField.value];
+    const newImages = [...media];
+    const newValues = [...mediaField.value];
 
     newImages.splice(index, 1);
     newValues.splice(index, 1);
 
-    imagesField.onChange(newValues);
-    setImages(newImages);
+    mediaField.onChange(newValues);
+    setMedia(newImages);
   };
 
   const backToChannelList = (): void => {
-    navigation.dispatch(CommonActions.reset({
-      index: 1,
-      routes: [
-        { name: "ChannelList" },
-        { name: "Channel", params: route.params}
-      ]
-    }));
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 1,
+        routes: [
+          { name: 'ChannelList' },
+          { name: 'Channel', params: route.params },
+        ],
+      }),
+    );
     navigation.goBack();
-  }
+  };
 
   return (
     <View style={pStyles.globalContainer}>
@@ -300,9 +312,9 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
                 onChangeText={field.onChange}
                 keyboardAppearance="dark"
                 viewAbove={
-                  images.length === 0 && !uploading ? undefined : (
+                  media.length === 0 && !uploading ? undefined : (
                     <View style={styles.imageContainer}>
-                      {images.map((image, index) => (
+                      {media.map((image, index) => (
                         <View key={image.uri} style={styles.imageView}>
                           <FastImage
                             style={styles.image}
@@ -386,16 +398,8 @@ const styles = StyleSheet.create({
   flex: {
     flex: 1,
   },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   list: {
     paddingBottom: 24,
-  },
-  label: {
-    height: 0,
-    marginBottom: 0,
   },
   inputContainer: {
     position: 'relative',

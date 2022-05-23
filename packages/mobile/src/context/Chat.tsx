@@ -51,6 +51,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
               id: user._id,
               firstName: user.firstName,
               lastName: user.lastName,
+              name: `${user.firstName} ${user.lastName}`,
               avatar: user.avatar,
               company: user.companies?.[0]?.name,
               position: user.position,

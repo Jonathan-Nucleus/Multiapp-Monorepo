@@ -282,6 +282,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       height: 400,
       cropping: false,
       compressImageQuality: 0.8,
+      compressVideoPreset: '1920x1080',
     });
 
     await uploadImage(image);
@@ -303,6 +304,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   const takeVideo = async (): Promise<void> => {
     const videoData = await ImagePicker.openCamera({
       mediaType: 'video',
+      compressVideoPreset: '1920x1080',
     });
 
     await uploadImage(videoData);

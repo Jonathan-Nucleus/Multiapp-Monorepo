@@ -71,13 +71,22 @@ const createFundsCollection = (fundsCollection: Collection<Fund.Mongo>) => {
      *
      * @returns The list of funds.
      */
-    findByKeyword: async (search = "", limit = 10): Promise<Fund.Mongo[]> => {
+    findByKeyword: async (accreditation: Accreditation, search = "", limit = 10): Promise<Fund.Mongo[]> => {
       const stage = createSearchStage("name", search);
       if (!stage) {
         return [];
       }
 
-      const funds = (await fundsCollection
+      const accreditationLevels: Accreditation[] = [
+        "accredited",
+        "client",
+        "purchaser",
+      ];
+      accreditationLevels.splice(
+        accreditationLevels.indexOf(accreditation) + 1
+      );
+
+      const funds = ((await fundsCollection
         .aggregate([
           {
             $search: { ...stage },
@@ -86,7 +95,7 @@ const createFundsCollection = (fundsCollection: Collection<Fund.Mongo>) => {
             $limit: limit,
           },
         ])
-        .toArray()) as Fund.Mongo[];
+        .toArray()) as Fund.Mongo[]).filter((fund) => accreditationLevels.includes(fund.level));
 
       return funds;
     },

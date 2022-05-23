@@ -14,6 +14,7 @@ type UserType = Pick<
 > & {
   firstName: string;
   lastName: string;
+  name: string;
   avatar?: string;
   company?: string;
   position?: string;

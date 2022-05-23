@@ -43,6 +43,7 @@ export async function registerUser(
         id: user._id.toString(),
         firstName: user.firstName,
         lastName: user.lastName,
+        name: `${user.firstName} ${user.lastName}`,
         avatar: user.avatar,
         company: company?.name,
         position: user.position,

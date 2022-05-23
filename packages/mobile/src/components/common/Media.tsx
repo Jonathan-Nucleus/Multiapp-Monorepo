@@ -2,7 +2,6 @@ import React, { FC, useState, useRef } from 'react';
 import { StyleProp, StyleSheet, Pressable, View } from 'react-native';
 import FastImage, { ResizeMode, ImageStyle } from 'react-native-fast-image';
 import Video, { VideoProperties } from 'react-native-video';
-import { Play } from 'phosphor-react-native';
 import { POST_URL } from 'react-native-dotenv';
 import { Media as MediaType } from 'shared/graphql/fragments/post';
 
@@ -17,8 +16,14 @@ interface MediaProps {
 
 const SUPPORTED_EXTENSION = ['mp4'];
 
-function isVideo(src: string): boolean {
-  const ext = src.toLowerCase().substring(src.lastIndexOf('.') + 1);
+export function isVideo(src: string): boolean {
+  let filename = src;
+  const query = src.indexOf('?');
+  if (query >= 0) {
+    filename = src.substring(0, query);
+  }
+
+  const ext = filename.toLowerCase().substring(filename.lastIndexOf('.') + 1);
   return SUPPORTED_EXTENSION.includes(ext);
 }
 
@@ -75,13 +80,7 @@ const Media: FC<MediaProps> = ({
           repeat={false}
           style={{ aspectRatio: media.aspectRatio }}
         />
-        {isFirstLoad && (
-          <View style={styles.overlay} pointerEvents="none">
-            <View style={styles.playbackButton}>
-              <Play color={WHITE60} size={24} />
-            </View>
-          </View>
-        )}
+        {isFirstLoad && <View style={styles.overlay} pointerEvents="none" />}
       </View>
     </Pressable>
   ) : (

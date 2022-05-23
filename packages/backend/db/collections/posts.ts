@@ -442,13 +442,21 @@ const createPostsCollection = (
      *
      * @returns The list of posts.
      */
-    findByKeyword: async (search = "", limit = 10): Promise<Post.Mongo[]> => {
+    findByKeyword: async (audience: Audience, search = "", limit = 10): Promise<Post.Mongo[]> => {
       const stage = createSearchStage("body", search);
       if (!stage) {
         return [];
       }
 
-      const posts = (await postsCollection
+      const audienceLevels: Audience[] = [
+        "everyone",
+        "accredited",
+        "client",
+        "purchaser",
+      ];
+      audienceLevels.splice(audienceLevels.indexOf(audience) + 1);
+
+      const posts = ((await postsCollection
         .aggregate([
           {
             $search: { ...stage },
@@ -462,7 +470,7 @@ const createPostsCollection = (
             $limit: limit,
           },
         ])
-        .toArray()) as Post.Mongo[];
+        .toArray()) as Post.Mongo[]).filter((post) => audienceLevels.includes(post.audience));
 
       return posts;
     },
