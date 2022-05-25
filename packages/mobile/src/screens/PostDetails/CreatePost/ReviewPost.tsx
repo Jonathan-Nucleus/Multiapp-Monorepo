@@ -167,6 +167,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
         {route.params.media ? (
           <View style={styles.postImage}>
             <Media
+              mediaId="create-post-media"
               media={route.params.media}
               style={styles.preview}
               resizeMode="contain"

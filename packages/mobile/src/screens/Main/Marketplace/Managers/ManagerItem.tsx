@@ -74,7 +74,7 @@ const ManagerItem: FC<ManagerItemProps> = ({ manager }) => {
           <PLabel label="FUNDS MANAGED" textStyle={styles.titleLabel} />
           <View style={styles.funds}>
             {funds.map((fund, index) => (
-              <>
+              <React.Fragment key={fund._id}>
                 <Pressable
                   key={fund._id}
                   style={({ pressed }) =>
@@ -86,7 +86,7 @@ const ManagerItem: FC<ManagerItemProps> = ({ manager }) => {
                 {index < funds.length - 1 ? (
                   <PLabel label=", " textStyle={styles.desLabel} />
                 ) : null}
-              </>
+              </React.Fragment>
             ))}
           </View>
         </>

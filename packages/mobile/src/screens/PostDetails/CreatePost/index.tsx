@@ -501,6 +501,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
                   {imageData || mediaField.value ? (
                     <View style={styles.attachment}>
                       <Media
+                        mediaId="create-post-media"
                         media={
                           mediaField.value || {
                             url: imageData!.path,

@@ -27,7 +27,7 @@ import * as NavigationService from 'mobile/src/services/navigation/NavigationSer
 import { WHITE, GRAY100 } from 'shared/src/colors';
 import { Body2, Body2Bold } from 'mobile/src/theme/fonts';
 
-import { useAccountContext } from 'mobile/src/context/Account';
+import { useAccountContext } from 'shared/context/Account';
 import ChatAvatar from 'mobile/src/components/main/chat/ChatAvatar';
 import { channelName, Channel } from 'mobile/src/services/chat';
 

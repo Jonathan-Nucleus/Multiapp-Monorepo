@@ -9,12 +9,13 @@ import { PostSummary } from 'shared/graphql/fragments/post';
 type Post = PostSummary;
 interface SharePostItem {
   post: Post;
+  sharedBy: string;
 }
 
-const SharePostItem: FC<SharePostItem> = ({ post }) => {
+const SharePostItem: FC<SharePostItem> = ({ post, sharedBy }) => {
   return (
     <View style={styles.postContainer}>
-      <PostContent post={post} hideMenu />
+      <PostContent post={post} sharedBy={sharedBy} hideMenu />
     </View>
   );
 };

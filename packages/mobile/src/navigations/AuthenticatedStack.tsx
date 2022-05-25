@@ -35,7 +35,7 @@ import ContactSuccess from '../screens/Main/Settings/Contact/ContactSuccess';
 import { MediaType } from 'backend/graphql/mutations.graphql';
 import { Accreditation } from 'shared/graphql/mutation/account/useSaveQuestionnaire';
 
-import { AccountProvider } from 'mobile/src/context/Account';
+import { AccountProvider } from 'shared/context/Account';
 import { ChatProvider } from 'mobile/src/context/Chat';
 import { useChatToken } from 'shared/graphql/query/account/useChatToken';
 

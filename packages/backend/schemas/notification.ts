@@ -41,6 +41,14 @@ export const NotificationTypeOptions = {
     label: "Comment post",
     value: "comment-post",
   },
+  TAGGED_IN_POST: {
+    label: "Tagged in post",
+    value: "tagged-in-post",
+  },
+  TAGGED_IN_COMMENT: {
+    label: "Tagged in comment",
+    value: "tagged-in-comment",
+  },
 } as const;
 export type NotificationType = ValueOf<typeof NotificationTypeOptions>["value"];
 export type NotificationTypeEnum = keyof typeof NotificationTypeOptions;
@@ -100,6 +108,14 @@ export const generateNotification = (
     case "comment-post":
       title = "Commented";
       body = `${user.fullName} commented on your post`;
+      break;
+    case "tagged-in-post":
+      title = "Tagged";
+      body = `${user.fullName} tagged you in a post`;
+      break;
+    case "tagged-in-comment":
+      title = "Tagged";
+      body = `${user.fullName} tagged you in a comment`;
       break;
     default:
       break;

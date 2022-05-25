@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Pressable } from 'react-native';
+import { View, StyleSheet, Pressable, Text } from 'react-native';
 import {
   ThumbsUp,
   ChatCenteredText,
@@ -20,32 +20,15 @@ import LikesModal from './LikesModal';
 import { Post } from 'shared/graphql/query/post/usePosts';
 import { PostCategories } from 'backend/graphql/enumerations.graphql';
 
-import { useLikePost } from 'shared/graphql/mutation/posts';
+import { useLikePost } from 'shared/graphql/mutation/posts/useLikePost';
 
 export interface PostItemProps {
   post: Post;
 }
 
 const PostItem: React.FC<PostItemProps> = ({ post }) => {
-  const { likes } = post;
-  const [liked, setLiked] = useState(false);
   const [likesModalVisible, setLikesModalVisible] = useState(false);
-  const [likePost] = useLikePost();
-
-  const toggleLike = async (): Promise<void> => {
-    const toggled = !liked;
-    try {
-      const { data: postData } = await likePost({
-        variables: { like: toggled, postId: post._id },
-      });
-
-      postData && postData.likePost
-        ? setLiked(toggled)
-        : console.log('Error liking post');
-    } catch (err) {
-      console.log('Error liking post', err);
-    }
-  };
+  const { isLiked, toggleLike, likeCount } = useLikePost(post._id);
 
   const goToDetails = (comment?: boolean): void => {
     NavigationService.navigate('PostDetails', {
@@ -73,25 +56,27 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
           <PostContent post={post} />
           <View style={[styles.postInfo, styles.contentPadding]}>
             <View style={styles.tagWrapper}>
-              {post.categories.map((item) => (
-                <Tag
-                  label={PostCategories[item]}
-                  viewStyle={styles.tagStyle}
-                  key={item}
-                />
+              {post.categories.map((item, index) => (
+                <React.Fragment key={item}>
+                  <Tag
+                    label={PostCategories[item]}
+                    viewStyle={styles.tagStyle}
+                  />
+                  {index < post.categories.length - 1 ? (
+                    <Text style={styles.tagSeparator}>•</Text>
+                  ) : null}
+                </React.Fragment>
               ))}
             </View>
             <View style={styles.otherInfo}>
-              {post.likeIds && post.likeIds.length > 0 && (
+              {likeCount > 0 && (
                 <Pressable
                   onPress={() => setLikesModalVisible(true)}
                   style={({ pressed }) =>
                     pressed ? pStyles.pressedStyle : {}
                   }>
                   <PLabel
-                    label={`${post.likeIds.length} ${
-                      post.likeIds.length === 1 ? 'Like' : 'Likes'
-                    }`}
+                    label={`${likeCount} ${likeCount === 1 ? 'Like' : 'Likes'}`}
                     textStyle={styles.smallLabel}
                   />
                 </Pressable>
@@ -118,8 +103,8 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
             <IconButton
               icon={
                 <ThumbsUp
-                  weight={liked ? 'fill' : 'light'}
-                  color={liked ? PRIMARYSTATE : WHITE60}
+                  weight={isLiked ? 'fill' : 'light'}
+                  color={isLiked ? PRIMARYSTATE : WHITE60}
                   size={20}
                 />
               }
@@ -141,7 +126,7 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
         </View>
       </Pressable>
       <LikesModal
-        likes={likes}
+        likes={post.likes}
         isVisible={likesModalVisible}
         onClose={() => setLikesModalVisible(false)}
       />
@@ -162,23 +147,26 @@ const styles = StyleSheet.create({
   },
   smallLabel: {
     ...Body3,
-    marginRight: 8,
-    padding: 8,
+    marginTop: 4,
+    marginLeft: 8,
   },
   tagWrapper: {
     flexDirection: 'row',
     flex: 1,
+    alignItems: 'center',
     flexWrap: 'wrap',
   },
   tagStyle: {
-    marginRight: 8,
-    marginBottom: 8,
-    backgroundColor: WHITE12,
+    marginRight: 4,
+    backgroundColor: 'transparent',
+  },
+  tagSeparator: {
+    color: WHITE60,
+    marginRight: 4,
   },
   otherInfo: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 2,
   },
   bottomWrapper: {
     marginTop: 16,

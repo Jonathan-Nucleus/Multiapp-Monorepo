@@ -18,10 +18,18 @@ import {
 } from 'mobile/src/utils/auth-token';
 import { GRAPHQL_URI } from 'react-native-dotenv';
 
-const typePolicies = {};
-
 const cache = new InMemoryCache({
-  typePolicies,
+  typePolicies: {
+    Post: {
+      fields: {
+        likes: {
+          merge(existing, incoming) {
+            return incoming;
+          },
+        },
+      },
+    },
+  },
 });
 
 const persistor = new CachePersistor({

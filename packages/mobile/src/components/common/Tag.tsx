@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
-import { GRAY10, PRIMARYLIGHT, PRIMARYSTATE } from 'shared/src/colors';
+import { GRAY10, PRIMARYLIGHT, PRIMARYSTATE, WHITE60 } from 'shared/src/colors';
 import { Body3 } from '../../theme/fonts';
 import PLabel from './PLabel';
 
@@ -42,7 +42,6 @@ const styles = StyleSheet.create({
   container: {
     borderRadius: 16,
     backgroundColor: GRAY10,
-    paddingHorizontal: 16,
     paddingVertical: 4,
   },
   selectedContainer: {
@@ -52,7 +51,7 @@ const styles = StyleSheet.create({
     ...Body3,
     textTransform: 'uppercase',
     letterSpacing: 1.25,
-    fontWeight: 'bold',
+    color: WHITE60,
   },
   selectedTextStyle: {
     color: PRIMARYSTATE,

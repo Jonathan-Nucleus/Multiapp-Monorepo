@@ -1,4 +1,4 @@
-import React, { FC, useState, useRef } from 'react';
+import React, { FC, useState, useEffect, useRef } from 'react';
 import { StyleProp, StyleSheet, Pressable, View } from 'react-native';
 import FastImage, { ResizeMode, ImageStyle } from 'react-native-fast-image';
 import Video, { VideoProperties } from 'react-native-video';
@@ -12,6 +12,7 @@ interface MediaProps {
   style?: StyleProp<ImageStyle>;
   resizeMode?: 'contain' | 'cover';
   onLoad?: VideoProperties['onLoad'];
+  mediaId: string;
 }
 
 const SUPPORTED_EXTENSION = ['mp4'];
@@ -27,33 +28,80 @@ export function isVideo(src: string): boolean {
   return SUPPORTED_EXTENSION.includes(ext);
 }
 
+type UnsubscribeVideoPlaybackStarted = () => void;
+type VideoPlaybackStartedHandler = (id: string) => void;
+
+const videoPlaybackStartedSubscribers = new Map<
+  string,
+  VideoPlaybackStartedHandler
+>();
+
+function addVideoStateChangeListener(
+  id: string,
+  handler: VideoPlaybackStartedHandler,
+): UnsubscribeVideoPlaybackStarted {
+  videoPlaybackStartedSubscribers.set(id, handler);
+
+  return () => {
+    videoPlaybackStartedSubscribers.delete(id);
+  };
+}
+
+function triggerPlaybackStarted(id: string): void {
+  videoPlaybackStartedSubscribers.forEach((callback) => callback(id));
+}
+
+export function stopVideos(): void {
+  videoPlaybackStartedSubscribers.forEach((callback) => callback('stop-all'));
+}
+
+export function stopVideo(id: string): void {
+  videoPlaybackStartedSubscribers.get(id)?.('stop-this-video');
+}
+
 const Media: FC<MediaProps> = ({
+  mediaId,
   media,
   style,
   onLoad,
   resizeMode = 'cover',
 }) => {
-  const [isFirstLoad, setIsFirstLoad] = useState(true);
+  const [paused, setPaused] = useState(true);
   const player = useRef<Video | null>(null);
 
-  const playVideo = (): void => {
-    if (!isFirstLoad) {
-      return;
+  useEffect(() => {
+    if (isVideo(media.url)) {
+      const unsubscribe = addVideoStateChangeListener(mediaId, (id) => {
+        if (id !== mediaId) {
+          setPaused(true);
+        }
+      });
+
+      return () => {
+        unsubscribe();
+        setPaused(true);
+      };
+    }
+  }, [media.url, mediaId]);
+
+  const togglePause = (): void => {
+    const newState = !paused;
+    if (!newState) {
+      triggerPlaybackStarted(mediaId);
     }
 
-    player.current?.seek(0);
-    setIsFirstLoad(false);
+    setPaused(newState);
   };
 
   const onVideoEnd = (): void => {
-    setIsFirstLoad(true);
+    player.current?.seek(0);
   };
 
   // TODO: Need to potentially validate the src url before feeding it to
   // react-native-video as an invalid source seems to crash the app
   return isVideo(media.url) ? (
     <Pressable
-      onPress={playVideo}
+      onPress={togglePause}
       style={[
         styles.media,
         style,
@@ -75,12 +123,16 @@ const Media: FC<MediaProps> = ({
           onError={(err) => console.log('error', err)}
           onEnd={onVideoEnd}
           controls={true}
+          onSeek={(data) => {
+            if (data.seekTime === 0) {
+              setPaused(true);
+            }
+          }}
           ignoreSilentSwitch="ignore"
-          paused={isFirstLoad}
+          paused={paused}
           repeat={false}
           style={{ aspectRatio: media.aspectRatio }}
         />
-        {isFirstLoad && <View style={styles.overlay} pointerEvents="none" />}
       </View>
     </Pressable>
   ) : (

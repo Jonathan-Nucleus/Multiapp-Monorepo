@@ -29,7 +29,7 @@ import { MediaType } from 'backend/graphql/mutations.graphql';
 import { Accreditation } from 'shared/graphql/mutation/account/useSaveQuestionnaire';
 import { useVerifyToken } from 'shared/graphql/query/account/useVerifyToken';
 
-import { AccountProvider } from 'mobile/src/context/Account';
+import { AccountProvider } from 'shared/context/Account';
 
 const defaultScreenOptions = {
   headerShown: false,

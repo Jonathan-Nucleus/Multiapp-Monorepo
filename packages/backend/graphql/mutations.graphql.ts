@@ -656,7 +656,15 @@ const resolvers = {
           throw new BadRequestError("Not authorized");
         }
 
+        // Send Notification
         const postData = await db.posts.create(post, user._id);
+        const mentionIds = postData?.mentionIds ?? [];
+        await Promise.all(mentionIds.map((mentionId) => {
+          return db.notifications.create(user, "tagged-in-post", mentionId, {
+            postId: postData._id,
+          });
+        }));
+
         return postData;
       }
     ),
@@ -1065,12 +1073,17 @@ const resolvers = {
         const newComment = await db.comments.create(comment, user._id);
 
         // Send notification
-        if (newComment) {
-          db.notifications.create(user, "comment-post", postData.userId, {
-            postId: postData._id,
+        db.notifications.create(user, "comment-post", postData.userId, {
+          postId: postData._id,
+          commentId: newComment._id,
+        });
+
+        const mentionIds = newComment?.mentionIds ?? [];
+        await Promise.all(mentionIds.map((mentionId) => {
+          return db.notifications.create(user, "tagged-in-comment", mentionId, {
             commentId: newComment._id,
           });
-        }
+        }));
 
         return newComment;
       }

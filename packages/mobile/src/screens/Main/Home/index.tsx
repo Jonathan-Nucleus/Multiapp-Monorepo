@@ -1,4 +1,4 @@
-import React, { useState, memo, useMemo } from 'react';
+import React, { useState, memo, useMemo, useCallback } from 'react';
 import {
   ListRenderItem,
   FlatList,
@@ -7,14 +7,17 @@ import {
   TouchableOpacity,
   Text,
   RefreshControl,
+  FlatListProps,
 } from 'react-native';
 import isEqual from 'react-fast-compare';
 import { SlidersHorizontal } from 'phosphor-react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { UIActivityIndicator } from 'react-native-indicators';
 
 import MainHeader from 'mobile/src/components/main/Header';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import PostItem from 'mobile/src/components/main/posts/PostItem';
+import { stopVideos, stopVideo } from 'mobile/src/components/common/Media';
 import pStyles from 'mobile/src/theme/pStyles';
 
 import { usePosts, Post } from 'shared/graphql/query/post/usePosts';
@@ -48,6 +51,18 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
         <PostItem post={item} />,
     [],
   );
+
+  useFocusEffect(() => () => {
+    stopVideos();
+  });
+
+  const onViewableItemsChanged = useCallback<
+    Exclude<FlatListProps<Post>['onViewableItemsChanged'], null | undefined>
+  >(({ changed }) => {
+    changed.forEach((token) => {
+      !token.isViewable && stopVideo(token.key);
+    });
+  }, []);
 
   const account = userData?.account;
   const postData = data?.posts ?? [];
@@ -83,6 +98,7 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
     await refetch();
     setRefreshing(false);
   };
+
   return (
     <View style={pStyles.globalContainer}>
       <MainHeader />
@@ -100,6 +116,10 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
         extraData={account}
         renderItem={renderItem}
         keyExtractor={(item) => item._id}
+        onViewableItemsChanged={onViewableItemsChanged}
+        viewabilityConfig={{
+          viewAreaCoveragePercentThreshold: 10,
+        }}
         refreshControl={
           <RefreshControl
             onRefresh={onRefresh}

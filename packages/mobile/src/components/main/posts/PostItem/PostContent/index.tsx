@@ -21,11 +21,13 @@ import { useAccount } from 'shared/graphql/query/account/useAccount';
 export interface PostContentProps {
   post: Post;
   hideMenu?: boolean;
+  sharedBy?: string;
 }
 
 const PostContent: React.FC<PostContentProps> = ({
   post,
   hideMenu = false,
+  sharedBy,
 }) => {
   const { user, company, body, media } = post;
 
@@ -102,10 +104,16 @@ const PostContent: React.FC<PostContentProps> = ({
           collapseLongText={true}
           style={styles.body}
         />
-        {media ? <Media media={media} style={styles.media} /> : null}
+        {media ? (
+          <Media
+            mediaId={sharedBy || post._id}
+            media={media}
+            style={styles.media}
+          />
+        ) : null}
         {post.sharedPost && (
           <View style={styles.sharedPostContainer}>
-            <SharePostItem post={post.sharedPost} />
+            <SharePostItem post={post.sharedPost} sharedBy={post._id} />
           </View>
         )}
       </View>

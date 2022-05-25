@@ -7,8 +7,8 @@ import {
   Text,
   TouchableOpacity,
 } from 'react-native';
-import { useIsFocused } from '@react-navigation/native';
 import { CaretLeft } from 'phosphor-react-native';
+import { useFocusEffect } from '@react-navigation/native';
 
 import MainHeader from 'mobile/src/components/main/Header';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
@@ -25,6 +25,7 @@ import CompanyDetail from './CompanyDetail';
 import Funds from 'mobile/src/components/main/Funds';
 import ProfilePlaceholder from '../../../components/placeholder/ProfilePlaceholder';
 import PostItemPlaceholder from 'mobile/src/components/placeholder/PostItemPlaceholder';
+import { stopVideos } from 'mobile/src/components/common/Media';
 
 import { Post } from 'shared/graphql/query/post/usePosts';
 import { useAccount } from 'shared/graphql/query/account/useAccount';
@@ -43,10 +44,9 @@ const CompanyProfile: CompanyProfileScreen = ({ navigation, route }) => {
   const { data: { account } = {} } = useAccount({ fetchPolicy: 'cache-only' });
   const { data: companyData } = useCompany(companyId);
   const { data: fundsData } = useFunds(companyId);
-  const { data: postsData, refetch } = usePosts(companyId);
+  const { data: postsData } = usePosts(companyId);
   const { data: featuredPostsData } = useFeaturedPosts(companyId);
-  const isFocused = useIsFocused();
-  const [focusState, setFocusState] = useState(isFocused);
+
   const funds = fundsData?.companyProfile?.funds ?? [];
   const posts = postsData?.companyProfile?.posts;
   const featuredPosts = featuredPostsData?.companyProfile?.posts ?? [];
@@ -62,11 +62,9 @@ const CompanyProfile: CompanyProfileScreen = ({ navigation, route }) => {
     return false;
   }, [account, route.params]);
 
-  if (isFocused !== focusState) {
-    console.log('refetching...');
-    refetch();
-    setFocusState(isFocused);
-  }
+  useFocusEffect(() => () => {
+    stopVideos();
+  });
 
   if (!company || !account) {
     return (
@@ -79,7 +77,7 @@ const CompanyProfile: CompanyProfileScreen = ({ navigation, route }) => {
           }
           onPressLeft={() => navigation.goBack()}
         />
-        <ProfilePlaceholder variant="company" />
+        {!company && <ProfilePlaceholder variant="company" />}
       </View>
     );
   }

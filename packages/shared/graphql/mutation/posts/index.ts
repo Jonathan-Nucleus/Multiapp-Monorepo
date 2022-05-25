@@ -76,31 +76,6 @@ export function useCreatePost(): MutationTuple<
   );
 }
 
-type LikePostVariables = {
-  like: boolean;
-  postId: string;
-};
-
-type LikePostData = {
-  likePost: Pick<PostSummary, "_id" | "likeIds">;
-};
-
-/**
- * GraphQL mutation that like post
- *
- * @returns   GraphQL mutation.
- */
-export function useLikePost(): MutationTuple<LikePostData, LikePostVariables> {
-  return useMutation<LikePostData, LikePostVariables>(gql`
-    mutation LikePost($like: Boolean!, $postId: ID!) {
-      likePost(like: $like, postId: $postId) {
-        _id
-        likeIds
-      }
-    }
-  `);
-}
-
 type CommentPostVariables = {
   comment: {
     postId: string;

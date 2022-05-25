@@ -5,6 +5,7 @@ import {
   ListRenderItem,
   StyleSheet,
   FlatList,
+  FlatListProps,
   Platform,
   Pressable,
   View,
@@ -15,6 +16,7 @@ import { CommonActions } from '@react-navigation/native';
 import { CaretLeft, ImageSquare, X } from 'phosphor-react-native';
 import ImagePicker, { ImageOrVideo } from 'react-native-image-crop-picker';
 import FastImage from 'react-native-fast-image';
+import { useFocusEffect } from '@react-navigation/native';
 
 import relativeTime from 'dayjs/plugin/relativeTime';
 import dayjs from 'dayjs';
@@ -28,7 +30,11 @@ import ExpandingInput, {
 import MentionsList from 'mobile/src/components/main/MentionsList';
 import MessageItem from 'mobile/src/components/main/chat/MessageItem';
 import ChatAvatar from 'mobile/src/components/main/chat/ChatAvatar';
-import { isVideo } from 'mobile/src/components/common/Media';
+import {
+  isVideo,
+  stopVideos,
+  stopVideo,
+} from 'mobile/src/components/common/Media';
 import { Body1Bold, Body3, Body2Bold } from 'mobile/src/theme/fonts';
 import pStyles from 'mobile/src/theme/pStyles';
 import {
@@ -88,6 +94,10 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
   const [media, setMedia] = useState<{ uri: string; data: ImageOrVideo }[]>([]);
   const [mentionUsers, setMentionUsers] = useState<User[]>([]);
   const onMentionSelected = useRef<OnSelectUser>();
+
+  useFocusEffect(() => () => {
+    stopVideos();
+  });
 
   const { members } = channel.current?.state ?? {};
   const users = members
@@ -180,6 +190,20 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
     ),
     [userId, users.length],
   );
+
+  const onViewableItemsChanged = useCallback<
+    Exclude<FlatListProps<PMessage>['onViewableItemsChanged'], null | undefined>
+  >(({ changed }) => {
+    changed.forEach((token) => {
+      const item = token.item as PMessage;
+      if (!token.isViewable && item.attachments) {
+        item.attachments.forEach((attachment, index) => {
+          stopVideo(`${item.id}-${index}`);
+        });
+      }
+      !token.isViewable && stopVideo(token.key);
+    });
+  }, []);
 
   if (!client || !userId) {
     // Return error state
@@ -319,6 +343,10 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
           inverted
           contentContainerStyle={styles.list}
           keyboardDismissMode="interactive"
+          onViewableItemsChanged={onViewableItemsChanged}
+          viewabilityConfig={{
+            viewAreaCoveragePercentThreshold: 10,
+          }}
         />
         <View style={styles.mentionContainer}>
           <MentionsList
@@ -425,7 +453,6 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingBottom: 24,
-    flex: 1,
     flexGrow: 1,
   },
   imageContainer: {

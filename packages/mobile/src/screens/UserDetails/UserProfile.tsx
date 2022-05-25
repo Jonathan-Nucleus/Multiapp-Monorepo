@@ -13,6 +13,7 @@ import {
 import retry from 'async-retry';
 import FastImage from 'react-native-fast-image';
 import { CaretLeft, Pencil } from 'phosphor-react-native';
+import { useFocusEffect } from '@react-navigation/native';
 
 import MainHeader from 'mobile/src/components/main/Header';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
@@ -39,13 +40,14 @@ import TwitterSvg from 'shared/assets/images/twitter.svg';
 import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 import NoPostSvg from 'shared/assets/images/no-post.svg';
 import PostItemPlaceholder from 'mobile/src/components/placeholder/PostItemPlaceholder';
+import { stopVideos } from 'mobile/src/components/common/Media';
 
 import { useProfile } from 'shared/graphql/query/user/useProfile';
 import { usePosts, Post } from 'shared/graphql/query/user/usePosts';
 import { useManagedFunds } from 'shared/graphql/query/user/useManagedFunds';
 import { useFollowUser } from 'shared/graphql/mutation/account/useFollowUser';
 import { useFeaturedPosts } from 'shared/graphql/query/user/useFeaturedPosts';
-import { useAccountContext } from 'mobile/src/context/Account';
+import { useAccountContext } from 'shared/context/Account';
 import { useChatContext } from 'mobile/src/context/Chat';
 import { createChannel } from 'mobile/src/services/chat';
 
@@ -68,6 +70,10 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
   const { data } = usePosts(userId);
   const { data: featuredPostsData } = useFeaturedPosts(userId);
   const { isFollowing, toggleFollow } = useFollowUser(userId);
+
+  useFocusEffect(() => () => {
+    stopVideos();
+  });
 
   const funds = fundsData?.userProfile?.managedFunds ?? [];
   const profile = profileData?.userProfile;

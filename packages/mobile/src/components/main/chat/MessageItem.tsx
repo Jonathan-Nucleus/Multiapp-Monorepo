@@ -86,7 +86,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
                 isMine ? styles.flexEnd : null,
                 lastMessage ? styles.messageSpacer : null,
               ]}>
-              {attachments.map((attachment) => {
+              {attachments.map((attachment, index) => {
                 const { image_url } = attachment;
                 if (!image_url) {
                   return null;
@@ -94,7 +94,10 @@ const MessageItem: React.FC<MessageItemProps> = ({
 
                 const media =
                   attachment.type === 'video' ? (
-                    <Media media={{ url: image_url, aspectRatio: 1 }} />
+                    <Media
+                      mediaId={`${message.id}-${index}`}
+                      media={{ url: image_url, aspectRatio: 1 }}
+                    />
                   ) : (
                     <FastImage
                       key={image_url}

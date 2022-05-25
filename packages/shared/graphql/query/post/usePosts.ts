@@ -50,6 +50,7 @@ export function usePosts(
         ...(categories ? { categories } : {}),
         ...(roleFilter ? { roleFilter } : {}),
       },
+      fetchPolicy: "cache-and-network"
     }
   );
 

@@ -12,7 +12,6 @@ import {
 } from "../../config/utils";
 import { getIgniteDb } from "../../../db";
 import { AudienceOptions, PostCategoryOptions } from "../../../schemas/post";
-import { toObjectId } from "../../../lib/mongo-helper";
 
 describe("Mutations - createPost", () => {
   const query = gql`
@@ -53,7 +52,6 @@ describe("Mutations - createPost", () => {
       url: "test.png",
       aspectRatio: 1.58,
     },
-    mentionIds: [toObjectId().toString()],
   };
 
   beforeAll(async () => {
@@ -339,5 +337,51 @@ describe("Mutations - createPost", () => {
       res.data?.createPost._id
     );
     expect(newPostCount).toBe(oldPostCount + 1);
+  });
+
+  it("notifies user when tagged in post", async () => {
+    const { users, notifications, db } = await getIgniteDb();
+    const oldPostCount = await db
+      .collection(DbCollection.POSTS)
+      .countDocuments();
+
+    const oldNotifyCount = (await notifications.findAllByUser(user1._id)).length;
+
+    const res = await server.executeOperation({
+      query,
+      variables: {
+        post: {
+          ...postData,
+          mentionIds: [user1._id.toString()]
+        },
+      },
+    });
+
+    expect(res.data?.createPost?.body).toBe(postData.body);
+    expect(JSON.stringify(res.data?.createPost?.categories)).toBe(
+      JSON.stringify(postData.categories)
+    );
+    expect(JSON.stringify(res.data?.createPost?.media)).toBe(
+      JSON.stringify(postData.media)
+    );
+    expect(res.data?.createPost?.user._id).toBe(authUser._id.toString());
+
+    const newUser = (await users.find({
+      _id: authUser._id,
+    })) as User.Mongo | null;
+    if (!newUser) {
+      throw new Error("Cannot find original post creator");
+    }
+
+    const newPostCount = await db
+      .collection(DbCollection.POSTS)
+      .countDocuments();
+    const newNotifyCount = (await notifications.findAllByUser(user1._id)).length;
+
+    expect(newUser.postIds?.map((id) => id.toString())).toContain(
+      res.data?.createPost._id
+    );
+    expect(newPostCount).toBe(oldPostCount + 1);
+    expect(newNotifyCount).toBe(oldNotifyCount + 1);
   });
 });
