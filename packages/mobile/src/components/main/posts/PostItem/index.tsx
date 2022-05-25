@@ -11,7 +11,7 @@ import IconButton from 'mobile/src/components/common/IconButton';
 import Tag from 'mobile/src/components/common/Tag';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 import pStyles from 'mobile/src/theme/pStyles';
-import { PRIMARYSTATE, WHITE12, WHITE60, PRIMARY } from 'shared/src/colors';
+import { PRIMARYSTATE, WHITE12, WHITE60 } from 'shared/src/colors';
 import { Body3 } from 'mobile/src/theme/fonts';
 
 import PostContent from './PostContent';
@@ -47,7 +47,7 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
     }
   };
 
-  const goToDetails = (comment?: boolean) => {
+  const goToDetails = (comment?: boolean): void => {
     NavigationService.navigate('PostDetails', {
       screen: 'PostDetail',
       params: {
@@ -57,7 +57,7 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
     });
   };
 
-  const sharePost = () => {
+  const sharePost = (): void => {
     NavigationService.navigate('PostDetails', {
       screen: 'SharePost',
       params: {
@@ -157,7 +157,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   postInfo: {
-    marginTop: 16,
     flexDirection: 'row',
     alignItems: 'flex-start',
   },

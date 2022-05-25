@@ -12,7 +12,7 @@ import { WHITE60 } from 'shared/src/colors';
 
 import UserPostActionModal from './UserPostActionModal';
 import OwnPostActionModal from './OwnPostActionModal';
-import SharePostItem from '../../SharePostItem';
+import SharePostItem from 'mobile/src/components/main/posts/SharePostItem';
 
 import { Post } from 'shared/graphql/query/post/usePosts';
 
@@ -100,8 +100,9 @@ const PostContent: React.FC<PostContentProps> = ({
           body={body}
           hideLinkPreview={!!media}
           collapseLongText={true}
+          style={styles.body}
         />
-        {media ? <Media media={media} /> : null}
+        {media ? <Media media={media} style={styles.media} /> : null}
         {post.sharedPost && (
           <View style={styles.sharedPostContainer}>
             <SharePostItem post={post.sharedPost} />
@@ -135,6 +136,12 @@ const styles = StyleSheet.create({
   headerWrapper: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  body: {
+    marginBottom: 16,
+  },
+  media: {
+    marginTop: 0,
   },
   menuContainer: {
     marginTop: 16,

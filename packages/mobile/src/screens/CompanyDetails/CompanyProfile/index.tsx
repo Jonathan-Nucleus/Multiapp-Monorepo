@@ -12,7 +12,7 @@ import { CaretLeft } from 'phosphor-react-native';
 
 import MainHeader from 'mobile/src/components/main/Header';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
-import PostItem from 'mobile/src/components/main/PostItem';
+import PostItem from 'mobile/src/components/main/posts/PostItem';
 import FeaturedItem from 'mobile/src/components/main/settings/FeaturedItem';
 import Members from 'mobile/src/components/main/settings/Members';
 import PGradientOutlineButton from 'mobile/src/components/common/PGradientOutlineButton';
@@ -24,6 +24,7 @@ import { WHITE, GRAY100, PRIMARY, PRIMARYSOLID } from 'shared/src/colors';
 import CompanyDetail from './CompanyDetail';
 import Funds from 'mobile/src/components/main/Funds';
 import ProfilePlaceholder from '../../../components/placeholder/ProfilePlaceholder';
+import PostItemPlaceholder from 'mobile/src/components/placeholder/PostItemPlaceholder';
 
 import { Post } from 'shared/graphql/query/post/usePosts';
 import { useAccount } from 'shared/graphql/query/account/useAccount';
@@ -33,6 +34,8 @@ import { usePosts } from 'shared/graphql/query/company/usePosts';
 import { useFeaturedPosts } from 'shared/graphql/query/company/useFeaturedPosts';
 
 import { CompanyProfileScreen } from 'mobile/src/navigations/CompanyDetailsStack';
+
+const PLACE_HOLDERS = 4;
 
 const CompanyProfile: CompanyProfileScreen = ({ navigation, route }) => {
   const { companyId } = route.params;
@@ -45,7 +48,7 @@ const CompanyProfile: CompanyProfileScreen = ({ navigation, route }) => {
   const isFocused = useIsFocused();
   const [focusState, setFocusState] = useState(isFocused);
   const funds = fundsData?.companyProfile?.funds ?? [];
-  const posts = postsData?.companyProfile?.posts ?? [];
+  const posts = postsData?.companyProfile?.posts;
   const featuredPosts = featuredPostsData?.companyProfile?.posts ?? [];
   const company = companyData?.companyProfile;
 
@@ -123,6 +126,7 @@ const CompanyProfile: CompanyProfileScreen = ({ navigation, route }) => {
             </View>
           ) : (
             isMyCompany &&
+            posts &&
             posts.length > 0 && (
               <>
                 <Text style={styles.text}>Featured Posts</Text>
@@ -136,7 +140,7 @@ const CompanyProfile: CompanyProfileScreen = ({ navigation, route }) => {
           )}
 
           <View style={styles.allPosts}>
-            {posts.length > 0 ? (
+            {posts && posts.length > 0 ? (
               <FlatList
                 data={posts}
                 renderItem={({ item }) => <PostItem post={item} />}
@@ -144,6 +148,10 @@ const CompanyProfile: CompanyProfileScreen = ({ navigation, route }) => {
                 listKey="post"
                 ListHeaderComponent={<Text style={styles.text}>All Posts</Text>}
               />
+            ) : !posts ? (
+              [...Array(PLACE_HOLDERS)].map((_, index) => (
+                <PostItemPlaceholder key={index} />
+              ))
             ) : (
               isMyCompany && (
                 <View style={styles.noPostContainer}>

@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { View, StyleSheet } from 'react-native';
 
-import { WHITE, WHITE12 } from 'shared/src/colors';
+import { WHITE12 } from 'shared/src/colors';
 
 import PostContent from './PostItem/PostContent';
 import { PostSummary } from 'shared/graphql/fragments/post';
@@ -26,8 +26,5 @@ const styles = StyleSheet.create({
     borderColor: WHITE12,
     borderWidth: 1,
     borderRadius: 16,
-  },
-  postBody: {
-    color: WHITE,
   },
 });

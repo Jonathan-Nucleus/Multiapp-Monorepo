@@ -8,7 +8,7 @@ export const PASSWORD_PATTERN =
   /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&.^]).{8,}$/;
 export const LINK_PATTERN =
   /((?:(?:https|http|ftp):\/\/)?(?:www\.)?(?:[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b)+(?:\/[\/\d\w\.\-\?=&%\+#]+)?)/gim;
-export const TAG_PATTERN = /(^|\W)([\$|#]\w+)/gim;
+export const TAG_PATTERN = /(^|\W)([\$|#]\D{1}\w*)/gim;
 export const MENTION_PATTERN =
   /(?<original>(?<trigger>.)\[(?<name>([^[]*))]\((?<id>([\d\w-]*))\))/gim;
 
@@ -19,7 +19,6 @@ export const POST_PATTERN = new RegExp(
 
 export const processPost = (text: string): string[] => {
   const splits = text.split(POST_PATTERN);
-  let numLinks = 0;
 
   const processedSplits: string[] = [];
   for (let index = 0; index < splits.length; index++) {
@@ -30,9 +29,6 @@ export const processPost = (text: string): string[] => {
       processedSplits.push(`@${splits[index + 2]}|${splits[index + 4]}`);
       index += 5;
     } else if (val.trim() !== "" && val.match(LINK_PATTERN)) {
-      numLinks++;
-      //if (numLinks === 1) continue; // Skip the first link in the body
-
       processedSplits.push(`%%${val}`);
     } else {
       processedSplits.push(val);

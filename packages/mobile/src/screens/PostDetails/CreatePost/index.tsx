@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -21,11 +21,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import RadioGroup, { Option } from 'react-native-radio-button-group';
 import {
-  MentionInput,
-  MentionSuggestionsProps,
-} from 'react-native-controlled-mentions';
-import _isEqual from 'lodash/isEqual';
-import {
   Camera,
   VideoCamera,
   Image as GalleryImage,
@@ -41,7 +36,6 @@ import QCSvg from 'shared/assets/images/QC.svg';
 import Avatar from 'mobile/src/components/common/Avatar';
 import PLabel from 'mobile/src/components/common/PLabel';
 import IconButton from 'mobile/src/components/common/IconButton';
-import UserInfo from 'mobile/src/components/common/UserInfo';
 import PModal from 'mobile/src/components/common/PModal';
 import RoundIcon from 'mobile/src/components/common/RoundIcon';
 import Media from 'mobile/src/components/common/Media';
@@ -66,10 +60,6 @@ import {
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useAccount } from 'shared/graphql/query/account/useAccount';
-import {
-  useMentionUsers,
-  User,
-} from 'shared/graphql/query/user/useMentionUsers';
 import { useFetchUploadLink } from 'shared/graphql/mutation/posts';
 
 import type { Audience } from 'shared/graphql/query/post/usePosts';
@@ -78,9 +68,13 @@ import { Audiences } from 'backend/graphql/enumerations.graphql';
 import PostHeader from './PostHeader';
 import PostSelection from './PostSelection';
 import PreviewLink from './PreviewLink';
+import ExpandingInput, {
+  User,
+  OnSelectUser,
+} from 'mobile/src/components/common/ExpandingInput';
+import MentionsList from 'mobile/src/components/main/MentionsList';
 
 import { CreatePostScreen } from 'mobile/src/navigations/PostDetailsStack';
-import { POST_PATTERN } from 'shared/src/patterns';
 
 const RadioBodyView = (props: any) => {
   const { icon, label } = props;
@@ -179,15 +173,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   const { post } = route.params;
 
   const { data: { account } = {} } = useAccount({ fetchPolicy: 'cache-only' });
-  const { data: usersData, refetch } = useMentionUsers();
   const [fetchUploadLink] = useFetchUploadLink();
-
-  const mentionUndefinedCount = useRef(0);
-  const currentSearch = useRef<string | undefined>(undefined);
-  const lastSearch = useRef<string | undefined>(undefined);
-  const nextSearch = useRef<string | undefined>(undefined);
-  const suggestionCallback =
-    useRef<MentionSuggestionsProps['onSuggestionPress']>();
 
   const [keyboardShowing, setKeyboardShowing] = useState(false);
   const [postAsModalVisible, setPostAsModalVisible] = useState(false);
@@ -197,9 +183,8 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     undefined,
   );
 
-  const [mentionUsers, setMentionUsers] = useState(
-    usersData?.mentionUsers ?? [],
-  );
+  const [mentionUsers, setMentionUsers] = useState<User[]>([]);
+  const onMentionSelected = useRef<OnSelectUser>();
   const companies = account?.companies ?? [];
 
   const {
@@ -390,89 +375,12 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     })),
   ];
 
-  const fetchMentionUsers = useCallback(
-    async (search: string) => {
-      if (search === lastSearch.current) {
-        return;
-      }
-
-      if (currentSearch.current !== undefined) {
-        nextSearch.current = search;
-        return;
-      }
-
-      currentSearch.current = search;
-      const { data } = await refetch({ search });
-
-      if (data.mentionUsers && !_isEqual(mentionUsers, data.mentionUsers)) {
-        setMentionUsers(data.mentionUsers);
-      }
-
-      lastSearch.current = currentSearch.current;
-      currentSearch.current = undefined;
-      if (nextSearch.current) {
-        fetchMentionUsers(nextSearch.current);
-        nextSearch.current = undefined;
-      }
-    },
-    [mentionUsers, refetch],
-  );
-
-  const clearMentions = (): void => {
-    // Avoid issue with setting state from inside renderSuggestion render
-    // cycle
-    setTimeout(() => {
-      setMentionUsers([]);
-      lastSearch.current = undefined;
-      currentSearch.current = undefined;
-      nextSearch.current = undefined;
-    }, 10);
-  };
-
   const onPress = (user: User): void => {
-    if (!suggestionCallback.current) {
-      return;
-    }
-
-    suggestionCallback.current({
-      id: user._id,
-      name: `${user.firstName} ${user.lastName}`,
-    });
+    onMentionSelected.current?.(user);
     mentionsField.onChange(
       Array.from(new Set([...mentionsField.value, user._id])),
     );
-    clearMentions();
   };
-
-  const renderSuggestions = useCallback(
-    ({
-      keyword,
-      onSuggestionPress,
-    }: MentionSuggestionsProps): React.ReactNode => {
-      if (keyword === undefined) {
-        mentionUndefinedCount.current++;
-        if (mentionUndefinedCount.current > 1) {
-          mentionUndefinedCount.current = 0;
-          clearMentions();
-          return null;
-        }
-      } else {
-        mentionUndefinedCount.current = 0;
-      }
-
-      if (keyword !== undefined) {
-        fetchMentionUsers(keyword);
-      }
-
-      if (mentionUsers.length === 0) {
-        return null;
-      }
-
-      suggestionCallback.current = onSuggestionPress;
-      return null;
-    },
-    [mentionUsers, fetchMentionUsers],
-  );
 
   return (
     <SafeAreaView
@@ -573,104 +481,68 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
             keyboardDismissMode="interactive"
             style={styles.contentContainer}
             contentContainerStyle={styles.grow}>
-            <Controller
+            <ExpandingInput
               control={control}
               name="body"
-              render={({ field }) => (
-                <MentionInput
-                  keyboardAppearance="dark"
-                  value={field.value ?? ''}
-                  onChange={field.onChange}
-                  placeholder="Create a post"
-                  placeholderTextColor={WHITE60}
-                  style={styles.mentionInput}
-                  containerStyle={[styles.mentionContainer]}
-                  partTypes={[
-                    {
-                      isBottomMentionSuggestionsRender: true,
-                      isInsertSpaceAfterMention: true,
-                      trigger: '@',
-                      renderSuggestions,
-                      textStyle: {
-                        color: PRIMARY,
-                      },
-                    },
-                    {
-                      pattern: POST_PATTERN,
-                      textStyle: {
-                        color: PRIMARY,
-                      },
-                    },
-                  ]}
-                />
-              )}
-            />
-            {uploading ? (
-              <View style={[styles.attachment, styles.uploadIndicator]}>
-                <ActivityIndicator size="large" />
-              </View>
-            ) : null}
-            {imageData || mediaField.value ? (
-              <View style={styles.attachment}>
-                <Media
-                  media={
-                    mediaField.value || {
-                      url: imageData!.path,
-                      aspectRatio: imageData!.width / imageData!.height,
-                    }
-                  }
-                  onLoad={({ naturalSize }) => {
-                    if (naturalSize.orientation === 'portrait') {
-                      mediaField.onChange({
-                        ...mediaField.value,
-                        aspectRatio:
-                          Math.min(naturalSize.width, naturalSize.height) /
-                          Math.max(naturalSize.width, naturalSize.height),
-                      });
-                    }
-                  }}
-                  style={styles.preview}
-                />
-                <Pressable onPress={clearImage} style={styles.closeButton}>
-                  <X color={WHITE} size={24} />
-                </Pressable>
-              </View>
-            ) : null}
-            {watchBody && !uploading && !imageData && !post?.media?.url ? (
-              <PreviewLink
-                body={watchBody}
-                containerStyle={styles.attachment}
-              />
-            ) : null}
-          </ScrollView>
-          <View style={styles.mentionsContainer}>
-            {mentionUsers.length > 0 && (
-              <ScrollView
-                style={styles.mentionList}
-                contentContainerStyle={styles.mentionContentContainer}
-                keyboardShouldPersistTaps="handled">
-                <View style={styles.flex}>
-                  {mentionUsers.map((user, index) => (
-                    <Pressable
-                      key={user._id}
-                      onPress={() => onPress(user)}
-                      style={({ pressed }) => [
-                        index < mentionUsers.length - 1
-                          ? styles.mentionItem
-                          : null,
-                        pressed ? pStyles.pressedStyle : null,
-                      ]}>
-                      <UserInfo
-                        user={user}
-                        avatarSize={32}
-                        showFollow={false}
+              placeholder="Create a post"
+              containerStyle={styles.bodyInput}
+              placeholderTextColor={WHITE60}
+              renderUsers={(users, onSelected) => {
+                setMentionUsers(users);
+                onMentionSelected.current = onSelected;
+              }}
+              viewBelow={
+                <>
+                  {uploading ? (
+                    <View style={[styles.attachment, styles.uploadIndicator]}>
+                      <ActivityIndicator size="large" />
+                    </View>
+                  ) : null}
+                  {imageData || mediaField.value ? (
+                    <View style={styles.attachment}>
+                      <Media
+                        media={
+                          mediaField.value || {
+                            url: imageData!.path,
+                            aspectRatio: imageData!.width / imageData!.height,
+                          }
+                        }
+                        onLoad={({ naturalSize }) => {
+                          if (naturalSize.orientation === 'portrait') {
+                            mediaField.onChange({
+                              ...mediaField.value,
+                              aspectRatio:
+                                Math.min(
+                                  naturalSize.width,
+                                  naturalSize.height,
+                                ) /
+                                Math.max(naturalSize.width, naturalSize.height),
+                            });
+                          }
+                        }}
+                        style={styles.preview}
                       />
-                    </Pressable>
-                  ))}
-                </View>
-              </ScrollView>
-            )}
-          </View>
+                      <Pressable
+                        onPress={clearImage}
+                        style={styles.closeButton}>
+                        <X color={WHITE} size={24} />
+                      </Pressable>
+                    </View>
+                  ) : null}
+                  {watchBody &&
+                  !uploading &&
+                  !imageData &&
+                  !post?.media?.url ? (
+                    <PreviewLink
+                      body={watchBody}
+                      containerStyle={styles.attachment}
+                    />
+                  ) : null}
+                </>
+              }
+            />
+          </ScrollView>
+          <MentionsList users={mentionUsers} onPress={onPress} />
         </View>
         {mentionUsers.length === 0 ? (
           <View
@@ -729,34 +601,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  mentionInput: {
-    paddingHorizontal: 8,
-    paddingVertical: 8,
-    lineHeight: 20,
-    color: 'white',
-    marginTop: 16,
-    fontSize: 16,
+  bodyInput: {
+    marginTop: 8,
     flex: 1,
-  },
-  mentionContainer: {
-    flex: 1,
-    flexGrow: 1,
-  },
-  mentionList: {
-    backgroundColor: BLACK,
-    paddingHorizontal: 16,
-    borderRadius: 16,
-    maxHeight: 270,
-    flexGrow: 0,
-    width: '100%',
-    bottom: 0,
-  },
-  mentionContentContainer: {
-    marginVertical: 8,
-  },
-  mentionItem: {
-    borderBottomWidth: 1,
-    borderBottomColor: WHITE12,
+    alignItems: 'stretch',
+    backgroundColor: 'transparent',
   },
   uploadIndicator: {
     alignItems: 'center',
@@ -780,13 +629,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 8,
     top: 8,
-  },
-  mentionsContainer: {
-    position: 'absolute',
-    left: 16,
-    right: 16,
-    bottom: 4,
-    zIndex: 20,
   },
   actionWrapper: {
     backgroundColor: BGDARK,

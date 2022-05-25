@@ -180,6 +180,6 @@ export async function createChannel(
     name,
   });
 
-  await channel.create();
+  await channel.watch();
   return channel;
 }

@@ -10,6 +10,7 @@ import {
   View,
   Text,
 } from 'react-native';
+import retry from 'async-retry';
 import { CommonActions } from '@react-navigation/native';
 import { CaretLeft, ImageSquare, X } from 'phosphor-react-native';
 import ImagePicker, { ImageOrVideo } from 'react-native-image-crop-picker';
@@ -20,7 +21,12 @@ import dayjs from 'dayjs';
 dayjs.extend(relativeTime);
 
 import PHeader from 'mobile/src/components/common/PHeader';
-import ExpandingInput from 'mobile/src/components/common/ExpandingInput';
+import ExpandingInput, {
+  User,
+  OnSelectUser,
+} from 'mobile/src/components/common/ExpandingInput';
+import MentionsList from 'mobile/src/components/main/MentionsList';
+import MessageItem from 'mobile/src/components/main/chat/MessageItem';
 import ChatAvatar from 'mobile/src/components/main/chat/ChatAvatar';
 import { isVideo } from 'mobile/src/components/common/Media';
 import { Body1Bold, Body3, Body2Bold } from 'mobile/src/theme/fonts';
@@ -50,7 +56,6 @@ import {
   PMessage,
   Message,
 } from 'mobile/src/services/chat';
-import MessageItem from 'mobile/src/components/main/chat/MessageItem';
 
 import { ChannelScreen } from 'mobile/src/navigations/ChatStack';
 
@@ -72,7 +77,7 @@ const schema = yup
 const Channel: ChannelScreen = ({ navigation, route }) => {
   const { channelId, initialData } = route.params;
 
-  const { client, userId } = useChatContext() || {};
+  const { client, userId, reconnect } = useChatContext() || {};
   const channel = useRef(initialData);
   const [uploading, setUploading] = useState(false);
   const [messages, setMessages] = useState(
@@ -81,6 +86,8 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
       : [],
   );
   const [media, setMedia] = useState<{ uri: string; data: ImageOrVideo }[]>([]);
+  const [mentionUsers, setMentionUsers] = useState<User[]>([]);
+  const onMentionSelected = useRef<OnSelectUser>();
 
   const { members } = channel.current?.state ?? {};
   const users = members
@@ -102,21 +109,35 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
   });
 
   const fetchChannel = useCallback(async () => {
-    if (client) {
-      const channelData = (
-        await client.queryChannels({
-          type: 'messaging',
-          cid: channelId,
-        })
-      )[0];
+    await retry(
+      async () => {
+        if (client) {
+          const channelData = (
+            await client.queryChannels({
+              type: 'messaging',
+              cid: channelId,
+            })
+          )[0];
 
-      channel.current = channelData;
-      setMessages(processMessages(channelData.state.messages));
-    }
-  }, [client, channelId]);
+          channel.current = channelData;
+          setMessages(processMessages(channelData.state.messages));
+        }
+      },
+      {
+        onRetry: (error) => {
+          reconnect?.();
+          console.log('retrying', error);
+        },
+      },
+    );
+  }, [client, channelId, reconnect]);
 
   useEffect(() => {
-    if (!initialData || channel.current?.cid !== channelId) {
+    if (
+      !initialData ||
+      initialData.state.messages.length === 0 ||
+      channel.current?.cid !== channelId
+    ) {
       fetchChannel();
     }
   }, [fetchChannel, initialData, channelId]);
@@ -299,75 +320,75 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
           contentContainerStyle={styles.list}
           keyboardDismissMode="interactive"
         />
-        <View style={styles.inputContainer}>
-          <Controller
-            name="message"
-            control={control}
-            render={({ field }) => (
-              <ExpandingInput
-                {...field}
-                placeholder="Type a message..."
-                containerStyle={styles.input}
-                value={field.value}
-                onChangeText={field.onChange}
-                keyboardAppearance="dark"
-                viewAbove={
-                  media.length === 0 && !uploading ? undefined : (
-                    <View style={styles.imageContainer}>
-                      {media.map((image, index) => (
-                        <View key={image.uri} style={styles.imageView}>
-                          <FastImage
-                            style={styles.image}
-                            source={{
-                              uri: image.uri,
-                            }}
-                          />
-                          <Pressable
-                            style={styles.removeImage}
-                            onPress={() => removeImage(index)}>
-                            <X size={24} color={WHITE} />
-                          </Pressable>
-                        </View>
-                      ))}
-                      {uploading ? (
-                        <View style={styles.imageView}>
-                          <ActivityIndicator
-                            size="small"
-                            color={WHITE}
-                            animating={true}
-                            style={styles.flex}
-                          />
-                        </View>
-                      ) : null}
-                    </View>
-                  )
-                }
-                viewLeft={
-                  <View style={styles.imageButton}>
-                    <Pressable
-                      onPress={openPicker}
-                      style={({ pressed }) =>
-                        pressed ? pStyles.pressedStyle : null
-                      }>
-                      <ImageSquare size={20} color={WHITE} />
-                    </Pressable>
-                  </View>
-                }
-                viewRight={
-                  <View style={styles.sendButton}>
-                    <Pressable
-                      onPress={handleSubmit(onSubmit)}
-                      style={({ pressed }) =>
-                        pressed ? pStyles.pressedStyle : null
-                      }>
-                      <Text style={styles.sendText}>Send</Text>
-                    </Pressable>
-                  </View>
-                }
-              />
-            )}
+        <View style={styles.mentionContainer}>
+          <MentionsList
+            users={mentionUsers}
+            onPress={(user) => onMentionSelected.current?.(user)}
           />
         </View>
+        <ExpandingInput
+          name="message"
+          control={control}
+          placeholder="Type a message..."
+          containerStyle={styles.input}
+          renderUsers={(userList, onSelected) => {
+            setMentionUsers(userList);
+            onMentionSelected.current = onSelected;
+          }}
+          viewAbove={
+            media.length === 0 && !uploading ? undefined : (
+              <View style={styles.imageContainer}>
+                {media.map((image, index) => (
+                  <View key={image.uri} style={styles.imageView}>
+                    <FastImage
+                      style={styles.image}
+                      source={{
+                        uri: image.uri,
+                      }}
+                    />
+                    <Pressable
+                      style={styles.removeImage}
+                      onPress={() => removeImage(index)}>
+                      <X size={24} color={WHITE} />
+                    </Pressable>
+                  </View>
+                ))}
+                {uploading ? (
+                  <View style={styles.imageView}>
+                    <ActivityIndicator
+                      size="small"
+                      color={WHITE}
+                      animating={true}
+                      style={styles.flex}
+                    />
+                  </View>
+                ) : null}
+              </View>
+            )
+          }
+          viewLeft={
+            <View style={styles.imageButton}>
+              <Pressable
+                onPress={openPicker}
+                style={({ pressed }) =>
+                  pressed ? pStyles.pressedStyle : null
+                }>
+                <ImageSquare size={20} color={WHITE} />
+              </Pressable>
+            </View>
+          }
+          viewRight={
+            <View style={styles.sendButton}>
+              <Pressable
+                onPress={handleSubmit(onSubmit)}
+                style={({ pressed }) =>
+                  pressed ? pStyles.pressedStyle : null
+                }>
+                <Text style={styles.sendText}>Send</Text>
+              </Pressable>
+            </View>
+          }
+        />
       </KeyboardAvoidingView>
     </View>
   );
@@ -376,6 +397,10 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
 export default Channel;
 
 const styles = StyleSheet.create({
+  mentionContainer: {
+    position: 'relative',
+    height: 0,
+  },
   headerTitleContainer: {
     flex: 1,
     alignItems: 'center',
@@ -400,9 +425,8 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingBottom: 24,
-  },
-  inputContainer: {
-    position: 'relative',
+    flex: 1,
+    flexGrow: 1,
   },
   imageContainer: {
     flexDirection: 'row',
@@ -437,6 +461,7 @@ const styles = StyleSheet.create({
   },
   input: {
     margin: 16,
+    maxHeight: 180,
   },
   imageButton: {
     justifyContent: 'center',

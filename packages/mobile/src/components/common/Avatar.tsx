@@ -18,7 +18,9 @@ interface AvatarProps {
 }
 
 const Avatar: React.FC<AvatarProps> = ({ user, size = 64, style }) => {
-  if (!user) return null;
+  if (!user) {
+    return null;
+  }
 
   const sizeStyles = {
     width: size,
@@ -52,7 +54,7 @@ const Avatar: React.FC<AvatarProps> = ({ user, size = 64, style }) => {
       ) : null}
       {companyData ? (
         <Text style={styles.initials} adjustsFontSizeToFit numberOfLines={1}>
-          {companyData.name.charAt(0)}
+          {companyData.name?.charAt(0)}
         </Text>
       ) : null}
     </View>

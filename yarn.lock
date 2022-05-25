@@ -4049,6 +4049,13 @@
   dependencies:
     "@types/node" "*"
 
+"@types/async-retry@^1.4.4":
+  version "1.4.4"
+  resolved "https://registry.yarnpkg.com/@types/async-retry/-/async-retry-1.4.4.tgz#3304ce1e64f8757723f166518fc4c4b68df4fe66"
+  integrity sha512-IGT+yESLPYje0MV8MfOpT5V5oH9lAKLwlosQRyq75tYJmntkkWcfEThHLxsgYjGmYXJEY7ZZkYPb4xuW+NA6GA==
+  dependencies:
+    "@types/retry" "*"
+
 "@types/babel__core@^7.0.0", "@types/babel__core@^7.1.14", "@types/babel__core@^7.1.7":
   version "7.1.19"
   resolved "https://registry.yarnpkg.com/@types/babel__core/-/babel__core-7.1.19.tgz#7b497495b7d1b4812bdb9d02804d0576f43ee460"
@@ -4426,6 +4433,11 @@
     "@types/prop-types" "*"
     "@types/scheduler" "*"
     csstype "^3.0.2"
+
+"@types/retry@*":
+  version "0.12.2"
+  resolved "https://registry.yarnpkg.com/@types/retry/-/retry-0.12.2.tgz#ed279a64fa438bb69f2480eda44937912bb7480a"
+  integrity sha512-XISRgDJ2Tc5q4TRqvgJtzsRkFYNJzZrhTdtMoGVBttwzzQJkPnS3WWTFc7kuDRoPtPakl+T+OfdEUjYJj7Jbow==
 
 "@types/scheduler@*":
   version "0.16.2"

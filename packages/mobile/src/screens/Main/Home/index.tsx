@@ -14,7 +14,7 @@ import { UIActivityIndicator } from 'react-native-indicators';
 
 import MainHeader from 'mobile/src/components/main/Header';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
-import PostItem from 'mobile/src/components/main/PostItem';
+import PostItem from 'mobile/src/components/main/posts/PostItem';
 import pStyles from 'mobile/src/theme/pStyles';
 
 import { usePosts, Post } from 'shared/graphql/query/post/usePosts';
@@ -63,19 +63,22 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
     );
   }
 
-  const handleCreatePost = () => {
+  const handleCreatePost = (): void => {
     navigation.navigate('PostDetails', {
       screen: 'CreatePost',
       params: {},
     });
   };
 
-  const postFilter = (role: PostRoleFilter, cateogies: PostCategory[]) => {
+  const postFilter = (
+    role: PostRoleFilter,
+    cateogies: PostCategory[],
+  ): void => {
     setSelectedRole(role);
     setSelectedCategories(cateogies.length > 0 ? cateogies : undefined);
   };
 
-  const onRefresh = async () => {
+  const onRefresh = async (): Promise<void> => {
     setRefreshing(true);
     await refetch();
     setRefreshing(false);
@@ -91,11 +94,6 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
           <SlidersHorizontal color={WHITE} size={24} />
         </TouchableOpacity>
       </View>
-      {refreshing && (
-        <View style={styles.refreshIndicator}>
-          <UIActivityIndicator color={WHITE} size={24} />
-        </View>
-      )}
       <FlatList
         contentContainerStyle={styles.container}
         data={postData}
@@ -103,7 +101,12 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
         renderItem={renderItem}
         keyExtractor={(item) => item._id}
         refreshControl={
-          <RefreshControl onRefresh={onRefresh} refreshing={refreshing} />
+          <RefreshControl
+            onRefresh={onRefresh}
+            refreshing={refreshing}
+            colors={[WHITE]}
+            tintColor={WHITE}
+          />
         }
       />
 
@@ -131,18 +134,6 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 16,
     paddingHorizontal: 0,
-  },
-  refreshIndicator: {
-    paddingTop: 40,
-    marginBottom: -40,
-  },
-  tagStyle: {
-    paddingHorizontal: 15,
-    marginRight: 8,
-    borderRadius: 4,
-  },
-  tagLabel: {
-    textTransform: 'none',
   },
   postButton: {
     position: 'absolute',

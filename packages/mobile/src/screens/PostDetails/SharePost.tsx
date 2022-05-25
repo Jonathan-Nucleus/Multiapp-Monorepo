@@ -1,8 +1,7 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -16,7 +15,6 @@ import {
   MentionInput,
   MentionSuggestionsProps,
 } from 'react-native-controlled-mentions';
-import _isEqual from 'lodash/isEqual';
 
 import UserSvg from 'shared/assets/images/user.svg';
 import GlobalSvg from 'shared/assets/images/global.svg';
@@ -26,13 +24,19 @@ import QCSvg from 'shared/assets/images/QC.svg';
 
 import Avatar from 'mobile/src/components/common/Avatar';
 import PLabel from 'mobile/src/components/common/PLabel';
-import UserInfo from 'mobile/src/components/common/UserInfo';
 import PModal from 'mobile/src/components/common/PModal';
 import RoundIcon from 'mobile/src/components/common/RoundIcon';
+import PostHeader from './CreatePost/PostHeader';
+import PostSelection from './CreatePost/PostSelection';
+import SharePostItem from 'mobile/src/components/main/posts/SharePostItem';
+import ExpandingInput, {
+  User,
+  OnSelectUser,
+} from 'mobile/src/components/common/ExpandingInput';
+import MentionsList from 'mobile/src/components/main/MentionsList';
 import { showMessage } from 'mobile/src/services/utils';
 import pStyles from 'mobile/src/theme/pStyles';
 import {
-  SECONDARY,
   WHITE60,
   PRIMARY,
   PRIMARYSOLID,
@@ -49,19 +53,11 @@ import {
 } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+
 import { useAccount } from 'shared/graphql/query/account/useAccount';
-import {
-  useMentionUsers,
-  User,
-} from 'shared/graphql/query/user/useMentionUsers';
 import { usePost } from 'shared/graphql/query/post/usePost';
 import { useSharePost } from 'shared/graphql/mutation/posts/useSharePost';
-
 import type { Audience } from 'shared/graphql/query/post/usePosts';
-
-import PostHeader from './CreatePost/PostHeader';
-import PostSelection from './CreatePost/PostSelection';
-import SharePostItem from 'mobile/src/components/main/SharePostItem';
 
 import { SharePostScreen } from 'mobile/src/navigations/PostDetailsStack';
 
@@ -140,21 +136,12 @@ const CreatePost: SharePostScreen = ({ navigation, route }) => {
   const { sharePostId } = route.params;
 
   const { data: { account } = {} } = useAccount({ fetchPolicy: 'cache-only' });
-  const { data: usersData, refetch } = useMentionUsers();
   const { data: postData } = usePost(sharePostId);
   const [sharePost] = useSharePost();
-
-  const mentionUndefinedCount = useRef(0);
-  const currentSearch = useRef<string | undefined>(undefined);
-  const lastSearch = useRef<string | undefined>(undefined);
-  const nextSearch = useRef<string | undefined>(undefined);
-  const suggestionCallback =
-    useRef<MentionSuggestionsProps['onSuggestionPress']>();
-
   const [postAsModalVisible, setPostAsModalVisible] = useState(false);
-  const [mentionUsers, setMentionUsers] = useState(
-    usersData?.mentionUsers ?? [],
-  );
+  const [mentionUsers, setMentionUsers] = useState<User[]>([]);
+  const onMentionSelected = useRef<OnSelectUser>();
+
   const companies = account?.companies ?? [];
 
   const {
@@ -185,7 +172,7 @@ const CreatePost: SharePostScreen = ({ navigation, route }) => {
   });
   //const watchBody = watch('body', '');
 
-  const onSubmit = async (values: FormValues) => {
+  const onSubmit = async (values: FormValues): Promise<void> => {
     const { userId, ...postValues } = values;
     try {
       const { data } = await sharePost({
@@ -242,90 +229,12 @@ const CreatePost: SharePostScreen = ({ navigation, route }) => {
     })),
   ];
 
-  const fetchMentionUsers = useCallback(
-    async (search: string) => {
-      if (search === lastSearch.current) {
-        return;
-      }
-
-      if (currentSearch.current !== undefined) {
-        nextSearch.current = search;
-        return;
-      }
-
-      currentSearch.current = search;
-      const { data } = await refetch({ search });
-
-      if (data.mentionUsers && !_isEqual(mentionUsers, data.mentionUsers)) {
-        setMentionUsers(data.mentionUsers);
-      }
-
-      lastSearch.current = currentSearch.current;
-      currentSearch.current = undefined;
-      if (nextSearch.current) {
-        fetchMentionUsers(nextSearch.current);
-        nextSearch.current = undefined;
-      }
-    },
-    [mentionUsers, refetch],
-  );
-
-  const clearMentions = () => {
-    // Avoid issue with setting state from inside renderSuggestion render
-    // cycle
-    setTimeout(() => {
-      setMentionUsers([]);
-      lastSearch.current = undefined;
-      currentSearch.current = undefined;
-      nextSearch.current = undefined;
-      suggestionCallback.current = undefined;
-    }, 10);
-  };
-
-  const onPress = (user: User) => {
-    if (!suggestionCallback.current) {
-      return;
-    }
-
-    suggestionCallback.current({
-      id: user._id,
-      name: `${user.firstName} ${user.lastName}`,
-    });
+  const onPress = (user: User): void => {
+    onMentionSelected.current?.(user);
     mentionsField.onChange(
       Array.from(new Set([...mentionsField.value, user._id])),
     );
-    clearMentions();
   };
-
-  const renderSuggestions = useCallback(
-    ({
-      keyword,
-      onSuggestionPress,
-    }: MentionSuggestionsProps): React.ReactNode => {
-      if (keyword === undefined) {
-        mentionUndefinedCount.current++;
-        if (mentionUndefinedCount.current > 1) {
-          mentionUndefinedCount.current = 0;
-          clearMentions();
-          return null;
-        }
-      } else {
-        mentionUndefinedCount.current = 0;
-      }
-
-      if (keyword !== undefined) {
-        fetchMentionUsers(keyword);
-      }
-
-      if (mentionUsers.length === 0) {
-        return null;
-      }
-
-      suggestionCallback.current = onSuggestionPress;
-      return null;
-    },
-    [mentionUsers, fetchMentionUsers],
-  );
 
   return (
     <SafeAreaView
@@ -400,63 +309,26 @@ const CreatePost: SharePostScreen = ({ navigation, route }) => {
             keyboardDismissMode="interactive"
             style={styles.contentContainer}
             contentContainerStyle={styles.grow}>
-            <Controller
+            <ExpandingInput
               control={control}
               name="body"
-              render={({ field }) => (
-                <MentionInput
-                  keyboardAppearance="dark"
-                  value={field.value ?? ''}
-                  onChange={field.onChange}
-                  placeholder="Share a post"
-                  placeholderTextColor={WHITE60}
-                  style={styles.mentionInput}
-                  partTypes={[
-                    {
-                      isBottomMentionSuggestionsRender: true,
-                      isInsertSpaceAfterMention: true,
-                      trigger: '@',
-                      renderSuggestions,
-                      textStyle: {
-                        color: SECONDARY,
-                      },
-                    },
-                    {
-                      trigger: '#',
-                      textStyle: {
-                        color: 'green',
-                      },
-                    },
-                  ]}
-                />
-              )}
+              placeholder="Create a post"
+              containerStyle={styles.inputContainer}
+              placeholderTextColor={WHITE60}
+              renderUsers={(users, onSelected) => {
+                setMentionUsers(users);
+                onMentionSelected.current = onSelected;
+              }}
+              viewBelow={
+                postData?.post ? (
+                  <View style={styles.sharePostContainer}>
+                    <SharePostItem post={postData.post} />
+                  </View>
+                ) : null
+              }
             />
-            {postData?.post ? (
-              <View style={styles.sharePostContainer}>
-                <SharePostItem post={postData.post} />
-              </View>
-            ) : null}
           </ScrollView>
-          <View style={styles.mentionsContainer}>
-            {mentionUsers.length > 0 && (
-              <ScrollView style={styles.mentionList}>
-                <View style={styles.flex}>
-                  {mentionUsers.map((user) => (
-                    <Pressable
-                      key={user._id}
-                      onPress={() => onPress(user)}
-                      style={styles.mentionItem}>
-                      <UserInfo
-                        user={user}
-                        avatarSize={32}
-                        showFollow={false}
-                      />
-                    </Pressable>
-                  ))}
-                </View>
-              </ScrollView>
-            )}
-          </View>
+          <MentionsList users={mentionUsers} onPress={onPress} />
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -483,38 +355,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  inputContainer: {
+    paddingHorizontal: 16,
+    marginTop: 8,
+    flex: 1,
+    alignItems: 'stretch',
+    backgroundColor: 'transparent',
+  },
   sharePostContainer: {
     flex: 1,
-    paddingHorizontal: 8,
-    marginBottom: 16,
-  },
-  mentionsContainer: {
-    position: 'absolute',
-    left: 16,
-    right: 16,
-    bottom: 4,
-    zIndex: 2,
-  },
-  mentionInput: {
-    paddingHorizontal: 8,
-    paddingVertical: 8,
-    minHeight: 80,
-    lineHeight: 20,
-    color: 'white',
-    marginTop: 16,
-    fontSize: 16,
-  },
-  mentionList: {
-    backgroundColor: BLACK,
-    padding: 16,
-    borderRadius: 16,
-    maxHeight: 270,
-    flexGrow: 0,
-    width: '100%',
-  },
-  mentionItem: {
-    borderBottomWidth: 1,
-    borderBottomColor: WHITE12,
+    marginVertical: 16,
   },
   radioGroupStyle: {
     marginVertical: 30,

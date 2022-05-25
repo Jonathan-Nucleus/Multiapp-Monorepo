@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     borderColor: WHITE12,
     borderRadius: 8,
     backgroundColor: GRAY900,
-    marginTop: 24,
+    marginBottom: 16,
   },
   title: {
     marginHorizontal: 16,

@@ -2,7 +2,6 @@ import React from 'react';
 import { StyleSheet, StyleProp, View, ViewStyle } from 'react-native';
 
 import Avatar from 'mobile/src/components/common/Avatar';
-import { WHITE } from 'shared/src/colors';
 import { User } from 'mobile/src/services/chat';
 
 interface ChatAvatarProps {

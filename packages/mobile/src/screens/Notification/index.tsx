@@ -6,6 +6,7 @@ import {
   Text,
   ListRenderItem,
   Pressable,
+  RefreshControl,
 } from 'react-native';
 import {
   Gear,
@@ -50,6 +51,7 @@ import type { NotificationScreen } from 'mobile/src/navigations/AuthenticatedSta
 
 const Notifications: NotificationScreen = ({ navigation }) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const { data, refetch } = useNotifications();
   const [readNotification] = useReadNotification();
   const [readNotifications] = useReadNotifications();
@@ -63,6 +65,12 @@ const Notifications: NotificationScreen = ({ navigation }) => {
       return <ThumbsUp size={18} color={WHITE} />;
     }
     return <UserCirclePlus size={18} color={WHITE} />;
+  };
+
+  const onRefresh = async (): Promise<void> => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
   };
 
   const handleReadNotification = async (
@@ -158,6 +166,14 @@ const Notifications: NotificationScreen = ({ navigation }) => {
         renderItem={renderListItem}
         keyExtractor={(item) => item._id}
         style={styles.flatList}
+        refreshControl={
+          <RefreshControl
+            onRefresh={onRefresh}
+            refreshing={refreshing}
+            colors={[WHITE]}
+            tintColor={WHITE}
+          />
+        }
       />
       <Modal
         isVisible={isVisible}

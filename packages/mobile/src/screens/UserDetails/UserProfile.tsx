@@ -10,6 +10,7 @@ import {
   Linking,
   Pressable,
 } from 'react-native';
+import retry from 'async-retry';
 import FastImage from 'react-native-fast-image';
 import { CaretLeft, Pencil } from 'phosphor-react-native';
 
@@ -17,12 +18,12 @@ import MainHeader from 'mobile/src/components/main/Header';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import PLabel from 'mobile/src/components/common/PLabel';
-import PostItem from 'mobile/src/components/main/PostItem';
+import PostItem from 'mobile/src/components/main/posts/PostItem';
 import FeaturedItem from 'mobile/src/components/main/settings/FeaturedItem';
 import FollowModal from 'mobile/src/components/main/FollowModal';
 import Funds from 'mobile/src/components/main/Funds';
 import PGradientOutlineButton from 'mobile/src/components/common/PGradientOutlineButton';
-import ProfilePlaceholder from '../../components/placeholder/ProfilePlaceholder';
+import ProfilePlaceholder from 'mobile/src/components/placeholder/ProfilePlaceholder';
 import pStyles from 'mobile/src/theme/pStyles';
 import { Body2, Body3, H6Bold } from 'mobile/src/theme/fonts';
 import {
@@ -37,6 +38,7 @@ import LinkedinSvg from 'shared/assets/images/linkedin.svg';
 import TwitterSvg from 'shared/assets/images/twitter.svg';
 import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 import NoPostSvg from 'shared/assets/images/no-post.svg';
+import PostItemPlaceholder from 'mobile/src/components/placeholder/PostItemPlaceholder';
 
 import { useProfile } from 'shared/graphql/query/user/useProfile';
 import { usePosts, Post } from 'shared/graphql/query/user/usePosts';
@@ -51,10 +53,12 @@ import { UserProfileScreen } from 'mobile/src/navigations/UserDetailsStack';
 import { BACKGROUND_URL } from 'react-native-dotenv';
 import Avatar from '../../components/common/Avatar';
 
+const PLACE_HOLDERS = 4;
+
 const UserProfile: UserProfileScreen = ({ navigation, route }) => {
   const { userId } = route.params;
 
-  const { client } = useChatContext() || {};
+  const { client, reconnect } = useChatContext() || {};
   const [visibleFollowerModal, setVisibleFollowerModal] = useState(false);
   const [visibleFollowingModal, setVisibleFollowingModal] = useState(false);
 
@@ -67,7 +71,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
 
   const funds = fundsData?.userProfile?.managedFunds ?? [];
   const profile = profileData?.userProfile;
-  const postData = data?.userProfile?.posts ?? [];
+  const postData = data?.userProfile?.posts;
   const featuredPosts = featuredPostsData?.userProfile?.posts ?? [];
 
   const isMyAccount = useMemo(() => {
@@ -101,7 +105,16 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
       return;
     }
 
-    const channel = await createChannel(client, [account._id, userId]);
+    const channel = await retry(
+      async () => await createChannel(client, [account._id, userId]),
+      {
+        onRetry: (error) => {
+          reconnect?.();
+          console.log('retrying', error);
+        },
+      },
+    );
+
     navigation.navigate('Main', {
       screen: 'Chat',
       params: {
@@ -298,7 +311,6 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
               />
             </View>
           )}
-
           {postData && postData.length > 0 ? (
             <FlatList
               data={postData || []}
@@ -308,6 +320,10 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
               listKey="post"
               ListHeaderComponent={<Text style={styles.text}>All Posts</Text>}
             />
+          ) : !postData ? (
+            [...Array(PLACE_HOLDERS)].map((_, index) => (
+              <PostItemPlaceholder key={index} />
+            ))
           ) : (
             isMyAccount && (
               <View style={styles.noPostContainer}>

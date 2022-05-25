@@ -1,9 +1,7 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Image, StyleSheet, View, Text } from 'react-native';
 import { MentionInput } from 'react-native-controlled-mentions';
 const Buffer = global.Buffer || require('buffer').Buffer;
-
-import { POST_URL } from 'react-native-dotenv';
 
 import UserSvg from 'shared/assets/images/user.svg';
 import GlobalSvg from 'shared/assets/images/global.svg';
@@ -12,7 +10,7 @@ import Tag from 'mobile/src/components/common/Tag';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import { showMessage } from 'mobile/src/services/utils';
 import pStyles from 'mobile/src/theme/pStyles';
-import { BGDARK, WHITE, PRIMARY, BLACK } from 'shared/src/colors';
+import { BGDARK, WHITE, PRIMARY } from 'shared/src/colors';
 
 import PreviewLink from './PreviewLink';
 import PostSelection from './PostSelection';
@@ -42,10 +40,15 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
   const { data: accountData } = useAccount();
   const [createPost] = useCreatePost();
   const [editPost] = useEditPost();
+  const isSubmitted = useRef(false);
 
   const account = accountData?.account;
 
   const handleSubmit = async (): Promise<void> => {
+    if (isSubmitted.current) {
+      return;
+    }
+
     let success = false;
     const finalPostData = {
       body,
@@ -93,6 +96,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
       }
 
       if (success) {
+        isSubmitted.current = true;
         navigation.pop(2);
         // it should go to different stack
         navigation.navigate('Main');
@@ -191,18 +195,10 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
 export default ReviewPost;
 
 const styles = StyleSheet.create({
-  bgDark: {
-    backgroundColor: BGDARK,
-  },
   usersPart: {
     marginTop: 16,
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  mentionInput: {
-    color: 'white',
-    marginVertical: 16,
-    fontSize: 16,
   },
   postImage: {
     width: '100%',
@@ -213,7 +209,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   body: {
-    marginTop: 16,
+    marginVertical: 16,
     lineHeight: 20,
     color: WHITE,
   },

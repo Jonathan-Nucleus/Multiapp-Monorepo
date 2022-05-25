@@ -4,15 +4,10 @@ import moment from 'moment';
 import { DotsThreeVertical } from 'phosphor-react-native';
 
 import PLabel from 'mobile/src/components/common/PLabel';
+import PBodyText from 'mobile/src/components/common/PBodyText';
 import UserInfo from 'mobile/src/components/common/UserInfo';
-import {
-  BLACK,
-  PRIMARY,
-  PRIMARYSOLID,
-  PRIMARYSOLID7,
-  WHITE,
-} from 'shared/src/colors';
-import { Body2Bold, Body3 } from 'mobile/src/theme/fonts';
+import { PRIMARY, WHITE } from 'shared/src/colors';
+import { Body3 } from 'mobile/src/theme/fonts';
 
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 
@@ -57,7 +52,7 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply, onEdit }) => {
     }
   }, [account, comment.likeIds, liked]);
 
-  const closeKebobMenu = () => {
+  const closeKebobMenu = (): void => {
     setKebobIsClosing(true);
     setKebobMenuVisible(false);
 
@@ -72,7 +67,7 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply, onEdit }) => {
     marginLeft: commentId ? 32 : 0,
   };
 
-  const toggleLike = async () => {
+  const toggleLike = async (): Promise<void> => {
     const toggled = !liked;
     const { data } = await likeComment({
       variables: { like: toggled, commentId: comment._id },
@@ -83,7 +78,7 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply, onEdit }) => {
       : console.log('Error liking comment');
   };
 
-  const goToProfile = () => {
+  const goToProfile = (): void => {
     NavigationService.navigate('UserDetails', {
       screen: 'UserProfile',
       params: {
@@ -106,7 +101,12 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply, onEdit }) => {
           <DotsThreeVertical size={24} color={WHITE} />
         </TouchableOpacity>
       </View>
-      <PLabel label={body} viewStyle={styles.bodyContent} />
+      <PBodyText
+        style={styles.bodyContent}
+        body={body}
+        collapseLongText={false}
+        hideLinkPreview={true}
+      />
       <View style={styles.actionContainer}>
         <PLabel
           label={moment(createdAt).fromNow()}

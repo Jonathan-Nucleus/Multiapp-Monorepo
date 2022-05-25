@@ -7,6 +7,7 @@ import {
   FlatList,
   View,
 } from 'react-native';
+import retry from 'async-retry';
 import { NotePencil } from 'phosphor-react-native';
 
 import MainHeader from 'mobile/src/components/main/Header';
@@ -43,12 +44,10 @@ const schema = yup
 
 const ChannelList: ChannelListScreen = ({ navigation, route }) => {
   const { channelId } = route.params || {};
-  const { client, userId } = useChatContext() || {};
+  const { client, userId, reconnect } = useChatContext() || {};
 
   const [channels, setChannels] = useState<Channel[]>([]);
-  const { control, handleSubmit, getValues } = useForm<
-    yup.InferType<typeof schema>
-  >({
+  const { control, getValues } = useForm<yup.InferType<typeof schema>>({
     resolver: yupResolver(schema),
     mode: 'onSubmit',
     defaultValues: schema.cast(
@@ -59,6 +58,7 @@ const ChannelList: ChannelListScreen = ({ navigation, route }) => {
 
   const fetchChannels = useCallback(async () => {
     if (!client) {
+      console.log('no client');
       return;
     }
 
@@ -75,12 +75,21 @@ const ChannelList: ChannelListScreen = ({ navigation, route }) => {
         : {}),
     };
 
-    const newChannels = await client.queryChannels(filter, DEFAULT_SORT, {
-      limit: 12,
-      watch: true,
-    });
+    const newChannels = await retry(
+      () =>
+        client.queryChannels(filter, DEFAULT_SORT, {
+          limit: 12,
+          watch: true,
+        }),
+      {
+        onRetry: (error) => {
+          reconnect?.();
+          console.log('retrying', error);
+        },
+      },
+    );
     setChannels(newChannels);
-  }, [client, getValues, userId]);
+  }, [client, getValues, userId, reconnect]);
 
   useEffect(() => {
     if (channelId) {

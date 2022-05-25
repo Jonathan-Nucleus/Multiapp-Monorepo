@@ -12,7 +12,7 @@ import { SlidersHorizontal } from 'phosphor-react-native';
 import { WHITE, WHITE60 } from 'shared/src/colors';
 import { Body2Bold } from '../../../theme/fonts';
 
-import PostItem from 'mobile/src/components/main/PostItem';
+import PostItem from 'mobile/src/components/main/posts/PostItem';
 import { Post } from 'shared/graphql/query/post/usePosts';
 import type {
   PostCategory,

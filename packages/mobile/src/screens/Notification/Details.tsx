@@ -3,7 +3,7 @@ import { Text, StyleSheet, FlatList, ListRenderItem } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BGDARK, WHITE } from 'shared/src/colors';
 
-import PostItem from 'mobile/src/components/main/PostItem';
+import PostItem from 'mobile/src/components/main/posts/PostItem';
 import PHeader from 'mobile/src/components/common/PHeader';
 import RoundIcon from 'mobile/src/components/common/RoundIcon';
 import { Body1 } from 'mobile/src/theme/fonts';

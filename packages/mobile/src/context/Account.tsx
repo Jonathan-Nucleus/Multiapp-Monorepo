@@ -4,7 +4,7 @@ import {
   useAccount,
   AccountData,
 } from 'shared/graphql/query/account/useAccount';
-type Account = AccountData['account'];
+export type Account = AccountData['account'];
 
 const AccountContext = React.createContext<Account | undefined>(undefined);
 export function useAccountContext(): Account {
