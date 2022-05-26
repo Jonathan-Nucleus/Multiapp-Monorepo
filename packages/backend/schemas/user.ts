@@ -61,6 +61,7 @@ export namespace User {
     fcmTokenCreated?: Date;
     notificationBadge?: number;
     deletedAt?: Date;
+    superUser?: boolean;
 
     managedFundsIds?: ObjectId[];
     mutedPostIds?: ObjectId[];
@@ -525,6 +526,7 @@ export const UserSchema = `
     createdAt: Date!
     updatedAt: Date
     notificationBadge: Int
+    superUser: Boolean
 
     mutedPosts: [Post!]
     hiddenPosts: [Post!]
