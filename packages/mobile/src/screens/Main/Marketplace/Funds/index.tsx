@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, FlatList, View, Text, ListRenderItem } from 'react-native';
-import { useIsFocused } from '@react-navigation/native';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 
 import { BLACK, WHITE } from 'shared/src/colors';
 import pStyles from 'mobile/src/theme/pStyles';
@@ -16,7 +16,16 @@ import { useFunds, Fund } from 'shared/graphql/query/marketplace/useFunds';
 const PLACE_HOLDERS = 7;
 
 const Funds: FundsScreen = ({ navigation }) => {
-  const { data } = useFunds();
+  const focused = useIsFocused();
+
+  const { data, refetch } = useFunds();
+  const [focus, setFocus] = useState(focused);
+
+  if (focused !== focus) {
+    console.log('refetching funds');
+    refetch();
+    setFocus(focused);
+  }
 
   if (!data?.funds) {
     return (

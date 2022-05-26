@@ -11,6 +11,7 @@ import {
   FundSchema,
   FundStatusOptions,
   DocumentCategoryOptions,
+  AssetClassOptions,
 } from "../schemas/fund";
 
 type GraphQLFund = Fund.GraphQL;
@@ -23,6 +24,12 @@ const schema = gql`
 const resolvers = {
   FundStatus: FundStatusOptions,
   DocumentCategory: DocumentCategoryOptions,
+  AssetClass: Object.keys(AssetClassOptions).reduce<{
+    [key: string]: string;
+  }>((acc, option) => {
+    acc[option] = AssetClassOptions[option].value;
+    return acc;
+  }, {}),
   Fund: {
     createdAt: async (
       parent: Fund.Mongo,

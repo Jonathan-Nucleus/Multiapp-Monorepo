@@ -55,6 +55,27 @@ export default async function (
             y: 0,
             scale: 1,
           },
+          class: "hedge",
+          aum: Math.round(Math.random() * 100000000),
+          min: Math.round(Math.random() * 100000),
+          lockup: Math.round(Math.random() * 730),
+          strategy: faker.lorem.words(4),
+          liquidity: faker.lorem.words(4),
+          fees: [
+            {
+              label: faker.lorem.word(),
+              value: `${Math.round(Math.random() * 100)}%`,
+            },
+            {
+              label: faker.lorem.word(),
+              value: `${Math.round(Math.random() * 100)}%`,
+            },
+          ],
+          attributes: [...Array(4)].map(() => ({
+            label: faker.lorem.word(),
+            value: (Math.random() * 100).toFixed(1),
+          })),
+          metrics: [],
           highlights: [...Array(4)].map(() => faker.lorem.sentence()),
           overview: faker.lorem.paragraph(8),
           teamIds: Array.from(

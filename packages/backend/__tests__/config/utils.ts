@@ -208,6 +208,27 @@ export const createFund = async (
     _id: toObjectId(),
     name: `${faker.commerce.product()} Fund`,
     level,
+    class: "hedge",
+    aum: Math.round(Math.random() * 100000000),
+    min: Math.round(Math.random() * 100000),
+    lockup: Math.round(Math.random() * 730),
+    strategy: faker.lorem.words(4),
+    liquidity: faker.lorem.words(4),
+    fees: [
+      {
+        label: faker.lorem.word(),
+        value: `${Math.round(Math.random() * 100)}%`,
+      },
+      {
+        label: faker.lorem.word(),
+        value: `${Math.round(Math.random() * 100)}%`,
+      },
+    ],
+    attributes: [...Array(4)].map(() => ({
+      label: faker.lorem.word(),
+      value: (Math.random() * 100).toFixed(1),
+    })),
+    metrics: [],
     managerId: toObjectId(userId),
     companyId: toObjectId(companyId),
     status: "open",

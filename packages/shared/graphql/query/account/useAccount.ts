@@ -44,6 +44,7 @@ export type AccountData = {
     | "managedFunds"
     | "mutedPostIds"
     | "settings"
+    | "superUser"
   > & {
     watchlist: WatchlistFund[];
     company: Pick<
@@ -83,6 +84,7 @@ export function useAccount(
       query Account {
         account {
           _id
+          superUser
           firstName
           lastName
           avatar

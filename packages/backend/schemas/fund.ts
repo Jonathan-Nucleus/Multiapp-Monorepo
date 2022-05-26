@@ -8,9 +8,17 @@ export namespace Fund {
   export interface Mongo {
     _id: ObjectId;
     name: string;
-    level: Accreditation;
     managerId: ObjectId;
     companyId: ObjectId;
+    level: Accreditation;
+    class: AssetClass;
+    aum: number;
+    min: number;
+    lockup: number;
+    strategy: string;
+    liquidity: string;
+    fees: Attribute[];
+    attributes: Attribute[];
     status: FundStatus;
     highlights: string[];
     overview: string;
@@ -18,6 +26,7 @@ export namespace Fund {
     documents?: Document[];
     teamIds: ObjectId[];
     tags: string[];
+    metrics: Metric[];
     updatedAt?: Date;
 
     // TODO: Figure out the rest of these soon
@@ -27,9 +36,10 @@ export namespace Fund {
   }
 
   export type GraphQL = GraphQLEntity<
-    Omit<Mongo, "level" | "status" | "documents">
+    Omit<Mongo, "level" | "class" | "status" | "documents">
   > & {
     level: AccreditationEnum;
+    class: AssetClassEnum;
     status: FundStatusEnum;
     documents: Array<
       Omit<Document, "category"> & { category: DocumentCategoryEnum }
@@ -47,6 +57,16 @@ interface Document {
   category: DocumentCategory;
   date: Date;
   createdAt: number;
+}
+
+interface Attribute {
+  label: string;
+  value: string;
+}
+
+interface Metric {
+  date: Date;
+  figure: number;
 }
 
 /** Enumeration describing the status of a fund. */
@@ -69,15 +89,36 @@ export const DocumentCategoryOptions = {
 export type DocumentCategory = ValueOf<typeof DocumentCategoryOptions>;
 export type DocumentCategoryEnum = keyof typeof DocumentCategoryOptions;
 
+export const AssetClassOptions = {
+  HEDGE: {
+    label: "Hedge Fund",
+    value: "hedge",
+  },
+  PE: {
+    label: "Private Equity",
+    value: "pe",
+  },
+} as const;
+export type AssetClass = ValueOf<typeof AssetClassOptions>["value"];
+export type AssetClassEnum = keyof typeof AssetClassOptions;
+
 // Note that AdjustableImage referenced below is defined as part of the User
 // schema.
 export const FundSchema = `
   type Fund {
     _id: ID!
     name: String!
-    level: Accreditation!
     managerId: ID!
     companyId: ID!
+    level: Accreditation!
+    class: AssetClass!
+    aum: Int!
+    min: Int!
+    lockup: Int!
+    strategy: String!
+    liquidity: String!
+    fees: [Attribute!]!
+    attributes: [Attribute!]!
     status: FundStatus!
     highlights: [String!]!
     overview: String!
@@ -85,6 +126,7 @@ export const FundSchema = `
     documents: [Document!]
     teamIds: [ID!]!
     tags: [String!]!
+    metrics: [Metric!]!
     createdAt: Date!
     updatedAt: Date
 
@@ -101,11 +143,25 @@ export const FundSchema = `
     createdAt: Int!
   }
 
+  type Attribute {
+    label: String!
+    value: String!
+  }
+
+  type Metric {
+    date: Date!
+    figure: Float!
+  }
+
   enum FundStatus {
     ${Object.keys(FundStatusOptions).map((key) => key)}
   }
 
   enum DocumentCategory {
     ${Object.keys(DocumentCategoryOptions).map((key) => key)}
+  }
+
+  enum AssetClass {
+    ${Object.keys(AssetClassOptions).map((key) => key)}
   }
 `;

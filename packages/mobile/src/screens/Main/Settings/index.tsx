@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   FlatList,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Pressable,
   Linking,
+  Switch,
 } from 'react-native';
 import { clearToken } from 'mobile/src/utils/auth-token';
 import {
@@ -18,10 +19,19 @@ import {
   Lifebuoy,
   Headset,
   ShieldCheck,
+  Database,
 } from 'phosphor-react-native';
 import { CommonActions } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { GRAY100, WHITE, WHITE12, SUCCESS } from 'shared/src/colors';
+import {
+  GRAY100,
+  WHITE,
+  WHITE12,
+  SUCCESS,
+  GRAY20,
+  GREEN,
+} from 'shared/src/colors';
 
 import Avatar from 'mobile/src/components/common/Avatar';
 import MainHeader from 'mobile/src/components/main/Header';
@@ -51,6 +61,15 @@ const Settings: SettingsScreen = ({ navigation }) => {
   const { data } = useAccount();
   const account = data?.account;
   const isAccredited = account?.accreditation !== 'NONE';
+  const [env, setEnv] = useState('env');
+
+  useEffect(() => {
+    (async () => {
+      const currentEnv = (await AsyncStorage.getItem('env')) ?? 'dev';
+      setEnv(currentEnv);
+    })();
+  }, []);
+
   const MENU_ITEMS = [
     {
       id: 'accreditation',
@@ -223,6 +242,14 @@ const Settings: SettingsScreen = ({ navigation }) => {
     );
   };
 
+  const onEnvChange = async (): Promise<void> => {
+    const updatedEnv = env === 'staging' ? 'dev' : 'staging';
+    await AsyncStorage.setItem('env', updatedEnv);
+    setEnv(updatedEnv);
+
+    setTimeout(() => handleLogout(), 500);
+  };
+
   return (
     <View style={pStyles.globalContainer}>
       <MainHeader />
@@ -233,11 +260,31 @@ const Settings: SettingsScreen = ({ navigation }) => {
         keyExtractor={(item) => item.id}
         style={styles.flatList}
         ListFooterComponent={
-          <TouchableOpacity onPress={handleLogout}>
-            <View style={[styles.item, styles.center]}>
-              <Text style={styles.label}>Log Out</Text>
-            </View>
-          </TouchableOpacity>
+          <View>
+            {account?.superUser ? (
+              <View style={[styles.item, styles.between, styles.border]}>
+                <View style={[styles.row, styles.alignCenter]}>
+                  <Database size={26} color={WHITE} />
+                  <View style={styles.rightItem}>
+                    <Text style={styles.label}>Demo Database</Text>
+                  </View>
+                </View>
+                <View>
+                  <Switch
+                    trackColor={{ false: GRAY20, true: GREEN }}
+                    ios_backgroundColor={GRAY20}
+                    onValueChange={onEnvChange}
+                    value={env === 'staging'}
+                  />
+                </View>
+              </View>
+            ) : null}
+            <TouchableOpacity onPress={handleLogout}>
+              <View style={[styles.item, styles.center]}>
+                <Text style={styles.label}>Log Out</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         }
       />
     </View>
