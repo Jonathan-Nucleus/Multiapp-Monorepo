@@ -1,16 +1,13 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import {
   TouchableOpacity,
-  Image,
   Text,
   View,
   StyleSheet,
   Pressable,
 } from 'react-native';
-import FastImage from 'react-native-fast-image';
 
 import Avatar from 'mobile/src/components/common/Avatar';
-import Tag from 'mobile/src/components/common/Tag';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 import {
   PRIMARY,
@@ -28,6 +25,7 @@ import {
   FundSummary,
   FundManager,
   FundCompany,
+  AssetClasses,
 } from 'shared/graphql/fragments/fund';
 
 import { useFollowUser } from 'shared/graphql/mutation/account/useFollowUser';
@@ -48,6 +46,8 @@ const FundProfileInfo: FC<FundProfileInfo> = ({ fund, category }) => {
         userId: fund.manager._id,
       },
     });
+
+  const dollarFormatter = Intl.NumberFormat('en', { notation: 'compact' });
 
   return (
     <View>
@@ -85,16 +85,20 @@ const FundProfileInfo: FC<FundProfileInfo> = ({ fund, category }) => {
       <View style={styles.fundSummaryContainer}>
         <View style={[styles.fundDescriptorContainer, styles.rightSeparator]}>
           <Text style={[styles.title, styles.center]}>Asset Class</Text>
-          <Text style={[styles.whiteText, styles.center]}>Hedge Fund</Text>
+          <Text style={[styles.whiteText, styles.center]}>
+            {AssetClasses[fund.class]}
+          </Text>
         </View>
         <View style={[styles.fundDescriptorContainer]}>
           <Text style={[styles.title, styles.center]}>Strategy</Text>
-          <Text style={[styles.whiteText, styles.center]}>Multi-Strategy</Text>
+          <Text style={[styles.whiteText, styles.center]}>{fund.strategy}</Text>
         </View>
         {category !== 'equity' && (
           <View style={[styles.fundDescriptorContainer, styles.leftSeparator]}>
             <Text style={[styles.title, styles.center]}>Minimum</Text>
-            <Text style={[styles.whiteText, styles.center]}>$500K</Text>
+            <Text style={[styles.whiteText, styles.center]}>
+              ${dollarFormatter.format(fund.min)}
+            </Text>
           </View>
         )}
       </View>
@@ -134,9 +138,7 @@ const FundProfileInfo: FC<FundProfileInfo> = ({ fund, category }) => {
             </View>
           </Pressable>
         )}
-        <Text
-          style={[styles.overview, styles.whiteText, Body3]}
-          numberOfLines={2}>
+        <Text style={[styles.overview, styles.whiteText, Body3]}>
           {fund.overview}
         </Text>
       </View>

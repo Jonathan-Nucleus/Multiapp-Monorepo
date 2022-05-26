@@ -11,7 +11,6 @@ import { Body2 } from 'mobile/src/theme/fonts';
 import {
   BLACK,
   PRIMARYSTATE,
-  PRIMARYDARK,
   WHITE,
   WHITE12,
   WHITE60,

@@ -12,10 +12,15 @@ import {
   FundStatusOptions,
   DocumentCategoryOptions,
   AssetClassOptions,
+  AssetClassEnum,
 } from "../schemas/fund";
 
 type GraphQLFund = Fund.GraphQL;
-export type { GraphQLFund as Fund, AccreditationEnum as Accredidation };
+export type {
+  GraphQLFund as Fund,
+  AccreditationEnum as Accredidation,
+  AssetClassEnum as AssetClass,
+};
 
 const schema = gql`
   ${FundSchema}

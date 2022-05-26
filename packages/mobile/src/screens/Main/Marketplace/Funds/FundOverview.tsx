@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
   ViewProps,
+  Text,
 } from 'react-native';
 import { Presentation } from 'phosphor-react-native';
 import FastImage from 'react-native-fast-image';
@@ -19,8 +20,6 @@ import { Body1Bold, Body2Bold, Body3, H6Bold } from 'mobile/src/theme/fonts';
 import {
   PRIMARY,
   WHITE,
-  SUCCESS,
-  DANGER,
   GRAY100,
   WHITE12,
   BLACK,
@@ -28,6 +27,7 @@ import {
   WHITE60,
 } from 'shared/src/colors';
 
+import { AssetClasses } from 'shared/graphql/fragments/fund';
 import { FundDetails } from 'shared/graphql/query/marketplace/useFund';
 import { BACKGROUND_URL } from 'react-native-dotenv';
 
@@ -83,7 +83,8 @@ const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
     );
   };
 
-  const { background, avatar } = fund.company;
+  const { background } = fund.company;
+  const dollarFormatter = Intl.NumberFormat('en', { notation: 'compact' });
 
   return (
     <View {...viewProps} style={[styles.overviewContainer, viewProps.style]}>
@@ -106,6 +107,7 @@ const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
                 <PLabel
                   label={item}
                   viewStyle={styles.highlightLabelContainer}
+                  textStyle={styles.highlightLabel}
                 />
               </View>
             ))}
@@ -124,52 +126,73 @@ const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
         {fund.tags && fund.tags.length > 0 && (
           <View style={styles.tags}>
             {fund.tags.map((tag, index) => (
-              <Tag label={tag} viewStyle={styles.tagStyle} key={index} />
+              <React.Fragment key={tag}>
+                <Tag label={tag} viewStyle={styles.tagStyle} />
+                {index < fund.tags.length - 1 ? (
+                  <Text style={styles.tagSeparator}>•</Text>
+                ) : null}
+              </React.Fragment>
             ))}
           </View>
         )}
+      </View>
+      <View>
         <View style={styles.infoContainer}>
           <PLabel textStyle={styles.fund} label="Fund Details" />
         </View>
         <View style={styles.infoContainer}>
-          <PTitle title="Asset Class" subTitle={fund.name} flex={LEFT_FLEX} />
-          <PTitle title="Strategy" subTitle="L/S Equity" flex={RIGHT_FLEX} />
-        </View>
-        <View style={styles.infoContainer}>
-          <PTitle title="AUM" subTitle="$10M" />
-        </View>
-        <View style={styles.infoContainer}>
-          <PTitle title="Minimum Investment" subTitle="$25K" flex={LEFT_FLEX} />
-          <PTitle title="Lockup Period" subTitle="2 years" flex={RIGHT_FLEX} />
-        </View>
-        <View style={styles.infoContainer}>
-          <PTitle title="liquidity" subTitle="Quarterly w/30 days notice" />
-        </View>
-        <View style={styles.memberContainer}>
-          <PLabel label="Team Members" textStyle={styles.sectionTitle} />
-          <FlatList
-            data={fund.team}
-            keyExtractor={(item) => item._id}
-            renderItem={renderTeamMemberItem}
-            showsVerticalScrollIndicator={false}
-            horizontal={true}
+          <PTitle
+            title="Asset Class"
+            subTitle={AssetClasses[fund.class]}
+            flex={LEFT_FLEX}
           />
+          <PTitle title="Strategy" subTitle={fund.strategy} flex={RIGHT_FLEX} />
+        </View>
+        <View style={styles.infoContainer}>
+          <PTitle
+            title="AUM"
+            subTitle={`$${dollarFormatter.format(fund.aum)}`}
+          />
+        </View>
+        <View style={styles.infoContainer}>
+          <PTitle
+            title="Minimum Investment"
+            subTitle={`$${dollarFormatter.format(fund.min)}`}
+            flex={LEFT_FLEX}
+          />
+          <PTitle
+            title="Lockup Period"
+            subTitle={
+              fund.lockup === 0
+                ? 'None'
+                : `${fund.lockup} ${fund.lockup === 1 ? 'year' : 'years'}`
+            }
+            flex={RIGHT_FLEX}
+          />
+        </View>
+        <View style={styles.infoContainer}>
+          <PTitle title="liquidity" subTitle={fund.liquidity} />
         </View>
         <View style={styles.infoContainer}>
           <PLabel textStyle={styles.fund} label="Highlights" />
         </View>
-        <View style={styles.infoContainer}>
-          <PTitle
-            title="annualized volatility"
-            subTitle="2.8%"
-            flex={LEFT_FLEX}
-          />
-          <PTitle title="ARSI" subTitle="2.8%" flex={RIGHT_FLEX} />
+        <View style={styles.attributesContainer}>
+          {fund.attributes.map((attribute) => (
+            <View key={attribute.label} style={styles.attribute}>
+              <PTitle title={attribute.label} subTitle={attribute.value} />
+            </View>
+          ))}
         </View>
-        <View style={styles.infoContainer}>
-          <PTitle title="MTD Return" subTitle="3.2%" flex={LEFT_FLEX} />
-          <PTitle title="YTD Return" subTitle="3.1%" flex={RIGHT_FLEX} />
-        </View>
+      </View>
+      <View style={styles.memberContainer}>
+        <PLabel label="Team Members" textStyle={styles.sectionTitle} />
+        <FlatList
+          data={[fund.manager, ...fund.team]}
+          keyExtractor={(item) => item._id}
+          renderItem={renderTeamMemberItem}
+          showsVerticalScrollIndicator={false}
+          horizontal={true}
+        />
       </View>
     </View>
   );
@@ -199,25 +222,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     zIndex: 1,
   },
-  whiteText: {
-    color: WHITE,
-  },
-  grayText: {
-    color: GRAY100,
-  },
-  successText: {
-    color: SUCCESS,
-  },
-  dangerText: {
-    color: DANGER,
-  },
   fund: {
     marginTop: 16,
     lineHeight: 24,
     ...H6Bold,
-  },
-  overview: {
-    lineHeight: 20,
   },
   presentationContainer: {
     marginVertical: 36,
@@ -233,13 +241,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     marginVertical: 16,
+    alignItems: 'center',
   },
   tagStyle: {
-    marginRight: 8,
+    marginRight: 4,
+    backgroundColor: 'transparent',
   },
-  center: {
-    textAlign: 'center',
-    marginTop: 4,
+  tagSeparator: {
+    color: WHITE60,
+    marginRight: 4,
   },
   title: {
     textTransform: 'uppercase',
@@ -251,12 +261,15 @@ const styles = StyleSheet.create({
   infoContainer: {
     borderBottomColor: WHITE12,
     borderBottomWidth: 1,
-    paddingVertical: 16,
+    padding: 16,
     justifyContent: 'space-between',
     flexDirection: 'row',
   },
   highlightContainer: {
     marginTop: 16,
+  },
+  highlightLabel: {
+    lineHeight: 20,
   },
   highlightItem: {
     marginVertical: 3,
@@ -274,8 +287,21 @@ const styles = StyleSheet.create({
   highlightLabelContainer: {
     width: '90%',
   },
+  attributesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  attribute: {
+    flex: 1,
+    flexBasis: '50%',
+    paddingLeft: 16,
+    paddingVertical: 16,
+    borderBottomColor: WHITE12,
+    borderBottomWidth: 1,
+  },
   memberContainer: {
     marginTop: 16,
+    paddingHorizontal: 16,
   },
   memberItem: {
     borderColor: BGDARK,

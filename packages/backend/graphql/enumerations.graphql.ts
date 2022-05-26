@@ -5,6 +5,8 @@ import {
   PostCategoryEnum,
 } from "../schemas/post";
 
+import { AssetClassOptions, AssetClassEnum } from "../schemas/fund";
+
 import { NotificationMethodOptions } from "../schemas/user";
 
 import {
@@ -26,6 +28,13 @@ export const PostCategories = Object.keys(PostCategoryOptions).reduce(
     return acc;
   },
   {} as Record<PostCategoryEnum, string>
+);
+export const AssetClasses = Object.keys(AssetClassOptions).reduce(
+  (acc, assetClass) => {
+    acc[assetClass] = AssetClassOptions[assetClass].label;
+    return acc;
+  },
+  {} as Record<AssetClassEnum, string>
 );
 
 const orderedInvestorClassOptions: InvestorClassEnum[] = [

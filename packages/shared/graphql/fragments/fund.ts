@@ -1,21 +1,32 @@
 import { gql } from "@apollo/client";
-import { Fund, Accredidation } from "backend/graphql/funds.graphql";
+import { Fund, Accredidation, AssetClass } from "backend/graphql/funds.graphql";
+import { AssetClasses } from "backend/graphql/enumerations.graphql";
 
-export type { Accredidation };
+export type { Accredidation, AssetClass };
+export { AssetClasses };
 
 export type FundSummary = Pick<
   Fund,
-  "_id" | "name" | "status" | "highlights" | "overview" | "tags"
+  | "_id"
+  | "name"
+  | "class"
+  | "status"
+  | "highlights"
+  | "overview"
+  | "strategy"
+  | "min"
 >;
 
 export const FUND_SUMMARY_FRAGMENT = gql`
   fragment FundSummaryFields on Fund {
     _id
     name
+    class
     status
+    min
+    strategy
     highlights
     overview
-    tags
   }
 `;
 
