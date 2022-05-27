@@ -14,6 +14,7 @@ export { PostCategories };
 type UploadLinkVariables = {
   localFilename: string;
   type: MediaType;
+  id: string;
 };
 
 type UploadLinkData = {
@@ -30,8 +31,8 @@ export function useFetchUploadLink(): MutationTuple<
   UploadLinkVariables
 > {
   return useMutation<UploadLinkData, UploadLinkVariables>(gql`
-    mutation UploadLink($localFilename: String!, $type: MediaType!) {
-      uploadLink(localFilename: $localFilename, type: $type) {
+    mutation UploadLink($localFilename: String!, $type: MediaType!, $id: ID!) {
+      uploadLink(localFilename: $localFilename, type: $type, id: $id) {
         remoteName
         uploadUrl
       }

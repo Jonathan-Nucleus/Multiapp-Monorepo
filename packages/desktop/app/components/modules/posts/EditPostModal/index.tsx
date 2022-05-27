@@ -297,6 +297,8 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
   };
 
   const uploadMedia = async (file: File): Promise<string | undefined> => {
+    if (!account) return;
+
     setLoading(true);
     setLocalFileUrl(URL.createObjectURL(file));
 
@@ -304,6 +306,7 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
       variables: {
         localFilename: file.name,
         type: "POST",
+        id: account._id,
       },
     });
 

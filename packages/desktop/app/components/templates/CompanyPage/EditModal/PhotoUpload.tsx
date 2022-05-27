@@ -40,6 +40,7 @@ const PhotoUploadModal: FC<PhotoUploadProps> = ({
         variables: {
           localFilename: file.name,
           type: type,
+          id: company._id,
         },
       });
 

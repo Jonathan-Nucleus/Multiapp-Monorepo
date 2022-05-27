@@ -43,6 +43,7 @@ const EditMediaModal: FC<EditMediaModalProps> = ({
         variables: {
           localFilename: file.name,
           type: type,
+          id: user._id,
         },
       });
 
@@ -94,8 +95,7 @@ const EditMediaModal: FC<EditMediaModalProps> = ({
       setLoading(false);
       setLocalFileUrl(null);
       onClose();
-    } catch (err) {
-    }
+    } catch (err) {}
   };
 
   return (

@@ -18,14 +18,15 @@ export interface RemoteUpload {
 
 export async function getUploadUrl(
   fileExt: string,
-  type: "avatar" | "post" | "background"
+  type: "avatar" | "post" | "background" | "fund",
+  id: string
 ): Promise<RemoteUpload> {
   if (!AWS_UPLOAD_REGION || !S3_BUCKET) {
     throw new InternalServerError("Missing AWS configuration");
   }
 
   const remoteFilename = `${uuid()}.${fileExt}`;
-  const remoteKey = `${type}s/${remoteFilename}`;
+  const remoteKey = `${type}s/${id}/${remoteFilename}`;
 
   const client = new S3Client({
     region: AWS_UPLOAD_REGION,

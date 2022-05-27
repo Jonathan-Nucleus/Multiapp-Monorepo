@@ -80,6 +80,7 @@ const EditCompanyPhoto: EditCompanyPhotoScreen = ({ navigation, route }) => {
         variables: {
           localFilename: imageData?.filename,
           type,
+          id: company._id,
         },
       });
 

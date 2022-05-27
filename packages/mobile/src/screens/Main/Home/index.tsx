@@ -67,6 +67,8 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
   const account = userData?.account;
   const postData = data?.posts ?? [];
 
+  console.log('POSTS', postData.length);
+
   if (!postData || !account) {
     return (
       <View style={pStyles.globalContainer}>

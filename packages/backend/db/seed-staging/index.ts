@@ -44,6 +44,7 @@ const seedDb = async (): Promise<void> => {
           email: `jeff.brines+${fundData.manager.firstName.toLowerCase()}.${fundData.manager.lastName.toLowerCase()}@gmail.com`,
           fullName: `${fundData.manager.firstName} ${fundData.manager.lastName}`,
           password: hashPassword("pro-ignite-pass", salt),
+          managedFundsIds: [fundId],
           ...fundData.manager,
         };
 
@@ -56,6 +57,7 @@ const seedDb = async (): Promise<void> => {
           email: `jeff.brines+${member.firstName.toLowerCase()}.${member.lastName.toLowerCase()}@gmail.com`,
           fullName: `${member.firstName} ${member.lastName}`,
           password: hashPassword("pro-ignite-pass", salt),
+          managedFundsIds: [fundId],
           ...member,
         }));
 

@@ -76,7 +76,7 @@ const schema = gql`
     comment(comment: CommentInput!): Comment
     editComment(comment: CommentUpdate!): Comment
     deleteComment(commentId: ID!): Boolean
-    uploadLink(localFilename: String!, type: MediaType!): MediaUpload
+    uploadLink(localFilename: String!, type: MediaType!, id: ID!): MediaUpload
     saveQuestionnaire(questionnaire: QuestionnaireInput!): User
     proRequest(request: ProRequestInput!): Boolean
 
@@ -115,11 +115,12 @@ const schema = gql`
     POST
     AVATAR
     BACKGROUND
+    FUND
   }
 `;
 
 export type MediaUpload = RemoteUpload;
-export type MediaType = "POST" | "AVATAR" | "BACKGROUND";
+export type MediaType = "POST" | "AVATAR" | "BACKGROUND" | "FUND";
 
 type FollowUserResult = {
   account?: User.Mongo;
@@ -659,11 +660,13 @@ const resolvers = {
         // Send Notification
         const postData = await db.posts.create(post, user._id);
         const mentionIds = postData?.mentionIds ?? [];
-        await Promise.all(mentionIds.map((mentionId) => {
-          return db.notifications.create(user, "tagged-in-post", mentionId, {
-            postId: postData._id,
-          });
-        }));
+        await Promise.all(
+          mentionIds.map((mentionId) => {
+            return db.notifications.create(user, "tagged-in-post", mentionId, {
+              postId: postData._id,
+            });
+          })
+        );
 
         return postData;
       }
@@ -1079,11 +1082,18 @@ const resolvers = {
         });
 
         const mentionIds = newComment?.mentionIds ?? [];
-        await Promise.all(mentionIds.map((mentionId) => {
-          return db.notifications.create(user, "tagged-in-comment", mentionId, {
-            commentId: newComment._id,
-          });
-        }));
+        await Promise.all(
+          mentionIds.map((mentionId) => {
+            return db.notifications.create(
+              user,
+              "tagged-in-comment",
+              mentionId,
+              {
+                commentId: newComment._id,
+              }
+            );
+          })
+        );
 
         return newComment;
       }
@@ -1156,26 +1166,31 @@ const resolvers = {
     uploadLink: secureEndpoint(
       async (
         parentIgnored,
-        args: { localFilename: string; type: MediaType }
+        args: { localFilename: string; type: MediaType; id: string }
       ): Promise<RemoteUpload | null> => {
         const validator = yup
           .object()
           .shape({
             localFilename: yup.string().required(),
-            type: yup.string().oneOf(["POST", "AVATAR", "BACKGROUND"]),
+            type: yup.string().oneOf(["POST", "AVATAR", "BACKGROUND", "FUND"]),
+            id: yup.string().required().test({
+              test: isObjectId,
+              message: "Invalid id",
+            }),
           })
           .required();
 
         validateArgs(validator, args);
 
-        const { localFilename, type } = args;
+        const { localFilename, type, id } = args;
 
         const fileExt = localFilename.substring(
           localFilename.lastIndexOf(".") + 1
         );
         const uploadInfo = await getUploadUrl(
           fileExt,
-          type.toLowerCase() as Lowercase<MediaType>
+          type.toLowerCase() as Lowercase<MediaType>,
+          id
         );
         return uploadInfo;
       }

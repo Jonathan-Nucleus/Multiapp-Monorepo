@@ -50,12 +50,15 @@ const SendMessage: FC<SendMessageProps> = ({
   };
 
   const uploadMedia = async (file: File): Promise<string | undefined> => {
+    if (!user) return;
+
     setLoading(true);
     try {
       const { data } = await fetchUploadLink({
         variables: {
           localFilename: file.name,
           type: "POST",
+          id: user._id,
         },
       });
       if (!data || !data.uploadLink) {

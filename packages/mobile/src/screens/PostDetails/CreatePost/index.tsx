@@ -59,8 +59,8 @@ import {
 } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { useAccount } from 'shared/graphql/query/account/useAccount';
 import { useFetchUploadLink } from 'shared/graphql/mutation/posts';
+import { useAccountContext } from 'shared/context/Account';
 
 import type { Audience } from 'shared/graphql/query/post/usePosts';
 import { Audiences } from 'backend/graphql/enumerations.graphql';
@@ -172,7 +172,7 @@ const schema = yup
 const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   const { post } = route.params;
 
-  const { data: { account } = {} } = useAccount({ fetchPolicy: 'cache-only' });
+  const account = useAccountContext();
   const [fetchUploadLink] = useFetchUploadLink();
 
   const [keyboardShowing, setKeyboardShowing] = useState(false);
@@ -304,6 +304,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       variables: {
         localFilename: filename,
         type: 'POST',
+        id: account._id,
       },
     });
 

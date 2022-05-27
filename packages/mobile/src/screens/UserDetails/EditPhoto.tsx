@@ -77,6 +77,7 @@ const EditPhoto: EditUserPhotoScreen = ({ navigation, route }) => {
         variables: {
           localFilename: imageData?.filename,
           type,
+          id: user._id,
         },
       });
 

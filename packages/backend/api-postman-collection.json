@@ -2,7 +2,8 @@
 	"info": {
 		"_postman_id": "e51c092e-9774-4a17-a93a-934e3da708d9",
 		"name": "Prometheus API",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20095490"
 	},
 	"item": [
 		{
@@ -111,22 +112,12 @@
 				{
 					"name": "Funds",
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU4MDc2OWJjOGE3MDFkYjJkNjFiMTMiLCJyb2xlIjoidXNlciIsImFjYyI6Im5vbmUiLCJpYXQiOjE2NDk5MzYzMzB9.mlZBY5TUdliHkrEkRxYkjXSvEh5fVW88kmYMiMiTGSk",
-									"type": "string"
-								}
-							]
-						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query Funds {\n  funds {\n        _id\n        name\n        level\n        status\n        overview\n        tags\n        background {\n          url\n          x\n          y\n          width\n          height\n          scale\n        }\n        manager {\n          _id\n          firstName\n          lastName\n          avatar\n          followerIds\n          postIds\n        }\n        company {\n          _id\n          name\n        }\n      }\n}",
+								"query": "query Funds {\n  funds {\n        _id\n        name\n        level\n        class\n        status\n        overview\n        tags\n        manager {\n          _id\n          firstName\n          lastName\n          avatar\n          followerIds\n          postIds\n        }\n        company {\n          _id\n          name\n        }\n      }\n}",
 								"variables": ""
 							}
 						},
@@ -157,7 +148,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query Fund($fundId: ID!) {\n  fund(fundId: $fundId) {\n        _id\n        name       \n        manager {\n          _id\n          firstName\n          lastName\n          avatar\n        }\n        company {\n          _id\n          name\n          avatar          \n        }\n      }\n}",
+								"query": "query Fund($fundId: ID!) {\n  fund(fundId: $fundId) {\n        _id\n        name\n        aum\n        min\n        lockup\n        strategy\n        liquidity\n        fees {\n            label\n            value\n        }\n        attributes {\n            label\n            value\n        }\n        tags\n        metrics {\n            date\n            figure\n        }       \n        manager {\n          _id\n          firstName\n          lastName\n          avatar\n        }\n        company {\n          _id\n          name\n          avatar          \n        }\n      }\n}",
 								"variables": "{\n    \"fundId\": \"6258071f0dbb6820e20f9b15\"\n}"
 							}
 						},
@@ -407,7 +398,7 @@
 									"mode": "graphql",
 									"graphql": {
 										"query": "mutation RequestInvite($email: String!) {\n  requestInvite(email: $email)\n}",
-										"variables": "{\n  \"email\": \"darash.desai+test@gmail.com\"\n}"
+										"variables": "{\n  \"email\": \"pblankemeyer93@me.com\"\n}"
 									}
 								},
 								"url": {
@@ -873,8 +864,8 @@
 								"body": {
 									"mode": "graphql",
 									"graphql": {
-										"query": "mutation UploadLink($localFilename: String!, $type: MediaType!) {\n    uploadLink(localFilename: $localFilename, type: $type) {\n        remoteName\n        uploadUrl\n    }\n}",
-										"variables": "{\n    \"localFilename\": \"test.jpg\",\n    \"type\": \"BACKGROUND\"\n}"
+										"query": "mutation UploadLink($localFilename: String!, $type: MediaType!, $id: ID!) {\n    uploadLink(localFilename: $localFilename, type: $type, id: $id) {\n        remoteName\n        uploadUrl\n    }\n}",
+										"variables": "{\n    \"localFilename\": \"test.jpg\",\n    \"type\": \"BACKGROUND\",\n    \"id\": \"000000000000\"\n}"
 									}
 								},
 								"url": {
@@ -1329,7 +1320,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjdlYTk0ODczZTgyMTVkZmE4YjA2MjkiLCJyb2xlIjoidXNlciIsImFjYyI6InB1cmNoYXNlciIsImlhdCI6MTY1MjYzNDgzN30.kIioX8twcaIOXClaOmPJe6yS-FP4HDm0InXovxaZZTE",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjdlYTk0ODczZTgyMTVkZmE4YjA2MjkiLCJyb2xlIjoidXNlciIsImFjYyI6InB1cmNoYXNlciIsImlhdCI6MTY1MzY4MDUwN30.Jl4SwL_PLnRyXgBNICjITiKf7xluHaW4xC1_k5gWIGM",
 				"type": "string"
 			}
 		]

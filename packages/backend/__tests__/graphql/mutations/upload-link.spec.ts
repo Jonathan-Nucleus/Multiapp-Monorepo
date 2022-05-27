@@ -5,14 +5,15 @@ import { createTestApolloServer } from "../../../lib/server";
 import { ErrorCode } from "../../../lib/validate";
 import { User } from "../../../schemas/user";
 import { createUser, getErrorCode, getFieldError } from "../../config/utils";
+import { toObjectId } from "../../../lib/mongo-helper";
 
 jest.mock("@aws-sdk/client-s3");
 jest.mock("@aws-sdk/s3-request-presigner");
 
 describe("Mutations - uploadLink", () => {
   const query = gql`
-    mutation UploadLink($localFilename: String!, $type: MediaType!) {
-      uploadLink(localFilename: $localFilename, type: $type) {
+    mutation UploadLink($localFilename: String!, $type: MediaType!, $id: ID!) {
+      uploadLink(localFilename: $localFilename, type: $type, id: $id) {
         remoteName
         uploadUrl
       }
@@ -25,6 +26,7 @@ describe("Mutations - uploadLink", () => {
   const fileData = {
     localFilename: faker.system.commonFileName(fileExt),
     type: "AVATAR",
+    id: toObjectId().toString(),
   };
 
   beforeAll(async () => {
