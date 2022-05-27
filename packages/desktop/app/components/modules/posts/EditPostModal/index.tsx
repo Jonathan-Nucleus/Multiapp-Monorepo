@@ -11,8 +11,6 @@ import {
   XCircle,
 } from "phosphor-react";
 import Image from "next/image";
-import { Picker } from "emoji-mart";
-import "emoji-mart/css/emoji-mart.css";
 
 import CategorySelector, { categoriesSchema } from "./CategorySelector";
 import Avatar from "desktop/app/components/common/Avatar";
@@ -44,9 +42,10 @@ import { PostSummary } from "shared/graphql/fragments/post";
 import { useEditPost } from "shared/graphql/mutation/posts/useEditPost";
 import ModalDialog from "../../../common/ModalDialog";
 import { useAccount } from "shared/graphql/query/account/useAccount";
-import { LINK_PATTERN } from "shared/src/patterns";
+import { hrefFromLink, isWebLink, LINK_PATTERN } from "shared/src/patterns";
 import LinkPreview from "../LinkPreview";
 import _ from "lodash";
+import EmojiPicker from "../../../common/EmojiPicker";
 
 const audienceOptions = [
   {
@@ -137,7 +136,9 @@ interface EditPostModalProps {
 
 const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
   const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
-  const [userOptions, setUserOptions] = useState<DropdownProps["items"][number][]>([]);
+  const [userOptions, setUserOptions] = useState<
+    DropdownProps["items"][number][]
+  >([]);
   const selectedFile = useRef<File | undefined>(undefined);
   const [localFileUrl, setLocalFileUrl] = useState<string | null>(null);
   const [showCategories, setShowCategories] = useState(!!post);
@@ -147,22 +148,38 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [visibleEmoji, setVisibleEmoji] = useState(false);
   const [linkPreview, setLinkPreview] = useState<string>();
-  const changeCallback = useRef(_.debounce((body: string | undefined) => {
-    if (!body) {
-      setLinkPreview(undefined);
-      return;
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => {
+    // Should focus textarea automatically when component mounted.
+    // currently we are using setTimeout since focus() method does not work
+    // when click to open from "Edit Post" button menu.
+    // #headlessui, #menu, #https://blog.maisie.ink/react-ref-autofocus/
+    if (inputRef?.current) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
     }
-    const result = body.matchAll(LINK_PATTERN);
-    const matches = Array.from(result);
-    if (matches.length > 0) {
-      const link = matches[0][0];
-      if (link != linkPreview) {
-        setLinkPreview(link);
+  }, []);
+  const changeCallback = useRef(
+    _.debounce((body: string | undefined) => {
+      if (!body) {
+        setLinkPreview(undefined);
+        return;
       }
-    } else {
-      setLinkPreview(undefined);
-    }
-  }, 500)).current;
+      const result = body.matchAll(LINK_PATTERN);
+      const matches = Array.from(result);
+      if (matches.length > 0) {
+        const validLink = matches
+          .map((match) => match[0])
+          .find((link) => isWebLink(link));
+        if (validLink && validLink != linkPreview) {
+          setLinkPreview(hrefFromLink(validLink));
+        }
+      } else {
+        setLinkPreview(undefined);
+      }
+    }, 500)
+  ).current;
   const {
     handleSubmit,
     control,
@@ -179,44 +196,48 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
 
   useEffect(() => {
     if (account) {
-      setUserOptions([
-        {
-          icon: <User color="currentColor" weight="fill" size={24} />,
-          title: `${account.firstName} ${account.lastName}`,
-          value: account._id,
-        },
-        ...account.companies.map((company) => ({
-          icon: <Buildings color="currentColor" weight="fill" size={24} />,
-          title: company.name,
-          value: company._id,
-        })),
-      ]);
+      if (account.companies.length > 0) {
+        setUserOptions([
+          {
+            icon: <User color="currentColor" weight="fill" size={24} />,
+            title: `${account.firstName} ${account.lastName}`,
+            value: account._id,
+          },
+          ...account.companies.map((company) => ({
+            icon: <Buildings color="currentColor" weight="fill" size={24} />,
+            title: company.name,
+            value: company._id,
+          })),
+        ]);
+      }
       if (post) {
         reset(
           schema.cast({
             user: account._id == post.userId ? account._id : post.userId,
-            media: post.media ?? "",
+            media: post.media ?? undefined,
             categories: post.categories,
             mentionInput: {
               body: post.body,
             },
-          }) as DefaultValues<FormValues>,
+          }) as DefaultValues<FormValues>
         );
         setLocalFileUrl(
           post.media
             ? `${process.env.NEXT_PUBLIC_POST_URL}/${post.media.url}`
-            : null,
+            : null
         );
+        changeCallback(post.body);
       } else {
         reset(schema.cast({ user: account._id }) as DefaultValues<FormValues>);
       }
     }
-  }, [account, post, reset]);
+  }, [account, changeCallback, post, reset]);
 
   const onEmojiClick = (emojiObject: any) => {
     const body = getValues("mentionInput.body");
     setValue("mentionInput.body", body + emojiObject.native);
     setVisibleEmoji(false);
+    inputRef?.current?.focus();
   };
 
   useEffect(() => {
@@ -325,9 +346,15 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
             <div className="flex flex-col md:w-[40rem] relative">
               <div className="flex flex-wrap items-center p-4">
                 <Avatar size={56} user={account} />
-                <div className="ml-2">
-                  <Dropdown items={userOptions} control={control} name="user" />
-                </div>
+                {userOptions.length > 0 && (
+                  <div className="ml-2">
+                    <Dropdown
+                      items={userOptions}
+                      control={control}
+                      name="user"
+                    />
+                  </div>
+                )}
                 <div className="ml-2">
                   <Dropdown
                     items={audienceOptions}
@@ -337,13 +364,17 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
                 </div>
               </div>
               <div className="mx-4 mt-2 caret-primary min-h-0 flex-grow">
-                <MentionTextarea control={control} name="mentionInput" />
+                <MentionTextarea
+                  inputRef={inputRef}
+                  control={control}
+                  name="mentionInput"
+                />
               </div>
-              {linkPreview &&
+              {linkPreview && (
                 <div className="mx-4 my-2">
                   <LinkPreview link={linkPreview} size="sm" />
                 </div>
-              }
+              )}
               {localFileUrl && (
                 <div className="my-2">
                   <div className="relative px-4">
@@ -441,8 +472,8 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
                 </div>
               </div>
               {visibleEmoji && (
-                <div className="absolute bottom-8 z-50">
-                  <Picker onSelect={onEmojiClick} style={{ width: "100%" }} />
+                <div className="absolute left-10 bottom-10 z-20">
+                  <EmojiPicker onSelect={onEmojiClick} />
                 </div>
               )}
             </div>

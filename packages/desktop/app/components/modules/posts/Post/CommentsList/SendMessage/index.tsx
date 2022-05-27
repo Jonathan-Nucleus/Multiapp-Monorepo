@@ -1,15 +1,16 @@
 import React, { FC, useRef, useState } from "react";
 import { Image as PhotoImage, PaperPlaneRight, Smiley } from "phosphor-react";
-import { Picker } from "emoji-mart";
 import { useFetchUploadLink } from "shared/graphql/mutation/posts";
-import "emoji-mart/css/emoji-mart.css";
 
-import Button from "../Button";
-import Avatar from "../Avatar";
-import Input from "../Input";
+import Button from "../../../../../common/Button";
+import Avatar from "../../../../../common/Avatar";
+import Input from "../../../../../common/Input";
 import { UserSummary } from "shared/graphql/fragments/user";
+import EmojiPicker from "../../../../../common/EmojiPicker";
+import Label from "../../../../../common/Label";
 
 type User = UserSummary;
+
 interface SendMessageProps {
   user?: User;
   avatarSize?: number;
@@ -30,6 +31,7 @@ const SendMessage: FC<SendMessageProps> = ({
   const [visibleEmoji, setVisibleEmoji] = useState(false);
   const [loading, setLoading] = useState(false);
   const selectedFile = useRef<File | undefined>(undefined);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const sendMessage = async (): Promise<void> => {
     if ((!comment || comment.trim() === "") && !selectedFile.current) return;
@@ -42,7 +44,9 @@ const SendMessage: FC<SendMessageProps> = ({
   };
 
   const onEmojiClick = (emojiObject: any) => {
-    setComment(comment + " " + emojiObject.native + " ");
+    setComment(comment + emojiObject.native);
+    setVisibleEmoji(false);
+    inputRef?.current?.focus();
   };
 
   const uploadMedia = async (file: File): Promise<string | undefined> => {
@@ -76,55 +80,56 @@ const SendMessage: FC<SendMessageProps> = ({
 
   return (
     <div className="relative">
-      <div className="flex items-center">
+      <div className="flex items-center py-3">
         <Avatar user={user} size={avatarSize} />
-        <div className="flex items-center justify-between p-4 flex-1 relative">
+        <div className="flex items-center justify-between flex-1 relative mx-2">
           <Input
+            ref={inputRef}
             placeholder={placeholder}
-            className="bg-background-DEFAULT pr-16 pl-4 text-sm font-light tracking-wide"
-            shape="pill"
+            className="bg-background pl-4 pr-16 text-xs font-light !rounded-full"
             value={comment}
-            onChange={(event) => {
-              setComment(event.currentTarget.value);
-            }}
+            onChange={(event) => setComment(event.currentTarget.value)}
           />
           <Button
             variant="text"
-            className="absolute right-14"
+            className="absolute right-10"
             onClick={() => setVisibleEmoji(!visibleEmoji)}
           >
             <Smiley size={20} color="#00AAE0" weight="fill" />
           </Button>
-          <div className="absolute right-8 cursor-pointer">
-            <div className="relative">
-              <Button variant="text">
-                <PhotoImage size={20} color="#00AAE0" weight="fill" />
-              </Button>
-              <Input
-                id="image-select"
-                type="file"
-                value=""
-                onInput={async (evt) => {
-                  selectedFile.current = evt.currentTarget.files?.[0];
-                }}
-                accept="image/*, video/*"
-                className="w-2 h-2 absolute right-0 top-3 opacity-0 cursor-pointer"
+          <div className="absolute right-4 cursor-pointer">
+            <Label htmlFor="image-select" className="hover:opacity-80">
+              <PhotoImage
+                size={20}
+                color="currentColor"
+                weight="fill"
+                className="text-primary"
               />
-            </div>
+            </Label>
+            <Input
+              id="image-select"
+              type="file"
+              value=""
+              onInput={async (evt) => {
+                selectedFile.current = evt.currentTarget.files?.[0];
+              }}
+              accept="image/*, video/*"
+              className="hidden"
+            />
           </div>
         </div>
         <Button
           variant="text"
           className="flex-shrink-0"
-          loading={loading}
+          disabled={loading}
           onClick={sendMessage}
         >
           <PaperPlaneRight size={32} />
         </Button>
       </div>
       {visibleEmoji && (
-        <div className="absolute right-0 w-full z-50">
-          <Picker onSelect={onEmojiClick} style={{ width: "100%" }} />
+        <div className="absolute right-10 z-50">
+          <EmojiPicker onSelect={onEmojiClick} />
         </div>
       )}
     </div>

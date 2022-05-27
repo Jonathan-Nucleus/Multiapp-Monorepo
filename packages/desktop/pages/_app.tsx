@@ -2,8 +2,7 @@ import "../app/styles/app.scss";
 import type { AppProps } from "next/app";
 
 import RootLayout from "../app/components/layouts/index";
-import SecureApolloProvider
-  from "../app/components/providers/SecureApolloProvider";
+import SecureApolloProvider from "../app/components/providers/SecureApolloProvider";
 import { ThemeProvider } from "next-themes";
 import { SessionProvider } from "next-auth/react";
 import { NextPageWithLayout } from "../app/types/next-page";

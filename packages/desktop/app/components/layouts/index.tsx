@@ -1,19 +1,21 @@
 import { FC, PropsWithChildren, useEffect, useState } from "react";
 import NextNProgress from "nextjs-progressbar";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import AppAuthOptions from "../../config/auth";
 import { AppPageProps } from "../../types/next-page";
 import AuthLayout from "./AuthLayout";
 import MainLayout from "./MainLayout";
 import Background from "./Background";
+import { Toaster } from "react-hot-toast";
+import { AccountProvider } from "shared/context/Account";
 
 type RootLayoutProps = PropsWithChildren<AppPageProps>;
 
 const RootLayout: FC<RootLayoutProps> = ({
   middleware,
   layout,
-  background = (layout == "auth" ? "radial" : "default"),
+  background = layout == "auth" ? "radial" : "default",
   children,
 }: RootLayoutProps) => {
   const { status } = useSession();
@@ -40,11 +42,21 @@ const RootLayout: FC<RootLayoutProps> = ({
     }
     if (middleware == "auth" && status == "unauthenticated") {
       router.replace(
-        `${AppAuthOptions.pages?.signIn}?redirect=${router.asPath}`,
+        `${AppAuthOptions.pages?.signIn}?redirect=${router.asPath}`
       );
       return <></>;
     }
   }
+  const appContent = (
+    <Background type={background}>
+      {layout == "auth" && <AuthLayout>{children}</AuthLayout>}
+      {layout == "main" && <MainLayout fluid={false}>{children}</MainLayout>}
+      {layout == "main-fluid" && (
+        <MainLayout fluid={true}>{children}</MainLayout>
+      )}
+      {layout == undefined && children}
+    </Background>
+  );
   return (
     <>
       <NextNProgress
@@ -56,23 +68,21 @@ const RootLayout: FC<RootLayoutProps> = ({
         options={{ easing: "ease", speed: 500, showSpinner: false }}
         nonce=""
       />
+      <Toaster />
       <main>
-        {(status == "loading" || routeChangeStarted) ?
+        {status == "loading" || routeChangeStarted ? (
           <></>
-          :
-          <Background type={background}>
-            {layout == "auth" &&
-              <AuthLayout>{children}</AuthLayout>
-            }
-            {layout == "main" &&
-              <MainLayout fluid={false}>{children}</MainLayout>
-            }
-            {layout == "main-fluid" &&
-              <MainLayout fluid={true}>{children}</MainLayout>
-            }
-            {layout == undefined && children}
-          </Background>
-        }
+        ) : (
+          <>
+            {middleware == "auth" ? (
+              <AccountProvider onUnauthenticated={async () => await signOut()}>
+                {appContent}
+              </AccountProvider>
+            ) : (
+              appContent
+            )}
+          </>
+        )}
       </main>
     </>
   );

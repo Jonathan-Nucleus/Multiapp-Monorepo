@@ -1,17 +1,13 @@
 import React, { FC } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { Share, Star } from "phosphor-react";
+import { Star } from "phosphor-react";
 import { useAccount } from "shared/graphql/query/account/useAccount";
 import { useWatchFund } from "shared/graphql/mutation/funds/useWatchFund";
 import { useFollowUser } from "shared/graphql/mutation/account/useFollowUser";
-import {
-  useFollowCompany,
-} from "shared/graphql/mutation/account/useFollowCompany";
+import { useFollowCompany } from "shared/graphql/mutation/account/useFollowCompany";
 import { Fund } from "shared/graphql/query/marketplace/useFunds";
 import Avatar from "desktop/app/components/common/Avatar";
 import Button from "desktop/app/components/common/Button";
-import Card from "desktop/app/components/common/Card";
 
 export interface FundCardProps {
   fund: Fund;
@@ -25,14 +21,10 @@ const FundCard: FC<FundCardProps> = ({
   profileType,
 }: FundCardProps) => {
   const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
-  const {
-    isFollowing: isFollowingManager,
-    toggleFollow: toggleFollowManager,
-  } = useFollowUser(fund.manager._id);
-  const {
-    isFollowing: isFollowingCompany,
-    toggleFollow: toggleFollowCompany,
-  } = useFollowCompany(fund.company._id);
+  const { isFollowing: isFollowingManager, toggleFollow: toggleFollowManager } =
+    useFollowUser(fund.manager._id);
+  const { isFollowing: isFollowingCompany, toggleFollow: toggleFollowCompany } =
+    useFollowCompany(fund.company._id);
   const { isWatching, toggleWatch } = useWatchFund(fund._id);
   const isMyFund = account?._id == fund.manager._id;
 
@@ -140,7 +132,9 @@ const FundCard: FC<FundCardProps> = ({
                 {fund.manager.postIds?.length ?? 0} Posts
               </div>
               <div className="text-center min-h-0 flex-grow mb-2">
-                <div className={(isMyFund || isFollowingManager) ? "invisible" : ""}>
+                <div
+                  className={isMyFund || isFollowingManager ? "invisible" : ""}
+                >
                   <Button
                     variant="text"
                     className="text-sm text-primary tracking-normal font-normal"
@@ -212,11 +206,7 @@ const FundCard: FC<FundCardProps> = ({
         <div className="flex items-center py-3">
           <Link href={`/company/${fund.company._id}`}>
             <a className="ml-4">
-              <Avatar
-                user={fund.company}
-                shape="square"
-                size={64}
-              />
+              <Avatar user={fund.company} shape="square" size={64} />
             </a>
           </Link>
           <Link href={`/company/${fund.company._id}`}>
@@ -259,9 +249,7 @@ const FundCard: FC<FundCardProps> = ({
             </Link>
           </div>
         </div>
-        <div className="text-xs text-white ml-5 mr-3 mt-4">
-          {fund.overview}
-        </div>
+        <div className="text-xs text-white ml-5 mr-3 mt-4">{fund.overview}</div>
         <div className="flex items-center mx-5 my-4">
           <div className="flex-grow">
             <Link href={`/funds/${fund._id}`}>

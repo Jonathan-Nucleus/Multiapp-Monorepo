@@ -21,6 +21,8 @@ export type PostsData = {
 type PostsVariables = {
   categories?: PostCategory[];
   roleFilter?: PostRoleFilter;
+  before?: string;
+  limit?: number;
 };
 
 /**
@@ -30,14 +32,26 @@ type PostsVariables = {
  */
 export function usePosts(
   categories?: PostCategory[],
-  roleFilter?: PostRoleFilter
+  roleFilter?: PostRoleFilter,
+  before?: string,
+  limit = 15
 ): QueryResult<PostsData, PostsVariables> {
   const [state, setState] = useState<PostsData>();
   const { data, loading, ...rest } = useQuery<PostsData, PostsVariables>(
     gql`
       ${POST_SUMMARY_FRAGMENT}
-      query Posts($categories: [PostCategory!], $roleFilter: PostRoleFilter) {
-        posts(categories: $categories, roleFilter: $roleFilter) {
+      query Posts(
+        $categories: [PostCategory!]
+        $roleFilter: PostRoleFilter
+        $before: ID
+        $limit: Int
+      ) {
+        posts(
+          categories: $categories
+          roleFilter: $roleFilter
+          before: $before
+          limit: $limit
+        ) {
           ...PostSummaryFields
           sharedPost {
             ...PostSummaryFields
@@ -49,8 +63,10 @@ export function usePosts(
       variables: {
         ...(categories ? { categories } : {}),
         ...(roleFilter ? { roleFilter } : {}),
+        before,
+        limit,
       },
-      fetchPolicy: "cache-and-network"
+      fetchPolicy: "cache-and-network",
     }
   );
 

@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { PostSummary } from "shared/graphql/fragments/post";
 import PostsList from "../../../modules/posts/PostsList";
 import EditPostModal from "../../../modules/posts/EditPostModal";
@@ -6,12 +6,52 @@ import AddPost from "../AddPost";
 import { UserProfileProps } from "../../../../types/common-props";
 import Button from "../../../common/Button";
 import { Plus } from "phosphor-react";
-import { usePosts } from "shared/graphql/query/post/usePosts";
+import { Post, usePosts } from "shared/graphql/query/post/usePosts";
+import _ from "lodash";
+import Spinner from "../../../common/Spinner";
+
+const POSTS_PER_SCROLL = 15;
+const SCROLL_OFFSET_THRESHOLD = 100;
+const FETCH_DEBOUNCE_INTERVAL = 100;
 
 const PostsSection: FC<UserProfileProps> = ({ user }) => {
-  const { data: { posts = [] } = {}, refetch } = usePosts();
+  const [limit, setLimit] = useState(POSTS_PER_SCROLL);
+  const {
+    data: { posts } = {},
+    loading,
+    refetch,
+    fetchMore,
+  } = usePosts(undefined, undefined, undefined, limit);
   const [showPostModal, setShowPostModal] = useState(false);
   const [selectedPost, setSelectedPost] = useState<PostSummary>();
+  const scrollCallback = useRef(
+    _.debounce(async (posts?: Post[]) => {
+      const lastItem = _.last(posts)?._id;
+      fetchMore({
+        variables: {
+          before: lastItem,
+          limit: POSTS_PER_SCROLL,
+        },
+      }).then(({ data: { posts: newPosts = [] } }) => {
+        setLimit((posts?.length ?? 0) + newPosts.length);
+      });
+    }, FETCH_DEBOUNCE_INTERVAL)
+  ).current;
+  useEffect(() => {
+    const handleScroll = (event: Event) => {
+      const target = event.target;
+      if (target && target instanceof HTMLElement) {
+        if (
+          target.clientHeight + target.scrollTop >
+          target.scrollHeight - SCROLL_OFFSET_THRESHOLD
+        ) {
+          scrollCallback(posts);
+        }
+      }
+    };
+    document.addEventListener("scroll", handleScroll, true);
+    return () => document.removeEventListener("wheel", handleScroll);
+  }, [posts, scrollCallback]);
   return (
     <>
       <div className="hidden md:block">
@@ -51,6 +91,11 @@ const PostsSection: FC<UserProfileProps> = ({ user }) => {
           show={showPostModal}
           onClose={() => setShowPostModal(false)}
         />
+      )}
+      {loading && (
+        <div className="text-center">
+          <Spinner />
+        </div>
       )}
     </>
   );

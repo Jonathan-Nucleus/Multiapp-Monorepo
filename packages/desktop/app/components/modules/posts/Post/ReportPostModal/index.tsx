@@ -7,6 +7,7 @@ import Label from "../../../../common/Label";
 import Textarea from "../../../../common/Textarea";
 import { useReportPost } from "shared/graphql/mutation/posts";
 import { PostViolationOptions } from "backend/schemas/user";
+import { Toast } from "../../../../common/Toast";
 
 interface ReportPostModalProps {
   post: PostSummary;
@@ -14,15 +15,19 @@ interface ReportPostModalProps {
   onClose: () => void;
 }
 
-const violationItems = Object.keys(PostViolationOptions)
-  .map(key => ({ key, ...PostViolationOptions[key] }));
+const violationItems = Object.keys(PostViolationOptions).map((key) => ({
+  key,
+  ...PostViolationOptions[key],
+}));
 
 const ReportPostModal: FC<ReportPostModalProps> = ({ post, show, onClose }) => {
   const [violations, setViolations] = useState<string[]>([]);
   const [comments, setComments] = useState("");
   const [reportPost] = useReportPost();
+  const [loading, setLoading] = useState(false);
   const reportPostCallback = async () => {
-    await reportPost({
+    setLoading(true);
+    const { data } = await reportPost({
       variables: {
         report: {
           violations: violations,
@@ -31,7 +36,11 @@ const ReportPostModal: FC<ReportPostModalProps> = ({ post, show, onClose }) => {
         },
       },
     });
-    onClose();
+    setLoading(false);
+    if (data?.reportPost) {
+      onClose();
+      Toast.success("Thanks for letting us know");
+    }
   };
   return (
     <>
@@ -78,7 +87,10 @@ const ReportPostModal: FC<ReportPostModalProps> = ({ post, show, onClose }) => {
                               setViolations([...violations, item.key]);
                             } else {
                               const _violations = [...violations];
-                              _violations.splice(_violations.indexOf(item.key), 1);
+                              _violations.splice(
+                                _violations.indexOf(item.key),
+                                1
+                              );
                               setViolations(_violations);
                             }
                           }}
@@ -114,6 +126,7 @@ const ReportPostModal: FC<ReportPostModalProps> = ({ post, show, onClose }) => {
                   <Button
                     variant="text"
                     className="text-sm text-primary tracking-normal py-0"
+                    disabled={loading}
                     onClick={onClose}
                   >
                     CANCEL
@@ -121,6 +134,9 @@ const ReportPostModal: FC<ReportPostModalProps> = ({ post, show, onClose }) => {
                   <Button
                     variant="text"
                     className="text-sm text-error tracking-normal py-0"
+                    disabled={
+                      loading || violations.length == 0 || comments.length == 0
+                    }
                     onClick={reportPostCallback}
                   >
                     REPORT POST

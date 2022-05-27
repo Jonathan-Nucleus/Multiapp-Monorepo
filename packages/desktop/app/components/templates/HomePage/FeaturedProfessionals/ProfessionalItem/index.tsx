@@ -40,7 +40,7 @@ const ProfessionalItem: FC<ProfessionalItemProps> = ({ professional }) => {
                     {professional.position}
                   </div>
                   <div className="text-white text-xs">
-                    {professional.company.name}
+                    {professional.company?.name}
                   </div>
                 </div>
               </div>

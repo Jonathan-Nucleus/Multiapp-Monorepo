@@ -4,9 +4,9 @@ import { DotsThreeOutlineVertical, Trash, Pen } from "phosphor-react";
 import { Menu } from "@headlessui/react";
 import moment from "moment";
 
-import SendMessage from "./SendMessage";
-import Button from "../Button";
-import Avatar from "../Avatar";
+import SendMessage from "../SendMessage";
+import Button from "../../../../../common/Button";
+import Avatar from "../../../../../common/Avatar";
 
 import {
   useDeleteComment,
@@ -17,20 +17,20 @@ import {
 import { useAccount } from "shared/graphql/query/account/useAccount";
 import type { Comment } from "shared/graphql/query/post/usePost";
 
-interface CommentCardProps extends React.PropsWithChildren<unknown> {
+interface CommentItemProps extends React.PropsWithChildren<unknown> {
   comment: Comment;
   postId: string;
   parentId?: string;
   size?: number;
 }
 
-const CommentCard: FC<CommentCardProps> = ({
+const CommentItem: FC<CommentItemProps> = ({
   comment,
   postId,
   size,
   parentId,
   children,
-}: CommentCardProps) => {
+}: CommentItemProps) => {
   const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const [likeComment] = useLikeComment();
   const [deleteComment] = useDeleteComment();
@@ -225,4 +225,4 @@ const CommentCard: FC<CommentCardProps> = ({
   );
 };
 
-export default CommentCard;
+export default CommentItem;

@@ -34,7 +34,12 @@ const schema = gql`
     account: User
     chatToken: String
     post(postId: ID!): Post
-    posts(categories: [PostCategory!], roleFilter: PostRoleFilter): [Post!]
+    posts(
+      categories: [PostCategory!]
+      roleFilter: PostRoleFilter
+      before: ID
+      limit: Int
+    ): [Post!]
     funds: [Fund!]
     fund(fundId: ID!): Fund
     fundManagers(featured: Boolean): FundManagers
@@ -155,7 +160,12 @@ const resolvers = {
     posts: secureEndpoint(
       async (
         parentIgnored,
-        args: { categories?: PostCategory[]; roleFilter?: PostRoleFilter },
+        args: {
+          categories?: PostCategory[];
+          roleFilter?: PostRoleFilter;
+          before?: string;
+          limit?: number;
+        },
         { db, user }
       ): Promise<Post.Mongo[]> => {
         const validator = yup
@@ -170,12 +180,17 @@ const resolvers = {
             roleFilter: yup
               .string()
               .oneOf(_.map(Object.values(PostRoleFilterOptions), "value")),
+            before: yup.string().notRequired().test({
+              test: isObjectId,
+              message: "Invalid post id",
+            }),
+            limit: yup.number().integer().min(0).notRequired(),
           })
           .required();
 
         validateArgs(validator, args);
 
-        const { categories, roleFilter = "everyone" } = args;
+        const { categories, roleFilter = "everyone", before, limit } = args;
 
         const userData = await db.users.find({ _id: user._id });
         if (!userData || !isUser(userData)) {
@@ -191,7 +206,9 @@ const resolvers = {
           userData.hiddenPostIds,
           userData.hiddenUserIds,
           roleFilter,
-          userData.followingIds
+          userData.followingIds,
+          before,
+          limit
         );
       }
     ),
@@ -433,9 +450,10 @@ const resolvers = {
         const [users, companies, posts, funds] = await Promise.all([
           db.users.findByKeyword(search),
           db.companies.findByKeyword(search),
-          db.posts.findByKeyword(user.accreditation === "none"
-            ? "everyone"
-            : user.accreditation, search),
+          db.posts.findByKeyword(
+            user.accreditation === "none" ? "everyone" : user.accreditation,
+            search
+          ),
           db.funds.findByKeyword(user.accreditation, search),
         ]);
 

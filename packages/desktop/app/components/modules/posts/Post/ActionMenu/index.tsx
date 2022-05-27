@@ -17,6 +17,7 @@ import { useHidePost, useMutePost } from "shared/graphql/mutation/posts";
 import ConfirmDeleteModal from "../ConfirmDeleteModal";
 import FollowUserMenu from "./FollowUserMenu";
 import FollowCompanyMenu from "./FollowCompanyMenu";
+import { Toast } from "../../../../common/Toast";
 
 interface ActionMenuProps {
   post: PostSummary;
@@ -38,10 +39,13 @@ const ActionMenu: FC<ActionMenuProps> = ({
   const [hidePost] = useHidePost();
   const { user, company } = post;
   const toggleMutePost = async () => {
-    await mutePost({
+    const { data } = await mutePost({
       variables: { mute: !isMuted, postId: post._id },
       refetchQueries: ["Account"],
     });
+    if (data?.mutePost && !isMuted) {
+      Toast.success("You won't be notified about updates to this post");
+    }
   };
   const hidePostCallback = async () => {
     await hidePost({
@@ -79,17 +83,9 @@ const ActionMenu: FC<ActionMenuProps> = ({
                     onClick={() => toggleMutePost()}
                   >
                     {isMuted ? (
-                      <Bell
-                        fill="currentColor"
-                        weight="light"
-                        size={24}
-                      />
+                      <Bell fill="currentColor" weight="light" size={24} />
                     ) : (
-                      <BellSlash
-                        fill="currentColor"
-                        weight="light"
-                        size={24}
-                      />
+                      <BellSlash fill="currentColor" weight="light" size={24} />
                     )}
                     {isMuted ? (
                       <div className="ml-4">Turn on notifications</div>
@@ -103,11 +99,7 @@ const ActionMenu: FC<ActionMenuProps> = ({
                     className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
                     onClick={() => hidePostCallback()}
                   >
-                    <XSquare
-                      fill="currentColor"
-                      weight="light"
-                      size={24}
-                    />
+                    <XSquare fill="currentColor" weight="light" size={24} />
                     <div className="ml-4">Hide post</div>
                   </div>
                 </Menu.Item>
@@ -129,11 +121,7 @@ const ActionMenu: FC<ActionMenuProps> = ({
                     className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
                     onClick={() => setShowHidePost(true)}
                   >
-                    <EyeClosed
-                      fill="currentColor"
-                      weight="light"
-                      size={24}
-                    />
+                    <EyeClosed fill="currentColor" weight="light" size={24} />
                     <div className="ml-4">
                       {company && `Hide ${company.name}`}
                       {user && `Hide ${user.firstName} ${user.lastName}`}
@@ -148,11 +136,7 @@ const ActionMenu: FC<ActionMenuProps> = ({
                     className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
                     onClick={() => onClickToEdit && onClickToEdit()}
                   >
-                    <Pencil
-                      fill="currentColor"
-                      weight="light"
-                      size={24}
-                    />
+                    <Pencil fill="currentColor" weight="light" size={24} />
                     <div className="ml-4">Edit post</div>
                   </div>
                 </Menu.Item>
@@ -162,17 +146,9 @@ const ActionMenu: FC<ActionMenuProps> = ({
                     onClick={() => toggleMutePost()}
                   >
                     {isMuted ? (
-                      <Bell
-                        fill="currentColor"
-                        weight="light"
-                        size={24}
-                      />
+                      <Bell fill="currentColor" weight="light" size={24} />
                     ) : (
-                      <BellSlash
-                        fill="currentColor"
-                        weight="light"
-                        size={24}
-                      />
+                      <BellSlash fill="currentColor" weight="light" size={24} />
                     )}
                     {isMuted ? (
                       <div className="ml-4">Turn on notifications</div>
@@ -195,18 +171,20 @@ const ActionMenu: FC<ActionMenuProps> = ({
           </Menu.Items>
         </Transition>
       </Menu>
-      {user &&
+      {user && (
         <ConfirmHideUserModal
           user={user}
           show={showHidePost}
           onClose={() => setShowHidePost(false)}
         />
-      }
-      <ReportPostModal
-        post={post}
-        show={showReportPost}
-        onClose={() => setShowReportPost(false)}
-      />
+      )}
+      {showReportPost && (
+        <ReportPostModal
+          post={post}
+          show={showReportPost}
+          onClose={() => setShowReportPost(false)}
+        />
+      )}
       <ConfirmDeleteModal
         postId={post._id}
         show={showDeleteConfirm}

@@ -68,14 +68,14 @@ const createPostsCollection = (
      * Provides a list of all posts in the DB that match a specific set of
      * categories.
      *
-     * @param userId         Id of the user requesting posts.
+     * @param userId          Id of the user requesting posts.
      * @param audience        Audience level of posts to fetch.
      * @param categories      Optional list of categories to match.
      * @param ignorePosts     List of post ids that should not be fetched.
      * @param ignoreUsers     List of user ids of whose posts not to fetch.
      * @param roleFilter      Role filter to filter the post by user role.
      * @param followingUsers  List of user ids that user is following.
-     * @param offset          Optional offset for pagination. Defaults to 0.
+     * @param before          Optional post id to load items before.
      * @param limit           Optional limit for pagination. Defaults to no limit.
      *
      * @returns   An array of matching Post objects.
@@ -88,7 +88,7 @@ const createPostsCollection = (
       ignoreUsers: MongoId[] = [],
       roleFilter: PostRoleFilter = "everyone",
       followingUsers: MongoId[] = [],
-      offset = 0,
+      before?: MongoId,
       limit = 0
     ): Promise<Post.Mongo[]> => {
       const audienceLevels: Audience[] = [
@@ -124,7 +124,7 @@ const createPostsCollection = (
 
       return postsCollection
         .find({
-          _id: { $nin: toObjectIds(ignorePosts) },
+          _id: { $nin: toObjectIds(ignorePosts), $lt: toObjectId(before) },
           deleted: { $exists: false },
           $or: [
             {
@@ -148,7 +148,6 @@ const createPostsCollection = (
           ],
         })
         .sort({ _id: -1 })
-        .skip(offset)
         .limit(limit)
         .toArray();
     },
@@ -442,7 +441,11 @@ const createPostsCollection = (
      *
      * @returns The list of posts.
      */
-    findByKeyword: async (audience: Audience, search = "", limit = 10): Promise<Post.Mongo[]> => {
+    findByKeyword: async (
+      audience: Audience,
+      search = "",
+      limit = 10
+    ): Promise<Post.Mongo[]> => {
       const stage = createSearchStage("body", search);
       if (!stage) {
         return [];
@@ -456,21 +459,23 @@ const createPostsCollection = (
       ];
       audienceLevels.splice(audienceLevels.indexOf(audience) + 1);
 
-      const posts = ((await postsCollection
-        .aggregate([
-          {
-            $search: { ...stage },
-          },
-          {
-            $match: {
-              deleted: { $exists: false },
+      const posts = (
+        (await postsCollection
+          .aggregate([
+            {
+              $search: { ...stage },
             },
-          },
-          {
-            $limit: limit,
-          },
-        ])
-        .toArray()) as Post.Mongo[]).filter((post) => audienceLevels.includes(post.audience));
+            {
+              $match: {
+                deleted: { $exists: false },
+              },
+            },
+            {
+              $limit: limit,
+            },
+          ])
+          .toArray()) as Post.Mongo[]
+      ).filter((post) => audienceLevels.includes(post.audience));
 
       return posts;
     },

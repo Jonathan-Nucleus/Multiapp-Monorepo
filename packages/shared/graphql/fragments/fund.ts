@@ -15,6 +15,7 @@ export type FundSummary = Pick<
   | "overview"
   | "strategy"
   | "min"
+  | "tags"
 >;
 
 export const FUND_SUMMARY_FRAGMENT = gql`
@@ -27,6 +28,7 @@ export const FUND_SUMMARY_FRAGMENT = gql`
     strategy
     highlights
     overview
+    tags
   }
 `;
 

@@ -1,15 +1,15 @@
 import { FC, useState } from "react";
 import Card from "../../../common/Card";
 import { ChatCenteredText, Share, ThumbsUp } from "phosphor-react";
-import Media from "../../../common/Media";
-import { useLikePost } from "shared/graphql/mutation/posts";
-import LikeModal from "./LikesModal";
-import CommentPost from "../../../common/Comment";
+import { useLikePost } from "shared/graphql/mutation/posts/useLikePost";
+import LikesModal from "./LikesModal";
 import { PostSummary } from "shared/graphql/fragments/post";
 import { useAccount } from "shared/graphql/query/account/useAccount";
 import ActionMenu from "./ActionMenu";
 import Header from "./Header";
 import PostBody from "./PostBody";
+import CommentsList from "./CommentsList";
+import Button from "../../../common/Button";
 
 interface PostProps {
   post: PostSummary;
@@ -18,20 +18,13 @@ interface PostProps {
 
 const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
   const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
-  const [likePost] = useLikePost();
+  const { isLiked, toggleLike } = useLikePost(post._id);
   const [visiblePostLikeModal, setVisiblePostLikeModal] = useState(false);
   const [visibleComment, setVisibleComment] = useState(false);
   const isMyPost =
     (post.user && post.user._id == account?._id) ||
     (post.company && account?.companyIds?.includes(post.company._id));
-  const isLiked = account && post.likeIds?.includes(account._id);
   const isMuted = account?.mutedPostIds?.includes(post._id) ?? false;
-  const toggleLike = async () => {
-    await likePost({
-      variables: { like: !isLiked, postId: post._id },
-      refetchQueries: ["Posts"],
-    });
-  };
   return (
     <>
       <Card className="border-0 p-0 rounded-none overflow-visible	md:rounded-2xl mb-6">
@@ -48,10 +41,10 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
             />
           </div>
         </div>
-        <div className="px-4 mt-4">
+        <div className="mt-4 mb-4">
           <PostBody account={account} post={post} />
         </div>
-        <div className="flex items-center p-4">
+        <div className="flex items-center border-t border-brand-overlay/[.1] px-4 py-3">
           <div className="text-white/60">
             <div
               className="flex w-10 items-center cursor-pointer text-primary-medium"
@@ -69,9 +62,10 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
               )}
             </div>
           </div>
-          <div className="w-10 text-white/60 ml-10">
-            <div
-              className="flex items-center cursor-pointer"
+          <div className="w-10 flex items-center text-white/60 ml-10">
+            <Button
+              variant="text"
+              className="select-none font-normal tracking-normal py-0"
               onClick={() => setVisibleComment(!visibleComment)}
             >
               <ChatCenteredText weight="light" color="currentColor" size={24} />
@@ -80,7 +74,7 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
                   {post.commentIds.length}
                 </div>
               )}
-            </div>
+            </Button>
           </div>
           <div className="w-10 text-white/60 ml-10">
             <div className="flex items-center cursor-pointer">
@@ -104,9 +98,11 @@ const Post: FC<PostProps> = ({ post, onClickToEdit }) => {
             )}
           </div>
         </div>
-        {visibleComment && <CommentPost postId={post._id} />}
+        {visibleComment && (
+          <CommentsList show={visibleComment} postId={post._id} />
+        )}
       </Card>
-      <LikeModal
+      <LikesModal
         show={visiblePostLikeModal}
         onClose={() => setVisiblePostLikeModal(false)}
         members={post.likes}
