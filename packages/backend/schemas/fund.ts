@@ -98,6 +98,10 @@ export const AssetClassOptions = {
     label: "Private Equity",
     value: "pe",
   },
+  CREDIT: {
+    label: "Credit",
+    value: "credit",
+  },
 } as const;
 export type AssetClass = ValueOf<typeof AssetClassOptions>["value"];
 export type AssetClassEnum = keyof typeof AssetClassOptions;

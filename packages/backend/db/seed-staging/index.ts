@@ -15,14 +15,15 @@ const seedDb = async (): Promise<void> => {
     allData.map((fundData) => {
       return (async () => {
         const companyId = new ObjectId();
-        const managerId = new ObjectId();
         const fundId = new ObjectId();
+        const managerId = new ObjectId();
+        const teamIds: ObjectId[] = fundData.team.map(() => new ObjectId());
 
         const fund: Fund.Mongo = {
           _id: fundId,
           companyId,
           managerId,
-          teamIds: [],
+          teamIds,
           ...fundData.fund,
         };
 
@@ -46,9 +47,25 @@ const seedDb = async (): Promise<void> => {
           ...fundData.manager,
         };
 
+        const team: User.Mongo[] = fundData.team.map((member, index) => ({
+          _id: teamIds[index],
+          role: "professional",
+          accreditation: fund.level,
+          companyIds: [companyId],
+          salt,
+          email: `jeff.brines+${member.firstName.toLowerCase()}.${member.lastName.toLowerCase()}@gmail.com`,
+          fullName: `${member.firstName} ${member.lastName}`,
+          password: hashPassword("pro-ignite-pass", salt),
+          ...member,
+        }));
+
         await db.collection(DbCollection.USERS).insertOne(manager);
         await db.collection(DbCollection.COMPANIES).insertOne(company);
         await db.collection(DbCollection.FUNDS).insertOne(fund);
+
+        if (fundData.team.length > 0) {
+          await db.collection(DbCollection.USERS).insertMany(team);
+        }
       })();
     })
   );
