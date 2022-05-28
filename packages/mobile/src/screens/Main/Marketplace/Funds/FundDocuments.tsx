@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
   recentContainer: {
     paddingHorizontal: 16,
     flexDirection: 'row',
-    marginBottom: 16,
+    marginTop: 16,
   },
   recentInfo: {
     flex: 1,
