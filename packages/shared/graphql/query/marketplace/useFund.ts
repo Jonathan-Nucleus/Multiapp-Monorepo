@@ -20,7 +20,14 @@ export type FundDetails = FundSummary &
     >[];
   } & Pick<
     GraphQLFund,
-    "aum" | "lockup" | "liquidity" | "fees" | "tags" | "attributes" | "metrics"
+    | "aum"
+    | "lockup"
+    | "liquidity"
+    | "fees"
+    | "tags"
+    | "attributes"
+    | "metrics"
+    | "videos"
   >;
 
 export type FundData = {
@@ -64,6 +71,7 @@ export function useFund(fundId?: string): QueryResult<FundData, FundVariables> {
             date
             figure
           }
+          videos
           documents {
             title
             url

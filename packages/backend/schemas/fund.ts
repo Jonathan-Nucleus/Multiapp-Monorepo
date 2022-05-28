@@ -23,6 +23,7 @@ export namespace Fund {
     highlights: string[];
     overview: string;
     presentationUrl?: string;
+    videos?: string[];
     documents?: Document[];
     teamIds: ObjectId[];
     tags: string[];
@@ -127,6 +128,7 @@ export const FundSchema = `
     highlights: [String!]!
     overview: String!
     presentationUrl: String
+    videos: [String!]
     documents: [Document!]
     teamIds: [ID!]!
     tags: [String!]!
