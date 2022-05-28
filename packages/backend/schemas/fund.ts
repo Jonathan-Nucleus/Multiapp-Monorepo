@@ -146,7 +146,7 @@ export const FundSchema = `
     url: String!
     category: DocumentCategory!
     date: Date!
-    createdAt: Int!
+    createdAt: Date!
   }
 
   type Attribute {
