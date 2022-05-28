@@ -11,6 +11,7 @@ import {
   FundSchema,
   FundStatusOptions,
   DocumentCategoryOptions,
+  DocumentCategoryEnum,
   AssetClassOptions,
   AssetClassEnum,
 } from "../schemas/fund";
@@ -20,6 +21,7 @@ export type {
   GraphQLFund as Fund,
   AccreditationEnum as Accredidation,
   AssetClassEnum as AssetClass,
+  DocumentCategoryEnum as DocumentCategory,
 };
 
 const schema = gql`
@@ -28,7 +30,12 @@ const schema = gql`
 
 const resolvers = {
   FundStatus: FundStatusOptions,
-  DocumentCategory: DocumentCategoryOptions,
+  DocumentCategory: Object.keys(DocumentCategoryOptions).reduce<{
+    [key: string]: string;
+  }>((acc, option) => {
+    acc[option] = DocumentCategoryOptions[option].value;
+    return acc;
+  }, {}),
   AssetClass: Object.keys(AssetClassOptions).reduce<{
     [key: string]: string;
   }>((acc, option) => {

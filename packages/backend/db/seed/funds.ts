@@ -58,7 +58,7 @@ export default async function (
           class: "hedge",
           aum: Math.round(Math.random() * 100000000),
           min: Math.round(Math.random() * 100000),
-          lockup: Math.round(Math.random() * 730),
+          lockup: "1 year",
           strategy: faker.lorem.words(4),
           liquidity: faker.lorem.words(4),
           fees: [

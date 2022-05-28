@@ -19,7 +19,7 @@ export const fundData: FundData[] = [
       class: "hedge",
       aum: 30000000,
       min: 100000,
-      lockup: 0,
+      lockup: "None",
       strategy: "L/S Equity",
       liquidity: "Quarterly w/ 45 days notice",
       fees: [
@@ -142,6 +142,10 @@ export const fundData: FundData[] = [
           date: new Date(2022, 3, 30),
           figure: -0.37,
         },
+        {
+          date: new Date(2023, 0, 1),
+          figure: 0.4,
+        },
       ],
     },
     company: {
@@ -162,7 +166,7 @@ export const fundData: FundData[] = [
       class: "hedge",
       aum: 41700000,
       min: 1000000,
-      lockup: 0,
+      lockup: "None",
       strategy: "L/S Equity",
       liquidity: "Quarterly w/ 45 days notice",
       fees: [
@@ -211,7 +215,7 @@ export const fundData: FundData[] = [
       class: "hedge",
       aum: 38500000,
       min: 500000,
-      lockup: 0,
+      lockup: "None",
       strategy: "L/S Equity",
       liquidity: "Monthly w/ 30 days notice",
       fees: [
@@ -258,7 +262,7 @@ export const fundData: FundData[] = [
       class: "hedge",
       aum: 26500000,
       min: 500000,
-      lockup: 0.5,
+      lockup: "6 months",
       strategy: "L/S Equity",
       liquidity: "Quarterly w/ 30 days notice",
       fees: [
@@ -306,7 +310,7 @@ export const fundData: FundData[] = [
       class: "hedge",
       aum: 62200000,
       min: 5000000,
-      lockup: 1,
+      lockup: "1 year",
       strategy: "L/S Equity",
       liquidity: "Quarterly w/ 45 days notice",
       fees: [
@@ -349,7 +353,7 @@ export const fundData: FundData[] = [
       class: "credit",
       aum: 299000000,
       min: 500000,
-      lockup: 5,
+      lockup: "5+ years",
       strategy: "Special Situations",
       liquidity: "N/A",
       fees: [
@@ -402,7 +406,7 @@ export const fundData: FundData[] = [
       class: "credit",
       aum: 299000000,
       min: 500000,
-      lockup: 5,
+      lockup: "5+ years",
       strategy: "Special Situations",
       liquidity: "N/A",
       fees: [
@@ -455,7 +459,7 @@ export const fundData: FundData[] = [
       class: "credit",
       aum: 288000000,
       min: 500000,
-      lockup: 1,
+      lockup: "1 year",
       strategy: "Special Situations",
       liquidity: "Annually w/ 120 days notice",
       fees: [
@@ -508,7 +512,7 @@ export const fundData: FundData[] = [
       class: "credit",
       aum: 91000000,
       min: 500000,
-      lockup: 1,
+      lockup: "1 year",
       strategy: "Special Situations",
       liquidity: "Annually w/ 120 days notice",
       fees: [
@@ -561,7 +565,7 @@ export const fundData: FundData[] = [
       class: "hedge",
       aum: 30600000,
       min: 250000,
-      lockup: 1,
+      lockup: "1 year",
       strategy: "L/S Equity",
       liquidity: "Quarterly w/ 45 days notice",
       fees: [

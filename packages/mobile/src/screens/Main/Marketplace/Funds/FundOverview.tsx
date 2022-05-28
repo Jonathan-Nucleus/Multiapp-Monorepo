@@ -15,6 +15,7 @@ import FastImage from 'react-native-fast-image';
 import Tag from 'mobile/src/components/common/Tag';
 import PLabel from 'mobile/src/components/common/PLabel';
 import Avatar from 'mobile/src/components/common/Avatar';
+import Media from 'mobile/src/components/common/Media';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 import { Body1Bold, Body2Bold, Body3, H6Bold } from 'mobile/src/theme/fonts';
 import {
@@ -26,6 +27,8 @@ import {
   BGDARK,
   WHITE60,
 } from 'shared/src/colors';
+
+import NetReturnsTable from './NetReturnsTable';
 
 import { AssetClasses } from 'shared/graphql/fragments/fund';
 import { FundDetails } from 'shared/graphql/query/marketplace/useFund';
@@ -54,6 +57,7 @@ const LEFT_FLEX = 0.6;
 const RIGHT_FLEX = 0.4;
 
 const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
+  const video = fund.videos?.[0];
   const renderTeamMemberItem: ListRenderItem<FundDetails['team'][number]> = ({
     item,
   }) => {
@@ -97,6 +101,15 @@ const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
           />
         )}
       </View>
+      {video ? (
+        <View style={styles.videoContainer}>
+          <Media
+            media={{ url: video, aspectRatio: 1.58 }}
+            mediaId={fund._id}
+            type="fund"
+          />
+        </View>
+      ) : null}
       <View style={styles.fundDetailsContainer}>
         <PLabel textStyle={styles.fund} label="Strategy Overview" />
         {fund.highlights && fund.highlights.length > 0 && (
@@ -162,11 +175,7 @@ const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
           />
           <PTitle
             title="Lockup Period"
-            subTitle={
-              fund.lockup === 0
-                ? 'None'
-                : `${fund.lockup} ${fund.lockup === 1 ? 'year' : 'years'}`
-            }
+            subTitle={fund.lockup}
             flex={RIGHT_FLEX}
           />
         </View>
@@ -194,6 +203,12 @@ const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
           horizontal={true}
         />
       </View>
+      {fund.metrics && fund.metrics.length > 0 ? (
+        <View style={styles.memberContainer}>
+          <PLabel textStyle={styles.fund} label="Monthly Net Return" />
+          <NetReturnsTable returns={fund.metrics} />
+        </View>
+      ) : null}
     </View>
   );
 };
@@ -215,6 +230,10 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginHorizontal: 15,
     marginTop: 24,
+  },
+  videoContainer: {
+    marginTop: 8,
+    paddingHorizontal: 16,
   },
   fundDetailsContainer: {
     padding: 16,
@@ -304,7 +323,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   memberItem: {
-    borderColor: BGDARK,
+    borderColor: WHITE12,
     borderWidth: 1,
     width: Dimensions.get('screen').width / 2 - 20,
     height: 180,

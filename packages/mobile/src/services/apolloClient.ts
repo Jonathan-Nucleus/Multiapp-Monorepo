@@ -30,6 +30,31 @@ const cache = new InMemoryCache({
         },
       },
     },
+    Fund: {
+      fields: {
+        metrics: {
+          read(metrics: { date: string; figure: number }[]) {
+            const convertedDates = metrics.map((metric) => ({
+              date: new Date(metric.date),
+              figure: metric.figure,
+            }));
+
+            return convertedDates;
+          },
+        },
+        documents: {
+          read(documents?: { date?: string; createdAt?: string }[]) {
+            const convertedDates = documents?.map((doc) => ({
+              ...doc,
+              ...(doc.date ? { date: new Date(doc.date) } : {}),
+              ...(doc.createdAt ? { createdAt: new Date(doc.createdAt) } : {}),
+            }));
+
+            return convertedDates;
+          },
+        },
+      },
+    },
   },
 });
 

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Pressable, StyleSheet, Text, View, ScrollView } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { CaretLeft, Star } from 'phosphor-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,9 +17,11 @@ import {
   WHITE60,
 } from 'shared/src/colors';
 
+import { stopVideos } from 'mobile/src/components/common/Media';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 import FundProfileInfo from './FundProfileInfo';
 import FundOverview from './FundOverview';
+import FundDocuments from './FundDocuments';
 import FundsPlaceholder from 'mobile/src/components/placeholder/FundsPlaceholder';
 
 import { useFund } from 'shared/graphql/query/marketplace/useFund';
@@ -32,6 +35,12 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
   const { data } = useFund(fundId);
   const { isWatching, toggleWatch } = useWatchFund(fundId);
   const [tabviewHeight, setTabViewHeight] = useState<number>(500);
+  const overviewTabHeight = useRef(0);
+  const documentsTabHeight = useRef(0);
+
+  useFocusEffect(() => () => {
+    stopVideos();
+  });
 
   const fund = data?.fund;
   if (!fund) {
@@ -99,19 +108,64 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
                 </Text>
               ),
             })}
-            initialRouteName="FundOverview">
+            initialRouteName={
+              tabviewHeight === documentsTabHeight.current
+                ? 'Documents'
+                : 'Overview'
+            }>
             <Tab.Screen name="Overview">
-              {() => (
-                <FundOverview
-                  fund={fund}
-                  onLayout={(event) => {
-                    const { height } = event.nativeEvent.layout;
-                    setTabViewHeight(height + styles.tabBar.height);
-                  }}
-                />
-              )}
+              {({ navigation }) => {
+                useEffect(() => {
+                  const unsubscribe = navigation.addListener('tabPress', () => {
+                    setTabViewHeight(overviewTabHeight.current);
+                  });
+
+                  return unsubscribe;
+                }, [setTabViewHeight, navigation]);
+
+                return (
+                  <FundOverview
+                    fund={fund}
+                    onLayout={(event) => {
+                      const { height } = event.nativeEvent.layout;
+                      overviewTabHeight.current = height + styles.tabBar.height;
+
+                      if (tabviewHeight === 500) {
+                        setTabViewHeight(overviewTabHeight.current);
+                      }
+                    }}
+                  />
+                );
+              }}
             </Tab.Screen>
-            <Tab.Screen name="Documents">{() => <></>}</Tab.Screen>
+            {fund.documents ? (
+              <Tab.Screen name="Documents">
+                {({ navigation }) => {
+                  useEffect(() => {
+                    const unsubscribe = navigation.addListener(
+                      'tabPress',
+                      () => {
+                        setTabViewHeight(documentsTabHeight.current);
+                        stopVideos();
+                      },
+                    );
+
+                    return unsubscribe;
+                  }, [setTabViewHeight, navigation]);
+
+                  return (
+                    <FundDocuments
+                      fund={fund}
+                      onLayout={(event) => {
+                        const { height } = event.nativeEvent.layout;
+                        documentsTabHeight.current =
+                          height + styles.tabBar.height;
+                      }}
+                    />
+                  );
+                }}
+              </Tab.Screen>
+            ) : null}
           </Tab.Navigator>
         </View>
       </ScrollView>

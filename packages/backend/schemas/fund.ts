@@ -14,7 +14,7 @@ export namespace Fund {
     class: AssetClass;
     aum: number;
     min: number;
-    lockup: number;
+    lockup: string;
     strategy: string;
     liquidity: string;
     fees: Attribute[];
@@ -37,7 +37,8 @@ export namespace Fund {
   }
 
   export type GraphQL = GraphQLEntity<
-    Omit<Mongo, "level" | "class" | "status" | "documents">
+    Omit<Mongo, "level" | "class" | "status" | "documents">,
+    Date
   > & {
     level: AccreditationEnum;
     class: AssetClassEnum;
@@ -80,14 +81,32 @@ export type FundStatusEnum = keyof typeof FundStatusOptions;
 
 /** Enumeration describing the category of a document. */
 export const DocumentCategoryOptions = {
-  PRESENTATION: "presentation",
-  TEARSHEET: "tearsheet",
-  INVESTOR_LETTER: "investor-letter",
-  OPERATIONAL: "operational",
-  PERFORMANCE: "performance",
-  OTHER: "other",
+  PRESENTATION: {
+    label: "Presentations",
+    value: "presentation",
+  },
+  TEARSHEET: {
+    label: "Tear Sheets",
+    value: "tearsheet",
+  },
+  INVESTOR_LETTER: {
+    label: "Investor Letters",
+    value: "investor-letter",
+  },
+  OPERATIONAL: {
+    label: "Operational",
+    value: "operational",
+  },
+  PERFORMANCE: {
+    label: "Performance",
+    value: "performance",
+  },
+  OTHER: {
+    label: "Other",
+    value: "other",
+  },
 } as const;
-export type DocumentCategory = ValueOf<typeof DocumentCategoryOptions>;
+export type DocumentCategory = ValueOf<typeof DocumentCategoryOptions>["value"];
 export type DocumentCategoryEnum = keyof typeof DocumentCategoryOptions;
 
 export const AssetClassOptions = {
@@ -119,7 +138,7 @@ export const FundSchema = `
     class: AssetClass!
     aum: Int!
     min: Int!
-    lockup: Int!
+    lockup: String!
     strategy: String!
     liquidity: String!
     fees: [Attribute!]!

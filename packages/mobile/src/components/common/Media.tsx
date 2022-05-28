@@ -5,7 +5,7 @@ import Video, { VideoProperties } from 'react-native-video';
 import { Media as MediaType } from 'shared/graphql/fragments/post';
 
 import { useAccountContext } from 'shared/context/Account';
-import { postsUrl } from 'mobile/src/utils/env';
+import { postsUrl, fundsUrl } from 'mobile/src/utils/env';
 
 import { BLACK75, WHITE60 } from 'shared/src/colors';
 
@@ -15,6 +15,7 @@ interface MediaProps {
   resizeMode?: 'contain' | 'cover';
   onLoad?: VideoProperties['onLoad'];
   mediaId?: string;
+  type?: 'post' | 'fund';
 }
 
 const SUPPORTED_EXTENSION = ['mp4'];
@@ -67,13 +68,21 @@ const Media: FC<MediaProps> = ({
   style,
   onLoad,
   resizeMode = 'cover',
+  type = 'post',
 }) => {
   const account = useAccountContext();
   const [paused, setPaused] = useState(true);
   const player = useRef<Video | null>(null);
 
-  const mediaKey = mediaId ? `${account._id}/${mediaId}` : account._id;
-  const mediaUrl = `${postsUrl()}/${mediaKey}/${media.url}`;
+  const mediaKey =
+    type === 'fund' && mediaId
+      ? mediaId
+      : mediaId
+      ? `${account._id}/${mediaId}`
+      : account._id;
+  const mediaUrl = `${type === 'fund' ? fundsUrl() : postsUrl()}/${mediaKey}/${
+    media.url
+  }`;
 
   useEffect(() => {
     if (isVideo(media.url)) {
@@ -133,6 +142,7 @@ const Media: FC<MediaProps> = ({
             }
           }}
           ignoreSilentSwitch="ignore"
+          playInBackground={false}
           paused={paused}
           repeat={false}
           style={{ aspectRatio: media.aspectRatio }}

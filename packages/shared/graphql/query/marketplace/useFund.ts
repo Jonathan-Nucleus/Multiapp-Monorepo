@@ -1,6 +1,11 @@
 import { gql, useQuery, QueryResult } from "@apollo/client";
 import { Fund as GraphQLFund } from "backend/graphql/funds.graphql";
 import {
+  DocumentCategories,
+  DocumentCategory,
+} from "backend/graphql/enumerations.graphql";
+
+import {
   FUND_SUMMARY_FRAGMENT,
   FUND_COMPANY_FRAGMENT,
   FUND_MANAGER_FRAGMENT,
@@ -9,6 +14,9 @@ import {
   FundManager,
 } from "shared/graphql/fragments/fund";
 import { useEffect, useState } from "react";
+
+export type { DocumentCategory };
+export { DocumentCategories };
 
 export type FundDetails = FundSummary &
   FundManager &
@@ -77,7 +85,6 @@ export function useFund(fundId?: string): QueryResult<FundData, FundVariables> {
             url
             category
             date
-            createdAt
           }
           team {
             _id

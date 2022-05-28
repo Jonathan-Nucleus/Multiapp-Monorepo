@@ -5,7 +5,12 @@ import {
   PostCategoryEnum,
 } from "../schemas/post";
 
-import { AssetClassOptions, AssetClassEnum } from "../schemas/fund";
+import {
+  AssetClassOptions,
+  AssetClassEnum,
+  DocumentCategoryOptions,
+  DocumentCategoryEnum,
+} from "../schemas/fund";
 
 import { NotificationMethodOptions } from "../schemas/user";
 
@@ -36,6 +41,15 @@ export const AssetClasses = Object.keys(AssetClassOptions).reduce(
   },
   {} as Record<AssetClassEnum, string>
 );
+export type { AssetClassEnum as AssetClass };
+export const DocumentCategories = Object.keys(DocumentCategoryOptions).reduce(
+  (acc, category) => {
+    acc[category] = DocumentCategoryOptions[category].label;
+    return acc;
+  },
+  {} as Record<DocumentCategoryEnum, string>
+);
+export type { DocumentCategoryEnum as DocumentCategory };
 
 const orderedInvestorClassOptions: InvestorClassEnum[] = [
   "INDIVIDUAL",
