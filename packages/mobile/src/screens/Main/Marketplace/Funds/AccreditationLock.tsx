@@ -9,7 +9,6 @@ import {
   Dimensions,
 } from 'react-native';
 import { Presentation } from 'phosphor-react-native';
-import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
 
 import {
   PRIMARY,

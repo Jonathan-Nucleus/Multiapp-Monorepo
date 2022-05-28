@@ -320,6 +320,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       'base64',
     );
 
+    console.log('Uploading media for user', account._id, 'to', uploadUrl);
     const result = await fetch(uploadUrl, {
       method: 'PUT',
       body: buffer,
@@ -502,7 +503,6 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
                   {imageData || mediaField.value ? (
                     <View style={styles.attachment}>
                       <Media
-                        mediaId="create-post-media"
                         media={
                           mediaField.value || {
                             url: imageData!.path,

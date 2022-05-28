@@ -22,7 +22,7 @@ import {
   Database,
 } from 'phosphor-react-native';
 import { CommonActions } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getEnv, setEnv } from 'mobile/src/utils/env';
 
 import {
   GRAY100,
@@ -61,14 +61,7 @@ const Settings: SettingsScreen = ({ navigation }) => {
   const { data } = useAccount();
   const account = data?.account;
   const isAccredited = account?.accreditation !== 'NONE';
-  const [env, setEnv] = useState('env');
-
-  useEffect(() => {
-    (async () => {
-      const currentEnv = (await AsyncStorage.getItem('env')) ?? 'dev';
-      setEnv(currentEnv);
-    })();
-  }, []);
+  const [currentEnv, setCurrentEnv] = useState(getEnv());
 
   const MENU_ITEMS = [
     {
@@ -243,9 +236,9 @@ const Settings: SettingsScreen = ({ navigation }) => {
   };
 
   const onEnvChange = async (): Promise<void> => {
-    const updatedEnv = env === 'staging' ? 'dev' : 'staging';
-    await AsyncStorage.setItem('env', updatedEnv);
-    setEnv(updatedEnv);
+    const updatedEnv = currentEnv === 'staging' ? 'dev' : 'staging';
+    await setEnv(updatedEnv);
+    setCurrentEnv(updatedEnv);
 
     setTimeout(() => handleLogout(), 500);
   };
@@ -274,7 +267,7 @@ const Settings: SettingsScreen = ({ navigation }) => {
                     trackColor={{ false: GRAY20, true: GREEN }}
                     ios_backgroundColor={GRAY20}
                     onValueChange={onEnvChange}
-                    value={env === 'staging'}
+                    value={currentEnv === 'staging'}
                   />
                 </View>
               </View>

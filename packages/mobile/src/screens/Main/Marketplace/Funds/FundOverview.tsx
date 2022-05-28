@@ -29,7 +29,7 @@ import {
 
 import { AssetClasses } from 'shared/graphql/fragments/fund';
 import { FundDetails } from 'shared/graphql/query/marketplace/useFund';
-import { BACKGROUND_URL } from 'react-native-dotenv';
+import { backgroundUrl } from 'mobile/src/utils/env';
 
 interface PTitleProps {
   title: string;
@@ -92,7 +92,7 @@ const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
         {background && (
           <FastImage
             style={styles.backgroundImage}
-            source={{ uri: `${BACKGROUND_URL}/${background.url}` }}
+            source={{ uri: `${backgroundUrl()}/${background.url}` }}
             resizeMode={FastImage.resizeMode.cover}
           />
         )}

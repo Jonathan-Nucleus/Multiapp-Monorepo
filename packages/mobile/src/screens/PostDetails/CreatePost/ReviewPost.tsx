@@ -18,7 +18,7 @@ import PostHeader from './PostHeader';
 import Media from 'mobile/src/components/common/Media';
 import { AUDIENCE_OPTIONS } from './index';
 
-import { useAccount } from 'shared/graphql/query/account/useAccount';
+import { useAccountContext } from 'shared/context/Account';
 import { useCreatePost, PostCategories } from 'shared/graphql/mutation/posts';
 import { useEditPost } from 'shared/graphql/mutation/posts/useEditPost';
 import { processPost } from 'shared/src/patterns';
@@ -37,12 +37,10 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
     localMediaPath,
   } = postData;
 
-  const { data: accountData } = useAccount();
+  const account = useAccountContext();
   const [createPost] = useCreatePost();
   const [editPost] = useEditPost();
   const isSubmitted = useRef(false);
-
-  const account = accountData?.account;
 
   const handleSubmit = async (): Promise<void> => {
     if (isSubmitted.current) {
@@ -84,7 +82,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
           variables: {
             post: {
               ...finalPostData,
-              ...(userId !== account?._id ? { companyId: userId } : {}),
+              ...(userId !== account._id ? { companyId: userId } : {}),
             },
           },
         });
@@ -110,10 +108,9 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
   };
 
   const postAsLabel =
-    account?._id === userId
-      ? `${account?.firstName} ${account?.lastName}`
-      : account?.companies.find((company) => company._id === userId)?.name ??
-        '';
+    account._id === userId
+      ? `${account.firstName} ${account.lastName}`
+      : account.companies.find((company) => company._id === userId)?.name ?? '';
   const selectedAudienceLabel =
     AUDIENCE_OPTIONS.find((option) => option.id === audience)?.value ?? '';
 
@@ -167,7 +164,6 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
         {route.params.media ? (
           <View style={styles.postImage}>
             <Media
-              mediaId="create-post-media"
               media={route.params.media}
               style={styles.preview}
               resizeMode="contain"

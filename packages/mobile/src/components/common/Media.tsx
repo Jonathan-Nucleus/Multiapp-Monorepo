@@ -2,8 +2,10 @@ import React, { FC, useState, useEffect, useRef } from 'react';
 import { StyleProp, StyleSheet, Pressable, View } from 'react-native';
 import FastImage, { ResizeMode, ImageStyle } from 'react-native-fast-image';
 import Video, { VideoProperties } from 'react-native-video';
-import { POST_URL } from 'react-native-dotenv';
 import { Media as MediaType } from 'shared/graphql/fragments/post';
+
+import { useAccountContext } from 'shared/context/Account';
+import { postsUrl } from 'mobile/src/utils/env';
 
 import { BLACK75, WHITE60 } from 'shared/src/colors';
 
@@ -12,7 +14,7 @@ interface MediaProps {
   style?: StyleProp<ImageStyle>;
   resizeMode?: 'contain' | 'cover';
   onLoad?: VideoProperties['onLoad'];
-  mediaId: string;
+  mediaId?: string;
 }
 
 const SUPPORTED_EXTENSION = ['mp4'];
@@ -66,13 +68,17 @@ const Media: FC<MediaProps> = ({
   onLoad,
   resizeMode = 'cover',
 }) => {
+  const account = useAccountContext();
   const [paused, setPaused] = useState(true);
   const player = useRef<Video | null>(null);
 
+  const mediaKey = mediaId ? `${account._id}/${mediaId}` : account._id;
+  const mediaUrl = `${postsUrl()}/${mediaKey}/${media.url}`;
+
   useEffect(() => {
     if (isVideo(media.url)) {
-      const unsubscribe = addVideoStateChangeListener(mediaId, (id) => {
-        if (id !== mediaId) {
+      const unsubscribe = addVideoStateChangeListener(mediaKey, (id) => {
+        if (id !== mediaKey) {
           setPaused(true);
         }
       });
@@ -82,12 +88,12 @@ const Media: FC<MediaProps> = ({
         setPaused(true);
       };
     }
-  }, [media.url, mediaId]);
+  }, [media.url, mediaKey]);
 
   const togglePause = (): void => {
     const newState = !paused;
     if (!newState) {
-      triggerPlaybackStarted(mediaId);
+      triggerPlaybackStarted(mediaKey);
     }
 
     setPaused(newState);
@@ -114,9 +120,7 @@ const Media: FC<MediaProps> = ({
         <Video
           ref={(ref) => (player.current = ref)}
           source={{
-            uri: media.url.includes('/')
-              ? media.url
-              : `${POST_URL}/${media.url}`,
+            uri: media.url.includes('/') ? media.url : mediaUrl,
           }}
           resizeMode={resizeMode}
           onLoad={onLoad}
@@ -146,7 +150,7 @@ const Media: FC<MediaProps> = ({
           : null,
       ]}
       source={{
-        uri: media.url.includes('/') ? media.url : `${POST_URL}/${media.url}`,
+        uri: media.url.includes('/') ? media.url : mediaUrl,
       }}
       resizeMode={resizeMode}
     />

@@ -14,13 +14,15 @@ import {
   Image as ImagePhoto,
   Trash,
 } from 'phosphor-react-native';
-import { AVATAR_URL, BACKGROUND_URL } from 'react-native-dotenv';
+import { avatarUrl, backgroundUrl } from 'mobile/src/utils/env';
 import ImagePicker from 'react-native-image-crop-picker';
+import RNFS from 'react-native-fs';
 const Buffer = global.Buffer || require('buffer').Buffer;
 
 import MainHeader from 'mobile/src/components/main/Header';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
+import Avatar from '../../components/common/Avatar';
 import { showMessage } from 'mobile/src/services/utils';
 import pStyles from 'mobile/src/theme/pStyles';
 import { Body1Bold, Body2, Body2Bold, H5Bold } from 'mobile/src/theme/fonts';
@@ -52,12 +54,15 @@ const EditCompanyPhoto: EditCompanyPhotoScreen = ({ navigation, route }) => {
   const company = companyData?.companyProfile;
   if (!company) return null;
 
+  const aspect =
+    type === 'AVATAR'
+      ? { width: 300, height: 300 }
+      : { width: 900, height: 150 };
   const openPicker = () => {
     ImagePicker.openPicker({
-      width: 300,
-      height: 400,
+      ...aspect,
       cropping: true,
-      includeBase64: true,
+      compressImageQuality: 0.8,
     }).then((image) => {
       setImageData(image);
     });
@@ -65,20 +70,21 @@ const EditCompanyPhoto: EditCompanyPhotoScreen = ({ navigation, route }) => {
 
   const takePhoto = () => {
     ImagePicker.openCamera({
-      width: 300,
-      height: 400,
+      ...aspect,
       cropping: true,
-      includeBase64: true,
+      compressImageQuality: 0.8,
     }).then((image) => {
       setImageData(image);
     });
   };
 
   const updatePhoto = async () => {
+    const fileUri = imageData.path;
+    const filename = fileUri.substring(fileUri.lastIndexOf('/') + 1);
     try {
       const { data } = await fetchUploadLink({
         variables: {
-          localFilename: imageData?.filename,
+          localFilename: filename,
           type,
           id: company._id,
         },
@@ -90,13 +96,14 @@ const EditCompanyPhoto: EditCompanyPhotoScreen = ({ navigation, route }) => {
       }
 
       const { remoteName, uploadUrl } = data.uploadLink;
-      const buf = new Buffer(
-        imageData.data.replace(/^data:image\/\w+;base64,/, ''),
+      const rawData = await RNFS.readFile(fileUri, 'base64');
+      const buffer = new Buffer(
+        rawData.replace(/^data:image\/\w+;base64,/, ''),
         'base64',
       );
       await fetch(uploadUrl, {
         method: 'PUT',
-        body: buf,
+        body: buffer,
       });
 
       if (type === 'AVATAR') {
@@ -170,13 +177,7 @@ const EditCompanyPhoto: EditCompanyPhotoScreen = ({ navigation, route }) => {
                 resizeMode={FastImage.resizeMode.cover}
               />
             ) : company?.avatar ? (
-              <FastImage
-                style={styles.avatar}
-                source={{
-                  uri: `${AVATAR_URL}/${company?.avatar}`,
-                }}
-                resizeMode={FastImage.resizeMode.cover}
-              />
+              <Avatar user={company} size={200} />
             ) : (
               <View style={styles.noAvatarContainer}>
                 <Text style={styles.noAvatar}>{company.name.charAt(0)}</Text>
@@ -194,7 +195,9 @@ const EditCompanyPhoto: EditCompanyPhotoScreen = ({ navigation, route }) => {
             <FastImage
               style={styles.cover}
               source={{
-                uri: `${BACKGROUND_URL}/${company?.background.url}`,
+                uri: `${backgroundUrl()}/${company?._id}/${
+                  company?.background.url
+                }`,
               }}
               resizeMode={FastImage.resizeMode.cover}
             />

@@ -13,8 +13,9 @@ import {
   Image as ImagePhoto,
   Trash,
 } from 'phosphor-react-native';
-import { BACKGROUND_URL } from 'react-native-dotenv';
+import { backgroundUrl } from 'mobile/src/utils/env';
 import ImagePicker from 'react-native-image-crop-picker';
+import RNFS from 'react-native-fs';
 const Buffer = global.Buffer || require('buffer').Buffer;
 
 import MainHeader from 'mobile/src/components/main/Header';
@@ -31,7 +32,7 @@ import {
   PRIMARY,
 } from 'shared/src/colors';
 
-import { useAccount } from 'shared/graphql/query/account/useAccount';
+import { useAccountContext } from 'shared/context/Account';
 import { useUpdateUserProfile } from 'shared/graphql/mutation/account';
 import { useFetchUploadLink } from 'shared/graphql/mutation/posts';
 
@@ -41,20 +42,20 @@ import Avatar from '../../components/common/Avatar';
 const EditPhoto: EditUserPhotoScreen = ({ navigation, route }) => {
   const { type } = route.params;
 
-  const { data: accountData } = useAccount();
+  const user = useAccountContext();
   const [updateUserProfile] = useUpdateUserProfile();
   const [fetchUploadLink] = useFetchUploadLink();
   const [imageData, setImageData] = useState<any>({});
 
-  const user = accountData?.account;
-  if (!user) return null;
-
+  const aspect =
+    type === 'AVATAR'
+      ? { width: 300, height: 300 }
+      : { width: 900, height: 150 };
   const openPicker = () => {
     ImagePicker.openPicker({
-      width: 300,
-      height: 400,
+      ...aspect,
       cropping: true,
-      includeBase64: true,
+      compressImageQuality: 0.8,
     }).then((image) => {
       setImageData(image);
     });
@@ -62,20 +63,21 @@ const EditPhoto: EditUserPhotoScreen = ({ navigation, route }) => {
 
   const takePhoto = () => {
     ImagePicker.openCamera({
-      width: 300,
-      height: 400,
+      ...aspect,
       cropping: true,
-      includeBase64: true,
+      compressImageQuality: 0.8,
     }).then((image) => {
       setImageData(image);
     });
   };
 
   const updatePhoto = async () => {
+    const fileUri = imageData.path;
+    const filename = fileUri.substring(fileUri.lastIndexOf('/') + 1);
     try {
       const { data } = await fetchUploadLink({
         variables: {
-          localFilename: imageData?.filename,
+          localFilename: filename,
           type,
           id: user._id,
         },
@@ -87,13 +89,14 @@ const EditPhoto: EditUserPhotoScreen = ({ navigation, route }) => {
       }
 
       const { remoteName, uploadUrl } = data.uploadLink;
-      const buf = new Buffer(
-        imageData.data.replace(/^data:image\/\w+;base64,/, ''),
+      const rawData = await RNFS.readFile(fileUri, 'base64');
+      const buffer = new Buffer(
+        rawData.replace(/^data:image\/\w+;base64,/, ''),
         'base64',
       );
       await fetch(uploadUrl, {
         method: 'PUT',
-        body: buf,
+        body: buffer,
       });
 
       if (type === 'AVATAR') {
@@ -185,7 +188,7 @@ const EditPhoto: EditUserPhotoScreen = ({ navigation, route }) => {
             <FastImage
               style={styles.cover}
               source={{
-                uri: `${BACKGROUND_URL}/${user?.background.url}`,
+                uri: `${backgroundUrl()}/${user._id}/${user.background.url}`,
               }}
               resizeMode={FastImage.resizeMode.cover}
             />

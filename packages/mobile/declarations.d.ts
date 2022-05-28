@@ -14,9 +14,8 @@ declare module '*.png';
 declare module '@env';
 
 declare module 'react-native-dotenv' {
-  declare const POST_URL: string;
-  declare const AVATAR_URL: string;
-  declare const BACKGROUND_URL: string;
+  declare const S3_BUCKET_DEV: string;
+  declare const S3_BUCKET_STAGING: string;
   declare const GRAPHQL_URI_DEV: string;
   declare const GRAPHQL_URI_STAGING: string;
   declare const GOOGLE_ID: string;

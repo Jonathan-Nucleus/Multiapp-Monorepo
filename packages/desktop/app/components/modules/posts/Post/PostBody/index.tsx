@@ -91,7 +91,7 @@ const PostBody: FC<PostBodyProps> = ({ account, post }: PostBodyProps) => {
       </div>
       {post.media && (
         <div className="relative h-auto mt-5 border-b border-white/[.12]">
-          <Media media={post.media} />
+          <Media media={post.media} mediaId={post._id} />
         </div>
       )}
       <div className="uppercase text-xs text-white font-medium opacity-60 mt-3 px-4">

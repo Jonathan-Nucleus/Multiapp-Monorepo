@@ -6,11 +6,15 @@ import { GRAY200, PRIMARYSOLID } from 'shared/src/colors';
 
 import type { UserProfile } from 'backend/graphql/users.graphql';
 import type { Company as CompanyProfile } from 'backend/graphql/companies.graphql';
-import { AVATAR_URL } from 'react-native-dotenv';
+import { S3_BUCKET_DEV, S3_BUCKET_STAGING } from 'react-native-dotenv';
 import { Body2Bold } from '../../theme/fonts';
 
-type User = Partial<Pick<UserProfile, 'firstName' | 'lastName' | 'avatar'>>;
-type Company = Pick<CompanyProfile, 'name' | 'avatar'>;
+import { avatarUrl } from 'mobile/src/utils/env';
+
+type User = Partial<
+  Pick<UserProfile, '_id' | 'firstName' | 'lastName' | 'avatar'>
+>;
+type Company = Pick<CompanyProfile, '_id' | 'name' | 'avatar'>;
 interface AvatarProps {
   user?: User | Company;
   size?: number;
@@ -40,7 +44,9 @@ const Avatar: React.FC<AvatarProps> = ({ user, size = 64, style }) => {
     <FastImage
       style={[sizeStyles, style]}
       source={{
-        uri: `${AVATAR_URL}/${user.avatar}`,
+        uri: `${avatarUrl()}/${userData?._id || companyData?._id}/${
+          user.avatar
+        }`,
       }}
       resizeMode={FastImage.resizeMode.cover}
     />

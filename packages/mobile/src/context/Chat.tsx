@@ -14,7 +14,7 @@ import pStyles from 'mobile/src/theme/pStyles';
 import type { Client, StreamType } from 'mobile/src/services/chat';
 import { useAccountContext } from 'shared/context/Account';
 
-import { GETSTREAM_ACCESS_KEY, AVATAR_URL } from 'react-native-dotenv';
+import { GETSTREAM_ACCESS_KEY } from 'react-native-dotenv';
 
 export interface ChatSession {
   client: Client;

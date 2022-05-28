@@ -52,7 +52,7 @@ import { useChatContext } from 'mobile/src/context/Chat';
 import { createChannel } from 'mobile/src/services/chat';
 
 import { UserProfileScreen } from 'mobile/src/navigations/UserDetailsStack';
-import { BACKGROUND_URL } from 'react-native-dotenv';
+import { backgroundUrl } from 'mobile/src/utils/env';
 import Avatar from '../../components/common/Avatar';
 
 const PLACE_HOLDERS = 4;
@@ -165,7 +165,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
             <FastImage
               style={styles.backgroundImg}
               source={{
-                uri: `${BACKGROUND_URL}/${background.url}`,
+                uri: `${backgroundUrl()}/${profile._id}/${background.url}`,
               }}
               resizeMode={FastImage.resizeMode.cover}
             />

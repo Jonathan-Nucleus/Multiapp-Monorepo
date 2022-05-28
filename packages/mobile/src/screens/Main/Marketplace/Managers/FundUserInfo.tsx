@@ -4,7 +4,6 @@ import Avatar from 'mobile/src/components/common/Avatar';
 import { WHITE, BLACK } from 'shared/src/colors';
 import { Body1Bold, Body3 } from 'mobile/src/theme/fonts';
 
-import { AVATAR_URL } from 'react-native-dotenv';
 import PLabel from 'mobile/src/components/common/PLabel';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
 

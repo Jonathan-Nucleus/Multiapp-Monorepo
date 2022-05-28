@@ -15,7 +15,7 @@ import {
   Pencil,
   Share as ShareIcon,
 } from 'phosphor-react-native';
-import { BACKGROUND_URL } from 'react-native-dotenv';
+import { backgroundUrl } from 'mobile/src/utils/env';
 import Share from 'react-native-share';
 
 import Avatar from 'mobile/src/components/common/Avatar';
@@ -89,7 +89,7 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
           <FastImage
             style={styles.backgroundImg}
             source={{
-              uri: `${BACKGROUND_URL}/${background.url}`,
+              uri: `${backgroundUrl()}/${background.url}`,
             }}
             resizeMode={FastImage.resizeMode.cover}
           />

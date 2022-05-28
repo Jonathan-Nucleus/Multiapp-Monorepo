@@ -16,6 +16,7 @@ import {
   detachTokenObserver,
   TokenAction,
 } from 'mobile/src/utils/auth-token';
+import { getEnv } from 'mobile/src/utils/env';
 import { GRAPHQL_URI_DEV, GRAPHQL_URI_STAGING } from 'react-native-dotenv';
 
 const cache = new InMemoryCache({
@@ -86,7 +87,7 @@ export const useInitializeClient =
           },
         );
 
-        const env = (await AsyncStorage.getItem('env')) ?? 'dev';
+        const env = getEnv();
         const graphqlUri =
           env === 'staging' ? GRAPHQL_URI_STAGING : GRAPHQL_URI_DEV;
         console.log('Graphql env', env, graphqlUri);

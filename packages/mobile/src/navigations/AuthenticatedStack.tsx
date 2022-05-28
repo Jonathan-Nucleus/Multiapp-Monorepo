@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import {
   NavigationContainer,
   NavigatorScreenParams,
@@ -38,11 +38,18 @@ import { Accreditation } from 'shared/graphql/mutation/account/useSaveQuestionna
 import { AccountProvider } from 'shared/context/Account';
 import { ChatProvider } from 'mobile/src/context/Chat';
 import { useChatToken } from 'shared/graphql/query/account/useChatToken';
+import {
+  getToken,
+  attachTokenObserver,
+  detachTokenObserver,
+  TokenAction,
+} from 'mobile/src/utils/auth-token';
 
 import { AuthenticatedScreen, AppScreenProps } from './AppNavigator';
 
 const Stack = createStackNavigator();
 const AuthenticatedStack: AuthenticatedScreen = () => {
+  const [authenticated, setAuthenticated] = useState<boolean>();
   const { data, loading: loadingToken, called: calledToken } = useChatToken();
   const token = data?.chatToken;
 
@@ -50,7 +57,28 @@ const AuthenticatedStack: AuthenticatedScreen = () => {
     console.log('Error fetching chat token');
   }
 
-  return (
+  useEffect(() => {
+    (async () => {
+      if (authenticated === undefined) {
+        setAuthenticated(!!(await getToken()));
+      }
+    })();
+
+    const tokenObserver = (action: TokenAction): void => {
+      if (action === 'cleared') {
+        setAuthenticated(false);
+      } else if (action === 'set') {
+        setAuthenticated(true);
+      }
+    };
+
+    attachTokenObserver(tokenObserver);
+    return () => {
+      detachTokenObserver(tokenObserver);
+    };
+  }, []);
+
+  return authenticated ? (
     <AccountProvider>
       <ChatProvider token={token}>
         <Stack.Navigator
@@ -88,6 +116,8 @@ const AuthenticatedStack: AuthenticatedScreen = () => {
         </Stack.Navigator>
       </ChatProvider>
     </AccountProvider>
+  ) : (
+    <></>
   );
 };
 
