@@ -82,7 +82,7 @@ export type FundStatusEnum = keyof typeof FundStatusOptions;
 export const DocumentCategoryOptions = {
   PRESENTATION: "presentation",
   TEARSHEET: "tearsheet",
-  INVESTOR_LETTER: "investor_letter",
+  INVESTOR_LETTER: "investor-letter",
   OPERATIONAL: "operational",
   PERFORMANCE: "performance",
   OTHER: "other",
@@ -145,7 +145,7 @@ export const FundSchema = `
     title: String!
     url: String!
     category: DocumentCategory!
-    date: Int!
+    date: Date!
     createdAt: Int!
   }
 

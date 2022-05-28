@@ -349,7 +349,7 @@ export const fundData: FundData[] = [
       class: "credit",
       aum: 299000000,
       min: 500000,
-      lockup: 60,
+      lockup: 5,
       strategy: "Special Situations",
       liquidity: "N/A",
       fees: [
