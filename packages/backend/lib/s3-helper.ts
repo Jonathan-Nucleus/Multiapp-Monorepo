@@ -1,4 +1,9 @@
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  PutObjectCommand,
+  CopyObjectCommand,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { v4 as uuid } from "uuid";
 
@@ -46,4 +51,44 @@ export async function getUploadUrl(
     console.error(err);
     throw new InternalServerError("Not able to generate signed url.");
   }
+}
+
+export async function movePostMedia(
+  userId: string,
+  postId: string,
+  filename: string
+): Promise<boolean> {
+  if (process.env.NODE_ENV === "test") return true;
+
+  if (!AWS_UPLOAD_REGION || !S3_BUCKET) {
+    throw new InternalServerError("Missing AWS configuration");
+  }
+
+  const originalKey = `posts/${userId}/${filename}`;
+  const newKey = `posts/${userId}/${postId}/${filename}`;
+
+  const client = new S3Client({
+    region: AWS_UPLOAD_REGION,
+  });
+  const copyCommand = new CopyObjectCommand({
+    Bucket: S3_BUCKET,
+    CopySource: `${S3_BUCKET}/${originalKey}`,
+    Key: newKey,
+  });
+  const deleteCommand = new DeleteObjectCommand({
+    Bucket: S3_BUCKET,
+    Key: originalKey,
+  });
+
+  try {
+    await client.send(copyCommand);
+    await client.send(deleteCommand);
+
+    return true;
+  } catch (err) {
+    console.error(err);
+    throw new InternalServerError("Not able to generate signed url.");
+  }
+
+  return false;
 }

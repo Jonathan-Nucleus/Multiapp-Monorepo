@@ -17,7 +17,7 @@ import {
   ResetTokenPayload,
 } from "../lib/tokens";
 import { registerUser } from "../lib/get-stream";
-import { getUploadUrl, RemoteUpload } from "../lib/s3-helper";
+import { getUploadUrl, RemoteUpload, movePostMedia } from "../lib/s3-helper";
 import {
   isObjectId,
   NotFoundError,
@@ -657,8 +657,18 @@ const resolvers = {
           throw new BadRequestError("Not authorized");
         }
 
-        // Send Notification
         const postData = await db.posts.create(post, user._id);
+
+        // Move AWS media to the appropriate post folder
+        if (postData.media) {
+          movePostMedia(
+            user._id.toString(),
+            postData._id.toString(),
+            postData.media.url
+          );
+        }
+
+        // Send Notification
         const mentionIds = postData?.mentionIds ?? [];
         await Promise.all(
           mentionIds.map((mentionId) => {
@@ -743,6 +753,20 @@ const resolvers = {
           )
         ) {
           throw new BadRequestError("Not authorized");
+        }
+
+        const originalPost = await db.posts.find(post._id);
+        if (!originalPost) {
+          throw new NotFoundError("Post");
+        }
+
+        // Move AWS media to the appropriate post folder
+        if (post.media && post.media.url !== originalPost.media?.url) {
+          movePostMedia(
+            user._id.toString(),
+            post._id.toString(),
+            post.media.url
+          );
         }
 
         return db.posts.edit(post, post.userId);
