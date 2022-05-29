@@ -6,12 +6,18 @@ import {
   StyleSheet,
   Pressable,
 } from 'react-native';
+import { Star } from 'phosphor-react-native';
 
 import Avatar from 'mobile/src/components/common/Avatar';
+import PLabel from 'mobile/src/components/common/PLabel';
+import Tag from 'mobile/src/components/common/Tag';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
+import pStyles from 'mobile/src/theme/pStyles';
 import {
   PRIMARY,
+  PRIMARYSTATE,
   WHITE,
+  WHITE60,
   SUCCESS,
   DANGER,
   GRAY100,
@@ -19,7 +25,7 @@ import {
   SUCCESS30,
   DANGER30,
 } from 'shared/src/colors';
-import { Body1, Body2, Body3, Body4 } from 'mobile/src/theme/fonts';
+import { Body1, Body2, Body2Bold, Body3, Body4 } from 'mobile/src/theme/fonts';
 
 import {
   FundSummary,
@@ -28,22 +34,39 @@ import {
   AssetClasses,
 } from 'shared/graphql/fragments/fund';
 
+import { useWatchFund } from 'shared/graphql/mutation/funds/useWatchFund';
 import { useFollowUser } from 'shared/graphql/mutation/account/useFollowUser';
 
 export type Fund = FundSummary & FundManager & FundCompany;
 export interface FundProfileInfo {
   fund: Fund;
   category?: string;
+  showCompany?: boolean;
+  showTags?: boolean;
 }
 
-const FundProfileInfo: FC<FundProfileInfo> = ({ fund, category }) => {
+const FundProfileInfo: FC<FundProfileInfo> = ({
+  fund,
+  category,
+  showCompany = false,
+  showTags = false,
+}) => {
   const { isFollowing, toggleFollow } = useFollowUser(fund.manager._id);
+  const { isWatching, toggleWatch } = useWatchFund(fund._id);
 
   const goToManager = (): void =>
     NavigationService.navigate('UserDetails', {
       screen: 'UserProfile',
       params: {
         userId: fund.manager._id,
+      },
+    });
+
+  const goToCompany = (): void =>
+    NavigationService.navigate('CompanyDetails', {
+      screen: 'CompanyProfile',
+      params: {
+        userId: fund.company._id,
       },
     });
 
@@ -80,13 +103,13 @@ const FundProfileInfo: FC<FundProfileInfo> = ({ fund, category }) => {
             {fund.status}
           </Text>
         </View>
-        {/* <Text style={[styles.company, Body2]}>{fund.company.name}</Text> */}
       </View>
       <View style={styles.fundSummaryContainer}>
         <View style={[styles.fundDescriptorContainer, styles.rightSeparator]}>
           <Text style={[styles.title, styles.center]}>Asset Class</Text>
           <Text style={[styles.whiteText, styles.center]}>
-            {AssetClasses[fund.class]}
+            {AssetClasses.find((assetClass) => assetClass.value === fund.class)
+              ?.label ?? ''}
           </Text>
         </View>
         <View style={[styles.fundDescriptorContainer]}>
@@ -102,6 +125,40 @@ const FundProfileInfo: FC<FundProfileInfo> = ({ fund, category }) => {
           </View>
         )}
       </View>
+      {showTags && fund.tags && fund.tags.length > 0 && (
+        <View style={styles.tags}>
+          {fund.tags.map((tag, index) => (
+            <React.Fragment key={tag}>
+              <Tag label={tag} viewStyle={styles.tagStyle} />
+              {index < fund.tags.length - 1 ? (
+                <Text style={styles.tagSeparator}>•</Text>
+              ) : null}
+            </React.Fragment>
+          ))}
+        </View>
+      )}
+      {showCompany ? (
+        <View style={styles.actionBar}>
+          <Pressable
+            onPress={goToCompany}
+            style={({ pressed }) => [
+              styles.flex,
+              pressed ? pStyles.pressedStyle : null,
+            ]}>
+            <Text style={styles.link}>View Company Profile</Text>
+          </Pressable>
+          <Pressable
+            onPress={toggleWatch}
+            style={({ pressed }) => [pressed ? pStyles.pressedStyle : null]}>
+            <Star
+              size={24}
+              color={isWatching ? PRIMARYSTATE : WHITE}
+              style={styles.favorite}
+              weight={isWatching ? 'fill' : 'regular'}
+            />
+          </Pressable>
+        </View>
+      ) : null}
       <View style={styles.fundDetailsContainer}>
         {fund && fund.manager && (
           <Pressable onPress={goToManager}>
@@ -138,9 +195,21 @@ const FundProfileInfo: FC<FundProfileInfo> = ({ fund, category }) => {
             </View>
           </Pressable>
         )}
-        <Text style={[styles.overview, styles.whiteText, Body3]}>
-          {fund.overview}
-        </Text>
+        {fund.highlights && fund.highlights.length > 0 && (
+          <View style={styles.highlightContainer}>
+            <PLabel label="Fund Highlights" textStyle={styles.sectionTitle} />
+            {fund.highlights.map((item, index) => (
+              <View key={index} style={styles.highlightItem}>
+                <View style={styles.bullet} />
+                <PLabel
+                  label={item}
+                  viewStyle={styles.highlightLabelContainer}
+                  textStyle={styles.highlightLabel}
+                />
+              </View>
+            ))}
+          </View>
+        )}
       </View>
     </View>
   );
@@ -149,8 +218,8 @@ const FundProfileInfo: FC<FundProfileInfo> = ({ fund, category }) => {
 export default FundProfileInfo;
 
 const styles = StyleSheet.create({
-  fundItem: {
-    marginBottom: 16,
+  flex: {
+    flex: 1,
   },
   imagesContainer: {
     flex: 1,
@@ -193,13 +262,32 @@ const styles = StyleSheet.create({
     lineHeight: 21,
     marginLeft: 12,
   },
-  company: {
-    color: PRIMARY,
-    marginBottom: 16,
+  sectionTitle: {
+    marginBottom: 8,
+    ...Body2Bold,
   },
-  overview: {
-    lineHeight: 16,
+  highlightContainer: {
     marginTop: 16,
+  },
+  highlightLabel: {
+    lineHeight: 16,
+    ...Body3,
+  },
+  highlightItem: {
+    marginVertical: 3,
+    flexDirection: 'row',
+    alignContent: 'center',
+  },
+  bullet: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: WHITE,
+    marginRight: 8,
+    marginTop: 5,
+  },
+  highlightLabelContainer: {
+    width: '90%',
   },
   statusContainer: {
     flexDirection: 'row',
@@ -235,13 +323,26 @@ const styles = StyleSheet.create({
     borderBottomColor: WHITE12,
     borderBottomWidth: 1,
   },
+  link: {
+    color: PRIMARY,
+  },
   tags: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginTop: 16,
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    borderColor: WHITE12,
+    borderBottomWidth: 1,
   },
   tagStyle: {
-    marginRight: 8,
+    marginRight: 4,
+    backgroundColor: 'transparent',
+  },
+  tagSeparator: {
+    color: WHITE60,
+    marginRight: 4,
   },
   managerContainer: {
     flexDirection: 'row',
@@ -294,13 +395,8 @@ const styles = StyleSheet.create({
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  buttonContainer: {
-    flex: 1,
-  },
-  button: {
-    fontWeight: 'bold',
-    textTransform: 'none',
+    borderColor: WHITE12,
+    borderBottomWidth: 1,
   },
   favorite: {
     marginLeft: 16,
@@ -308,8 +404,5 @@ const styles = StyleSheet.create({
   name: {
     textTransform: 'capitalize',
     ...Body2,
-  },
-  contactBtn: {
-    marginTop: 15,
   },
 });

@@ -34,20 +34,32 @@ export const PostCategories = Object.keys(PostCategoryOptions).reduce(
   },
   {} as Record<PostCategoryEnum, string>
 );
-export const AssetClasses = Object.keys(AssetClassOptions).reduce(
-  (acc, assetClass) => {
-    acc[assetClass] = AssetClassOptions[assetClass].label;
-    return acc;
-  },
-  {} as Record<AssetClassEnum, string>
-);
+
+const orderedAssetClasses: AssetClassEnum[] = ["PE", "HEDGE", "CREDIT"];
+export const AssetClasses = orderedAssetClasses.map((assetClass) => {
+  const { label } = AssetClassOptions[assetClass];
+  return {
+    label,
+    value: assetClass,
+  };
+});
 export type { AssetClassEnum as AssetClass };
-export const DocumentCategories = Object.keys(DocumentCategoryOptions).reduce(
-  (acc, category) => {
-    acc[category] = DocumentCategoryOptions[category].label;
-    return acc;
-  },
-  {} as Record<DocumentCategoryEnum, string>
+
+const orderedDocumentCategoryOptions: DocumentCategoryEnum[] = [
+  "PRESENTATION",
+  "PERFORMANCE",
+  "INVESTOR_LETTER",
+  "OPERATIONAL",
+  "OTHER",
+];
+export const DocumentCategories = orderedDocumentCategoryOptions.map(
+  (category) => {
+    const { label } = DocumentCategoryOptions[category];
+    return {
+      label,
+      value: category,
+    };
+  }
 );
 export type { DocumentCategoryEnum as DocumentCategory };
 

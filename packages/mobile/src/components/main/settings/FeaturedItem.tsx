@@ -3,7 +3,7 @@ import { View, StyleSheet, Pressable } from 'react-native';
 import dayjs from 'dayjs';
 
 import PLabel from '../../common/PLabel';
-import Media from '../../common/Media';
+import { PostMedia } from '../../common/Media';
 import UserInfo from '../../common/UserInfo';
 import { WHITE12 } from 'shared/src/colors';
 
@@ -65,7 +65,12 @@ const FeaturedItem: React.FC<FeedItemProps> = ({ post }) => {
           />
         ) : null}
         {media ? (
-          <Media mediaId={post._id} style={styles.postImage} media={media} />
+          <PostMedia
+            userId={post.userId}
+            mediaId={post._id}
+            style={styles.postImage}
+            media={media}
+          />
         ) : null}
       </View>
     </Pressable>

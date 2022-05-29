@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import {
   ListRenderItem,
   View,
@@ -10,21 +10,27 @@ import {
   Text,
 } from 'react-native';
 import { Presentation } from 'phosphor-react-native';
+import { useNavigation } from '@react-navigation/native';
 import FastImage from 'react-native-fast-image';
 
 import Tag from 'mobile/src/components/common/Tag';
 import PLabel from 'mobile/src/components/common/PLabel';
 import Avatar from 'mobile/src/components/common/Avatar';
-import Media from 'mobile/src/components/common/Media';
+import { FundMedia } from 'mobile/src/components/common/Media';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
-import { Body1Bold, Body2Bold, Body3, H6Bold } from 'mobile/src/theme/fonts';
+import {
+  Body1Bold,
+  Body2Bold,
+  Body2,
+  Body3,
+  H6Bold,
+} from 'mobile/src/theme/fonts';
 import {
   PRIMARY,
   WHITE,
   GRAY100,
   WHITE12,
   BLACK,
-  BGDARK,
   WHITE60,
 } from 'shared/src/colors';
 
@@ -34,6 +40,8 @@ import { AssetClasses } from 'shared/graphql/fragments/fund';
 import { FundDetails } from 'shared/graphql/query/marketplace/useFund';
 import { backgroundUrl } from 'mobile/src/utils/env';
 
+import { FundDetailsTabs } from './FundDetails';
+
 interface PTitleProps {
   title: string;
   subTitle: string;
@@ -42,6 +50,7 @@ interface PTitleProps {
 
 interface FundOverviewProps extends ViewProps {
   fund: FundDetails;
+  onFocus?: () => void;
 }
 
 const PTitle: FC<PTitleProps> = ({ title, subTitle, flex }) => {
@@ -56,7 +65,21 @@ const PTitle: FC<PTitleProps> = ({ title, subTitle, flex }) => {
 const LEFT_FLEX = 0.6;
 const RIGHT_FLEX = 0.4;
 
-const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
+const FundOverview: FC<FundOverviewProps> = ({
+  fund,
+  onFocus,
+  ...viewProps
+}) => {
+  const navigation = useNavigation<FundDetailsTabs>();
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('tabPress', () => {
+      onFocus?.();
+    });
+
+    return unsubscribe;
+  }, [navigation, onFocus]);
+
   const video = fund.videos?.[0];
   const renderTeamMemberItem: ListRenderItem<FundDetails['team'][number]> = ({
     item,
@@ -103,39 +126,22 @@ const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
       </View>
       {video ? (
         <View style={styles.videoContainer}>
-          <Media
+          <FundMedia
             media={{ url: video, aspectRatio: 1.58 }}
             mediaId={fund._id}
-            type="fund"
           />
         </View>
       ) : null}
       <View style={styles.fundDetailsContainer}>
         <PLabel textStyle={styles.fund} label="Strategy Overview" />
-        {fund.highlights && fund.highlights.length > 0 && (
-          <View style={styles.highlightContainer}>
-            {fund.highlights.map((item, index) => (
-              <View key={index} style={styles.highlightItem}>
-                <View style={styles.bullet} />
-                <PLabel
-                  label={item}
-                  viewStyle={styles.highlightLabelContainer}
-                  textStyle={styles.highlightLabel}
-                />
-              </View>
-            ))}
-          </View>
-        )}
-        {/* <Text style={[styles.overview, styles.whiteText, Body2]}>
-          {fund.overview}
-        </Text> */}
-        <View style={styles.presentationContainer}>
+        <Text style={styles.overview}>{fund.overview}</Text>
+        {/*<View style={styles.presentationContainer}>
           <Presentation size={32} color={WHITE} />
           <PLabel
             textStyle={styles.presentationLabel}
             label="View Presentation"
           />
-        </View>
+        </View>*/}
         {fund.tags && fund.tags.length > 0 && (
           <View style={styles.tags}>
             {fund.tags.map((tag, index) => (
@@ -156,7 +162,10 @@ const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
         <View style={styles.infoContainer}>
           <PTitle
             title="Asset Class"
-            subTitle={AssetClasses[fund.class]}
+            subTitle={
+              AssetClasses.find((assetClass) => assetClass.value === fund.class)
+                ?.label ?? ''
+            }
             flex={LEFT_FLEX}
           />
           <PTitle title="Strategy" subTitle={fund.strategy} flex={RIGHT_FLEX} />
@@ -283,6 +292,12 @@ const styles = StyleSheet.create({
     padding: 16,
     justifyContent: 'space-between',
     flexDirection: 'row',
+  },
+  overview: {
+    color: WHITE,
+    marginTop: 8,
+    lineHeight: 20,
+    ...Body2,
   },
   highlightContainer: {
     marginTop: 16,

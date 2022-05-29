@@ -1,4 +1,5 @@
 import React, { ReactElement, useRef, useState, useEffect } from 'react';
+import { View } from 'react-native';
 import {
   NavigationContainer,
   NavigatorScreenParams,
@@ -19,6 +20,8 @@ import {
   TokenAction,
 } from 'mobile/src/utils/auth-token';
 import { useUpdateFcmToken } from 'shared/graphql/mutation/account';
+
+import PAppContainer from 'mobile/src/components/common/PAppContainer';
 
 import AuthStack, { AuthStackParamList } from './AuthStack';
 import AuthenticatedStack, {
@@ -110,14 +113,9 @@ const AppNavigator = () => {
     console.log('Prev: ', prev);
     routeNameRef.current = current;
   };
-  useEffect(() => {
-    if (authenticated) {
-      NavigationService.navigate('Main');
-    }
-  }, [authenticated]);
 
   if (authenticated === null) {
-    return <></>;
+    return <PAppContainer noScroll />;
   }
 
   return (

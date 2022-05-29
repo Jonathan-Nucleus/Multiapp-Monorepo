@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
-import { gql, useQuery, QueryResult } from "@apollo/client";
+import {
+  gql,
+  useQuery,
+  QueryResult,
+  FetchMoreQueryOptions,
+  ApolloQueryResult,
+} from "@apollo/client";
 import {
   PostCategory,
   Audience,
@@ -34,7 +40,7 @@ export function usePosts(
   categories?: PostCategory[],
   roleFilter?: PostRoleFilter,
   before?: string,
-  limit = 15
+  limit = 10
 ): QueryResult<PostsData, PostsVariables> {
   const [state, setState] = useState<PostsData>();
   const { data, loading, ...rest } = useQuery<PostsData, PostsVariables>(
@@ -67,6 +73,7 @@ export function usePosts(
         limit,
       },
       fetchPolicy: "cache-and-network",
+      skip: state?.posts && state.posts.length > 0,
     }
   );
 
@@ -76,5 +83,31 @@ export function usePosts(
     }
   }, [data, loading]);
 
-  return { data: state, loading, ...rest };
+  const fetchMore: typeof rest.fetchMore = async (
+    params: FetchMoreQueryOptions<PostsVariables>
+  ) => {
+    const result = await rest.fetchMore({
+      ...params,
+      variables: {
+        ...(categories ? { categories } : {}),
+        ...(roleFilter ? { roleFilter } : {}),
+        limit,
+        ...params.variables,
+      },
+    });
+
+    if (result.data.posts) {
+      console.log("Fetched", result.data.posts.length, "more posts");
+      const newData = { ...state };
+      newData.posts = [
+        ...(newData.posts ? newData.posts : []),
+        ...result.data.posts,
+      ];
+      setState(newData);
+    }
+
+    return result as any; // TODO: Resolve type mismatch error
+  };
+
+  return { data: state, loading, ...rest, fetchMore };
 }

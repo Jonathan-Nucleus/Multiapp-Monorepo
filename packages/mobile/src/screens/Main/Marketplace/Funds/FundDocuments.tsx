@@ -1,43 +1,20 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import {
-  ListRenderItem,
   View,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  Dimensions,
   ViewProps,
+  StyleSheet,
   Text,
   Pressable,
   Linking,
 } from 'react-native';
-import { Presentation, File } from 'phosphor-react-native';
-import FastImage from 'react-native-fast-image';
+import { useNavigation } from '@react-navigation/native';
+import { MaterialTopTabNavigationProp } from '@react-navigation/material-top-tabs';
+import { File } from 'phosphor-react-native';
 import dayjs from 'dayjs';
 
-import Tag from 'mobile/src/components/common/Tag';
-import PLabel from 'mobile/src/components/common/PLabel';
-import Avatar from 'mobile/src/components/common/Avatar';
-import Media from 'mobile/src/components/common/Media';
-import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 import pStyles from 'mobile/src/theme/pStyles';
-import {
-  Body1,
-  Body1Bold,
-  Body2Bold,
-  Body3,
-  H6Bold,
-} from 'mobile/src/theme/fonts';
-import {
-  PRIMARY,
-  WHITE,
-  GRAY100,
-  WHITE12,
-  BLACK,
-  BGDARK,
-  BGDARK200,
-  WHITE60,
-} from 'shared/src/colors';
+import { Body1, Body3, H6Bold } from 'mobile/src/theme/fonts';
+import { WHITE, WHITE12, BLACK, BGDARK200, WHITE60 } from 'shared/src/colors';
 
 import RecentDoc from 'shared/assets/images/recent-doc.svg';
 import { AssetClasses } from 'shared/graphql/fragments/fund';
@@ -48,13 +25,29 @@ import {
 } from 'shared/graphql/query/marketplace/useFund';
 import { fundsUrl } from 'mobile/src/utils/env';
 
+import { FundDetailsTabs } from './FundDetails';
+
 interface FundDocumentsProps extends ViewProps {
   fund: FundDetails;
+  onFocus?: () => void;
 }
 
-const FundDocuments: FC<FundDocumentsProps> = ({ fund, ...viewProps }) => {
+const FundDocuments: FC<FundDocumentsProps> = ({
+  fund,
+  onFocus,
+  ...viewProps
+}) => {
   const { documents } = fund;
   const categories = new Set<DocumentCategory>();
+
+  const navigation = useNavigation<FundDetailsTabs>();
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('tabPress', () => {
+      onFocus?.();
+    });
+
+    return unsubscribe;
+  }, [navigation, onFocus]);
 
   const documentsSorted = [...documents];
   documentsSorted.sort((a, b) => b.date.getTime() - a.date.getTime());
@@ -91,35 +84,40 @@ const FundDocuments: FC<FundDocumentsProps> = ({ fund, ...viewProps }) => {
           );
         })}
       </View>
-      {Array.from(categories).map((category) => (
-        <View key={category} style={styles.sectionContainer}>
-          <View style={styles.row}>
-            <Text style={[styles.textWhite, styles.sectionTitle]}>
-              {DocumentCategories[category]}
-            </Text>
-          </View>
-          {documentsSorted
-            .filter((doc) => doc.category === category)
-            .map((doc) => (
-              <Pressable
-                key={doc.url}
-                onPress={() => goToFile(doc.url)}
-                style={({ pressed }) =>
-                  pressed ? pStyles.pressedStyle : null
-                }>
-                <View style={styles.row}>
-                  <File size={24} color={WHITE} />
-                  <View style={styles.docInfo}>
-                    <Text style={styles.textWhite}>{doc.title}</Text>
-                    <Text style={styles.date}>
-                      {dayjs(doc.date).format('MMMM D, YYYY h:mmA')}
-                    </Text>
+      {DocumentCategories.map((orderedCategory) => {
+        const category = orderedCategory.value;
+        if (!categories.has(category)) return null;
+
+        return (
+          <View key={category} style={styles.sectionContainer}>
+            <View style={styles.row}>
+              <Text style={[styles.textWhite, styles.sectionTitle]}>
+                {orderedCategory.label}
+              </Text>
+            </View>
+            {documentsSorted
+              .filter((doc) => doc.category === category)
+              .map((doc) => (
+                <Pressable
+                  key={doc.url}
+                  onPress={() => goToFile(doc.url)}
+                  style={({ pressed }) =>
+                    pressed ? pStyles.pressedStyle : null
+                  }>
+                  <View style={styles.row}>
+                    <File size={24} color={WHITE} />
+                    <View style={styles.docInfo}>
+                      <Text style={styles.textWhite}>{doc.title}</Text>
+                      <Text style={styles.date}>
+                        {dayjs(doc.date).format('MMMM D, YYYY h:mmA')}
+                      </Text>
+                    </View>
                   </View>
-                </View>
-              </Pressable>
-            ))}
-        </View>
-      ))}
+                </Pressable>
+              ))}
+          </View>
+        );
+      })}
     </View>
   );
 };

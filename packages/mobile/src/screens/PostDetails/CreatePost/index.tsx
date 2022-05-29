@@ -38,7 +38,7 @@ import PLabel from 'mobile/src/components/common/PLabel';
 import IconButton from 'mobile/src/components/common/IconButton';
 import PModal from 'mobile/src/components/common/PModal';
 import RoundIcon from 'mobile/src/components/common/RoundIcon';
-import Media from 'mobile/src/components/common/Media';
+import { PostMedia } from 'mobile/src/components/common/Media';
 import { showMessage } from 'mobile/src/services/utils';
 import pStyles from 'mobile/src/theme/pStyles';
 import {
@@ -502,7 +502,8 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
                   ) : null}
                   {imageData || mediaField.value ? (
                     <View style={styles.attachment}>
-                      <Media
+                      <PostMedia
+                        userId={account._id}
                         media={
                           mediaField.value || {
                             url: imageData!.path,

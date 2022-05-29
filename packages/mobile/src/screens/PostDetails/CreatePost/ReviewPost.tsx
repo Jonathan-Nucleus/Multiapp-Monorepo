@@ -1,6 +1,5 @@
 import React, { useRef } from 'react';
-import { Image, StyleSheet, View, Text } from 'react-native';
-import { MentionInput } from 'react-native-controlled-mentions';
+import { StyleSheet, View, Text } from 'react-native';
 const Buffer = global.Buffer || require('buffer').Buffer;
 
 import UserSvg from 'shared/assets/images/user.svg';
@@ -10,12 +9,12 @@ import Tag from 'mobile/src/components/common/Tag';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import { showMessage } from 'mobile/src/services/utils';
 import pStyles from 'mobile/src/theme/pStyles';
-import { BGDARK, WHITE, PRIMARY } from 'shared/src/colors';
+import { WHITE, PRIMARY } from 'shared/src/colors';
 
 import PreviewLink from './PreviewLink';
 import PostSelection from './PostSelection';
 import PostHeader from './PostHeader';
-import Media from 'mobile/src/components/common/Media';
+import { PostMedia } from 'mobile/src/components/common/Media';
 import { AUDIENCE_OPTIONS } from './index';
 
 import { useAccountContext } from 'shared/context/Account';
@@ -163,7 +162,8 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
         </Text>
         {route.params.media ? (
           <View style={styles.postImage}>
-            <Media
+            <PostMedia
+              userId={account._id}
               media={route.params.media}
               style={styles.preview}
               resizeMode="contain"

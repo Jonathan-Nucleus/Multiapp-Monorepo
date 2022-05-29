@@ -29,12 +29,14 @@ export function useAccountContext(): Account {
 interface AccountProviderProps extends PropsWithChildren<unknown> {
   onReady?: () => void;
   onUnauthenticated?: () => void;
+  loadingComponent?: React.ReactElement;
 }
 
 export const AccountProvider: React.FC<AccountProviderProps> = ({
   onReady,
   onUnauthenticated,
   children,
+  loadingComponent,
 }) => {
   const { account, loading } = useAccountStated();
 
@@ -49,7 +51,7 @@ export const AccountProvider: React.FC<AccountProviderProps> = ({
   }, [account, loading]);
 
   if (loading) {
-    return <></>;
+    return loadingComponent || <></>;
   }
 
   return (

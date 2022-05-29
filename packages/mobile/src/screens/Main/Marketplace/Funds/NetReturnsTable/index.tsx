@@ -1,12 +1,11 @@
 import React, { FC } from 'react';
-import { StyleSheet, FlatList, View, Text, ListRenderItem } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import PagerView from 'react-native-pager-view';
 import dayjs from 'dayjs';
 import localData from 'dayjs/plugin/localeData';
 dayjs.extend(localData);
 
-import { BLACK, WHITE, WHITE12 } from 'shared/src/colors';
-import pStyles from 'mobile/src/theme/pStyles';
+import { WHITE, WHITE12 } from 'shared/src/colors';
 import { Body2Bold, Body3 } from 'mobile/src/theme/fonts';
 
 import { FundDetails } from 'shared/graphql/query/marketplace/useFund';
@@ -20,9 +19,9 @@ const MONTHS = dayjs().localeData().monthsShort();
 const NetReturnsTable: FC<NetReturnsTableProps> = ({ returns }) => {
   const earliestYear = returns[0]?.date.getFullYear();
   const latestYear = returns[returns.length - 2]?.date.getFullYear(); // Assume last entry is YTD for last year
-  let pages = [...Array(Math.ceil((latestYear - earliestYear + 1) / 3))].map(
-    (_, index) => index,
-  );
+  const pages = [...Array(Math.ceil((latestYear - earliestYear + 1) / 3))]
+    .map((_, index) => index)
+    .reverse();
 
   return (
     <PagerView
@@ -32,7 +31,10 @@ const NetReturnsTable: FC<NetReturnsTableProps> = ({ returns }) => {
       overdrag={true}>
       {pages.map((page) => {
         const startYear = latestYear - (pages.length - page) * 3 + 1;
-        const years = [...Array(3)].map((_, index) => startYear + index);
+        const years = [...Array(3)]
+          .map((_, index) => startYear + index)
+          .reverse();
+
         return (
           <View key={page} collapsable={false} style={styles.page}>
             <View style={styles.metricsTable}>

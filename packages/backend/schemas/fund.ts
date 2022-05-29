@@ -82,23 +82,19 @@ export type FundStatusEnum = keyof typeof FundStatusOptions;
 /** Enumeration describing the category of a document. */
 export const DocumentCategoryOptions = {
   PRESENTATION: {
-    label: "Presentations",
+    label: "Investor Presentation",
     value: "presentation",
-  },
-  TEARSHEET: {
-    label: "Tear Sheets",
-    value: "tearsheet",
   },
   INVESTOR_LETTER: {
     label: "Investor Letters",
     value: "investor-letter",
   },
   OPERATIONAL: {
-    label: "Operational",
+    label: "Operational Docs",
     value: "operational",
   },
   PERFORMANCE: {
-    label: "Performance",
+    label: "Performance Reports",
     value: "performance",
   },
   OTHER: {

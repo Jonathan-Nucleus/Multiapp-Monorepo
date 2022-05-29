@@ -32,6 +32,8 @@ import NotificationDetail from '../screens/Notification/Details';
 import Preferences from '../screens/Main/Settings/Preferences';
 import ContactSuccess from '../screens/Main/Settings/Contact/ContactSuccess';
 
+import PAppContainer from 'mobile/src/components/common/PAppContainer';
+
 import { MediaType } from 'backend/graphql/mutations.graphql';
 import { Accreditation } from 'shared/graphql/mutation/account/useSaveQuestionnaire';
 
@@ -79,7 +81,7 @@ const AuthenticatedStack: AuthenticatedScreen = () => {
   }, []);
 
   return authenticated ? (
-    <AccountProvider>
+    <AccountProvider loadingComponent={<PAppContainer noScroll />}>
       <ChatProvider token={token}>
         <Stack.Navigator
           screenOptions={{
@@ -117,7 +119,7 @@ const AuthenticatedStack: AuthenticatedScreen = () => {
       </ChatProvider>
     </AccountProvider>
   ) : (
-    <></>
+    <PAppContainer noScroll />
   );
 };
 

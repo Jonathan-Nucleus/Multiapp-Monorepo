@@ -1,17 +1,28 @@
-import React, { useState } from 'react';
-import { StyleSheet, FlatList, View, Text, ListRenderItem } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import {
+  StyleSheet,
+  FlatList,
+  View,
+  Text,
+  ListRenderItem,
+  SectionList,
+} from 'react-native';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 
-import { BLACK, WHITE } from 'shared/src/colors';
+import { BLACK, WHITE, WHITE12 } from 'shared/src/colors';
 import pStyles from 'mobile/src/theme/pStyles';
-import { H6 } from 'mobile/src/theme/fonts';
+import { H6Bold } from 'mobile/src/theme/fonts';
 
 import AccreditationLock from './AccreditationLock';
 import FundItem from './FundItem';
 import FundsPlaceholder from '../../../../components/placeholder/FundsPlaceholder';
 import { FundsScreen } from 'mobile/src/navigations/MarketplaceTabs';
 
-import { useFunds, Fund } from 'shared/graphql/query/marketplace/useFunds';
+import {
+  useFunds,
+  Fund,
+  AssetClasses,
+} from 'shared/graphql/query/marketplace/useFunds';
 
 const PLACE_HOLDERS = 7;
 
@@ -26,6 +37,16 @@ const Funds: FundsScreen = ({ navigation }) => {
     refetch();
     setFocus(focused);
   }
+
+  const sectionedFunds = useMemo(() => {
+    const sectionedData = AssetClasses.map((assetClass) => ({
+      title: assetClass.label,
+      data:
+        data?.funds?.filter((fund) => fund.class === assetClass.value) ?? [],
+    })).filter((section) => section.data.length > 0);
+
+    return sectionedData;
+  }, [data?.funds]);
 
   if (!data?.funds) {
     return (
@@ -55,34 +76,15 @@ const Funds: FundsScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={data?.funds ?? []}
+      <SectionList
+        sections={sectionedFunds}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
-        ListHeaderComponent={
-          <></> /* TODO Private Equity Start
-          <View>
-            {data?.funds && data?.funds.length > 0 && (
-              <>
-                <Text style={[styles.listHeaderText, H6]}>Private Equity</Text>
-                <FundItem
-                  fund={data.funds[0]}
-                  category="equity"
-                  onClickFundDetails={() => {
-                    data.funds?.[0]?._id &&
-                      navigation.navigate('FundDetails', {
-                        fundId: data.funds[0]._id,
-                      });
-                  }}
-                />
-              </>
-            )}
-            {/* TODO Private Equity End }
-            <Text style={[styles.listHeaderText, H6]}>Hedge Funds</Text>
+        renderSectionHeader={({ section: { title } }) => (
+          <View style={styles.listHeader}>
+            <Text style={styles.listHeaderText}>{title}</Text>
           </View>
-        */
-        }
-        listKey="hedge_funds"
+        )}
       />
     </View>
   );
@@ -95,9 +97,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: BLACK,
   },
+  listHeader: {
+    backgroundColor: BLACK,
+    borderColor: WHITE12,
+    borderBottomWidth: 1,
+  },
   listHeaderText: {
     color: WHITE,
     padding: 16,
-    fontWeight: 'bold',
+    ...H6Bold,
   },
 });

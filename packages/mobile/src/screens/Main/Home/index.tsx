@@ -12,7 +12,6 @@ import {
 import isEqual from 'react-fast-compare';
 import { SlidersHorizontal } from 'phosphor-react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { UIActivityIndicator } from 'react-native-indicators';
 
 import MainHeader from 'mobile/src/components/main/Header';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
@@ -43,7 +42,10 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
   const [visibleFilter, setVisibleFilter] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const { data: userData } = useAccount();
-  const { data, refetch } = usePosts(selectedCategories, selectedRole);
+  const { data, refetch, fetchMore } = usePosts(
+    selectedCategories,
+    selectedRole,
+  );
 
   const renderItem: ListRenderItem<Post> = useMemo(
     () =>
@@ -101,6 +103,16 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
     setRefreshing(false);
   };
 
+  const onEndReached = () => {
+    console.log('Fetching more posts');
+    const lastItem = postData[postData.length - 1]._id;
+    fetchMore({
+      variables: {
+        before: lastItem,
+      },
+    });
+  };
+
   return (
     <View style={pStyles.globalContainer}>
       <MainHeader />
@@ -119,6 +131,8 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
         renderItem={renderItem}
         keyExtractor={(item) => item._id}
         onViewableItemsChanged={onViewableItemsChanged}
+        onEndReachedThreshold={5}
+        onEndReached={onEndReached}
         viewabilityConfig={{
           viewAreaCoveragePercentThreshold: 10,
         }}

@@ -7,9 +7,15 @@ import {
   FundCompany,
   FundManager,
 } from "shared/graphql/fragments/fund";
+import {
+  AssetClasses,
+  DocumentCategory,
+} from "backend/graphql/enumerations.graphql";
 import { useEffect, useState } from "react";
 
 type FundsVariables = never;
+
+export { AssetClasses };
 
 export type Fund = FundSummary & FundCompany & FundManager;
 export type FundsData = {

@@ -29,6 +29,7 @@ import type { Notification } from "../schemas/notification";
 
 const schema = gql`
   type Query {
+    version: String
     verifyToken(token: String!): Boolean!
     verifyInvite(code: String!): Boolean!
     account: User
@@ -80,6 +81,13 @@ export type GlobalSearchResult = {
 
 const resolvers = {
   Query: {
+    /**
+     * Returns the server version.
+     */
+    version: secureEndpoint(async (): Promise<string> => {
+      return "v0.1.0";
+    }),
+
     verifyToken: async (
       parentIgnored: unknown,
       args: { token: string },

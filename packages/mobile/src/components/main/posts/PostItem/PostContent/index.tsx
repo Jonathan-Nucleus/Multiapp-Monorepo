@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import { DotsThreeVertical } from 'phosphor-react-native';
 
 import UserInfo from 'mobile/src/components/common/UserInfo';
-import Media from 'mobile/src/components/common/Media';
+import { PostMedia } from 'mobile/src/components/common/Media';
 import PBodyText from 'mobile/src/components/common/PBodyText';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 import pStyles from 'mobile/src/theme/pStyles';
@@ -105,7 +105,8 @@ const PostContent: React.FC<PostContentProps> = ({
           style={styles.body}
         />
         {media ? (
-          <Media
+          <PostMedia
+            userId={post.userId}
             mediaId={sharedBy || post._id}
             media={media}
             style={styles.media}

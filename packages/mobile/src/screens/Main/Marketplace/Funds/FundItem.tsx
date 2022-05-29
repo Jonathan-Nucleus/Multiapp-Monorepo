@@ -1,9 +1,10 @@
 import React, { FC } from 'react';
-import { View, StyleSheet, Pressable } from 'react-native';
+import { View, StyleSheet, Pressable, Text } from 'react-native';
 import { Star } from 'phosphor-react-native';
 
 import PGradientOutlineButton from '../../../../components/common/PGradientOutlineButton';
-import { PRIMARYSTATE, WHITE } from 'shared/src/colors';
+import Tag from 'mobile/src/components/common/Tag';
+import { PRIMARYSTATE, WHITE, WHITE60 } from 'shared/src/colors';
 import {
   FundSummary,
   FundCompany,
@@ -29,13 +30,11 @@ const FundItem: FC<FundItemProps> = ({
   category,
   onClickFundDetails,
 }) => {
-  const { toggleWatch } = useWatchFund(fund._id);
-  const { data: accountData } = useAccount({ fetchPolicy: 'cache-only' });
-  const isWatched = !!accountData?.account?.watchlistIds?.includes(fund._id);
+  const { isWatching, toggleWatch } = useWatchFund(fund._id);
 
   return (
     <View style={styles.fundItem}>
-      <FundProfileInfo fund={fund} category={category} />
+      <FundProfileInfo fund={fund} category={category} showTags />
       <View style={styles.actionBar}>
         <PGradientOutlineButton
           label={
@@ -52,9 +51,9 @@ const FundItem: FC<FundItemProps> = ({
           style={({ pressed }) => [pressed ? styles.onPress : undefined]}>
           <Star
             size={24}
-            color={isWatched ? PRIMARYSTATE : WHITE}
+            color={isWatching ? PRIMARYSTATE : WHITE}
             style={styles.favorite}
-            weight={isWatched ? 'fill' : 'regular'}
+            weight={isWatching ? 'fill' : 'regular'}
           />
         </Pressable>
       </View>

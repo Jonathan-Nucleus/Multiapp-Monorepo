@@ -4,17 +4,14 @@ import FastImage, { ResizeMode, ImageStyle } from 'react-native-fast-image';
 import Video, { VideoProperties } from 'react-native-video';
 import { Media as MediaType } from 'shared/graphql/fragments/post';
 
-import { useAccountContext } from 'shared/context/Account';
 import { postsUrl, fundsUrl } from 'mobile/src/utils/env';
-
-import { BLACK75, WHITE60 } from 'shared/src/colors';
 
 interface MediaProps {
   media: MediaType;
   style?: StyleProp<ImageStyle>;
   resizeMode?: 'contain' | 'cover';
   onLoad?: VideoProperties['onLoad'];
-  mediaId?: string;
+  mediaId: string;
   type?: 'post' | 'fund';
 }
 
@@ -70,24 +67,17 @@ const Media: FC<MediaProps> = ({
   resizeMode = 'cover',
   type = 'post',
 }) => {
-  const account = useAccountContext();
   const [paused, setPaused] = useState(true);
   const player = useRef<Video | null>(null);
 
-  const mediaKey =
-    type === 'fund' && mediaId
-      ? mediaId
-      : mediaId
-      ? `${account._id}/${mediaId}`
-      : account._id;
-  const mediaUrl = `${type === 'fund' ? fundsUrl() : postsUrl()}/${mediaKey}/${
+  const mediaUrl = `${type === 'fund' ? fundsUrl() : postsUrl()}/${mediaId}/${
     media.url
   }`;
 
   useEffect(() => {
     if (isVideo(media.url)) {
-      const unsubscribe = addVideoStateChangeListener(mediaKey, (id) => {
-        if (id !== mediaKey) {
+      const unsubscribe = addVideoStateChangeListener(mediaId, (id) => {
+        if (id !== mediaId) {
           setPaused(true);
         }
       });
@@ -97,12 +87,12 @@ const Media: FC<MediaProps> = ({
         setPaused(true);
       };
     }
-  }, [media.url, mediaKey]);
+  }, [media.url, mediaId]);
 
   const togglePause = (): void => {
     const newState = !paused;
     if (!newState) {
-      triggerPlaybackStarted(mediaKey);
+      triggerPlaybackStarted(mediaId);
     }
 
     setPaused(newState);
@@ -167,30 +157,32 @@ const Media: FC<MediaProps> = ({
   );
 };
 
+type PostMediaProps = Omit<MediaProps, 'type' | 'mediaId'> & {
+  userId: string;
+  mediaId?: string;
+};
+export const PostMedia: FC<PostMediaProps> = ({
+  mediaId,
+  userId,
+  ...props
+}) => {
+  const key = mediaId ? `${userId}/${mediaId}` : userId;
+  return <Media {...props} type="post" mediaId={key} />;
+};
+
+type FundMediaProps = Omit<MediaProps, 'type'>;
+export const FundMedia: FC<FundMediaProps> = (props) => {
+  return <Media {...props} type="fund" />;
+};
+
+type MessageMediaProps = Omit<MediaProps, 'type'>;
+export const MessageMedia: FC<MessageMediaProps> = (props) => {
+  return <Media {...props} type="post" />;
+};
+
 const styles = StyleSheet.create({
   videoContainer: {
     position: 'relative',
-  },
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: BLACK75,
-  },
-  playbackButton: {
-    width: 80,
-    height: 80,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: WHITE60,
-    borderRadius: 40,
   },
   media: {
     width: '100%',
@@ -203,5 +195,3 @@ const styles = StyleSheet.create({
     width: undefined,
   },
 });
-
-export default Media;
