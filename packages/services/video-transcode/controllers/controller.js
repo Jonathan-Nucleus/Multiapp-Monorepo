@@ -1,7 +1,7 @@
 'use strict';
 
 const dbMediaConvertConnector = require('../service/db-mediaconvert-connector');
-const validApiKeys = process.env.API_KEYS || 'abc,def';
+const validApiKeys = process.env.API_KEYS;
 
 let controllers = {
     dbMediaConvertConnectorController: (req, res) => {
