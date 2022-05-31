@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   gql,
   useQuery,
@@ -43,6 +43,7 @@ export function usePosts(
   limit = 10
 ): QueryResult<PostsData, PostsVariables> {
   const [state, setState] = useState<PostsData>();
+  const isFetchMore = useRef(false);
   const { data, loading, ...rest } = useQuery<PostsData, PostsVariables>(
     gql`
       ${POST_SUMMARY_FRAGMENT}
@@ -73,10 +74,11 @@ export function usePosts(
         limit,
       },
       fetchPolicy: "cache-and-network",
-      skip: state?.posts && state.posts.length > 0,
+      skip: isFetchMore.current,
+      notifyOnNetworkStatusChange: true,
     }
   );
-
+  
   useEffect(() => {
     if (!loading && data) {
       setState(data);
@@ -86,6 +88,7 @@ export function usePosts(
   const fetchMore: typeof rest.fetchMore = async (
     params: FetchMoreQueryOptions<PostsVariables>
   ) => {
+    isFetchMore.current = true;
     const result = await rest.fetchMore({
       ...params,
       variables: {
@@ -106,6 +109,7 @@ export function usePosts(
       setState(newData);
     }
 
+    isFetchMore.current = false;
     return result as any; // TODO: Resolve type mismatch error
   };
 

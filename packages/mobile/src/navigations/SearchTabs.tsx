@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  Pressable,
 } from 'react-native';
 import {
   createMaterialTopTabNavigator,
@@ -24,6 +25,7 @@ import {
   WHITE12,
 } from 'shared/src/colors';
 
+import AllSearchResults from '../screens/Search/All';
 import Funds from '../screens/Search/Funds';
 import People from '../screens/Search/People';
 import Companies from '../screens/Search/Companies';
@@ -41,7 +43,7 @@ const SearchTabs: SearchScreen = ({ navigation, route }) => {
   const { data: searchData } = useGlobalSearch(search);
 
   const initialRoute =
-    search.startsWith('#') || search.startsWith('$') ? 'Posts' : 'People';
+    search.startsWith('#') || search.startsWith('$') ? 'Posts' : 'All';
 
   return (
     <View style={styles.globalContainer}>
@@ -60,9 +62,11 @@ const SearchTabs: SearchScreen = ({ navigation, route }) => {
       <Tab.Navigator
         screenOptions={({ route }) => ({
           tabBarStyle: styles.tabBar,
+          tabBarScrollEnabled: true,
           tabBarIndicatorStyle: styles.tabBarIndicator,
           tabBarActiveTintColor: WHITE,
           tabBarInactiveTintColor: WHITE60,
+          tabBarItemStyle: styles.tabBarItem,
           tabBarLabel: ({ focused, color }) => (
             <Text style={[Body2, { color }, focused ? Body2Bold : {}]}>
               {route.name}
@@ -70,6 +74,21 @@ const SearchTabs: SearchScreen = ({ navigation, route }) => {
           ),
         })}
         initialRouteName={initialRoute}>
+        <Tab.Screen name="All">
+          {() => (
+            <AllSearchResults
+              searchResults={
+                searchData?.globalSearch || {
+                  users: [],
+                  companies: [],
+                  posts: [],
+                  funds: [],
+                }
+              }
+              search={search}
+            />
+          )}
+        </Tab.Screen>
         <Tab.Screen name="People">
           {() => (
             <People
@@ -148,6 +167,9 @@ const styles = StyleSheet.create({
     paddingTop: 0,
     borderBottomColor: WHITE12,
     borderBottomWidth: 1,
+  },
+  tabBarItem: {
+    width: 87,
   },
   tabBarIndicator: {
     backgroundColor: PRIMARYSTATE,

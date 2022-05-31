@@ -7,6 +7,12 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { CaretLeft, LinkedinLogo, TwitterLogo } from 'phosphor-react-native';
+import _omitBy from 'lodash/omitBy';
+import _isNil from 'lodash/isNil';
+
+import { useForm, DefaultValues, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import PTextInput from 'mobile/src/components/common/PTextInput';
@@ -21,34 +27,64 @@ import { useUpdateCompanyProfile } from 'shared/graphql/mutation/account';
 
 import { EditCompanyPhotoScreen } from 'mobile/src/navigations/CompanyDetailsStack';
 
+type FormValues = {
+  name: string;
+  overview?: string | null;
+  website?: string | null;
+  twitter?: string | null;
+  linkedIn?: string | null;
+};
+
+const schema = yup
+  .object({
+    name: yup.string().trim().required('Required').default(''),
+    overview: yup.string().nullable(),
+    website: yup.string().url('Invalid URL').nullable(),
+    twitter: yup.string().url('Invalid URL').nullable(),
+    linkedIn: yup.string().url('Invalid URL').nullable(),
+  })
+  .required();
+
 const EditCompanyProfile: EditCompanyPhotoScreen = ({ navigation, route }) => {
   const { companyId } = route.params;
 
   const { data: companyData } = useCompany(companyId);
-  const [name, setName] = useState('');
-  const [bio, setBio] = useState('');
-  const [website, setWebsite] = useState('');
-  const [twitter, setTwitter] = useState('');
-  const [linkedIn, setLinkedIn] = useState('');
+  const [updateCompanyProfile] = useUpdateCompanyProfile();
+
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm<yup.InferType<typeof schema>>({
+    resolver: yupResolver(schema),
+    mode: 'onChange',
+    defaultValues: schema.cast(
+      {},
+      {
+        assert: false,
+        stripUnknown: true,
+      },
+    ) as DefaultValues<FormValues>,
+  });
+  const isValid = Object.keys(errors).length === 0;
 
   const company = companyData?.companyProfile;
   useEffect(() => {
     if (company) {
-      setName(company.name);
-      setBio(company.overview ?? '');
-      setWebsite(company.website ?? '');
-      setTwitter(company.twitter ?? '');
-      setLinkedIn(company.linkedIn ?? '');
+      reset(
+        _omitBy(
+          schema.cast(company, {
+            assert: false,
+            stripUnknown: true,
+          }),
+          _isNil,
+        ),
+      );
     }
   }, [company]);
 
-  const [updateCompanyProfile] = useUpdateCompanyProfile();
-
-  const disabled = useMemo(() => {
-    return !name;
-  }, [name]);
-
-  const handleUpdateProfile = async () => {
+  const onSubmit = async ({ name, ...partialValues }: FormValues) => {
     Keyboard.dismiss();
 
     try {
@@ -57,13 +93,9 @@ const EditCompanyProfile: EditCompanyPhotoScreen = ({ navigation, route }) => {
           profile: {
             _id: companyId,
             name,
-            overview: bio,
-            website: website ?? '',
-            linkedIn: linkedIn ?? '',
-            twitter: twitter ?? '',
+            ..._omitBy(partialValues, _isNil),
           },
         },
-        refetchQueries: ['Account'],
       });
       showMessage('success', 'Company info is updated.');
       navigation.goBack();
@@ -83,54 +115,115 @@ const EditCompanyProfile: EditCompanyPhotoScreen = ({ navigation, route }) => {
           </Text>
         }
         rightIcon={
-          <TouchableOpacity onPress={handleUpdateProfile} disabled={disabled}>
-            <Text style={[styles.save, !disabled && styles.active]}>Save</Text>
+          <TouchableOpacity
+            onPress={handleSubmit(onSubmit)}
+            disabled={!isValid}>
+            <Text style={[styles.save, isValid ? styles.active : null]}>
+              Save
+            </Text>
           </TouchableOpacity>
         }
         onPressLeft={() => navigation.goBack()}
         containerStyle={styles.headerContainer}
       />
       <PAppContainer>
-        <PTextInput
-          label="Company Name"
-          onChangeText={(val: string) => setName(val)}
-          text={name}
-          containerStyle={styles.textContainer}
+        <Controller
+          control={control}
+          name="name"
+          render={({ field, fieldState }) => (
+            <PTextInput
+              label="Company Name"
+              onChangeText={field.onChange}
+              onBlur={field.onBlur}
+              text={field.value ?? ''}
+              containerStyle={styles.textContainer}
+              error={fieldState.error?.message}
+            />
+          )}
         />
-        <PTextInput
-          label="Bio"
-          onChangeText={(val: string) => setBio(val)}
-          text={bio}
-          multiline
-          textInputStyle={styles.bio}
+        <Controller
+          control={control}
+          name="overview"
+          render={({ field, fieldState }) => (
+            <PTextInput
+              label="Bio"
+              onChangeText={field.onChange}
+              onBlur={field.onBlur}
+              text={field.value ?? ''}
+              multiline
+              textInputStyle={styles.bioText}
+              textContainerStyle={styles.bio}
+              error={fieldState.error?.message}
+            />
+          )}
         />
         <Text style={styles.social}>Social / Website Links</Text>
-        <View style={styles.row}>
-          <PTextInput
-            label=""
-            onChangeText={(val: string) => setLinkedIn(val)}
-            text={linkedIn}
-            textInputStyle={styles.socialView}
-          />
-          <View style={styles.icon}>
-            <LinkedinLogo size={24} weight="fill" color={WHITE} />
-          </View>
-        </View>
-        <View style={styles.row}>
-          <PTextInput
-            label=""
-            onChangeText={(val: string) => setTwitter(val)}
-            text={twitter}
-            textInputStyle={styles.socialView}
-          />
-          <View style={styles.icon}>
-            <TwitterLogo size={24} weight="fill" color={WHITE} />
-          </View>
-        </View>
-        <PTextInput
-          label="Website"
-          onChangeText={(val: string) => setWebsite(val)}
-          text={website}
+        <Controller
+          control={control}
+          name="linkedIn"
+          render={({ field, fieldState }) => (
+            <View style={styles.row}>
+              <PTextInput
+                label=""
+                onChangeText={field.onChange}
+                onBlur={field.onBlur}
+                text={field.value ?? ''}
+                textInputStyle={styles.socialView}
+                labelStyle={styles.noHeight}
+                subLabelStyle={styles.noHeight}
+                error={fieldState.error?.message}
+              />
+              <View style={styles.icon}>
+                <LinkedinLogo size={24} weight="fill" color={WHITE} />
+              </View>
+            </View>
+          )}
+        />
+        <Controller
+          control={control}
+          name="twitter"
+          render={({ field, fieldState }) => (
+            <View style={styles.row}>
+              <PTextInput
+                label=""
+                onChangeText={field.onChange}
+                onBlur={field.onBlur}
+                text={field.value ?? ''}
+                labelStyle={styles.noHeight}
+                subLabelStyle={styles.noHeight}
+                textInputStyle={styles.socialView}
+                error={fieldState.error?.message}
+              />
+              <View style={styles.icon}>
+                <TwitterLogo size={24} weight="fill" color={WHITE} />
+              </View>
+            </View>
+          )}
+        />
+        <Controller
+          control={control}
+          name="website"
+          render={({ field, fieldState }) => (
+            <PTextInput
+              label="Website"
+              placeholder="https://"
+              onChangeText={field.onChange}
+              onFocus={() => {
+                if (!field.value || field.value === '') {
+                  field.onChange('https://');
+                }
+              }}
+              onBlur={(evt) => {
+                if (evt.nativeEvent.text === 'https://') {
+                  field.onChange('');
+                }
+
+                field.onBlur();
+              }}
+              text={field.value ?? ''}
+              error={fieldState.error?.message}
+            />
+          )}
         />
       </PAppContainer>
     </View>
@@ -172,9 +265,15 @@ const styles = StyleSheet.create({
   bio: {
     height: 180,
   },
+  bioText: {
+    height: '100%',
+  },
+  noHeight: {
+    height: 0,
+  },
   icon: {
     position: 'absolute',
-    bottom: 20,
+    top: 5,
     left: 0,
     height: 40,
     alignItems: 'center',

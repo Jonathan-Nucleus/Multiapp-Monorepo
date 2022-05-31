@@ -23,6 +23,9 @@ RUN yarn build
 FROM node:16-bullseye-slim AS runner
 WORKDIR /app
 
+ARG commit_hash
+ENV COMMIT_HASH=$commit_hash
+
 ENV NODE_ENV production
 EXPOSE 3000
 

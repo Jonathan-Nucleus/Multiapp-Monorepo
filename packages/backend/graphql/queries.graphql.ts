@@ -27,6 +27,8 @@ import {
 import type { Fund } from "../schemas/fund";
 import type { Notification } from "../schemas/notification";
 
+import "dotenv/config";
+
 const schema = gql`
   type Query {
     version: String
@@ -85,7 +87,7 @@ const resolvers = {
      * Returns the server version.
      */
     version: secureEndpoint(async (): Promise<string> => {
-      return "v0.1.0";
+      return process.env.COMMIT_HASH as string;
     }),
 
     verifyToken: async (

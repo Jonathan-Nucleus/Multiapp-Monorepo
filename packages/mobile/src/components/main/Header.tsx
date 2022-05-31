@@ -1,16 +1,20 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
+import { View, StyleSheet, ViewStyle, Pressable, Text } from 'react-native';
 
 import Avatar from '../common/Avatar';
 import PHeader from '../common/PHeader';
 import PLabel from '../common/PLabel';
 import * as NavigationService from '../../services/navigation/NavigationService';
+import pStyles from 'mobile/src/theme/pStyles';
+import { WHITE } from 'shared/src/colors';
 
 import LogoSvg from 'shared/assets/images/logo-icon.svg';
 import SearchSvg from 'shared/assets/images/search.svg';
 import BellSvg from 'shared/assets/images/bell.svg';
-import { H6 } from '../../theme/fonts';
-import { useAccount } from 'shared/graphql/query/account/useAccount';
+import { H6, Body3 } from '../../theme/fonts';
+
+import { useAccountContext } from 'shared/context/Account';
+import { useNotifications } from 'shared/graphql/query/notification/useNotifications';
 
 interface HeaderProps {
   containerStyle?: ViewStyle;
@@ -30,7 +34,11 @@ const MainHeader: React.FC<HeaderProps> = (props) => {
     centerIcon,
     onPressLeft,
   } = props;
-  const { data: { account } = {} } = useAccount();
+  const account = useAccountContext();
+  const { data } = useNotifications();
+
+  console.log('Notifications', data);
+  const newNotificationCount = data?.notifications?.filter((notification) => notification.isNew).length ?? 0;
 
   return (
     <PHeader
@@ -53,25 +61,38 @@ const MainHeader: React.FC<HeaderProps> = (props) => {
           rightIcon
         ) : (
           <View style={styles.headerIconContainer}>
-            <TouchableOpacity
+            <Pressable
+              style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}
               onPress={() => NavigationService.navigate('Search')}>
               <SearchSvg />
-            </TouchableOpacity>
-            <TouchableOpacity
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [
+                styles.notifications,
+                pressed ? pStyles.pressedStyle : null,
+              ]}
               onPress={() => NavigationService.navigate('Notification')}>
               <BellSvg style={styles.headerIcon} />
-            </TouchableOpacity>
-            <TouchableOpacity
+              {newNotificationCount > 0 ? (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>
+                    {newNotificationCount}
+                  </Text>
+                </View>
+              ) : null}
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}
               onPress={() =>
                 NavigationService.navigate('UserDetails', {
                   screen: 'UserProfile',
                   params: {
-                    userId: account?._id,
+                    userId: account._id,
                   },
                 })
               }>
               <Avatar user={account} size={32} />
-            </TouchableOpacity>
+            </Pressable>
           </View>
         )
       }
@@ -96,6 +117,27 @@ const styles = StyleSheet.create({
   },
   logoText: {
     ...H6,
+  },
+  notifications: {
+    position: 'relative',
+  },
+  badge: {
+    position: 'absolute',
+    top: -8,
+    right: 12,
+    backgroundColor: 'red',
+    paddingHorizontal: 4,
+    borderRadius: 8,
+    padding: 2,
+    height: 16,
+    minWidth: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badgeText: {
+    color: WHITE,
+    lineHeight: 16,
+    ...Body3,
   },
   headerIconContainer: {
     flexDirection: 'row',

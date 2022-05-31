@@ -50,7 +50,7 @@ const Contact: ContactScreen = ({ navigation }) => {
       />
       <PAppContainer contentContainerStyle={styles.flex}>
         <PTitle
-          title="Choose a fund specialist"
+          title="Contact fund specialist"
           style={styles.textContainer}
           textStyle={styles.title}
         />

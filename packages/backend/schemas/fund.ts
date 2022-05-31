@@ -58,7 +58,7 @@ interface Document {
   url: string;
   category: DocumentCategory;
   date: Date;
-  createdAt: number;
+  createdAt: Date;
 }
 
 interface Attribute {

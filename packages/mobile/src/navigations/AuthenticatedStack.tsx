@@ -44,6 +44,7 @@ import {
   getToken,
   attachTokenObserver,
   detachTokenObserver,
+  clearToken,
   TokenAction,
 } from 'mobile/src/utils/auth-token';
 
@@ -80,8 +81,15 @@ const AuthenticatedStack: AuthenticatedScreen = () => {
     };
   }, []);
 
+  const onUnauthenticated = () => {
+    console.log('Unauthenticated');
+    clearToken();
+  };
+
   return authenticated ? (
-    <AccountProvider loadingComponent={<PAppContainer noScroll />}>
+    <AccountProvider
+      onUnauthenticated={onUnauthenticated}
+      loadingComponent={<PAppContainer noScroll />}>
       <ChatProvider token={token}>
         <Stack.Navigator
           screenOptions={{

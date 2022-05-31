@@ -127,30 +127,35 @@ export function useUpdateUserProfile(): MutationTuple<
   UpdateUserProfileData,
   UpdateUserProfileVariables
 > {
-  return useMutation<UpdateUserProfileData, UpdateUserProfileVariables>(gql`
-    mutation UpdateUserProfile($profile: UserProfileInput!) {
-      updateUserProfile(profile: $profile) {
-        _id
-        firstName
-        lastName
-        position
-        avatar
-        background {
-          url
-          x
-          y
-          width
-          height
-          scale
+  return useMutation<UpdateUserProfileData, UpdateUserProfileVariables>(
+    gql`
+      mutation UpdateUserProfile($profile: UserProfileInput!) {
+        updateUserProfile(profile: $profile) {
+          _id
+          firstName
+          lastName
+          position
+          avatar
+          background {
+            url
+            x
+            y
+            width
+            height
+            scale
+          }
+          tagline
+          overview
+          website
+          linkedIn
+          twitter
         }
-        tagline
-        overview
-        website
-        linkedIn
-        twitter
       }
+    `,
+    {
+      refetchQueries: ["Account"],
     }
-  `);
+  );
 }
 
 type CompanyData = Pick<
@@ -182,31 +187,33 @@ export function useUpdateCompanyProfile(): MutationTuple<
   UpdateCompanyProfileData,
   UpdateCompanyProfileVariables
 > {
-  return useMutation<
-    UpdateCompanyProfileData,
-    UpdateCompanyProfileVariables
-  >(gql`
-    mutation UpdateCompanyProfile($profile: CompanyProfileInput!) {
-      updateCompanyProfile(profile: $profile) {
-        _id
-        name
-        avatar
-        background {
-          url
-          x
-          y
-          width
-          height
-          scale
+  return useMutation<UpdateCompanyProfileData, UpdateCompanyProfileVariables>(
+    gql`
+      mutation UpdateCompanyProfile($profile: CompanyProfileInput!) {
+        updateCompanyProfile(profile: $profile) {
+          _id
+          name
+          avatar
+          background {
+            url
+            x
+            y
+            width
+            height
+            scale
+          }
+          tagline
+          overview
+          website
+          linkedIn
+          twitter
         }
-        tagline
-        overview
-        website
-        linkedIn
-        twitter
       }
+    `,
+    {
+      refetchQueries: ["CompanyProfile"],
     }
-  `);
+  );
 }
 
 type UpdateFcmTokenVariables = {
