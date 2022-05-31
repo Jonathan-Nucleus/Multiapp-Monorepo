@@ -32,7 +32,6 @@ app.use(morgan(function (tokens, req, res) {
         tokens.status(req, res),
         tokens.res(req, res, 'content-length'),
         tokens.requestBody(req, res),
-        tokens.responseBody(req, res),
         tokens['response-time'](req, res), 'ms'
       ]);
 }));

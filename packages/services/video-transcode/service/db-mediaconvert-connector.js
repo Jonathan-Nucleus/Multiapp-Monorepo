@@ -7,6 +7,11 @@ let dbMediaConvertConnector = {
         const status = req.body.status;
         const postId = req.body.postId;
 
+        const validStatuses = ['Transcoded'];
+
+        if (!status || !validStatuses.includes(status)) throw new Error(`Please provide a valid status, one of: ${validStatuses.join(',')}`);
+        if (!postId) throw new Error('Please provide a post ID.');
+
         try {
             MongoClient.connect(mongoDbURI, async (err, client) => {
                 if (err) console.error(err);
