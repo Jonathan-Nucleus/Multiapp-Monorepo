@@ -2,7 +2,7 @@ const mongoDbURI = process.env.MONGODB_URI;
 const MongoClient = require('mongodb').MongoClient;
 const ObjectId = require('mongodb').ObjectId;
 
-var dbMediaConvertConnector = {
+let dbMediaConvertConnector = {
     update: async (req, res, next) => {
         const status = req.body.status;
         const postId = req.body.postId;
