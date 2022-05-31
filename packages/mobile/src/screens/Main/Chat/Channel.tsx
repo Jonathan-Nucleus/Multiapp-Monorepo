@@ -156,6 +156,8 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
     if (!channel.current) {
       return;
     }
+
+    channel.current.markRead();
     const listener = channel.current.on((event) => {
       switch (event.type) {
         case 'message.new':

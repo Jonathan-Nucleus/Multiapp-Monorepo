@@ -4,7 +4,7 @@ import {
   View,
   StyleSheet,
   FlatList,
-  TouchableOpacity,
+  Pressable,
   Dimensions,
   ViewProps,
   Text,
@@ -18,6 +18,7 @@ import PLabel from 'mobile/src/components/common/PLabel';
 import Avatar from 'mobile/src/components/common/Avatar';
 import { FundMedia } from 'mobile/src/components/common/Media';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
+import pStyles from 'mobile/src/theme/pStyles';
 import {
   Body1Bold,
   Body2Bold,
@@ -85,7 +86,11 @@ const FundOverview: FC<FundOverviewProps> = ({
     item,
   }) => {
     return (
-      <TouchableOpacity
+      <Pressable
+        style={({ pressed }) => [
+          styles.memberItemContainer,
+          pressed ? pStyles.pressedStyle : null,
+        ]}
         onPress={() =>
           NavigationService.navigate('UserDetails', {
             screen: 'UserProfile',
@@ -106,7 +111,7 @@ const FundOverview: FC<FundOverviewProps> = ({
           />
           <PLabel textStyle={styles.position} label={item.position || ''} />
         </View>
-      </TouchableOpacity>
+      </Pressable>
     );
   };
 
@@ -337,16 +342,18 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingHorizontal: 16,
   },
-  memberItem: {
+  memberItemContainer: {
+    width: Dimensions.get('screen').width / 2 - 20,
     borderColor: WHITE12,
     borderWidth: 1,
-    width: Dimensions.get('screen').width / 2 - 20,
+    borderRadius: 8,
     height: 180,
+    marginRight: 8,
+    marginVertical: 16,
+  },
+  memberItem: {
     alignItems: 'center',
     padding: 8,
-    marginVertical: 16,
-    marginRight: 8,
-    borderRadius: 8,
     alignSelf: 'center',
   },
   fullWidth: {

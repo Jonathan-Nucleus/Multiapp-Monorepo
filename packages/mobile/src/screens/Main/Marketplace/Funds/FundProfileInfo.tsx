@@ -66,7 +66,7 @@ const FundProfileInfo: FC<FundProfileInfo> = ({
     NavigationService.navigate('CompanyDetails', {
       screen: 'CompanyProfile',
       params: {
-        userId: fund.company._id,
+        companyId: fund.company._id,
       },
     });
 

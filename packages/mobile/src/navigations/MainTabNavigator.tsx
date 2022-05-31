@@ -1,5 +1,5 @@
-import React, { ReactElement } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import React, { ReactElement, useEffect, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import {
   createBottomTabNavigator,
   BottomTabScreenProps,
@@ -13,6 +13,7 @@ import { House, Star, Chats, DotsThreeCircle } from 'phosphor-react-native';
 import FundsSVG from 'shared/assets/images/fund.svg';
 import GreyFundsSVG from 'shared/assets/images/grey-fund.svg';
 import { WHITE, BLACK, GRAY400, GRAY700, WHITE12 } from 'shared/src/colors';
+import { Body3 } from 'mobile/src/theme/fonts';
 
 import { Home } from 'mobile/src/screens/Main/Home';
 import WatchList from 'mobile/src/screens/Main/WatchList';
@@ -22,12 +23,35 @@ import MoreStack, { MoreStackParamList } from './MoreStack';
 import { Body5Bold, Body5 } from '../theme/fonts';
 
 import { useChatContext } from 'mobile/src/context/Chat';
+import { useNotifications } from 'shared/graphql/query/notification/useNotifications';
 
 import type { AuthenticatedScreenProps } from './AuthenticatedStack';
 
 const Tab = createBottomTabNavigator();
 const MainTabNavigator = () => {
-  const client = useChatContext();
+  const {
+    client,
+    userId: chatUserId,
+    unreadCount: userUnreadCount,
+  } = useChatContext() || {};
+  const [unreadCount, setUnreadCount] = useState(userUnreadCount ?? 0);
+
+  useEffect(() => {
+    if (client) {
+      setUnreadCount(userUnreadCount ?? 0);
+      const handler = client.on((event) => {
+        if (
+          event.total_unread_count &&
+          unreadCount !== event.total_unread_count
+        ) {
+          setUnreadCount(event.total_unread_count);
+        }
+      });
+
+      return () => handler.unsubscribe();
+    }
+  }, [client]);
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -90,12 +114,20 @@ const MainTabNavigator = () => {
           tabBarLabel: ({ focused }) => (
             <Text style={[styles.text, focused && styles.bold]}>messages</Text>
           ),
-          tabBarIcon: ({ focused, size }) =>
-            focused ? (
-              <Chats size={size} color={WHITE} weight="fill" />
-            ) : (
-              <Chats size={size} color={client ? GRAY400 : GRAY700} />
-            ),
+          tabBarIcon: ({ focused, size }) => (
+            <View style={styles.relative}>
+              {focused ? (
+                <Chats size={size} color={WHITE} weight="fill" />
+              ) : (
+                <Chats size={size} color={client ? GRAY400 : GRAY700} />
+              )}
+              {unreadCount > 0 ? (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>{unreadCount}</Text>
+                </View>
+              ) : null}
+            </View>
+          ),
         }}
         listeners={{
           tabPress: (evt) => {
@@ -155,6 +187,9 @@ export type SettingsScreen = (
 ) => ReactElement | null;
 
 const styles = StyleSheet.create({
+  relative: {
+    position: 'relative',
+  },
   text: {
     ...Body5,
     color: GRAY400,
@@ -163,5 +198,23 @@ const styles = StyleSheet.create({
   bold: {
     ...Body5Bold,
     color: WHITE,
+  },
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: 'red',
+    paddingHorizontal: 4,
+    borderRadius: 8,
+    padding: 2,
+    height: 16,
+    minWidth: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badgeText: {
+    color: WHITE,
+    lineHeight: 16,
+    ...Body3,
   },
 });

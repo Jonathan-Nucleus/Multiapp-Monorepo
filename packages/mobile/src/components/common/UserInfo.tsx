@@ -117,9 +117,9 @@ const UserInfo: React.FC<UserInfoProps> = (props) => {
           {auxInfo ? (
             <PLabel label={auxInfo} textStyle={styles.smallLabel} />
           ) : null}
-          {audienceInfo ? (
+          {/*audienceInfo ? (
             <View style={styles.audienceInfo}>{audienceIcon}</View>
-          ) : null}
+          ) : null*/}
           {!isSelf && showFollow && (
             <>
               {!isFollowing ? <View style={styles.separator} /> : null}

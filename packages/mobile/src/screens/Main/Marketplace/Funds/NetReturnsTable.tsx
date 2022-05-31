@@ -45,14 +45,14 @@ const NetReturnsTable: FC<NetReturnsTableProps> = ({ returns }) => {
                     {month}
                   </Text>
                 ))}
-                <Text style={[styles.row, styles.header]}>YTD</Text>
+                <Text style={[styles.row, styles.header]}>YR</Text>
               </View>
               {years.map((year, yearIndex) => {
                 const ytdFigure = returns.find(
                   (metric) =>
-                    metric.date.getMonth() === 0 &&
-                    metric.date.getFullYear() === year + 1 &&
-                    metric.date.getDate() === 1,
+                    metric.date.getUTCMonth() === 0 &&
+                    metric.date.getUTCFullYear() === year + 1 &&
+                    metric.date.getUTCDate() === 1,
                 )?.figure;
 
                 return (
@@ -66,19 +66,23 @@ const NetReturnsTable: FC<NetReturnsTableProps> = ({ returns }) => {
                     {MONTHS.map((month, index) => {
                       const figure = returns.find(
                         (metric) =>
-                          metric.date.getMonth() === index &&
-                          metric.date.getFullYear() === year &&
-                          metric.date.getDate() !== 1,
+                          metric.date.getUTCMonth() === index &&
+                          metric.date.getUTCFullYear() === year &&
+                          metric.date.getUTCDate() !== 1,
                       )?.figure;
 
                       return (
                         <Text key={month} style={[styles.row, styles.figure]}>
-                          {figure ? `${figure}%` : '--'}
+                          {figure !== undefined
+                            ? `${figure.toFixed(1)}%`
+                            : '--'}
                         </Text>
                       );
                     })}
                     <Text style={[styles.row, styles.figure]}>
-                      {ytdFigure ? `${ytdFigure}%` : '--'}
+                      {ytdFigure !== undefined
+                        ? `${ytdFigure.toFixed(1)}%`
+                        : '--'}
                     </Text>
                   </View>
                 );

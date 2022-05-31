@@ -102,8 +102,23 @@ export function useFund(fundId?: string): QueryResult<FundData, FundVariables> {
     }
   );
   useEffect(() => {
-    if (!loading && data) {
-      setState(data);
+    if (!loading && data && data.fund) {
+      const parsedDates: FundData = {
+        fund: {
+          ...data.fund,
+          metrics: data.fund.metrics?.map((metric) => ({
+            ...metric,
+            date: new Date(metric.date),
+          })),
+          documents: data.fund.documents?.map((doc) => ({
+            ...doc,
+            createdAt: new Date(doc.createdAt),
+            date: new Date(doc.date),
+          })),
+        },
+      };
+
+      setState(parsedDates);
     }
   }, [data, loading]);
   return { data: state, loading, ...rest };

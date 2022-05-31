@@ -20,6 +20,7 @@ export interface ChatSession {
   client: Client;
   reconnect: () => void;
   userId: string;
+  unreadCount: number;
 }
 
 const ChatContext = React.createContext<ChatSession | undefined>(undefined);
@@ -39,6 +40,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
   const chatClient = useRef<Client>();
   const fetchingClient = useRef(false);
   const [isReady, setReady] = useState<boolean>();
+  const [unreadCount, setUnreadCount] = useState(0);
   const retryCount = useRef(0);
 
   const connect = useCallback(async (): Promise<void> => {
@@ -54,7 +56,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
     const client = StreamChat.getInstance<StreamType>(GETSTREAM_ACCESS_KEY);
     try {
       fetchingClient.current = true;
-      await client.connectUser(
+      const result = await client.connectUser(
         {
           id: user._id,
           firstName: user.firstName,
@@ -66,8 +68,10 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
         },
         token,
       );
-      console.log('Client created');
       chatClient.current = client;
+      if (result && result.me) {
+        setUnreadCount(result.me.total_unread_count);
+      }
       setReady(true);
     } catch (err) {
       console.log('Error connect to stream chat', err);
@@ -117,7 +121,12 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
     <ChatContext.Provider
       value={
         chatClient.current
-          ? { client: chatClient.current, userId: user._id, reconnect: connect }
+          ? {
+              client: chatClient.current,
+              userId: user._id,
+              reconnect: connect,
+              unreadCount,
+            }
           : undefined
       }>
       {children}

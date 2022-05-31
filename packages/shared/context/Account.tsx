@@ -50,7 +50,7 @@ export const AccountProvider: React.FC<AccountProviderProps> = ({
     }
   }, [account, loading]);
 
-  if (loading) {
+  if (loading || !account) {
     return loadingComponent || <></>;
   }
 

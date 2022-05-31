@@ -21,33 +21,33 @@ interface CompanyProps {
   search: string;
 }
 
+export const renderItem: ListRenderItem<Company> = ({ item }) => {
+  return (
+    <TouchableOpacity
+      onPress={() =>
+        NavigationService.navigate('CompanyDetails', {
+          screen: 'CompanyProfile',
+          params: { companyId: item._id },
+        })
+      }>
+      <View style={styles.item}>
+        <Avatar
+          user={{ avatar: item.avatar }}
+          size={60}
+          style={styles.companyAvatar}
+        />
+        <View style={styles.rightItem}>
+          <Text style={styles.name}>{item.name}</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
 const Companies: React.FC<CompanyProps> = ({
   companies,
   search,
 }: CompanyProps) => {
-  const renderItem: ListRenderItem<Company> = ({ item }) => {
-    return (
-      <TouchableOpacity
-        onPress={() =>
-          NavigationService.navigate('CompanyDetails', {
-            screen: 'CompanyProfile',
-            params: { companyId: item._id },
-          })
-        }>
-        <View style={styles.item}>
-          <Avatar
-            user={{ avatar: item.avatar }}
-            size={60}
-            style={styles.companyAvatar}
-          />
-          <View style={styles.rightItem}>
-            <Text style={styles.name}>{item.name}</Text>
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
-  };
-
   return (
     <View style={pStyles.globalContainer}>
       {!!search && (

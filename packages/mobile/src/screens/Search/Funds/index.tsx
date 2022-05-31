@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import {
   FlatList,
   ListRenderItem,
@@ -10,10 +10,16 @@ import {
 import { Star } from 'phosphor-react-native';
 
 import Avatar from 'mobile/src/components/common/Avatar';
-import { GRAY400, WHITE, PRIMARYSOLID, WHITE60 } from 'shared/src/colors';
+import {
+  GRAY400,
+  WHITE,
+  PRIMARYSOLID,
+  WHITE60,
+  WHITE12,
+} from 'shared/src/colors';
 
 import { Fund } from 'backend/graphql/funds.graphql';
-import { useWatchFund } from 'shared/graphql/mutation/account';
+import { useWatchFund } from 'shared/graphql/mutation/funds/useWatchFund';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 import { Body1Bold, Body3 } from '../../../theme/fonts';
 import pStyles from '../../../theme/pStyles';
@@ -23,49 +29,42 @@ interface FundsProps {
   search: string;
 }
 
-const Funds: React.FC<FundsProps> = ({ funds, search }) => {
-  const [watchFund] = useWatchFund();
+interface FundItemProps {
+  fund: Fund;
+}
 
-  const handleRemoveWatchList = async (id: string): Promise<void> => {
-    try {
-      const { data } = await watchFund({
-        variables: { watch: false, fundId: id },
-      });
-      if (data?.watchFund) {
-      } else {
-        console.log('err', data);
-      }
-    } catch (err) {
-      console.log('err', err);
-    }
-  };
-
-  const navigateToFund = async (id: string): Promise<void> => {
-    NavigationService.navigate('FundDetails', { fundId: id });
-  };
-
-  const renderListItem: ListRenderItem<Fund> = ({ item }) => {
-    return (
-      <TouchableOpacity onPress={() => navigateToFund(item._id)}>
-        <View style={styles.item}>
-          <View style={styles.fund}>
-            <Avatar
-              user={item.company}
-              size={64}
-              style={styles.companyAvatar}
-            />
-            <View style={[styles.flex, styles.company]}>
-              <Text style={styles.title}>{item.name}</Text>
-              <Text style={styles.type}>{item.company.name}</Text>
-            </View>
-            <TouchableOpacity onPress={() => handleRemoveWatchList(item._id)}>
-              <Star size={24} color={PRIMARYSOLID} weight="fill" />
-            </TouchableOpacity>
+const FundItem: FC<FundItemProps> = ({ fund }) => {
+  const { isWatching, toggleWatch } = useWatchFund(fund._id);
+  return (
+    <TouchableOpacity
+      onPress={() => {
+        NavigationService.navigate('FundDetails', { fundId: fund._id });
+      }}>
+      <View style={styles.item}>
+        <View style={styles.fund}>
+          <Avatar user={fund.company} size={64} style={styles.companyAvatar} />
+          <View style={[styles.flex, styles.company]}>
+            <Text style={styles.title}>{fund.name}</Text>
+            <Text style={styles.type}>{fund.company.name}</Text>
           </View>
+          <TouchableOpacity onPress={toggleWatch}>
+            <Star
+              size={24}
+              color={isWatching ? PRIMARYSOLID : WHITE}
+              weight={isWatching ? 'fill' : 'regular'}
+            />
+          </TouchableOpacity>
         </View>
-      </TouchableOpacity>
-    );
-  };
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+export const renderItem: ListRenderItem<Fund> = ({ item }) => {
+  return <FundItem fund={item} />;
+};
+
+const Funds: FC<FundsProps> = ({ funds, search }) => {
   return (
     <View style={pStyles.globalContainer}>
       {!!search && (
@@ -75,7 +74,7 @@ const Funds: React.FC<FundsProps> = ({ funds, search }) => {
       )}
       <FlatList
         data={funds}
-        renderItem={renderListItem}
+        renderItem={renderItem}
         keyExtractor={(item) => item._id}
       />
     </View>
@@ -88,7 +87,7 @@ const styles = StyleSheet.create({
   item: {
     flexDirection: 'column',
     padding: 16,
-    borderBottomColor: WHITE60,
+    borderBottomColor: WHITE12,
     borderBottomWidth: 1,
     alignItems: 'flex-start',
   },

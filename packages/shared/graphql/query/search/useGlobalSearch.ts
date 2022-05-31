@@ -13,7 +13,9 @@ import { FUND_SUMMARY_FRAGMENT } from "../../fragments/fund";
 import { useEffect, useState } from "react";
 
 export type Post = PostSummary;
+export type { User, Company, Fund };
 
+export type SearchResult = User | Company | Post | Fund;
 export type GlobalSearchData = {
   globalSearch: {
     users: User[];
@@ -66,17 +68,16 @@ export const GLOBAL_SEARCH_FRAGMENT = gql`
 `;
 
 export function useGlobalSearch(
-  search: string,
+  search: string
 ): QueryResult<GlobalSearchData, GlobalSearchVariables> {
   const [state, setState] = useState<GlobalSearchData>();
-  const { data, loading, ...rest } = useQuery<GlobalSearchData,
-    GlobalSearchVariables>(
-    GLOBAL_SEARCH_FRAGMENT,
-    {
-      skip: !search,
-      variables: { search: search ?? "" },
-    },
-  );
+  const { data, loading, ...rest } = useQuery<
+    GlobalSearchData,
+    GlobalSearchVariables
+  >(GLOBAL_SEARCH_FRAGMENT, {
+    skip: !search,
+    variables: { search: search ?? "" },
+  });
   useEffect(() => {
     if (!loading && data) {
       setState(data);
@@ -85,7 +86,11 @@ export function useGlobalSearch(
   return { data: state, loading, ...rest };
 }
 
-export function useGlobalSearchLazy(): QueryTuple<GlobalSearchData,
-  GlobalSearchVariables> {
-  return useLazyQuery<GlobalSearchData, GlobalSearchVariables>(GLOBAL_SEARCH_FRAGMENT);
+export function useGlobalSearchLazy(): QueryTuple<
+  GlobalSearchData,
+  GlobalSearchVariables
+> {
+  return useLazyQuery<GlobalSearchData, GlobalSearchVariables>(
+    GLOBAL_SEARCH_FRAGMENT
+  );
 }
