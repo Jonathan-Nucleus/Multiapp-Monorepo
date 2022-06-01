@@ -9,11 +9,8 @@ import { UserSummary } from "shared/graphql/fragments/user";
 import EmojiPicker from "../../../../../common/EmojiPicker";
 import Label from "../../../../../common/Label";
 
-type User = UserSummary;
-
 interface SendMessageProps {
-  user?: User;
-  avatarSize?: number;
+  user?: UserSummary;
   message?: string;
   placeholder?: string;
   onSend: (message: string, mediaUrl?: string) => void;
@@ -21,7 +18,6 @@ interface SendMessageProps {
 
 const SendMessage: FC<SendMessageProps> = ({
   onSend,
-  avatarSize = 36,
   placeholder,
   message = "",
   user,
@@ -84,7 +80,7 @@ const SendMessage: FC<SendMessageProps> = ({
   return (
     <div className="relative">
       <div className="flex items-center py-3">
-        <Avatar user={user} size={avatarSize} />
+        <Avatar user={user} size={36} />
         <div className="flex items-center justify-between flex-1 relative mx-2">
           <Input
             ref={inputRef}

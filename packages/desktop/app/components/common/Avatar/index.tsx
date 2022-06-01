@@ -3,8 +3,8 @@ import Image from "next/image";
 import { UserSummary } from "shared/graphql/fragments/user";
 import { CompanySummary } from "shared/graphql/fragments/company";
 
-type User = Pick<UserSummary, "firstName" | "lastName" | "avatar">;
-type Company = Pick<CompanySummary, "name" | "avatar">;
+type User = Pick<UserSummary, "_id" | "firstName" | "lastName" | "avatar">;
+type Company = Pick<CompanySummary, "_id" | "name" | "avatar">;
 
 interface AvatarProps extends HTMLProps<HTMLDivElement> {
   user?: User | Company;
@@ -19,7 +19,9 @@ const Avatar: FC<AvatarProps> = ({
   ...divProps
 }: AvatarProps) => {
   let initials = "";
-  const avatar = user?.avatar;
+  const avatar = user?.avatar
+    ? `${process.env.NEXT_PUBLIC_AWS_BUCKET}/avatars/${user._id}/${user.avatar}`
+    : undefined;
   if (!avatar && user) {
     initials =
       "firstName" in user
@@ -30,22 +32,21 @@ const Avatar: FC<AvatarProps> = ({
   return (
     <div
       {...divProps}
-      className={`flex items-center justify-center
-          flex-shrink-0 relative shadow
+      className={`flex items-center justify-center flex-shrink-0 relative shadow
           ${shape === "circle" ? "rounded-full" : "rounded-lg"}
           ${divProps.className ?? ""}
-          ${!avatar ? "bg-gray-200" : "bg-background"}
+          ${!avatar ? "bg-gray-200" : "bg-background"} 
           overflow-hidden
         `}
       style={{ width: `${size}px`, height: `${size}px` }}
     >
       {avatar ? (
         <Image
-          src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${avatar}`}
+          src={avatar}
           alt=""
           width={size}
           height={size}
-          className="object-cover"
+          objectFit="cover"
           unoptimized={true}
         />
       ) : (

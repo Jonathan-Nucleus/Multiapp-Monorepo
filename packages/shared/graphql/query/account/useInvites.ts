@@ -1,11 +1,17 @@
 import { gql, QueryHookOptions, QueryResult, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
-import { User } from "backend/graphql/users.graphql";
+import { User as GraphQLUser, Stub } from "backend/graphql/users.graphql";
 
-export type Invitee = Pick<User, "avatar" | "email" | "firstName" | "lastName">;
+type User = Pick<
+  GraphQLUser,
+  "_id" | "firstName" | "lastName" | "email" | "avatar"
+>;
+export type { User };
+
+export type Invitee = Stub | User;
 export type InvitesVariables = never;
 export type InviteesData = {
-  account: Pick<User, "_id" | "role"> & {
+  account: Pick<GraphQLUser, "_id" | "role"> & {
     invitees: Invitee[];
   };
 };
@@ -28,12 +34,14 @@ export function useInvites(
           invitees {
             __typename
             ... on User {
+              _id
               avatar
               email
               firstName
               lastName
             }
             ... on UserStub {
+              _id
               email
             }
           }

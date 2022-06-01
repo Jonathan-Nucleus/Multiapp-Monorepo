@@ -1,15 +1,12 @@
 .mentions--multiLine {
-  @apply h-full;
 }
 
 .mentions--multiLine .mentions__input {
-  @apply outline-none border border-transparent;
-  overflow-y: auto !important;
+  @apply min-h-[200px] outline-none border border-transparent;
 }
 
 .mentions__highlighter {
   @apply box-border overflow-hidden inset-0;
-  position: absolute !important;
 }
 
 .mentions__suggestions__list {
@@ -21,7 +18,6 @@
 }
 
 .mentions__mention {
-  @apply text-primary;
+  @apply text-primary relative;
   z-index: 1;
-  position: relative;
 }

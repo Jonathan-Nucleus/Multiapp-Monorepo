@@ -8,9 +8,7 @@ import {
   Image as ImageIcon,
   Smiley,
   CaretDown,
-  XCircle,
 } from "phosphor-react";
-import Image from "next/image";
 
 import CategorySelector, { categoriesSchema } from "./CategorySelector";
 import Avatar from "desktop/app/components/common/Avatar";
@@ -20,16 +18,8 @@ import Dropdown, {
   DropdownProps,
 } from "desktop/app/components/common/Dropdown";
 import Label from "desktop/app/components/common/Label";
-import MentionTextarea, {
-  mentionTextSchema,
-} from "desktop/app/components/common/MentionTextarea";
 
-import {
-  SubmitHandler,
-  useForm,
-  Controller,
-  DefaultValues,
-} from "react-hook-form";
+import { SubmitHandler, useForm, DefaultValues } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import {
@@ -41,11 +31,13 @@ import { Audiences } from "backend/graphql/enumerations.graphql";
 import { PostSummary } from "shared/graphql/fragments/post";
 import { useEditPost } from "shared/graphql/mutation/posts/useEditPost";
 import ModalDialog from "../../../common/ModalDialog";
-import { useAccount } from "shared/graphql/query/account/useAccount";
 import { hrefFromLink, isWebLink, LINK_PATTERN } from "shared/src/patterns";
 import LinkPreview from "../LinkPreview";
 import _ from "lodash";
 import EmojiPicker from "../../../common/EmojiPicker";
+import MentionTextarea, { mentionTextSchema } from "../MentionTextarea";
+import { useAccountContext } from "shared/context/Account";
+import MediaPreview from "./MediaPreview";
 
 const audienceOptions = [
   {
@@ -130,17 +122,22 @@ const schema = yup
 
 interface EditPostModalProps {
   post?: PostSummary;
+  file?: File;
   show: boolean;
   onClose: () => void;
 }
 
-const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
-  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
+const EditPostModal: FC<EditPostModalProps> = ({
+  post,
+  file,
+  show,
+  onClose,
+}) => {
+  const account = useAccountContext();
   const [userOptions, setUserOptions] = useState<
     DropdownProps["items"][number][]
   >([]);
-  const selectedFile = useRef<File | undefined>(undefined);
-  const [localFileUrl, setLocalFileUrl] = useState<string | null>(null);
+  const selectedFile = useRef<File | undefined>(file);
   const [showCategories, setShowCategories] = useState(!!post);
   const [createPost] = useCreatePost();
   const [editPost] = useEditPost();
@@ -160,6 +157,7 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
       }, 100);
     }
   }, []);
+  const suggestionsContainer = useRef<HTMLDivElement>(null);
   const changeCallback = useRef(
     _.debounce((body: string | undefined) => {
       if (!body) {
@@ -214,17 +212,17 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
         reset(
           schema.cast({
             user: account._id == post.userId ? account._id : post.userId,
-            media: post.media ?? undefined,
+            media: post.media
+              ? {
+                  aspectRatio: post.media.aspectRatio,
+                  url: post.media.url,
+                }
+              : undefined,
             categories: post.categories,
             mentionInput: {
               body: post.body,
             },
           }) as DefaultValues<FormValues>
-        );
-        setLocalFileUrl(
-          post.media
-            ? `${process.env.NEXT_PUBLIC_POST_URL}/${post.media.url}`
-            : null
         );
         changeCallback(post.body);
       } else {
@@ -296,11 +294,10 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
     } catch (err) {}
   };
 
-  const uploadMedia = async (file: File): Promise<string | undefined> => {
+  const uploadMedia = async (file: File) => {
     if (!account) return;
 
     setLoading(true);
-    setLocalFileUrl(URL.createObjectURL(file));
 
     const { data } = await fetchUploadLink({
       variables: {
@@ -366,81 +363,59 @@ const EditPostModal: FC<EditPostModalProps> = ({ post, show, onClose }) => {
                   />
                 </div>
               </div>
-              <div className="mx-4 mt-2 caret-primary min-h-0 flex-grow">
-                <MentionTextarea
-                  inputRef={inputRef}
-                  control={control}
-                  name="mentionInput"
+              <div
+                ref={suggestionsContainer}
+                className="min-h-0 flex flex-col flex-grow overflow-y-auto mt-2 px-4"
+              >
+                <div className="flex-grow">
+                  <MentionTextarea
+                    inputRef={inputRef}
+                    control={control}
+                    name="mentionInput"
+                    suggestionsContainer={
+                      suggestionsContainer.current ?? undefined
+                    }
+                  />
+                </div>
+                <MediaPreview
+                  media={watch("media") ? post?.media : undefined}
+                  file={selectedFile.current}
+                  postId={post?._id}
+                  userId={post?.userId ?? account._id}
+                  onLoaded={(aspectRatio) => {
+                    const media = watch("media");
+                    setValue("media", { ...media, aspectRatio });
+                  }}
+                  onRemove={() => {
+                    selectedFile.current = undefined;
+                    setValue("media", undefined);
+                  }}
                 />
-              </div>
-              {linkPreview && (
-                <div className="mx-4 my-2">
-                  <LinkPreview link={linkPreview} size="sm" />
-                </div>
-              )}
-              {localFileUrl && (
-                <div className="my-2">
-                  <div className="relative px-4">
-                    <div className="h-64 relative">
-                      <Image
-                        alt=""
-                        loader={() => localFileUrl}
-                        src={localFileUrl}
-                        layout="fill"
-                        className="rounded-md"
-                        objectFit="cover"
-                        unoptimized={true}
-                        onLoad={() => {
-                          if (selectedFile.current) {
-                            URL.revokeObjectURL(localFileUrl);
-                          }
-                        }}
-                      />
-                    </div>
-                    <Button
-                      variant="text"
-                      className="absolute top-1 right-5 py-0"
-                      onClick={() => {
-                        if (selectedFile.current) {
-                          selectedFile.current = undefined;
-                          URL.revokeObjectURL(localFileUrl);
-                        } else {
-                          setValue("media", undefined);
-                        }
-                        setLocalFileUrl(null);
-                      }}
-                    >
-                      <XCircle size={32} color="#5F5F5F" weight="fill" />
-                    </Button>
+                {linkPreview && !watch("media") && !selectedFile.current && (
+                  <div className="my-2">
+                    <LinkPreview link={linkPreview} />
                   </div>
-                </div>
-              )}
+                )}
+              </div>
               <div className="mx-4 my-2">
                 <div className="flex items-center">
-                  <Controller
-                    control={control}
-                    name="media"
-                    render={({ field }) => (
-                      <Input
-                        id="image-select"
-                        type="file"
-                        value=""
-                        onInput={async (evt) => {
-                          const file = evt.currentTarget.files?.[0];
-                          selectedFile.current = file;
-
-                          if (file) {
-                            const remoteFilename = await uploadMedia(file);
-                            field.onChange({
-                              url: remoteFilename,
-                              aspectRatio: 1.58,
-                            });
-                          }
-                        }}
-                        className="hidden"
-                        accept="image/*, video/*"
-                      />
-                    )}
+                  <Input
+                    id="image-select"
+                    type="file"
+                    value=""
+                    onInput={async (event) => {
+                      const file = event.currentTarget.files?.[0];
+                      selectedFile.current = file;
+                      if (file) {
+                        const remoteFilename = await uploadMedia(file);
+                        setValue("media", {
+                          ...watch("media"),
+                          url: remoteFilename,
+                        });
+                      }
+                    }}
+                    className="hidden"
+                    accept="image/*, video/*"
                   />
                   <Label
                     htmlFor="image-select"

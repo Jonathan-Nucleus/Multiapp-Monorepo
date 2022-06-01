@@ -537,7 +537,6 @@ export const UserSchema = `
   type UserStub {
     _id: ID!
     email: String!
-    emailToken: String
   }
 
   type UserProfile {

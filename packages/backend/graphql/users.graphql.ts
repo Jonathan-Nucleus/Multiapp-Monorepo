@@ -29,6 +29,7 @@ import type { Company } from "../schemas/company";
 
 type GraphQLUser = User.GraphQL;
 type GraphQLProfile = User.Profile;
+type Stub = Omit<User.Stub, "emailToken" | "role">;
 type FundManager = User.FundManager;
 type OAuthInput = User.OAuthInput;
 
@@ -43,6 +44,7 @@ type SettingsInput = {
 export type {
   GraphQLUser as User,
   GraphQLProfile as UserProfile,
+  Stub,
   FundManager,
   OAuthInput,
   Questionnaire,

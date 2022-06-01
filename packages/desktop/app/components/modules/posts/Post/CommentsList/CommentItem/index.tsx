@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, PropsWithChildren, useState } from "react";
 import Image from "next/image";
 import { DotsThreeOutlineVertical, Trash, Pen } from "phosphor-react";
 import { Menu } from "@headlessui/react";
@@ -17,17 +17,15 @@ import {
 import { useAccount } from "shared/graphql/query/account/useAccount";
 import type { Comment } from "shared/graphql/query/post/usePost";
 
-interface CommentItemProps extends React.PropsWithChildren<unknown> {
+interface CommentItemProps extends PropsWithChildren<unknown> {
   comment: Comment;
   postId: string;
   parentId?: string;
-  size?: number;
 }
 
 const CommentItem: FC<CommentItemProps> = ({
   comment,
   postId,
-  size,
   parentId,
   children,
 }: CommentItemProps) => {
@@ -38,7 +36,7 @@ const CommentItem: FC<CommentItemProps> = ({
   const [commentPost] = useCommentPost();
   const [isEditable, setIsEditable] = useState(false);
   const [liked, setLiked] = useState(
-    (account && comment.likeIds?.includes(account._id)) ?? false,
+    (account && comment.likeIds?.includes(account._id)) ?? false
   );
   const [visibleReply, setVisibleReply] = useState(false);
 
@@ -65,7 +63,7 @@ const CommentItem: FC<CommentItemProps> = ({
 
   const handleEditComment = async (
     message: string,
-    mediaUrl?: string,
+    mediaUrl?: string
   ): Promise<void> => {
     if ((!message || message.trim() === "") && !mediaUrl) return;
     try {
@@ -82,14 +80,10 @@ const CommentItem: FC<CommentItemProps> = ({
       if (data?.editComment) {
         setIsEditable(false);
       }
-    } catch (err) {
-    }
+    } catch (err) {}
   };
-  const handleReplyComment = async (
-    reply: string,
-    mediaUrl?: string,
-  ): Promise<void> => {
-    if ((!reply || reply.trim() === "") && !mediaUrl) return;
+  const handleReplyComment = async (reply: string, mediaUrl?: string) => {
+    if ((!reply || reply.trim() == "") && !mediaUrl) return;
     try {
       setVisibleReply(false);
       await commentPost({
@@ -103,14 +97,13 @@ const CommentItem: FC<CommentItemProps> = ({
           },
         },
       });
-    } catch (err) {
-    }
+    } catch (err) {}
   };
   return (
     <>
       <div className="flex items-start">
-        <Avatar user={comment.user} size={size ? size : 36} />
-        <div className="ml-4 w-full">
+        <Avatar user={comment.user} size={36} />
+        <div className="ml-2 w-full">
           <div className="p-2 rounded-lg bg-background-popover">
             <div className="flex justify-between">
               <div>
@@ -164,7 +157,6 @@ const CommentItem: FC<CommentItemProps> = ({
                 placeholder="Edit comment..."
                 message={comment.body}
                 user={account}
-                avatarSize={24}
               />
             ) : (
               <div className="text text-sm text-white mt-4 flex flex-col">
@@ -196,7 +188,7 @@ const CommentItem: FC<CommentItemProps> = ({
               <Button
                 variant="text"
                 className="ml-4"
-                onClick={() => setVisibleReply(true)}
+                onClick={() => setVisibleReply(!visibleReply)}
               >
                 <div className="text text-xs text-white font-medium tracking-wide">
                   Reply
@@ -210,17 +202,16 @@ const CommentItem: FC<CommentItemProps> = ({
               </div>
             )}
           </div>
-          <div className="child-list">{children}</div>
+          <div>{children}</div>
+          {visibleReply && (
+            <SendMessage
+              user={account}
+              onSend={(val, mediaUrl) => handleReplyComment(val, mediaUrl)}
+              placeholder="Reply comment..."
+            />
+          )}
         </div>
       </div>
-      {visibleReply && (
-        <SendMessage
-          user={account}
-          avatarSize={24}
-          onSend={(val, mediaUrl) => handleReplyComment(val, mediaUrl)}
-          placeholder="Reply comment..."
-        />
-      )}
     </>
   );
 };

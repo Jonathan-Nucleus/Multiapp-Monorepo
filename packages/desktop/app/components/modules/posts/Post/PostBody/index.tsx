@@ -4,7 +4,7 @@ import Link from "next/link";
 import { UserProfile } from "backend/graphql/users.graphql";
 import { hrefFromLink, isWebLink, processPost } from "shared/src/patterns";
 import LinkPreview from "../../LinkPreview";
-import Media from "../../../../common/Media";
+import PostMedia from "../../PostMedia";
 
 interface PostBodyProps {
   account: Pick<UserProfile, "_id"> | undefined;
@@ -85,13 +85,17 @@ const PostBody: FC<PostBodyProps> = ({ account, post }: PostBodyProps) => {
         </div>
         {previewLink && !post.media && (
           <div className="my-4">
-            <LinkPreview link={previewLink} size="lg" />
+            <LinkPreview link={previewLink} />
           </div>
         )}
       </div>
       {post.media && (
         <div className="relative h-auto mt-5 border-b border-white/[.12]">
-          <Media media={post.media} mediaId={post._id} />
+          <PostMedia
+            media={post.media}
+            userId={post.userId}
+            postId={post._id}
+          />
         </div>
       )}
       <div className="uppercase text-xs text-white font-medium opacity-60 mt-3 px-4">
