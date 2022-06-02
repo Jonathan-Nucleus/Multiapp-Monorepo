@@ -4394,7 +4394,7 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react-mentions@^4.1.5":
+"@types/react-mentions@^4.1.6":
   version "4.1.6"
   resolved "https://registry.yarnpkg.com/@types/react-mentions/-/react-mentions-4.1.6.tgz#0ecdb61785c22edbf9c7d6718505d4814ad3a65c"
   integrity sha512-f4/BdnjlMxT47q+WqlcYYwFABbBMVQrDoFFeMeljtFC5nnR9/x8TOFmN18BJKgNuWMgivy9uE5EKtsjlay751w==
@@ -13271,10 +13271,10 @@ react-markdown@^5.0.3:
     unist-util-visit "^2.0.0"
     xtend "^4.0.1"
 
-react-mentions@^4.3.1:
-  version "4.3.2"
-  resolved "https://registry.yarnpkg.com/react-mentions/-/react-mentions-4.3.2.tgz#93a2a674648f31d2b40e8c90d30b94c377cbb582"
-  integrity sha512-NV8ixuE5W9zuvBNWLpPlO+f4QYEkR+p6mR3Jfpfcbytrqqn2nbVb27YXE/M4qSP8N8C+ktgeMUV4jVhm86gt1A==
+react-mentions@4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/react-mentions/-/react-mentions-4.4.0.tgz#af7556c2dd9e7a36e21de5a8d8e7ea0fbbd5099d"
+  integrity sha512-5cbXRm73efshM/l9KhIOC/68wclbz+Tu2lKHGZG8X/keffFqeh2KcyF1SxH7H/Xkb02CpR/I4IwP6qbX6fXO1g==
   dependencies:
     "@babel/runtime" "7.4.5"
     invariant "^2.2.4"

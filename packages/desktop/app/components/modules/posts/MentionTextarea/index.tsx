@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import {
   DataFunc,
   Mention,
@@ -16,7 +15,7 @@ import {
   Path,
 } from "react-hook-form";
 import * as yup from "yup";
-import Avatar from "../Avatar";
+import Avatar from "../../../common/Avatar";
 import { useUsers } from "shared/graphql/query/user/useUsers";
 import { useAccount } from "shared/graphql/query/account/useAccount";
 
@@ -47,6 +46,7 @@ type MentionTextareaProps<
   TName extends Path<TFieldValues> = Path<TFieldValues>
 > = Omit<ControllerProps<TFieldValues, TName>, "render"> & {
   inputRef?: MentionsInputProps["inputRef"];
+  suggestionsContainer?: Element;
 };
 
 function MentionTextarea<
@@ -76,7 +76,7 @@ function MentionTextarea<
   };
 
   return (
-    <div className="text-sm text-white h-full">
+    <div className="text-sm text-white caret-primary min-h-[200px]">
       <Controller
         {...controllerProps}
         name={`${controllerProps.name}.body` as TName}
@@ -89,6 +89,8 @@ function MentionTextarea<
               "Create a post\nUse $ before ticker symbols: ex: $TSLA\nUse @ to tag a user, page or fund"
             }
             classNames={styles}
+            allowSuggestionsAboveCursor={true}
+            suggestionsPortalHost={controllerProps.suggestionsContainer}
           >
             <Mention
               trigger="@"
@@ -104,17 +106,15 @@ function MentionTextarea<
                   },
                 ]);
               }}
-              renderSuggestion={(suggestion, search, highlightedDisplay) => {
+              renderSuggestion={(suggestion) => {
                 const user = users.find((user) => user._id == suggestion.id);
                 return (
                   <div className="flex items-center p-2">
-                    <div className="flex items-center">
-                      <Avatar user={user} size={56} />
-                    </div>
+                    <Avatar user={user} size={56} />
                     <div className="ml-2">
                       <div className="flex items-center">
                         <div className="text-base">
-                          {highlightedDisplay as unknown as ReactNode}
+                          {user?.firstName} {user?.lastName}
                         </div>
                         {user?.role == "PROFESSIONAL" && (
                           <div className="flex items-center">

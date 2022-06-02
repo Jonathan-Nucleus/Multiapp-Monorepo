@@ -1,45 +1,72 @@
 import { FC } from "react";
 import Image from "next/image";
-import { Media as MediaType } from "shared/graphql/fragments/post";
-import { useAccountContext } from "shared/context/Account";
+import { getMediaTypeFrom, MediaType } from "shared/src/media";
 
 interface MediaProps {
-  media: MediaType;
-  mediaId?: string;
+  url: string;
+  type?: MediaType;
+  aspectRatio: number;
+  onLoad?: (aspectRatio: number) => void;
 }
 
-type VideoType = "video/mp4" | "video/ogg" | "video/webm";
-
-function videoType(src: string): VideoType | null {
-  if (src.endsWith(".mp4")) return "video/mp4";
-  return null;
-}
-
-const Media: FC<MediaProps> = ({ media, mediaId }) => {
-  const account = useAccountContext();
-  const mediaKey = mediaId ? `${account._id}/${mediaId}` : account._id;
-
-  const type = videoType(media.url);
-  return type ? (
-    <video controls className="w-full">
-      <source
-        src={`${process.env.NEXT_PUBLIC_POST_URL}/${mediaKey}/${media.url}`}
-        type={type}
-      />
-    </video>
-  ) : (
-    <Image
-      loader={() =>
-        `${process.env.NEXT_PUBLIC_POST_URL}/${mediaKey}/${media.url}`
-      }
-      src={`${process.env.NEXT_PUBLIC_POST_URL}/${mediaKey}/${media.url}`}
-      alt=""
-      layout="responsive"
-      unoptimized={true}
-      objectFit="cover"
-      width={300}
-      height={300 * media.aspectRatio}
-    />
+const Media: FC<MediaProps> = ({
+  url,
+  type: mediaType = getMediaTypeFrom(url),
+  aspectRatio: ratioValue,
+  onLoad,
+}) => {
+  const maxHeight = 700;
+  // When ratio value is invalid, use aspect square instead
+  const aspectRatio = ratioValue != 0 ? ratioValue : 1;
+  return (
+    <div className="bg-black relative">
+      {mediaType == "video" && (
+        <div
+          style={{ maxWidth: `${maxHeight * aspectRatio}px` }}
+          className="mx-auto"
+        >
+          <div style={{ paddingBottom: `${100 / aspectRatio}%` }}>
+            <div className="absolute inset-0">
+              <video
+                controls
+                className="w-full h-full"
+                onLoadedMetadata={(data) => {
+                  const target = data.currentTarget;
+                  onLoad?.(target.videoWidth / target.videoHeight);
+                }}
+              >
+                <source src={url} />
+              </video>
+            </div>
+          </div>
+        </div>
+      )}
+      {mediaType == "image" && (
+        <div
+          style={{ maxWidth: `${maxHeight * aspectRatio}px` }}
+          className="mx-auto"
+        >
+          <div
+            style={{ paddingBottom: `${100 / aspectRatio}%` }}
+            className="relative"
+          >
+            <div className="absolute inset-0">
+              <Image
+                loader={() => url}
+                src={url}
+                alt=""
+                layout="fill"
+                unoptimized={true}
+                objectFit="contain"
+                onLoadingComplete={({ naturalWidth, naturalHeight }) => {
+                  onLoad?.(naturalWidth / naturalHeight);
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

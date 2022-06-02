@@ -92,8 +92,8 @@ const PostsSection: FC<UserProfileProps> = ({ user }) => {
           onClose={() => setShowPostModal(false)}
         />
       )}
-      {loading && (
-        <div className="text-center">
+      {loading && posts && (
+        <div className="text-center p-5">
           <Spinner />
         </div>
       )}

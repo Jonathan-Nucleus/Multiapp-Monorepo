@@ -26,7 +26,7 @@ const api = async (req: NextApiRequest, res: NextApiResponse<SiteMetadata>) => {
     const response = await fetch(urlString);
     const html = await response.text();
     const $ = loadHtml(html);
-    let favicon = $("link[rel=icon]").attr("href");
+    let favicon = $("link[rel*='icon']").attr("href");
     if (favicon) {
       if (!favicon.startsWith("http")) {
         favicon = `${url.origin}${

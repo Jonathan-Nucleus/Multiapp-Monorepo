@@ -9,24 +9,12 @@ import Link from "next/link";
 
 interface LinkPreviewProps {
   link: string;
-  size?: "sm" | "md" | "lg";
 }
 
-const LinkPreview: FC<LinkPreviewProps> = ({
-  size = "md",
-  link,
-}: LinkPreviewProps) => {
+const LinkPreview: FC<LinkPreviewProps> = ({ link }: LinkPreviewProps) => {
   const [preview, setPreview] = useState<SiteMetadata>();
   const [loading, setLoading] = useState(false);
   const [showImage, setShowImage] = useState(true);
-  let sizeClass: string;
-  if (size == "sm") {
-    sizeClass = "h-24";
-  } else if (size == "md") {
-    sizeClass = "h-48";
-  } else {
-    sizeClass = "h-64";
-  }
   useEffect(() => {
     const fetchPreview = async (link: string) => {
       setLoading(true);
@@ -101,8 +89,8 @@ const LinkPreview: FC<LinkPreviewProps> = ({
               leaveFrom="opacity-100 h-full"
               leaveTo="opacity-0 h-0"
             >
-              <div className={`${sizeClass} relative overflow-hidden`}>
-                <div className="flex items-center justify-center">
+              <div className="">
+                <div className="items-center justify-center">
                   {preview.image && (
                     <Link href={link}>
                       <a target="_blank" rel="noopener noreferrer">
@@ -110,7 +98,10 @@ const LinkPreview: FC<LinkPreviewProps> = ({
                           loader={() => preview.image!}
                           src={preview.image}
                           alt=""
-                          layout="fill"
+                          width={161}
+                          height={100}
+                          layout="responsive"
+                          sizes="50vw"
                           objectFit="cover"
                           unoptimized={true}
                           className="rounded"
@@ -119,7 +110,7 @@ const LinkPreview: FC<LinkPreviewProps> = ({
                     </Link>
                   )}
                   {!preview.image && (
-                    <div className="text-sm text-gray-400">
+                    <div className="text-sm text-center text-gray-400">
                       Preview not available
                     </div>
                   )}
