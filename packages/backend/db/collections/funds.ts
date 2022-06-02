@@ -20,7 +20,10 @@ const createFundsCollection = (fundsCollection: Collection<Fund.Mongo>) => {
      * @returns   The fund or null if it was not found.
      */
     find: async (id: MongoId): Promise<Fund.Mongo | null> =>
-      fundsCollection.findOne({ _id: toObjectId(id) }),
+      fundsCollection.findOne({
+        _id: toObjectId(id),
+        inactive: { $exists: false },
+      }),
 
     /**
      * Provides a list of all funds in the DB.
@@ -30,9 +33,14 @@ const createFundsCollection = (fundsCollection: Collection<Fund.Mongo>) => {
      * @returns   An array of matching Fund objects.
      */
     findAll: async (ids?: MongoId[]): Promise<Fund.Mongo[]> => {
-      const query =
-        ids !== undefined ? { _id: { $in: ids ? toObjectIds(ids) : ids } } : {};
-      return fundsCollection.find(query).toArray();
+      return fundsCollection
+        .find({
+          inactive: { $exists: false },
+          ...(ids !== undefined
+            ? { _id: { $in: ids ? toObjectIds(ids) : ids } }
+            : {}),
+        })
+        .toArray();
     },
 
     /**
@@ -71,7 +79,11 @@ const createFundsCollection = (fundsCollection: Collection<Fund.Mongo>) => {
      *
      * @returns The list of funds.
      */
-    findByKeyword: async (accreditation: Accreditation, search = "", limit = 10): Promise<Fund.Mongo[]> => {
+    findByKeyword: async (
+      accreditation: Accreditation,
+      search = "",
+      limit = 10
+    ): Promise<Fund.Mongo[]> => {
       const stage = createSearchStage("name", search);
       if (!stage) {
         return [];
@@ -86,16 +98,18 @@ const createFundsCollection = (fundsCollection: Collection<Fund.Mongo>) => {
         accreditationLevels.indexOf(accreditation) + 1
       );
 
-      const funds = ((await fundsCollection
-        .aggregate([
-          {
-            $search: { ...stage },
-          },
-          {
-            $limit: limit,
-          },
-        ])
-        .toArray()) as Fund.Mongo[]).filter((fund) => accreditationLevels.includes(fund.level));
+      const funds = (
+        (await fundsCollection
+          .aggregate([
+            {
+              $search: { ...stage },
+            },
+            {
+              $limit: limit,
+            },
+          ])
+          .toArray()) as Fund.Mongo[]
+      ).filter((fund) => accreditationLevels.includes(fund.level));
 
       return funds;
     },
