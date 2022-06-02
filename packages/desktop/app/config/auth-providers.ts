@@ -1,3 +1,4 @@
+import getConfig from "next/config";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { Provider } from "next-auth/providers";
 import GoogleProvider from "next-auth/providers/google";
@@ -6,6 +7,9 @@ import LinkedInProvider from "next-auth/providers/linkedin";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { gql } from "@apollo/client";
 import { createApolloClient } from "desktop/app/lib/apolloClient";
+
+const { publicRuntimeConfig = {} } = getConfig();
+const { NEXT_PUBLIC_GRAPHQL_URI } = publicRuntimeConfig;
 
 const providers: Provider[] = [
   CredentialsProvider({
@@ -17,7 +21,11 @@ const providers: Provider[] = [
     async authorize(credentials) {
       if (!credentials) return null;
       const { email, password } = credentials;
-      const result = await createApolloClient().mutate({
+      const result = await createApolloClient(
+        undefined,
+        undefined,
+        NEXT_PUBLIC_GRAPHQL_URI
+      ).mutate({
         mutation: gql`
           mutation Login($email: String!, $password: String!) {
             login(email: $email, password: $password)

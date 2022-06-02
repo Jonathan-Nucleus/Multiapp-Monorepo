@@ -32,13 +32,20 @@ EXPOSE 3000
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-COPY --from=build /ignite/packages/desktop/next.config.js ./
 COPY --from=build /ignite/packages/desktop/public ./
 COPY --from=build /ignite/packages/desktop/package.json ./
 
 COPY --from=build --chown=nextjs:nodejs /ignite/packages/desktop/.next/standalone ./
 COPY --from=build --chown=nextjs:nodejs /ignite/packages/desktop/.next/static ./packages/desktop/.next/static
 
+COPY --from=build /ignite/packages/desktop/next.config.js ./packages/desktop
+COPY --from=build --chown=nextjs:nodejs /ignite/packages/desktop/app/lib/injectConfig.js ./packages/desktop/
+COPY --from=build --chown=nextjs:nodejs /ignite/packages/desktop/app/lib/entrypoint.sh ./packages/desktop/
+
 USER nextjs
 
-CMD ["node", "packages/desktop/server.js"]
+WORKDIR /app/packages/desktop
+
+ENTRYPOINT ["./entrypoint.sh"]
+
+CMD ["node", "server.js"]

@@ -26,6 +26,7 @@
     "dayjs": "^1.11.1",
     "deepmerge": "^4.2.2",
     "dot-object": "^2.1.4",
+    "dotenv": "^16.0.1",
     "emoji-mart": "^3.0.1",
     "graphql": "^16.3.0",
     "jsonwebtoken": "^8.5.1",

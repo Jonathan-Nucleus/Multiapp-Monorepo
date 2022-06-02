@@ -1,9 +1,5 @@
 const path = require("path");
-const withTM = require("next-transpile-modules")([
-  "backend",
-  "mobile",
-  "shared",
-]);
+const withTM = require("next-transpile-modules")(["backend", "shared"]);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = withTM({
@@ -12,9 +8,13 @@ const nextConfig = withTM({
     SCHEMA_BUILD: 1, // Increment each time backend schema changes
   },
   publicRuntimeConfig: {
-    datadogAppId: process.env.DATADOG_RUM_APPLICATION_ID,
-    datadogClientToken: process.env.DATADOG_RUM_CLIENT_TOKEN,
-    datadogRUMEnv: process.env.DATADOG_RUM_ENVIRONMENT,
+    DATADOG_RUM_APPLICATION_ID: process.env.DATADOG_RUM_APPLICATION_ID,
+    DATADOG_RUM_CLIENT_TOKEN: process.env.DATADOG_RUM_CLIENT_TOKEN,
+    DATADOG_RUM_ENVIRONMENT: process.env.DATADOG_RUM_ENVIRONMENT,
+    NEXT_PUBLIC_AWS_BUCKET: process.env.NEXT_PUBLIC_AWS_BUCKET,
+    NEXT_PUBLIC_GRAPHQL_URI: process.env.NEXT_PUBLIC_GRAPHQL_URI,
+    NEXT_PUBLIC_GETSTREAM_ACCESS_KEY:
+      process.env.NEXT_PUBLIC_GETSTREAM_ACCESS_KEY,
   },
   webpack: (config) => {
     config.resolve.alias = {

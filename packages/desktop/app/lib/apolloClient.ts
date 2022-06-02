@@ -18,6 +18,7 @@ const SCHEMA_BUILD_KEY = "prometheus-apollo-schema-build";
 export type ApolloPageProps = {
   initialApolloState?: NormalizedCacheObject;
   graphqlToken?: string;
+  graphqlUri?: string;
 };
 
 /**
@@ -34,7 +35,8 @@ export type ApolloPageProps = {
  */
 export function createApolloClient(
   token?: string,
-  initialCache?: NormalizedCacheObject
+  initialCache?: NormalizedCacheObject,
+  graphqlUri?: string
 ): ApolloClient<NormalizedCacheObject> {
   const fetcher = (
     input: RequestInfo,
@@ -131,12 +133,13 @@ export function createApolloClient(
     return -1;
   }
 
+  console.log("Connecting to apollo server at", graphqlUri);
   const client = new ApolloClient({
     ssrMode: typeof window === "undefined",
     link: from([
       errorLink,
       createHttpLink({
-        uri: process.env.NEXT_PUBLIC_GRAPHQL_URI || "/api/graphql",
+        uri: graphqlUri || "/api/graphql",
         fetch: fetcher,
         headers: token && {
           authorization: `Bearer ${token}`,
