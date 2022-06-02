@@ -66,6 +66,7 @@ const createFundsCollection = (fundsCollection: Collection<Fund.Mongo>) => {
       return fundsCollection
         .find({
           level: { $in: accreditationLevels },
+          inactive: { $exists: false },
           ...(ids ? { _id: { $in: toObjectIds(ids) } } : {}),
         })
         .toArray();
@@ -109,7 +110,9 @@ const createFundsCollection = (fundsCollection: Collection<Fund.Mongo>) => {
             },
           ])
           .toArray()) as Fund.Mongo[]
-      ).filter((fund) => accreditationLevels.includes(fund.level));
+      ).filter(
+        (fund) => accreditationLevels.includes(fund.level) && !fund.inactive
+      );
 
       return funds;
     },

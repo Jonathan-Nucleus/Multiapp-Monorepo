@@ -200,7 +200,8 @@ export const createCompany = async (
 export const createFund = async (
   userId?: MongoId,
   companyId?: MongoId,
-  level: Accreditation = "none"
+  level: Accreditation = "none",
+  inactive = false
 ): Promise<Fund.Mongo> => {
   const { db } = await getIgniteDb();
 
@@ -236,6 +237,8 @@ export const createFund = async (
     overview: faker.lorem.paragraph(8),
     teamIds: [toObjectId(userId)],
     tags: [faker.lorem.word()],
+    updatedAt: new Date(),
+    ...(inactive ? { inactive: true } : {}),
   };
 
   try {

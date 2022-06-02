@@ -36,6 +36,7 @@ export type FundDetails = FundSummary &
     | "attributes"
     | "metrics"
     | "videos"
+    | "updatedAt"
   >;
 
 export type FundData = {
@@ -93,6 +94,7 @@ export function useFund(fundId?: string): QueryResult<FundData, FundVariables> {
             avatar
             position
           }
+          updatedAt
         }
       }
     `,
@@ -115,6 +117,7 @@ export function useFund(fundId?: string): QueryResult<FundData, FundVariables> {
             createdAt: new Date(doc.createdAt),
             date: new Date(doc.date),
           })),
+          updatedAt: new Date(data.fund.updatedAt),
         },
       };
 

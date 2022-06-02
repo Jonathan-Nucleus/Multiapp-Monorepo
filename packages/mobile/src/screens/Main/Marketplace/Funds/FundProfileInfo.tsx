@@ -77,9 +77,27 @@ const FundProfileInfo: FC<FundProfileInfo> = ({
       <View style={styles.imagesContainer}>
         <View style={styles.companyInfo}>
           <Avatar user={fund.company} size={40} style={styles.avatarImage} />
-          <Text style={[styles.whiteText, Body1, styles.fund]}>
-            {fund.name}
-          </Text>
+          <View style={styles.companyName}>
+            <Text style={[styles.whiteText, Body1, styles.fund]}>
+              {fund.name}
+            </Text>
+            {fund.feeder ? (
+              <View style={[styles.row]}>
+                <View style={[styles.statusIndicator, styles.special]} />
+                <Text style={[styles.whiteText, Body2]}>
+                  Feeder fund available
+                </Text>
+              </View>
+            ) : null}
+            {fund.offshore ? (
+              <View style={styles.row}>
+                <View style={[styles.statusIndicator, styles.special]} />
+                <Text style={[styles.whiteText, Body2]}>
+                  Offshore fund available
+                </Text>
+              </View>
+            ) : null}
+          </View>
         </View>
         <View
           style={[
@@ -221,6 +239,11 @@ const styles = StyleSheet.create({
   flex: {
     flex: 1,
   },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
   imagesContainer: {
     flex: 1,
     flexDirection: 'row',
@@ -236,9 +259,12 @@ const styles = StyleSheet.create({
   },
   companyInfo: {
     flex: 1,
-    marginRight: 50,
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  companyName: {
+    flex: 1,
+    paddingHorizontal: 12,
   },
   avatarImage: {
     borderRadius: 4,
@@ -259,8 +285,7 @@ const styles = StyleSheet.create({
     color: DANGER,
   },
   fund: {
-    lineHeight: 21,
-    marginLeft: 12,
+    lineHeight: 20,
   },
   sectionTitle: {
     marginBottom: 8,
@@ -293,8 +318,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: 16,
-    paddingHorizontal: 7,
-    paddingVertical: 3,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
   openContainer: {
     backgroundColor: SUCCESS30,
@@ -303,9 +328,9 @@ const styles = StyleSheet.create({
     backgroundColor: DANGER30,
   },
   statusIndicator: {
-    width: 12,
+    width: 8,
     aspectRatio: 1,
-    borderRadius: 6,
+    borderRadius: 4,
     marginRight: 4,
   },
   open: {
@@ -313,6 +338,10 @@ const styles = StyleSheet.create({
   },
   closed: {
     backgroundColor: DANGER,
+  },
+  special: {
+    backgroundColor: PRIMARYSTATE,
+    marginRight: 8,
   },
   fundSummaryContainer: {
     flexDirection: 'row',

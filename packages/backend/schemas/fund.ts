@@ -38,7 +38,7 @@ export namespace Fund {
     /** Whether this fund is inactive and should not currently be displayed.*/
     inactive?: boolean;
 
-    updatedAt?: Date;
+    updatedAt: Date;
   }
 
   export type GraphQL = GraphQLEntity<
@@ -156,7 +156,7 @@ export const FundSchema = `
     offshore: Boolean
     feeder: Boolean
     createdAt: Date!
-    updatedAt: Date
+    updatedAt: Date!
 
     manager: UserProfile
     company: Company
