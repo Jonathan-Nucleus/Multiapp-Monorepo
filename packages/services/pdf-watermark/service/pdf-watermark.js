@@ -7,7 +7,7 @@ const jwtClient = require('jsonwebtoken');
 const fs = require('fs');
 let pdfWatermark = {
     applyWatermark: async (req, res, next) => {
-        const token = req.body.token;
+        const token = req.query.token;
         const watermark_position_adjustment_coeficient = 7; //determines watermark position based on it's length and size
         let decoded;
 
