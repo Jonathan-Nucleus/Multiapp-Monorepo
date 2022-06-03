@@ -149,6 +149,7 @@ const styles = StyleSheet.create({
     paddingTop: 0,
     textAlignVertical: 'top',
     flex: 1,
+    flexGrow: 1,
   },
   errorInput: {
     borderColor: DANGER,

@@ -168,7 +168,7 @@ export type AuthenticatedStackParamList = {
     accreditation: Accreditation;
   };
   Preferences: undefined;
-  Contact: undefined;
+  Contact: { fundId?: string } | undefined;
   ContactSuccess: undefined;
 };
 

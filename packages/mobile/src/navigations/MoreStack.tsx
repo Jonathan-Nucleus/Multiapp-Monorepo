@@ -56,3 +56,7 @@ export type SettingsScreen = (
 export type BecomeProScreen = (
   props: MoreScreenProps<'BecomePro'>,
 ) => ReactElement;
+
+export type InviteFriendsScreen = (
+  props: MoreScreenProps<'InviteFriends'>,
+) => ReactElement;

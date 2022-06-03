@@ -79,7 +79,7 @@ const BecomePro: BecomeProScreen = ({ navigation }) => {
       }
     } catch (err) {
       console.error('login error', err);
-      showMessage('Error', 'Uh oh! We encountered a problem.');
+      showMessage('error', 'Uh oh! We encountered a problem.');
     }
   };
 
@@ -130,6 +130,7 @@ const BecomePro: BecomeProScreen = ({ navigation }) => {
               labelTextStyle={styles.label}
               textContainerStyle={styles.inputContainerStyle}
               error={fieldState.error?.message}
+              autoCapitalize="words"
             />
           )}
         />
@@ -144,6 +145,7 @@ const BecomePro: BecomeProScreen = ({ navigation }) => {
               labelTextStyle={styles.label}
               textContainerStyle={styles.inputContainerStyle}
               error={fieldState.error?.message}
+              autoCapitalize="words"
             />
           )}
         />
@@ -159,8 +161,13 @@ const BecomePro: BecomeProScreen = ({ navigation }) => {
               underlineColorAndroid="transparent"
               numberOfLines={4}
               labelTextStyle={styles.label}
-              textContainerStyle={styles.inputContainerStyle}
+              textContainerStyle={[
+                styles.inputContainerStyle,
+                styles.longInput,
+              ]}
               error={fieldState.error?.message}
+              autoCapitalize="sentences"
+              autoCorrect={true}
             />
           )}
         />
@@ -199,8 +206,10 @@ const styles = StyleSheet.create({
   description: {
     color: WHITE,
     ...Body2,
+    lineHeight: 20,
     textAlign: 'center',
-    marginBottom: 30,
+    marginBottom: 20,
+    position: 'relative',
   },
   label: {
     ...Body2Bold,
@@ -209,11 +218,8 @@ const styles = StyleSheet.create({
     backgroundColor: GRAY900,
     borderColor: GRAY600,
   },
-  textInput: {
-    borderRadius: 16,
-    height: 56,
-    fontSize: 24,
-    paddingHorizontal: 12,
+  longInput: {
+    height: 140,
   },
   cancel: {
     ...Body1Bold,

@@ -1,5 +1,12 @@
 import React, { FC, useState, useEffect, useRef } from 'react';
-import { StyleProp, StyleSheet, Pressable, View } from 'react-native';
+import {
+  AppState,
+  AppStateStatus,
+  StyleProp,
+  StyleSheet,
+  Pressable,
+  View,
+} from 'react-native';
 import FastImage, { ResizeMode, ImageStyle } from 'react-native-fast-image';
 import Video, { VideoProperties } from 'react-native-video';
 import { Media as MediaType } from 'shared/graphql/fragments/post';
@@ -76,15 +83,26 @@ const Media: FC<MediaProps> = ({
 
   useEffect(() => {
     if (isVideo(media.url)) {
+      const appStateSubscription = AppState.addEventListener(
+        'change',
+        (newState) => {
+          if (newState === 'active' || newState === 'background') {
+            console.log('Pausing video', mediaId);
+            setPaused(true);
+          }
+        },
+      );
+
       const unsubscribe = addVideoStateChangeListener(mediaId, (id) => {
         if (id !== mediaId) {
+          console.log('Pausing video', mediaId);
           setPaused(true);
         }
       });
 
       return () => {
         unsubscribe();
-        setPaused(true);
+        appStateSubscription.remove();
       };
     }
   }, [media.url, mediaId]);
@@ -92,6 +110,7 @@ const Media: FC<MediaProps> = ({
   const togglePause = (): void => {
     const newState = !paused;
     if (!newState) {
+      console.log('Playing video', mediaId);
       triggerPlaybackStarted(mediaId);
     }
 

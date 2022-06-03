@@ -62,7 +62,9 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
   }
 
   const contactSpecialist = (): void => {
-    navigation.navigate('Contact');
+    navigation.navigate('Contact', {
+      fundId: fund._id,
+    });
   };
 
   return (
@@ -72,7 +74,7 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
         onPressLeft={() => NavigationService.goBack()}
       />
       <ScrollView scrollIndicatorInsets={{ right: 1 }}>
-        <FundProfileInfo fund={fund} showCompany />
+        <FundProfileInfo fund={fund} />
         <View
           style={[
             styles.tabView,
@@ -84,6 +86,7 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
           ]}>
           <Tab.Navigator
             sceneContainerStyle={styles.tabContainer}
+            backBehavior="none"
             screenOptions={({ route: tabRoute }) => ({
               swipeEnabled: false, // disabled swipe to scroll team members properly
               tabBarStyle: styles.tabBar,

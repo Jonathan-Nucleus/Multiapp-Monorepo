@@ -17,9 +17,19 @@ import {
   NotFoundError,
   UnprocessableEntityError,
 } from "../../lib/validate";
-import { User } from "../../schemas/user";
+import { User, Accreditation } from "../../schemas/user";
 import { Company } from "../../schemas/company";
 import { createSearchStage } from "../../lib/utils";
+
+type FilterOptions = {
+  postIds?: MongoId[];
+  categories?: PostCategory[];
+  ignorePosts?: MongoId[];
+  ignoreUsers?: MongoId[];
+  roleFilter?: PostRoleFilter;
+  followingUsers?: MongoId[];
+  featured?: boolean;
+};
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 const createPostsCollection = (
@@ -69,12 +79,8 @@ const createPostsCollection = (
      * categories.
      *
      * @param userId          Id of the user requesting posts.
-     * @param audience        Audience level of posts to fetch.
-     * @param categories      Optional list of categories to match.
-     * @param ignorePosts     List of post ids that should not be fetched.
-     * @param ignoreUsers     List of user ids of whose posts not to fetch.
-     * @param roleFilter      Role filter to filter the post by user role.
-     * @param followingUsers  List of user ids that user is following.
+     * @param accreditation   Accreditation level of the user.
+     * @param filterOptions   Optional filter parameters for posts.
      * @param before          Optional post id to load items before.
      * @param limit           Optional limit for pagination. Defaults to no limit.
      *
@@ -82,15 +88,22 @@ const createPostsCollection = (
      */
     findByFilters: async (
       userId: MongoId,
-      audience: Audience,
-      categories?: PostCategory[],
-      ignorePosts: MongoId[] = [],
-      ignoreUsers: MongoId[] = [],
-      roleFilter: PostRoleFilter = "everyone",
-      followingUsers: MongoId[] = [],
+      accreditation: Accreditation,
+      filterOptions: FilterOptions = {},
       before?: MongoId,
       limit = 0
     ): Promise<Post.Mongo[]> => {
+      const {
+        categories,
+        postIds,
+        ignorePosts = [],
+        ignoreUsers = [],
+        roleFilter = "everyone",
+        followingUsers = [],
+        featured = false,
+      } = filterOptions;
+
+      const audience = accreditation === "none" ? "everyone" : accreditation;
       const audienceLevels: Audience[] = [
         "everyone",
         "accredited",
@@ -122,9 +135,19 @@ const createPostsCollection = (
         userIds = _.difference(userIds, ignoreUsers || []);
       }
 
+      const excludePostIds = ignorePosts.map((id) => id.toString());
+      const includePosts = postIds?.filter(
+        (id) => !excludePostIds.includes(id.toString())
+      );
+
       return postsCollection
         .find({
-          _id: { $nin: toObjectIds(ignorePosts), $lt: toObjectId(before) },
+          _id: {
+            ...(includePosts
+              ? { $in: toObjectIds(includePosts) }
+              : { $nin: toObjectIds(ignorePosts) }),
+            $lt: toObjectId(before),
+          },
           deleted: { $exists: false },
           $or: [
             {
@@ -132,6 +155,7 @@ const createPostsCollection = (
               ...(categories !== undefined
                 ? { categories: { $in: categories } }
                 : {}),
+              ...(featured ? { featured: true } : {}),
             },
             {
               audience: { $in: audienceLevels },
@@ -144,6 +168,7 @@ const createPostsCollection = (
               ...(categories !== undefined
                 ? { categories: { $in: categories } }
                 : {}),
+              ...(featured ? { featured: true } : {}),
             },
           ],
         })

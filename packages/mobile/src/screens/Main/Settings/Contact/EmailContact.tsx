@@ -5,7 +5,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
 import PTextInput from 'mobile/src/components/common/PTextInput';
-import { Body2, H6Bold, Body1Bold, Body2Bold } from 'mobile/src/theme/fonts';
+import { Body1Bold, Body2Bold } from 'mobile/src/theme/fonts';
 import { BLACK, WHITE, GRAY600, GRAY900 } from 'shared/src/colors';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import PPicker from 'mobile/src/components/common/PPicker';
@@ -34,9 +34,15 @@ const schema = yup
 interface Props {
   handleContact: (request: HelpRequest) => void;
   funds: Fund[];
+  initialFund?: string;
 }
 
-const EmailContact: React.FC<Props> = ({ handleContact, funds }) => {
+const EmailContact: React.FC<Props> = ({
+  handleContact,
+  funds,
+  initialFund,
+}) => {
+  console.log('initial fund', initialFund);
   const {
     handleSubmit,
     control,
@@ -45,12 +51,12 @@ const EmailContact: React.FC<Props> = ({ handleContact, funds }) => {
     resolver: yupResolver(schema),
     mode: 'onChange',
     defaultValues: schema.cast(
-      {},
+      { fundId: initialFund },
       { assert: false, stripUnknown: true },
     ) as DefaultValues<FormValues>,
   });
 
-  const onSubmit = ({ email, fundId, message }: FormValues) => {
+  const onSubmit = ({ email, fundId, message }: FormValues): void => {
     handleContact({
       fundId,
       message,
@@ -100,6 +106,8 @@ const EmailContact: React.FC<Props> = ({ handleContact, funds }) => {
               labelTextStyle={[styles.label]}
               errorStyle={styles.errorStyle}
               textContainerStyle={[styles.textArea, styles.inputContainerStyle]}
+              autoCorrect={true}
+              autoCapitalize="sentences"
             />
           )}
         />
@@ -130,32 +138,11 @@ const styles = StyleSheet.create({
   formContainer: {
     flex: 1,
   },
-  textContainer: {
-    textAlign: 'center',
-    alignSelf: 'center',
-    marginTop: 26,
-  },
   errorStyle: {
     height: 0,
   },
-  title: {
-    ...H6Bold,
-    color: WHITE,
-  },
-  description: {
-    color: WHITE,
-    ...Body2,
-    textAlign: 'center',
-    marginBottom: 30,
-  },
   label: {
     ...Body2Bold,
-  },
-  textInput: {
-    borderRadius: 16,
-    height: 56,
-    fontSize: 24,
-    paddingHorizontal: 12,
   },
   inputContainerStyle: {
     backgroundColor: GRAY900,

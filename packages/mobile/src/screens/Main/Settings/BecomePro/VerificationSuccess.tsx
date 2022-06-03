@@ -20,11 +20,9 @@ const VerificationSuccess: React.FC<VerificationSuccessProProps> = ({
         <PGradientOutlineButton
           label="Back to App"
           btnContainer={styles.btnContainer}
-          onPress={() =>
-            navigation.navigate('Main', {
-              screen: 'Home',
-            })
-          }
+          onPress={() => {
+            navigation.navigate('Settings');
+          }}
         />
       </View>
     </View>
