@@ -6,7 +6,7 @@ const jwtSecret = process.env.JWT_SECRET;
 const jwtClient = require('jsonwebtoken');
 const fs = require('fs');
 let pdfWatermark = {
-    applyWatermark: async (req, res, next) => {
+    applyWatermark: async (req, res, _next) => {
         const token = req.query.token;
         const watermark_position_adjustment_coeficient = 7; //determines watermark position based on it's length and size
         let decoded;
@@ -27,7 +27,7 @@ let pdfWatermark = {
         const file = decoded.file;
         const filename = file.split('/').pop().split('?')[0];
         const url = bucketURL + '/' + file;
-        const existingPdfBytes = await axios.get(url, {responseType: 'arraybuffer'}).then(res => res.data);
+        const existingPdfBytes = await axios.get(url, {responseType: 'arraybuffer'}).then(response => response.data);
 
         const pdfDoc = await PDFDocument.load(existingPdfBytes);
         const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);

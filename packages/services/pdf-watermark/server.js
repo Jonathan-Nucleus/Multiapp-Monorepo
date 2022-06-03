@@ -24,7 +24,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 //logging
-morgan.token('requestBody', function (req, res) { return JSON.stringify(req.body) });
+morgan.token('requestBody', function (req, _res) { return JSON.stringify(req.body) });
 app.use(morgan(function (tokens, req, res) {
 
     return JSON.stringify([
