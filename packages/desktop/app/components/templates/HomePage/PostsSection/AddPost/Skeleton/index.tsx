@@ -1,6 +1,6 @@
 import { FC } from "react";
-import Card from "../../../../common/Card";
-import Button from "../../../../common/Button";
+import Card from "../../../../../common/Card";
+import Button from "../../../../../common/Button";
 import { Image as ImageIcon } from "phosphor-react";
 
 const Skeleton: FC = () => {

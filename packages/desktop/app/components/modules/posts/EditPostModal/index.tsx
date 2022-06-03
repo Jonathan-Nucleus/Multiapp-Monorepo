@@ -137,7 +137,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
   const [userOptions, setUserOptions] = useState<
     DropdownProps["items"][number][]
   >([]);
-  const selectedFile = useRef<File | undefined>(file);
+  const [selectedFile, setSelectedFile] = useState(file);
   const [showCategories, setShowCategories] = useState(!!post);
   const [createPost] = useCreatePost();
   const [editPost] = useEditPost();
@@ -294,33 +294,35 @@ const EditPostModal: FC<EditPostModalProps> = ({
     } catch (err) {}
   };
 
-  const uploadMedia = async (file: File) => {
-    if (!account) return;
-
-    setLoading(true);
-
-    const { data } = await fetchUploadLink({
-      variables: {
-        localFilename: file.name,
-        type: "POST",
-        id: account._id,
-      },
-    });
-
-    if (!data || !data.uploadLink) {
-      console.log("Error fetching upload link");
-      return undefined;
+  useEffect(() => {
+    const uploadMedia = async (file: File) => {
+      setLoading(true);
+      const { data } = await fetchUploadLink({
+        variables: {
+          localFilename: file.name,
+          type: "POST",
+          id: account._id,
+        },
+      });
+      if (!data || !data.uploadLink) {
+        console.log("Error fetching upload link");
+        return undefined;
+      }
+      const { remoteName, uploadUrl } = data.uploadLink;
+      await fetch(uploadUrl, {
+        method: "PUT",
+        body: file,
+      });
+      setLoading(false);
+      return remoteName;
+    };
+    if (selectedFile) {
+      console.log("uploading");
+      uploadMedia(selectedFile).then((url) => {
+        setValue("media", { ...watch("media"), url });
+      });
     }
-
-    const { remoteName, uploadUrl } = data.uploadLink;
-    await fetch(uploadUrl, {
-      method: "PUT",
-      body: file,
-    });
-
-    setLoading(false);
-    return remoteName;
-  };
+  }, [account._id, fetchUploadLink, selectedFile, setValue, watch]);
 
   const closeModal = () => {
     onClose();
@@ -379,7 +381,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
                 </div>
                 <MediaPreview
                   media={watch("media") ? post?.media : undefined}
-                  file={selectedFile.current}
+                  file={selectedFile}
                   postId={post?._id}
                   userId={post?.userId ?? account._id}
                   onLoaded={(aspectRatio) => {
@@ -387,11 +389,11 @@ const EditPostModal: FC<EditPostModalProps> = ({
                     setValue("media", { ...media, aspectRatio });
                   }}
                   onRemove={() => {
-                    selectedFile.current = undefined;
+                    setSelectedFile(undefined);
                     setValue("media", undefined);
                   }}
                 />
-                {linkPreview && !watch("media") && !selectedFile.current && (
+                {linkPreview && !watch("media") && !selectedFile && (
                   <div className="my-2">
                     <LinkPreview link={linkPreview} />
                   </div>
@@ -399,28 +401,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
               </div>
               <div className="mx-4 my-2">
                 <div className="flex items-center">
-                  <Input
-                    id="image-select"
-                    type="file"
-                    value=""
-                    onInput={async (event) => {
-                      const file = event.currentTarget.files?.[0];
-                      selectedFile.current = file;
-                      if (file) {
-                        const remoteFilename = await uploadMedia(file);
-                        setValue("media", {
-                          ...watch("media"),
-                          url: remoteFilename,
-                        });
-                      }
-                    }}
-                    className="hidden"
-                    accept="image/*, video/*"
-                  />
-                  <Label
-                    htmlFor="image-select"
-                    className="flex items-center cursor-pointer hover:opacity-80 transition"
-                  >
+                  <Label className="flex items-center cursor-pointer hover:opacity-80 transition">
                     <div className="text-purple-secondary">
                       <ImageIcon
                         color="currentColor"
@@ -431,6 +412,16 @@ const EditPostModal: FC<EditPostModalProps> = ({
                     <div className="text-sm text-white/[.6] font-normal ml-2">
                       Photo/Video
                     </div>
+                    <Input
+                      id="image-select"
+                      type="file"
+                      value=""
+                      onInput={async (event) => {
+                        setSelectedFile(event.currentTarget.files?.[0]);
+                      }}
+                      className="hidden"
+                      accept="image/*, video/*"
+                    />
                   </Label>
                   <div
                     className="flex items-center text-white/[.6] ml-4 cursor-pointer hover:opacity-80 transition"
@@ -482,6 +473,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
                 type="button"
                 variant="gradient-primary"
                 className="w-48 font-medium"
+                disabled={loading}
                 loading={loading}
                 onClick={() => handleSubmit(onSubmit)()}
               >
@@ -492,6 +484,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
                 type="button"
                 variant="gradient-primary"
                 className="w-48 font-medium"
+                disabled={loading}
                 loading={loading}
                 onClick={() => setShowCategories(true)}
               >

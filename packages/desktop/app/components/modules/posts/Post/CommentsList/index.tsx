@@ -3,7 +3,6 @@ import { FC, useEffect, useState } from "react";
 import { Comment, usePost } from "shared/graphql/query/post/usePost";
 import SendMessage from "./SendMessage";
 import CommentItem from "./CommentItem";
-import { useAccount } from "shared/graphql/query/account/useAccount";
 import { useCommentPost } from "shared/graphql/mutation/posts";
 import Spinner from "../../../../common/Spinner";
 
@@ -13,7 +12,6 @@ interface CommentsListProps {
 }
 
 const CommentsList: FC<CommentsListProps> = ({ show, postId }) => {
-  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const { data: { post } = {}, refetch } = usePost(postId);
   const [commentPost] = useCommentPost();
   const [comments, setComments] = useState<
@@ -35,22 +33,36 @@ const CommentsList: FC<CommentsListProps> = ({ show, postId }) => {
       );
     }
   }, [post]);
-  const sendMessage = async (message: string, mediaUrl?: string) => {
-    if ((!message || message.trim() === "") && !mediaUrl) return;
-    try {
-      await commentPost({
-        variables: {
-          comment: {
-            body: message,
-            postId,
-            mentionIds: [],
-            mediaUrl,
-          },
+  const addNewComment = async (message: string, mediaUrl?: string) => {
+    await commentPost({
+      variables: {
+        comment: {
+          body: message,
+          postId,
+          mentionIds: [],
+          mediaUrl,
         },
-        refetchQueries: ["Posts"],
-      });
-      await refetch();
-    } catch (err) {}
+      },
+    });
+    await refetch();
+  };
+  const replyToComment = async (
+    commentId: string,
+    message: string,
+    mediaUrl?: string
+  ) => {
+    await commentPost({
+      variables: {
+        comment: {
+          body: message,
+          commentId,
+          postId,
+          mentionIds: [],
+          mediaUrl,
+        },
+      },
+    });
+    await refetch();
   };
 
   if (!post) {
@@ -72,28 +84,27 @@ const CommentsList: FC<CommentsListProps> = ({ show, postId }) => {
         leaveFrom="opacity-100"
         leaveTo="opacity-0"
       >
-        <div className="px-4 relative">
-          <SendMessage
-            onSend={(val, mediaUrl) => sendMessage(val, mediaUrl)}
-            placeholder="Add a comment..."
-            user={account}
-          />
+        <div className="px-4 pb-5 relative">
+          <div className="py-3">
+            <SendMessage
+              type="create-comment"
+              placeholder="Add a comment..."
+              onSend={addNewComment}
+            />
+          </div>
           {comments.map((comment) => (
-            <CommentItem
-              comment={comment}
-              key={comment._id}
-              parentId={comment._id}
-              postId={post._id}
-            >
-              {comment.comments.map((nestedComment) => (
-                <CommentItem
-                  comment={nestedComment}
-                  key={nestedComment._id}
-                  parentId={comment._id}
-                  postId={post._id}
-                />
-              ))}
-            </CommentItem>
+            <div key={comment._id} className="pb-4">
+              <CommentItem comment={comment} onReply={replyToComment} />
+              {comment.comments.length > 0 && (
+                <div className="ml-10 mt-4 pl-2">
+                  {comment.comments.map((nestedComment) => (
+                    <div key={nestedComment._id}>
+                      <CommentItem comment={comment} />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           ))}
         </div>
       </Transition>

@@ -11,16 +11,19 @@ const Background: FC<BackgroundProps> = ({
 }: BackgroundProps) => {
   return (
     <div>
-      {type == "default" &&
-        <div className="h-screen bg-surface overflow-y-auto">
+      {type == "default" && (
+        <div id="app-layout" className="h-screen bg-surface overflow-y-auto">
           {children}
         </div>
-      }
-      {type == "radial" &&
-        <div className="h-screen bg-radial bg-no-repeat bg-top bg-cover overflow-y-auto">
+      )}
+      {type == "radial" && (
+        <div
+          id="app-layout"
+          className="h-screen bg-radial bg-no-repeat bg-top bg-cover overflow-y-auto"
+        >
           {children}
         </div>
-      }
+      )}
     </div>
   );
 };

@@ -1,9 +1,9 @@
-import { FC, useState } from "react";
-import FilterDropdown, { FilterCategory } from "./FilterDropdown";
+import { FC } from "react";
 import Post from "../Post";
 import { PostSummary } from "shared/graphql/fragments/post";
 import { PostCategory } from "backend/graphql/posts.graphql";
 import Skeleton from "./Skeleton";
+import FilterHeader from "./FilterHeader";
 
 interface PostsListProps {
   posts: PostSummary[] | undefined;
@@ -18,10 +18,6 @@ const PostsList: FC<PostsListProps> = ({
   onSelectPost,
   onRefresh,
 }) => {
-  const [selectedTopics, setSelectedTopics] = useState<FilterCategory[]>([
-    "ALL",
-  ]);
-  const [selectedFrom, setSelectedFrom] = useState("Everyone");
   if (!posts) {
     return <Skeleton />;
   }
@@ -30,23 +26,13 @@ const PostsList: FC<PostsListProps> = ({
   }
   return (
     <>
-      {displayFilter &&
-        <FilterDropdown
-          initialTopics={selectedTopics}
-          from={selectedFrom}
-          onSelect={(topics, from) => {
-            if (topics.length == 0) {
-              topics.push("ALL");
-            }
-            setSelectedTopics(topics);
-            setSelectedFrom(from);
-            const postCategories = topics.includes("ALL")
-              ? undefined
-              : (topics as PostCategory[]);
-            onRefresh && onRefresh(postCategories);
+      {displayFilter && (
+        <FilterHeader
+          onFilterChange={(categories, from) => {
+            onRefresh?.(categories.length > 0 ? categories : undefined);
           }}
         />
-      }
+      )}
       <div>
         {posts.map((post, index) => (
           <div key={index} className="mt-4 mb-4">
