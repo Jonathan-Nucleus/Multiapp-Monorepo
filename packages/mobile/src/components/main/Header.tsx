@@ -37,8 +37,9 @@ const MainHeader: React.FC<HeaderProps> = (props) => {
   const account = useAccountContext();
   const { data } = useNotifications();
 
-  console.log('Notifications', data);
-  const newNotificationCount = data?.notifications?.filter((notification) => notification.isNew).length ?? 0;
+  const newNotificationCount =
+    data?.notifications?.filter((notification) => notification.isNew).length ??
+    0;
 
   return (
     <PHeader
@@ -75,9 +76,7 @@ const MainHeader: React.FC<HeaderProps> = (props) => {
               <BellSvg style={styles.headerIcon} />
               {newNotificationCount > 0 ? (
                 <View style={styles.badge}>
-                  <Text style={styles.badgeText}>
-                    {newNotificationCount}
-                  </Text>
+                  <Text style={styles.badgeText}>{newNotificationCount}</Text>
                 </View>
               ) : null}
             </Pressable>

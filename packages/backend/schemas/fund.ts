@@ -28,12 +28,17 @@ export namespace Fund {
     teamIds: ObjectId[];
     tags: string[];
     metrics: Metric[];
-    updatedAt?: Date;
 
-    // TODO: Figure out the rest of these soon
-    // attributes
-    // performance
-    // status
+    /** Whether an offshore fund is alo available. */
+    offshore?: boolean;
+
+    /** Whether a feeder fund is in place for this fund. */
+    feeder?: boolean;
+
+    /** Whether this fund is inactive and should not currently be displayed.*/
+    inactive?: boolean;
+
+    updatedAt: Date;
   }
 
   export type GraphQL = GraphQLEntity<
@@ -148,8 +153,10 @@ export const FundSchema = `
     teamIds: [ID!]!
     tags: [String!]!
     metrics: [Metric!]!
+    offshore: Boolean
+    feeder: Boolean
     createdAt: Date!
-    updatedAt: Date
+    updatedAt: Date!
 
     manager: UserProfile
     company: Company

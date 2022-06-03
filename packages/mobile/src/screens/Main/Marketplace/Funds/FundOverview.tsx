@@ -12,6 +12,7 @@ import {
 import { Presentation } from 'phosphor-react-native';
 import { useNavigation } from '@react-navigation/native';
 import FastImage from 'react-native-fast-image';
+import dayjs from 'dayjs';
 
 import Tag from 'mobile/src/components/common/Tag';
 import PLabel from 'mobile/src/components/common/PLabel';
@@ -197,7 +198,16 @@ const FundOverview: FC<FundOverviewProps> = ({
           <PTitle title="liquidity" subTitle={fund.liquidity} />
         </View>
         <View style={styles.infoContainer}>
+          <Text style={styles.fee}>
+            {fund.fees.map((fee) => `${fee.label}: ${fee.value}`).join(' • ')}
+          </Text>
+        </View>
+        <View style={styles.infoContainer}>
           <PLabel textStyle={styles.fund} label="Highlights" />
+          <PLabel
+            textStyle={styles.asOf}
+            label={`As of ${dayjs(fund.updatedAt).format('M/DD/YYYY')}`}
+          />
         </View>
         <View style={styles.attributesContainer}>
           {fund.attributes.map((attribute) => (
@@ -260,6 +270,15 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     ...H6Bold,
   },
+  asOf: {
+    marginTop: 16,
+    marginRight: 16,
+    lineHeight: 24,
+    textTransform: 'uppercase',
+    color: GRAY100,
+    letterSpacing: 1.5,
+    ...Body3,
+  },
   presentationContainer: {
     marginVertical: 36,
     flexDirection: 'row',
@@ -297,6 +316,10 @@ const styles = StyleSheet.create({
     padding: 16,
     justifyContent: 'space-between',
     flexDirection: 'row',
+  },
+  fee: {
+    color: GRAY100,
+    ...Body2,
   },
   overview: {
     color: WHITE,

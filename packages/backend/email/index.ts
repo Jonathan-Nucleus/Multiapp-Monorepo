@@ -27,7 +27,7 @@ const sesInstance = new SES({
 
 if (
   process.env.NODE_ENV !== "test" &&
-  (CS_EMAIL || !SENDER || MAILER_TEMPLATE_PATH || !PROMETHEUS_URL)
+  (!CS_EMAIL || !SENDER || !MAILER_TEMPLATE_PATH || !PROMETHEUS_URL)
 ) {
   throw new Error("Invalid sever configuration for email");
 }

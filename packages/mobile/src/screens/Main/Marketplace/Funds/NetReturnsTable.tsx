@@ -17,8 +17,12 @@ interface NetReturnsTableProps {
 const MONTHS = dayjs().localeData().monthsShort();
 
 const NetReturnsTable: FC<NetReturnsTableProps> = ({ returns }) => {
-  const earliestYear = returns[0]?.date.getFullYear();
-  const latestYear = returns[returns.length - 2]?.date.getFullYear(); // Assume last entry is YTD for last year
+  const sortedReturns = returns.sort(
+    (a, b) => a.date.getTime() - b.date.getTime(),
+  );
+  const earliestYear = sortedReturns[0]?.date.getFullYear();
+  const latestYear =
+    sortedReturns[sortedReturns.length - 2]?.date.getFullYear(); // Assume last entry is YTD for last year
   const pages = [...Array(Math.ceil((latestYear - earliestYear + 1) / 3))]
     .map((_, index) => index)
     .reverse();
@@ -48,7 +52,7 @@ const NetReturnsTable: FC<NetReturnsTableProps> = ({ returns }) => {
                 <Text style={[styles.row, styles.header]}>YR</Text>
               </View>
               {years.map((year, yearIndex) => {
-                const ytdFigure = returns.find(
+                const ytdFigure = sortedReturns.find(
                   (metric) =>
                     metric.date.getUTCMonth() === 0 &&
                     metric.date.getUTCFullYear() === year + 1 &&
@@ -64,7 +68,7 @@ const NetReturnsTable: FC<NetReturnsTableProps> = ({ returns }) => {
                     ]}>
                     <Text style={[styles.row, styles.header]}>{year}</Text>
                     {MONTHS.map((month, index) => {
-                      const figure = returns.find(
+                      const figure = sortedReturns.find(
                         (metric) =>
                           metric.date.getUTCMonth() === index &&
                           metric.date.getUTCFullYear() === year &&

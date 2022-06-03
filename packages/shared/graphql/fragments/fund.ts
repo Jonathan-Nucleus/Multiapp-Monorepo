@@ -16,6 +16,8 @@ export type FundSummary = Pick<
   | "strategy"
   | "min"
   | "tags"
+  | "offshore"
+  | "feeder"
 >;
 
 export const FUND_SUMMARY_FRAGMENT = gql`
@@ -29,6 +31,8 @@ export const FUND_SUMMARY_FRAGMENT = gql`
     highlights
     overview
     tags
+    offshore
+    feeder
   }
 `;
 

@@ -8,6 +8,7 @@ import {
   createStackNavigator,
   StackScreenProps,
 } from '@react-navigation/stack';
+import dayjs from 'dayjs';
 
 import MainTabNavigator, { MainTabParamList } from './MainTabNavigator';
 import UserDetailsStack, {
@@ -32,6 +33,12 @@ import NotificationDetail from '../screens/Notification/Details';
 import Preferences from '../screens/Main/Settings/Preferences';
 import ContactSuccess from '../screens/Main/Settings/Contact/ContactSuccess';
 
+import {
+  attachTokenObserver,
+  detachTokenObserver,
+  readToken,
+} from 'mobile/src/services/PushNotificationService';
+import { clearToken } from 'mobile/src/utils/auth-token';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 
 import { MediaType } from 'backend/graphql/mutations.graphql';
@@ -40,53 +47,60 @@ import { Accreditation } from 'shared/graphql/mutation/account/useSaveQuestionna
 import { AccountProvider } from 'shared/context/Account';
 import { ChatProvider } from 'mobile/src/context/Chat';
 import { useChatToken } from 'shared/graphql/query/account/useChatToken';
-import {
-  getToken,
-  attachTokenObserver,
-  detachTokenObserver,
-  clearToken,
-  TokenAction,
-} from 'mobile/src/utils/auth-token';
+import { useUpdateFcmToken } from 'shared/graphql/mutation/account';
 
 import { AuthenticatedScreen, AppScreenProps } from './AppNavigator';
 
 const Stack = createStackNavigator();
 const AuthenticatedStack: AuthenticatedScreen = () => {
-  const [authenticated, setAuthenticated] = useState<boolean>();
   const { data, loading: loadingToken, called: calledToken } = useChatToken();
-  const token = data?.chatToken;
+  const [updateFcmToken] = useUpdateFcmToken();
 
+  const token = data?.chatToken;
   if (calledToken && !loadingToken && !token) {
     console.log('Error fetching chat token');
   }
 
   useEffect(() => {
-    (async () => {
-      if (authenticated === undefined) {
-        setAuthenticated(!!(await getToken()));
-      }
-    })();
+    const persistToken = async (): Promise<void> => {
+      const fcmToken = await readToken();
+      console.log('Read stored FCM token', fcmToken);
+      if (fcmToken) {
+        const { token, updatedAt } = fcmToken;
 
-    const tokenObserver = (action: TokenAction): void => {
-      if (action === 'cleared') {
-        setAuthenticated(false);
-      } else if (action === 'set') {
-        setAuthenticated(true);
+        // Only persist the token if it's fresh
+        if (dayjs(updatedAt).isAfter(dayjs().subtract(5, 'minutes'))) {
+          console.log('Persisting FCM token');
+          try {
+            const { data } = await updateFcmToken({
+              variables: { fcmToken: token },
+            });
+
+            data?.updateFcmToken
+              ? console.log('Updated FCM token')
+              : console.log('Failure updating FCM token');
+          } catch (e) {
+            console.log('FCM token fail:', e);
+          }
+        }
       }
+    };
+
+    persistToken();
+    const tokenObserver = (): void => {
+      persistToken();
     };
 
     attachTokenObserver(tokenObserver);
-    return () => {
-      detachTokenObserver(tokenObserver);
-    };
-  }, []);
+    return () => detachTokenObserver(tokenObserver);
+  }, [updateFcmToken]);
 
   const onUnauthenticated = () => {
     console.log('Unauthenticated');
     clearToken();
   };
 
-  return authenticated ? (
+  return (
     <AccountProvider
       onUnauthenticated={onUnauthenticated}
       loadingComponent={<PAppContainer noScroll />}>
@@ -126,8 +140,6 @@ const AuthenticatedStack: AuthenticatedScreen = () => {
         </Stack.Navigator>
       </ChatProvider>
     </AccountProvider>
-  ) : (
-    <PAppContainer noScroll />
   );
 };
 
@@ -156,7 +168,7 @@ export type AuthenticatedStackParamList = {
     accreditation: Accreditation;
   };
   Preferences: undefined;
-  Contact: undefined;
+  Contact: { fundId?: string } | undefined;
   ContactSuccess: undefined;
 };
 

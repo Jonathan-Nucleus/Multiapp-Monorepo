@@ -38,6 +38,7 @@ describe("Query - funds", () => {
       await createFund(authUser._id, company1._id, "accredited"),
       await createFund(authUser._id, company1._id, "client"),
       await createFund(authUser._id, company1._id, "purchaser"),
+      await createFund(authUser._id, company1._id, "accredited", true),
     ])) as Fund.Mongo[];
 
     server = createTestApolloServer(authUser);

@@ -41,14 +41,14 @@ export type Fund = FundSummary & FundManager & FundCompany;
 export interface FundProfileInfo {
   fund: Fund;
   category?: string;
-  showCompany?: boolean;
+  highlightManager?: boolean;
   showTags?: boolean;
 }
 
 const FundProfileInfo: FC<FundProfileInfo> = ({
   fund,
   category,
-  showCompany = false,
+  highlightManager = false,
   showTags = false,
 }) => {
   const { isFollowing, toggleFollow } = useFollowUser(fund.manager._id);
@@ -77,9 +77,27 @@ const FundProfileInfo: FC<FundProfileInfo> = ({
       <View style={styles.imagesContainer}>
         <View style={styles.companyInfo}>
           <Avatar user={fund.company} size={40} style={styles.avatarImage} />
-          <Text style={[styles.whiteText, Body1, styles.fund]}>
-            {fund.name}
-          </Text>
+          <View style={styles.companyName}>
+            <Text style={[styles.whiteText, Body1, styles.fund]}>
+              {fund.name}
+            </Text>
+            {fund.feeder ? (
+              <View style={[styles.row]}>
+                <View style={[styles.statusIndicator, styles.special]} />
+                <Text style={[styles.whiteText, Body2]}>
+                  Feeder fund available
+                </Text>
+              </View>
+            ) : null}
+            {fund.offshore ? (
+              <View style={styles.row}>
+                <View style={[styles.statusIndicator, styles.special]} />
+                <Text style={[styles.whiteText, Body2]}>
+                  Offshore fund available
+                </Text>
+              </View>
+            ) : null}
+          </View>
         </View>
         <View
           style={[
@@ -104,6 +122,58 @@ const FundProfileInfo: FC<FundProfileInfo> = ({
           </Text>
         </View>
       </View>
+      {highlightManager ? (
+        <View style={styles.actionBar}>
+          {fund && fund.manager && (
+            <Pressable
+              onPress={goToManager}
+              style={({ pressed }) => [
+                styles.managerContainer,
+                pressed ? pStyles.pressedStyle : null,
+              ]}>
+              <Avatar
+                size={24}
+                user={fund.manager}
+                style={styles.managerAvatar}
+              />
+              <View style={styles.manager}>
+                <Text style={[styles.whiteText, styles.name]}>
+                  {`${fund.manager.firstName} ${fund.manager.lastName}`}
+                </Text>
+              </View>
+            </Pressable>
+          )}
+          <Pressable
+            onPress={goToCompany}
+            style={({ pressed }) => [
+              styles.flex,
+              pressed ? pStyles.pressedStyle : null,
+            ]}>
+            <Text style={styles.linkWhite}>{fund.company.name}</Text>
+          </Pressable>
+        </View>
+      ) : (
+        <View style={styles.actionBar}>
+          <Pressable
+            onPress={goToCompany}
+            style={({ pressed }) => [
+              styles.flex,
+              pressed ? pStyles.pressedStyle : null,
+            ]}>
+            <Text style={styles.link}>{fund.company.name}</Text>
+          </Pressable>
+          <Pressable
+            onPress={toggleWatch}
+            style={({ pressed }) => [pressed ? pStyles.pressedStyle : null]}>
+            <Star
+              size={24}
+              color={isWatching ? PRIMARYSTATE : WHITE}
+              style={styles.favorite}
+              weight={isWatching ? 'fill' : 'regular'}
+            />
+          </Pressable>
+        </View>
+      )}
       <View style={styles.fundSummaryContainer}>
         <View style={[styles.fundDescriptorContainer, styles.rightSeparator]}>
           <Text style={[styles.title, styles.center]}>Asset Class</Text>
@@ -125,78 +195,29 @@ const FundProfileInfo: FC<FundProfileInfo> = ({
           </View>
         )}
       </View>
-      {showTags && fund.tags && fund.tags.length > 0 && (
-        <View style={styles.tags}>
-          {fund.tags.map((tag, index) => (
-            <React.Fragment key={tag}>
-              <Tag label={tag} viewStyle={styles.tagStyle} />
-              {index < fund.tags.length - 1 ? (
-                <Text style={styles.tagSeparator}>•</Text>
-              ) : null}
-            </React.Fragment>
-          ))}
-        </View>
-      )}
-      {showCompany ? (
-        <View style={styles.actionBar}>
+      <View style={styles.fundDetailsContainer}>
+        {fund && fund.manager && !highlightManager && (
           <Pressable
-            onPress={goToCompany}
+            onPress={goToManager}
             style={({ pressed }) => [
-              styles.flex,
+              styles.managerContainer,
+              styles.managerContainerSpacer,
               pressed ? pStyles.pressedStyle : null,
             ]}>
-            <Text style={styles.link}>View Company Profile</Text>
-          </Pressable>
-          <Pressable
-            onPress={toggleWatch}
-            style={({ pressed }) => [pressed ? pStyles.pressedStyle : null]}>
-            <Star
+            <Avatar
               size={24}
-              color={isWatching ? PRIMARYSTATE : WHITE}
-              style={styles.favorite}
-              weight={isWatching ? 'fill' : 'regular'}
+              user={fund.manager}
+              style={styles.managerAvatar}
             />
-          </Pressable>
-        </View>
-      ) : null}
-      <View style={styles.fundDetailsContainer}>
-        {fund && fund.manager && (
-          <Pressable onPress={goToManager}>
-            <View style={styles.managerContainer}>
-              <Avatar
-                size={48}
-                user={fund.manager}
-                style={styles.managerAvatar}
-              />
-              <View>
-                <View style={styles.manager}>
-                  <Text style={[styles.whiteText, styles.name]}>
-                    {`${fund.manager.firstName} ${fund.manager.lastName}`}
-                  </Text>
-                  {!isFollowing ? (
-                    <>
-                      <View style={styles.separator} />
-                      <TouchableOpacity onPress={toggleFollow}>
-                        <Text style={[styles.follow, Body3]}>Follow</Text>
-                      </TouchableOpacity>
-                    </>
-                  ) : null}
-                </View>
-                <View style={styles.managerInfo}>
-                  <Text style={[styles.grayText, Body2]}>
-                    {`${fund.manager.followerIds?.length ?? 0} Followers`}
-                  </Text>
-                  <View style={styles.separator} />
-                  <Text style={[styles.grayText, Body2]}>
-                    {`${fund.manager.postIds?.length ?? 0} Posts`}
-                  </Text>
-                </View>
-              </View>
+            <View style={styles.manager}>
+              <Text style={[styles.whiteText, styles.name]}>
+                {`${fund.manager.firstName} ${fund.manager.lastName}`}
+              </Text>
             </View>
           </Pressable>
         )}
         {fund.highlights && fund.highlights.length > 0 && (
-          <View style={styles.highlightContainer}>
+          <View>
             <PLabel label="Fund Highlights" textStyle={styles.sectionTitle} />
             {fund.highlights.map((item, index) => (
               <View key={index} style={styles.highlightItem}>
@@ -211,6 +232,18 @@ const FundProfileInfo: FC<FundProfileInfo> = ({
           </View>
         )}
       </View>
+      {showTags && fund.tags && fund.tags.length > 0 && (
+        <View style={styles.tags}>
+          {fund.tags.map((tag, index) => (
+            <React.Fragment key={tag}>
+              <Tag label={tag} viewStyle={styles.tagStyle} />
+              {index < fund.tags.length - 1 ? (
+                <Text style={styles.tagSeparator}>•</Text>
+              ) : null}
+            </React.Fragment>
+          ))}
+        </View>
+      )}
     </View>
   );
 };
@@ -220,6 +253,11 @@ export default FundProfileInfo;
 const styles = StyleSheet.create({
   flex: {
     flex: 1,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
   },
   imagesContainer: {
     flex: 1,
@@ -236,9 +274,12 @@ const styles = StyleSheet.create({
   },
   companyInfo: {
     flex: 1,
-    marginRight: 50,
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  companyName: {
+    flex: 1,
+    paddingHorizontal: 12,
   },
   avatarImage: {
     borderRadius: 4,
@@ -259,15 +300,11 @@ const styles = StyleSheet.create({
     color: DANGER,
   },
   fund: {
-    lineHeight: 21,
-    marginLeft: 12,
+    lineHeight: 20,
   },
   sectionTitle: {
     marginBottom: 8,
     ...Body2Bold,
-  },
-  highlightContainer: {
-    marginTop: 16,
   },
   highlightLabel: {
     lineHeight: 16,
@@ -293,8 +330,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: 16,
-    paddingHorizontal: 7,
-    paddingVertical: 3,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
   openContainer: {
     backgroundColor: SUCCESS30,
@@ -303,9 +340,9 @@ const styles = StyleSheet.create({
     backgroundColor: DANGER30,
   },
   statusIndicator: {
-    width: 12,
+    width: 8,
     aspectRatio: 1,
-    borderRadius: 6,
+    borderRadius: 4,
     marginRight: 4,
   },
   open: {
@@ -313,6 +350,10 @@ const styles = StyleSheet.create({
   },
   closed: {
     backgroundColor: DANGER,
+  },
+  special: {
+    backgroundColor: PRIMARYSTATE,
+    marginRight: 8,
   },
   fundSummaryContainer: {
     flexDirection: 'row',
@@ -326,6 +367,10 @@ const styles = StyleSheet.create({
   link: {
     color: PRIMARY,
   },
+  linkWhite: {
+    color: WHITE,
+    ...Body2Bold,
+  },
   tags: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -334,6 +379,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 16,
     borderColor: WHITE12,
+    borderTopWidth: 1,
     borderBottomWidth: 1,
   },
   tagStyle: {
@@ -345,8 +391,12 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   managerContainer: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  managerContainerSpacer: {
+    marginBottom: 16,
   },
   manager: {
     flexDirection: 'row',

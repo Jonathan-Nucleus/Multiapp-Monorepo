@@ -2,7 +2,6 @@
   "name": "shared",
   "version": "1.0.0",
   "description": "Prometheus Shared Resources",
-  "main": "index.js",
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.5.10",

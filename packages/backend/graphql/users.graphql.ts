@@ -3,6 +3,7 @@ import {
   PartialSchema,
   ApolloServerContext,
   NoArgs,
+  secureEndpoint,
 } from "../lib/apollo-helper";
 import {
   UserSchema,
@@ -21,11 +22,11 @@ import {
   User,
   ReportedPost,
   isUser,
-  compareAccreditation,
   NotificationMethodEnum,
   AccreditationEnum,
 } from "../schemas/user";
 import type { Company } from "../schemas/company";
+import type { PostCategory } from "../schemas/post";
 
 type GraphQLUser = User.GraphQL;
 type GraphQLProfile = User.Profile;
@@ -62,11 +63,37 @@ const schema = gql`
 `;
 
 export const contentCreatorResolvers = {
-  posts: async (
-    parent: User.Mongo | Company.Mongo,
-    { featured = false }: { featured?: boolean },
-    { db }: ApolloServerContext
-  ) => (parent.postIds ? db.posts.findAll(parent.postIds, featured) : []),
+  posts: secureEndpoint(
+    async (
+      parent: User.Mongo | Company.Mongo,
+      {
+        featured,
+        categories,
+        before,
+        limit,
+      }: {
+        featured?: boolean;
+        categories?: PostCategory[];
+        before?: string;
+        limit?: number;
+      },
+      { db, user }
+    ) =>
+      parent.postIds
+        ? db.posts.findByFilters(
+            user._id,
+            user.accreditation,
+            {
+              postIds: parent.postIds,
+              ignorePosts: user.hiddenPostIds,
+              categories,
+              featured,
+            },
+            before,
+            limit
+          )
+        : []
+  ),
 
   comments: async (
     parent: User.Mongo | Company.Mongo,
@@ -131,8 +158,9 @@ export const publicUserResolvers = {
     { db, user }: ApolloServerContext
   ) =>
     user && parent.managedFundsIds
-      ? (await db.funds.findAll(parent.managedFundsIds)).filter(
-          (fund) => compareAccreditation(user.accreditation, fund.level) >= 0
+      ? await db.funds.findByAccreditation(
+          user.accreditation,
+          parent.managedFundsIds
         )
       : [],
 };

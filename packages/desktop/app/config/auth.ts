@@ -2,6 +2,7 @@
  * Next-Auth configurations.
  *
  */
+import getConfig from "next/config";
 import { NextAuthOptions } from "next-auth";
 import jwt from "jsonwebtoken";
 import { gql } from "@apollo/client";
@@ -9,6 +10,9 @@ import { createApolloClient } from "desktop/app/lib/apolloClient";
 import providers from "./auth-providers";
 
 import { AccessTokenPayload } from "backend/lib/tokens";
+
+const { publicRuntimeConfig = {} } = getConfig();
+const { NEXT_PUBLIC_GRAPHQL_URI } = publicRuntimeConfig;
 
 const AppAuthOptions: NextAuthOptions = {
   providers,
@@ -52,7 +56,11 @@ const AppAuthOptions: NextAuthOptions = {
         // new user record if this user is logging into Prometheus for the
         // first time. The access token requested here should be used to
         // authenticate any requests to secured API endpoints.
-        const result = await createApolloClient().mutate({
+        const result = await createApolloClient(
+          undefined,
+          undefined,
+          process.env.NEXT_PUBLIC_GRAPHQL_URI
+        ).mutate({
           mutation: gql`
             mutation LoginOAuth($user: OAuthUserInput!) {
               loginOAuth(user: $user)

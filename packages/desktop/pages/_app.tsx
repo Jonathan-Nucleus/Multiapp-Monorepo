@@ -1,8 +1,10 @@
 import "../app/styles/app.scss";
-import type { AppProps } from "next/app";
+import getConfig from "next/config";
+import App, { AppProps, AppInitialProps, AppContext } from "next/app";
 
 import RootLayout from "../app/components/layouts/index";
 import SecureApolloProvider from "../app/components/providers/SecureApolloProvider";
+import type { ApolloPageProps } from "desktop/app/lib/apolloClient";
 import { ThemeProvider } from "next-themes";
 import { SessionProvider } from "next-auth/react";
 import { NextPageWithLayout } from "../app/types/next-page";
@@ -10,17 +12,30 @@ import { initializeDatadogRum } from "../app/lib/datadog";
 
 initializeDatadogRum();
 
-type AppPropsWithLayout = AppProps & {
-  Component: NextPageWithLayout;
+type MyAppProps = {
+  runtimeVars: {
+    NEXT_PUBLIC_GRAPHQL_URI: string;
+  };
 };
+
+type AppPropsWithLayout = AppProps &
+  MyAppProps & {
+    Component: NextPageWithLayout;
+  };
 
 function MyApp({
   Component,
   pageProps: { session, ...pageProps },
+  runtimeVars,
 }: AppPropsWithLayout) {
   return (
     <SessionProvider session={session}>
-      <SecureApolloProvider apolloProps={pageProps}>
+      <SecureApolloProvider
+        apolloProps={{
+          ...pageProps,
+          graphqlUri: runtimeVars.NEXT_PUBLIC_GRAPHQL_URI,
+        }}
+      >
         <ThemeProvider>
           <RootLayout
             middleware={Component.middleware}
@@ -34,5 +49,20 @@ function MyApp({
     </SessionProvider>
   );
 }
+
+MyApp.getInitialProps = async (
+  ctx: AppContext
+): Promise<AppInitialProps & MyAppProps> => {
+  const appProps = await App.getInitialProps(ctx);
+  const { publicRuntimeConfig } = getConfig();
+  const { NEXT_PUBLIC_GRAPHQL_URI } = publicRuntimeConfig;
+
+  return {
+    ...appProps,
+    runtimeVars: {
+      NEXT_PUBLIC_GRAPHQL_URI,
+    },
+  };
+};
 
 export default MyApp;

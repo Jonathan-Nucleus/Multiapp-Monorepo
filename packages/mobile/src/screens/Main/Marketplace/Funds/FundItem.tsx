@@ -33,8 +33,13 @@ const FundItem: FC<FundItemProps> = ({
   const { isWatching, toggleWatch } = useWatchFund(fund._id);
 
   return (
-    <View style={styles.fundItem}>
-      <FundProfileInfo fund={fund} category={category} showTags />
+    <View>
+      <FundProfileInfo
+        fund={fund}
+        category={category}
+        showTags
+        highlightManager
+      />
       <View style={styles.actionBar}>
         <PGradientOutlineButton
           label={
@@ -64,11 +69,9 @@ const FundItem: FC<FundItemProps> = ({
 export default FundItem;
 
 const styles = StyleSheet.create({
-  fundItem: {
-    marginBottom: 16,
-  },
   actionBar: {
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 20,
     flexDirection: 'row',
     alignItems: 'center',
   },

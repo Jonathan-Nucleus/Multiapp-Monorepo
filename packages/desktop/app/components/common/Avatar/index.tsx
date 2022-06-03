@@ -1,7 +1,11 @@
 import { FC, HTMLProps } from "react";
+import getConfig from "next/config";
 import Image from "next/image";
 import { UserSummary } from "shared/graphql/fragments/user";
 import { CompanySummary } from "shared/graphql/fragments/company";
+
+const { publicRuntimeConfig } = getConfig();
+const { NEXT_PUBLIC_AWS_BUCKET } = publicRuntimeConfig;
 
 type User = Pick<UserSummary, "_id" | "firstName" | "lastName" | "avatar">;
 type Company = Pick<CompanySummary, "_id" | "name" | "avatar">;
@@ -20,7 +24,7 @@ const Avatar: FC<AvatarProps> = ({
 }: AvatarProps) => {
   let initials = "";
   const avatar = user?.avatar
-    ? `${process.env.NEXT_PUBLIC_AWS_BUCKET}/avatars/${user._id}/${user.avatar}`
+    ? `${NEXT_PUBLIC_AWS_BUCKET}/avatars/${user._id}/${user.avatar}`
     : undefined;
   if (!avatar && user) {
     initials =
@@ -35,7 +39,7 @@ const Avatar: FC<AvatarProps> = ({
       className={`flex items-center justify-center flex-shrink-0 relative shadow
           ${shape === "circle" ? "rounded-full" : "rounded-lg"}
           ${divProps.className ?? ""}
-          ${!avatar ? "bg-gray-200" : "bg-background"} 
+          ${!avatar ? "bg-gray-200" : "bg-background"}
           overflow-hidden
         `}
       style={{ width: `${size}px`, height: `${size}px` }}

@@ -209,14 +209,14 @@ const resolvers = {
 
         return db.posts.findByFilters(
           user._id,
-          userData.accreditation === "none"
-            ? "everyone"
-            : userData.accreditation,
-          categories,
-          userData.hiddenPostIds,
-          userData.hiddenUserIds,
-          roleFilter,
-          userData.followingIds,
+          user.accreditation,
+          {
+            categories,
+            roleFilter,
+            ignorePosts: userData.hiddenPostIds,
+            ignoreUsers: userData.hiddenUserIds,
+            followingUsers: userData.followingIds,
+          },
           before,
           limit
         );

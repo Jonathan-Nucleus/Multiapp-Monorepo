@@ -90,6 +90,7 @@ export default async function (
           tags: [...Array(randomInt(0, MAX_TAGS_PER_FUND))].map(() =>
             faker.lorem.word()
           ),
+          updatedAt: new Date(),
         };
       }
     );

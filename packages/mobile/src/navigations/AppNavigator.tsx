@@ -48,48 +48,21 @@ const AppNavigator = () => {
   const navigationRef = useRef<NavigationContainerRef<AppParamList> | null>(
     null,
   );
-  const [updateFcmToken] = useUpdateFcmToken();
   //const [verifyToken] = useVerifyToken();
 
   useEffect(() => {
     NavigationService.setNavigator(navigationRef.current);
 
-    let updateFcmHandle: NodeJS.Timeout | null = null;
     const tokenObserver = (action: TokenAction): void => {
       if (action === 'cleared') {
         setAuthenticated(false);
         navigationRef.current?.navigate('Auth');
-      } else if (action === 'set') {
-        // Update the FCM token whenever the auth token is set. Perform on a
-        // timeout to allow sufficient time for apollo client to restore cache
-        // and complete initialization.
-        updateFcmHandle = setTimeout(async () => {
-          try {
-            const fcmToken = await AsyncStorage.getItem('@fcm_token');
-            if (fcmToken) {
-              const { data } = await updateFcmToken({
-                variables: { fcmToken: fcmToken },
-              });
-
-              data?.updateFcmToken
-                ? console.log('Updated fcm token')
-                : console.log('Failure updating fcm token');
-            }
-          } catch (e) {
-            console.log('fcm token fail:', e);
-          }
-        }, 1000);
       }
     };
 
     attachTokenObserver(tokenObserver);
-    return () => {
-      detachTokenObserver(tokenObserver);
-      if (updateFcmHandle) {
-        clearTimeout(updateFcmHandle);
-      }
-    };
-  }, [updateFcmToken, authenticated]);
+    return () => detachTokenObserver(tokenObserver);
+  }, [authenticated]);
 
   // Fetch authentication token to check whether or not the current user is
   // already logged in

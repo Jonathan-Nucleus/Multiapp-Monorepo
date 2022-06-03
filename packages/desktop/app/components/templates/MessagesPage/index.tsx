@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { FC, useEffect, useState, useRef } from "react";
 import { ChannelFilters, ChannelSort, StreamChat } from "stream-chat";
 import {
   Chat,
@@ -18,11 +18,14 @@ import PThreadHeader from "./PChannel/PThreadHeader";
 import { PChannel } from "./PChannel";
 import { GiphyContext } from "../../../types/message";
 
-const API_KEY = "tr4bpwdeccc6"; //process.env.NEXT_PUBLIC_GETSTREAM_ACCESS_KEY as string;
-const TARGET_ORIGIN = "https://getstream.io"; //process.env.NEXT_PUBLIC_STREAM_TARGET_ORIGIN as string;
+const TARGET_ORIGIN = "https://getstream.io";
 const options = { state: true, watch: true, presence: true };
 
-const MessagesPage = () => {
+interface MessagesPageProps {
+  apiKey: string;
+}
+
+const MessagesPage: FC<MessagesPageProps> = ({ apiKey }) => {
   const chatClient = useRef<StreamChat | null>(null);
   const [channelFilters, setChannelFilters] = useState<ChannelFilters>();
   const [channelSort, setChannelSort] = useState<ChannelSort>({
@@ -36,16 +39,16 @@ const MessagesPage = () => {
   const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
   const { data: chatData } = useChatToken();
   console.log("Received chat token", chatData);
-  console.log("App key", API_KEY);
+  console.log("App key", apiKey);
   console.log("App origin", TARGET_ORIGIN);
 
   useChecklist(chatClient.current, TARGET_ORIGIN);
 
   useEffect(() => {
-    if (API_KEY && !chatClient.current && chatData?.chatToken && account) {
+    if (!chatClient.current && chatData?.chatToken && account) {
       console.log("initializing chat client");
       const initChat = async () => {
-        const client = StreamChat.getInstance(API_KEY, {
+        const client = StreamChat.getInstance(apiKey, {
           enableInsights: true,
           enableWSFallback: true,
         });

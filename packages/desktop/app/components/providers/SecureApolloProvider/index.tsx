@@ -15,10 +15,11 @@ const SecureApolloProvider: FC<SecureApolloProviderProps> = ({
   apolloProps,
 }) => {
   const { data: session } = useSession();
-  const { graphqlToken, initialApolloState } = apolloProps ?? {};
+  const { graphqlUri, graphqlToken, initialApolloState } = apolloProps ?? {};
   const apolloClient = createApolloClient(
     graphqlToken ?? (session?.access_token as string),
-    initialApolloState
+    initialApolloState,
+    graphqlUri
   );
 
   return <ApolloProvider client={apolloClient}>{children}</ApolloProvider>;

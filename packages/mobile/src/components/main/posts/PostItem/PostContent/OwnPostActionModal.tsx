@@ -66,7 +66,7 @@ const OwnPostActionModal: React.FC<OwnPostActionModalProps> = ({
       });
 
       data?.deletePost
-        ? showMessage('success', 'This post has been succesfully deleted.')
+        ? showMessage('success', 'This post has been successfully deleted.')
         : showMessage('error', SOMETHING_WRONG);
     } catch (err) {
       showMessage('error', SOMETHING_WRONG);

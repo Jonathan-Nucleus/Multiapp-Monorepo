@@ -9,16 +9,14 @@ import Toast from 'react-native-toast-message';
 import messaging from '@react-native-firebase/messaging';
 
 import AppNavigator from './navigations/AppNavigator';
+import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import { useInitializeClient } from './services/apolloClient';
-import { requestUserNotificationPermission } from './services/PushNotificationService';
+import { start } from './services/PushNotificationService';
 import { showMessage } from './services/utils';
-
-// Used only for demos. Comment out when not demoing.
-console.disableYellowBox = true;
 
 const App = () => {
   useEffect(() => {
-    requestUserNotificationPermission();
+    start();
 
     // handle interaction from background state
     messaging().onNotificationOpenedApp((remoteMessage) => {
@@ -56,7 +54,7 @@ const App = () => {
 
   const client = useInitializeClient();
   if (!client) {
-    return null;
+    return <PAppContainer noScroll />;
   }
 
   StatusBar.setBarStyle('light-content');
