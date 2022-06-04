@@ -10,6 +10,8 @@ import { BLACK, WHITE, GRAY600, GRAY900 } from 'shared/src/colors';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import PPicker from 'mobile/src/components/common/PPicker';
 
+import { goBack } from 'mobile/src/services/navigation/NavigationService';
+
 import { HelpRequest } from 'shared/graphql/mutation/account';
 
 interface Fund {
@@ -113,7 +115,7 @@ const EmailContact: React.FC<Props> = ({
         />
       </View>
       <View style={styles.bottom}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => goBack()}>
           <Text style={styles.cancel}>Cancel</Text>
         </TouchableOpacity>
         <PGradientButton

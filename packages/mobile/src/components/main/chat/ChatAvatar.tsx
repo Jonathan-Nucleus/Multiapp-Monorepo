@@ -35,7 +35,7 @@ const ChatAvatar: React.FC<ChatAvatarProps> = ({
 
   return (
     <View style={[styles.avatarContainer, sizeStyle, style]}>
-      <Avatar user={user} size={size} />
+      <Avatar user={{ ...user, _id: user.id }} size={size} />
       {showOnlineStatus && online && (
         <View style={[styles.onlineIndicator, indicatorSizeStyle]} />
       )}

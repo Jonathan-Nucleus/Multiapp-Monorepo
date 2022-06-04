@@ -24,7 +24,9 @@ const ErrorText: React.FC<ErrorTextProps> = (props) => {
   return (
     <View style={[styles.errorView, errorContainer]}>
       <ErrorSvg />
-      <Text style={[styles.error, errorStyle]}>{error}</Text>
+      <Text style={[styles.error, errorStyle]} allowFontScaling={false}>
+        {error}
+      </Text>
     </View>
   );
 };

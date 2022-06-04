@@ -52,13 +52,15 @@ const EditCompanyPhoto: EditCompanyPhotoScreen = ({ navigation, route }) => {
   const [fetchUploadLink] = useFetchUploadLink();
 
   const company = companyData?.companyProfile;
-  if (!company) return null;
+  if (!company) {
+    return null;
+  }
 
   const aspect =
     type === 'AVATAR'
       ? { width: 300, height: 300 }
       : { width: 900, height: 150 };
-  const openPicker = () => {
+  const openPicker = (): void => {
     ImagePicker.openPicker({
       ...aspect,
       cropping: true,
@@ -68,7 +70,7 @@ const EditCompanyPhoto: EditCompanyPhotoScreen = ({ navigation, route }) => {
     });
   };
 
-  const takePhoto = () => {
+  const takePhoto = (): void => {
     ImagePicker.openCamera({
       ...aspect,
       cropping: true,
@@ -78,7 +80,7 @@ const EditCompanyPhoto: EditCompanyPhotoScreen = ({ navigation, route }) => {
     });
   };
 
-  const updatePhoto = async () => {
+  const updatePhoto = async (): Promise<void> => {
     const fileUri = imageData.path;
     const filename = fileUri.substring(fileUri.lastIndexOf('/') + 1);
     try {
@@ -117,6 +119,7 @@ const EditCompanyPhoto: EditCompanyPhotoScreen = ({ navigation, route }) => {
             profile,
           },
         });
+        showMessage('success', 'Profile photo successfully updated.');
       }
 
       if (type === 'BACKGROUND') {
@@ -137,8 +140,8 @@ const EditCompanyPhoto: EditCompanyPhotoScreen = ({ navigation, route }) => {
             profile,
           },
         });
+        showMessage('success', 'Cover photo successfully updated.');
       }
-      showMessage('success', 'Cover photo is updated.');
       navigation.goBack();
     } catch (err) {
       console.log('upload error=====>', err);

@@ -43,8 +43,10 @@ import PAppContainer from 'mobile/src/components/common/PAppContainer';
 
 import { MediaType } from 'backend/graphql/mutations.graphql';
 import { Accreditation } from 'shared/graphql/mutation/account/useSaveQuestionnaire';
+import NotificationsManager from 'mobile/src/services/NotificationsManager';
 
 import { AccountProvider } from 'shared/context/Account';
+import { NotificationsProvider } from 'shared/context/Notifications';
 import { ChatProvider } from 'mobile/src/context/Chat';
 import { useChatToken } from 'shared/graphql/query/account/useChatToken';
 import { useUpdateFcmToken } from 'shared/graphql/mutation/account';
@@ -104,41 +106,48 @@ const AuthenticatedStack: AuthenticatedScreen = () => {
     <AccountProvider
       onUnauthenticated={onUnauthenticated}
       loadingComponent={<PAppContainer noScroll />}>
-      <ChatProvider token={token}>
-        <Stack.Navigator
-          screenOptions={{
-            headerShown: false,
-            gestureEnabled: true,
-          }}
-          initialRouteName={'Main'}>
-          <Stack.Screen name="Main" component={MainTabNavigator} />
-          <Stack.Screen name="UserDetails" component={UserDetailsStack} />
-          <Stack.Screen name="CompanyDetails" component={CompanyDetailsStack} />
-          <Stack.Screen name="PostDetails" component={PostDetailsStack} />
-          <Stack.Screen name="FundDetails" component={FundDetails} />
-          <Stack.Screen name="Contact" component={Contact} />
-          <Stack.Screen
-            name="VerificationSuccess"
-            component={VerificationSuccess}
-          />
-          <Stack.Screen name="Search" component={SearchTabs} />
-          <Stack.Screen name="Notification" component={Notification} />
-          <Stack.Screen name="Preferences" component={Preferences} />
-          <Stack.Screen
-            name="NotificationDetail"
-            component={NotificationDetail}
-          />
-          <Stack.Screen
-            name="AccreditationStack"
-            component={AccreditationStack}
-          />
-          <Stack.Screen
-            name="AccreditationResult"
-            component={AccreditationResult}
-          />
-          <Stack.Screen name="ContactSuccess" component={ContactSuccess} />
-        </Stack.Navigator>
-      </ChatProvider>
+      <NotificationsProvider>
+        <NotificationsManager>
+          <ChatProvider token={token}>
+            <Stack.Navigator
+              screenOptions={{
+                headerShown: false,
+                gestureEnabled: true,
+              }}
+              initialRouteName={'Main'}>
+              <Stack.Screen name="Main" component={MainTabNavigator} />
+              <Stack.Screen name="UserDetails" component={UserDetailsStack} />
+              <Stack.Screen
+                name="CompanyDetails"
+                component={CompanyDetailsStack}
+              />
+              <Stack.Screen name="PostDetails" component={PostDetailsStack} />
+              <Stack.Screen name="FundDetails" component={FundDetails} />
+              <Stack.Screen name="Contact" component={Contact} />
+              <Stack.Screen
+                name="VerificationSuccess"
+                component={VerificationSuccess}
+              />
+              <Stack.Screen name="Search" component={SearchTabs} />
+              <Stack.Screen name="Notification" component={Notification} />
+              <Stack.Screen name="Preferences" component={Preferences} />
+              <Stack.Screen
+                name="NotificationDetail"
+                component={NotificationDetail}
+              />
+              <Stack.Screen
+                name="AccreditationStack"
+                component={AccreditationStack}
+              />
+              <Stack.Screen
+                name="AccreditationResult"
+                component={AccreditationResult}
+              />
+              <Stack.Screen name="ContactSuccess" component={ContactSuccess} />
+            </Stack.Navigator>
+          </ChatProvider>
+        </NotificationsManager>
+      </NotificationsProvider>
     </AccountProvider>
   );
 };

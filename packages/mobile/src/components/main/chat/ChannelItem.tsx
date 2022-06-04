@@ -24,7 +24,7 @@ dayjs.updateLocale('en', {
 });
 
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
-import { WHITE, GRAY100 } from 'shared/src/colors';
+import { WHITE, GRAY100, PRIMARYSOLID } from 'shared/src/colors';
 import { Body2, Body2Bold } from 'mobile/src/theme/fonts';
 
 import { useAccountContext } from 'shared/context/Account';
@@ -56,6 +56,9 @@ const ChannelItem: React.FC<ChannelItemProps> = ({ channel }) => {
       onPress={navigateToChat}
       style={({ pressed }) => (pressed ? styles.pressed : null)}>
       <View style={[styles.row, styles.container]}>
+        {channel.state.unreadCount > 0 ? (
+          <View style={styles.unreadIndicator} />
+        ) : null}
         {firstUser.user && <ChatAvatar user={firstUser.user} />}
         <View style={[styles.col, styles.userInfo]}>
           <Text style={[styles.textWhite, Body2Bold]}>
@@ -85,8 +88,17 @@ export default ChannelItem;
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     paddingVertical: 16,
+    position: 'relative',
+  },
+  unreadIndicator: {
+    position: 'absolute',
+    width: 8,
+    left: 6,
+    aspectRatio: 1,
+    borderRadius: 4,
+    backgroundColor: PRIMARYSOLID,
   },
   flexShrink: {
     flexShrink: 1,

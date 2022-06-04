@@ -50,6 +50,7 @@ const PGradientOutlineButton: React.FC<ButtonProps> = (props) => {
         ) : (
           <View style={styles.txtWrap}>
             <Text
+              allowFontScaling={false}
               style={[
                 styles.textStyle,
                 textStyle,

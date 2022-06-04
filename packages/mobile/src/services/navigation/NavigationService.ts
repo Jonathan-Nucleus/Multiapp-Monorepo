@@ -1,13 +1,17 @@
 import { CommonActions } from '@react-navigation/native';
 import { NavigationContainerRef } from '@react-navigation/core';
 
+import { AppParamList } from 'mobile/src/navigations/AppNavigator';
+
 interface NavigationServicesConfig {
-  navigator?: NavigationContainerRef<{}>;
+  navigator?: NavigationContainerRef<AppParamList>;
 }
 
 const config: NavigationServicesConfig = {};
 
-export function setNavigator(nav: NavigationContainerRef<{}> | null): void {
+export function setNavigator(
+  nav: NavigationContainerRef<AppParamList> | null,
+): void {
   if (nav) {
     config.navigator = nav;
   }
@@ -18,7 +22,7 @@ export function navigate(
   params?: Record<string, unknown>,
 ): void {
   if (config.navigator && routeName) {
-    let action = CommonActions.navigate({
+    const action = CommonActions.navigate({
       name: routeName,
       params,
     });
@@ -28,7 +32,7 @@ export function navigate(
 
 export function goBack(): void {
   if (config.navigator) {
-    let action = CommonActions.goBack();
+    const action = CommonActions.goBack();
     config.navigator.dispatch(action);
   }
 }

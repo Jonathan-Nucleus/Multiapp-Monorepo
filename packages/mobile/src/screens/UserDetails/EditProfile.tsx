@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React from 'react';
 import {
   StyleSheet,
   Keyboard,
@@ -68,7 +68,7 @@ const EditProfile: EditUserProfileScreen = ({ navigation }) => {
   });
 
   const isValid = Object.keys(errors).length === 0;
-  const onSubmit = async (values: FormValues) => {
+  const onSubmit = async (values: FormValues): Promise<void> => {
     Keyboard.dismiss();
 
     try {
@@ -80,7 +80,7 @@ const EditProfile: EditUserProfileScreen = ({ navigation }) => {
           },
         },
       });
-      showMessage('success', 'Profile is updated.');
+      showMessage('success', 'Uer profile successfully updated.');
       navigation.goBack();
     } catch (e: any) {
       console.log(e.message);

@@ -52,6 +52,7 @@ const PGradientButton: React.FC<ButtonProps> = (props) => {
           <>
             {label && (
               <Text
+                allowFontScaling={false}
                 style={[
                   styles.textStyle,
                   textStyle,
@@ -78,9 +79,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 32,
     height: 40,
-  },
-  disabled: {
-    backgroundColor: 'red',
   },
   disabledLabel: {
     color: DISABLEDTXT,

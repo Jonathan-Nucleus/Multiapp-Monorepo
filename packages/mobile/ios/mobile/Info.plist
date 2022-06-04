@@ -40,7 +40,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>This app requires to access to camera to take a photo</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This app requires to access to microphone to record a voice</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
@@ -49,25 +49,24 @@
 	<string>This app requires to access to photo library to upload photos</string>
 	<key>UIAppFonts</key>
 	<array>
-		<string>Gotham-Black.otf</string>
-		<string>Gotham-Bold.otf</string>
-		<string>Gotham-BookItalic.otf</string>
-		<string>Gotham-Light.otf</string>
-		<string>Gotham-Thin.otf</string>
-		<string>Gotham-ThinItalic.otf</string>
-		<string>Gotham-UltraItalic.otf</string>
-		<string>Gotham-XLight.otf</string>
-		<string>Gotham-XLightItalic.otf</string>
-		<string>GothamBold.ttf</string>
-		<string>GothamBoldItalic.ttf</string>
-		<string>GothamBook.ttf</string>
-		<string>GothamBookItalic.ttf</string>
-		<string>GothamLight.ttf</string>
-		<string>GothamLightItalic.ttf</string>
-		<string>GothamMedium_1.ttf</string>
-		<string>GothamMedium.ttf</string>
-		<string>GothamMediumItalic.ttf</string>
-		<string>Gotham-Medium.otf</string>
+		<string>Metropolis-Black.otf</string>
+		<string>Metropolis-BlackItalic.otf</string>
+		<string>Metropolis-Bold.otf</string>
+		<string>Metropolis-BoldItalic.otf</string>
+		<string>Metropolis-ExtraBold.otf</string>
+		<string>Metropolis-ExtraBoldItalic.otf</string>
+		<string>Metropolis-ExtraLight.otf</string>
+		<string>Metropolis-ExtraLightItalic.otf</string>
+		<string>Metropolis-Light.otf</string>
+		<string>Metropolis-LightItalic.otf</string>
+		<string>Metropolis-Medium.otf</string>
+		<string>Metropolis-MediumItalic.otf</string>
+		<string>Metropolis-Regular.otf</string>
+		<string>Metropolis-RegularItalic.otf</string>
+		<string>Metropolis-SemiBold.otf</string>
+		<string>Metropolis-SemiBoldItalic.otf</string>
+		<string>Metropolis-Thin.otf</string>
+		<string>Metropolis-ThinItalic.otf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>

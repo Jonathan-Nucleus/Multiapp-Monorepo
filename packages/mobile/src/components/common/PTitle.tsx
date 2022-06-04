@@ -16,8 +16,12 @@ const PTitle: React.FC<TitleProps> = (props) => {
 
   return (
     <View style={style}>
-      <Text style={[styles.text, textStyle]}>{title}</Text>
-      <Text style={[styles.subTxt]}>{subTitle}</Text>
+      <Text style={[styles.text, textStyle]} allowFontScaling={false}>
+        {title}
+      </Text>
+      <Text style={[styles.subTxt]} allowFontScaling={false}>
+        {subTitle}
+      </Text>
     </View>
   );
 };

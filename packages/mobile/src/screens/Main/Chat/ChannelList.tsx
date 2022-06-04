@@ -100,15 +100,7 @@ const ChannelList: ChannelListScreen = ({ navigation, route }) => {
     if (client) {
       fetchChannels();
       const handler = client.on((event) => {
-        const { channel, message, member, user } = event;
-        console.log(
-          'received event',
-          event.type,
-          channel,
-          message,
-          member,
-          user,
-        );
+        console.log('received event in channel list', event.type);
         switch (event.type) {
           case 'user.watching.start':
           case 'user.watching.stop':

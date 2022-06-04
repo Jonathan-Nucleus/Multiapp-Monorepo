@@ -23,14 +23,8 @@ import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import { showMessage } from 'mobile/src/services/utils';
 import pStyles from 'mobile/src/theme/pStyles';
-import { Body1Bold, Body2, Body2Bold, H5Bold } from 'mobile/src/theme/fonts';
-import {
-  WHITE,
-  PRIMARYSOLID,
-  WHITE12,
-  WHITE60,
-  PRIMARY,
-} from 'shared/src/colors';
+import { Body1Bold, Body2, Body2Bold } from 'mobile/src/theme/fonts';
+import { WHITE, WHITE12, WHITE60, PRIMARY } from 'shared/src/colors';
 
 import { useAccountContext } from 'shared/context/Account';
 import { useUpdateUserProfile } from 'shared/graphql/mutation/account';
@@ -51,7 +45,7 @@ const EditPhoto: EditUserPhotoScreen = ({ navigation, route }) => {
     type === 'AVATAR'
       ? { width: 300, height: 300 }
       : { width: 900, height: 150 };
-  const openPicker = () => {
+  const openPicker = (): void => {
     ImagePicker.openPicker({
       ...aspect,
       cropping: true,
@@ -61,7 +55,7 @@ const EditPhoto: EditUserPhotoScreen = ({ navigation, route }) => {
     });
   };
 
-  const takePhoto = () => {
+  const takePhoto = (): void => {
     ImagePicker.openCamera({
       ...aspect,
       cropping: true,
@@ -71,7 +65,7 @@ const EditPhoto: EditUserPhotoScreen = ({ navigation, route }) => {
     });
   };
 
-  const updatePhoto = async () => {
+  const updatePhoto = async (): Promise<void> => {
     const fileUri = imageData.path;
     const filename = fileUri.substring(fileUri.lastIndexOf('/') + 1);
     try {
@@ -111,6 +105,7 @@ const EditPhoto: EditUserPhotoScreen = ({ navigation, route }) => {
             profile,
           },
         });
+        showMessage('success', 'Profile photo successfully updated.');
       }
 
       if (type === 'BACKGROUND') {
@@ -133,12 +128,12 @@ const EditPhoto: EditUserPhotoScreen = ({ navigation, route }) => {
           },
           refetchQueries: ['Account'],
         });
+        showMessage('success', 'Cover photo successfully updated.');
       }
 
-      showMessage('success', 'Profile photo is updated.');
       navigation.goBack();
     } catch (err) {
-      console.log('upload error=====>', err);
+      console.log('upload error,', err);
       showMessage('error', (err as Error).message);
     } finally {
       setImageData(null);
@@ -263,18 +258,6 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     ...Body2Bold,
     color: WHITE,
-  },
-  noAvatarContainer: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: WHITE,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  noAvatar: {
-    color: PRIMARYSOLID,
-    ...H5Bold,
   },
   bottom: {
     marginBottom: 40,
