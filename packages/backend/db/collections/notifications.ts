@@ -87,7 +87,13 @@ const createNotificationsCollection = (
       );
 
       if (user.fcmToken) {
-        sendPushNotification(title, body, user.fcmToken);
+        sendPushNotification(
+          title,
+          body,
+          user.fcmToken,
+          notificationData.type,
+          notificationData.data
+        );
       }
 
       return true;

@@ -1,4 +1,8 @@
 import firebaseAdmin from "firebase-admin";
+import {
+  NotificationData,
+  NotificationType,
+} from "backend/schemas/notification";
 
 import "dotenv/config";
 
@@ -35,7 +39,9 @@ export const initializeFirebase = (): void => {
 export const sendPushNotification = async (
   title: string,
   body: string,
-  token: string
+  token: string,
+  type: NotificationType,
+  data: NotificationData
 ): Promise<void> => {
   if (!firebaseInitialized || !token) {
     return;
@@ -48,6 +54,17 @@ export const sendPushNotification = async (
         body,
       },
       token,
+      data: {
+        type,
+        ...Object.keys(data).reduce<Record<string, string>>((acc, key) => {
+          const value = data[key]?.toString();
+          if (value) {
+            acc[key] = value;
+          }
+
+          return acc;
+        }, {}),
+      },
     });
   } catch (err) {
     console.error(err);
