@@ -22,35 +22,15 @@ import ChatStack, { ChatStackParamList } from './ChatStack';
 import MoreStack, { MoreStackParamList } from './MoreStack';
 import { Body5Bold, Body5 } from '../theme/fonts';
 
-import { useChatContext } from 'mobile/src/context/Chat';
+import { useChatContext, useUnreadCount } from 'mobile/src/context/Chat';
 import { useNotifications } from 'shared/graphql/query/notification/useNotifications';
 
 import type { AuthenticatedScreenProps } from './AuthenticatedStack';
 
 const Tab = createBottomTabNavigator();
 const MainTabNavigator = () => {
-  const {
-    client,
-    userId: chatUserId,
-    unreadCount: userUnreadCount,
-  } = useChatContext() || {};
-  const [unreadCount, setUnreadCount] = useState(userUnreadCount ?? 0);
-
-  useEffect(() => {
-    if (client) {
-      setUnreadCount(userUnreadCount ?? 0);
-      const handler = client.on((event) => {
-        if (
-          event.total_unread_count &&
-          unreadCount !== event.total_unread_count
-        ) {
-          setUnreadCount(event.total_unread_count);
-        }
-      });
-
-      return () => handler.unsubscribe();
-    }
-  }, [client]);
+  const { client, unreadCount: userUnreadCount } = useChatContext() || {};
+  const unreadCount = useUnreadCount();
 
   return (
     <Tab.Navigator

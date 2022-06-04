@@ -25,7 +25,8 @@ const PLabel: React.FC<PLabelProps> = (props) => {
       <Text
         style={[styles.textStyle, textStyle]}
         numberOfLines={numberOfLines}
-        selectable={true}>
+        selectable={true}
+        allowFontScaling={false}>
         {label}
       </Text>
     </View>

@@ -40,7 +40,6 @@ import { useAccount } from 'shared/graphql/query/account/useAccount';
 import { useFollowCompany } from 'shared/graphql/mutation/account/useFollowCompany';
 import type { CompanyProfile } from 'shared/graphql/query/company/useCompany';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
-import { showMessage } from '../../../services/utils';
 
 interface CompanyDetailProps {
   company: CompanyProfile;
@@ -64,23 +63,6 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
     linkedIn,
     twitter,
   } = company;
-
-  const onShare = async () => {
-    try {
-      const result = await Share.open({
-        title: 'Join me on Prometheus Alts!',
-        message: 'Share company',
-        url: company.linkedIn ? company.linkedIn : 'prometheusalts.com',
-      });
-      console.log('result', result);
-      showMessage('success', 'You shared this post succesfully');
-    } catch (err) {
-      console.log(err);
-      showMessage('error', (err as Error).message);
-    } finally {
-      setIsVisible(false);
-    }
-  };
 
   return (
     <>
@@ -175,11 +157,14 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
           />
         ) : (
           <View style={styles.row}>
-            <PGradientOutlineButton
-              label="Message"
-              onPress={() => console.log(11)}
-              gradientContainer={styles.button}
-            />
+            {/**
+               * Hide for MVP
+              <PGradientOutlineButton
+                label="Message"
+                onPress={() => console.log(11)}
+                gradientContainer={styles.button}
+              />
+              */}
             <PGradientButton
               label={isFollowing ? 'unfollow' : 'follow'}
               onPress={toggleFollow}
@@ -235,14 +220,6 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
               <Chats color={WHITE} size={28} />
               <View style={styles.commentWrap}>
                 <Text style={styles.modalLabel}>Message {company.name}</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => onShare()}>
-            <View style={styles.item}>
-              <ShareIcon color={WHITE} size={28} />
-              <View style={styles.commentWrap}>
-                <Text style={styles.modalLabel}>Share as Post</Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -351,7 +328,7 @@ const styles = StyleSheet.create({
     ...Body3,
   },
   button: {
-    width: Dimensions.get('screen').width / 2 - 24,
+    width: Dimensions.get('screen').width - 32,
   },
   socialView: {
     flexDirection: 'row',

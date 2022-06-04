@@ -18,7 +18,7 @@
   "dependencies": {
     "@apollo/client": "^3.6.1",
     "@datadog/browser-rum": "^4.8.1",
-    "@headlessui/react": "^1.6.0",
+    "@headlessui/react": "^1.6.4",
     "@hookform/resolvers": "^2.8.8",
     "@splidejs/react-splide": "^0.7.2",
     "apollo3-cache-persist": "^0.14.0",

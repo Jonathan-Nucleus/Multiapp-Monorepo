@@ -88,13 +88,15 @@ const Settings: SettingsScreen = ({ navigation }) => {
       onPress: () => navigation.navigate('AccountAdmin'),
       icon: <Gear size={26} color={WHITE} />,
     },
+    /**
+     * Remove for now until and implement/integrate at a later date (6/3/22)
     {
       id: 'Preferences',
       label: 'Preferences',
       disabled: true,
       onPress: () => navigation.navigate('Preferences'),
       icon: <SlidersHorizontal size={26} color={WHITE} />,
-    },
+    },*/
     {
       id: 'Support',
       label: 'Help & Support',

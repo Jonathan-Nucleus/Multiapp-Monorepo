@@ -9,13 +9,13 @@ import {
   RefreshControl,
 } from 'react-native';
 import {
-  Gear,
   Checks,
   DotsThreeOutlineVertical,
   ChatCenteredText,
   UserCirclePlus,
   CaretLeft,
   ThumbsUp,
+  At,
 } from 'phosphor-react-native';
 import {
   PRIMARYSTATE,
@@ -39,9 +39,9 @@ import Avatar from 'mobile/src/components/common/Avatar';
 import MainHeader from 'mobile/src/components/main/Header';
 
 import {
-  useNotifications,
+  useNotificationsContext,
   Notification,
-} from 'shared/graphql/query/notification/useNotifications';
+} from 'shared/context/Notifications';
 import {
   useReadNotification,
   useReadNotifications,
@@ -52,19 +52,23 @@ import type { NotificationScreen } from 'mobile/src/navigations/AuthenticatedSta
 const Notifications: NotificationScreen = ({ navigation }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const { data, refetch } = useNotifications();
+  const { notifications, refetch } = useNotificationsContext();
   const [readNotification] = useReadNotification();
   const [readNotifications] = useReadNotifications();
-  const notifications = data?.notifications || [];
 
   const renderIcon = (val: Notification): ReactElement => {
-    if (val.type === 'COMMENT_POST') {
-      return <ChatCenteredText size={18} color={WHITE} />;
+    switch (val.type) {
+      case 'COMMENT_POST':
+        return <ChatCenteredText size={18} color={WHITE} />;
+      case 'LIKE_POST':
+        return <ThumbsUp size={18} color={WHITE} />;
+      case 'TAGGED_IN_POST':
+      case 'TAGGED_IN_COMMENT':
+        return <At size={18} color={WHITE} />;
+      case 'FOLLOWED_BY_USER':
+      case 'FOLLOWED_BY_COMPANY':
+        return <UserCirclePlus size={18} color={WHITE} />;
     }
-    if (val.type === 'LIKE_POST') {
-      return <ThumbsUp size={18} color={WHITE} />;
-    }
-    return <UserCirclePlus size={18} color={WHITE} />;
   };
 
   const onRefresh = async (): Promise<void> => {
@@ -88,7 +92,10 @@ const Notifications: NotificationScreen = ({ navigation }) => {
       }
 
       if (
-        (type === 'COMMENT_POST' || type === 'LIKE_POST') &&
+        (type === 'COMMENT_POST' ||
+          type === 'LIKE_POST' ||
+          type === 'TAGGED_IN_POST' ||
+          type === 'TAGGED_IN_COMMENT') &&
         notificationData.postId
       ) {
         navigation.navigate('PostDetails', {
@@ -128,9 +135,9 @@ const Notifications: NotificationScreen = ({ navigation }) => {
   }) => {
     return (
       <Pressable
-        style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}
+        style={({ pressed }) => (pressed ? styles.pressedState : null)}
         onPress={() => handleReadNotification(item)}>
-        <View style={[styles.item, item.isNew && styles.unread]}>
+        <View style={styles.item}>
           <View style={styles.avatarView}>
             {item.isNew && <View style={styles.dot} />}
             <Avatar size={54} user={item.data.user} />
@@ -222,25 +229,17 @@ const Notifications: NotificationScreen = ({ navigation }) => {
 export default Notifications;
 
 const styles = StyleSheet.create({
-  globalContainer: {
-    flex: 1,
-  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 8,
   },
-  headerTitle: {
-    ...Body1,
-    color: WHITE,
+  pressedState: {
+    backgroundColor: BLUE500,
   },
   flatList: {
     flex: 1,
     marginTop: 16,
-  },
-  avatar: {
-    width: 54,
-    height: 54,
   },
   chat: {
     position: 'absolute',
@@ -316,9 +315,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     position: 'relative',
-  },
-  unread: {
-    backgroundColor: BLUE500,
   },
   title: {
     ...H5Bold,

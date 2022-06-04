@@ -108,7 +108,7 @@ const AppNavigator = () => {
 
 export default AppNavigator;
 
-type AppParamList = {
+export type AppParamList = {
   Auth: NavigatorScreenParams<AuthStackParamList> | undefined;
   Authenticated: NavigatorScreenParams<AuthenticatedStackParamList> | undefined;
 };

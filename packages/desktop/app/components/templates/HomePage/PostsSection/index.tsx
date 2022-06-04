@@ -2,7 +2,7 @@ import { FC, useEffect, useRef, useState } from "react";
 import { PostSummary } from "shared/graphql/fragments/post";
 import PostsList from "../../../modules/posts/PostsList";
 import EditPostModal from "../../../modules/posts/EditPostModal";
-import AddPost from "../AddPost";
+import AddPost from "./AddPost";
 import { UserProfileProps } from "../../../../types/common-props";
 import Button from "../../../common/Button";
 import { Plus } from "phosphor-react";
@@ -16,14 +16,16 @@ const FETCH_DEBOUNCE_INTERVAL = 100;
 
 const PostsSection: FC<UserProfileProps> = ({ user }) => {
   const [limit, setLimit] = useState(POSTS_PER_SCROLL);
+  const scrollOffset = useRef(0);
   const {
     data: { posts } = {},
     loading,
     refetch,
     fetchMore,
   } = usePosts(undefined, undefined, undefined, limit);
+  const selectedPost = useRef<PostSummary>();
+  const selectedFile = useRef<File>();
   const [showPostModal, setShowPostModal] = useState(false);
-  const [selectedPost, setSelectedPost] = useState<PostSummary>();
   const scrollCallback = useRef(
     _.debounce(async (posts?: Post[]) => {
       const lastItem = _.last(posts)?._id;
@@ -40,13 +42,21 @@ const PostsSection: FC<UserProfileProps> = ({ user }) => {
   useEffect(() => {
     const handleScroll = (event: Event) => {
       const target = event.target;
-      if (target && target instanceof HTMLElement) {
+      if (
+        target &&
+        target instanceof HTMLElement &&
+        target.id == "app-layout"
+      ) {
         if (
           target.clientHeight + target.scrollTop >
           target.scrollHeight - SCROLL_OFFSET_THRESHOLD
         ) {
-          scrollCallback(posts);
+          // Fetch more posts only when scroll down.
+          if (target.scrollTop >= scrollOffset.current) {
+            scrollCallback(posts);
+          }
         }
+        scrollOffset.current = target.scrollTop;
       }
     };
     document.addEventListener("scroll", handleScroll, true);
@@ -57,8 +67,9 @@ const PostsSection: FC<UserProfileProps> = ({ user }) => {
       <div className="hidden md:block">
         <AddPost
           user={user}
-          onClick={() => {
-            setSelectedPost(undefined);
+          onClick={(file) => {
+            selectedPost.current = undefined;
+            selectedFile.current = file;
             setShowPostModal(true);
           }}
         />
@@ -67,7 +78,8 @@ const PostsSection: FC<UserProfileProps> = ({ user }) => {
         <PostsList
           posts={posts}
           onSelectPost={(post) => {
-            setSelectedPost(post);
+            selectedPost.current = post;
+            selectedFile.current = undefined;
             setShowPostModal(true);
           }}
           onRefresh={(categories) => refetch({ categories })}
@@ -78,7 +90,8 @@ const PostsSection: FC<UserProfileProps> = ({ user }) => {
           variant="gradient-primary"
           className="w-12 h-12 rounded-full"
           onClick={() => {
-            setSelectedPost(undefined);
+            selectedPost.current = undefined;
+            selectedFile.current = undefined;
             setShowPostModal(true);
           }}
         >
@@ -87,7 +100,8 @@ const PostsSection: FC<UserProfileProps> = ({ user }) => {
       </div>
       {showPostModal && (
         <EditPostModal
-          post={selectedPost}
+          post={selectedPost.current}
+          file={selectedFile.current}
           show={showPostModal}
           onClose={() => setShowPostModal(false)}
         />

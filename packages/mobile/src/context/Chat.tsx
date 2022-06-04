@@ -12,6 +12,7 @@ import { StreamChat } from 'stream-chat';
 import pStyles from 'mobile/src/theme/pStyles';
 
 import type { Client, StreamType } from 'mobile/src/services/chat';
+import { readToken } from 'mobile/src/services/PushNotificationService';
 import { useAccountContext } from 'shared/context/Account';
 
 import { GETSTREAM_ACCESS_KEY } from 'react-native-dotenv';
@@ -26,6 +27,37 @@ export interface ChatSession {
 const ChatContext = React.createContext<ChatSession | undefined>(undefined);
 export function useChatContext(): ChatSession | undefined {
   return useContext(ChatContext);
+}
+
+export function useUnreadCount(): number {
+  const { client, unreadCount: userUnreadCount } = useChatContext() || {};
+  const [unreadCount, setUnreadCount] = useState(userUnreadCount ?? 0);
+
+  useEffect(() => {
+    if (client) {
+      setUnreadCount(userUnreadCount ?? 0);
+      const handler = client.on((event) => {
+        console.log('Received messaging event', event.type, event);
+        if (
+          event.total_unread_count &&
+          unreadCount !== event.total_unread_count
+        ) {
+          console.log('updating unread count');
+          setUnreadCount(event.total_unread_count);
+        } else if (
+          event.type === 'notification.mark_read' &&
+          !event.total_unread_count
+        ) {
+          setUnreadCount(0);
+        }
+      });
+
+      return () => handler.unsubscribe();
+    }
+  }, [client]);
+
+  console.log('Unread count', unreadCount);
+  return unreadCount;
 }
 
 interface ChatProviderProps extends PropsWithChildren<unknown> {
@@ -72,6 +104,13 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
       if (result && result.me) {
         setUnreadCount(result.me.total_unread_count);
       }
+
+      const fcmToken = await readToken();
+      if (fcmToken) {
+        console.log('adding token', fcmToken.token, 'to user', user._id);
+        await client.addDevice(fcmToken.token, 'firebase');
+      }
+
       setReady(true);
     } catch (err) {
       console.log('Error connect to stream chat', err);

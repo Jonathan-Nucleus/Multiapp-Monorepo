@@ -1,5 +1,12 @@
 import React from 'react';
-import { View, StyleSheet, ViewStyle, Pressable, Text } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ViewStyle,
+  Pressable,
+  Text,
+  StyleProp,
+} from 'react-native';
 
 import Avatar from '../common/Avatar';
 import PHeader from '../common/PHeader';
@@ -14,14 +21,14 @@ import BellSvg from 'shared/assets/images/bell.svg';
 import { H6, Body3 } from '../../theme/fonts';
 
 import { useAccountContext } from 'shared/context/Account';
-import { useNotifications } from 'shared/graphql/query/notification/useNotifications';
+import { useNotificationsContext } from 'shared/context/Notifications';
 
 interface HeaderProps {
-  containerStyle?: ViewStyle;
-  outerContainerStyle?: ViewStyle;
-  rightIcon?: any;
-  leftIcon?: any;
-  centerIcon?: any;
+  containerStyle?: StyleProp<ViewStyle>;
+  outerContainerStyle?: StyleProp<ViewStyle>;
+  rightIcon?: React.ReactNode;
+  leftIcon?: React.ReactNode;
+  centerIcon?: React.ReactNode;
   onPressLeft?: () => void;
 }
 
@@ -35,11 +42,11 @@ const MainHeader: React.FC<HeaderProps> = (props) => {
     onPressLeft,
   } = props;
   const account = useAccountContext();
-  const { data } = useNotifications();
+  const { notifications } = useNotificationsContext();
 
-  const newNotificationCount =
-    data?.notifications?.filter((notification) => notification.isNew).length ??
-    0;
+  const newNotificationCount = notifications.filter(
+    (notification) => notification.isNew,
+  ).length;
 
   return (
     <PHeader

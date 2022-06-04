@@ -25,7 +25,9 @@ const PFormLabel: React.FC<FormLabelProps> = (props) => {
   return (
     <TouchableWithoutFeedback onPress={() => onPress?.()}>
       <View style={[styles.container, style]}>
-        <Text style={[styles.textStyle, textStyle]}>{label}</Text>
+        <Text style={[styles.textStyle, textStyle]} allowFontScaling={false}>
+          {label}
+        </Text>
       </View>
     </TouchableWithoutFeedback>
   );

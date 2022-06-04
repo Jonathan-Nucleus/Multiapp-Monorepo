@@ -84,7 +84,10 @@ const EditCompanyProfile: EditCompanyPhotoScreen = ({ navigation, route }) => {
     }
   }, [company]);
 
-  const onSubmit = async ({ name, ...partialValues }: FormValues) => {
+  const onSubmit = async ({
+    name,
+    ...partialValues
+  }: FormValues): Promise<void> => {
     Keyboard.dismiss();
 
     try {
@@ -97,7 +100,7 @@ const EditCompanyProfile: EditCompanyPhotoScreen = ({ navigation, route }) => {
           },
         },
       });
-      showMessage('success', 'Company info is updated.');
+      showMessage('success', 'Company profile successfully updated.');
       navigation.goBack();
     } catch (e: any) {
       console.log(e.message);

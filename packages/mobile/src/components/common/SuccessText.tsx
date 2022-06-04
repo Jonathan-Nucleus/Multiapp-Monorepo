@@ -22,7 +22,9 @@ const SuccessText: React.FC<SuccessTextProps> = (props) => {
 
   return (
     <View style={[styles.successView, container]}>
-      <Text style={[styles.success, textStyle]}>{message}</Text>
+      <Text style={[styles.success, textStyle]} allowFontScaling={false}>
+        {message}
+      </Text>
     </View>
   );
 };

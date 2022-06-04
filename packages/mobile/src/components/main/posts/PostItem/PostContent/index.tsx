@@ -107,7 +107,7 @@ const PostContent: React.FC<PostContentProps> = ({
         {media ? (
           <PostMedia
             userId={post.userId}
-            mediaId={sharedBy || post._id}
+            mediaId={post._id}
             media={media}
             style={styles.media}
           />

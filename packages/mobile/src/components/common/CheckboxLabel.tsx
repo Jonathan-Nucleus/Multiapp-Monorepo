@@ -29,7 +29,11 @@ const CheckboxLabel = forwardRef<CheckBox, PostCategoryProps>((props, ref) => {
     disabled = false,
   } = props;
 
-  const onChange = () => !disabled && handleChange(id);
+  const onChange = (): void => {
+    if (!disabled) {
+      handleChange(id);
+    }
+  };
   return (
     <View
       style={[
@@ -39,6 +43,7 @@ const CheckboxLabel = forwardRef<CheckBox, PostCategoryProps>((props, ref) => {
         disabled && styles.disabled,
       ]}>
       <CheckBox
+        ref={ref}
         disabled={disabled}
         value={value}
         boxType="square"

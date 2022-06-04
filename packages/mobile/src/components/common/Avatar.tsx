@@ -6,7 +6,6 @@ import { GRAY200, PRIMARYSOLID } from 'shared/src/colors';
 
 import type { UserProfile } from 'backend/graphql/users.graphql';
 import type { Company as CompanyProfile } from 'backend/graphql/companies.graphql';
-import { S3_BUCKET_DEV, S3_BUCKET_STAGING } from 'react-native-dotenv';
 import { Body2Bold } from '../../theme/fonts';
 
 import { avatarUrl } from 'mobile/src/utils/env';
@@ -53,13 +52,21 @@ const Avatar: React.FC<AvatarProps> = ({ user, size = 64, style }) => {
   ) : (
     <View style={[styles.defaultAvatar, sizeStyles, style]}>
       {userData ? (
-        <Text style={styles.initials} adjustsFontSizeToFit numberOfLines={1}>
+        <Text
+          style={styles.initials}
+          adjustsFontSizeToFit
+          numberOfLines={1}
+          allowFontScaling={false}>
           {userData.firstName?.charAt(0)}
           {userData.lastName?.charAt(0)}
         </Text>
       ) : null}
       {companyData ? (
-        <Text style={styles.initials} adjustsFontSizeToFit numberOfLines={1}>
+        <Text
+          style={styles.initials}
+          adjustsFontSizeToFit
+          numberOfLines={1}
+          allowFontScaling={false}>
           {companyData.name?.charAt(0)}
         </Text>
       ) : null}

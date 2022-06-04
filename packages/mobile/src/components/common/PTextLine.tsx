@@ -16,7 +16,9 @@ const PTextLine: React.FC<TextLineProps> = (props) => {
   return (
     <View style={[styles.container, containerStyle]}>
       <View style={styles.line} />
-      <Text style={[styles.text, textStyle]}>{title}</Text>
+      <Text style={[styles.text, textStyle]} allowFontScaling={false}>
+        {title}
+      </Text>
       <View style={styles.line} />
     </View>
   );

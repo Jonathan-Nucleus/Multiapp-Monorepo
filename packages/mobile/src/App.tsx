@@ -1,55 +1,23 @@
 import 'react-native-gesture-handler';
 import 'mobile/src/utils/env';
 
-import React, { useEffect } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import { StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ApolloProvider } from '@apollo/react-hooks';
 import Toast from 'react-native-toast-message';
-import messaging from '@react-native-firebase/messaging';
 
 import AppNavigator from './navigations/AppNavigator';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import { useInitializeClient } from './services/apolloClient';
 import { start } from './services/PushNotificationService';
-import { showMessage } from './services/utils';
 
-const App = () => {
+import { LogBox } from 'react-native';
+LogBox.ignoreAllLogs();
+
+const App = (): ReactElement => {
   useEffect(() => {
     start();
-
-    // handle interaction from background state
-    messaging().onNotificationOpenedApp((remoteMessage) => {
-      console.log(
-        'Notification caused app to open from background state:',
-        remoteMessage.notification,
-      );
-    });
-
-    // handle interaction from quit state
-    // Check whether an initial notification is available
-    messaging()
-      .getInitialNotification()
-      .then((remoteMessage) => {
-        if (remoteMessage) {
-          console.log(
-            'Notification caused app to open from quit state:',
-            remoteMessage.notification,
-          );
-        }
-      });
-
-    // handle foreground state
-    const unsubscribe = messaging().onMessage(async (remoteMessage) => {
-      // refetch notification logic
-      console.log('A new FCM message arrived!', JSON.stringify(remoteMessage));
-      showMessage(
-        'info',
-        remoteMessage.notification?.title || '',
-        remoteMessage.notification?.body,
-      );
-    });
-    return unsubscribe;
   }, []);
 
   const client = useInitializeClient();
