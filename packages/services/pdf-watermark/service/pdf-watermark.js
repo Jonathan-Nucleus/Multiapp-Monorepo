@@ -33,7 +33,7 @@ let pdfWatermark = {
 
         // TODO: get rid of this once env variables no longer get the protocol stripped.
         if(!bucketURL.includes('http')) {
-            bucketURL = 'https://'+bucketURL;
+            url = 'https://'+url;
         }
 
         const existingPdfBytes = await axios.get(url, {responseType: 'arraybuffer'}).then(response => response.data);
