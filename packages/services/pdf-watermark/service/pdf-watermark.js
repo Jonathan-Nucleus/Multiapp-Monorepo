@@ -30,6 +30,12 @@ let pdfWatermark = {
         const filename = file.split('/').pop().split('?')[0];
         const url = bucketURL + '/' + file;
         console.log(`Retrieving PDF from: ${url}`);
+
+        // TODO: get rid of this once env variables no longer get the protocol stripped.
+        if(!bucketURL.includes('http')) {
+            bucketURL = 'https://'+bucketURL;
+        }
+
         const existingPdfBytes = await axios.get(url, {responseType: 'arraybuffer'}).then(response => response.data);
 
         const pdfDoc = await PDFDocument.load(existingPdfBytes);
