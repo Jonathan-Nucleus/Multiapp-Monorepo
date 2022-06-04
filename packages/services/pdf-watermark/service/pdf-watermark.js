@@ -28,7 +28,7 @@ let pdfWatermark = {
         const watermark = decoded.watermark;
         const file = decoded.file;
         const filename = file.split('/').pop().split('?')[0];
-        const url = bucketURL + '/' + file;
+        let url = bucketURL + '/' + file;
         console.log(`Retrieving PDF from: ${url}`);
 
         // TODO: get rid of this once env variables no longer get the protocol stripped.
