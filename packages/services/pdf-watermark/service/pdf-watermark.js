@@ -19,7 +19,9 @@ let pdfWatermark = {
             console.error(e);
         }
 
-        if (!decoded) throw new Error('Unable to validate token.');
+        if (!decoded) {
+            console.error(`Unable to validate token: ${token}`);
+        }
         if (!('watermark' in decoded)) throw new Error('Please provide a watermark.');
         if (!('file' in decoded)) throw new Error('Please provide a file.');
 
@@ -27,6 +29,7 @@ let pdfWatermark = {
         const file = decoded.file;
         const filename = file.split('/').pop().split('?')[0];
         const url = bucketURL + '/' + file;
+        console.log(`Retrieving PDF from: ${url}`);
         const existingPdfBytes = await axios.get(url, {responseType: 'arraybuffer'}).then(response => response.data);
 
         const pdfDoc = await PDFDocument.load(existingPdfBytes);
