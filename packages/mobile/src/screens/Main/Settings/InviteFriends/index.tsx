@@ -57,6 +57,7 @@ const InviteFriends: InviteFriendsScreen = ({ navigation }) => {
     handleSubmit,
     control,
     formState: { isValid },
+    reset,
   } = useForm<yup.InferType<typeof schema>>({
     resolver: yupResolver(schema),
     mode: 'onChange',
@@ -87,6 +88,16 @@ const InviteFriends: InviteFriendsScreen = ({ navigation }) => {
           message: `Just sent an invite to Prometheus to your email at ${email}. Check it out!`,
           url: 'prometheusalts.com',
         }).catch(() => console.log('User did not share invite message'));
+
+        reset(
+          schema.cast(
+            {},
+            {
+              assert: false,
+              stripUnknown: true,
+            },
+          ) as DefaultValues<FormValues>,
+        );
       } else {
         showMessage('error', 'Error sending invitation');
       }

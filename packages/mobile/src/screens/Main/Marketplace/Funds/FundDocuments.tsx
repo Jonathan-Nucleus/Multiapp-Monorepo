@@ -25,6 +25,8 @@ import {
 } from 'shared/graphql/query/marketplace/useFund';
 import { fundsUrl } from 'mobile/src/utils/env';
 
+import { useDocumentToken } from 'shared/graphql/query/account/useDocumentToken';
+
 import { FundDetailsTabs } from './FundDetails';
 
 interface FundDocumentsProps extends ViewProps {
@@ -40,6 +42,8 @@ const FundDocuments: FC<FundDocumentsProps> = ({
   const { documents } = fund;
   const categories = new Set<DocumentCategory>();
 
+  const [fetchDocumentToken] = useDocumentToken();
+
   const navigation = useNavigation<FundDetailsTabs>();
   useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
@@ -53,8 +57,23 @@ const FundDocuments: FC<FundDocumentsProps> = ({
   documentsSorted.sort((a, b) => b.date.getTime() - a.date.getTime());
   documentsSorted.forEach((doc) => categories.add(doc.category));
 
-  const goToFile = (url: string): void => {
-    Linking.openURL(`${fundsUrl()}/${fund._id}/${url}`);
+  const goToFile = async (url: string): Promise<void> => {
+    try {
+      const { data } = await fetchDocumentToken({
+        variables: {
+          fundId: fund._id,
+          document: url,
+        },
+      });
+
+      if (data && data.documentToken) {
+        Linking.openURL(
+          `${process.env.WATRMARKING_SERVICE_URL}?token=${data.documentToken}`,
+        );
+      }
+    } catch (err) {
+      console.log(err instanceof Error ? err.message : err);
+    }
   };
 
   return (
@@ -86,7 +105,9 @@ const FundDocuments: FC<FundDocumentsProps> = ({
       </View>
       {DocumentCategories.map((orderedCategory) => {
         const category = orderedCategory.value;
-        if (!categories.has(category)) return null;
+        if (!categories.has(category)) {
+          return null;
+        }
 
         return (
           <View key={category} style={styles.sectionContainer}>

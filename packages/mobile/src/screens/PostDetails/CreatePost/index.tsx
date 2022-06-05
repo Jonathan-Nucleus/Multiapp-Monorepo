@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -10,13 +9,12 @@ import {
   Keyboard,
   View,
 } from 'react-native';
+import { CircleSnail, Pie } from 'react-native-progress';
 import ImagePicker, {
   ImageOrVideo,
   Image as UploadImage,
 } from 'react-native-image-crop-picker';
 import { X } from 'phosphor-react-native';
-import RNFS from 'react-native-fs';
-import Video from 'react-native-video';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import RadioGroup, { Option } from 'react-native-radio-button-group';
@@ -179,6 +177,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   const [postAsModalVisible, setPostAsModalVisible] = useState(false);
   const [audienceModalVisible, setAudienceModalVisible] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [imageData, setImageData] = useState<ImageOrVideo | undefined>(
     undefined,
   );
@@ -267,7 +266,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       height: 400,
       cropping: false,
       compressImageQuality: 0.8,
-      compressVideoPreset: '1920x1080',
+      compressVideoPreset: 'Passthrough',
     });
 
     await uploadImage(image);
@@ -289,7 +288,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   const takeVideo = async (): Promise<void> => {
     const videoData = await ImagePicker.openCamera({
       mediaType: 'video',
-      compressVideoPreset: '1920x1080',
+      compressVideoPreset: 'Passthrough',
     });
 
     await uploadImage(videoData);
@@ -297,12 +296,12 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
 
   const uploadImage = async (image: ImageOrVideo): Promise<void> => {
     setUploading(true);
-    const fileUri = image.path;
+    const fileUri = image.sourceURL ?? image.path;
 
     const filename = fileUri.substring(fileUri.lastIndexOf('/') + 1);
     const { data } = await fetchUploadLink({
       variables: {
-        localFilename: filename,
+        localFilename: filename.toLowerCase(),
         type: 'POST',
         id: account._id,
       },
@@ -314,21 +313,29 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     }
 
     const { remoteName, uploadUrl } = data.uploadLink;
-    const rawData = await RNFS.readFile(fileUri, 'base64');
-    const buffer = new Buffer(
-      rawData.replace(/^data:image\/\w+;base64,/, ''),
-      'base64',
-    );
 
-    console.log('Uploading media for user', account._id, 'to', uploadUrl);
-    const result = await fetch(uploadUrl, {
-      method: 'PUT',
-      body: buffer,
-    });
-
-    if (!result.ok) {
-      showMessage('error', 'Image upload failed');
-      return;
+    try {
+      await new Promise((resolver, rejecter) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = () => {
+          if (xhr.status === 200) {
+            resolver(true);
+          } else {
+            const error = new Error(xhr.response);
+            rejecter(error);
+          }
+        };
+        xhr.onerror = (error) => {
+          rejecter(error);
+        };
+        xhr.upload.onprogress = (evt) => {
+          setUploadProgress(evt.loaded / evt.total);
+        };
+        xhr.open('PUT', uploadUrl);
+        xhr.send({ uri: fileUri });
+      });
+    } catch (err) {
+      console.log('Error uploading file', err);
     }
 
     mediaField.onChange({
@@ -337,6 +344,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     });
 
     setImageData(image);
+    setUploadProgress(0);
     setUploading(false);
   };
 
@@ -497,7 +505,15 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
                 <>
                   {uploading ? (
                     <View style={[styles.attachment, styles.uploadIndicator]}>
-                      <ActivityIndicator size="large" />
+                      {uploadProgress === 0 ? (
+                        <CircleSnail color={PRIMARYSOLID} size={40} />
+                      ) : (
+                        <Pie
+                          color={PRIMARYSOLID}
+                          size={40}
+                          progress={uploadProgress}
+                        />
+                      )}
                     </View>
                   ) : null}
                   {imageData || mediaField.value ? (
@@ -505,10 +521,12 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
                       <PostMedia
                         userId={account._id}
                         media={
-                          mediaField.value || {
-                            url: imageData!.path,
-                            aspectRatio: imageData!.width / imageData!.height,
-                          }
+                          imageData
+                            ? {
+                                url: imageData.path,
+                                aspectRatio: imageData.width / imageData.height,
+                              }
+                            : mediaField.value!
                         }
                         onLoad={({ naturalSize }) => {
                           if (naturalSize.orientation === 'portrait') {
@@ -613,6 +631,8 @@ const styles = StyleSheet.create({
   uploadIndicator: {
     alignItems: 'center',
     justifyContent: 'center',
+    width: '100%',
+    aspectRatio: 1.6,
   },
   attachment: {
     marginVertical: 16,

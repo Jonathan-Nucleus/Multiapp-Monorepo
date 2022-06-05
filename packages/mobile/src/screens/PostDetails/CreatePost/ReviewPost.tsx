@@ -1,6 +1,5 @@
 import React, { useRef } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
-const Buffer = global.Buffer || require('buffer').Buffer;
 
 import UserSvg from 'shared/assets/images/user.svg';
 import GlobalSvg from 'shared/assets/images/global.svg';
@@ -160,11 +159,18 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
               })
             : null}
         </Text>
-        {route.params.media ? (
-          <View style={styles.postImage}>
+        {media ? (
+          <View style={[styles.postImage, { aspectRatio: media.aspectRatio }]}>
             <PostMedia
               userId={account._id}
-              media={route.params.media}
+              media={
+                localMediaPath
+                  ? {
+                      url: localMediaPath,
+                      aspectRatio: media.aspectRatio,
+                    }
+                  : media
+              }
               style={styles.preview}
               resizeMode="contain"
             />
@@ -199,8 +205,7 @@ const styles = StyleSheet.create({
   },
   postImage: {
     width: '100%',
-    height: 224,
-    marginVertical: 16,
+    marginBottom: 16,
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
