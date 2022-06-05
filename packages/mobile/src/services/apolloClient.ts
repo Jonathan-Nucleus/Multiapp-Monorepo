@@ -16,8 +16,7 @@ import {
   detachTokenObserver,
   TokenAction,
 } from 'mobile/src/utils/auth-token';
-import { getEnv } from 'mobile/src/utils/env';
-import { GRAPHQL_URI_DEV, GRAPHQL_URI_STAGING } from 'react-native-dotenv';
+import { GRAPHQL_URI } from 'react-native-dotenv';
 
 const cache = new InMemoryCache({
   typePolicies: {
@@ -87,16 +86,13 @@ export const useInitializeClient =
           },
         );
 
-        const env = getEnv();
-        const graphqlUri =
-          env === 'staging' ? GRAPHQL_URI_STAGING : GRAPHQL_URI_DEV;
-        console.log('Graphql env', env, graphqlUri);
+        console.log('Graphql env', GRAPHQL_URI);
 
         const _client = new ApolloClient({
           link: from([
             errorLink,
             createHttpLink({
-              uri: graphqlUri,
+              uri: GRAPHQL_URI,
               headers: token && {
                 authorization: `Bearer ${token}`,
               },

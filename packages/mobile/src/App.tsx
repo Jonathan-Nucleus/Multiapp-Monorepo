@@ -1,5 +1,4 @@
 import 'react-native-gesture-handler';
-import 'mobile/src/utils/env';
 
 import React, { ReactElement, useEffect } from 'react';
 import { StatusBar } from 'react-native';

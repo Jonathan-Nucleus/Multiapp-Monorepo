@@ -13,7 +13,6 @@ import {
   Image as ImagePhoto,
   Trash,
 } from 'phosphor-react-native';
-import { backgroundUrl } from 'mobile/src/utils/env';
 import ImagePicker from 'react-native-image-crop-picker';
 import RNFS from 'react-native-fs';
 const Buffer = global.Buffer || require('buffer').Buffer;
@@ -32,6 +31,8 @@ import { useFetchUploadLink } from 'shared/graphql/mutation/posts';
 
 import { EditUserPhotoScreen } from 'mobile/src/navigations/UserDetailsStack';
 import Avatar from '../../components/common/Avatar';
+
+import { S3_BUCKET } from 'react-native-dotenv';
 
 const EditPhoto: EditUserPhotoScreen = ({ navigation, route }) => {
   const { type } = route.params;
@@ -183,7 +184,7 @@ const EditPhoto: EditUserPhotoScreen = ({ navigation, route }) => {
             <FastImage
               style={styles.cover}
               source={{
-                uri: `${backgroundUrl()}/${user._id}/${user.background.url}`,
+                uri: `${S3_BUCKET}/backgrounds/${user._id}/${user.background.url}`,
               }}
               resizeMode={FastImage.resizeMode.cover}
             />

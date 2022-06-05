@@ -8,7 +8,7 @@ import type { UserProfile } from 'backend/graphql/users.graphql';
 import type { Company as CompanyProfile } from 'backend/graphql/companies.graphql';
 import { Body2Bold } from '../../theme/fonts';
 
-import { avatarUrl } from 'mobile/src/utils/env';
+import { S3_BUCKET } from 'react-native-dotenv';
 
 type User = Partial<
   Pick<UserProfile, '_id' | 'firstName' | 'lastName' | 'avatar'>
@@ -43,7 +43,7 @@ const Avatar: React.FC<AvatarProps> = ({ user, size = 64, style }) => {
     <FastImage
       style={[sizeStyles, style]}
       source={{
-        uri: `${avatarUrl()}/${userData?._id || companyData?._id}/${
+        uri: `${S3_BUCKET}/avatars/${userData?._id || companyData?._id}/${
           user.avatar
         }`,
       }}

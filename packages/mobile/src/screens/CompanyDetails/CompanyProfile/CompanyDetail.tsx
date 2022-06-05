@@ -9,14 +9,7 @@ import {
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Modal from 'react-native-modal';
-import {
-  Chats,
-  CopySimple,
-  Pencil,
-  Share as ShareIcon,
-} from 'phosphor-react-native';
-import { backgroundUrl } from 'mobile/src/utils/env';
-import Share from 'react-native-share';
+import { Chats, CopySimple, Pencil } from 'phosphor-react-native';
 
 import Avatar from 'mobile/src/components/common/Avatar';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
@@ -40,6 +33,8 @@ import { useAccount } from 'shared/graphql/query/account/useAccount';
 import { useFollowCompany } from 'shared/graphql/mutation/account/useFollowCompany';
 import type { CompanyProfile } from 'shared/graphql/query/company/useCompany';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
+
+import { S3_BUCKET } from 'react-native-dotenv';
 
 interface CompanyDetailProps {
   company: CompanyProfile;
@@ -71,7 +66,7 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
           <FastImage
             style={styles.backgroundImg}
             source={{
-              uri: `${backgroundUrl()}/${background.url}`,
+              uri: `${S3_BUCKET}/backgrounds/${background.url}`,
             }}
             resizeMode={FastImage.resizeMode.cover}
           />

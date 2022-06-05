@@ -40,7 +40,7 @@ import NetReturnsTable from './NetReturnsTable';
 
 import { AssetClasses } from 'shared/graphql/fragments/fund';
 import { FundDetails } from 'shared/graphql/query/marketplace/useFund';
-import { backgroundUrl } from 'mobile/src/utils/env';
+import { S3_BUCKET } from 'react-native-dotenv';
 
 import { FundDetailsTabs } from './FundDetails';
 
@@ -125,7 +125,7 @@ const FundOverview: FC<FundOverviewProps> = ({
         {background && (
           <FastImage
             style={styles.backgroundImage}
-            source={{ uri: `${backgroundUrl()}/${background.url}` }}
+            source={{ uri: `${S3_BUCKET}/backgrounds/${background.url}` }}
             resizeMode={FastImage.resizeMode.cover}
           />
         )}

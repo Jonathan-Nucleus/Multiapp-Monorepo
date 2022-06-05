@@ -23,7 +23,6 @@ import {
   DocumentCategories,
   DocumentCategory,
 } from 'shared/graphql/query/marketplace/useFund';
-import { fundsUrl } from 'mobile/src/utils/env';
 
 import { useDocumentToken } from 'shared/graphql/query/account/useDocumentToken';
 

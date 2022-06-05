@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   StyleSheet,
+  ListRenderItem,
   FlatList,
   View,
   Text,
@@ -22,7 +23,6 @@ import {
   Database,
 } from 'phosphor-react-native';
 import { CommonActions } from '@react-navigation/native';
-import { getEnv, setEnv } from 'mobile/src/utils/env';
 
 import {
   GRAY100,
@@ -46,22 +46,19 @@ import AISvg from 'shared/assets/images/AI.svg';
 
 import { SettingsScreen } from 'mobile/src/navigations/MoreStack';
 
-interface RenderItemProps {
-  item: {
-    label: string;
-    comment?: string;
-    id: string;
-    icon: any;
-    disabled?: boolean;
-    onPress: (() => void) | undefined;
-  };
+interface MenuItem {
+  label: string;
+  comment?: string;
+  id: string;
+  icon: any;
+  disabled?: boolean;
+  onPress: (() => void) | undefined;
 }
 
 const Settings: SettingsScreen = ({ navigation }) => {
   const { data } = useAccount();
   const account = data?.account;
   const isAccredited = account?.accreditation !== 'NONE';
-  const [currentEnv, setCurrentEnv] = useState(getEnv());
 
   const MENU_ITEMS = [
     {
@@ -146,7 +143,7 @@ const Settings: SettingsScreen = ({ navigation }) => {
     }
   };
 
-  const renderListItem = ({ item }: RenderItemProps) => {
+  const renderListItem: ListRenderItem<MenuItem> = ({ item }) => {
     return (
       <Pressable
         disabled={item.disabled || false}
@@ -178,7 +175,7 @@ const Settings: SettingsScreen = ({ navigation }) => {
     );
   };
 
-  const renderListHeaderComponent = () => {
+  const renderListHeaderComponent = (): React.ReactElement => {
     if (!account) {
       return <></>;
     }
@@ -237,14 +234,6 @@ const Settings: SettingsScreen = ({ navigation }) => {
     );
   };
 
-  const onEnvChange = async (): Promise<void> => {
-    const updatedEnv = currentEnv === 'staging' ? 'dev' : 'staging';
-    await setEnv(updatedEnv);
-    setCurrentEnv(updatedEnv);
-
-    setTimeout(() => handleLogout(), 500);
-  };
-
   return (
     <View style={pStyles.globalContainer}>
       <MainHeader />
@@ -256,24 +245,6 @@ const Settings: SettingsScreen = ({ navigation }) => {
         style={styles.flatList}
         ListFooterComponent={
           <View>
-            {account?.superUser ? (
-              <View style={[styles.item, styles.between, styles.border]}>
-                <View style={[styles.row, styles.alignCenter]}>
-                  <Database size={26} color={WHITE} />
-                  <View style={styles.rightItem}>
-                    <Text style={styles.label}>Demo Database</Text>
-                  </View>
-                </View>
-                <View>
-                  <Switch
-                    trackColor={{ false: GRAY20, true: GREEN }}
-                    ios_backgroundColor={GRAY20}
-                    onValueChange={onEnvChange}
-                    value={currentEnv === 'staging'}
-                  />
-                </View>
-              </View>
-            ) : null}
             <TouchableOpacity onPress={handleLogout}>
               <View style={[styles.item, styles.center]}>
                 <Text style={styles.label}>Log Out</Text>

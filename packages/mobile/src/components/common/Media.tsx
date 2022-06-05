@@ -11,7 +11,7 @@ import FastImage, { ResizeMode, ImageStyle } from 'react-native-fast-image';
 import Video, { VideoProperties } from 'react-native-video';
 import { Media as MediaType } from 'shared/graphql/fragments/post';
 
-import { postsUrl, fundsUrl } from 'mobile/src/utils/env';
+import { S3_BUCKET } from 'react-native-dotenv';
 
 interface MediaProps {
   media: MediaType;
@@ -77,9 +77,9 @@ const Media: FC<MediaProps> = ({
   const [paused, setPaused] = useState(true);
   const player = useRef<Video | null>(null);
 
-  const mediaUrl = `${type === 'fund' ? fundsUrl() : postsUrl()}/${mediaId}/${
-    media.url
-  }`;
+  const mediaUrl = `${
+    type === 'fund' ? `${S3_BUCKET}/funds` : `${S3_BUCKET}/posts`
+  }/${mediaId}/${media.url}`;
 
   useEffect(() => {
     if (isVideo(media.url)) {

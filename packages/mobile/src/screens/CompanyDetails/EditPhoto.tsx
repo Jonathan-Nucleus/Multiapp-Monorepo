@@ -1,9 +1,8 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useState } from 'react';
 import {
   StyleSheet,
   View,
   Text,
-  Platform,
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
@@ -14,7 +13,6 @@ import {
   Image as ImagePhoto,
   Trash,
 } from 'phosphor-react-native';
-import { avatarUrl, backgroundUrl } from 'mobile/src/utils/env';
 import ImagePicker from 'react-native-image-crop-picker';
 import RNFS from 'react-native-fs';
 const Buffer = global.Buffer || require('buffer').Buffer;
@@ -40,6 +38,8 @@ import {
 } from 'shared/graphql/query/company/useCompany';
 import { useUpdateCompanyProfile } from 'shared/graphql/mutation/account';
 import { useFetchUploadLink } from 'shared/graphql/mutation/posts';
+
+import { S3_BUCKET } from 'react-native-dotenv';
 
 import { EditCompanyPhotoScreen } from 'mobile/src/navigations/CompanyDetailsStack';
 
@@ -198,9 +198,7 @@ const EditCompanyPhoto: EditCompanyPhotoScreen = ({ navigation, route }) => {
             <FastImage
               style={styles.cover}
               source={{
-                uri: `${backgroundUrl()}/${company?._id}/${
-                  company?.background.url
-                }`,
+                uri: `${S3_BUCKET}/backgrounds/${company?._id}/${company?.background.url}`,
               }}
               resizeMode={FastImage.resizeMode.cover}
             />

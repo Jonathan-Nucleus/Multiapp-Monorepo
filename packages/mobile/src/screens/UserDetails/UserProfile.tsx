@@ -52,8 +52,9 @@ import { useChatContext } from 'mobile/src/context/Chat';
 import { createChannel } from 'mobile/src/services/chat';
 
 import { UserProfileScreen } from 'mobile/src/navigations/UserDetailsStack';
-import { backgroundUrl } from 'mobile/src/utils/env';
 import Avatar from '../../components/common/Avatar';
+
+import { S3_BUCKET } from 'react-native-dotenv';
 
 const PLACE_HOLDERS = 4;
 
@@ -165,7 +166,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
             <FastImage
               style={styles.backgroundImg}
               source={{
-                uri: `${backgroundUrl()}/${profile._id}/${background.url}`,
+                uri: `${S3_BUCKET}/backgrounds/${profile._id}/${background.url}`,
               }}
               resizeMode={FastImage.resizeMode.cover}
             />
@@ -468,11 +469,6 @@ const styles = StyleSheet.create({
     marginTop: 2,
     marginBottom: 8,
     paddingLeft: 16,
-  },
-  avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
   },
   socialIcon: {
     marginHorizontal: 16,
