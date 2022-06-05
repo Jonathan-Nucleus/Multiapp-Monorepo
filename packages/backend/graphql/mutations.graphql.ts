@@ -657,7 +657,7 @@ const resolvers = {
           throw new BadRequestError("Not authorized");
         }
 
-        const postData = await db.posts.create(post, user._id);
+        const postData = await db.posts.create(post, user._id, !post.media);
 
         // Move AWS media to the appropriate post folder
         if (postData.media) {
@@ -786,8 +786,8 @@ const resolvers = {
               "for post",
               post._id
             );
-          } else if (result.mediaReady) {
-            await db.posts.setVisible(post._id, true, post.userId);
+          } else {
+            await db.posts.setVisible(post._id, result.mediaReady, post.userId);
           }
         }
 

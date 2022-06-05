@@ -185,17 +185,23 @@ const createPostsCollection = (
      *
      * @param post    The new post data.
      * @param userId  The ID of the user creating the post.
+     * @param visible Optional param indicating whether the post should be
+     *                visible on creation. Defaults to true.
      *
      * @returns   Persisted post data with id.
      */
-    create: async (post: Post.Input, userId: MongoId): Promise<Post.Mongo> => {
+    create: async (
+      post: Post.Input,
+      userId: MongoId,
+      visible = true
+    ): Promise<Post.Mongo> => {
       const { companyId, mentionIds, ...otherData } = post;
       const isCompany = !!companyId;
       const postData: Post.Mongo = {
         ...otherData,
         _id: new ObjectId(),
         mentionIds: mentionIds ? toObjectIds(mentionIds) : undefined,
-        visible: false,
+        visible,
         userId: toObjectId(companyId ?? userId),
         isCompany,
       };
