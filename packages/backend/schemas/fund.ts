@@ -38,6 +38,9 @@ export namespace Fund {
     /** Whether this fund is inactive and should not currently be displayed.*/
     inactive?: boolean;
 
+    /** Whether this fund should only be shown with a limited view. */
+    limitedView?: boolean;
+
     updatedAt: Date;
   }
 
@@ -155,6 +158,7 @@ export const FundSchema = `
     metrics: [Metric!]!
     offshore: Boolean
     feeder: Boolean
+    limitedView: Boolean
     createdAt: Date!
     updatedAt: Date!
 
