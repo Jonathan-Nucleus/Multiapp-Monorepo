@@ -183,7 +183,8 @@ const createPostsCollection = (
     /**
      * Creates a new post.
      *
-     * @param post  The new post data.
+     * @param post    The new post data.
+     * @param userId  The ID of the user creating the post.
      *
      * @returns   Persisted post data with id.
      */
