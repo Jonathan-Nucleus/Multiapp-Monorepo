@@ -10,6 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useMutation } from '@apollo/client';
 import { NavigationProp } from '@react-navigation/native';
 import { CommonActions } from '@react-navigation/native';
+import { showMessage } from 'mobile/src/services/utils';
 
 import PAppContainer from '../../components/common/PAppContainer';
 import PHeader from '../../components/common/PHeader';
@@ -52,7 +53,7 @@ const Login: LoginScreen = ({ navigation }) => {
     );
   };
 
-  const handleNextPage = async () => {
+  const handleNextPage = async (): Promise<void> => {
     Keyboard.dismiss();
     setError(false);
     try {
@@ -72,7 +73,7 @@ const Login: LoginScreen = ({ navigation }) => {
     }
   };
 
-  const googleLogin = async () => {
+  const googleLogin = async (): Promise<void> => {
     try {
       const result = await authenticate();
       if (result) {
@@ -99,10 +100,14 @@ const Login: LoginScreen = ({ navigation }) => {
       }
     } catch (err) {
       console.log('google login err', err);
+      showMessage(
+        'error',
+        'Linked accounts not supported. Try a different login method.',
+      );
     }
   };
 
-  const linkedInLogin = async () => {
+  const linkedInLogin = async (): Promise<void> => {
     console.log('Logging in via linked in');
   };
 
@@ -157,12 +162,15 @@ const Login: LoginScreen = ({ navigation }) => {
         />
         <PTextLine title="LOG IN WITH" containerStyle={styles.bottom} />
         <View style={styles.row}>
-          <TouchableOpacity style={styles.icon}>
-            <AppleSvg />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.icon} onPress={linkedInLogin}>
-            <LinkedinSvg />
-          </TouchableOpacity>
+          {/**
+            * Hide until services have been properly configured.
+            <TouchableOpacity style={styles.icon}>
+              <AppleSvg />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.icon} onPress={linkedInLogin}>
+              <LinkedinSvg />
+            </TouchableOpacity>
+            */}
           <TouchableOpacity style={styles.icon} onPress={googleLogin}>
             <GoogleSvg />
           </TouchableOpacity>
@@ -178,15 +186,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: BLACK,
-  },
-  textContainer: {
-    marginTop: 21,
-  },
-  textInput: {
-    borderRadius: 16,
-    height: 56,
-    fontSize: 24,
-    paddingHorizontal: 12,
   },
   btnContainer: {
     marginTop: 20,
@@ -231,17 +230,5 @@ const styles = StyleSheet.create({
   txt: {
     ...Body2,
     color: WHITE,
-  },
-  stayTxt: {
-    ...Body2,
-    color: WHITE,
-    marginLeft: 10,
-  },
-  signup: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    marginTop: 32,
-    marginBottom: 80,
   },
 });

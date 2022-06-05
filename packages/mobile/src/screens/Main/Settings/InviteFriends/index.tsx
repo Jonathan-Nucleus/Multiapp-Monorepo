@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { CaretLeft } from 'phosphor-react-native';
 import { WHITE } from 'shared/src/colors';
@@ -56,7 +56,7 @@ const InviteFriends: InviteFriendsScreen = ({ navigation }) => {
   const {
     handleSubmit,
     control,
-    formState: { isValid },
+    formState: { isValid, isSubmitting },
     reset,
   } = useForm<yup.InferType<typeof schema>>({
     resolver: yupResolver(schema),
@@ -83,12 +83,6 @@ const InviteFriends: InviteFriendsScreen = ({ navigation }) => {
           'success',
           "Invitation successfully sent! Let your contact know it's on it's way!",
         );
-        await Share.open({
-          title: 'Join me on Prometheus Alts!',
-          message: `Just sent an invite to Prometheus to your email at ${email}. Check it out!`,
-          url: 'prometheusalts.com',
-        }).catch(() => console.log('User did not share invite message'));
-
         reset(
           schema.cast(
             {},
@@ -98,6 +92,11 @@ const InviteFriends: InviteFriendsScreen = ({ navigation }) => {
             },
           ) as DefaultValues<FormValues>,
         );
+        await Share.open({
+          title: 'Join me on Prometheus Alts!',
+          message: `Just sent an invite to Prometheus to your email at ${email}. Check it out!`,
+          url: 'prometheusalts.com',
+        }).catch(() => console.log('User did not share invite message'));
       } else {
         showMessage('error', 'Error sending invitation');
       }
@@ -154,6 +153,7 @@ const InviteFriends: InviteFriendsScreen = ({ navigation }) => {
           label="Share a Code"
           btnContainer={styles.btn}
           disabled={!isValid || invitees.length > MAX_INVITES}
+          isLoading={isSubmitting}
         />
         <View style={styles.codeContainer}>
           {[...new Array(MAX_INVITES)].map((_, index) => (
