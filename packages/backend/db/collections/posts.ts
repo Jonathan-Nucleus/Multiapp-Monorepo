@@ -48,6 +48,7 @@ const createPostsCollection = (
     find: async (id: MongoId): Promise<Post.Mongo | null> =>
       postsCollection.findOne({
         _id: toObjectId(id),
+        visible: true,
         deleted: { $exists: false },
       }),
 
@@ -69,6 +70,7 @@ const createPostsCollection = (
           ...query,
           ...(featured ? { featured } : {}),
           deleted: { $exists: false },
+          visible: true,
         })
         .sort({ _id: -1 })
         .toArray();
@@ -148,6 +150,7 @@ const createPostsCollection = (
               : { $nin: toObjectIds(ignorePosts) }),
             $lt: toObjectId(before),
           },
+          visible: true,
           deleted: { $exists: false },
           $or: [
             {
@@ -191,7 +194,7 @@ const createPostsCollection = (
         ...otherData,
         _id: new ObjectId(),
         mentionIds: mentionIds ? toObjectIds(mentionIds) : undefined,
-        visible: true,
+        visible: false,
         userId: toObjectId(companyId ?? userId),
         isCompany,
       };
@@ -249,6 +252,38 @@ const createPostsCollection = (
           deleted: { $exists: false },
         },
         updateFilter,
+        { returnDocument: "after" }
+      );
+
+      if (!result.ok || !result.value) {
+        throw new NotFoundError("Post");
+      }
+
+      return result.value;
+    },
+
+    /**
+     * Updates the visibility state of a post.
+     *
+     * @param postId  The ID of the post to share.
+     * @param post    Additional informtion the user would like to include with
+     *                the shared post.
+     * @param userId  The ID of the user sharing the post.
+     *
+     * @returns   Persisted shared post data with id.
+     */
+    setVisible: async (
+      id: MongoId,
+      visible: boolean,
+      userId: MongoId
+    ): Promise<Post.Mongo> => {
+      const result = await postsCollection.findOneAndUpdate(
+        {
+          _id: toObjectId(id),
+          userId: toObjectId(userId),
+          deleted: { $exists: false },
+        },
+        { $set: { visible } },
         { returnDocument: "after" }
       );
 

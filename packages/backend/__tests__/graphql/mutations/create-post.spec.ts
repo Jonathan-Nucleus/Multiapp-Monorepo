@@ -188,6 +188,8 @@ describe("Mutations - createPost", () => {
       },
     });
 
+    console.log("repsonse", JSON.stringify(res));
+
     expect(res.data?.createPost?.body).toBe(postData.body);
     expect(JSON.stringify(res.data?.createPost?.categories)).toBe(
       JSON.stringify(postData.categories)
@@ -345,14 +347,15 @@ describe("Mutations - createPost", () => {
       .collection(DbCollection.POSTS)
       .countDocuments();
 
-    const oldNotifyCount = (await notifications.findAllByUser(user1._id)).length;
+    const oldNotifyCount = (await notifications.findAllByUser(user1._id))
+      .length;
 
     const res = await server.executeOperation({
       query,
       variables: {
         post: {
           ...postData,
-          mentionIds: [user1._id.toString()]
+          mentionIds: [user1._id.toString()],
         },
       },
     });
@@ -376,7 +379,8 @@ describe("Mutations - createPost", () => {
     const newPostCount = await db
       .collection(DbCollection.POSTS)
       .countDocuments();
-    const newNotifyCount = (await notifications.findAllByUser(user1._id)).length;
+    const newNotifyCount = (await notifications.findAllByUser(user1._id))
+      .length;
 
     expect(newUser.postIds?.map((id) => id.toString())).toContain(
       res.data?.createPost._id

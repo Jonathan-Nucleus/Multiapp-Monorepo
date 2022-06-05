@@ -7,7 +7,13 @@ import "dotenv/config";
 if (!process.env.IGNITE_SECRET) {
   throw new Error("IGNITE_SECRET env var undefined");
 }
+
+if (!process.env.WATERMARK_JWT_SECRET) {
+  throw new Error("WATERMARK_JWT_SECRET env var undefined");
+}
+
 const IGNITE_SECRET = process.env.IGNITE_SECRET as string;
+const WATERMARK_JWT_SECRET = process.env.WATERMARK_JWT_SECRET as string;
 
 export type AccessToken = string;
 export type AccessTokenPayload = DeserializedUser;
@@ -33,4 +39,18 @@ export function decodeToken(token: string): JwtPayload {
   } catch {
     throw new BadRequestError("Token is invalid.");
   }
+}
+
+export function getDocumentToken(
+  email: string,
+  fundId: string,
+  filename: string
+): Token {
+  return jwt.sign(
+    {
+      watermark: email,
+      file: `funds/${fundId}/${filename}`,
+    },
+    WATERMARK_JWT_SECRET
+  );
 }

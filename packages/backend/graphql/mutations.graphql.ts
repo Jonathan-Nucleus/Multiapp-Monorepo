@@ -661,11 +661,22 @@ const resolvers = {
 
         // Move AWS media to the appropriate post folder
         if (postData.media) {
-          movePostMedia(
+          const result = await movePostMedia(
             user._id.toString(),
             postData._id.toString(),
             postData.media.url
           );
+
+          if (!result.success) {
+            console.log(
+              "Error moving media asset",
+              postData.media.url,
+              "for post",
+              postData._id
+            );
+          } else if (result.mediaReady) {
+            await db.posts.setVisible(postData._id, true, postData.userId);
+          }
         }
 
         // Send Notification
@@ -762,11 +773,22 @@ const resolvers = {
 
         // Move AWS media to the appropriate post folder
         if (post.media && post.media.url !== originalPost.media?.url) {
-          movePostMedia(
+          const result = await movePostMedia(
             user._id.toString(),
             post._id.toString(),
             post.media.url
           );
+
+          if (!result.success) {
+            console.log(
+              "Error moving media asset",
+              post.media.url,
+              "for post",
+              post._id
+            );
+          } else if (result.mediaReady) {
+            await db.posts.setVisible(post._id, true, post.userId);
+          }
         }
 
         return db.posts.edit(post, post.userId);

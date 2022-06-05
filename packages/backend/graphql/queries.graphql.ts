@@ -1,7 +1,11 @@
 import { gql } from "apollo-server";
 import * as yup from "yup";
 import _ from "lodash";
-import { decodeToken, AccessTokenPayload } from "../lib/tokens";
+import {
+  decodeToken,
+  AccessTokenPayload,
+  getDocumentToken,
+} from "../lib/tokens";
 import { getChatToken } from "../lib/get-stream";
 import {
   PartialSchema,
@@ -36,6 +40,7 @@ const schema = gql`
     verifyInvite(code: String!): Boolean!
     account: User
     chatToken: String
+    documentToken(fundId: ID!, document: String!): String
     post(postId: ID!): Post
     posts(
       categories: [PostCategory!]
@@ -239,6 +244,44 @@ const resolvers = {
     chatToken: secureEndpoint(
       async (parentIgnored, argsIgnored, { user }): Promise<string> =>
         getChatToken(user._id.toString())
+    ),
+
+    documentToken: secureEndpoint(
+      async (
+        parentIgnored,
+        args: { fundId: string; document: string },
+        { db, user }
+      ): Promise<string | null> => {
+        const validator = yup
+          .object()
+          .shape({
+            fundId: yup.string().required().test({
+              test: isObjectId,
+              message: "Invalid fund id",
+            }),
+            document: yup.string().required(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { fundId, document: filename } = args;
+        const fund = await db.funds.find(fundId);
+
+        if (!fund) {
+          throw new NotFoundError("Fund");
+        }
+
+        if (compareAccreditation(user.accreditation, fund.level) < 0) {
+          return null;
+        }
+
+        if (!fund.documents?.some((doc) => doc.url === filename)) {
+          throw new NotFoundError("Document");
+        }
+
+        return getDocumentToken(user.email, fundId, filename);
+      }
     ),
 
     funds: secureEndpoint(
