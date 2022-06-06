@@ -1,4 +1,4 @@
-const MetropolisThin = 'Motropolis-Thin';
+const MetropolisThin = 'Metropolis-Thin';
 const Metropolis = 'Metropolis-Regular';
 const MetropolisMedium = 'Metropolis-Medium'; // not working
 const MetropolisSemibold = 'Metropolis-SemiBold';

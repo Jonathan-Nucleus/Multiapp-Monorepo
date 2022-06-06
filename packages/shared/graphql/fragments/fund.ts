@@ -18,6 +18,7 @@ export type FundSummary = Pick<
   | "tags"
   | "offshore"
   | "feeder"
+  | "limitedView"
 >;
 
 export const FUND_SUMMARY_FRAGMENT = gql`
@@ -33,6 +34,7 @@ export const FUND_SUMMARY_FRAGMENT = gql`
     tags
     offshore
     feeder
+    limitedView
   }
 `;
 

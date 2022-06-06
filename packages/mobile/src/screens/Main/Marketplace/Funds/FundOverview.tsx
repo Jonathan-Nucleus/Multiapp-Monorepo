@@ -16,6 +16,7 @@ import dayjs from 'dayjs';
 
 import Tag from 'mobile/src/components/common/Tag';
 import PLabel from 'mobile/src/components/common/PLabel';
+import Accordion from 'mobile/src/components/common/Accordion';
 import Avatar from 'mobile/src/components/common/Avatar';
 import { FundMedia } from 'mobile/src/components/common/Media';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
@@ -233,6 +234,9 @@ const FundOverview: FC<FundOverviewProps> = ({
           <NetReturnsTable returns={fund.metrics} />
         </View>
       ) : null}
+      {/*<Accordion title="Important Information">
+        <Text style={{ color: 'white' }}>Test</Text>
+      </Accordion>*/}
     </View>
   );
 };

@@ -111,14 +111,18 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
                 : 'Overview'
             }>
             <Tab.Screen name="Overview">
-              {() => (
+              {({ navigation: tabNavigation }) => (
                 <FundOverview
                   fund={fund}
                   onLayout={(event) => {
+                    const { index, routeNames } = tabNavigation.getState();
                     const { height } = event.nativeEvent.layout;
                     overviewTabHeight.current = height + styles.tabBar.height;
 
-                    if (tabviewHeight === 500) {
+                    if (
+                      tabviewHeight === 500 ||
+                      routeNames[index] === 'Overview'
+                    ) {
                       setTabViewHeight(overviewTabHeight.current);
                     }
                   }}

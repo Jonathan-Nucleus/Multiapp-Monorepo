@@ -13,6 +13,7 @@ import {
 } from '@react-navigation/material-top-tabs';
 import { CompositeScreenProps } from '@react-navigation/native';
 import { X, MagnifyingGlass, CaretLeft } from 'phosphor-react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import PHeader from '../components/common/PHeader';
 import SearchInput from '../components/common/SearchInput';
@@ -46,7 +47,7 @@ const SearchTabs: SearchScreen = ({ navigation, route }) => {
     search.startsWith('#') || search.startsWith('$') ? 'Posts' : 'All';
 
   return (
-    <View style={styles.globalContainer}>
+    <SafeAreaView style={styles.globalContainer} edges={['bottom']}>
       <PHeader
         leftIcon={<CaretLeft size={28} color={WHITE} />}
         onPressLeft={() => navigation.goBack()}
@@ -60,6 +61,7 @@ const SearchTabs: SearchScreen = ({ navigation, route }) => {
         }
       />
       <Tab.Navigator
+        style={styles.globalContainer}
         screenOptions={({ route }) => ({
           tabBarStyle: styles.tabBar,
           tabBarScrollEnabled: true,
@@ -68,7 +70,9 @@ const SearchTabs: SearchScreen = ({ navigation, route }) => {
           tabBarInactiveTintColor: WHITE60,
           tabBarItemStyle: styles.tabBarItem,
           tabBarLabel: ({ focused, color }) => (
-            <Text style={[Body2, { color }, focused ? Body2Bold : {}]}>
+            <Text
+              style={[Body2, { color }, focused ? Body2Bold : {}]}
+              allowFontScaling={false}>
               {route.name}
             </Text>
           ),
@@ -122,7 +126,7 @@ const SearchTabs: SearchScreen = ({ navigation, route }) => {
           )}
         </Tab.Screen>
       </Tab.Navigator>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -169,7 +173,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   tabBarItem: {
-    width: 87,
+    width: 105,
   },
   tabBarIndicator: {
     backgroundColor: PRIMARYSTATE,

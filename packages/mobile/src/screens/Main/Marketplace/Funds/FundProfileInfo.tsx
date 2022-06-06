@@ -35,7 +35,6 @@ import {
 } from 'shared/graphql/fragments/fund';
 
 import { useWatchFund } from 'shared/graphql/mutation/funds/useWatchFund';
-import { useFollowUser } from 'shared/graphql/mutation/account/useFollowUser';
 
 export type Fund = FundSummary & FundManager & FundCompany;
 export interface FundProfileInfo {
@@ -51,7 +50,6 @@ const FundProfileInfo: FC<FundProfileInfo> = ({
   highlightManager = false,
   showTags = false,
 }) => {
-  const { isFollowing, toggleFollow } = useFollowUser(fund.manager._id);
   const { isWatching, toggleWatch } = useWatchFund(fund._id);
 
   const goToManager = (): void =>

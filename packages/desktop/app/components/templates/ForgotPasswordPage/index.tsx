@@ -32,7 +32,9 @@ const ForgotPasswordPage: FC = () => {
     variant: "info",
   });
   const [requestReset] = useRequestPasswordReset();
-  const { register, handleSubmit, formState } = useForm<yup.InferType<typeof schema>>({
+  const { register, handleSubmit, formState } = useForm<
+    yup.InferType<typeof schema>
+  >({
     resolver: yupResolver(schema),
     mode: "onChange",
   });
@@ -43,13 +45,13 @@ const ForgotPasswordPage: FC = () => {
     setAlert(
       data?.requestPasswordReset
         ? {
-          message: `We sent an email to ${email} with a link to reset your password`,
-          variant: "success",
-        }
+            message: `We sent an email to ${email} with a link to reset your password`,
+            variant: "success",
+          }
         : {
-          message: `Looks like that account doesn't exist. Head to back to our login page to register.`,
-          variant: "error",
-        },
+            message: `Looks like that account doesn't exist. Head to back to our login page to register.`,
+            variant: "error",
+          }
     );
     setLoading(false);
   };
@@ -62,9 +64,7 @@ const ForgotPasswordPage: FC = () => {
           onClick={() => router.replace(AppAuthOptions.pages?.signIn!!)}
         >
           <ArrowLeft size={32} weight="light" color="currentColor" />
-          <span className="ml-3">
-            Back to Login
-          </span>
+          <span className="ml-3">Back to Login</span>
         </Button>
         <h1 className="text-white text-2xl mt-6">Reset Password</h1>
         <Alert variant={alert.variant} className="mt-6 text-white text-sm">
@@ -80,6 +80,7 @@ const ForgotPasswordPage: FC = () => {
             />
             <div className="text-right mt-8">
               <Button
+                type="submit"
                 variant="gradient-primary"
                 className="w-full md:w-48"
                 disabled={!isValid}

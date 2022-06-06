@@ -17,6 +17,7 @@ import { Body2Bold, H6Bold } from '../../../theme/fonts';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 
 import UserInfo from 'mobile/src/components/common/UserInfo';
+import PBodyText from 'mobile/src/components/common/PBodyText';
 import pStyles from 'mobile/src/theme/pStyles';
 
 import { renderItem as renderFundItem } from '../Funds';
@@ -63,9 +64,7 @@ const renderPostItem: ListRenderItem<Post> = ({ item }) => (
         auxInfo={dayjs(item.createdAt).format('MMM D')}
         audienceInfo={item.audience}
       />
-      <Text style={styles.body} numberOfLines={2}>
-        {item.body}
-      </Text>
+      <PBodyText body={item.body} style={styles.body} collapseLongText={true} />
     </View>
   </Pressable>
 );
@@ -110,7 +109,7 @@ const AllSearchResults: React.FC<AllSearchResultsProps> = ({
     <View style={pStyles.globalContainer}>
       {!!search && (
         <Text style={styles.alert}>
-          {totalResults} results for "{search}" in All
+          {totalResults} results for {`"${search}"`} in All
         </Text>
       )}
       <SectionList
@@ -136,10 +135,6 @@ const AllSearchResults: React.FC<AllSearchResultsProps> = ({
 export default AllSearchResults;
 
 const styles = StyleSheet.create({
-  container: {
-    marginTop: 16,
-    paddingHorizontal: 0,
-  },
   item: {
     paddingHorizontal: 16,
     paddingVertical: 8,
@@ -147,38 +142,6 @@ const styles = StyleSheet.create({
   link: {
     color: PRIMARY,
     ...Body2Bold,
-  },
-  tagStyle: {
-    paddingHorizontal: 15,
-    marginRight: 8,
-    borderRadius: 4,
-  },
-  tagLabel: {
-    textTransform: 'none',
-  },
-  postButton: {
-    position: 'absolute',
-    bottom: 22,
-    right: 22,
-  },
-  gradientContainer: {
-    width: 56,
-    height: 56,
-    paddingVertical: 0,
-  },
-  postLabel: {
-    fontSize: 40,
-    textAlign: 'center',
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 16,
-  },
-  filter: {
-    ...Body2Bold,
-    color: WHITE,
   },
   alert: {
     color: WHITE60,

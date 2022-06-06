@@ -95,25 +95,23 @@ const ResetPasswordPage: FC<ResetPasswordPageProps> = ({ token }) => {
   return (
     <div className="px-3">
       <div className="container mx-auto max-w-md">
-        {alert.state === "error" ?
+        {alert.state === "error" ? (
           <>
             <div>
               <Link href={AppAuthOptions.pages?.signIn!!}>
                 <a>
                   <Button variant="text" className="text-primary">
                     <ArrowLeft size={32} weight="light" color="currentColor" />
-                    <span className="ml-3">
-                  Back to Login
-                </span>
+                    <span className="ml-3">Back to Login</span>
                   </Button>
                 </a>
               </Link>
             </div>
             <h1 className="text-white text-2xl mt-5">Reset Password</h1>
           </>
-          :
+        ) : (
           <h1 className="text-white text-2xl">Welcome Back</h1>
-        }
+        )}
         <Alert variant={alert.state} className="mt-6 text-white text-sm">
           {alert.message}
         </Alert>
@@ -167,6 +165,7 @@ const ResetPasswordPage: FC<ResetPasswordPageProps> = ({ token }) => {
               <ErrorMessage name="confirmPassword" errors={errors} />
             </div>
             <Button
+              type="submit"
               variant="gradient-primary"
               className="w-full mt-9 px-10 uppercase"
               disabled={!isValid}
