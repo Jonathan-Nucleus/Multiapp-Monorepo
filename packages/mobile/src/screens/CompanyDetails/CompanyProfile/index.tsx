@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import {
   ListRenderItem,
   StyleSheet,
@@ -136,7 +136,6 @@ const CompanyProfile: CompanyProfileScreen = ({ navigation, route }) => {
               </>
             )
           )}
-
           <View style={styles.allPosts}>
             {posts && posts.length > 0 ? (
               <FlatList

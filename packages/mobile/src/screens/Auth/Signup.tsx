@@ -25,10 +25,8 @@ import {
   PRIMARY,
   WHITE,
   BLUE200,
-  PRIMARYSOLID,
   WHITE12,
   BGHEADER,
-  WHITE87,
 } from 'shared/src/colors';
 import LogoSvg from '../../assets/icons/logo.svg';
 import AppleSvg from '../../assets/icons/apple.svg';
@@ -53,7 +51,6 @@ const Signup: SignupScreen = ({ navigation, route }) => {
   const [secureConfirmPassEntry, setSecureConfirmPassEntry] = useState(true);
   const [error, setError] = useState('');
   const [agreed, setAgreed] = useState(false);
-  const [read, setRead] = useState(false);
   const [checkedString, setCheckedString] = useState(false);
   const [checkedSpecial, setCheckedSpecial] = useState(false);
   const [checkedNumber, setCheckedNumber] = useState(false);
@@ -75,8 +72,7 @@ const Signup: SignupScreen = ({ navigation, route }) => {
       validatePassword(pass).checkedString &&
       validatePassword(pass).checkedSpecial &&
       validatePassword(pass).checkedNumber &&
-      agreed &&
-      read
+      agreed
     ) {
       return false;
     } else if (pass && confirmPass && pass !== confirmPass) {
@@ -85,7 +81,7 @@ const Signup: SignupScreen = ({ navigation, route }) => {
     }
     setPassError('');
     return true;
-  }, [firstName, lastName, email, phone, pass, confirmPass, agreed, read]);
+  }, [firstName, lastName, email, phone, pass, confirmPass, agreed]);
 
   useEffect(() => {
     const validation = validatePassword(pass);
@@ -107,7 +103,7 @@ const Signup: SignupScreen = ({ navigation, route }) => {
     }
   }, [pass]);
 
-  const handleNextPage = async () => {
+  const handleNextPage = async (): Promise<void> => {
     Keyboard.dismiss();
     try {
       const { data } = await register({
@@ -121,17 +117,24 @@ const Signup: SignupScreen = ({ navigation, route }) => {
           },
         },
       });
+      console.log('Registration result', data);
       if (data.register) {
         await setToken(data.register);
         navigation.navigate('Topic');
         return;
       }
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      console.log('error', e);
+      if (e instanceof Error) {
+        setError(e.message);
+      }
     }
   };
 
-  const renderItem = (text: string, validation: boolean) => {
+  const renderItem = (
+    text: string,
+    validation: boolean,
+  ): React.ReactElement => {
     return (
       <View style={styles.renderItem}>
         {validation ? <CheckCircleSvg /> : <CircleSvg />}
@@ -151,11 +154,15 @@ const Signup: SignupScreen = ({ navigation, route }) => {
           onChangeText={(val: string) => setFirstName(val)}
           text={firstName}
           containerStyle={styles.textContainer}
+          autoCapitalize="words"
+          autoCorrect={false}
         />
         <PTextInput
           label="Last name"
           onChangeText={(val: string) => setLastName(val)}
           text={lastName}
+          autoCapitalize="words"
+          autoCorrect={false}
         />
         <PTextInput
           label="Email"
@@ -240,34 +247,6 @@ const Signup: SignupScreen = ({ navigation, route }) => {
             </Text>
           </View>
         </View>
-
-        <View style={styles.wrap}>
-          <CheckBox
-            value={read}
-            boxType="square"
-            onCheckColor={WHITE}
-            onFillColor={PRIMARY}
-            onTintColor={PRIMARY}
-            lineWidth={2}
-            onValueChange={setRead}
-            style={styles.checkBox}
-          />
-          <View style={styles.checkBoxLabel}>
-            <Text style={styles.txt}>
-              I also hereby acknowledge the receipt of
-              <Text
-                onPress={() =>
-                  Linking.openURL(
-                    'https://www.prometheusalts.com/legals/brokerage-form-crs-relationship-summary',
-                  )
-                }>
-                <Text style={styles.hyperText}> Prometheus’s Form CRS</Text>
-              </Text>
-              <Text style={styles.txt}>.</Text>
-            </Text>
-          </View>
-        </View>
-
         <PGradientButton
           label="SIGN UP"
           btnContainer={styles.btnContainer}
@@ -276,12 +255,15 @@ const Signup: SignupScreen = ({ navigation, route }) => {
         />
         <PTextLine title="OR, SIGN UP WITH" containerStyle={styles.bottom} />
         <View style={styles.row}>
-          <TouchableOpacity style={styles.icon}>
+          {/**
+            * Hide until these are configured 6/6/22
+            <TouchableOpacity style={styles.icon}>
             <AppleSvg />
           </TouchableOpacity>
           <TouchableOpacity style={styles.icon}>
             <LinkedinSvg />
           </TouchableOpacity>
+          */}
           <TouchableOpacity style={styles.icon}>
             <GoogleSvg />
           </TouchableOpacity>

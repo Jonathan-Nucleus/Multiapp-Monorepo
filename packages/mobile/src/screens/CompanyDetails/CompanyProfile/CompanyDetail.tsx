@@ -22,7 +22,6 @@ import { Body2, Body3, H5Bold, H6Bold } from 'mobile/src/theme/fonts';
 import {
   WHITE,
   WHITE12,
-  BLUE300,
   GRAY100,
   PRIMARY,
   PRIMARYSOLID,
@@ -66,7 +65,7 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
           <FastImage
             style={styles.backgroundImg}
             source={{
-              uri: `${S3_BUCKET}/backgrounds/${background.url}`,
+              uri: `${S3_BUCKET}/backgrounds/${company._id}/${background.url}`,
             }}
             resizeMode={FastImage.resizeMode.cover}
           />
@@ -94,7 +93,7 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
         <View style={styles.companyDetail}>
           <View style={styles.relative}>
             {avatar ? (
-              <Avatar user={{ avatar }} style={styles.avatar} size={80} />
+              <Avatar user={company} style={styles.avatar} size={80} />
             ) : (
               <View style={styles.noAvatarContainer}>
                 <Text style={styles.noAvatar}>{name.charAt(0)}</Text>
@@ -247,24 +246,9 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
 export default CompanyDetail;
 
 const styles = StyleSheet.create({
-  backIcon: {
-    backgroundColor: BLUE300,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  container: {
-    paddingHorizontal: 0,
-  },
   backgroundImg: {
     width: Dimensions.get('screen').width,
     height: 65,
-  },
-  logo: {
-    width: 80,
-    height: 80,
   },
   row: {
     flexDirection: 'row',

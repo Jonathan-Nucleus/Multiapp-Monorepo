@@ -13,6 +13,8 @@ import { Presentation } from 'phosphor-react-native';
 import { useNavigation } from '@react-navigation/native';
 import FastImage from 'react-native-fast-image';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
 
 import Tag from 'mobile/src/components/common/Tag';
 import PLabel from 'mobile/src/components/common/PLabel';
@@ -117,20 +119,10 @@ const FundOverview: FC<FundOverviewProps> = ({
     );
   };
 
-  const { background } = fund.company;
   const dollarFormatter = Intl.NumberFormat('en', { notation: 'compact' });
 
   return (
     <View {...viewProps} style={[styles.overviewContainer, viewProps.style]}>
-      <View style={styles.imagesContainer}>
-        {background && (
-          <FastImage
-            style={styles.backgroundImage}
-            source={{ uri: `${S3_BUCKET}/backgrounds/${background.url}` }}
-            resizeMode={FastImage.resizeMode.cover}
-          />
-        )}
-      </View>
       {video ? (
         <View style={styles.videoContainer}>
           <FundMedia
@@ -207,7 +199,7 @@ const FundOverview: FC<FundOverviewProps> = ({
           <PLabel textStyle={styles.fund} label="Highlights" />
           <PLabel
             textStyle={styles.asOf}
-            label={`As of ${dayjs(fund.updatedAt).format('M/DD/YYYY')}`}
+            label={`As of ${dayjs(fund.updatedAt).utc().format('M/DD/YYYY')}`}
           />
         </View>
         <View style={styles.attributesContainer}>

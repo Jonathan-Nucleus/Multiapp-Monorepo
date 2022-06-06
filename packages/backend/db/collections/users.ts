@@ -59,9 +59,26 @@ export type DeserializedUser = {
   acc: User.Mongo["accreditation"];
 };
 
-export const DEFAULT_USER_OPTIONS = {
+export const DEFAULT_USER_OPTIONS: Pick<
+  User.Mongo,
+  "role" | "accreditation" | "settings"
+> = {
   role: UserRoleOptions.USER,
   accreditation: AccreditationOptions.NONE.value,
+  settings: {
+    interests: [],
+    tagging: true,
+    messaging: true,
+    emailUnreadMessage: false,
+    notifications: {
+      commentLike: "sms",
+      messageReceived: "sms",
+      postComment: "sms",
+      postCreate: "sms",
+      postLike: "sms",
+      tagCreate: "sms",
+    },
+  },
 };
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
