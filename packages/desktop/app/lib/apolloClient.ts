@@ -132,8 +132,7 @@ export function createApolloClient(
     // Report that the cursor could not be found.
     return -1;
   }
-
-  console.log("Connecting to apollo server at", graphqlUri);
+  
   const client = new ApolloClient({
     ssrMode: typeof window === "undefined",
     link: from([
