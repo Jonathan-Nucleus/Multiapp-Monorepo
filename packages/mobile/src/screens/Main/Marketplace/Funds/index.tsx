@@ -6,15 +6,18 @@ import {
   Text,
   ListRenderItem,
   SectionList,
+  Pressable,
 } from 'react-native';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+import { Info } from 'phosphor-react-native';
 
-import { BLACK, WHITE, WHITE12 } from 'shared/src/colors';
+import Disclosure from 'mobile/src/components/main/Disclosure';
+import FundItem from 'mobile/src/components/main/funds/FundItem';
 import pStyles from 'mobile/src/theme/pStyles';
+import { BLACK, WHITE, WHITE12, WHITE60 } from 'shared/src/colors';
 import { H6Bold } from 'mobile/src/theme/fonts';
 
 import AccreditationLock from './AccreditationLock';
-import FundItem from './FundItem';
 import FundsPlaceholder from '../../../../components/placeholder/FundsPlaceholder';
 import { FundsScreen } from 'mobile/src/navigations/MarketplaceTabs';
 
@@ -26,11 +29,12 @@ import {
 
 const PLACE_HOLDERS = 7;
 
-const Funds: FundsScreen = ({ navigation }) => {
+const Funds: FundsScreen = () => {
   const focused = useIsFocused();
 
   const { data, refetch } = useFunds();
   const [focus, setFocus] = useState(focused);
+  const [disclosureVisible, setDisclosureVisible] = useState(false);
 
   if (focused !== focus) {
     console.log('refetching funds');
@@ -64,14 +68,7 @@ const Funds: FundsScreen = ({ navigation }) => {
 
   const keyExtractor = (item: Fund): string => item._id;
   const renderItem: ListRenderItem<Fund> = ({ item }) => {
-    return (
-      <FundItem
-        fund={item}
-        onClickFundDetails={() =>
-          navigation.navigate('FundDetails', { fundId: item._id })
-        }
-      />
-    );
+    return <FundItem fund={item} />;
   };
 
   return (
@@ -85,6 +82,23 @@ const Funds: FundsScreen = ({ navigation }) => {
             <Text style={styles.listHeaderText}>{title}</Text>
           </View>
         )}
+        ListFooterComponent={
+          <>
+            <Pressable
+              onPress={() => setDisclosureVisible(true)}
+              style={({ pressed }) => [
+                styles.disclosureContainer,
+                pressed ? pStyles.pressedStyle : null,
+              ]}>
+              <Info color={WHITE60} size={20} />
+              <Text style={styles.disclosureText}>Prometheus Disclosures</Text>
+            </Pressable>
+            <Disclosure
+              isVisible={disclosureVisible}
+              onDismiss={() => setDisclosureVisible(false)}
+            />
+          </>
+        }
       />
     </View>
   );
@@ -106,5 +120,16 @@ const styles = StyleSheet.create({
     color: WHITE,
     padding: 16,
     ...H6Bold,
+  },
+  disclosureContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 16,
+    paddingVertical: 8,
+    marginBottom: 20,
+  },
+  disclosureText: {
+    color: WHITE60,
+    marginLeft: 8,
   },
 });

@@ -22,7 +22,7 @@ import {
 
 import { stopVideos } from 'mobile/src/components/common/Media';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
-import FundProfileInfo from './FundProfileInfo';
+import FundProfileInfo from 'mobile/src/components/main/funds/FundProfileInfo';
 import FundOverview from './FundOverview';
 import FundDocuments from './FundDocuments';
 import FundsPlaceholder from 'mobile/src/components/placeholder/FundsPlaceholder';

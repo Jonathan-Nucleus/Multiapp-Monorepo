@@ -63,85 +63,83 @@ const PBodyText: FC<PBodyTextProps> = ({
   }
 
   return (
-    <>
-      <LinkPreview
-        containerStyle={styles.previewContainer}
-        renderLinkPreview={({ previewData }) => (
-          <>
-            <Text
-              numberOfLines={more ? 3 : undefined}
-              style={[styles.body, style]}
-              selectable={true}>
-              {processPost(body).map((split, index) => {
-                if (split.startsWith('$') || split.startsWith('#')) {
-                  return (
-                    <Text
-                      key={`${split}-${index}`}
-                      style={styles.tagLink}
-                      onPress={() => search(split)}>
-                      {split}
-                    </Text>
-                  );
-                } else if (split.startsWith('@') && split.includes('|')) {
-                  const [name, id] = split.substring(1).split('|');
-                  return (
-                    <Text
-                      key={id}
-                      style={styles.tagLink}
-                      onPress={() => goToProfile(id)}>
-                      @{name}
-                    </Text>
-                  );
-                } else if (split.startsWith('%%')) {
-                  return (
-                    <Text
-                      key={`${split}-${index}`}
-                      style={styles.tagLink}
-                      onPress={() => goToUrl(split.substring(2).trim())}>
-                      {split.substring(2)}
-                    </Text>
-                  );
-                } else {
-                  return (
-                    <React.Fragment key={`${split}-${index}`}>
-                      {split}
-                    </React.Fragment>
-                  );
-                }
-              })}
-            </Text>
-            {!hideLinkPreview &&
-              (previewData?.title || previewData?.description) && (
-                <View style={styles.metaDataContainer}>
-                  <FastImage
-                    source={{ uri: previewData?.image?.url }}
-                    style={styles.previewImage}
-                    resizeMode="cover"
-                  />
-                  <PLabel
-                    label={previewData?.title || ''}
-                    textStyle={styles.title}
-                  />
-                  <PLabel
-                    label={previewData?.description || ''}
-                    textStyle={styles.description}
-                    numberOfLines={2}
-                  />
-                </View>
-              )}
-          </>
-        )}
-        textContainerStyle={styles.previewTextContainer}
-        text={body}
-      />
-      {collapseLongText && isLong ? (
-        <Pressable
-          onPress={() => setMore(!more)}
-          style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}>
-          <Text style={styles.more}>read {more ? 'more...' : 'less'}</Text>
-        </Pressable>
-      ) : null}
-    </>
+    <LinkPreview
+      containerStyle={styles.previewContainer}
+      renderLinkPreview={({ previewData }) => (
+        <>
+          <Text
+            numberOfLines={more ? 3 : undefined}
+            style={[styles.body, style]}
+            selectable={true}>
+            {processPost(body).map((split, index) => {
+              if (split.startsWith('$') || split.startsWith('#')) {
+                return (
+                  <Text
+                    key={`${split}-${index}`}
+                    style={styles.tagLink}
+                    onPress={() => search(split)}>
+                    {split}
+                  </Text>
+                );
+              } else if (split.startsWith('@') && split.includes('|')) {
+                const [name, id] = split.substring(1).split('|');
+                return (
+                  <Text
+                    key={id}
+                    style={styles.tagLink}
+                    onPress={() => goToProfile(id)}>
+                    @{name}
+                  </Text>
+                );
+              } else if (split.startsWith('%%')) {
+                return (
+                  <Text
+                    key={`${split}-${index}`}
+                    style={styles.tagLink}
+                    onPress={() => goToUrl(split.substring(2).trim())}>
+                    {split.substring(2)}
+                  </Text>
+                );
+              } else {
+                return (
+                  <React.Fragment key={`${split}-${index}`}>
+                    {split}
+                  </React.Fragment>
+                );
+              }
+            })}
+          </Text>
+          {collapseLongText && isLong ? (
+            <Pressable
+              onPress={() => setMore(!more)}
+              style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}>
+              <Text style={styles.more}>read {more ? 'more...' : 'less'}</Text>
+            </Pressable>
+          ) : null}
+          {!hideLinkPreview &&
+            (previewData?.title || previewData?.description) && (
+              <View style={styles.metaDataContainer}>
+                <FastImage
+                  source={{ uri: previewData?.image?.url }}
+                  style={styles.previewImage}
+                  resizeMode="cover"
+                />
+                <PLabel
+                  label={previewData?.title || ''}
+                  textStyle={styles.title}
+                />
+                <PLabel
+                  label={previewData?.description || ''}
+                  textStyle={styles.description}
+                  numberOfLines={2}
+                />
+              </View>
+            )}
+        </>
+      )}
+      textContainerStyle={styles.previewTextContainer}
+      text={body}
+    />
   );
 };
 
@@ -190,5 +188,7 @@ const styles = StyleSheet.create({
   },
   more: {
     color: PRIMARY,
+    marginTop: -8,
+    marginBottom: 8,
   },
 });

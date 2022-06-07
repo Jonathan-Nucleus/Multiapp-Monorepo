@@ -124,9 +124,6 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     ...Body3Bold,
   },
-  whiteText: {
-    color: WHITE,
-  },
   desLabel: {
     color: PRIMARY,
     lineHeight: 20,

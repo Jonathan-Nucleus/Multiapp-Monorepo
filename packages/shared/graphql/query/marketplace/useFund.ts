@@ -18,14 +18,15 @@ import { useEffect, useState } from "react";
 export type { DocumentCategory };
 export { DocumentCategories };
 
+export type TeamMember = Pick<
+  GraphQLFund["team"][number],
+  "_id" | "firstName" | "lastName" | "avatar" | "position"
+>;
 export type FundDetails = FundSummary &
   FundManager &
   FundCompany & {
     documents: GraphQLFund["documents"];
-    team: Pick<
-      GraphQLFund["team"][number],
-      "_id" | "firstName" | "lastName" | "avatar" | "position"
-    >[];
+    team: TeamMember[];
   } & Pick<
     GraphQLFund,
     | "aum"
@@ -34,6 +35,7 @@ export type FundDetails = FundSummary &
     | "fees"
     | "tags"
     | "attributes"
+    | "presentationUrl"
     | "metrics"
     | "videos"
     | "updatedAt"
@@ -87,6 +89,7 @@ export function useFund(fundId?: string): QueryResult<FundData, FundVariables> {
             category
             date
           }
+          presentationUrl
           team {
             _id
             firstName

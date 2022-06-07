@@ -1,17 +1,7 @@
-import React, { FC, useEffect } from 'react';
-import {
-  ListRenderItem,
-  View,
-  StyleSheet,
-  FlatList,
-  Pressable,
-  Dimensions,
-  ViewProps,
-  Text,
-} from 'react-native';
-import { Presentation } from 'phosphor-react-native';
+import React, { FC, useEffect, useState } from 'react';
+import { View, StyleSheet, ViewProps, Text, Pressable } from 'react-native';
+import { Presentation, Info } from 'phosphor-react-native';
 import { useNavigation } from '@react-navigation/native';
-import FastImage from 'react-native-fast-image';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
@@ -19,17 +9,11 @@ dayjs.extend(utc);
 import Tag from 'mobile/src/components/common/Tag';
 import PLabel from 'mobile/src/components/common/PLabel';
 import Accordion from 'mobile/src/components/common/Accordion';
-import Avatar from 'mobile/src/components/common/Avatar';
+import TeamList from 'mobile/src/components/main/funds/TeamList';
 import { FundMedia } from 'mobile/src/components/common/Media';
-import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
+import Disclosure from 'mobile/src/components/main/Disclosure';
 import pStyles from 'mobile/src/theme/pStyles';
-import {
-  Body1Bold,
-  Body2Bold,
-  Body2,
-  Body3,
-  H6Bold,
-} from 'mobile/src/theme/fonts';
+import { Body2Bold, Body2, Body3, H6Bold } from 'mobile/src/theme/fonts';
 import {
   PRIMARY,
   WHITE,
@@ -43,7 +27,6 @@ import NetReturnsTable from './NetReturnsTable';
 
 import { AssetClasses } from 'shared/graphql/fragments/fund';
 import { FundDetails } from 'shared/graphql/query/marketplace/useFund';
-import { S3_BUCKET } from 'react-native-dotenv';
 
 import { FundDetailsTabs } from './FundDetails';
 
@@ -76,6 +59,7 @@ const FundOverview: FC<FundOverviewProps> = ({
   ...viewProps
 }) => {
   const navigation = useNavigation<FundDetailsTabs>();
+  const [disclosureVisible, setDisclosureVisible] = useState(false);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', () => {
@@ -86,39 +70,6 @@ const FundOverview: FC<FundOverviewProps> = ({
   }, [navigation, onFocus]);
 
   const video = fund.videos?.[0];
-  const renderTeamMemberItem: ListRenderItem<FundDetails['team'][number]> = ({
-    item,
-  }) => {
-    return (
-      <Pressable
-        style={({ pressed }) => [
-          styles.memberItemContainer,
-          pressed ? pStyles.pressedStyle : null,
-        ]}
-        onPress={() =>
-          NavigationService.navigate('UserDetails', {
-            screen: 'UserProfile',
-            params: {
-              userId: item._id,
-            },
-          })
-        }>
-        <View
-          style={[
-            styles.memberItem,
-            fund.team.length === 1 && styles.fullWidth,
-          ]}>
-          <Avatar user={item} size={80} style={styles.avatar} />
-          <PLabel
-            textStyle={styles.name}
-            label={`${item.firstName} ${item.lastName}`}
-          />
-          <PLabel textStyle={styles.position} label={item.position || ''} />
-        </View>
-      </Pressable>
-    );
-  };
-
   const dollarFormatter = Intl.NumberFormat('en', { notation: 'compact' });
 
   return (
@@ -134,13 +85,15 @@ const FundOverview: FC<FundOverviewProps> = ({
       <View style={styles.fundDetailsContainer}>
         <PLabel textStyle={styles.fund} label="Strategy Overview" />
         <Text style={styles.overview}>{fund.overview}</Text>
-        {/*<View style={styles.presentationContainer}>
-          <Presentation size={32} color={WHITE} />
-          <PLabel
-            textStyle={styles.presentationLabel}
-            label="View Presentation"
-          />
-        </View>*/}
+        {fund.presentationUrl ? (
+          <View style={styles.presentationContainer}>
+            <Presentation size={32} color={WHITE} />
+            <PLabel
+              textStyle={styles.presentationLabel}
+              label="View Presentation"
+            />
+          </View>
+        ) : null}
         {fund.tags && fund.tags.length > 0 && (
           <View style={styles.tags}>
             {fund.tags.map((tag, index) => (
@@ -210,16 +163,7 @@ const FundOverview: FC<FundOverviewProps> = ({
           ))}
         </View>
       </View>
-      <View style={styles.memberContainer}>
-        <PLabel label="Team Members" textStyle={styles.sectionTitle} />
-        <FlatList
-          data={[fund.manager, ...fund.team]}
-          keyExtractor={(item) => item._id}
-          renderItem={renderTeamMemberItem}
-          showsVerticalScrollIndicator={false}
-          horizontal={true}
-        />
-      </View>
+      <TeamList team={[fund.manager, ...fund.team]} />
       {fund.metrics && fund.metrics.length > 0 ? (
         <View style={styles.memberContainer}>
           <PLabel textStyle={styles.fund} label="Monthly Net Return" />
@@ -229,6 +173,19 @@ const FundOverview: FC<FundOverviewProps> = ({
       {/*<Accordion title="Important Information">
         <Text style={{ color: 'white' }}>Test</Text>
       </Accordion>*/}
+      <Pressable
+        onPress={() => setDisclosureVisible(true)}
+        style={({ pressed }) => [
+          styles.disclosureContainer,
+          pressed ? pStyles.pressedStyle : null,
+        ]}>
+        <Info color={WHITE60} size={20} />
+        <Text style={styles.disclosureText}>Prometheus Disclosures</Text>
+      </Pressable>
+      <Disclosure
+        isVisible={disclosureVisible}
+        onDismiss={() => setDisclosureVisible(false)}
+      />
     </View>
   );
 };
@@ -238,18 +195,6 @@ export default FundOverview;
 const styles = StyleSheet.create({
   overviewContainer: {
     backgroundColor: BLACK,
-  },
-  imagesContainer: {
-    width: '100%',
-    position: 'relative',
-    overflow: 'visible',
-    zIndex: 2,
-  },
-  backgroundImage: {
-    height: 206,
-    borderRadius: 16,
-    marginHorizontal: 15,
-    marginTop: 24,
   },
   videoContainer: {
     marginTop: 8,
@@ -323,28 +268,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     ...Body2,
   },
-  highlightContainer: {
-    marginTop: 16,
-  },
-  highlightLabel: {
-    lineHeight: 20,
-  },
-  highlightItem: {
-    marginVertical: 3,
-    flexDirection: 'row',
-    alignContent: 'center',
-  },
-  bullet: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: WHITE,
-    marginRight: 8,
-    marginTop: 5,
-  },
-  highlightLabelContainer: {
-    width: '90%',
-  },
   attributesContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -361,38 +284,17 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingHorizontal: 16,
   },
-  memberItemContainer: {
-    width: Dimensions.get('screen').width / 2 - 20,
-    borderColor: WHITE12,
-    borderWidth: 1,
-    borderRadius: 8,
-    height: 180,
-    marginRight: 8,
-    marginVertical: 16,
-  },
-  memberItem: {
+  disclosureContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
-    padding: 8,
-    alignSelf: 'center',
+    marginHorizontal: 16,
+    borderColor: WHITE12,
+    borderTopWidth: 1,
+    paddingVertical: 8,
+    marginBottom: 20,
   },
-  fullWidth: {
-    width: Dimensions.get('screen').width - 32,
-  },
-  avatar: {
-    marginBottom: 16,
-  },
-  name: {
-    ...Body2Bold,
-    textTransform: 'capitalize',
-  },
-  position: {
-    ...Body3,
+  disclosureText: {
     color: WHITE60,
-    marginTop: 8,
-    textAlign: 'center',
-  },
-  sectionTitle: {
-    marginTop: 16,
-    ...Body1Bold,
+    marginLeft: 8,
   },
 });

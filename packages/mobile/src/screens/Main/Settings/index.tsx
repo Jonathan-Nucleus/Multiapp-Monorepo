@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   ListRenderItem,
@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   Pressable,
   Linking,
-  Switch,
 } from 'react-native';
 import { clearToken } from 'mobile/src/utils/auth-token';
 import {
@@ -20,22 +19,14 @@ import {
   Lifebuoy,
   Headset,
   ShieldCheck,
-  Database,
 } from 'phosphor-react-native';
-import { CommonActions } from '@react-navigation/native';
 
-import {
-  GRAY100,
-  WHITE,
-  WHITE12,
-  SUCCESS,
-  GRAY20,
-  GREEN,
-} from 'shared/src/colors';
+import { GRAY100, WHITE, WHITE12, SUCCESS } from 'shared/src/colors';
 
 import Avatar from 'mobile/src/components/common/Avatar';
 import MainHeader from 'mobile/src/components/main/Header';
 import PLabel from 'mobile/src/components/common/PLabel';
+import Disclosure from 'mobile/src/components/main/Disclosure';
 import pStyles from 'mobile/src/theme/pStyles';
 import { Body3, H6Bold, Body4Bold, Body2Bold } from 'mobile/src/theme/fonts';
 import { useAccount } from 'shared/graphql/query/account/useAccount';
@@ -57,6 +48,8 @@ interface MenuItem {
 
 const Settings: SettingsScreen = ({ navigation }) => {
   const { data } = useAccount();
+  const [disclosureVisible, setDisclosureVisible] = useState(false);
+
   const account = data?.account;
   const isAccredited = account?.accreditation !== 'NONE';
 
@@ -103,9 +96,8 @@ const Settings: SettingsScreen = ({ navigation }) => {
     },
     {
       id: 'Terms',
-      label: 'Terms and Disclosures',
-      onPress: () =>
-        Linking.openURL('https://prometheusalts.com/legals/disclosure-library'),
+      label: 'Prometheus Disclosures',
+      onPress: () => setDisclosureVisible(true),
       icon: <ShieldWarning size={26} color={WHITE} />,
     },
     {
@@ -218,11 +210,7 @@ const Settings: SettingsScreen = ({ navigation }) => {
             }
             key={company._id}>
             <View style={[styles.item, styles.border]}>
-              <Avatar
-                user={{ avatar: company.avatar }}
-                size={60}
-                style={styles.companyAvatar}
-              />
+              <Avatar user={company} size={60} style={styles.companyAvatar} />
               <View style={styles.rightItem}>
                 <Text style={styles.name}>{company.name}</Text>
                 <Text style={styles.comment}>See company page</Text>
@@ -244,7 +232,7 @@ const Settings: SettingsScreen = ({ navigation }) => {
         keyExtractor={(item) => item.id}
         style={styles.flatList}
         ListFooterComponent={
-          <View>
+          <View style={styles.footer}>
             <TouchableOpacity onPress={handleLogout}>
               <View style={[styles.item, styles.center]}>
                 <Text style={styles.label}>Log Out</Text>
@@ -252,6 +240,10 @@ const Settings: SettingsScreen = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         }
+      />
+      <Disclosure
+        isVisible={disclosureVisible}
+        onDismiss={() => setDisclosureVisible(false)}
       />
     </View>
   );
@@ -320,5 +312,9 @@ const styles = StyleSheet.create({
   },
   disabled: {
     opacity: 0.5,
+  },
+  footer: {
+    paddingTop: 8,
+    paddingBottom: 28,
   },
 });

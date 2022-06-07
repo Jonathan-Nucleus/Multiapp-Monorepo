@@ -1,10 +1,10 @@
 import React, { FC } from 'react';
-import { View, StyleSheet, Pressable, Text } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
 import { Star } from 'phosphor-react-native';
 
-import PGradientOutlineButton from '../../../../components/common/PGradientOutlineButton';
-import Tag from 'mobile/src/components/common/Tag';
-import { PRIMARYSTATE, WHITE, WHITE60 } from 'shared/src/colors';
+import PGradientOutlineButton from 'mobile/src/components/common/PGradientOutlineButton';
+import { navigate } from 'mobile/src/services/navigation/NavigationService';
+import { PRIMARYSTATE, WHITE } from 'shared/src/colors';
 import {
   FundSummary,
   FundCompany,
@@ -13,24 +13,22 @@ import {
 import FundProfileInfo from './FundProfileInfo';
 
 import { useWatchFund } from 'shared/graphql/mutation/funds/useWatchFund';
-import { useAccount } from 'shared/graphql/query/account/useAccount';
 
-type Fund = FundSummary & FundCompany & FundManager;
+export type Fund = FundSummary & FundCompany & FundManager;
 
 export interface FundItemProps {
   fund: Fund;
   showOverview?: boolean;
   showTags?: boolean;
-  onClickFundDetails: () => void;
   category?: string;
 }
 
-const FundItem: FC<FundItemProps> = ({
-  fund,
-  category,
-  onClickFundDetails,
-}) => {
+const FundItem: FC<FundItemProps> = ({ fund, category }) => {
   const { isWatching, toggleWatch } = useWatchFund(fund._id);
+
+  const goToFund = (): void => {
+    navigate('FundDetails', { fundId: fund._id });
+  };
 
   return (
     <View>
@@ -49,7 +47,7 @@ const FundItem: FC<FundItemProps> = ({
           }
           textStyle={styles.button}
           btnContainer={styles.buttonContainer}
-          onPress={onClickFundDetails}
+          onPress={goToFund}
         />
         <Pressable
           onPress={toggleWatch}

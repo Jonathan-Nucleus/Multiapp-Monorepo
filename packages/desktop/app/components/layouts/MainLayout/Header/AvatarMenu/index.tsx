@@ -175,7 +175,10 @@ const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
             <Button
               variant="primary"
               className="w-24"
-              onClick={() => signOut()}
+              onClick={async () => {
+                await signOut();
+                localStorage.clear();
+              }}
             >
               Yes
             </Button>

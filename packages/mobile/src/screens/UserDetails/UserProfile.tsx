@@ -14,6 +14,7 @@ import retry from 'async-retry';
 import FastImage from 'react-native-fast-image';
 import { CaretLeft, Pencil } from 'phosphor-react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import MainHeader from 'mobile/src/components/main/Header';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
@@ -22,7 +23,7 @@ import PLabel from 'mobile/src/components/common/PLabel';
 import PostItem from 'mobile/src/components/main/posts/PostItem';
 import FeaturedItem from 'mobile/src/components/main/settings/FeaturedItem';
 import FollowModal from 'mobile/src/components/main/FollowModal';
-import Funds from 'mobile/src/components/main/Funds';
+import FundList from 'mobile/src/components/main/funds/FundList';
 import PGradientOutlineButton from 'mobile/src/components/common/PGradientOutlineButton';
 import ProfilePlaceholder from 'mobile/src/components/placeholder/ProfilePlaceholder';
 import pStyles from 'mobile/src/theme/pStyles';
@@ -151,7 +152,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
   } = profile;
 
   return (
-    <View style={pStyles.globalContainer}>
+    <SafeAreaView style={pStyles.globalContainer} edges={['bottom']}>
       <MainHeader
         leftIcon={
           <View style={styles.backIcon}>
@@ -303,7 +304,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
             <DotsThreeVerticalSvg />
           </TouchableOpacity> */}
         </View>
-        <Funds accredited={profile.accreditation} funds={funds} />
+        <FundList accredited={profile.accreditation} funds={funds} />
         <View>
           {featuredPosts && featuredPosts.length > 0 && (
             <View>
@@ -368,7 +369,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
           />
         </View>
       </PAppContainer>
-    </View>
+    </SafeAreaView>
   );
 };
 

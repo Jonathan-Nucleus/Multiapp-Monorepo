@@ -9,20 +9,21 @@ import {
 } from 'react-native';
 import { CaretLeft } from 'phosphor-react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import MainHeader from 'mobile/src/components/main/Header';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import PostItem from 'mobile/src/components/main/posts/PostItem';
 import FeaturedItem from 'mobile/src/components/main/settings/FeaturedItem';
-import Members from 'mobile/src/components/main/settings/Members';
+import Members from 'mobile/src/components/main/funds/TeamList';
 import PGradientOutlineButton from 'mobile/src/components/common/PGradientOutlineButton';
 import NoPostSvg from 'shared/assets/images/no-post.svg';
 import pStyles from 'mobile/src/theme/pStyles';
-import { Body2Bold, Body3, H5Bold, H6Bold } from 'mobile/src/theme/fonts';
-import { WHITE, GRAY100, PRIMARY, PRIMARYSOLID } from 'shared/src/colors';
+import { Body2Bold, H6Bold } from 'mobile/src/theme/fonts';
+import { WHITE } from 'shared/src/colors';
 
 import CompanyDetail from './CompanyDetail';
-import Funds from 'mobile/src/components/main/Funds';
+import FundList from 'mobile/src/components/main/funds/FundList';
 import ProfilePlaceholder from '../../../components/placeholder/ProfilePlaceholder';
 import PostItemPlaceholder from 'mobile/src/components/placeholder/PostItemPlaceholder';
 import { stopVideos } from 'mobile/src/components/common/Media';
@@ -47,7 +48,6 @@ const CompanyProfile: CompanyProfileScreen = ({ navigation, route }) => {
   const { data: postsData } = usePosts(companyId);
   const { data: featuredPostsData } = useFeaturedPosts(companyId);
 
-  const funds = fundsData?.companyProfile?.funds ?? [];
   const posts = postsData?.companyProfile?.posts;
   const featuredPosts = featuredPostsData?.companyProfile?.posts ?? [];
   const company = companyData?.companyProfile;
@@ -82,6 +82,11 @@ const CompanyProfile: CompanyProfileScreen = ({ navigation, route }) => {
     );
   }
 
+  const funds = (fundsData?.companyProfile?.funds ?? []).map((fund) => ({
+    ...fund,
+    company,
+  }));
+
   const renderItem: ListRenderItem<Post> = ({ item }) => (
     <TouchableOpacity
       onPress={() => {
@@ -95,7 +100,7 @@ const CompanyProfile: CompanyProfileScreen = ({ navigation, route }) => {
   );
 
   return (
-    <View style={pStyles.globalContainer}>
+    <SafeAreaView style={pStyles.globalContainer} edges={['bottom']}>
       <MainHeader
         leftIcon={
           <View style={styles.backIcon}>
@@ -107,10 +112,10 @@ const CompanyProfile: CompanyProfileScreen = ({ navigation, route }) => {
       <PAppContainer style={styles.container}>
         <CompanyDetail company={company} isMyCompany={isMyCompany} />
         {account ? (
-          <Funds funds={funds} accredited={account.accreditation} />
+          <FundList funds={funds} accredited={account.accreditation} />
         ) : null}
         <View>
-          <Members members={company.members || []} key={company._id} />
+          <Members team={company.members || []} />
           {featuredPosts.length > 0 ? (
             <View>
               <Text style={styles.text}>Featured Posts</Text>
@@ -174,7 +179,7 @@ const CompanyProfile: CompanyProfileScreen = ({ navigation, route }) => {
           </View>
         </View>
       </PAppContainer>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -191,12 +196,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     marginBottom: 36,
   },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'flex-end',
-    flex: 1,
-  },
   noPostsText: {
     marginTop: 16,
     marginBottom: 24,
@@ -204,17 +203,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 24,
     ...H6Bold,
-  },
-  verticalLine: {
-    height: 32,
-    backgroundColor: GRAY100,
-    width: 1,
-    marginLeft: 40,
-    marginRight: 20,
-  },
-  website: {
-    color: PRIMARY,
-    ...Body3,
   },
   text: {
     color: WHITE,
@@ -231,17 +219,5 @@ const styles = StyleSheet.create({
   },
   createPostBtn: {
     marginTop: 25,
-  },
-  noAvatarContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: WHITE,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  noAvatar: {
-    color: PRIMARYSOLID,
-    ...H5Bold,
   },
 });
