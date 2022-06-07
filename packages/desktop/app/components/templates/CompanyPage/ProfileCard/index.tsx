@@ -20,17 +20,12 @@ import { CompanyProfile } from "shared/graphql/query/company/useCompany";
 import FollowersModal from "../../../modules/users/FollowersModal";
 import { useFollowCompany } from "shared/graphql/mutation/account/useFollowCompany";
 import EditModal from "../EditModal";
-import PhotoUploadModal from "../EditModal/PhotoUpload";
 import { MediaType } from "backend/graphql/mutations.graphql";
+import MediaEditorModal from "../../../modules/users/MediaEditorModal";
 
 interface CompanyPageProps {
   company: CompanyProfile;
   isEditable?: boolean;
-}
-
-interface PothoProps {
-  type: MediaType;
-  visible: boolean;
 }
 
 const ProfileCard: FC<CompanyPageProps> = ({
@@ -39,10 +34,7 @@ const ProfileCard: FC<CompanyPageProps> = ({
 }: CompanyPageProps) => {
   const [isVisible, setVisible] = useState(false);
   const [editableModal, setEditableModal] = useState(false);
-  const [editablePhoto, setEditablePhoto] = useState<PothoProps>({
-    type: "AVATAR",
-    visible: false,
-  });
+  const [mediaToEdit, setMediaToEdit] = useState<MediaType>();
   const { isFollowing, toggleFollow } = useFollowCompany(company._id);
   let overviewShort: string | undefined = undefined;
   const [showFullOverView, setShowFullOverView] = useState(false);
@@ -82,12 +74,7 @@ const ProfileCard: FC<CompanyPageProps> = ({
               )}
               {isEditable && (
                 <div
-                  onClick={() =>
-                    setEditablePhoto({
-                      type: "BACKGROUND",
-                      visible: true,
-                    })
-                  }
+                  onClick={() => setMediaToEdit("BACKGROUND")}
                   className="rounded-full border border-primary flex-shrink-0 w-10 h-10 bg-surface-light10 flex items-center justify-center cursor-pointer absolute right-4 top-4"
                 >
                   <Pencil size={24} color="white" />
@@ -99,12 +86,7 @@ const ProfileCard: FC<CompanyPageProps> = ({
                 <Avatar user={company} size={120} shape="square" />
                 {isEditable && (
                   <div
-                    onClick={() =>
-                      setEditablePhoto({
-                        type: "AVATAR",
-                        visible: true,
-                      })
-                    }
+                    onClick={() => setMediaToEdit("AVATAR")}
                     className="rounded-full border border-primary flex-shrink-0 w-10 h-10 bg-surface-light10 flex items-center justify-center cursor-pointer absolute right-0 bottom-0"
                   >
                     <Pencil size={24} color="white" />
@@ -144,12 +126,7 @@ const ProfileCard: FC<CompanyPageProps> = ({
                   <Avatar user={company} size={80} shape="square" />
                   {isEditable && (
                     <div
-                      onClick={() =>
-                        setEditablePhoto({
-                          type: "AVATAR",
-                          visible: true,
-                        })
-                      }
+                      onClick={() => setMediaToEdit("AVATAR")}
                       className="rounded-full border border-primary flex-shrink-0 w-8 h-8 bg-surface-light10 flex items-center justify-center cursor-pointer absolute right-0 bottom-0"
                     >
                       <Pencil size={18} color="white" />
@@ -387,17 +364,14 @@ const ProfileCard: FC<CompanyPageProps> = ({
         onClose={() => setEditableModal(false)}
         company={company}
       />
-      <PhotoUploadModal
-        show={editablePhoto.visible}
-        onClose={() => {
-          setEditablePhoto({
-            type: "AVATAR",
-            visible: false,
-          });
-        }}
-        type={editablePhoto.type}
-        company={company}
-      />
+      {mediaToEdit && (
+        <MediaEditorModal
+          mediaType={mediaToEdit}
+          company={company}
+          show={!!mediaToEdit}
+          onClose={() => setMediaToEdit(undefined)}
+        />
+      )}
     </>
   );
 };

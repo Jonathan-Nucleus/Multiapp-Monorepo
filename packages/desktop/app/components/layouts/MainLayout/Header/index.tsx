@@ -16,12 +16,10 @@ import NavItem from "./NavItem";
 import Sidebar from "./Sidebar";
 import AvatarMenu from "./AvatarMenu";
 import Avatar from "../../../common/Avatar";
-import { useAccount } from "shared/graphql/query/account/useAccount";
-import {
-  useNotifications,
-} from "shared/graphql/query/notification/useNotifications";
+import { useNotifications } from "shared/graphql/query/notification/useNotifications";
 import SearchView from "./SearchView";
 import Container from "../../Container";
+import { useAccountContext } from "shared/context/Account";
 
 const navItems = [
   {
@@ -45,7 +43,7 @@ const navItems = [
 
 const Header: FC = () => {
   const [showSidebar, setShowSidebar] = useState(false);
-  const { data: { account } = {} } = useAccount();
+  const account = useAccountContext();
   const { data: { notifications = [] } = {} } = useNotifications();
 
   return (
@@ -83,8 +81,8 @@ const Header: FC = () => {
                   text-white absolute -top-1.5 -right-1.5 flex items-center
                   justify-center font-medium`}
                 >
-                1
-              </span>
+                  1
+                </span>
               </a>
             </Link>
             <Link href="/notifications">
@@ -96,8 +94,8 @@ const Header: FC = () => {
                     text-white absolute -top-1.5 -right-1.5 flex items-center
                     justify-center font-medium`}
                   >
-                  {notifications.filter((v) => v.isNew).length}
-                </span>
+                    {notifications.filter((v) => v.isNew).length}
+                  </span>
                 )}
               </a>
             </Link>

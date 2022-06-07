@@ -39,6 +39,7 @@ module.exports = {
           overlay: "#57B1FF",
           medium: "#A5A1FF",
           highlight: primaryHighlight,
+          light: "#EBEBFF",
         },
         secondary: {
           DEFAULT: "#0067E0",

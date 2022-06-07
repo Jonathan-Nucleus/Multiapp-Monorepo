@@ -7,8 +7,6 @@ import { UserProfileProps } from "../../../types/common-props";
 import PostsSection from "./PostsSection";
 import FundsSection from "./FundsSection";
 import EditProfileModal from "./ProfileCard/EditModal";
-import EditMediaModal from "./EditMediaModal";
-import { MediaType } from "backend/graphql/mutations.graphql";
 import ProfileCardSkeleton from "./ProfileCard/Skeleton";
 
 interface ProfilePageProps extends UserProfileProps {
@@ -19,8 +17,6 @@ interface ProfilePageProps extends UserProfileProps {
 const ProfilePage: FC<ProfilePageProps> = ({ user, loading, isMyProfile }) => {
   const [showPostModal, setShowPostModal] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
-  const [showEditMedia, setShowEditMedia] = useState(false);
-  const [mediaTypeToEdit, setMediaTypeToEdit] = useState<MediaType>();
 
   return (
     <>
@@ -29,55 +25,51 @@ const ProfilePage: FC<ProfilePageProps> = ({ user, loading, isMyProfile }) => {
           <div className="flex-grow max-w-3xl lg:mx-4">
             <div className="divide-y divide-inherit border-white/[.12]">
               <div className="pb-5">
-                {user ?
+                {user ? (
                   <ProfileCard
                     user={user}
                     isEditable={isMyProfile}
                     onSelectToEditProfile={() => setShowEditProfile(true)}
-                    onSelectToEditMedia={(mediaType) => {
-                      setMediaTypeToEdit(mediaType);
-                      setShowEditMedia(true);
-                    }}
                   />
-                  :
+                ) : (
                   <ProfileCardSkeleton />
-                }
+                )}
               </div>
-              {loading &&
+              {loading && (
                 <div className="lg:hidden mb-5 pt-5">
                   <CompaniesListSkeleton />
                 </div>
-              }
-              {user?.companies && user.companies.length > 0 &&
+              )}
+              {user?.companies && user.companies.length > 0 && (
                 <div className="lg:hidden mb-5 pt-5">
                   <CompaniesList companies={user?.companies} />
                 </div>
-              }
-              {user &&
+              )}
+              {user && (
                 <FundsSection
                   userId={user._id}
                   showNoFundsLabel={isMyProfile}
                 />
-              }
+              )}
               <div className="pt-4">
-                {user &&
+                {user && (
                   <PostsSection userId={user._id} showAddPost={isMyProfile} />
-                }
+                )}
               </div>
             </div>
           </div>
           <div className="flex-shrink-0">
             <div className="hidden lg:block">
-              {loading &&
+              {loading && (
                 <div className="w-80 mx-4">
                   <CompaniesListSkeleton />
                 </div>
-              }
-              {user?.companies && user.companies.length > 0 &&
+              )}
+              {user?.companies && user.companies.length > 0 && (
                 <div className="w-80 mx-4">
                   <CompaniesList companies={user?.companies} />
                 </div>
-              }
+              )}
             </div>
           </div>
         </div>
@@ -92,14 +84,6 @@ const ProfilePage: FC<ProfilePageProps> = ({ user, loading, isMyProfile }) => {
         <EditProfileModal
           show={showEditProfile}
           onClose={() => setShowEditProfile(false)}
-        />
-      )}
-      {showEditMedia && (
-        <EditMediaModal
-          type={mediaTypeToEdit!}
-          user={user!}
-          show={showEditMedia}
-          onClose={() => setShowEditMedia(false)}
         />
       )}
     </>

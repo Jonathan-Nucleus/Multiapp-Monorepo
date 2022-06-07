@@ -44,18 +44,19 @@ const CompanyEdit: FC<CompanyEditModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [updateCompanyProfile] = useUpdateCompanyProfile();
-  const { register, handleSubmit, formState } =
-    useForm<yup.InferType<typeof schema>>({
-      resolver: yupResolver(schema),
-      defaultValues: schema.cast({
-        name: company.name,
-        about: company.overview,
-        website: company.website ?? "",
-        linkedIn: company.linkedIn ?? "",
-        twitter: company.twitter ?? "",
-      }) as DefaultValues<FormValues>,
-      mode: "onChange",
-    });
+  const { register, handleSubmit, formState } = useForm<
+    yup.InferType<typeof schema>
+  >({
+    resolver: yupResolver(schema),
+    defaultValues: schema.cast({
+      name: company.name,
+      about: company.overview ?? "",
+      website: company.website ?? "",
+      linkedIn: company.linkedIn ?? "",
+      twitter: company.twitter ?? "",
+    }) as DefaultValues<FormValues>,
+    mode: "onChange",
+  });
   const { isValid } = formState;
 
   const onSubmit: SubmitHandler<FormValues> = async (values) => {
@@ -106,7 +107,11 @@ const CompanyEdit: FC<CompanyEditModalProps> = ({
                   <Alert variant="error">
                     <div className="flex flex-row">
                       <div className="flex-shrink-0 text-error">
-                        <WarningCircle size={24} weight="bold" color="currentColor" />
+                        <WarningCircle
+                          size={24}
+                          weight="bold"
+                          color="currentColor"
+                        />
                       </div>
                       <div className="text-white ml-3">{error}</div>
                     </div>

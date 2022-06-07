@@ -17,8 +17,6 @@ import Card from "../../../../components/common/Card";
 import Avatar from "../../../common/Avatar";
 import FollowersModal from "../../../modules/users/FollowersModal";
 
-import { useAccount } from "shared/graphql/query/account/useAccount";
-
 import LinkedIn from "shared/assets/images/linkedin.svg";
 import Twitter from "shared/assets/images/twitter.svg";
 import Globe from "shared/assets/images/globe.svg";
@@ -26,22 +24,22 @@ import ConfirmHideUserModal from "./ConfirmHideUserModal";
 import { MediaType } from "backend/graphql/mutations.graphql";
 import { UserProfile } from "shared/graphql/query/user/useProfile";
 import { useFollowUser } from "shared/graphql/mutation/account/useFollowUser";
+import { useAccountContext } from "shared/context/Account";
+import MediaEditorModal from "../../../modules/users/MediaEditorModal";
 
 interface ProfileCardProps {
   user: UserProfile;
   isEditable?: boolean;
   onSelectToEditProfile: () => void;
-  onSelectToEditMedia: (mediaType: MediaType) => void;
 }
 
 const ProfileCard: FC<ProfileCardProps> = ({
   user,
   isEditable = false,
   onSelectToEditProfile,
-  onSelectToEditMedia,
 }) => {
   const [isVisible, setVisible] = useState(false);
-  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
+  const account = useAccountContext();
   const [followersModalTab, setFollowersModalTab] = useState(0);
   const [showHideUser, setShowHideUser] = useState(false);
   const { isFollowing, toggleFollow } = useFollowUser(user._id);
@@ -51,6 +49,7 @@ const ProfileCard: FC<ProfileCardProps> = ({
   };
   let overviewShort: string | undefined = undefined;
   const [showFullOverView, setShowFullOverView] = useState(false);
+  const [mediaToEdit, setMediaToEdit] = useState<MediaType>();
   {
     const regexpSpace = /\s/g;
     const result = user?.overview?.matchAll(regexpSpace);
@@ -87,7 +86,7 @@ const ProfileCard: FC<ProfileCardProps> = ({
               {isEditable && isMyProfile && (
                 <div
                   className="rounded-full border border-primary flex-shrink-0 w-10 h-10 bg-surface-light10 flex items-center justify-center cursor-pointer absolute right-4 top-4"
-                  onClickCapture={() => onSelectToEditMedia("BACKGROUND")}
+                  onClickCapture={() => setMediaToEdit("BACKGROUND")}
                 >
                   <Pencil size={24} color="white" />
                 </div>
@@ -99,7 +98,7 @@ const ProfileCard: FC<ProfileCardProps> = ({
                 {isEditable && isMyProfile && (
                   <div
                     className="rounded-full border border-primary flex-shrink-0 w-10 h-10 bg-surface-light10 flex items-center justify-center cursor-pointer absolute right-0 bottom-0"
-                    onClickCapture={() => onSelectToEditMedia("AVATAR")}
+                    onClickCapture={() => setMediaToEdit("AVATAR")}
                   >
                     <Pencil size={24} color="white" />
                   </div>
@@ -153,7 +152,7 @@ const ProfileCard: FC<ProfileCardProps> = ({
                 {isEditable && isMyProfile && (
                   <div
                     className="rounded-full border border-primary flex-shrink-0 w-8 h-8 bg-surface-light10 flex items-center justify-center cursor-pointer absolute right-0 bottom-0"
-                    onClickCapture={() => onSelectToEditMedia("AVATAR")}
+                    onClickCapture={() => setMediaToEdit("AVATAR")}
                   >
                     <Pencil size={20} color="white" />
                   </div>
@@ -418,6 +417,14 @@ const ProfileCard: FC<ProfileCardProps> = ({
         show={showHideUser}
         onClose={() => setShowHideUser(false)}
       />
+      {mediaToEdit && (
+        <MediaEditorModal
+          mediaType={mediaToEdit}
+          user={user}
+          show={!!mediaToEdit}
+          onClose={() => setMediaToEdit(undefined)}
+        />
+      )}
     </>
   );
 };

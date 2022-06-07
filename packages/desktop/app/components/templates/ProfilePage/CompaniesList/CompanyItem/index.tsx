@@ -2,16 +2,16 @@ import { FC } from "react";
 import Link from "next/link";
 import Avatar from "../../../../common/Avatar";
 import Button from "../../../../common/Button";
-import {
-  useFollowCompany,
-} from "shared/graphql/mutation/account/useFollowCompany";
+import { useFollowCompany } from "shared/graphql/mutation/account/useFollowCompany";
 import { UserProfile } from "shared/graphql/query/user/useProfile";
+import { useAccountContext } from "shared/context/Account";
 
 interface CompanyItemProps {
   company: UserProfile["companies"][number];
 }
 
 const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
+  const account = useAccountContext();
   const { isFollowing, toggleFollow } = useFollowCompany(company._id);
 
   return (
@@ -27,13 +27,19 @@ const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
         <Link href={`/company/${company._id}`}>
           <a className="text-white ml-4">{company.name}</a>
         </Link>
-        <Button
-          variant="text"
-          className="w-16 flex-shrink-0 text-xs text-primary tracking-normal font-normal ml-auto px-2 py-0"
-          onClick={toggleFollow}
+        <div
+          className={
+            account.companyIds?.includes(company._id) ? "invisible" : ""
+          }
         >
-          {isFollowing ? "Unfollow" : "Follow"}
-        </Button>
+          <Button
+            variant="text"
+            className="w-16 flex-shrink-0 text-xs text-primary tracking-normal font-normal ml-auto px-2 py-0"
+            onClick={toggleFollow}
+          >
+            {isFollowing ? "Unfollow" : "Follow"}
+          </Button>
+        </div>
       </div>
     </>
   );

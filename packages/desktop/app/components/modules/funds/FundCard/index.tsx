@@ -1,13 +1,13 @@
 import React, { FC } from "react";
 import Link from "next/link";
 import { Star } from "phosphor-react";
-import { useAccount } from "shared/graphql/query/account/useAccount";
 import { useWatchFund } from "shared/graphql/mutation/funds/useWatchFund";
 import { useFollowUser } from "shared/graphql/mutation/account/useFollowUser";
 import { useFollowCompany } from "shared/graphql/mutation/account/useFollowCompany";
 import { Fund } from "shared/graphql/query/marketplace/useFunds";
 import Avatar from "desktop/app/components/common/Avatar";
 import Button from "desktop/app/components/common/Button";
+import { useAccountContext } from "shared/context/Account";
 
 export interface FundCardProps {
   fund: Fund;
@@ -20,7 +20,7 @@ const FundCard: FC<FundCardProps> = ({
   showImages = true,
   profileType,
 }: FundCardProps) => {
-  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
+  const account = useAccountContext();
   const { isFollowing: isFollowingManager, toggleFollow: toggleFollowManager } =
     useFollowUser(fund.manager._id);
   const { isFollowing: isFollowingCompany, toggleFollow: toggleFollowCompany } =
@@ -83,7 +83,7 @@ const FundCard: FC<FundCardProps> = ({
                 </a>
               </Link>
               <Link href={`/company/${fund.company._id}`}>
-                <a className="text-sm text-white mt-2 tracking-wide">
+                <a className="text-sm text-white text-center mt-2 tracking-wide">
                   {fund.company.name}
                 </a>
               </Link>
@@ -93,7 +93,13 @@ const FundCard: FC<FundCardProps> = ({
                 {fund.company.postIds?.length ?? 0} Posts
               </div>
               <div className="text-center min-h-0 flex-grow mb-2">
-                <div className={isMyFund ? "invisible" : ""}>
+                <div
+                  className={
+                    isMyFund || account.companyIds?.includes(fund.company._id)
+                      ? "invisible"
+                      : ""
+                  }
+                >
                   <Button
                     variant="text"
                     className="text-sm text-primary tracking-normal font-normal"

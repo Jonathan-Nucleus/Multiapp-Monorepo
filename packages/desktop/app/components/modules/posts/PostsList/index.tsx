@@ -1,7 +1,7 @@
 import { FC } from "react";
 import Post from "../Post";
 import { PostSummary } from "shared/graphql/fragments/post";
-import { PostCategory } from "backend/graphql/posts.graphql";
+import { PostCategory, PostRoleFilter } from "backend/graphql/posts.graphql";
 import Skeleton from "./Skeleton";
 import FilterHeader from "./FilterHeader";
 
@@ -9,7 +9,10 @@ interface PostsListProps {
   posts: PostSummary[] | undefined;
   displayFilter?: boolean;
   onSelectPost: (post: PostSummary) => void;
-  onRefresh?: (categories: PostCategory[] | undefined) => void;
+  onRefresh?: (
+    categories: PostCategory[] | undefined,
+    filter?: PostRoleFilter
+  ) => void;
 }
 
 const PostsList: FC<PostsListProps> = ({
@@ -21,15 +24,12 @@ const PostsList: FC<PostsListProps> = ({
   if (!posts) {
     return <Skeleton />;
   }
-  if (posts.length == 0) {
-    return <></>;
-  }
   return (
     <>
       {displayFilter && (
         <FilterHeader
-          onFilterChange={(categories, from) => {
-            onRefresh?.(categories.length > 0 ? categories : undefined);
+          onFilterChange={(categories, filter) => {
+            onRefresh?.(categories.length > 0 ? categories : undefined, filter);
           }}
         />
       )}

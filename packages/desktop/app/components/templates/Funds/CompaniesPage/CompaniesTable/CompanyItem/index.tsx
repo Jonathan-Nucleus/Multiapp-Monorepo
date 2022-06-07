@@ -6,16 +6,16 @@ import Button from "../../../../../common/Button";
 import Card from "../../../../../common/Card";
 import { ShieldCheck } from "phosphor-react";
 
-import {
-  useFollowCompany,
-} from "shared/graphql/mutation/account/useFollowCompany";
+import { useFollowCompany } from "shared/graphql/mutation/account/useFollowCompany";
 import { Company } from "shared/graphql/query/marketplace/useFundCompanies";
+import { useAccountContext } from "shared/context/Account";
 
 interface CompanyItemProps {
   company: Company;
 }
 
 const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
+  const account = useAccountContext();
   const { isFollowing, toggleFollow } = useFollowCompany(company._id);
   const managerLookup = company.fundManagers.reduce((acc, manager) => {
     acc[manager._id] = manager;
@@ -46,19 +46,25 @@ const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
           </div>
         </div>
         <div className="flex items-center justify-end">
-          <Button
-            variant="text"
-            className="text-primary font-medium text-md py-0"
-            onClick={toggleFollow}
+          <div
+            className={
+              account.companyIds?.includes(company._id) ? "hidden" : ""
+            }
           >
-            {isFollowing ? "Unfollow" : "Follow"}
-          </Button>
+            <Button
+              variant="text"
+              className="text-primary font-medium text-md py-0"
+              onClick={toggleFollow}
+            >
+              {isFollowing ? "Unfollow" : "Follow"}
+            </Button>
+          </div>
           <Link href={`/company/${company._id}`}>
             <a>
               <Button
                 variant="primary"
-                className={`text-primary text-white tracking-normal ml-4
-              bg-purple-dark border border-primary-solid hover:bg-primary-solid`}
+                className={`text-primary text-white tracking-normal ml-4 
+                bg-purple-dark border border-primary-solid hover:bg-primary-solid`}
               >
                 View Profile
               </Button>
@@ -84,7 +90,11 @@ const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
             </div>
             <div className="text-xs text-white">Followers</div>
           </div>
-          <div className="ml-auto">
+          <div
+            className={`${
+              account.companyIds?.includes(company._id) ? "hidden" : ""
+            } ml-auto`}
+          >
             <Button
               variant="outline-primary"
               className="text-primary text-white"

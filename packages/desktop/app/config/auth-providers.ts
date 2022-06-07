@@ -4,7 +4,6 @@ import { Provider } from "next-auth/providers";
 import GoogleProvider from "next-auth/providers/google";
 import LinkedInProvider from "next-auth/providers/linkedin";
 
-import jwt, { JwtPayload } from "jsonwebtoken";
 import { gql } from "@apollo/client";
 import { createApolloClient } from "desktop/app/lib/apolloClient";
 
@@ -21,7 +20,7 @@ const providers: Provider[] = [
     async authorize(credentials) {
       if (!credentials) return null;
       const { email, password } = credentials;
-      const result = await createApolloClient(
+      const { data } = await createApolloClient(
         undefined,
         undefined,
         NEXT_PUBLIC_GRAPHQL_URI
@@ -34,8 +33,7 @@ const providers: Provider[] = [
         variables: { email, password },
       });
 
-      const { data } = result;
-      if (data && data.login) {
+      if (data?.login) {
         const token = data.login;
         return { access_token: token };
       }

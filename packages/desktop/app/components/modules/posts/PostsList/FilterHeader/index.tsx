@@ -5,10 +5,14 @@ import { CaretDown, SlidersHorizontal, X } from "phosphor-react";
 import { PostCategories } from "backend/graphql/enumerations.graphql";
 import FilterDropdown from "./FilterDropdown";
 import { Popover, Transition } from "@headlessui/react";
+import {
+  PostRoleFilterEnum,
+  PostRoleFilterOptions,
+} from "backend/schemas/post";
 
 export type FilterChangeCallback = (
   categories: PostCategory[],
-  from: string
+  filter: PostRoleFilterEnum
 ) => void;
 
 interface FilterHeaderProps {
@@ -17,7 +21,7 @@ interface FilterHeaderProps {
 
 const FilterHeader: FC<FilterHeaderProps> = ({ onFilterChange }) => {
   const [categories, setCategories] = useState<PostCategory[]>([]);
-  const [postedFrom, setPostedFrom] = useState("Everyone");
+  const [postedFrom, setPostedFrom] = useState<PostRoleFilterEnum>("EVERYONE");
   const onRemoveCategory = (category: PostCategory) => {
     filterChangeCallback(
       [...categories].filter((item) => item != category),
@@ -47,7 +51,9 @@ const FilterHeader: FC<FilterHeaderProps> = ({ onFilterChange }) => {
                   {categories.length == 0 ? "All" : "Filtered"}
                 </span>
                 <span> posts from </span>
-                <span className="font-semibold">{postedFrom}</span>
+                <span className="font-semibold">
+                  {PostRoleFilterOptions[postedFrom].label}
+                </span>
               </div>
               <CaretDown color="white" size={24} className="ml-2" />
             </Button>

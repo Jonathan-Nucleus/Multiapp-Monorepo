@@ -19,9 +19,11 @@ import Button from "../../../../common/Button";
 import InviteFriends from "../../../../modules/users/InviteFriends";
 import { UserProfile } from "shared/graphql/query/user/useProfile";
 import BecomeProModal from "../../../../modules/account/BecomeProModal";
+import { getInitials } from "../../../../../lib/utilities";
+import { AccreditationOptions } from "backend/schemas/user";
 
 interface AvatarMenuProps {
-  account: UserProfile | undefined;
+  account: UserProfile;
 }
 
 const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
@@ -34,12 +36,12 @@ const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
         <div className="relative text-success">
           <CircleWavy color="currentColor" weight="fill" size={24} />
           <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-xs font-bold scale-75 text-background">
-            AI
+            {getInitials(AccreditationOptions[account.accreditation].label)}
           </div>
         </div>
       ),
-      title: "Accredited Investor",
-      path: "/",
+      title: AccreditationOptions[account.accreditation].label,
+      path: "/funds",
     },
     {
       icon: (

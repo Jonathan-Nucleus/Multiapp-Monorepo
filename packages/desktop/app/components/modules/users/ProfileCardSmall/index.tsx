@@ -1,20 +1,20 @@
 import React, { FC } from "react";
 import { CircleWavy } from "phosphor-react";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
 import { getInitials } from "../../../../lib/utilities";
 
 import Avatar from "../../../common/Avatar";
 import Card from "../../../common/Card";
 import { AccreditationOptions } from "backend/schemas/user";
 import { UserProfile } from "shared/graphql/query/user/useProfile";
+import { useAccountContext } from "shared/context/Account";
 
 interface ProfileProps {
   user: UserProfile | undefined;
 }
 
 const ProfileCardSmall: FC<ProfileProps> = ({ user }: ProfileProps) => {
-  const { data: session } = useSession();
+  const account = useAccountContext();
   if (!user) {
     return (
       <div className="animate-pulse">
@@ -35,7 +35,7 @@ const ProfileCardSmall: FC<ProfileProps> = ({ user }: ProfileProps) => {
       </div>
     );
   }
-  const isMyProfile = user._id == session?.user?._id;
+  const isMyProfile = user._id == account._id;
   return (
     <div>
       <Link href={`/profile/${isMyProfile ? "me" : user._id}`}>

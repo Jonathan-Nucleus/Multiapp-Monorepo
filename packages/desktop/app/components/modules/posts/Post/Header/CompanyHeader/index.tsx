@@ -3,9 +3,8 @@ import Link from "next/link";
 import Avatar from "../../../../../common/Avatar";
 import { PostSummary } from "shared/graphql/fragments/post";
 import Button from "../../../../../common/Button";
-import {
-  useFollowCompany,
-} from "shared/graphql/mutation/account/useFollowCompany";
+import { useFollowCompany } from "shared/graphql/mutation/account/useFollowCompany";
+import { useAccountContext } from "shared/context/Account";
 
 interface CompanyHeaderProps {
   company: Exclude<PostSummary["company"], undefined>;
@@ -14,6 +13,7 @@ interface CompanyHeaderProps {
 
 const CompanyHeader: FC<CompanyHeaderProps> = ({ company, createdAt }) => {
   const { isFollowing, toggleFollow } = useFollowCompany(company._id);
+  const account = useAccountContext();
   return (
     <>
       <div className="flex items-center">
@@ -29,11 +29,9 @@ const CompanyHeader: FC<CompanyHeaderProps> = ({ company, createdAt }) => {
             <div>
               <div className="flex items-center">
                 <Link href={`/company/${company._id}`}>
-                  <a className="text-white capitalize">
-                    {company.name}
-                  </a>
+                  <a className="text-white capitalize">{company.name}</a>
                 </Link>
-                {!isFollowing && (
+                {!isFollowing && !account.companyIds?.includes(company._id) && (
                   <div className="flex items-center">
                     <div className="mx-1 text-white opacity-60">•</div>
                     <div className="flex">
@@ -48,9 +46,7 @@ const CompanyHeader: FC<CompanyHeaderProps> = ({ company, createdAt }) => {
                   </div>
                 )}
               </div>
-              <div className="text-xs text-white opacity-60">
-                {createdAt}
-              </div>
+              <div className="text-xs text-white opacity-60">{createdAt}</div>
             </div>
           </div>
         </div>
@@ -60,4 +56,3 @@ const CompanyHeader: FC<CompanyHeaderProps> = ({ company, createdAt }) => {
 };
 
 export default CompanyHeader;
-

@@ -8,17 +8,14 @@ import Button from "desktop/app/components/common/Button";
 import { PostCategories } from "backend/graphql/enumerations.graphql";
 import { PostCategory } from "backend/graphql/posts.graphql";
 import { FilterChangeCallback } from "../index";
-
-const fromItems = [
-  "Pros + people I follow",
-  "Professionals",
-  "People I follow",
-  "Everyone",
-];
+import {
+  PostRoleFilterEnum,
+  PostRoleFilterOptions,
+} from "backend/schemas/post";
 
 interface FilterDropdownProps {
   categories: PostCategory[];
-  postedFrom: string;
+  postedFrom: PostRoleFilterEnum;
   onApplyFilter: FilterChangeCallback;
 }
 
@@ -69,20 +66,19 @@ const FilterDropdown: FC<FilterDropdownProps> = ({
           <div>
             <div className="text-xs text-white font-medium">Posts From</div>
             <div className="mt-3">
-              {fromItems.map((item, index) => (
+              {Object.keys(PostRoleFilterOptions).map((key, index) => (
                 <div key={index} className="flex items-center py-2">
                   <Radio
-                    id={`from-${index}`}
-                    name="from"
-                    defaultChecked={selectedPostedFrom == item}
+                    id={key}
+                    checked={selectedPostedFrom == key}
                     onChange={(event: ChangeEvent<HTMLInputElement>) => {
                       if (event.target.checked) {
-                        setSelectedPostedFrom(item);
+                        setSelectedPostedFrom(key);
                       }
                     }}
                   />
-                  <Label htmlFor={`from-${index}`} className="font-medium ml-2">
-                    {item}
+                  <Label htmlFor={key} className="font-medium ml-2">
+                    {PostRoleFilterOptions[key].label}
                   </Label>
                 </div>
               ))}

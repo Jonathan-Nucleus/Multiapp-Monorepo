@@ -60,7 +60,7 @@ const PostsSection: FC<UserProfileProps> = ({ user }) => {
       }
     };
     document.addEventListener("scroll", handleScroll, true);
-    return () => document.removeEventListener("wheel", handleScroll);
+    return () => document.removeEventListener("scroll", handleScroll, true);
   }, [posts, scrollCallback]);
   return (
     <>
@@ -82,7 +82,12 @@ const PostsSection: FC<UserProfileProps> = ({ user }) => {
             selectedFile.current = undefined;
             setShowPostModal(true);
           }}
-          onRefresh={(categories) => refetch({ categories })}
+          onRefresh={(categories, filter) =>
+            refetch({
+              categories,
+              roleFilter: filter,
+            })
+          }
         />
       </div>
       <div className="block md:hidden fixed bottom-5 right-5">
