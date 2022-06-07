@@ -70,7 +70,7 @@ interface Media {
 }
 
 /** Enumeration describing the audience targeted by a post. */
-const { NONE: ignored, ...relevantAccrediationOptions } = Object.keys(
+const { NONE: ignored, ...relevantAccreditationOptions } = Object.keys(
   AccreditationOptions
 ).reduce<{
   [key: string]: string;
@@ -81,7 +81,7 @@ const { NONE: ignored, ...relevantAccrediationOptions } = Object.keys(
 
 export const AudienceOptions = {
   EVERYONE: "everyone",
-  ...relevantAccrediationOptions,
+  ...relevantAccreditationOptions,
 } as const;
 export type Audience =
   | ValueOf<typeof AudienceOptions>
@@ -90,7 +90,7 @@ export type AudienceEnum =
   | keyof typeof AudienceOptions
   | Exclude<AccreditationEnum, "NONE">;
 
-/** Enumeration describing the possible cateogories of a post. */
+/** Enumeration describing the possible categories of a post. */
 export const PostCategoryOptions = {
   MACRO: {
     value: "macro",

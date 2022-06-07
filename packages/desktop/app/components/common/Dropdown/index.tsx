@@ -1,4 +1,4 @@
-import { FC, ReactElement } from "react";
+import { ReactElement } from "react";
 import { Menu } from "@headlessui/react";
 import { CaretUp, CaretDown } from "phosphor-react";
 import {
@@ -13,6 +13,7 @@ export interface DropdownProps<
   TName extends Path<TFieldValues> = Path<TFieldValues>
 > extends Omit<ControllerProps<TFieldValues, TName>, "render"> {
   items: { icon?: ReactElement; title: string; value: string }[];
+  readonly?: boolean;
 }
 
 function Dropdown<
@@ -20,6 +21,7 @@ function Dropdown<
   TName extends Path<TFieldValues> = Path<TFieldValues>
 >({
   items,
+  readonly = false,
   ...controllerProps
 }: DropdownProps<TFieldValues, TName>): ReactElement {
   return (
@@ -31,8 +33,12 @@ function Dropdown<
           <Menu as="div" className="relative">
             {({ open }) => (
               <>
-                <Menu.Button>
-                  <div className="border border-primary-solid rounded-full">
+                <Menu.Button disabled={readonly}>
+                  <div
+                    className={`${
+                      readonly ? "opacity-60" : "border"
+                    } border-primary-solid rounded-full`}
+                  >
                     <div className="px-4 py-1">
                       <div
                         className={
@@ -48,7 +54,7 @@ function Dropdown<
                             {selectedItem?.title}
                           </span>
                         </div>
-                        <div className="ml-2">
+                        <div className={`ml-2 ${readonly ? "hidden" : ""}`}>
                           {open ? (
                             <CaretUp
                               color="currentColor"

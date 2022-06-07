@@ -3,23 +3,19 @@ import { FC } from "react";
 import Avatar from "desktop/app/components/common/Avatar";
 import Button from "desktop/app/components/common/Button";
 
-import { useAccount } from "shared/graphql/query/account/useAccount";
 import { useFollowUser } from "shared/graphql/mutation/account/useFollowUser";
-import type {
-  FundManager,
-} from "shared/graphql/query/marketplace/useFundManagers";
+import { FundManager } from "shared/graphql/query/marketplace/useFundManagers";
 import Link from "next/link";
+import { useAccountContext } from "shared/context/Account";
 
 interface FeaturedManagerProps {
   manager: FundManager;
 }
 
 const FeaturedManager: FC<FeaturedManagerProps> = ({ manager }) => {
-  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
-  const {
-    isFollowing: isFollowingManager,
-    toggleFollow: toggleFollowManager,
-  } = useFollowUser(manager._id);
+  const account = useAccountContext();
+  const { isFollowing: isFollowingManager, toggleFollow: toggleFollowManager } =
+    useFollowUser(manager._id);
   const isMyProfile = account?._id == manager._id;
 
   return (
@@ -47,7 +43,7 @@ const FeaturedManager: FC<FeaturedManagerProps> = ({ manager }) => {
         </a>
       </Link>
       <div className="text-center mt-1.5">
-        <div className={(!isMyProfile && !isFollowingManager) ? "" : "invisible"}>
+        <div className={!isMyProfile && !isFollowingManager ? "" : "invisible"}>
           <Button
             variant="text"
             className="text-xs text-primary font-normal tracking-normal py-0"

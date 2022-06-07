@@ -13,13 +13,13 @@ import {
   NotificationEventOptions,
   NotificationMethodEnum,
 } from "backend/schemas/user";
-import { useAccount } from "shared/graphql/query/account/useAccount";
 import { useUpdateSettings } from "shared/graphql/mutation/account/useUpdateSettings";
 import ToggleSwitch from "../../common/ToggleSwitch";
 import { useForm } from "react-hook-form";
 import { SettingsInput } from "backend/graphql/users.graphql";
 import Link from "next/link";
 import { CaretRight } from "phosphor-react";
+import { useAccountContext } from "shared/context/Account";
 
 const notificationItems = Object.keys(NotificationEventOptions).map((key) => {
   return {
@@ -38,7 +38,7 @@ type FormValues = {
 };
 
 const SettingsPage: FC = () => {
-  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
+  const account = useAccountContext();
   const [updateSettings] = useUpdateSettings();
   const { control, reset, getValues, watch, handleSubmit } =
     useForm<FormValues>({ mode: "onChange" });
@@ -250,9 +250,7 @@ const SettingsPage: FC = () => {
                     <div key={index} className="px-6 py-5">
                       <div className="md:flex items-center">
                         <div className="flex-grow mr-3">
-                          <div className="text-white">
-                            {notification.label}
-                          </div>
+                          <div className="text-white">{notification.label}</div>
                           {notification.info && (
                             <div className="text-xs text-white/[.6] mt-2">
                               {notification.info}

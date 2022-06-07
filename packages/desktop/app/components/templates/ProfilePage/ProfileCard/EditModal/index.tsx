@@ -13,9 +13,9 @@ import Card from "../../../../common/Card";
 import Button from "../../../../common/Button";
 import Field from "../../../../common/Field";
 import Alert from "../../../../common/Alert";
-import { useAccount } from "shared/graphql/query/account/useAccount";
 import WarningIcon from "shared/assets/images/warning-red.svg";
 import { useUpdateUserProfile } from "shared/graphql/mutation/account";
+import { useAccountContext } from "shared/context/Account";
 
 type FormValues = {
   firstName: string;
@@ -43,7 +43,7 @@ interface EditModalProps {
 }
 
 const EditModal: FC<EditModalProps> = ({ show, onClose }) => {
-  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
+  const account = useAccountContext();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [updateUserProfile] = useUpdateUserProfile();

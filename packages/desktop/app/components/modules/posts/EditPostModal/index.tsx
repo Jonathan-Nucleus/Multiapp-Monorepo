@@ -14,12 +14,9 @@ import CategorySelector, { categoriesSchema } from "./CategorySelector";
 import Avatar from "desktop/app/components/common/Avatar";
 import Button from "desktop/app/components/common/Button";
 import Input from "desktop/app/components/common/Input";
-import Dropdown, {
-  DropdownProps,
-} from "desktop/app/components/common/Dropdown";
 import Label from "desktop/app/components/common/Label";
 
-import { SubmitHandler, useForm, DefaultValues } from "react-hook-form";
+import { DefaultValues, SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import {
@@ -38,50 +35,38 @@ import EmojiPicker from "../../../common/EmojiPicker";
 import MentionTextarea, { mentionTextSchema } from "../MentionTextarea";
 import { useAccountContext } from "shared/context/Account";
 import MediaPreview from "./MediaPreview";
+import { AudienceOptions } from "backend/schemas/post";
+import { AccreditationEnum, AccreditationOptions } from "backend/schemas/user";
+import { getInitials } from "../../../../lib/utilities";
+import { useSharePost } from "shared/graphql/mutation/posts/useSharePost";
+import Dropdown from "../../../common/Dropdown";
+import Post from "../Post";
 
-const audienceOptions = [
-  {
-    icon: <GlobeHemisphereEast color="currentColor" weight="fill" size={24} />,
-    title: "Everyone",
-    value: "EVERYONE",
-  },
-  {
-    icon: (
-      <div className="text-success relative">
-        <CircleWavy color="currentColor" weight="fill" size={24} />
-        <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-xs font-bold scale-75 text-white">
-          QP
+const audienceOptions = Object.keys(AudienceOptions).map((key) => {
+  if (key == "EVERYONE") {
+    return {
+      icon: (
+        <GlobeHemisphereEast color="currentColor" weight="fill" size={24} />
+      ),
+      title: "Everyone",
+      value: "EVERYONE",
+    };
+  } else {
+    const value = AccreditationOptions[key as AccreditationEnum];
+    return {
+      icon: (
+        <div className="text-success relative">
+          <CircleWavy color="currentColor" weight="fill" size={24} />
+          <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-xs font-bold scale-75 text-white">
+            {getInitials(value.label)}
+          </div>
         </div>
-      </div>
-    ),
-    title: "Qualified Purchasers",
-    value: "QUALIFIED_PURCHASER",
-  },
-  {
-    icon: (
-      <div className="text-success relative">
-        <CircleWavy color="currentColor" weight="fill" size={24} />
-        <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-xs font-bold scale-75 text-white">
-          QC
-        </div>
-      </div>
-    ),
-    title: "Qualified Clients",
-    value: "QUALIFIED_CLIENT",
-  },
-  {
-    icon: (
-      <div className="text-success relative">
-        <CircleWavy color="currentColor" weight="fill" size={24} />
-        <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-xs font-bold scale-75 text-white">
-          AI
-        </div>
-      </div>
-    ),
-    title: "Accredited Investors",
-    value: "ACCREDITED",
-  },
-];
+      ),
+      title: value.label,
+      value: key,
+    };
+  }
+});
 
 type FormValues = {
   user: string;
@@ -120,27 +105,30 @@ const schema = yup
   })
   .required();
 
+export type PostActionType =
+  | { type: "create"; post?: undefined; file?: File }
+  | { type: "edit"; post: PostSummary; file?: never }
+  | { type: "share"; post: PostSummary; file?: never };
+
 interface EditPostModalProps {
-  post?: PostSummary;
-  file?: File;
+  actionData: PostActionType;
   show: boolean;
   onClose: () => void;
 }
 
 const EditPostModal: FC<EditPostModalProps> = ({
-  post,
-  file,
+  actionData,
   show,
   onClose,
 }) => {
   const account = useAccountContext();
-  const [userOptions, setUserOptions] = useState<
-    DropdownProps["items"][number][]
-  >([]);
-  const [selectedFile, setSelectedFile] = useState(file);
-  const [showCategories, setShowCategories] = useState(!!post);
+  const [selectedFile, setSelectedFile] = useState(actionData.file);
+  const [showCategories, setShowCategories] = useState(
+    actionData.type == "edit"
+  );
   const [createPost] = useCreatePost();
   const [editPost] = useEditPost();
+  const [sharePost] = useSharePost();
   const [fetchUploadLink] = useFetchUploadLink();
   const [loading, setLoading] = useState(false);
   const [visibleEmoji, setVisibleEmoji] = useState(false);
@@ -157,6 +145,21 @@ const EditPostModal: FC<EditPostModalProps> = ({
       }, 100);
     }
   }, []);
+  const userOptions =
+    account.companies.length > 0
+      ? [
+          {
+            icon: <User color="currentColor" weight="fill" size={24} />,
+            title: `${account.firstName} ${account.lastName}`,
+            value: account._id,
+          },
+          ...account.companies.map((company) => ({
+            icon: <Buildings color="currentColor" weight="fill" size={24} />,
+            title: company.name,
+            value: company._id,
+          })),
+        ]
+      : [];
   const suggestionsContainer = useRef<HTMLDivElement>(null);
   const changeCallback = useRef(
     _.debounce((body: string | undefined) => {
@@ -178,58 +181,56 @@ const EditPostModal: FC<EditPostModalProps> = ({
       }
     }, 500)
   ).current;
+
+  let defaultValues = {};
+  {
+    if (actionData.type == "create") {
+      defaultValues = {
+        user: account._id,
+        audience: "EVERYONE",
+        categories: [],
+      };
+    } else if (actionData.type == "edit") {
+      const post = actionData.post;
+      defaultValues = {
+        user: post.userId,
+        audience: post.audience,
+        media: post.media
+          ? {
+              aspectRatio: post.media.aspectRatio,
+              url: post.media.url,
+            }
+          : undefined,
+        categories: post.categories,
+        mentionInput: {
+          body: post.body,
+        },
+      };
+    } else if (actionData.type == "share") {
+      const post = actionData.post;
+      defaultValues = {
+        user: account._id,
+        mentionInput: {
+          body: "",
+        },
+        audience: post.audience,
+        categories: post.categories,
+      };
+    }
+  }
+
   const {
     handleSubmit,
     control,
-    reset,
     getValues,
     setValue,
     watch,
     formState: { errors },
   } = useForm<yup.InferType<typeof schema>>({
     resolver: yupResolver(schema),
-    defaultValues: schema.cast({ categories: [] }) as DefaultValues<FormValues>,
+    defaultValues: schema.cast(defaultValues) as DefaultValues<FormValues>,
     mode: "onChange",
   });
-
-  useEffect(() => {
-    if (account) {
-      if (account.companies.length > 0) {
-        setUserOptions([
-          {
-            icon: <User color="currentColor" weight="fill" size={24} />,
-            title: `${account.firstName} ${account.lastName}`,
-            value: account._id,
-          },
-          ...account.companies.map((company) => ({
-            icon: <Buildings color="currentColor" weight="fill" size={24} />,
-            title: company.name,
-            value: company._id,
-          })),
-        ]);
-      }
-      if (post) {
-        reset(
-          schema.cast({
-            user: account._id == post.userId ? account._id : post.userId,
-            media: post.media
-              ? {
-                  aspectRatio: post.media.aspectRatio,
-                  url: post.media.url,
-                }
-              : undefined,
-            categories: post.categories,
-            mentionInput: {
-              body: post.body,
-            },
-          }) as DefaultValues<FormValues>
-        );
-        changeCallback(post.body);
-      } else {
-        reset(schema.cast({ user: account._id }) as DefaultValues<FormValues>);
-      }
-    }
-  }, [account, changeCallback, post, reset]);
 
   const onEmojiClick = (emojiObject: any) => {
     const body = getValues("mentionInput.body");
@@ -256,7 +257,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
   }) => {
     setLoading(true);
     try {
-      if (!post) {
+      if (actionData.type == "create") {
         const { data } = await createPost({
           variables: {
             post: {
@@ -273,12 +274,12 @@ const EditPostModal: FC<EditPostModalProps> = ({
           closeModal();
           return;
         }
-      } else {
+      } else if (actionData.type == "edit") {
         const { data } = await editPost({
           variables: {
             post: {
-              _id: post._id,
-              userId: post.userId,
+              _id: actionData.post._id,
+              userId: actionData.post.userId,
               audience,
               categories,
               media,
@@ -288,6 +289,20 @@ const EditPostModal: FC<EditPostModalProps> = ({
           },
         });
         if (data && data.editPost) {
+          closeModal();
+        }
+      } else if (actionData.type == "share") {
+        const { data } = await sharePost({
+          variables: {
+            postId: actionData.post._id,
+            post: {
+              body: mentionInput.body ?? "",
+              mentionIds: mentionInput.mentions?.map((mention) => mention.id),
+              ...(user != account?._id ? { companyId: user } : {}),
+            },
+          },
+        });
+        if (data && data.sharePost) {
           closeModal();
         }
       }
@@ -317,7 +332,6 @@ const EditPostModal: FC<EditPostModalProps> = ({
       return remoteName;
     };
     if (selectedFile) {
-      console.log("uploading");
       uploadMedia(selectedFile).then((url) => {
         setValue("media", { ...watch("media"), url });
       });
@@ -338,7 +352,9 @@ const EditPostModal: FC<EditPostModalProps> = ({
         <div className="h-full md:flex flex-col">
           <div className="flex items-center justify-between p-4 border-b border-white/[.12]">
             <div className="text-xl text-white font-medium">
-              {post ? "Edit Post" : "Create Post"}
+              {actionData.type == "create" && "Create Post"}
+              {actionData.type == "edit" && "Edit Post"}
+              {actionData.type == "share" && "Share Post"}
             </div>
             <Button variant="text">
               <X color="white" weight="bold" size={24} onClick={closeModal} />
@@ -362,6 +378,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
                     items={audienceOptions}
                     control={control}
                     name="audience"
+                    readonly={actionData.type == "share"}
                   />
                 </div>
               </div>
@@ -379,29 +396,47 @@ const EditPostModal: FC<EditPostModalProps> = ({
                     }
                   />
                 </div>
-                <MediaPreview
-                  media={watch("media") ? post?.media : undefined}
-                  file={selectedFile}
-                  postId={post?._id}
-                  userId={post?.userId ?? account._id}
-                  onLoaded={(aspectRatio) => {
-                    const media = watch("media");
-                    setValue("media", { ...media, aspectRatio });
-                  }}
-                  onRemove={() => {
-                    setSelectedFile(undefined);
-                    setValue("media", undefined);
-                  }}
-                />
-                {linkPreview && !watch("media") && !selectedFile && (
-                  <div className="my-2">
-                    <LinkPreview link={linkPreview} />
+                {actionData.type != "share" && (
+                  <MediaPreview
+                    media={watch("media") ? actionData.post?.media : undefined}
+                    file={selectedFile}
+                    postId={actionData.post?._id}
+                    userId={actionData.post?.userId ?? account._id}
+                    onLoaded={(aspectRatio) => {
+                      const media = watch("media");
+                      setValue("media", { ...media, aspectRatio });
+                    }}
+                    onRemove={() => {
+                      setSelectedFile(undefined);
+                      setValue("media", undefined);
+                    }}
+                  />
+                )}
+                {actionData.type != "share" &&
+                  linkPreview &&
+                  !watch("media") &&
+                  !selectedFile && (
+                    <div className="my-2">
+                      <LinkPreview link={linkPreview} />
+                    </div>
+                  )}
+                {actionData.type == "share" && (
+                  <div className="border border-brand-overlay/[.1] rounded">
+                    <div className="rounded overflow-hidden">
+                      <Post post={actionData.post} isPreview={true} />
+                    </div>
                   </div>
                 )}
               </div>
               <div className="mx-4 my-2">
                 <div className="flex items-center">
-                  <Label className="flex items-center cursor-pointer hover:opacity-80 transition">
+                  <Label
+                    className={`flex items-center cursor-pointer hover:opacity-80 transition select-none ${
+                      actionData.type == "share"
+                        ? "pointer-events-none opacity-40"
+                        : ""
+                    }`}
+                  >
                     <div className="text-purple-secondary">
                       <ImageIcon
                         color="currentColor"
@@ -477,7 +512,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
                 loading={loading}
                 onClick={() => handleSubmit(onSubmit)()}
               >
-                {post ? "Save Updates" : "Post"}
+                {actionData.type == "edit" ? "Save Updates" : "Post"}
               </Button>
             ) : (
               <Button
@@ -486,9 +521,15 @@ const EditPostModal: FC<EditPostModalProps> = ({
                 className="w-48 font-medium"
                 disabled={loading}
                 loading={loading}
-                onClick={() => setShowCategories(true)}
+                onClick={() => {
+                  if (actionData.type == "create") {
+                    setShowCategories(true);
+                  } else if (actionData.type == "share") {
+                    handleSubmit(onSubmit)();
+                  }
+                }}
               >
-                NEXT
+                {actionData.type == "share" ? "Share" : "Next"}
               </Button>
             )}
           </div>

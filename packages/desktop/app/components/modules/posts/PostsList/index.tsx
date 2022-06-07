@@ -1,14 +1,14 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import Post from "../Post";
-import { PostSummary } from "shared/graphql/fragments/post";
+import { Post as PostType } from "shared/graphql/query/post/usePosts";
 import { PostCategory, PostRoleFilter } from "backend/graphql/posts.graphql";
 import Skeleton from "./Skeleton";
 import FilterHeader from "./FilterHeader";
+import EditPostModal, { PostActionType } from "../EditPostModal";
 
 interface PostsListProps {
-  posts: PostSummary[] | undefined;
+  posts: PostType[] | undefined;
   displayFilter?: boolean;
-  onSelectPost: (post: PostSummary) => void;
   onRefresh?: (
     categories: PostCategory[] | undefined,
     filter?: PostRoleFilter
@@ -18,9 +18,10 @@ interface PostsListProps {
 const PostsList: FC<PostsListProps> = ({
   posts,
   displayFilter = true,
-  onSelectPost,
   onRefresh,
 }) => {
+  const [postAction, setPostAction] = useState<PostActionType | undefined>();
+
   if (!posts) {
     return <Skeleton />;
   }
@@ -35,11 +36,28 @@ const PostsList: FC<PostsListProps> = ({
       )}
       <div>
         {posts.map((post, index) => (
-          <div key={index} className="mt-4 mb-4">
-            <Post post={post} onClickToEdit={() => onSelectPost(post)} />
+          <div key={index} className="mt-4 mb-8">
+            <Post
+              post={post}
+              onClickToEdit={() => setPostAction({ type: "edit", post })}
+              onClickToShare={() => {
+                if (post.sharedPost) {
+                  setPostAction({ type: "share", post: post.sharedPost });
+                } else {
+                  setPostAction({ type: "share", post });
+                }
+              }}
+            />
           </div>
         ))}
       </div>
+      {postAction && (
+        <EditPostModal
+          actionData={postAction}
+          show={!!postAction}
+          onClose={() => setPostAction(undefined)}
+        />
+      )}
     </>
   );
 };

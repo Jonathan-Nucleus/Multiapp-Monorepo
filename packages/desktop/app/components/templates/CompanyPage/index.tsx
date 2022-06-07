@@ -9,7 +9,7 @@ import ProfileCard from "./ProfileCard";
 import TeamMembersList from "../../modules/teams/TeamMembersList";
 import FundCard from "../../modules/funds/FundCard";
 import { CompanyProfile } from "shared/graphql/query/company/useCompany";
-import { useAccount } from "shared/graphql/query/account/useAccount";
+import { useAccountContext } from "shared/context/Account";
 
 interface CompanyPageProps {
   company: CompanyProfile;
@@ -18,10 +18,8 @@ interface CompanyPageProps {
 const CompanyPage: FC<CompanyPageProps> = ({ company }: CompanyPageProps) => {
   const funds = company.funds.map((fund) => ({ ...fund, company }));
   const members = company.members.map((member) => ({ ...member, company }));
-  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
-  const isMyCompany =
-    (account?.companies.findIndex((item) => item._id == company._id) ?? -1) !=
-    -1;
+  const account = useAccountContext();
+  const isMyCompany = account.companyIds?.includes(company._id) ?? false;
 
   return (
     <div className="lg:mt-12 mb-12">
@@ -82,8 +80,8 @@ const CompanyPage: FC<CompanyPageProps> = ({ company }: CompanyPageProps) => {
           {company.posts && (
             <div className="py-5">
               <PostsList
+                displayFilter={false}
                 posts={company.posts}
-                onSelectPost={() => {}}
                 onRefresh={() => {}}
               />
             </div>

@@ -1,17 +1,23 @@
 import { FC, ReactElement, useMemo, useState } from "react";
-import { PostSummary } from "shared/graphql/fragments/post";
 import Link from "next/link";
 import { UserProfile } from "backend/graphql/users.graphql";
 import { hrefFromLink, isWebLink, processPost } from "shared/src/patterns";
 import LinkPreview from "../../LinkPreview";
 import PostMedia from "../../PostMedia";
+import { Post as PostType } from "shared/graphql/query/post/usePosts";
+import Post from "..";
 
 interface PostBodyProps {
   account: Pick<UserProfile, "_id"> | undefined;
-  post: PostSummary;
+  post: PostType;
+  isPreview?: boolean;
 }
 
-const PostBody: FC<PostBodyProps> = ({ account, post }: PostBodyProps) => {
+const PostBody: FC<PostBodyProps> = ({
+  account,
+  post,
+  isPreview = false,
+}: PostBodyProps) => {
   const [previewLink, setPreviewLink] = useState<string>();
   const elements = useMemo(() => {
     if (!post.body) {
@@ -83,7 +89,7 @@ const PostBody: FC<PostBodyProps> = ({ account, post }: PostBodyProps) => {
             <span key={index}>{element}</span>
           ))}
         </div>
-        {previewLink && !post.media && (
+        {previewLink && !post.media && !post.sharedPost && (
           <div className="my-4">
             <LinkPreview link={previewLink} />
           </div>
@@ -98,9 +104,16 @@ const PostBody: FC<PostBodyProps> = ({ account, post }: PostBodyProps) => {
           />
         </div>
       )}
-      <div className="uppercase text-xs text-white font-medium opacity-60 mt-3 px-4">
-        {post.categories.join(" • ")}
-      </div>
+      {post.sharedPost && (
+        <div className="border border-brand-overlay/[.1] rounded overflow-hidden mx-4 mt-4">
+          <Post post={post.sharedPost} isPreview={true} />
+        </div>
+      )}
+      {!isPreview && (
+        <div className="uppercase text-xs text-white font-medium opacity-60 mt-3 px-4">
+          {post.categories.join(" • ")}
+        </div>
+      )}
     </>
   );
 };

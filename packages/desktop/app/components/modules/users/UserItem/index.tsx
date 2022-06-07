@@ -5,7 +5,7 @@ import { Chats } from "phosphor-react";
 import Button from "desktop/app/components/common/Button";
 import Avatar from "desktop/app/components/common/Avatar";
 import { useFollowUser } from "shared/graphql/mutation/account/useFollowUser";
-import { useAccount } from "shared/graphql/query/account/useAccount";
+import { useAccountContext } from "shared/context/Account";
 
 export type UserType = {
   _id: string;
@@ -31,9 +31,9 @@ const UserItem: FC<UserItemProps> = ({
   showFollow = true,
   showCompany = true,
 }: UserItemProps) => {
-  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
+  const account = useAccountContext();
   const { isFollowing, toggleFollow } = useFollowUser(user._id);
-  const isMyProfile = account?._id == user._id;
+  const isMyProfile = account._id == user._id;
 
   return (
     <div className="flex items-center">
@@ -64,9 +64,9 @@ const UserItem: FC<UserItemProps> = ({
             </>
           )}
         </div>
-        {showCompany &&
+        {showCompany && (
           <div className="text-xs text-white opacity-60">{user.position}</div>
-        }
+        )}
         <div className="text-xs text-white opacity-60">
           {user.company?.name}
         </div>

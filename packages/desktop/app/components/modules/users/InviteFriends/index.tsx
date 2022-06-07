@@ -11,7 +11,7 @@ import { INVITE_USER } from "shared/graphql/mutation/account";
 import { X } from "phosphor-react";
 import Skeleton from "./Skeleton";
 import { useInvites } from "shared/graphql/query/account/useInvites";
-import { useAccount } from "shared/graphql/query/account/useAccount";
+import { useAccountContext } from "shared/context/Account";
 
 const MAX_INVITES = 10;
 
@@ -28,7 +28,7 @@ interface InviteFriendsProps {
 
 const InviteFriends: FC<InviteFriendsProps> = ({ onClose }) => {
   const [loading, setLoading] = useState(false);
-  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
+  const account = useAccountContext();
   const { data: invitesData } = useInvites();
   const invitedFriends = invitesData?.account?.invitees;
   const [inviteUser] = useMutation(INVITE_USER, {

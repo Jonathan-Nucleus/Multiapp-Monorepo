@@ -1,7 +1,8 @@
 import { FC, useEffect, useRef, useState } from "react";
-import { PostSummary } from "shared/graphql/fragments/post";
 import PostsList from "../../../modules/posts/PostsList";
-import EditPostModal from "../../../modules/posts/EditPostModal";
+import EditPostModal, {
+  PostActionType,
+} from "../../../modules/posts/EditPostModal";
 import AddPost from "./AddPost";
 import { UserProfileProps } from "../../../../types/common-props";
 import Button from "../../../common/Button";
@@ -23,9 +24,7 @@ const PostsSection: FC<UserProfileProps> = ({ user }) => {
     refetch,
     fetchMore,
   } = usePosts(undefined, undefined, undefined, limit);
-  const selectedPost = useRef<PostSummary>();
-  const selectedFile = useRef<File>();
-  const [showPostModal, setShowPostModal] = useState(false);
+  const [postAction, setPostAction] = useState<PostActionType>();
   const scrollCallback = useRef(
     _.debounce(async (posts?: Post[]) => {
       const lastItem = _.last(posts)?._id;
@@ -67,21 +66,12 @@ const PostsSection: FC<UserProfileProps> = ({ user }) => {
       <div className="hidden md:block">
         <AddPost
           user={user}
-          onClick={(file) => {
-            selectedPost.current = undefined;
-            selectedFile.current = file;
-            setShowPostModal(true);
-          }}
+          onClick={(file) => setPostAction({ type: "create", file })}
         />
       </div>
       <div className="mt-8">
         <PostsList
           posts={posts}
-          onSelectPost={(post) => {
-            selectedPost.current = post;
-            selectedFile.current = undefined;
-            setShowPostModal(true);
-          }}
           onRefresh={(categories, filter) =>
             refetch({
               categories,
@@ -94,21 +84,16 @@ const PostsSection: FC<UserProfileProps> = ({ user }) => {
         <Button
           variant="gradient-primary"
           className="w-12 h-12 rounded-full"
-          onClick={() => {
-            selectedPost.current = undefined;
-            selectedFile.current = undefined;
-            setShowPostModal(true);
-          }}
+          onClick={() => setPostAction({ type: "create" })}
         >
           <Plus color="white" size={24} />
         </Button>
       </div>
-      {showPostModal && (
+      {postAction && (
         <EditPostModal
-          post={selectedPost.current}
-          file={selectedFile.current}
-          show={showPostModal}
-          onClose={() => setShowPostModal(false)}
+          actionData={postAction}
+          show={!!postAction}
+          onClose={() => setPostAction(undefined)}
         />
       )}
       {loading && posts && (

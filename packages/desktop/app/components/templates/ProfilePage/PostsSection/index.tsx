@@ -1,8 +1,9 @@
 import { FC, useState } from "react";
 import { usePosts } from "shared/graphql/query/user/usePosts";
 import PostsList from "../../../modules/posts/PostsList";
-import EditPostModal from "../../../modules/posts/EditPostModal";
-import { PostSummary } from "shared/graphql/fragments/post";
+import EditPostModal, {
+  PostActionType,
+} from "../../../modules/posts/EditPostModal";
 import Image from "next/image";
 import NoPostSvg from "shared/assets/images/no-post.svg";
 import Button from "../../../common/Button";
@@ -15,21 +16,14 @@ interface PostsSectionProps {
 
 const PostsSection: FC<PostsSectionProps> = ({ userId, showAddPost }) => {
   const { data: { userProfile } = {}, refetch } = usePosts(userId);
-  const [showPostModal, setShowPostModal] = useState(false);
-  const [selectedPost, setSelectedPost] = useState<PostSummary | undefined>(
-    undefined,
-  );
+  const [postAction, setPostAction] = useState<PostActionType>();
   return (
     <>
       <PostsList
         posts={userProfile?.posts}
-        onSelectPost={(post) => {
-          setSelectedPost(post);
-          setShowPostModal(true);
-        }}
         onRefresh={(categories) => refetch({ categories })}
       />
-      {userProfile?.posts && userProfile.posts.length == 0 && showAddPost &&
+      {userProfile?.posts && userProfile.posts.length == 0 && showAddPost && (
         <>
           <div className="text-center pt-4">
             <Image src={NoPostSvg} alt="" />
@@ -39,19 +33,19 @@ const PostsSection: FC<PostsSectionProps> = ({ userId, showAddPost }) => {
             <Button
               variant="gradient-primary"
               className="w-52 h-12 rounded-full"
-              onClick={() => setShowPostModal(true)}
+              onClick={() => setPostAction({ type: "create" })}
             >
               <Plus color="white" size={24} />
               <div className="text text-white">Create a Post</div>
             </Button>
           </div>
         </>
-      }
-      {showPostModal && (
+      )}
+      {postAction && (
         <EditPostModal
-          post={selectedPost}
-          show={showPostModal}
-          onClose={() => setShowPostModal(false)}
+          actionData={postAction}
+          show={!!postAction}
+          onClose={() => setPostAction(undefined)}
         />
       )}
     </>

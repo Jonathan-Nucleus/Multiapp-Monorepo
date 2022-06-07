@@ -4,13 +4,13 @@ import { Info, Lock } from "phosphor-react";
 import Button from "../../../common/Button";
 import { useFunds } from "shared/graphql/query/marketplace/useFunds";
 import FundsList from "./FundsList";
-import { useAccount } from "shared/graphql/query/account/useAccount";
 import AccreditationQuestionnaire from "../AccreditationQuestionnaire";
 import Container from "../../../layouts/Container";
 import Link from "next/link";
+import { useAccountContext } from "shared/context/Account";
 
 const FundsPage: FC = () => {
-  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
+  const account = useAccountContext();
   const [isVerifying, setIsVerifying] = useState(false);
   const { data: { funds } = {} } = useFunds();
   return (

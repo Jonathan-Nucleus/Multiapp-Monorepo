@@ -17,7 +17,7 @@ import {
 import * as yup from "yup";
 import Avatar from "../../../common/Avatar";
 import { useUsers } from "shared/graphql/query/user/useUsers";
-import { useAccount } from "shared/graphql/query/account/useAccount";
+import { useAccountContext } from "shared/context/Account";
 
 // TODO: Stopgap measure to address breaking type changes for fragments ({})
 // in React 18.
@@ -57,7 +57,7 @@ function MentionTextarea<
     ...controllerProps,
     name: `${controllerProps.name}.mentions` as TName,
   });
-  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
+  const account = useAccountContext();
   const { data: { users: allUsers = [] } = {} } = useUsers();
   const users = allUsers.filter((user) => user._id != account?._id);
 

@@ -7,30 +7,26 @@ import Card from "../../../../../common/Card";
 import { ShieldCheck } from "phosphor-react";
 import Avatar from "../../../../../common/Avatar";
 
-import { useAccount } from "shared/graphql/query/account/useAccount";
 import { useFollowUser } from "shared/graphql/mutation/account/useFollowUser";
 import type {
   FundManager,
   FundListItem,
 } from "shared/graphql/query/marketplace/useFundManagers";
-
-type Fund = FundListItem;
+import { useAccountContext } from "shared/context/Account";
 
 interface ManagerItemProps {
   manager: FundManager;
-  funds: Fund[];
+  funds: FundListItem[];
 }
 
 const ManagerItem: FC<ManagerItemProps> = ({
   manager,
   funds,
 }: ManagerItemProps) => {
-  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
-  const {
-    isFollowing: isFollowingManager,
-    toggleFollow: toggleFollowManager,
-  } = useFollowUser(manager._id);
-  const isMyProfile = account?._id == manager._id;
+  const account = useAccountContext();
+  const { isFollowing: isFollowingManager, toggleFollow: toggleFollowManager } =
+    useFollowUser(manager._id);
+  const isMyProfile = account._id == manager._id;
 
   return (
     <>
@@ -100,7 +96,9 @@ const ManagerItem: FC<ManagerItemProps> = ({
                 {isFollowingManager ? "Unfollow" : "Follow"}
               </Button>
             )}
-            <Link href={isMyProfile ? "/profile/me" : `/profile/${manager._id}`}>
+            <Link
+              href={isMyProfile ? "/profile/me" : `/profile/${manager._id}`}
+            >
               <a>
                 <Button
                   variant="outline-primary"
@@ -166,9 +164,7 @@ const ManagerItem: FC<ManagerItemProps> = ({
             <div className="text-xs text-white mt-1">{manager.position}</div>
             <div className="text-xs text-primary">
               <Link href={`/company/${manager.company._id}`}>
-                <a>
-                  {manager.company.name}
-                </a>
+                <a>{manager.company.name}</a>
               </Link>
             </div>
             <div className="border-t border-white/[.12] mt-4">

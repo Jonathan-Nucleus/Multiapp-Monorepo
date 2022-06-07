@@ -2,7 +2,6 @@ import { FC, useState } from "react";
 import ProfileCard from "./ProfileCard";
 import CompaniesList from "./CompaniesList";
 import CompaniesListSkeleton from "./CompaniesList/Skeleton";
-import EditPostModal from "../../modules/posts/EditPostModal";
 import { UserProfileProps } from "../../../types/common-props";
 import PostsSection from "./PostsSection";
 import FundsSection from "./FundsSection";
@@ -15,7 +14,6 @@ interface ProfilePageProps extends UserProfileProps {
 }
 
 const ProfilePage: FC<ProfilePageProps> = ({ user, loading, isMyProfile }) => {
-  const [showPostModal, setShowPostModal] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
 
   return (
@@ -74,12 +72,6 @@ const ProfilePage: FC<ProfilePageProps> = ({ user, loading, isMyProfile }) => {
           </div>
         </div>
       </div>
-      {showPostModal && (
-        <EditPostModal
-          show={showPostModal}
-          onClose={() => setShowPostModal(false)}
-        />
-      )}
       {showEditProfile && (
         <EditProfileModal
           show={showEditProfile}

@@ -4,16 +4,16 @@ import Button from "../../../../common/Button";
 import Card from "../../../../common/Card";
 import { GlobalSearchData } from "shared/graphql/query/search/useGlobalSearch";
 import { useFollowUser } from "shared/graphql/mutation/account/useFollowUser";
-import { useAccount } from "shared/graphql/query/account/useAccount";
+import { useAccountContext } from "shared/context/Account";
 
 interface ItemViewProps {
   user: GlobalSearchData["globalSearch"]["users"][number];
 }
 
 const ItemView: FC<ItemViewProps> = ({ user }) => {
-  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
+  const account = useAccountContext();
   const { isFollowing, toggleFollow } = useFollowUser(user._id);
-  const isMyProfile = account?._id == user._id;
+  const isMyProfile = account._id == user._id;
 
   return (
     <>

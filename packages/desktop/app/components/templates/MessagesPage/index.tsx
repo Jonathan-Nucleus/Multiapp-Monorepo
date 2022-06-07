@@ -7,7 +7,6 @@ import {
   LoadingIndicator,
 } from "stream-chat-react";
 import { useChecklist } from "./ChecklistTasks";
-import { useAccount } from "shared/graphql/query/account/useAccount";
 import { useChatToken } from "shared/graphql/query/account/useChatToken";
 
 import GetStartedChannel from "./GetStartedChannel";
@@ -17,6 +16,7 @@ import PChannelPreview from "./PChannelList/PChannelPreview";
 import PThreadHeader from "./PChannel/PThreadHeader";
 import { PChannel } from "./PChannel";
 import { GiphyContext } from "../../../types/message";
+import { useAccountContext } from "shared/context/Account";
 
 const TARGET_ORIGIN = "https://getstream.io";
 const options = { state: true, watch: true, presence: true };
@@ -36,7 +36,7 @@ const MessagesPage: FC<MessagesPageProps> = ({ apiKey }) => {
   const [giphyState, setGiphyState] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [isMobileNavVisible, setMobileNav] = useState(false);
-  const { data: { account } = {} } = useAccount({ fetchPolicy: "cache-only" });
+  const account = useAccountContext();
   const { data: chatData } = useChatToken();
   console.log("Received chat token", chatData);
   console.log("App key", apiKey);
