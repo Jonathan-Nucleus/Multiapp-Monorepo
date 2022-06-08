@@ -9,11 +9,15 @@ import Avatar from "desktop/app/components/common/Avatar";
 import Button from "desktop/app/components/common/Button";
 import { useAccountContext } from "shared/context/Account";
 
+import { AssetClasses } from "backend/graphql/enumerations.graphql";
+
 export interface FundCardProps {
   fund: Fund;
   showImages?: boolean;
   profileType?: "manager" | "company";
 }
+
+const dollarFormatter = Intl.NumberFormat("en", { notation: "compact" });
 
 const FundCard: FC<FundCardProps> = ({
   fund,
@@ -31,7 +35,7 @@ const FundCard: FC<FundCardProps> = ({
   return (
     <>
       <div className="hidden lg:block border border-white/[.12] rounded-lg">
-        <div className="flex">
+        <div className="flex bg-surface-light10">
           <div className="flex flex-col flex-grow mt-4 px-4">
             <div className="flex items-center">
               {showImages && (
@@ -167,28 +171,38 @@ const FundCard: FC<FundCardProps> = ({
           <div className="flex border-white/[.12] divide-x divide-inherit">
             <div className="flex-grow grid grid-cols-4 border-white/[.12] divide-x divide-inherit">
               <div className="flex flex-col items-center justify-center py-2">
-                <div className="text-tiny text-white opacity-60 tracking-widest">
+                <div className="text-tiny text-white opacity-60 tracking-widest mb-1">
                   ASSET CLASS
                 </div>
-                <div className="text-white">Hedge Fund</div>
+                <div className="text-white">
+                  {
+                    AssetClasses.find(
+                      (assetClass) => assetClass.value === fund.class
+                    )?.label
+                  }
+                </div>
               </div>
               <div className="flex flex-col items-center justify-center py-2">
-                <div className="text-tiny text-white opacity-60 tracking-widest">
+                <div className="text-tiny text-white opacity-60 tracking-widest mb-1">
                   STRATEGY
                 </div>
-                <div className="text-white">L/S Equity</div>
+                <div className="text-white">{fund.strategy}</div>
               </div>
               <div className="flex flex-col items-center justify-center py-2">
-                <div className="text-tiny text-white opacity-60 tracking-widest">
+                <div className="text-tiny text-white opacity-60 tracking-widest mb-1">
                   AUM
                 </div>
-                <div className="text-white">$5M</div>
+                <div className="text-white">{`$${dollarFormatter.format(
+                  fund.aum
+                )}`}</div>
               </div>
               <div className="flex flex-col items-center justify-center py-2">
-                <div className="text-tiny text-white opacity-60 tracking-widest">
+                <div className="text-tiny text-white opacity-60 tracking-widest mb-1">
                   MIN INVESTMENT
                 </div>
-                <div className="text-white">$100K</div>
+                <div className="text-white">{`$${dollarFormatter.format(
+                  fund.min
+                )}`}</div>
               </div>
             </div>
             <div className="w-64 text-right flex items-center justify-between px-4">
@@ -229,16 +243,26 @@ const FundCard: FC<FundCardProps> = ({
         </div>
         <div className="grid grid-cols-3 border-y border-white/[.12] divide-x divide-inherit">
           <div className="flex flex-col items-center justify-center py-2">
-            <div className="text-tiny text-white opacity-60">ASSET CLASS</div>
-            <div className="text-xs text-white">Hedge Fund</div>
+            <div className="text-tiny text-white opacity-60 mb-1">
+              ASSET CLASS
+            </div>
+            <div className="text-xs text-white">
+              {
+                AssetClasses.find(
+                  (assetClass) => assetClass.value === fund.class
+                )?.label
+              }
+            </div>
           </div>
           <div className="flex flex-col items-center justify-center py-2">
-            <div className="text-tiny text-white opacity-60">STRATEGY</div>
-            <div className="text-xs text-white">L/S Equity</div>
+            <div className="text-tiny text-white opacity-60 mb-1">STRATEGY</div>
+            <div className="text-xs text-white">{fund.strategy}</div>
           </div>
           <div className="flex flex-col items-center justify-center py-2">
-            <div className="text-tiny text-white opacity-60">MINIMUM</div>
-            <div className="text-xs text-white">$500K</div>
+            <div className="text-tiny text-white opacity-60 mb-1">MINIMUM</div>
+            <div className="text-xs text-white">{`$${dollarFormatter.format(
+              fund.min
+            )}`}</div>
           </div>
         </div>
         <div className="flex items-center mt-4 px-5">

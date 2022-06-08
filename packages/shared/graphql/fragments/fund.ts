@@ -15,6 +15,7 @@ export type FundSummary = Pick<
   | "overview"
   | "strategy"
   | "min"
+  | "aum"
   | "tags"
   | "offshore"
   | "feeder"
@@ -28,6 +29,7 @@ export const FUND_SUMMARY_FRAGMENT = gql`
     class
     status
     min
+    aum
     strategy
     highlights
     overview

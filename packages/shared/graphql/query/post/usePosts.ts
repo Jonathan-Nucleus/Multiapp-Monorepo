@@ -75,10 +75,9 @@ export function usePosts(
       },
       fetchPolicy: "cache-and-network",
       skip: isFetchMore.current,
-      notifyOnNetworkStatusChange: true,
     }
   );
-  
+
   useEffect(() => {
     if (!loading && data) {
       setState(data);
@@ -88,6 +87,8 @@ export function usePosts(
   const fetchMore: typeof rest.fetchMore = async (
     params: FetchMoreQueryOptions<PostsVariables>
   ) => {
+    if (isFetchMore.current) return;
+
     isFetchMore.current = true;
     const result = await rest.fetchMore({
       ...params,

@@ -29,7 +29,6 @@ export type FundDetails = FundSummary &
     team: TeamMember[];
   } & Pick<
     GraphQLFund,
-    | "aum"
     | "lockup"
     | "liquidity"
     | "fees"
@@ -66,7 +65,6 @@ export function useFund(fundId?: string): QueryResult<FundData, FundVariables> {
           ...FundSummaryFields
           ...FundCompanyFields
           ...FundManagerFields
-          aum
           lockup
           liquidity
           fees {

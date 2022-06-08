@@ -1,5 +1,9 @@
-import { FC, useEffect, useRef, useState } from "react";
-import PostsList from "../../../modules/posts/PostsList";
+import { FC, useEffect, useRef, useState, useCallback, memo } from "react";
+import { PostSummary } from "shared/graphql/fragments/post";
+import PostsList, {
+  PostCategory,
+  PostRoleFilter,
+} from "../../../modules/posts/PostsList";
 import EditPostModal, {
   PostActionType,
 } from "../../../modules/posts/EditPostModal";
@@ -12,32 +16,37 @@ import _ from "lodash";
 import Spinner from "../../../common/Spinner";
 
 const POSTS_PER_SCROLL = 15;
-const SCROLL_OFFSET_THRESHOLD = 100;
-const FETCH_DEBOUNCE_INTERVAL = 100;
+const SCROLL_OFFSET_THRESHOLD = 3000;
 
 const PostsSection: FC<UserProfileProps> = ({ user }) => {
-  const [limit, setLimit] = useState(POSTS_PER_SCROLL);
   const scrollOffset = useRef(0);
   const {
-    data: { posts } = {},
+    data: { posts = [] } = {},
     loading,
     refetch,
     fetchMore,
-  } = usePosts(undefined, undefined, undefined, limit);
+  } = usePosts(undefined, undefined, undefined, POSTS_PER_SCROLL);
+  const triggeredOffset = useRef(false);
   const [postAction, setPostAction] = useState<PostActionType>();
-  const scrollCallback = useRef(
-    _.debounce(async (posts?: Post[]) => {
-      const lastItem = _.last(posts)?._id;
-      fetchMore({
-        variables: {
-          before: lastItem,
-          limit: POSTS_PER_SCROLL,
-        },
-      }).then(({ data: { posts: newPosts = [] } }) => {
-        setLimit((posts?.length ?? 0) + newPosts.length);
-      });
-    }, FETCH_DEBOUNCE_INTERVAL)
-  ).current;
+
+  const onEndReached = useCallback(() => {
+    const lastItem = posts[posts.length - 1]._id;
+    fetchMore({
+      variables: {
+        before: lastItem,
+      },
+    });
+  }, [posts]);
+
+  const onRefresh = useCallback(
+    (categories?: PostCategory[], filter?: PostRoleFilter) =>
+      refetch({
+        categories,
+        roleFilter: filter,
+      }),
+    [refetch]
+  );
+
   useEffect(() => {
     const handleScroll = (event: Event) => {
       const target = event.target;
@@ -48,19 +57,24 @@ const PostsSection: FC<UserProfileProps> = ({ user }) => {
       ) {
         if (
           target.clientHeight + target.scrollTop >
-          target.scrollHeight - SCROLL_OFFSET_THRESHOLD
+            target.scrollHeight - SCROLL_OFFSET_THRESHOLD &&
+          !triggeredOffset.current
         ) {
           // Fetch more posts only when scroll down.
           if (target.scrollTop >= scrollOffset.current) {
-            scrollCallback(posts);
+            triggeredOffset.current = true;
+            onEndReached();
           }
+        } else {
+          triggeredOffset.current = false;
         }
+
         scrollOffset.current = target.scrollTop;
       }
     };
     document.addEventListener("scroll", handleScroll, true);
     return () => document.removeEventListener("scroll", handleScroll, true);
-  }, [posts, scrollCallback]);
+  }, [onEndReached]);
   return (
     <>
       <div className="hidden md:block">
@@ -70,15 +84,7 @@ const PostsSection: FC<UserProfileProps> = ({ user }) => {
         />
       </div>
       <div className="mt-8">
-        <PostsList
-          posts={posts}
-          onRefresh={(categories, filter) =>
-            refetch({
-              categories,
-              roleFilter: filter,
-            })
-          }
-        />
+        <PostsList posts={posts} onRefresh={onRefresh} />
       </div>
       <div className="block md:hidden fixed bottom-5 right-5">
         <Button
@@ -96,13 +102,8 @@ const PostsSection: FC<UserProfileProps> = ({ user }) => {
           onClose={() => setPostAction(undefined)}
         />
       )}
-      {loading && posts && (
-        <div className="text-center p-5">
-          <Spinner />
-        </div>
-      )}
     </>
   );
 };
 
-export default PostsSection;
+export default memo(PostsSection);

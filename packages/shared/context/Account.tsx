@@ -70,6 +70,7 @@ const useAccountStated = (): AccountState => {
   const [state, setState] = useState<AccountState>({ loading: true });
   const { data, loading, error } = useAccount({
     fetchPolicy: "cache-and-network",
+    notifyOnNetworkStatusChange: true,
   });
   useEffect(() => {
     if (error) {

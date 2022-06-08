@@ -20,33 +20,16 @@ const RootLayout: FC<RootLayoutProps> = ({
 }: RootLayoutProps) => {
   const { status } = useSession();
   const router = useRouter();
-  const [routeChangeStarted, setRouteChangeStarted] = useState(false);
-  useEffect(() => {
-    const onRouteChangeStarted = () => {
-      setRouteChangeStarted(true);
-    };
-    const onRouteChangeCompleted = () => {
-      setRouteChangeStarted(false);
-    };
-    router.events.on("routeChangeStart", onRouteChangeStarted);
-    router.events.on("routeChangeComplete", onRouteChangeCompleted);
-    return () => {
-      router.events.off("routeChangeStart", onRouteChangeStarted);
-      router.events.off("routeChangeComplete", onRouteChangeCompleted);
-    };
-  }, [router]);
-  if (!routeChangeStarted && status != "loading") {
-    if (middleware == "guest" && status == "authenticated") {
-      router.replace("/");
-      return <></>;
-    }
-    if (middleware == "auth" && status == "unauthenticated") {
-      router.replace(
-        `${AppAuthOptions.pages?.signIn}?redirect=${router.asPath}`
-      );
-      return <></>;
-    }
+
+  if (middleware == "guest" && status == "authenticated") {
+    router.replace("/");
+    return <></>;
   }
+  if (middleware == "auth" && status == "unauthenticated") {
+    router.replace(`${AppAuthOptions.pages?.signIn}?redirect=${router.asPath}`);
+    return <></>;
+  }
+
   const appContent = (
     <Background type={background}>
       {layout == "auth" && <AuthLayout>{children}</AuthLayout>}
@@ -70,18 +53,17 @@ const RootLayout: FC<RootLayoutProps> = ({
       />
       <Toaster />
       <main>
-        {status == "loading" || routeChangeStarted ? (
-          <></>
+        {middleware == "auth" ? (
+          <AccountProvider
+            onUnauthenticated={async () => {
+              await signOut();
+              localStorage.clear();
+            }}
+          >
+            {appContent}
+          </AccountProvider>
         ) : (
-          <>
-            {middleware == "auth" ? (
-              <AccountProvider onUnauthenticated={async () => await signOut()}>
-                {appContent}
-              </AccountProvider>
-            ) : (
-              appContent
-            )}
-          </>
+          appContent
         )}
       </main>
     </>

@@ -6,6 +6,8 @@ import Skeleton from "./Skeleton";
 import FilterHeader from "./FilterHeader";
 import EditPostModal, { PostActionType } from "../EditPostModal";
 
+export type { PostCategory, PostRoleFilter };
+
 interface PostsListProps {
   posts: PostType[] | undefined;
   displayFilter?: boolean;
@@ -25,6 +27,8 @@ const PostsList: FC<PostsListProps> = ({
   if (!posts) {
     return <Skeleton />;
   }
+
+  console.log("Total posts", posts.length);
   return (
     <>
       {displayFilter && (
@@ -36,7 +40,7 @@ const PostsList: FC<PostsListProps> = ({
       )}
       <div>
         {posts.map((post, index) => (
-          <div key={index} className="mt-4 mb-8">
+          <div key={post._id} className="mt-4 mb-8">
             <Post
               post={post}
               onClickToEdit={() => setPostAction({ type: "edit", post })}
