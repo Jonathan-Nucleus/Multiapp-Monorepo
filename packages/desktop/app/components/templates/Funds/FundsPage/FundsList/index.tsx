@@ -1,4 +1,4 @@
-import { FC, useMemo } from "react";
+import { FC, useMemo, Fragment } from "react";
 import FundCard from "desktop/app/components/modules/funds/FundCard";
 import { Fund } from "shared/graphql/query/marketplace/useFunds";
 import Skeleton from "./Skeleton";
@@ -26,14 +26,14 @@ const FundsList: FC<FundsListProps> = ({ funds }: FundsListProps) => {
   return (
     <>
       {sectionedFunds.map((section) => (
-        <>
+        <Fragment key={section.title}>
           <span className="text-xl mb-2 block mt-10">{section.title}</span>
           {section.data.map((fund, index) => (
             <div key={index} className="mb-6">
               <FundCard fund={fund} />
             </div>
           ))}
-        </>
+        </Fragment>
       ))}
     </>
   );

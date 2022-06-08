@@ -1,4 +1,5 @@
 import { FC, PropsWithChildren, useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import NextNProgress from "nextjs-progressbar";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -70,4 +71,4 @@ const RootLayout: FC<RootLayoutProps> = ({
   );
 };
 
-export default RootLayout;
+export default dynamic(() => Promise.resolve(RootLayout), { ssr: false });

@@ -1,5 +1,6 @@
 import "../app/styles/app.scss";
 import getConfig from "next/config";
+import { getSession } from "next-auth/react";
 import App, { AppProps, AppInitialProps, AppContext } from "next/app";
 
 import RootLayout from "../app/components/layouts/index";
@@ -56,9 +57,14 @@ MyApp.getInitialProps = async (
   const appProps = await App.getInitialProps(ctx);
   const { publicRuntimeConfig } = getConfig();
   const { NEXT_PUBLIC_GRAPHQL_URI } = publicRuntimeConfig;
+  const session = await getSession({ req: ctx.ctx.req });
 
   return {
     ...appProps,
+    pageProps: {
+      ...(appProps.pageProps || {}),
+      session,
+    },
     runtimeVars: {
       NEXT_PUBLIC_GRAPHQL_URI,
     },
