@@ -1,15 +1,14 @@
 import "../app/styles/app.scss";
 import getConfig from "next/config";
-import { getSession } from "next-auth/react";
 import App, { AppProps, AppInitialProps, AppContext } from "next/app";
 
 import RootLayout from "../app/components/layouts/index";
 import SecureApolloProvider from "../app/components/providers/SecureApolloProvider";
-import type { ApolloPageProps } from "desktop/app/lib/apolloClient";
 import { ThemeProvider } from "next-themes";
-import { SessionProvider } from "next-auth/react";
+import { getSession, SessionProvider } from "next-auth/react";
 import { NextPageWithLayout } from "../app/types/next-page";
 import { initializeDatadogRum } from "../app/lib/datadog";
+import AppAuthOptions from "../app/config/auth";
 
 initializeDatadogRum();
 
@@ -51,13 +50,36 @@ function MyApp({
   );
 }
 
+type MyAppContext = AppContext & {
+  Component: NextPageWithLayout;
+};
+
 MyApp.getInitialProps = async (
-  ctx: AppContext
+  context: MyAppContext
 ): Promise<AppInitialProps & MyAppProps> => {
-  const appProps = await App.getInitialProps(ctx);
+  const appProps = await App.getInitialProps(context);
   const { publicRuntimeConfig } = getConfig();
   const { NEXT_PUBLIC_GRAPHQL_URI } = publicRuntimeConfig;
-  const session = await getSession({ req: ctx.ctx.req });
+
+  // Determine redirect if needed.
+  const session = await getSession(context.ctx);
+  const middleware = context.Component.middleware;
+  let redirect;
+  if (middleware == "auth" && !session) {
+    redirect = `${AppAuthOptions.pages?.signIn}?redirect=${context.router.asPath}`;
+  } else if (middleware == "guest" && session) {
+    redirect = "/";
+  }
+  if (redirect) {
+    if (context.ctx.res) {
+      context.ctx.res.writeHead(301, {
+        Location: redirect,
+      });
+      context.ctx.res.end();
+    } else {
+      await context.router.replace(redirect);
+    }
+  }
 
   return {
     ...appProps,

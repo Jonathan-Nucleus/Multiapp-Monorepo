@@ -1,15 +1,13 @@
-import { FC, PropsWithChildren, useEffect, useState } from "react";
-import dynamic from "next/dynamic";
+import { FC, PropsWithChildren } from "react";
 import NextNProgress from "nextjs-progressbar";
-import { signOut, useSession } from "next-auth/react";
-import { useRouter } from "next/router";
-import AppAuthOptions from "../../config/auth";
+import { signOut } from "next-auth/react";
 import { AppPageProps } from "../../types/next-page";
 import AuthLayout from "./AuthLayout";
 import MainLayout from "./MainLayout";
 import Background from "./Background";
 import { Toaster } from "react-hot-toast";
 import { AccountProvider } from "shared/context/Account";
+import dynamic from "next/dynamic";
 
 type RootLayoutProps = PropsWithChildren<AppPageProps>;
 
@@ -19,18 +17,6 @@ const RootLayout: FC<RootLayoutProps> = ({
   background = layout == "auth" ? "radial" : "default",
   children,
 }: RootLayoutProps) => {
-  const { status } = useSession();
-  const router = useRouter();
-
-  if (middleware == "guest" && status == "authenticated") {
-    router.replace("/");
-    return <></>;
-  }
-  if (middleware == "auth" && status == "unauthenticated") {
-    router.replace(`${AppAuthOptions.pages?.signIn}?redirect=${router.asPath}`);
-    return <></>;
-  }
-
   const appContent = (
     <Background type={background}>
       {layout == "auth" && <AuthLayout>{children}</AuthLayout>}
