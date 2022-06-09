@@ -430,6 +430,40 @@ const createPostsCollection = (
     },
 
     /**
+     * Updates the status of a transcoding media item to complete.
+     *
+     * @param postId    The ID of the post.
+     * @param mediaUrl  The final name of the media file.
+     *
+     * @returns   The updated Post or null if it could not be updated.
+     */
+    updatePostMedia: async (
+      postId: MongoId,
+      mediaUrl: string
+    ): Promise<Post.Mongo> => {
+      const result = await postsCollection.findOneAndUpdate(
+        {
+          _id: toObjectId(postId),
+          deleted: { $exists: false },
+        },
+        {
+          $set: {
+            "media.url": mediaUrl,
+            "media.transcoded": true,
+            visible: true,
+          },
+        },
+        { returnDocument: "after" }
+      );
+
+      if (!result.ok || !result.value) {
+        throw new NotFoundError("Post");
+      }
+
+      return result.value;
+    },
+
+    /**
      * Adds a like to a post from a specific user.
      *
      * @param postId  The id of the post.

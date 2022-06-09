@@ -13,6 +13,7 @@ import {
   getAccessToken,
   getResetToken,
   decodeToken,
+  decodeTranscoderToken,
   AccessToken,
   ResetTokenPayload,
 } from "../lib/tokens";
@@ -68,6 +69,7 @@ const schema = gql`
     sharePost(postId: ID!, post: SharePostInput!): Post
     deletePost(postId: ID!): Boolean
     featurePost(postId: ID!, feature: Boolean!): Post
+    updatePostMedia(token: String!): Boolean!
     likePost(like: Boolean!, postId: ID!): Post
     likeComment(like: Boolean!, commentId: ID!): Comment
     reportPost(report: ReportedPostInput!): Boolean
@@ -895,6 +897,21 @@ const resolvers = {
         return db.posts.feature(postId, user._id, feature);
       }
     ),
+
+    updatePostMedia: async (
+      parentIgnored: unknown,
+      { token }: { token: string },
+      { db }: ApolloServerContext
+    ) => {
+      try {
+        const { mediaUrl, postId } = decodeTranscoderToken(token);
+        await db.posts.updatePostMedia(postId, mediaUrl);
+
+        return true;
+      } catch {
+        return false;
+      }
+    },
 
     likePost: secureEndpoint(
       async (

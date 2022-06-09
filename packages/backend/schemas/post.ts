@@ -67,6 +67,7 @@ export namespace Post {
 interface Media {
   url: string;
   aspectRatio: number;
+  transcoded?: boolean;
 }
 
 /** Enumeration describing the audience targeted by a post. */
