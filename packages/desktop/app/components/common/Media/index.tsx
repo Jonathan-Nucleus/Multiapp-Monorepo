@@ -5,7 +5,7 @@ import { getMediaTypeFrom, MediaType } from "shared/src/media";
 interface MediaProps {
   url: string;
   type?: MediaType;
-  aspectRatio: number;
+  aspectRatio?: number;
   onLoad?: (aspectRatio: number) => void;
 }
 
@@ -22,32 +22,33 @@ const Media: FC<MediaProps> = ({
     <div className="bg-black relative">
       {mediaType == "video" && (
         <div
-          style={{ maxWidth: `${maxHeight * aspectRatio}px` }}
-          className="mx-auto"
+          className={`mx-auto max-h[${maxHeight}] ${
+            aspectRatio ? `aspect-[${aspectRatio}]` : ""
+          }`}
         >
-          <div style={{ paddingBottom: `${100 / aspectRatio}%` }}>
-            <div className="absolute inset-0">
-              <video
-                controls
-                className="w-full h-full"
-                onLoadedMetadata={(data) => {
-                  const target = data.currentTarget;
-                  onLoad?.(target.videoWidth / target.videoHeight);
-                }}
-              >
-                <source src={url} />
-              </video>
-            </div>
-          </div>
+          <video
+            controls
+            className="w-full"
+            onLoadedMetadata={(data) => {
+              const target = data.currentTarget;
+              onLoad?.(target.videoWidth / target.videoHeight);
+            }}
+          >
+            <source src={url} />
+          </video>
         </div>
       )}
       {mediaType == "image" && (
         <div
-          style={{ maxWidth: `${maxHeight * aspectRatio}px` }}
+          style={
+            aspectRatio ? { maxWidth: `${maxHeight * aspectRatio}px` } : {}
+          }
           className="mx-auto"
         >
           <div
-            style={{ paddingBottom: `${100 / aspectRatio}%` }}
+            style={
+              aspectRatio ? { paddingBottom: `${100 / aspectRatio}%` } : {}
+            }
             className="relative"
           >
             <div className="absolute inset-0">

@@ -7,31 +7,32 @@ import { Tab } from "@headlessui/react";
 import Avatar from "../../../common/Avatar";
 import Button from "../../../common/Button";
 import Card from "../../../common/Card";
+import FundMedia from "../../../modules/funds/FundMedia";
 import TeamMembersList from "../../../modules/teams/TeamMembersList";
+import RecentDoc from "shared/assets/images/recent-doc.svg";
 
-import { useFund } from "shared/graphql/query/marketplace/useFund";
+import {
+  useFund,
+  FundDetails,
+  DocumentCategories,
+  DocumentCategory,
+} from "shared/graphql/query/marketplace/useFund";
 import { useWatchFund } from "shared/graphql/mutation/funds/useWatchFund";
+import { useDocumentToken } from "shared/graphql/query/account/useDocumentToken";
+import { AssetClasses } from "shared/graphql/fragments/fund";
 import Skeleton from "./Skeleton";
 import ContactSpecialist from "../../../modules/funds/ContactSpecialist";
 
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import localData from "dayjs/plugin/localeData";
+dayjs.extend(localData);
+dayjs.extend(utc);
+
+const dollarFormatter = Intl.NumberFormat("en", { notation: "compact" });
+const MONTHS = dayjs().localeData().monthsShort();
+
 const fundData = {
-  mtd: "3.2%",
-  ytd: "3.1%",
-  annualVolatility: "2.8%",
-  arsi: "2.8%",
-  netData: {
-    2012: [0.5, -0.5, -0.1, 0.5, 0.5, 0.5, 0.5, -0.1, -0.1, -0.1, 0.5, -0.1],
-    2013: [0.5, -0.5, -0.1, 0.5, 0.5, 0.5, 0.5, -0.1, -0.1, -0.1, 0.5, -0.1],
-    2014: [0.5, -0.5, -0.1, 0.5, 0.5, 0.5, 0.5, -0.1, -0.1, -0.1, 0.5, -0.1],
-    2015: [0.5, -0.5, -0.1, 0.5, 0.5, 0.5, 0.5, -0.1, -0.1, -0.1, 0.5, -0.1],
-    2016: [0.5, -0.5, -0.1, 0.5, 0.5, 0.5, 0.5, -0.1, -0.1, -0.1, 0.5, -0.1],
-    2017: [0.5, -0.5, -0.1, 0.5, 0.5, 0.5, 0.5, -0.1, -0.1, -0.1, 0.5, -0.1],
-    2018: [0.5, -0.5, -0.1, 0.5, 0.5, 0.5, 0.5, -0.1, -0.1, -0.1, 0.5, -0.1],
-    2019: [0.5, -0.5, -0.1, 0.5, 0.5, 0.5, 0.5, -0.1, -0.1, -0.1, 0.5, -0.1],
-    2020: [0.5, -0.5, -0.1, 0.5, 0.5, 0.5, 0.5, -0.1, -0.1, -0.1, 0.5, -0.1],
-    2021: [0.5, -0.5, -0.1, 0.5, 0.5, 0.5, 0.5, -0.1, -0.1, -0.1, 0.5, -0.1],
-    2022: [0.5, -0.5, -0.1, 0.5, 0.5, 0.5, 0.5, -0.1, -0.1, -0.1, 0.5, -0.1],
-  },
   documents: [
     {
       image: "",
@@ -135,73 +136,90 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
   const [showContactSpecialist, setShowContactSpecialist] = useState(false);
   const companyBackground = fund?.company?.background?.url;
 
+  const categories = new Set<DocumentCategory>();
+  const [fetchDocumentToken] = useDocumentToken();
+
   if (!fund) {
     return <Skeleton />;
   }
 
+  const sortedReturns = fund.metrics.sort(
+    (a, b) => a.date.getTime() - b.date.getTime()
+  );
+  const earliestYear = sortedReturns[0]?.date.getFullYear();
+  const latestYear =
+    sortedReturns[sortedReturns.length - 2]?.date.getFullYear(); // Assume last entry is YTD for last year
+  const years = [...Array(latestYear - earliestYear + 1)].map(
+    (_, index) => earliestYear + index
+  );
+
+  const documentsSorted = [...fund.documents];
+  documentsSorted.sort((a, b) => b.date.getTime() - a.date.getTime());
+  documentsSorted.forEach((doc) => categories.add(doc.category));
+
+  const goToFile = async (url: string): Promise<void> => {
+    try {
+      const { data } = await fetchDocumentToken({
+        variables: {
+          fundId: fund._id,
+          document: url,
+        },
+      });
+
+      if (data && data.documentToken) {
+        window.open(
+          `https://api-dev.prometheusalts.com/pdf-watermark?token=${data.documentToken}`
+        );
+      }
+    } catch (err) {
+      console.log(err instanceof Error ? err.message : err);
+    }
+  };
+
   return (
-    <div className="mt-5 px-2">
-      <div className="lg:grid grid-cols-3">
+    <div className="mt-5 px-2 flex justify-center">
+      <div className="lg:grid grid-cols-3 max-w-5xl">
         <div className="col-span-2">
-          <Card className="bg-secondary/[.27] overflow-visible rounded p-0">
-            <div className="flex flex-row bg-secondary/[.27] rounded overflow-hidden -m-px">
-              <div className="flex-shrink-0 w-72 h-72 bg-white relative">
-                {companyBackground && (
-                  <Image
-                    loader={() =>
-                      `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${companyBackground}`
-                    }
-                    src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${companyBackground}`}
-                    alt=""
-                    layout="fill"
-                    className="object-cover"
-                    unoptimized={true}
-                  />
-                )}
+          <Card className="flex flex-row bg-background-card rounded-lg overflow-hidden p-4">
+            <div className="flex flex-col flex-grow">
+              <div className="flex">
+                <Avatar user={fund.company} size={96} shape="square" />
+                <div className="self-center flex-grow mx-4">
+                  <div className="text-2xl text-white">{fund.name}</div>
+                  <div className="text-primary">{fund.company.name}</div>
+                </div>
               </div>
-              <div className="flex flex-col flex-grow">
-                <div className="flex px-5">
-                  <Avatar
-                    user={fund.company}
-                    size={96}
-                    shape="square"
-                    className="rounded-t-none"
+              <div className="min-h-0 flex flex-grow text-sm text-white px-1 mt-5">
+                <ul className="self-center list-disc ml-4">
+                  {fund.highlights.map((highlight) => (
+                    <li key={highlight}>{highlight}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <div className="flex flex-col justify-between">
+              <div className="self-start flex items-center">
+                <div className="w-3 h-3 bg-success rounded-full" />
+                <div className="text-xs text-success ml-1">{fund.status}</div>
+              </div>
+              <div className="text-right leading-none">
+                <Button variant="text" className="hidden">
+                  <Share color="white" weight="light" size={24} />
+                </Button>
+                <Button
+                  variant="text"
+                  className="ml-2 py-0"
+                  onClick={toggleWatch}
+                >
+                  <Star
+                    className={
+                      isWatching ? "text-primary-medium" : "text-white"
+                    }
+                    color="currentColor"
+                    weight={isWatching ? "fill" : "light"}
+                    size={24}
                   />
-                  <div className="self-center flex-grow mx-4">
-                    <div className="text-xl text-white font-medium">
-                      {fund?.name}
-                    </div>
-                    <div className="text-primary">{fund?.company?.name}</div>
-                  </div>
-                  <div className="self-start flex items-center mt-5">
-                    <div className="w-3 h-3 bg-success rounded-full" />
-                    <div className="text-xs text-success ml-1">
-                      {fund?.status}
-                    </div>
-                  </div>
-                </div>
-                <div className="min-h-0 flex flex-grow text-sm text-white px-5 py-3">
-                  <ul className="self-center list-disc ml-4">
-                    {fund?.highlights.map((highlight) => (
-                      <li key={highlight}>{highlight}</li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="border-t border-white/[.12] text-right px-3 py-2">
-                  <Button variant="text" className="hidden">
-                    <Share color="white" weight="light" size={24} />
-                  </Button>
-                  <Button variant="text" className="ml-2" onClick={toggleWatch}>
-                    <Star
-                      className={
-                        isWatching ? "text-primary-medium" : "text-white"
-                      }
-                      color="currentColor"
-                      weight={isWatching ? "fill" : "light"}
-                      size={24}
-                    />
-                  </Button>
-                </div>
+                </Button>
               </div>
             </div>
           </Card>
@@ -218,7 +236,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                       }`}
                     >
                       <div
-                        className={`text-sm ${
+                        className={`text-sm uppercase ${
                           selected ? "text-white/[.87]" : "text-primary"
                         } hover:text-white transition-all font-medium py-4`}
                       >
@@ -230,7 +248,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                 <Tab>
                   {({ selected }) => (
                     <div
-                      className={`border-b-2 ${
+                      className={`border-b-2 uppercase ${
                         selected
                           ? "border-primary-medium"
                           : "border-white/[.12]"
@@ -249,122 +267,121 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
               </Tab.List>
               <Tab.Panels>
                 <Tab.Panel>
-                  <div className="mt-4">
-                    <Card className="h-96 bg-[#C4C4C4]" />
-                  </div>
-                  <div className="mt-11">
+                  {fund.videos && fund.videos.length > 0 ? (
+                    <div className="mt-4 rounded-xl overflow-hidden">
+                      <FundMedia mediaUrl={fund.videos[0]} fundId={fund._id} />
+                    </div>
+                  ) : null}
+                  <div className="mt-9">
                     <div className="text-xl text-white font-medium">
                       Strategy Overview
                     </div>
                     <div className="text-sm text-white mt-3">
-                      {fund?.overview}
+                      {fund.overview}
                     </div>
                   </div>
-                  <div className="mt-5">
-                    <Button variant="outline-primary">
-                      <TelevisionSimple color="currentColor" size={24} />
-                      <span className="ml-3">View Presentation</span>
-                    </Button>
-                  </div>
-                  <div className="mt-8">
-                    <div className="flex flex-wrap -mx-1 py-2">
-                      {fund?.tags.map((tag) => (
-                        <div
-                          key={tag}
-                          className={`bg-white/[.12] text-tiny text-white
-                            font-medium rounded-full uppercase m-1 px-3 py-1
-                            tracking-widest`}
-                        >
-                          {tag}
-                        </div>
-                      ))}
+                  {fund.presentationUrl ? (
+                    <div className="mt-5 mb-6">
+                      <Button variant="outline-primary">
+                        <TelevisionSimple color="currentColor" size={24} />
+                        <span className="ml-3">View Presentation</span>
+                      </Button>
+                    </div>
+                  ) : null}
+                  <div className="mt-6">
+                    <div
+                      className={`flex flex-wrap -mx-1 py-2 text-xs text-white/[.60]
+                      font-medium rounded-full uppercase m-1 px-1 py-1
+                      tracking-widest`}
+                    >
+                      {fund.tags.join(" • ")}
                     </div>
                   </div>
                   <div className="border-t border-white/[.12] mt-4" />
-                  <div className="mt-16">
-                    <div className="text-xl text-white font-medium">
-                      Performance
+                  <div className="mt-6">
+                    <div className="text-xl text-white font-medium items-center">
+                      Highlights
+                      <span className="float-right text-white/[0.6] text-xs leading-7 font-light">
+                        As of {dayjs(fund.updatedAt).utc().format("M/DD/YYYY")}
+                      </span>
                     </div>
                     <Card className="mt-5 p-0">
                       <div className="flex border-white/[.12] divide-x divide-inherit">
-                        <div className="flex flex-1 flex-col items-center p-6">
-                          <div className="text-xs text-white opacity-60">
-                            MTD RETURN
+                        {fund.attributes.map((attribute) => (
+                          <div className="flex flex-1 flex-col items-center py-6">
+                            <div className="text-tiny text-white/[0.60] uppercase">
+                              {attribute.label}
+                            </div>
+                            <div className="text-sm text-white mt-1">
+                              {attribute.value}
+                            </div>
                           </div>
-                          <div className="text-lg text-white mt-1">
-                            {fundData.mtd}
-                          </div>
-                        </div>
-                        <div className="flex flex-1 flex-col items-center p-6">
-                          <div className="text-xs text-white opacity-60">
-                            YTD RETURN
-                          </div>
-                          <div className="text-lg text-white mt-1">
-                            {fundData.ytd}
-                          </div>
-                        </div>
-                        <div className="flex flex-1 flex-col items-center p-6">
-                          <div className="text-xs text-white opacity-60">
-                            ANN. VOLATILITY
-                          </div>
-                          <div className="text-lg text-white mt-1">
-                            {fundData.annualVolatility}
-                          </div>
-                        </div>
-                        <div className="flex flex-1 flex-col items-center p-6">
-                          <div className="text-xs text-white opacity-60">
-                            ARSI
-                          </div>
-                          <div className="text-lg text-white mt-1">
-                            {fundData.arsi}
-                          </div>
-                        </div>
+                        ))}
                       </div>
                     </Card>
                   </div>
-                  <div className="mt-5 opacity-40">
-                    <div className="text-white">Monthly Net Return</div>
-                    <table className="w-full border-collapse border border-white/[.12]">
-                      <thead className="text-sm text-white font-bold">
+                  <div className="mt-6 text-white/[0.3]">
+                    <div className="mb-2 font-light tracking-widest">
+                      Monthly Net Return
+                    </div>
+                    <table className="w-full border-collapse border border-white/[.12] text-[0.75rem]">
+                      <thead className="font-bold">
                         <tr>
-                          <th className="border border-white/[.12] p-2" />
-                          <th className="border border-white/[.12] p-2">Jan</th>
-                          <th className="border border-white/[.12] p-2">Feb</th>
-                          <th className="border border-white/[.12] p-2">Mar</th>
-                          <th className="border border-white/[.12] p-2">Apr</th>
-                          <th className="border border-white/[.12] p-2">May</th>
-                          <th className="border border-white/[.12] p-2">Jun</th>
-                          <th className="border border-white/[.12] p-2">Jul</th>
-                          <th className="border border-white/[.12] p-2">Aug</th>
-                          <th className="border border-white/[.12] p-2">Sep</th>
-                          <th className="border border-white/[.12] p-2">Oct</th>
-                          <th className="border border-white/[.12] p-2">Nov</th>
-                          <th className="border border-white/[.12] p-2">Dec</th>
-                          <th className="border border-white/[.12] p-2">YTD</th>
+                          <th className="border border-white/[.12] py-3" />
+                          {MONTHS.map((month) => (
+                            <th
+                              key={month}
+                              className="border border-white/[.12] py-3 text-white/[0.4]"
+                            >
+                              {month}
+                            </th>
+                          ))}
+                          <th className="border border-white/[.12] py-3 text-white/[0.4]">
+                            YTD
+                          </th>
                         </tr>
                       </thead>
-                      <tbody className="text-sm text-white">
-                        {Object.keys(fundData.netData).map((year) => (
-                          <tr key={year}>
-                            <td className="font-bold border border-white/[.12] p-2">
-                              {year}
-                            </td>
-                            {fundData.netData[year].map((data, index) => (
-                              <td
-                                key={index}
-                                className="text-center border border-white/[.12] p-2"
-                              >
-                                {data}%
+                      <tbody>
+                        {years.map((year) => {
+                          const ytdFigure = sortedReturns.find(
+                            (metric) =>
+                              metric.date.getUTCMonth() === 0 &&
+                              metric.date.getUTCFullYear() === year + 1 &&
+                              metric.date.getUTCDate() === 1
+                          )?.figure;
+
+                          return (
+                            <tr key={year}>
+                              <td className="font-bold border border-white/[.12] py-3 text-center text-white/[0.4]">
+                                {year}
                               </td>
-                            ))}
-                            <td className="text-center font-bold border border-white/[.12] p-2">
-                              {fundData.netData[year]
-                                .reduce((a, b) => a + b, 0)
-                                .toFixed(1)}
-                              %
-                            </td>
-                          </tr>
-                        ))}
+                              {MONTHS.map((month, index) => {
+                                const figure = sortedReturns.find(
+                                  (metric) =>
+                                    metric.date.getUTCMonth() === index &&
+                                    metric.date.getUTCFullYear() === year &&
+                                    metric.date.getUTCDate() !== 1
+                                )?.figure;
+
+                                return (
+                                  <td
+                                    key={month}
+                                    className="text-center border border-white/[.12] py-3"
+                                  >
+                                    {figure !== undefined
+                                      ? `${figure.toFixed(1)}%`
+                                      : "--"}
+                                  </td>
+                                );
+                              })}
+                              <td className="text-center font-bold border border-white/[.12] py-3 text-white/[0.4]">
+                                {ytdFigure !== undefined
+                                  ? `${ytdFigure.toFixed(1)}%`
+                                  : "--"}
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
@@ -375,26 +392,17 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                       Recently Added
                     </div>
                     <div className="mt-3">
-                      {fundData.documents.map((item, index) => (
-                        <div key={index} className="mb-3">
+                      {documentsSorted.slice(0, 2)?.map((doc) => (
+                        <div key={doc.url} className="mb-3">
                           <Card className="p-0">
                             <div className="flex items-center">
-                              <div className="w-32 h-24 flex bg-white relative">
-                                {item.image && (
-                                  <Image
-                                    loader={() => item.image}
-                                    src={item.image}
-                                    alt=""
-                                    layout="fill"
-                                    className="object-cover"
-                                    unoptimized={true}
-                                  />
-                                )}
+                              <div className="w-32 h-24 flex bg-gray-300 relative items-center justify-center">
+                                <Image src={RecentDoc} alt="" />
                               </div>
                               <div className="ml-5">
-                                <div className="text-white">{item.title}</div>
+                                <div className="text-white">{doc.title}</div>
                                 <div className="text-white opacity-60">
-                                  {item.created}
+                                  {dayjs(doc.date).format("MMMM D, YYYY h:mmA")}
                                 </div>
                               </div>
                             </div>
@@ -403,166 +411,82 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                       ))}
                     </div>
                   </div>
-                  <div className="mt-10">
-                    <div className="text-xl text-white font-medium">
-                      Presentations
-                    </div>
-                    <div className="border-white/[.12] divide-y divide-inherit mt-5">
-                      {fundData.presentations.slice(0, 5).map((item, index) => (
-                        <div key={index} className="flex py-5">
-                          <div className="text-white">
-                            <File color="currentColor" size={24} />
-                          </div>
-                          <div className="ml-3">
-                            <div className="text-white">{item.title}</div>
-                            <div className="text-xs text-white opacity-60">
-                              {item.created}
-                            </div>
-                          </div>
+                  {DocumentCategories.map((orderedCategory) => {
+                    const category = orderedCategory.value;
+                    if (!categories.has(category)) {
+                      return null;
+                    }
+
+                    return (
+                      <div className="mt-10">
+                        <div className="text-xl text-white font-medium">
+                          {orderedCategory.label}
                         </div>
-                      ))}
-                      {more &&
-                        fundData.presentations.slice(5).map((item, index) => (
-                          <div key={index} className="flex py-5">
-                            <div className="text-white">
-                              <File color="currentColor" size={24} />
-                            </div>
-                            <div className="ml-3">
-                              <div className="text-white">{item.title}</div>
-                              <div className="text-xs text-white opacity-60">
-                                {item.created}
+                        <div className="border-white/[.12] divide-y divide-inherit mt-5">
+                          {documentsSorted
+                            .filter((doc) => doc.category === category)
+                            .slice(0, 5)
+                            .map((item, index) => (
+                              <div
+                                key={index}
+                                className="flex py-5 cursor-pointer"
+                                onClick={() => goToFile(item.url)}
+                              >
+                                <div className="text-white">
+                                  <File color="currentColor" size={24} />
+                                </div>
+                                <div className="ml-3">
+                                  <div className="text-white">{item.title}</div>
+                                  <div className="text-xs text-white/[0.6] mt-1 tracking-wider">
+                                    {dayjs(item.date).format(
+                                      "MMMM D, YYYY h:mmA"
+                                    )}
+                                  </div>
+                                </div>
                               </div>
+                            ))}
+                          {more &&
+                            documentsSorted
+                              .filter((doc) => doc.category === category)
+                              .slice(5)
+                              .map((item, index) => (
+                                <div
+                                  key={index}
+                                  className="flex py-5 cursor-pointer"
+                                  onClick={() => goToFile(item.url)}
+                                >
+                                  <div className="text-white">
+                                    <File color="currentColor" size={24} />
+                                  </div>
+                                  <div className="ml-3">
+                                    <div className="text-white">
+                                      {item.title}
+                                    </div>
+                                    <div className="text-xs text-white/[0.6] mt-1 tracking-wider">
+                                      {dayjs(item.date).format(
+                                        "MMMM D, YYYY h:mmA"
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                          {fundData.presentations.length > 5 && (
+                            <div className="py-5">
+                              <Button
+                                variant="text"
+                                className="text-primary font-medium"
+                                onClick={() => setMore(!more)}
+                              >
+                                {more
+                                  ? "LESS PRESENTATIONS"
+                                  : "MORE PRESENTATIONS"}
+                              </Button>
                             </div>
-                          </div>
-                        ))}
-                      {fundData.presentations.length > 5 && (
-                        <div className="py-5">
-                          <Button
-                            variant="text"
-                            className="text-primary font-medium"
-                            onClick={() => setMore(!more)}
-                          >
-                            {more ? "LESS PRESENTATIONS" : "MORE PRESENTATIONS"}
-                          </Button>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  </div>
-                  <div className="mt-10">
-                    <div className="text-xl text-white font-medium">
-                      Tearsheets
-                    </div>
-                    <div className="border-white/[.12] divide-y divide-inherit mt-5">
-                      {fundData.tearSheets.map((item, index) => (
-                        <div key={index} className="flex py-5">
-                          <div className="text-white">
-                            <File color="currentColor" size={24} />
-                          </div>
-                          <div className="ml-3">
-                            <div className="text-white">{item.title}</div>
-                            <div className="text-xs text-white opacity-60">
-                              {item.created}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                      <div className="py-2" />
-                    </div>
-                  </div>
-                  <div className="mt-10">
-                    <div className="text-xl text-white font-medium">
-                      Investor Letters
-                    </div>
-                    <div className="border-white/[.12] divide-y divide-inherit mt-5">
-                      {fundData.presentations.slice(0, 5).map((item, index) => (
-                        <div key={index} className="flex py-5">
-                          <div className="text-white">
-                            <File color="currentColor" size={24} />
-                          </div>
-                          <div className="ml-3">
-                            <div className="text-white">{item.title}</div>
-                            <div className="text-xs text-white opacity-60">
-                              {item.created}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                      {moreInvestor &&
-                        fundData.presentations.slice(5).map((item, index) => (
-                          <div key={index} className="flex py-5">
-                            <div className="text-white">
-                              <File color="currentColor" size={24} />
-                            </div>
-                            <div className="ml-3">
-                              <div className="text-white">{item.title}</div>
-                              <div className="text-xs text-white opacity-60">
-                                {item.created}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      {fundData.presentations.length > 5 && (
-                        <div className="py-5">
-                          <Button
-                            variant="text"
-                            className="text-primary font-medium"
-                            onClick={() => setMoreInvestor(!moreInvestor)}
-                          >
-                            {moreInvestor
-                              ? "LESS INVESTOR LETTERS"
-                              : "MORE INVESTOR LETTERS"}
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div className="mt-10">
-                    <div className="text-xl text-white font-medium">
-                      Operational
-                    </div>
-                    <div className="border-white/[.12] divide-y divide-inherit mt-5">
-                      {fundData.operational.slice(0, 5).map((item, index) => (
-                        <div key={index} className="flex py-5">
-                          <div className="text-white">
-                            <File color="currentColor" size={24} />
-                          </div>
-                          <div className="ml-3">
-                            <div className="text-white">{item.title}</div>
-                            <div className="text-xs text-white opacity-60">
-                              {item.created}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                      {moreOption &&
-                        fundData.operational.slice(5).map((item, index) => (
-                          <div key={index} className="flex py-5">
-                            <div className="text-white">
-                              <File color="currentColor" size={24} />
-                            </div>
-                            <div className="ml-3">
-                              <div className="text-white">{item.title}</div>
-                              <div className="text-xs text-white opacity-60">
-                                {item.created}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      {fundData.operational.length > 5 && (
-                        <div className="py-5">
-                          <Button
-                            variant="text"
-                            className="text-primary font-medium"
-                            onClick={() => setMoreOption(!moreOption)}
-                          >
-                            {moreOption
-                              ? "LESS OPERATIONAL"
-                              : "MORE OPERATIONAL"}
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                      </div>
+                    );
+                  })}
                 </Tab.Panel>
               </Tab.Panels>
             </Tab.Group>
@@ -583,7 +507,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
           </div>
         </div>
         <div className="ml-8">
-          <Card className="p-0">
+          <Card className="p-0 rounded-lg">
             <div className="border-white/[.12] divide-y divide-inherit">
               <div className="p-5">
                 <div className="flex flex-col items-center p-5 pt-1">
@@ -635,13 +559,17 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                   <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
                     Asset Class
                   </div>
-                  <div className="text-white">Hedge Fund</div>
+                  <div className="text-white">
+                    {AssetClasses.find(
+                      (assetClass) => assetClass.value === fund.class
+                    )?.label ?? ""}
+                  </div>
                 </div>
                 <div className="p-4">
                   <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
                     Strategy
                   </div>
-                  <div className="text-white">L/S Equity</div>
+                  <div className="text-white">{fund.strategy}</div>
                 </div>
               </div>
               <div className="grid grid-cols-2">
@@ -649,36 +577,42 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                   <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
                     AUM
                   </div>
-                  <div className="text-white">$10M</div>
+                  <div className="text-white">
+                    ${dollarFormatter.format(fund.aum)}
+                  </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-2">
-                <div className="p-4">
+                <div className="py-4 pl-4">
                   <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
                     Minimum Investment
                   </div>
-                  <div className="text-white">$25K</div>
+                  <div className="text-white">
+                    ${dollarFormatter.format(fund.min)}
+                  </div>
                 </div>
                 <div className="p-4">
                   <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
                     Lockup Period
                   </div>
-                  <div className="text-white">2 years</div>
+                  <div className="text-white">{fund.lockup}</div>
                 </div>
               </div>
               <div className="grid grid-cols-1">
                 <div className="p-4">
-                  <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
+                  <div className="text-tiny tracking-widest text-white/[0.6] uppercase mb-1">
                     liquidity
                   </div>
-                  <div className="text-white">Quarterly w/30 days notice</div>
+                  <div className="text-white font-light">{fund.liquidity}</div>
                 </div>
               </div>
               <div className="grid grid-cols-1">
                 <div className="p-4">
-                  <div className="text-sm text-white opacity-60">
-                    Management Fee: 1% • Performance Fee: 12%
+                  <div className="text-xs text-white/[0.6] font-light tracking-wider">
+                    {fund.fees
+                      .map((fee) => `${fee.label}: ${fee.value}`)
+                      .join(" • ")}
                   </div>
                 </div>
               </div>
