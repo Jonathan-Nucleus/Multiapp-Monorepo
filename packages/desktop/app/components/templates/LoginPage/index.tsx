@@ -2,7 +2,7 @@ import { FC, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { signIn, getProviders } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import { RedirectableProviderType } from "next-auth/providers";
 import { WarningCircle } from "phosphor-react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -24,8 +24,8 @@ const PROVIDER_ICONS: Record<string, string> = {
   linkedin: LinkedIn,
 };
 
-interface LoginPageProps {
-  providers: UnwrapPromise<ReturnType<typeof getProviders>>;
+export interface LoginPageProps {
+  ssoProviders: string[];
 }
 
 type FormValues = {
@@ -42,10 +42,11 @@ const schema = yup
   })
   .required();
 
-const LoginPage: FC<LoginPageProps> = ({ providers }: LoginPageProps) => {
+const LoginPage: FC<LoginPageProps> = ({ ssoProviders }: LoginPageProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingSSO, setLoadingSSO] = useState(false);
   const {
     register,
     handleSubmit,
@@ -137,28 +138,32 @@ const LoginPage: FC<LoginPageProps> = ({ providers }: LoginPageProps) => {
               type="submit"
               variant="gradient-primary"
               className="w-full leading-6"
-              disabled={!isValid}
+              disabled={!isValid || loadingSSO}
               loading={loading}
             >
               Log In
             </Button>
           </div>
-          <div className="flex items-center justify-center mt-12 w-full">
-            <div className="bg-white/[.12] h-px flex-1"></div>
-            <div className="text-center text-white mx-4">Or, Log In with</div>
-            <div className="bg-white/[.12] h-px flex-1"></div>
-          </div>
         </form>
       </div>
-      <div className="container mx-auto mt-8 max-w-lg">
-        <div className="flex items-center justify-center md:grid grid-cols-3 gap-7">
-          {Object.keys(providers).map((provider) =>
-            provider === "credentials" ? undefined : (
+      {ssoProviders.length > 0 && (
+        <div className="container max-w-lg mx-auto mt-12">
+          <div className="flex items-center justify-center w-full">
+            <div className="bg-brand-overlay/[.1] h-px flex-1"></div>
+            <div className="text-center text-white mx-4">Or, Log In with</div>
+            <div className="bg-brand-overlay/[.1] h-px flex-1"></div>
+          </div>
+          <div className="flex items-center justify-center mt-8">
+            {ssoProviders.map((provider) => (
               <Button
                 key={provider}
                 variant="outline-primary"
-                className="w-12 h-12 md:w-full md:h-auto rounded-lg md:rounded-full border border-white/[.12] md:border-primary px-0 py-0 md:py-2"
-                onClick={() => signIn(provider)}
+                className="w-12 h-12 md:w-40 md:h-auto rounded-lg md:rounded-full border border-white/[.12] md:border-primary mx-4 px-0 py-0 md:py-2"
+                disabled={loadingSSO}
+                onClick={async () => {
+                  setLoadingSSO(true);
+                  await signIn(provider);
+                }}
               >
                 <span className="hidden md:inline-flex items-center">
                   <Image
@@ -180,32 +185,10 @@ const LoginPage: FC<LoginPageProps> = ({ providers }: LoginPageProps) => {
                   {provider}
                 </span>
               </Button>
-            ),
-          )}
-          <Button
-            variant="outline-primary"
-            className="w-12 h-12 md:w-full md:h-auto rounded-lg md:rounded-full border border-white/[.12] md:border-primary px-0 py-0 md:py-2"
-          >
-            <span className="hidden md:inline-flex items-center">
-              <Image
-                src={PROVIDER_ICONS["apple"]}
-                alt=""
-                width={16}
-                height={16}
-              />
-            </span>
-            <span className="inline-flex md:hidden items-center">
-              <Image
-                src={PROVIDER_ICONS["apple"]}
-                alt=""
-                width={24}
-                height={24}
-              />
-            </span>
-            <span className="ml-2 hidden md:inline-block">Apple</span>
-          </Button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

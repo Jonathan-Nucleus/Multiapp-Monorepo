@@ -67,7 +67,7 @@ const PostBody: FC<PostBodyProps> = ({
         _elements.push(
           <Link href={href}>
             <a
-              className="text-primary"
+              className="text-primary break-all"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -84,7 +84,7 @@ const PostBody: FC<PostBodyProps> = ({
   return (
     <>
       <div className="px-4">
-        <div className="text-sm text-white opacity-90 whitespace-pre-wrap break-all">
+        <div className="text-sm text-white opacity-90 whitespace-pre-wrap break-words">
           {elements.map((element, index) => (
             <span key={index}>{element}</span>
           ))}

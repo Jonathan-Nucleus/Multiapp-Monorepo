@@ -21,6 +21,7 @@ import { UserProfile } from "shared/graphql/query/user/useProfile";
 import BecomeProModal from "../../../../modules/account/BecomeProModal";
 import { getInitials } from "../../../../../lib/utilities";
 import { AccreditationOptions } from "backend/schemas/user";
+import SignOutModal from "./SignOutModal";
 
 interface AvatarMenuProps {
   account: UserProfile;
@@ -30,6 +31,7 @@ const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showBecomeProModal, setShowBecomeProModal] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
   const items = [
     {
       icon: (
@@ -157,34 +159,10 @@ const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
           </Popover.Panel>
         </Transition>
       </Popover>
-      <ModalDialog
-        title={"Are you sure to logout?"}
-        className="w-96 max-w-full"
+      <SignOutModal
         show={showLogoutModal}
         onClose={() => setShowLogoutModal(false)}
-      >
-        <>
-          <div className="flex items-center justify-between px-8 py-5">
-            <Button
-              variant="outline-primary"
-              className="w-24"
-              onClick={() => setShowLogoutModal(false)}
-            >
-              No
-            </Button>
-            <Button
-              variant="primary"
-              className="w-24"
-              onClick={async () => {
-                await signOut();
-                localStorage.clear();
-              }}
-            >
-              Yes
-            </Button>
-          </div>
-        </>
-      </ModalDialog>
+      />
       <ModalDialog
         show={showInviteModal}
         className="!rounded-2xl"

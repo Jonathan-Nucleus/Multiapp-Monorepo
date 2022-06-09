@@ -4,11 +4,14 @@ import LoginPage from "../app/components/templates/LoginPage";
 import { NextPageWithLayout } from "../app/types/next-page";
 import { getProviders } from "next-auth/react";
 
-interface LoginProps {
+export interface LoginProps {
   providers: UnwrapPromise<ReturnType<typeof getProviders>>;
 }
 
 const Login: NextPageWithLayout<LoginProps> = ({ providers }) => {
+  const ssoProviders = Object.keys(providers).filter(
+    (provider) => provider == "google"
+  );
   return (
     <div>
       <Head>
@@ -16,7 +19,7 @@ const Login: NextPageWithLayout<LoginProps> = ({ providers }) => {
         <meta name="description" content="" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <LoginPage providers={providers} />
+      <LoginPage ssoProviders={ssoProviders} />
     </div>
   );
 };

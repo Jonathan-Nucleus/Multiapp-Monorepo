@@ -64,7 +64,11 @@ const InviteCodePage: FC = () => {
           </div>
         </form>
         <div className="mt-12">
-          <div className="text-center text-white">Or, Log in with</div>
+          <div className="flex items-center justify-center w-full">
+            <div className="bg-brand-overlay/[.1] h-px flex-1"></div>
+            <div className="text-center text-white mx-4">Or</div>
+            <div className="bg-brand-overlay/[.1] h-px flex-1"></div>
+          </div>
           <div className="text-center mt-4">
             <Link href="https://prometheusalts.com/#invite-form">
               <a>

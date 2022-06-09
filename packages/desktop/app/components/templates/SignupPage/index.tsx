@@ -22,6 +22,13 @@ import Apple from "shared/assets/images/apple.svg";
 import LinkedIn from "shared/assets/images/linkedin.svg";
 import Google from "shared/assets/images/google.svg";
 import Image from "next/image";
+import { LoginPageProps } from "../LoginPage";
+
+const PROVIDER_ICONS: Record<string, string> = {
+  apple: Apple,
+  google: Google,
+  linkedin: LinkedIn,
+};
 
 type FormValues = {
   firstName: string;
@@ -70,11 +77,12 @@ const schema = yup
   })
   .required();
 
-const SignupPage: FC = () => {
+const SignupPage: FC<LoginPageProps> = ({ ssoProviders }) => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingSSO, setLoadingSSO] = useState(false);
   const [error, setError] = useState("");
   const [registerUser] = useRegister();
   const { register, handleSubmit, formState } = useForm<
@@ -267,8 +275,8 @@ const SignupPage: FC = () => {
             <Button
               type="submit"
               variant="gradient-primary"
-              className="w-full md:w-48 uppercase leading-6"
-              disabled={!isValid}
+              className="w-full md:w-48 leading-6"
+              disabled={!isValid || loadingSSO}
               loading={loading}
             >
               Sign Up
@@ -276,77 +284,49 @@ const SignupPage: FC = () => {
           </div>
         </form>
       </div>
-      <div className="mt-12 text-center text-white">OR, SIGN UP WITH</div>
-      <div className="container mx-auto mt-8 pb-8 max-w-lg">
-        <div className="flex items-center justify-center md:grid grid-cols-3 gap-7">
-          <Button
-            variant="outline-primary"
-            className="w-12 h-12 md:w-full md:h-auto rounded-lg md:rounded-full border border-white/[.12] md:border-primary px-0 py-0 md:py-2"
-          >
-            <span className="hidden md:inline-flex items-center">
-              <Image
-                src={Apple}
-                alt=""
-                width={16}
-                height={16}
-              />
-            </span>
-            <span className="inline-flex md:hidden items-center">
-              <Image
-                src={Apple}
-                alt=""
-                width={24}
-                height={24}
-              />
-            </span>
-            <span className="ml-2 hidden md:inline-block">Apple</span>
-          </Button>
-          <Button
-            variant="outline-primary"
-            className="w-12 h-12 md:w-full md:h-auto rounded-lg md:rounded-full border border-white/[.12] md:border-primary px-0 py-0 md:py-2"
-          >
-            <span className="hidden md:inline-flex items-center">
-              <Image
-                src={Google}
-                alt=""
-                width={16}
-                height={16}
-              />
-            </span>
-            <span className="inline-flex md:hidden items-center">
-              <Image
-                src={Google}
-                alt=""
-                width={24}
-                height={24}
-              />
-            </span>
-            <span className="ml-2 hidden md:inline-block">Google</span>
-          </Button>
-          <Button
-            variant="outline-primary"
-            className="w-12 h-12 md:w-full md:h-auto rounded-lg md:rounded-full border border-white/[.12] md:border-primary px-0 py-0 md:py-2"
-          >
-            <span className="hidden md:inline-flex items-center">
-              <Image
-                src={LinkedIn}
-                alt=""
-                width={16}
-                height={16}
-              />
-            </span>
-            <span className="inline-flex md:hidden items-center">
-              <Image
-                src={LinkedIn}
-                alt=""
-                width={24}
-                height={24}
-              />
-            </span>
-            <span className="ml-2 hidden md:inline-block">Linkedin</span>
-          </Button>
+      {ssoProviders.length > 0 && (
+        <div className="container max-w-xl mx-auto mt-12">
+          <div className="flex items-center justify-center w-full">
+            <div className="bg-brand-overlay/[.1] h-px flex-1"></div>
+            <div className="text-center text-white mx-4">Or, Sign Up with</div>
+            <div className="bg-brand-overlay/[.1] h-px flex-1"></div>
+          </div>
+          <div className="flex items-center justify-center mt-8">
+            {ssoProviders.map((provider) => (
+              <Button
+                key={provider}
+                variant="outline-primary"
+                className="w-12 h-12 md:w-40 md:h-auto rounded-lg md:rounded-full border border-white/[.12] md:border-primary mx-4 px-0 py-0 md:py-2"
+                disabled={loadingSSO}
+                onClick={async () => {
+                  setLoadingSSO(true);
+                  await signIn(provider);
+                }}
+              >
+                <span className="hidden md:inline-flex items-center">
+                  <Image
+                    src={PROVIDER_ICONS[provider]}
+                    alt=""
+                    width={16}
+                    height={16}
+                  />
+                </span>
+                <span className="inline-flex md:hidden items-center">
+                  <Image
+                    src={PROVIDER_ICONS[provider]}
+                    alt=""
+                    width={24}
+                    height={24}
+                  />
+                </span>
+                <span className="ml-2 capitalize hidden md:inline-block">
+                  {provider}
+                </span>
+              </Button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

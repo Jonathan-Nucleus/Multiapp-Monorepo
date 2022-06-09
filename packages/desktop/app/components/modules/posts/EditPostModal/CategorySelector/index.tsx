@@ -11,7 +11,8 @@ import * as yup from "yup";
 import Checkbox from "../../../../common/Checkbox";
 import Label from "../../../../common/Label";
 
-const categories = Object.keys(PostCategories).sort();
+const categories = Object.keys(PostCategories);
+const MAX_CATEGORIES_COUNT = 3;
 export const categoriesSchema = yup
   .array()
   .of(yup.mixed().oneOf<PostCategory>(Object.keys(PostCategories)).required())
@@ -19,16 +20,17 @@ export const categoriesSchema = yup
   .default([])
   .min(1);
 
-type CategorySelectorProps<TFieldValues extends FieldValues = FieldValues,
-  TName extends Path<TFieldValues> = Path<TFieldValues>> = Omit<ControllerProps<TFieldValues, TName>, "render"> & {
+type CategorySelectorProps<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends Path<TFieldValues> = Path<TFieldValues>
+> = Omit<ControllerProps<TFieldValues, TName>, "render"> & {
   error?: string;
 };
 
-function CategorySelector<TFieldValues extends FieldValues = FieldValues,
-  TName extends Path<TFieldValues> = Path<TFieldValues>>({
-  error,
-  ...controllerProps
-}: CategorySelectorProps<TFieldValues, TName>) {
+function CategorySelector<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends Path<TFieldValues> = Path<TFieldValues>
+>({ error, ...controllerProps }: CategorySelectorProps<TFieldValues, TName>) {
   return (
     <div className="flex flex-col h-full">
       <div className="text-white/[.6] p-4 border-t md:border-t-0 border-b border-white/[.12]">
@@ -37,11 +39,7 @@ function CategorySelector<TFieldValues extends FieldValues = FieldValues,
           Select categories to make your post easier to find and visible to more
           people.
         </div>
-        {error &&
-          <div className="text-xs text-error mt-2">
-            {error}
-          </div>
-        }
+        {error && <div className="text-xs text-error mt-2">{error}</div>}
       </div>
       <div className="py-2 min-h-0 overflow-y-auto">
         <Controller
@@ -51,7 +49,12 @@ function CategorySelector<TFieldValues extends FieldValues = FieldValues,
               {categories.map((category) => (
                 <div
                   key={PostCategories[category]}
-                  className="flex items-center px-4 py-2"
+                  className={`flex items-center px-4 py-2 ${
+                    field.value.length >= MAX_CATEGORIES_COUNT &&
+                    !field.value.includes(category)
+                      ? "pointer-events-none opacity-60"
+                      : ""
+                  }`}
                 >
                   <Checkbox
                     id={`category-${PostCategories[category]}`}

@@ -178,7 +178,7 @@ export type PostCategoryEnum = keyof typeof PostCategoryOptions;
 
 export const PostRoleFilterOptions = {
   PROFESSIONAL_FOLLOW: {
-    label: "Pros + people I know",
+    label: "Pros + People I follow",
     value: "professional-follow",
   },
   PROFESSIONAL_ONLY: {
