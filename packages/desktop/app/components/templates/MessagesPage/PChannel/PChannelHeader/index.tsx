@@ -15,13 +15,7 @@ const PChannelHeader: React.FC<Props> = (props) => {
   const { toggleMobile } = props;
 
   const { channel } = useChannelStateContext();
-  const [isEditing, setIsEditing] = useState(false);
-
   const { channelName, channelAvatar } = useMessageChannel(channel);
-
-  const onChannelEdit = () => {
-    setIsEditing(true);
-  };
 
   return (
     <div className="px-4 py-4 flex justify-between items-center border-b border-white/[.15]">
@@ -34,19 +28,6 @@ const PChannelHeader: React.FC<Props> = (props) => {
         </div>
         <AvatarGroup members={channelAvatar} />
         <div className="text-white ml-1">{channelName}</div>
-      </div>
-      <div className="flex items-center">
-        <TypingIndicator />
-        <DotsThreeOutlineVertical
-          className="cursor-pointer"
-          size="24"
-          onClick={onChannelEdit}
-        />
-        <PChannelEdit
-          channel={channel}
-          show={isEditing}
-          onClose={() => setIsEditing(false)}
-        />
       </div>
     </div>
   );

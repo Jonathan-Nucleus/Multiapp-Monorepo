@@ -20,6 +20,7 @@ import { useNotifications } from "shared/graphql/query/notification/useNotificat
 import SearchView from "./SearchView";
 import Container from "../../Container";
 import { useAccountContext } from "shared/context/Account";
+import { useUnreadCount } from "shared/context/Chat";
 
 const navItems = [
   {
@@ -44,6 +45,8 @@ const navItems = [
 const Header: FC = () => {
   const [showSidebar, setShowSidebar] = useState(false);
   const account = useAccountContext();
+  const unread = useUnreadCount();
+
   const { data: { notifications = [] } = {} } = useNotifications();
 
   return (
@@ -76,13 +79,15 @@ const Header: FC = () => {
             <Link href="/messages">
               <a className="relative ml-8">
                 <ChatCircleDots color="white" size={24} />
-                <span
-                  className={`bg-error-light rounded-full w-4 h-4 text-tiny
+                {unread > 0 ? (
+                  <span
+                    className={`bg-error-light rounded-full w-4 h-4 text-tiny
                   text-white absolute -top-1.5 -right-1.5 flex items-center
                   justify-center font-medium`}
-                >
-                  1
-                </span>
+                  >
+                    {unread}
+                  </span>
+                ) : null}
               </a>
             </Link>
             <Link href="/notifications">

@@ -1,9 +1,5 @@
 import React, { FC } from "react";
-import {
-  ChatCenteredText,
-  ThumbsUp,
-  UserCirclePlus,
-} from "phosphor-react";
+import { ChatCenteredText, ThumbsUp, UserCirclePlus, At } from "phosphor-react";
 import moment from "moment";
 
 import { Notification } from "backend/graphql/notifications.graphql";
@@ -19,14 +15,21 @@ const NotificationItem: FC<NotificationItemProps> = ({
   handleReadNotification,
 }) => {
   let notificationIcon;
-  if (notification.type == "COMMENT_POST") {
-    notificationIcon = <ChatCenteredText size={16} />;
-  } else if (notification.type == "LIKE_POST") {
-    notificationIcon = <ThumbsUp size={16} />;
-  } else if (notification.type == "FOLLOWED_BY_USER") {
-    notificationIcon = <UserCirclePlus size={16} />;
-  } else if (notification.type == "FOLLOWED_BY_COMPANY") {
-    notificationIcon = <UserCirclePlus size={16} />;
+  switch (notification.type) {
+    case "COMMENT_POST":
+      notificationIcon = <ChatCenteredText size={16} />;
+      break;
+    case "LIKE_POST":
+      notificationIcon = <ThumbsUp size={16} />;
+      break;
+    case "TAGGED_IN_POST":
+    case "TAGGED_IN_COMMENT":
+      notificationIcon = <At size={16} />;
+      break;
+    case "FOLLOWED_BY_USER":
+    case "FOLLOWED_BY_COMPANY":
+      notificationIcon = <UserCirclePlus size={16} />;
+      break;
   }
 
   return (
@@ -41,7 +44,7 @@ const NotificationItem: FC<NotificationItemProps> = ({
           <div className="w-2 h-2 rounded-full bg-yellow ml-2" />
         </div>
         <div className="relative ml-2">
-          <Avatar user={notification.user} size={48} className="pl-3" />
+          <Avatar user={notification.data.user} size={48} />
           <div className="absolute -bottom-1 -right-1 rounded-full bg-purple-secondary p-1">
             {notificationIcon}
           </div>

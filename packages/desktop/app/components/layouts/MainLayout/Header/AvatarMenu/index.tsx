@@ -5,7 +5,6 @@ import {
   CaretDown,
   CircleWavy,
   ShieldCheck,
-  Gear,
   Lifebuoy,
   FileText,
   SignOut,
@@ -44,6 +43,7 @@ const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
       ),
       title: AccreditationOptions[account.accreditation].label,
       path: "/funds",
+      external: false,
     },
     {
       icon: (
@@ -54,12 +54,15 @@ const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
       title: "Become a Pro",
       path: "/",
       onClick: () => setShowBecomeProModal(true),
+      external: false,
     },
+    /**
+     * Omit until post-launch.
     {
       icon: <Gear color="white" weight="light" size={24} />,
       title: "Account Settings",
       path: "/settings",
-    },
+    },*/
     {
       icon: <Lifebuoy color="white" weight="light" size={24} />,
       title: "Help & Support",
@@ -77,8 +80,10 @@ const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
       title: "Sign Out",
       path: "/",
       onClick: () => setShowLogoutModal(true),
+      external: false,
     },
   ];
+
   if (account?.accreditation === "ACCREDITED") {
     items[1] = {
       icon: (
@@ -88,6 +93,7 @@ const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
       ),
       title: "Contact Fund Specialist",
       path: "/",
+      external: false,
     };
   }
 

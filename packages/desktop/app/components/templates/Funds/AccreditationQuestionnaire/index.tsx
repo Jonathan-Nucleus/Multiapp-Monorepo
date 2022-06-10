@@ -25,6 +25,11 @@ import BaseFinancialStatus, {
   formSchema as baseStatusSchema,
 } from "./BaseFinancialStatus";
 
+import FormCRS, {
+  FormData as FormCRSData,
+  formSchema as formCRSchema,
+} from "./FormCRS";
+
 import FAIntake, {
   FormData as FAIntakeData,
   formSchema as faIntakeSchema,
@@ -37,6 +42,7 @@ import AdvancedFinancialStatus, {
 
 type FormData = InvestorClassData &
   BaseFinancialStatusData &
+  FormCRSData &
   AdvancedFinancialStatusData &
   FAIntakeData;
 
@@ -105,7 +111,7 @@ const AccreditationQuestionnaire: FC<AccreditationQuestionnaireProps> = ({
     <>
       <ModalDialog
         title="Accreditation"
-        className="bg-background-card w-[30rem] rounded-lg"
+        className="bg-background-card w-[475px] rounded-lg"
         show={show}
         onClose={onClose}
       >
@@ -154,17 +160,19 @@ const AccreditationQuestionnaire: FC<AccreditationQuestionnaireProps> = ({
                         </div>
                         <div className="ml-1">Back</div>
                       </Button>
-                      <Button
-                        type="submit"
-                        variant="outline-primary"
-                        className={`w-40 font-medium border border-info
+                      {currentStep > 1 ? (
+                        <Button
+                          type="submit"
+                          variant="outline-primary"
+                          className={`w-40 font-medium border border-info
                           text-white bg-info/[.2] hover:bg-info/[.7] px-3`}
-                      >
-                        <div className="ml-4 mr-2 flex-1">continue</div>
-                        <div>
-                          <ArrowRight color="currentColor" size={24} />
-                        </div>
-                      </Button>
+                        >
+                          <div className="ml-4 mr-2 flex-1">continue</div>
+                          <div>
+                            <ArrowRight color="currentColor" size={24} />
+                          </div>
+                        </Button>
+                      ) : null}
                     </>
                   )}
                   <div
@@ -202,6 +210,16 @@ const AccreditationQuestionnaire: FC<AccreditationQuestionnaireProps> = ({
               onNext={async () => {
                 setInvestorClass(formDataRef.current.class);
               }}
+            />
+            <Wizard.Step
+              stepName="Form CRS"
+              schema={formCRSchema}
+              renderer={(props) => (
+                <FormCRS
+                  investorClass={investorClass ?? "INDIVIDUAL"}
+                  {...props}
+                />
+              )}
             />
             {investorClass === "ADVISOR" ? (
               <Wizard.Step

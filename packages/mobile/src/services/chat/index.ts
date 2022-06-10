@@ -7,8 +7,6 @@ import {
 import _ from 'lodash';
 import dayjs from 'dayjs';
 
-export * from './types';
-
 import type {
   User,
   Channel,
@@ -17,7 +15,9 @@ import type {
   ChannelSort,
   Client,
   StreamType,
-} from './types';
+} from 'shared/context/Chat/types';
+
+export * from 'shared/context/Chat/types';
 
 const CHANNEL_TYPE = 'messaging';
 

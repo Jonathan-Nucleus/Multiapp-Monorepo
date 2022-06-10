@@ -7,7 +7,9 @@ import MainLayout from "./MainLayout";
 import Background from "./Background";
 import { Toaster } from "react-hot-toast";
 import { AccountProvider } from "shared/context/Account";
+import { ChatProvider } from "shared/context/Chat";
 import dynamic from "next/dynamic";
+import { useChatToken } from "shared/graphql/query/account/useChatToken";
 
 type RootLayoutProps = PropsWithChildren<AppPageProps>;
 
@@ -17,6 +19,8 @@ const RootLayout: FC<RootLayoutProps> = ({
   background = layout == "auth" ? "radial" : "default",
   children,
 }: RootLayoutProps) => {
+  const { data: chatData } = useChatToken();
+
   const appContent = (
     <Background type={background}>
       {layout == "auth" && <AuthLayout>{children}</AuthLayout>}
@@ -27,6 +31,7 @@ const RootLayout: FC<RootLayoutProps> = ({
       {layout == undefined && children}
     </Background>
   );
+
   return (
     <>
       <NextNProgress
@@ -47,7 +52,9 @@ const RootLayout: FC<RootLayoutProps> = ({
               localStorage.clear();
             }}
           >
-            {appContent}
+            <ChatProvider apiKey="tr4bpwdeccc6" token={chatData?.chatToken}>
+              {appContent}
+            </ChatProvider>
           </AccountProvider>
         ) : (
           appContent

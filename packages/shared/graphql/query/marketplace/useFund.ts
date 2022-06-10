@@ -102,6 +102,7 @@ export function useFund(fundId?: string): QueryResult<FundData, FundVariables> {
     {
       skip: !fundId,
       variables: { fundId: fundId ?? "" },
+      fetchPolicy: "cache-and-network",
     }
   );
   useEffect(() => {

@@ -7,6 +7,7 @@ import Card from "../../common/Card";
 import Avatar from "../../common/Avatar";
 import ProfileCard from "./ProfileCard";
 import TeamMembersList from "../../modules/teams/TeamMembersList";
+import DisclosureCard from "desktop/app/components/modules/funds/DisclosureCard";
 import FundCard from "../../modules/funds/FundCard";
 import { CompanyProfile } from "shared/graphql/query/company/useCompany";
 import { useAccountContext } from "shared/context/Account";
@@ -89,6 +90,7 @@ const CompanyPage: FC<CompanyPageProps> = ({ company }: CompanyPageProps) => {
         </div>
         <div className="col-span-2 hidden lg:block">
           <TeamMembersList members={members} showChat={true} />
+          <DisclosureCard className="mt-8" />
         </div>
       </div>
     </div>

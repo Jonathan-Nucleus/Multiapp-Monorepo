@@ -4,15 +4,17 @@ import { Info, Lock } from "phosphor-react";
 import Button from "../../../common/Button";
 import { useFunds } from "shared/graphql/query/marketplace/useFunds";
 import FundsList from "./FundsList";
+import DisclosureModal from "../../../modules/funds/DisclosureModal";
 import AccreditationQuestionnaire from "../AccreditationQuestionnaire";
 import Container from "../../../layouts/Container";
-import Link from "next/link";
 import { useAccountContext } from "shared/context/Account";
 
 const FundsPage: FC = () => {
   const account = useAccountContext();
   const [isVerifying, setIsVerifying] = useState(false);
   const { data: { funds } = {} } = useFunds();
+  const [showDisclosureModal, setShowDisclosureModal] = useState(false);
+
   return (
     <>
       <Navbar />
@@ -55,17 +57,18 @@ const FundsPage: FC = () => {
           )}
         </div>
         <footer className="border-t border-white/[.12] mt-6 px-4 lg:px-0 pt-3">
-          <Link href="https://prometheusalts.com/legals/disclosure-library">
-            <a target="_blank" rel="noopener noreferrer">
-              <Button
-                variant="text"
-                className="text-white opacity-60 flex items-center tracking-normal font-normal"
-              >
-                <Info color="currentColor" weight="light" size={20} />
-                <span className="ml-2">Disclosure</span>
-              </Button>
-            </a>
-          </Link>
+          <Button
+            variant="text"
+            className="text-white opacity-60 flex items-center tracking-normal font-normal"
+            onClick={() => setShowDisclosureModal(true)}
+          >
+            <Info color="currentColor" weight="light" size={20} />
+            <span className="ml-2">Disclosure</span>
+          </Button>
+          <DisclosureModal
+            show={showDisclosureModal}
+            onClose={() => setShowDisclosureModal(false)}
+          />
         </footer>
       </Container>
     </>

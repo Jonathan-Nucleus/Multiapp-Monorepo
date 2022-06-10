@@ -44,8 +44,8 @@
     "react-hot-toast": "^2.2.0",
     "react-input-mask": "^2.0.4",
     "react-mentions": "4.4.0",
-    "stream-chat": "^6.4.0",
-    "stream-chat-react": "^8.1.0",
+    "stream-chat": "^6.6.0",
+    "stream-chat-react": "9.0.0",
     "yup": "^0.32.11",
     "yup-phone": "^1.3.2"
   },

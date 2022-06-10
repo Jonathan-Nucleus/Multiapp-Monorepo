@@ -1,11 +1,12 @@
 import { FC } from "react";
 import CompanyCard from "./CompanyCard";
 import FeaturedProfessionals from "./FeaturedProfessionals";
-import InviteFriends from "../../modules/users/InviteFriends";
-import ProfileCardSmall from "../../modules/users/ProfileCardSmall";
-import Watchlist from "../../modules/funds/Watchlist";
+import InviteFriends from "desktop/app/components/modules/users/InviteFriends";
+import ProfileCardSmall from "desktop/app/components/modules/users/ProfileCardSmall";
+import DisclosureCard from "desktop/app/components/modules/funds/DisclosureCard";
+import Watchlist from "desktop/app/components/modules/funds/Watchlist";
 import PostsSection from "./PostsSection";
-import Card from "../../common/Card";
+import Card from "desktop/app/components/common/Card";
 import { useAccountContext } from "shared/context/Account";
 
 const HomePage: FC = () => {
@@ -35,6 +36,7 @@ const HomePage: FC = () => {
               </Card>
             </div>
           )}
+          <DisclosureCard className="mt-5" />
         </div>
       </div>
     </div>

@@ -30,18 +30,23 @@ export type FundsData = {
  */
 export function useFunds(): QueryResult<FundsData, FundsVariables> {
   const [state, setState] = useState<FundsData>();
-  const { data, loading, ...rest } = useQuery<FundsData, FundsVariables>(gql`
-    ${FUND_SUMMARY_FRAGMENT}
-    ${FUND_COMPANY_FRAGMENT}
-    ${FUND_MANAGER_FRAGMENT}
-    query Funds {
-      funds {
-        ...FundSummaryFields
-        ...FundCompanyFields
-        ...FundManagerFields
+  const { data, loading, ...rest } = useQuery<FundsData, FundsVariables>(
+    gql`
+      ${FUND_SUMMARY_FRAGMENT}
+      ${FUND_COMPANY_FRAGMENT}
+      ${FUND_MANAGER_FRAGMENT}
+      query Funds {
+        funds {
+          ...FundSummaryFields
+          ...FundCompanyFields
+          ...FundManagerFields
+        }
       }
+    `,
+    {
+      fetchPolicy: "cache-and-network",
     }
-  `);
+  );
   useEffect(() => {
     if (!loading && data) {
       setState(data);

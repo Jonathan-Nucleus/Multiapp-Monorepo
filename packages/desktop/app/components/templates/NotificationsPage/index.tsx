@@ -1,12 +1,11 @@
 import React, { FC } from "react";
 import { Gear, Checks, DotsThreeOutlineVertical } from "phosphor-react";
 import { Menu } from "@headlessui/react";
+import DisclosureCard from "desktop/app/components/modules/funds/DisclosureCard";
 
 import Button from "../../common/Button";
 import NotificationItem from "./NotificationItem";
-import {
-  useNotifications,
-} from "shared/graphql/query/notification/useNotifications";
+import { useNotifications } from "shared/graphql/query/notification/useNotifications";
 import {
   useReadNotification,
   useReadNotifications,
@@ -38,24 +37,27 @@ const NotificationPage: FC = () => {
   };
 
   return (
-    <div className="max-w-2xl m-auto mt-8">
-      <div className="flex items-center justify-between mb-4 px-2 md:p-0">
-        <div className="text-2xl">Notifications</div>
+    <div className="lg:ml-48 xl:ml-80 max-w-6xl m-auto mt-8 pl-12">
+      <div className="flex items-center mb-4 px-2 max-w-2xl mr-96">
+        <div className="text-2xl mr-4">Notifications</div>
         <Button
           variant="text"
-          className="flex items-center text-sm text-primary font-medium tracking-wider hidden md:flex"
+          className="flex items-center text-sm text-primary font-medium tracking-wider md:flex"
           onClick={() => handleReadAllNotifications()}
         >
           <Checks size={24} color="currentColor" weight="fill" />
           <span className="ml-2">Mark all as read</span>
         </Button>
-        <Button
+        {/**
+          * Remove until post-launch
+          <Button
           variant="text"
-          className="flex items-center text-sm text-primary font-medium tracking-wider hidden md:flex"
+          className="flex items-center text-sm text-primary font-medium tracking-wider md:flex"
         >
           <Gear size={24} color="currentColor" weight="fill" />
           <span className="ml-2">Notification settings</span>
         </Button>
+        */}
         <div className="flex md:hidden items-center">
           <Menu as="div" className="relative">
             <Menu.Button>
@@ -90,17 +92,24 @@ const NotificationPage: FC = () => {
           </Menu>
         </div>
       </div>
-      <Card className="bg-background-cardDark border-none rounded-none sm:rounded-2xl mb-8 px-0 py-4">
-        <div className="divide-y divide-inherit border-white/[.12]">
-          {notifications.map((notification) => (
-            <NotificationItem
-              notification={notification}
-              key={notification._id}
-              handleReadNotification={(id) => handleReadNotification(id)}
-            />
-          ))}
+      <div className="flex flex-row">
+        <div className="max-w-2xl flex-1">
+          <Card className="bg-background-cardDark border-none rounded-none sm:rounded-2xl mb-8 px-0 py-4">
+            <div className="divide-y divide-inherit border-white/[.12]">
+              {notifications.map((notification) => (
+                <NotificationItem
+                  notification={notification}
+                  key={notification._id}
+                  handleReadNotification={(id) => handleReadNotification(id)}
+                />
+              ))}
+            </div>
+          </Card>
         </div>
-      </Card>
+        <div className="w-80 ml-8">
+          <DisclosureCard />
+        </div>
+      </div>
     </div>
   );
 };

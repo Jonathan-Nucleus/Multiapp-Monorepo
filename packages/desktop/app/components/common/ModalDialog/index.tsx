@@ -51,8 +51,7 @@ const ModalDialog: FC<ModalDialogProps> = ({
               >
                 <Dialog.Panel
                   className={
-                    "bg-background-card max-w-md rounded shadow-sm " +
-                    (className ?? "")
+                    "bg-background-card rounded shadow-sm " + (className ?? "")
                   }
                 >
                   {title && (

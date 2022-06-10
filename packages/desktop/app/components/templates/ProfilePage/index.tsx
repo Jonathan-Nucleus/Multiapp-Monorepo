@@ -2,6 +2,7 @@ import { FC, useState } from "react";
 import ProfileCard from "./ProfileCard";
 import CompaniesList from "./CompaniesList";
 import CompaniesListSkeleton from "./CompaniesList/Skeleton";
+import DisclosureCard from "desktop/app/components/modules/funds/DisclosureCard";
 import { UserProfileProps } from "../../../types/common-props";
 import PostsSection from "./PostsSection";
 import FundsSection from "./FundsSection";
@@ -57,17 +58,18 @@ const ProfilePage: FC<ProfilePageProps> = ({ user, loading, isMyProfile }) => {
             </div>
           </div>
           <div className="flex-shrink-0">
-            <div className="hidden lg:block">
+            <div className="hidden lg:block w-80">
               {loading && (
-                <div className="w-80 mx-4">
+                <div className="mx-4">
                   <CompaniesListSkeleton />
                 </div>
               )}
               {user?.companies && user.companies.length > 0 && (
-                <div className="w-80 mx-4">
+                <div className="mx-4">
                   <CompaniesList companies={user?.companies} />
                 </div>
               )}
+              <DisclosureCard />
             </div>
           </div>
         </div>

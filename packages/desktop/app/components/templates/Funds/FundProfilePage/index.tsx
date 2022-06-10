@@ -8,6 +8,7 @@ import Avatar from "../../../common/Avatar";
 import Button from "../../../common/Button";
 import Card from "../../../common/Card";
 import FundMedia from "../../../modules/funds/FundMedia";
+import DisclosureModal from "../../../modules/funds/DisclosureModal";
 import TeamMembersList from "../../../modules/teams/TeamMembersList";
 import RecentDoc from "shared/assets/images/recent-doc.svg";
 
@@ -32,97 +33,6 @@ dayjs.extend(utc);
 const dollarFormatter = Intl.NumberFormat("en", { notation: "compact" });
 const MONTHS = dayjs().localeData().monthsShort();
 
-const fundData = {
-  documents: [
-    {
-      image: "",
-      title: "Overview Presentation",
-      created: "July 1, 2021 5:59PM",
-    },
-    {
-      image: "",
-      title: "Team Overview",
-      created: "July 1, 2021 5:59PM",
-    },
-  ],
-  presentations: [
-    {
-      title: "February 2022 -  Letter to Investors",
-      created: "July 1, 2021 5:59PM",
-    },
-    {
-      title: "January 2022 - Letter to Investors",
-      created: "July 1, 2021 5:59PM",
-    },
-    {
-      title: "December 2021 - Letter to Investors",
-      created: "July 1, 2021 5:59PM",
-    },
-    {
-      title: "November 2021 - Letter to Investors",
-      created: "July 1, 2021 5:59PM",
-    },
-    {
-      title: "October 2021 - Letter to Investors",
-      created: "July 1, 2021 5:59PM",
-    },
-  ],
-  tearSheets: [
-    {
-      title: "Overview Presentation",
-      created: "July 1, 2021 5:59PM",
-    },
-    {
-      title: "Overview Presentation",
-      created: "July 1, 2021 5:59PM",
-    },
-  ],
-  investorLetters: [
-    {
-      title: "Overview Presentation",
-      created: "July 1, 2021 5:59PM",
-    },
-    {
-      title: "Overview Presentation",
-      created: "July 1, 2021 5:59PM",
-    },
-    {
-      title: "Overview Presentation",
-      created: "July 1, 2021 5:59PM",
-    },
-    {
-      title: "Overview Presentation",
-      created: "July 1, 2021 5:59PM",
-    },
-    {
-      title: "Overview Presentation",
-      created: "July 1, 2021 5:59PM",
-    },
-  ],
-  operational: [
-    {
-      title: "Dislosures and Disclaimers",
-      created: "July 1, 2021 5:59PM",
-    },
-    {
-      title: "Additional Risk Disclosures",
-      created: "July 1, 2021 5:59PM",
-    },
-    {
-      title: "Form CRS",
-      created: "July 1, 2021 5:59PM",
-    },
-    {
-      title: "Something",
-      created: "July 1, 2021 5:59PM",
-    },
-    {
-      title: "Something Else",
-      created: "July 1, 2021 5:59PM",
-    },
-  ],
-};
-
 interface FundProfileProps {
   fundId: string;
 }
@@ -134,6 +44,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
   const [moreInvestor, setMoreInvestor] = useState(false);
   const [moreOption, setMoreOption] = useState(false);
   const [showContactSpecialist, setShowContactSpecialist] = useState(false);
+  const [showDisclosureModal, setShowDisclosureModal] = useState(false);
   const companyBackground = fund?.company?.background?.url;
 
   const categories = new Set<DocumentCategory>();
@@ -143,13 +54,16 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
     return <Skeleton />;
   }
 
+  const fundTeam = [fund.manager, ...(fund?.team ?? [])];
+
   const sortedReturns = fund.metrics.sort(
     (a, b) => a.date.getTime() - b.date.getTime()
   );
   const earliestYear = sortedReturns[0]?.date.getFullYear();
   const latestYear =
     sortedReturns[sortedReturns.length - 2]?.date.getFullYear(); // Assume last entry is YTD for last year
-  const years = [...Array(latestYear - earliestYear + 1)].map(
+  const numYears = latestYear - earliestYear + 1;
+  const years = [...Array(!isNaN(numYears) ? numYears : 0)].map(
     (_, index) => earliestYear + index
   );
 
@@ -178,7 +92,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
 
   return (
     <div className="mt-5 px-2 flex justify-center">
-      <div className="lg:grid grid-cols-3 max-w-5xl">
+      <div className="lg:grid grid-cols-3 max-w-6xl">
         <div className="col-span-2">
           <Card className="flex flex-row bg-background-card rounded-lg overflow-hidden p-4">
             <div className="flex flex-col flex-grow">
@@ -320,71 +234,73 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                       </div>
                     </Card>
                   </div>
-                  <div className="mt-6 text-white/[0.3]">
-                    <div className="mb-2 font-light tracking-widest">
-                      Monthly Net Return
-                    </div>
-                    <table className="w-full border-collapse border border-white/[.12] text-[0.75rem]">
-                      <thead className="font-bold">
-                        <tr>
-                          <th className="border border-white/[.12] py-3" />
-                          {MONTHS.map((month) => (
-                            <th
-                              key={month}
-                              className="border border-white/[.12] py-3 text-white/[0.4]"
-                            >
-                              {month}
+                  {fund.metrics.length > 0 ? (
+                    <div className="mt-6 text-white/[0.3]">
+                      <div className="mb-2 font-light tracking-widest">
+                        Monthly Net Return
+                      </div>
+                      <table className="w-full border-collapse border border-white/[.12] text-[0.75rem]">
+                        <thead className="font-bold">
+                          <tr>
+                            <th className="border border-white/[.12] py-3" />
+                            {MONTHS.map((month) => (
+                              <th
+                                key={month}
+                                className="border border-white/[.12] py-3 text-white/[0.4]"
+                              >
+                                {month}
+                              </th>
+                            ))}
+                            <th className="border border-white/[.12] py-3 text-white/[0.4]">
+                              YTD
                             </th>
-                          ))}
-                          <th className="border border-white/[.12] py-3 text-white/[0.4]">
-                            YTD
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {years.map((year) => {
-                          const ytdFigure = sortedReturns.find(
-                            (metric) =>
-                              metric.date.getUTCMonth() === 0 &&
-                              metric.date.getUTCFullYear() === year + 1 &&
-                              metric.date.getUTCDate() === 1
-                          )?.figure;
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {years.map((year) => {
+                            const ytdFigure = sortedReturns.find(
+                              (metric) =>
+                                metric.date.getUTCMonth() === 0 &&
+                                metric.date.getUTCFullYear() === year + 1 &&
+                                metric.date.getUTCDate() === 1
+                            )?.figure;
 
-                          return (
-                            <tr key={year}>
-                              <td className="font-bold border border-white/[.12] py-3 text-center text-white/[0.4]">
-                                {year}
-                              </td>
-                              {MONTHS.map((month, index) => {
-                                const figure = sortedReturns.find(
-                                  (metric) =>
-                                    metric.date.getUTCMonth() === index &&
-                                    metric.date.getUTCFullYear() === year &&
-                                    metric.date.getUTCDate() !== 1
-                                )?.figure;
+                            return (
+                              <tr key={year}>
+                                <td className="font-bold border border-white/[.12] py-3 text-center text-white/[0.4]">
+                                  {year}
+                                </td>
+                                {MONTHS.map((month, index) => {
+                                  const figure = sortedReturns.find(
+                                    (metric) =>
+                                      metric.date.getUTCMonth() === index &&
+                                      metric.date.getUTCFullYear() === year &&
+                                      metric.date.getUTCDate() !== 1
+                                  )?.figure;
 
-                                return (
-                                  <td
-                                    key={month}
-                                    className="text-center border border-white/[.12] py-3"
-                                  >
-                                    {figure !== undefined
-                                      ? `${figure.toFixed(1)}%`
-                                      : "--"}
-                                  </td>
-                                );
-                              })}
-                              <td className="text-center font-bold border border-white/[.12] py-3 text-white/[0.4]">
-                                {ytdFigure !== undefined
-                                  ? `${ytdFigure.toFixed(1)}%`
-                                  : "--"}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
+                                  return (
+                                    <td
+                                      key={month}
+                                      className="text-center border border-white/[.12] py-3"
+                                    >
+                                      {figure !== undefined
+                                        ? `${figure.toFixed(1)}%`
+                                        : "--"}
+                                    </td>
+                                  );
+                                })}
+                                <td className="text-center font-bold border border-white/[.12] py-3 text-white/[0.4]">
+                                  {ytdFigure !== undefined
+                                    ? `${ytdFigure.toFixed(1)}%`
+                                    : "--"}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : null}
                 </Tab.Panel>
                 <Tab.Panel>
                   <div className="mt-8">
@@ -417,16 +333,37 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                       return null;
                     }
 
+                    const categoryDocuments = documentsSorted.filter(
+                      (doc) => doc.category === category
+                    );
+
                     return (
                       <div className="mt-10">
                         <div className="text-xl text-white font-medium">
                           {orderedCategory.label}
                         </div>
                         <div className="border-white/[.12] divide-y divide-inherit mt-5">
-                          {documentsSorted
-                            .filter((doc) => doc.category === category)
-                            .slice(0, 5)
-                            .map((item, index) => (
+                          {categoryDocuments.slice(0, 5).map((item, index) => (
+                            <div
+                              key={index}
+                              className="flex py-5 cursor-pointer"
+                              onClick={() => goToFile(item.url)}
+                            >
+                              <div className="text-white">
+                                <File color="currentColor" size={24} />
+                              </div>
+                              <div className="ml-3">
+                                <div className="text-white">{item.title}</div>
+                                <div className="text-xs text-white/[0.6] mt-1 tracking-wider">
+                                  {dayjs(item.date).format(
+                                    "MMMM D, YYYY h:mmA"
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                          {more &&
+                            categoryDocuments.slice(5).map((item, index) => (
                               <div
                                 key={index}
                                 className="flex py-5 cursor-pointer"
@@ -445,32 +382,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                                 </div>
                               </div>
                             ))}
-                          {more &&
-                            documentsSorted
-                              .filter((doc) => doc.category === category)
-                              .slice(5)
-                              .map((item, index) => (
-                                <div
-                                  key={index}
-                                  className="flex py-5 cursor-pointer"
-                                  onClick={() => goToFile(item.url)}
-                                >
-                                  <div className="text-white">
-                                    <File color="currentColor" size={24} />
-                                  </div>
-                                  <div className="ml-3">
-                                    <div className="text-white">
-                                      {item.title}
-                                    </div>
-                                    <div className="text-xs text-white/[0.6] mt-1 tracking-wider">
-                                      {dayjs(item.date).format(
-                                        "MMMM D, YYYY h:mmA"
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                          {fundData.presentations.length > 5 && (
+                          {categoryDocuments.length > 5 && (
                             <div className="py-5">
                               <Button
                                 variant="text"
@@ -478,8 +390,8 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                                 onClick={() => setMore(!more)}
                               >
                                 {more
-                                  ? "LESS PRESENTATIONS"
-                                  : "MORE PRESENTATIONS"}
+                                  ? `LESS ${orderedCategory.label}`
+                                  : `MORE ${orderedCategory.label}`}
                               </Button>
                             </div>
                           )}
@@ -490,19 +402,15 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                 </Tab.Panel>
               </Tab.Panels>
             </Tab.Group>
-            <div className="border-t border-white/[.12] mt-6" />
-            <div className="mt-2 mb-24">
-              <Link href="https://prometheusalts.com/legals/disclosure-library">
-                <a target="_blank" rel="noopener noreferrer">
-                  <Button
-                    variant="text"
-                    className="text-white opacity-60 flex items-center tracking-normal font-normal"
-                  >
-                    <Info color="currentColor" weight="light" size={20} />
-                    <span className="ml-2 underline">Disclosure</span>
-                  </Button>
-                </a>
-              </Link>
+            <div className="border-t border-white/[.12] mt-6 mb-24 pt-2">
+              <Button
+                variant="text"
+                className="text-white opacity-60 flex items-center tracking-normal font-normal"
+                onClick={() => setShowDisclosureModal(true)}
+              >
+                <Info color="currentColor" weight="light" size={20} />
+                <span className="ml-2 underline">Disclosure</span>
+              </Button>
             </div>
           </div>
         </div>
@@ -619,10 +527,14 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
             </div>
           </Card>
           <div className="mt-9">
-            {fund?.team.length > 0 && <TeamMembersList members={fund?.team} />}
+            {fundTeam.length > 0 && <TeamMembersList members={fundTeam} />}
           </div>
         </div>
       </div>
+      <DisclosureModal
+        show={showDisclosureModal}
+        onClose={() => setShowDisclosureModal(false)}
+      />
     </div>
   );
 };
