@@ -6,6 +6,8 @@ import Button from "../../../../common/Button";
 import { useGlobalSearchLazy } from "shared/graphql/query/search/useGlobalSearch";
 import _ from "lodash";
 import Spinner from "../../../../common/Spinner";
+import { useRouter } from "next/router";
+import { SearchTypeOptions } from "../../../../templates/SearchPage";
 
 const defaultItems: ItemType[] = [
   { type: "people" },
@@ -17,23 +19,21 @@ const defaultItems: ItemType[] = [
 const SearchView: FC = () => {
   const [keyword, setKeyword] = useState<string>();
   const [searchItems, setSearchItems] = useState<ItemType[]>(defaultItems);
-  const [selected, setSelected] = useState(defaultItems[0]);
-  const [performSearch, { data, loading }] = useGlobalSearchLazy();
-  const abortController = useRef<AbortController>();
+  const [selected, setSelected] = useState();
+  const [performSearch, { data, loading, refetch, called }] =
+    useGlobalSearchLazy();
   const searchCallback = useRef(
     _.debounce(async (search: string) => {
-      const controller = new AbortController();
-      abortController.current = controller;
-      await performSearch({
-        variables: { search },
-        context: { fetchOptions: { signal: controller.signal } },
-      });
+      if (!called) {
+        await performSearch({
+          variables: { search },
+        });
+      } else {
+        refetch({ search });
+      }
     }, 500)
   ).current;
-  const abortLatest = () =>
-    abortController.current && abortController.current.abort();
   useEffect(() => {
-    abortLatest();
     setSearchItems(defaultItems);
     if (keyword && keyword.trim().length >= 2) {
       searchCallback(keyword);
@@ -43,21 +43,46 @@ const SearchView: FC = () => {
     if (!loading && data) {
       const _searchItems = [...defaultItems];
       data.globalSearch.users.slice(0, 2).forEach((user) => {
-        _searchItems.push({ type: "people", value: { user } });
+        _searchItems.push({
+          type: "people",
+          value: { user, link: `/profile/${user._id}` },
+        });
       });
       data.globalSearch.companies.slice(0, 2).forEach((company) => {
-        _searchItems.push({ type: "company", value: { company } });
+        _searchItems.push({
+          type: "company",
+          value: { company, link: `/company/${company._id}` },
+        });
       });
       data.globalSearch.funds.slice(0, 2).forEach((fund) => {
-        _searchItems.push({ type: "fund", value: { fund } });
+        _searchItems.push({
+          type: "fund",
+          value: { fund, link: `/funds/${fund._id}` },
+        });
       });
       setSearchItems(_searchItems);
     }
   }, [data, loading]);
+  const router = useRouter();
   return (
     <>
       <div className="relative">
-        <Combobox value={selected} onChange={setSelected}>
+        <Combobox
+          value={selected}
+          onChange={async (value: ItemType | undefined) => {
+            if (!value) {
+              await router.push(`/search/all?query=${keyword}`);
+            } else if (!value.value) {
+              await router.push(
+                `/search/${
+                  SearchTypeOptions[value.type].route
+                }?query=${keyword}`
+              );
+            } else {
+              await router.push(value.value.link);
+            }
+          }}
+        >
           <div className="relative">
             <div className="relative">
               <Combobox.Input
@@ -84,10 +109,14 @@ const SearchView: FC = () => {
                 leave="transition ease-in duration-100"
                 leaveFrom="opacity-100"
                 leaveTo="opacity-0"
-                afterLeave={() => setKeyword("")}
+                afterLeave={() => {
+                  setKeyword("");
+                  setSelected(undefined);
+                }}
               >
                 <Combobox.Options className="absolute mt-2 max-h-80 w-80 overflow-auto rounded bg-background-popover border border-white/[.12] shadow py-4">
                   <div className="text-sm">
+                    <Combobox.Option value={undefined} />
                     {searchItems.map((item, index) => (
                       <Combobox.Option
                         key={index}

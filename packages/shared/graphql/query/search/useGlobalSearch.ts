@@ -91,6 +91,9 @@ export function useGlobalSearchLazy(): QueryTuple<
   GlobalSearchVariables
 > {
   return useLazyQuery<GlobalSearchData, GlobalSearchVariables>(
-    GLOBAL_SEARCH_FRAGMENT
+    GLOBAL_SEARCH_FRAGMENT,
+    {
+      notifyOnNetworkStatusChange: true,
+    }
   );
 }

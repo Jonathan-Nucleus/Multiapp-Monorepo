@@ -14,7 +14,6 @@ import RecentDoc from "shared/assets/images/recent-doc.svg";
 
 import {
   useFund,
-  FundDetails,
   DocumentCategories,
   DocumentCategory,
 } from "shared/graphql/query/marketplace/useFund";
@@ -27,6 +26,7 @@ import ContactSpecialist from "../../../modules/funds/ContactSpecialist";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import localData from "dayjs/plugin/localeData";
+
 dayjs.extend(localData);
 dayjs.extend(utc);
 
@@ -41,12 +41,8 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
   const { data: { fund } = {} } = useFund(fundId);
   const { isWatching, toggleWatch } = useWatchFund(fundId);
   const [more, setMore] = useState(false);
-  const [moreInvestor, setMoreInvestor] = useState(false);
-  const [moreOption, setMoreOption] = useState(false);
   const [showContactSpecialist, setShowContactSpecialist] = useState(false);
   const [showDisclosureModal, setShowDisclosureModal] = useState(false);
-  const companyBackground = fund?.company?.background?.url;
-
   const categories = new Set<DocumentCategory>();
   const [fetchDocumentToken] = useDocumentToken();
 
@@ -221,8 +217,11 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                     </div>
                     <Card className="mt-5 p-0">
                       <div className="flex border-white/[.12] divide-x divide-inherit">
-                        {fund.attributes.map((attribute) => (
-                          <div className="flex flex-1 flex-col items-center py-6">
+                        {fund.attributes.map((attribute, index) => (
+                          <div
+                            key={index}
+                            className="flex flex-1 flex-col items-center py-6"
+                          >
                             <div className="text-tiny text-white/[0.60] uppercase">
                               {attribute.label}
                             </div>
@@ -327,7 +326,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                       ))}
                     </div>
                   </div>
-                  {DocumentCategories.map((orderedCategory) => {
+                  {DocumentCategories.map((orderedCategory, index) => {
                     const category = orderedCategory.value;
                     if (!categories.has(category)) {
                       return null;
@@ -338,7 +337,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                     );
 
                     return (
-                      <div className="mt-10">
+                      <div key={index} className="mt-10">
                         <div className="text-xl text-white font-medium">
                           {orderedCategory.label}
                         </div>
