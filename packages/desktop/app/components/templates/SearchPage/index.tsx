@@ -5,8 +5,13 @@ import PostsPage from "./PostsPage";
 import UsersPage from "./UsersPage";
 import CompaniesPage from "./CompaniesPage";
 import FundsPage from "./FundsPage";
+import AllPage from "./AllPage";
 
 export const SearchTypeOptions = {
+  all: {
+    title: "All",
+    route: "all",
+  },
   people: {
     title: "People",
     route: "people",
@@ -40,8 +45,14 @@ const SearchPage: FC<SearchPageProps> = ({ type, query }) => {
     totalCount = globalSearch?.users?.length ?? 0;
   } else if (type == "company") {
     totalCount = globalSearch?.companies?.length ?? 0;
-  } else {
+  } else if (type == "fund") {
     totalCount = globalSearch?.funds?.length ?? 0;
+  } else {
+    totalCount =
+      (globalSearch?.posts?.length ?? 0) +
+      (globalSearch?.users?.length ?? 0) +
+      (globalSearch?.companies?.length ?? 0) +
+      (globalSearch?.funds?.length ?? 0);
   }
   return (
     <>
@@ -49,7 +60,9 @@ const SearchPage: FC<SearchPageProps> = ({ type, query }) => {
       <div className="max-w-3xl mx-auto mt-9 pb-10">
         <header className="px-2 md:px-0">
           <div className="text-lg text-white font-semibold">
-            {SearchTypeOptions[type].title}
+            {type == "all"
+              ? "All Search Results"
+              : SearchTypeOptions[type].title}
           </div>
           <div className={loading ? "invisible" : ""}>
             <div className="text-sm text-white opacity-80 mt-1">
@@ -59,18 +72,13 @@ const SearchPage: FC<SearchPageProps> = ({ type, query }) => {
           </div>
         </header>
         <div className="mt-3">
-          {type == "people" &&
-            <UsersPage users={globalSearch?.users} />
-          }
-          {type == "post" &&
-            <PostsPage posts={globalSearch?.posts} />
-          }
-          {type == "company" &&
+          {type == "all" && <AllPage data={globalSearch} query={query} />}
+          {type == "people" && <UsersPage users={globalSearch?.users} />}
+          {type == "post" && <PostsPage posts={globalSearch?.posts} />}
+          {type == "company" && (
             <CompaniesPage companies={globalSearch?.companies} />
-          }
-          {type == "fund" &&
-            <FundsPage funds={globalSearch?.funds} />
-          }
+          )}
+          {type == "fund" && <FundsPage funds={globalSearch?.funds} />}
         </div>
       </div>
     </>

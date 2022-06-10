@@ -33,7 +33,7 @@ const SearchItem: FC<SearchItemProps> = ({
 }: SearchItemProps) => {
   return (
     <>
-      <div className="cursor-pointer hover:bg-primary-overlay/[.12] px-4 py-2">
+      <div className="cursor-pointer px-4 py-2">
         {!item.value &&
           <Link href={`/search/${SearchTypeOptions[item.type].route}?query=${keyword}`}>
             <a>

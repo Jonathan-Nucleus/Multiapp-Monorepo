@@ -11,6 +11,9 @@ const Navbar: FC<NavbarProps> = ({ query }) => {
       <nav className="max-w-3xl mx-auto">
         <ul className="grid grid-cols-4 md:flex">
           <li className="md:w-44">
+            <NavItem path={`/search/all?query=${query}`} title="All" />
+          </li>
+          <li className="md:w-44">
             <NavItem path={`/search/people?query=${query}`} title="People" />
           </li>
           <li className="md:w-44">

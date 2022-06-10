@@ -3,9 +3,7 @@ import { MagnifyingGlass, X } from "phosphor-react";
 import { Combobox, Transition } from "@headlessui/react";
 import SearchItem, { ItemType } from "./SearchItem";
 import Button from "../../../../common/Button";
-import {
-  useGlobalSearchLazy,
-} from "shared/graphql/query/search/useGlobalSearch";
+import { useGlobalSearchLazy } from "shared/graphql/query/search/useGlobalSearch";
 import _ from "lodash";
 import Spinner from "../../../../common/Spinner";
 
@@ -19,20 +17,21 @@ const defaultItems: ItemType[] = [
 const SearchView: FC = () => {
   const [keyword, setKeyword] = useState<string>();
   const [searchItems, setSearchItems] = useState<ItemType[]>(defaultItems);
-  const [performSearch, {
-    data,
-    loading,
-  }] = useGlobalSearchLazy();
+  const [selected, setSelected] = useState(defaultItems[0]);
+  const [performSearch, { data, loading }] = useGlobalSearchLazy();
   const abortController = useRef<AbortController>();
-  const searchCallback = useRef(_.debounce(async (search: string) => {
-    const controller = new AbortController();
-    abortController.current = controller;
-    await performSearch({
-      variables: { search },
-      context: { fetchOptions: { signal: controller.signal } },
-    });
-  }, 500)).current;
-  const abortLatest = () => abortController.current && abortController.current.abort();
+  const searchCallback = useRef(
+    _.debounce(async (search: string) => {
+      const controller = new AbortController();
+      abortController.current = controller;
+      await performSearch({
+        variables: { search },
+        context: { fetchOptions: { signal: controller.signal } },
+      });
+    }, 500)
+  ).current;
+  const abortLatest = () =>
+    abortController.current && abortController.current.abort();
   useEffect(() => {
     abortLatest();
     setSearchItems(defaultItems);
@@ -43,13 +42,13 @@ const SearchView: FC = () => {
   useEffect(() => {
     if (!loading && data) {
       const _searchItems = [...defaultItems];
-      data.globalSearch.users.slice(0, 2).forEach(user => {
+      data.globalSearch.users.slice(0, 2).forEach((user) => {
         _searchItems.push({ type: "people", value: { user } });
       });
-      data.globalSearch.companies.slice(0, 2).forEach(company => {
+      data.globalSearch.companies.slice(0, 2).forEach((company) => {
         _searchItems.push({ type: "company", value: { company } });
       });
-      data.globalSearch.funds.slice(0, 2).forEach(fund => {
+      data.globalSearch.funds.slice(0, 2).forEach((fund) => {
         _searchItems.push({ type: "fund", value: { fund } });
       });
       setSearchItems(_searchItems);
@@ -58,7 +57,7 @@ const SearchView: FC = () => {
   return (
     <>
       <div className="relative">
-        <Combobox value={keyword} onChange={() => setKeyword("")}>
+        <Combobox value={selected} onChange={setSelected}>
           <div className="relative">
             <div className="relative">
               <Combobox.Input
@@ -67,7 +66,7 @@ const SearchView: FC = () => {
                 onChange={(event) => setKeyword(event.target.value)}
               />
               <div className="w-4 h-full flex items-center absolute right-3 top-0">
-                {keyword &&
+                {keyword && (
                   <Button
                     variant="text"
                     className="p-0"
@@ -75,11 +74,11 @@ const SearchView: FC = () => {
                   >
                     <X color="white" size={16} />
                   </Button>
-                }
+                )}
                 {!keyword && <MagnifyingGlass color="grey" size={16} />}
               </div>
             </div>
-            {keyword && keyword.length >= 1 &&
+            {keyword && keyword.length >= 1 && (
               <Transition
                 as={Fragment}
                 leave="transition ease-in duration-100"
@@ -90,19 +89,27 @@ const SearchView: FC = () => {
                 <Combobox.Options className="absolute mt-2 max-h-80 w-80 overflow-auto rounded bg-background-popover border border-white/[.12] shadow py-4">
                   <div className="text-sm">
                     {searchItems.map((item, index) => (
-                      <div key={index}>
+                      <Combobox.Option
+                        key={index}
+                        value={item}
+                        className={({ active }) =>
+                          `select-none ${
+                            active ? "bg-primary-overlay/[.12]" : ""
+                          }`
+                        }
+                      >
                         <SearchItem item={item} keyword={keyword ?? ""} />
-                      </div>
+                      </Combobox.Option>
                     ))}
-                    {loading &&
+                    {loading && (
                       <div className="text-center pt-3 pb-1">
                         <Spinner />
                       </div>
-                    }
+                    )}
                   </div>
                 </Combobox.Options>
               </Transition>
-            }
+            )}
           </div>
         </Combobox>
       </div>

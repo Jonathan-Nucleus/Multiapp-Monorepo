@@ -17,7 +17,7 @@ const ItemView: FC<ItemViewProps> = ({ user }) => {
 
   return (
     <>
-      <Card className="bg-background-header border-none rounded-lg p-4">
+      <Card className="bg-background-header border-none shadow-sm rounded-lg p-4">
         <div className="flex items-center">
           <div className="flex-grow flex-shrink-0">
             <UserItem user={user} showFollow={false} />

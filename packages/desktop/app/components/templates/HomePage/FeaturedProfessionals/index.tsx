@@ -44,13 +44,13 @@ const FeaturedProfessionals: FC = () => {
           <div className="splide__arrows">
             <Button
               variant="text"
-              className="splide__arrow--prev text-gray-600 py-0 absolute !-left-8 top-16"
+              className="splide__arrow--prev text-gray-600 py-0 !absolute !-left-8 top-16"
             >
               <ArrowCircleRight color="currentColor" weight="fill" size={50} />
             </Button>
             <Button
               variant="text"
-              className="splide__arrow--next text-gray-600 py-0 absolute !-right-8 top-16"
+              className="splide__arrow--next text-gray-600 py-0 !absolute !-right-8 top-16"
             >
               <ArrowCircleRight color="currentColor" weight="fill" size={50} />
             </Button>

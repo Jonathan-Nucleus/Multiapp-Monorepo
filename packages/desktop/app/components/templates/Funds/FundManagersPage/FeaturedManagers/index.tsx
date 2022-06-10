@@ -51,7 +51,7 @@ const FeaturedManagers: FC = () => {
             <div className="splide__arrows">
               <Button
                 variant="text"
-                className="splide__arrow--prev w-12 h-12 flex items-center bg-gradient-to-r from-[#844AFF] to-primary disabled:bg-none disabled:bg-gray-600 rounded-full py-0 absolute !-left-10 top-12 text-background"
+                className="splide__arrow--prev w-12 h-12 flex items-center bg-gradient-to-r from-[#844AFF] to-primary disabled:bg-none disabled:bg-gray-600 rounded-full py-0 !absolute !-left-10 top-12 text-background"
               >
                 <ArrowRight
                   color="currentColor"
@@ -61,7 +61,7 @@ const FeaturedManagers: FC = () => {
               </Button>
               <Button
                 variant="text"
-                className="splide__arrow--next w-12 h-12 flex items-center bg-gradient-to-r from-[#844AFF] to-primary disabled:bg-none disabled:bg-gray-600 rounded-full py-0 absolute !-right-10 top-12 text-background"
+                className="splide__arrow--next w-12 h-12 flex items-center bg-gradient-to-r from-[#844AFF] to-primary disabled:bg-none disabled:bg-gray-600 rounded-full py-0 !absolute !-right-10 top-12 text-background"
               >
                 <ArrowRight
                   color="currentColor"
