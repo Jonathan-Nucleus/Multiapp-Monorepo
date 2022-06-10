@@ -29,35 +29,35 @@ exports.handler = async (event) => {
             'postId': postId,
             'apiKey': apiKey
         });
-        
+
         const options = {
           hostname: dbConnectorURL,
           port: dbConnectorPort,
-          path: '/db-connector',
+          path: '/',
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Content-Length': body.length,
           },
-        }; 
-        
+        };
+
         const req = https.request(options, res => {
             if(res.statusCode == 200) {
-                console.log(`Success: postID ${postId}.`);    
+                console.log(`Success: postID ${postId}.`);
             }
             else {
-                console.error(`Failed: Received status code ${res.statusCode} for postID ${postId}.`);    
+                console.error(`Failed: Received status code ${res.statusCode} for postID ${postId}.`);
             }
         });
-        
+
         req.on('error', error => {
           console.error(error);
         });
-        
+
         req.write(body);
-        req.end();        
+        req.end();
     }
-    
+
     const response = {
         statusCode: 200
     };
