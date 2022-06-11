@@ -1,0 +1,15 @@
+{
+  "name": "video-transcode-lambda-handler",
+  "version": "1.0.0",
+  "description": "AWS Lambda function that pings backend API to flag a video finishing transcoding.",
+  "main": "video-transcode-done.js",
+  "workspaces": {
+    "nohoist": [
+      "**/**"
+    ]
+  },
+  "dependencies": {
+    "axios": "^0.27.2",
+    "jsonwebtoken": "^8.5.1"
+  }
+}

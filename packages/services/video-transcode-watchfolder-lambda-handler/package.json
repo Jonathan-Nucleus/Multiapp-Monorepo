@@ -1,0 +1,18 @@
+{
+  "name": "video-transcode-watchfolder-lambda-handler",
+  "version": "1.0.0",
+  "description": "AWS Lambda function triggered by S3 putItem events and creates AWS MediaConvert jobs for videos.",
+  "main": "video-transcode-watchfolder-lambda.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^8.5.1",
+    "uuid": "^8.3.2"
+  },
+  "workspaces": {
+    "nohoist": [
+      "**/**"
+    ]
+  }
+}
