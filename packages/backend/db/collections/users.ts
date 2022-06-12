@@ -81,6 +81,29 @@ export const DEFAULT_USER_OPTIONS: Pick<
   },
 };
 
+export const UNIVERSAL_INVITE_CODES = [
+  "C03A51",
+  "98E100",
+  "9FEF10",
+  "08E738",
+  "EFDC9F",
+  "56BCDF",
+  "05A1B9",
+  "24569C",
+  "9E7B41",
+  "CCD68A",
+  "D67C90",
+  "521772",
+  "A5A97A",
+  "125859",
+  "50453A",
+  "F17491",
+  "057FC5",
+  "435847",
+  "D19ACE",
+  "269038",
+];
+
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 const createUsersCollection = (
   usersCollection: Collection<User.Mongo | User.Stub>
@@ -265,11 +288,22 @@ const createUsersCollection = (
      * @returns   The new user record.
      */
     register: async (user: User.Input): Promise<User.Mongo> => {
-      const { firstName, lastName, password, inviteCode } = user;
+      const { firstName, lastName, password } = user;
+      const inviteCode = user.inviteCode.toUpperCase();
       const email = user.email.toLowerCase();
+      const isUniversalCode = UNIVERSAL_INVITE_CODES.includes(inviteCode);
 
       // Ensure user already already exists as a stub
-      const userData = await collection.find({ email });
+      const userData = isUniversalCode
+        ? ({
+            _id: new ObjectId(),
+            firstName,
+            lastName,
+            email,
+            emailToken: inviteCode,
+            role: "stub",
+          } as const)
+        : await collection.find({ email });
       if (!userData) {
         throw new NotFoundError();
       }
@@ -295,10 +329,14 @@ const createUsersCollection = (
         firstName,
         lastName,
         fullName: `${firstName} ${lastName}`,
+        inviteCode,
         ...DEFAULT_USER_OPTIONS,
       };
 
-      await usersCollection.replaceOne({ _id: userData._id }, newUser);
+      await usersCollection.replaceOne({ _id: userData._id }, newUser, {
+        upsert: true,
+      });
+
       return newUser;
     },
 
@@ -414,6 +452,10 @@ const createUsersCollection = (
      */
     verifyInvite: async (code: string): Promise<boolean> => {
       try {
+        if (UNIVERSAL_INVITE_CODES.includes(code.toUpperCase())) {
+          return true;
+        }
+
         const user = await usersCollection.findOne({
           emailToken: code,
           deletedAt: { $exists: false },

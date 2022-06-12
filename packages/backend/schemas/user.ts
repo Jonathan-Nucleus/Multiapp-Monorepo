@@ -70,6 +70,7 @@ export namespace User {
     hiddenUserIds?: ObjectId[];
     chatToken?: string;
     emailToken?: string;
+    inviteCode?: string;
     inviteeIds?: ObjectId[];
     updatedAt?: Date;
   }
