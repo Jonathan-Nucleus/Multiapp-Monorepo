@@ -38,7 +38,9 @@ async function fetchAWSCredentials(): Promise<SignatureV4Init["credentials"]> {
   console.log("AWS_CONTAINER_CREDENTIALS_RELATIVE_URI", AWS_CREDENTIALS_URI);
 
   try {
-    const response = await fetch(`https://169.254.170.2${AWS_CREDENTIALS_URI}`);
+    const response = await fetch(`http://169.254.170.2${AWS_CREDENTIALS_URI}`, {
+      timeout: 5000,
+    });
     if (!response.ok) console.log("response", response);
     const credentials = (await response.json()) as AWSCredentialsResponse;
     console.log("credentials", credentials);
