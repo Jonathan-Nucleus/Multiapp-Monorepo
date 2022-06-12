@@ -32,7 +32,7 @@ interface AWSCredentialsResponse {
   Token: string;
 }
 
-async function fetchAWSCredentials(): SignatureV4Init["credentials"] {
+async function fetchAWSCredentials(): Promise<SignatureV4Init["credentials"]> {
   const AWS_CREDENTIALS_URI =
     process.env.AWS_CONTAINER_CREDENTIALS_RELATIVE_URI;
   console.log("AWS_CONTAINER_CREDENTIALS_RELATIVE_URI", AWS_CREDENTIALS_URI);
@@ -45,7 +45,7 @@ async function fetchAWSCredentials(): SignatureV4Init["credentials"] {
     return {
       accessKeyId: credentials.AccessKeyId,
       secretAccessKey: credentials.SecretAccessKey,
-      expiration: credentials.Expiration,
+      expiration: new Date(credentials.Expiration),
       sessionToken: credentials.Token,
     };
   } catch (err) {
@@ -53,8 +53,8 @@ async function fetchAWSCredentials(): SignatureV4Init["credentials"] {
   }
 
   return {
-    accessKeyId: AWS_ACCESS_KEY_ID,
-    secretAccessKey: AWS_SECRET_ACCESS_KEY,
+    accessKeyId: AWS_ACCESS_KEY_ID ?? "",
+    secretAccessKey: AWS_SECRET_ACCESS_KEY ?? "",
   };
 }
 
