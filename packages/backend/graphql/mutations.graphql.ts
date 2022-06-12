@@ -908,7 +908,8 @@ const resolvers = {
         await db.posts.updatePostMedia(postId, mediaUrl);
 
         return true;
-      } catch {
+      } catch (err) {
+        console.log("Error updating post media:", err);
         return false;
       }
     },

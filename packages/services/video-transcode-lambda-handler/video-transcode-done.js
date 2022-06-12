@@ -1,8 +1,7 @@
 const axios = require("axios").default;
 const jwt = require("jsonwebtoken");
-const postIdIndex = 3;
+
 const requiredEnvVariables = ["BACKEND_URL", "JWT_SECRET"];
-const AWS = require("aws-sdk");
 const configurationSanityCheck = function () {
   for (let envVariableIdx in requiredEnvVariables) {
     if (!(requiredEnvVariables[envVariableIdx] in process.env)) {
@@ -21,19 +20,21 @@ exports.handler = async (event) => {
 
   let recordIdx = 0;
   const keyPath = decodeURIComponent(records[recordIdx]["s3"]["object"]["key"]);
-  const keyPathParts = keyPath.split("/");
-  const filename = keyPathParts.slice(-1)[0];
-  const postId = keyPathParts[postIdIndex];
   const API_URL = process.env.BACKEND_URL;
   const JWT_SECRET = process.env.JWT_SECRET;
 
-  const fileExtension = keyPathParts
-    .slice(-1)[0]
-    .split(".")
-    .slice(-1)[0]
-    .toLowerCase();
+  // Only send post update request if the media file matches the path
+  // posts/{userId}/{postId}/{filename} and has a valid filename extension of
+  // mp4, mov, or avi.
+  const validPath = new RegExp(
+    "posts/[a-z0-9]{24}/([a-z0-9]{24})/([\\w\\-. ]+.(?:mp4|mov|avi))",
+    "i"
+  );
 
-  if (["mp4", "mov", "avi"].includes(fileExtension)) {
+  const matchResult = keyPath.match(validPath);
+  if (matchResult !== null) {
+    const postId = matchResult[1];
+    const filename = matchResult[2];
     const payload = {
       postId: postId,
       mediaUrl: filename,
@@ -58,6 +59,8 @@ exports.handler = async (event) => {
     } catch (e) {
       console.error(e);
     }
+  } else {
+    console.log("Invalid key path for post update:", keyPath);
   }
 
   return {
