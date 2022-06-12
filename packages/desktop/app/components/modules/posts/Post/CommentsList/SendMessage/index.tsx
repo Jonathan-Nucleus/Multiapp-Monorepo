@@ -112,7 +112,7 @@ const SendMessage: FC<SendMessageProps> = ({
             <div className="flex items-center relative">
               <Input
                 placeholder={placeholder}
-                className="bg-background pl-4 pr-16 text-xs font-light !rounded-full"
+                className="bg-background pl-4 pr-12 text-xs font-light !rounded-full"
                 disabled={loading}
                 {...register("body")}
               />
@@ -123,7 +123,7 @@ const SendMessage: FC<SendMessageProps> = ({
                 >
                   <Smiley size={20} color="#00AAE0" weight="fill" />
                 </Button>
-                <Label className="cursor-pointer hover:opacity-80 ml-1">
+                <Label className="hidden cursor-pointer hover:opacity-80 ml-1">
                   <PhotoImage
                     size={20}
                     color="currentColor"

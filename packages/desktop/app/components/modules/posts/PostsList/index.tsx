@@ -2,7 +2,7 @@ import { FC, useState } from "react";
 import Post from "../Post";
 import { Post as PostType } from "shared/graphql/query/post/usePosts";
 import { PostCategory, PostRoleFilter } from "backend/graphql/posts.graphql";
-import Skeleton from "./Skeleton";
+import PostSkeleton from "desktop/app/components/modules/posts/Post/Skeleton";
 import FilterHeader from "./FilterHeader";
 import EditPostModal, { PostActionType } from "../EditPostModal";
 
@@ -25,7 +25,7 @@ const PostsList: FC<PostsListProps> = ({
   const [postAction, setPostAction] = useState<PostActionType | undefined>();
 
   if (!posts) {
-    return <Skeleton />;
+    return <PostSkeleton />;
   }
 
   console.log("Total posts", posts.length);
@@ -39,7 +39,7 @@ const PostsList: FC<PostsListProps> = ({
         />
       )}
       <div>
-        {posts.map((post, index) => (
+        {posts.map((post) => (
           <div key={post._id} className="mt-4 mb-8">
             <Post
               post={post}

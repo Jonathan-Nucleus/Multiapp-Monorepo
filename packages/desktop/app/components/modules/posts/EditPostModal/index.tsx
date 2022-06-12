@@ -140,6 +140,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
   const [visibleEmoji, setVisibleEmoji] = useState(false);
   const [linkPreview, setLinkPreview] = useState<string>();
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [uploadingPercent, setUploadingPercent] = useState<number>();
 
   const [preview, setPreview] = useState<LinkPreviewResponse>();
   const [previewLoading, setPreviewLoading] = useState(false);
@@ -338,6 +339,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
 
   useEffect(() => {
     const uploadMedia = async (file: File) => {
+      setUploadingPercent(0);
       setLoading(true);
       const { data } = await fetchUploadLink({
         variables: {
@@ -351,10 +353,30 @@ const EditPostModal: FC<EditPostModalProps> = ({
         return undefined;
       }
       const { remoteName, uploadUrl } = data.uploadLink;
-      await fetch(uploadUrl, {
-        method: "PUT",
-        body: file,
-      });
+      try {
+        await new Promise((resolver, rejecter) => {
+          const xhr = new XMLHttpRequest();
+          xhr.onload = () => {
+            if (xhr.status === 200) {
+              resolver(true);
+            } else {
+              const error = new Error(xhr.response);
+              rejecter(error);
+            }
+          };
+          xhr.onerror = (error) => {
+            rejecter(error);
+          };
+          xhr.upload.onprogress = (evt) => {
+            setUploadingPercent((evt.loaded / evt.total) * 100);
+          };
+          xhr.open("PUT", uploadUrl);
+          xhr.send(file);
+        });
+      } catch (err) {
+        console.log("Error uploading file", err);
+      }
+      setUploadingPercent(undefined);
       setLoading(false);
       return remoteName;
     };
@@ -429,6 +451,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
                     file={selectedFile}
                     postId={actionData.post?._id}
                     userId={actionData.post?.userId ?? account._id}
+                    percent={uploadingPercent}
                     onLoaded={(aspectRatio) => {
                       const media = watch("media");
                       setValue("media", { ...media, aspectRatio });
@@ -451,7 +474,11 @@ const EditPostModal: FC<EditPostModalProps> = ({
                 {actionData.type == "share" && (
                   <div className="border border-brand-overlay/[.1] rounded">
                     <div className="rounded overflow-hidden">
-                      <Post post={actionData.post} isPreview={true} />
+                      <Post
+                        post={actionData.post}
+                        isPreview={true}
+                        className="shadow-none"
+                      />
                     </div>
                   </div>
                 )}

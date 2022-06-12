@@ -5,12 +5,14 @@ import Media from "../../../../common/Media";
 import PostMedia from "../../PostMedia";
 import Button from "../../../../common/Button";
 import { XCircle } from "phosphor-react";
+import Spinner from "../../../../common/Spinner";
 
 interface MediaPreviewProps {
   media?: PostMediaType;
   file?: File;
   postId?: string;
   userId: string;
+  percent?: number;
   onLoaded: (aspectRatio: number) => void;
   onRemove: () => void;
 }
@@ -20,6 +22,7 @@ const MediaPreview: FC<MediaPreviewProps> = ({
   file,
   userId,
   postId,
+  percent,
   onLoaded,
   onRemove,
 }) => {
@@ -56,9 +59,14 @@ const MediaPreview: FC<MediaPreviewProps> = ({
                 <PostMedia userId={userId} media={media} postId={postId} />
               )}
             </>
+            {percent != undefined && (
+              <div className="absolute inset-0 bg-black/[.87] flex items-center justify-center">
+                <Spinner indeterminate={false} percent={percent} size={40} />
+              </div>
+            )}
             <Button
               variant="text"
-              className="absolute top-2 right-1 py-0"
+              className="!absolute top-2 right-1 py-0"
               onClick={onRemove}
             >
               <XCircle size={32} color="#5F5F5F" weight="fill" />

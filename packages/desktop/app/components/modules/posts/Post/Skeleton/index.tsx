@@ -1,5 +1,5 @@
 import { FC } from "react";
-import Card from "../../../../common/Card";
+import Card from "desktop/app/components/common/Card";
 
 const Skeleton: FC = () => {
   return (

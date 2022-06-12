@@ -106,7 +106,11 @@ const PostBody: FC<PostBodyProps> = ({
       )}
       {post.sharedPost && (
         <div className="border border-brand-overlay/[.1] rounded overflow-hidden mx-4 mt-4">
-          <Post post={post.sharedPost} isPreview={true} />
+          <Post
+            post={post.sharedPost}
+            isPreview={true}
+            className="shadow-none"
+          />
         </div>
       )}
       {!isPreview && (
