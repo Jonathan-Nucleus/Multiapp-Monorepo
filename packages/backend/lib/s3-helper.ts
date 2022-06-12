@@ -5,8 +5,10 @@ import {
 } from "@aws-sdk/client-s3";
 import { HttpRequest } from "@aws-sdk/protocol-http";
 import { parseUrl } from "@aws-sdk/url-parser";
+import fetch from "node-fetch";
 import { Hash } from "@aws-sdk/hash-node";
 import { S3RequestPresigner } from "@aws-sdk/s3-request-presigner";
+import type { SignatureV4Init } from "@aws-sdk/signature-v4";
 import { v4 as uuid } from "uuid";
 import { formatUrl } from "@aws-sdk/util-format-url";
 
@@ -22,6 +24,40 @@ const S3_BUCKET = process.env.S3_BUCKET;
 
 const VIDEO_EXTS = ["mp4", "mov", "avi"];
 
+interface AWSCredentialsResponse {
+  AccessKeyId: string;
+  Expiration: string;
+  RoleArn: string;
+  SecretAccessKey: string;
+  Token: string;
+}
+
+async function fetchAWSCredentials(): SignatureV4Init["credentials"] {
+  const AWS_CREDENTIALS_URI =
+    process.env.AWS_CONTAINER_CREDENTIALS_RELATIVE_URI;
+  console.log("AWS_CONTAINER_CREDENTIALS_RELATIVE_URI", AWS_CREDENTIALS_URI);
+
+  try {
+    const response = await fetch(`169.254.170.2${AWS_CREDENTIALS_URI}`);
+    if (!response.ok) console.log("response", response);
+    const credentials = (await response.json()) as AWSCredentialsResponse;
+    console.log("credentials", credentials);
+    return {
+      accessKeyId: credentials.AccessKeyId,
+      secretAccessKey: credentials.SecretAccessKey,
+      expiration: credentials.Expiration,
+      sessionToken: credentials.Token,
+    };
+  } catch (err) {
+    console.log("Error fetching AWS credentials", err);
+  }
+
+  return {
+    accessKeyId: AWS_ACCESS_KEY_ID,
+    secretAccessKey: AWS_SECRET_ACCESS_KEY,
+  };
+}
+
 export interface RemoteUpload {
   remoteName: string;
   uploadUrl: string;
@@ -32,12 +68,10 @@ export async function getUploadUrl(
   type: "avatar" | "post" | "background" | "fund",
   id: string
 ): Promise<RemoteUpload> {
-  if (
-    !AWS_UPLOAD_REGION ||
-    !AWS_ACCESS_KEY_ID ||
-    !AWS_SECRET_ACCESS_KEY ||
-    !MRAP_ENDPOINT
-  ) {
+  // Attempt to first fetch AWS credentials from the local container credentials
+  // endpoint
+
+  if (!AWS_UPLOAD_REGION || !MRAP_ENDPOINT) {
     throw new InternalServerError("Missing AWS configuration");
   }
 
@@ -48,20 +82,16 @@ export async function getUploadUrl(
   }${type}s/${id}/${remoteFilename}`;
 
   try {
+    const credentials = await fetchAWSCredentials();
     const presigner = new S3RequestPresigner({
-      credentials: {
-        accessKeyId: AWS_ACCESS_KEY_ID,
-        secretAccessKey: AWS_SECRET_ACCESS_KEY,
-      },
+      credentials,
       region: AWS_UPLOAD_REGION,
       sha256: Hash.bind(null, "sha256"),
     });
     const objectUrl = `https://${MRAP_ENDPOINT}.accesspoint.s3-global.amazonaws.com/${remoteKey}`;
     const presignedUrl = await presigner.presign(
       new HttpRequest({ ...parseUrl(objectUrl), method: "PUT" }),
-      {
-        expiresIn: 60,
-      }
+      { expiresIn: 60 }
     );
     const url = formatUrl(presignedUrl);
     return {
