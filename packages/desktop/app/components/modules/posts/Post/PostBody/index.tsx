@@ -89,9 +89,9 @@ const PostBody: FC<PostBodyProps> = ({
             <span key={index}>{element}</span>
           ))}
         </div>
-        {previewLink && !post.media && !post.sharedPost && (
+        {post.preview && !post.media && !post.sharedPost && (
           <div className="my-4">
-            <LinkPreview link={previewLink} />
+            <LinkPreview previewData={post.preview} />
           </div>
         )}
       </div>

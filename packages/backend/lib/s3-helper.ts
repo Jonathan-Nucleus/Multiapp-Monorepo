@@ -1,19 +1,24 @@
 import {
   S3Client,
-  PutObjectCommand,
   CopyObjectCommand,
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { HttpRequest } from "@aws-sdk/protocol-http";
+import { parseUrl } from "@aws-sdk/url-parser";
+import { Hash } from "@aws-sdk/hash-node";
+import { S3RequestPresigner } from "@aws-sdk/s3-request-presigner";
 import { v4 as uuid } from "uuid";
+import { formatUrl } from "@aws-sdk/util-format-url";
 
 import { InternalServerError } from "./validate";
 
 import "dotenv/config";
 
+const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID;
+const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY;
 const AWS_UPLOAD_REGION = process.env.AWS_REGION;
-const S3_BUCKET = process.env.AWS_S3_BUCKET;
-const S3_MEDIA_UPLOAD_BUCKET = process.env.S3_MEDIA_UPLOAD_BUCKET;
+const MRAP_ENDPOINT = process.env.MRAP_ENDPOINT;
+const S3_BUCKET = process.env.S3_BUCKET;
 
 const VIDEO_EXTS = ["mp4", "mov", "avi"];
 
@@ -27,23 +32,38 @@ export async function getUploadUrl(
   type: "avatar" | "post" | "background" | "fund",
   id: string
 ): Promise<RemoteUpload> {
-  if (!AWS_UPLOAD_REGION || !S3_BUCKET || !S3_MEDIA_UPLOAD_BUCKET) {
+  if (
+    !AWS_UPLOAD_REGION ||
+    !AWS_ACCESS_KEY_ID ||
+    !AWS_SECRET_ACCESS_KEY ||
+    !MRAP_ENDPOINT
+  ) {
     throw new InternalServerError("Missing AWS configuration");
   }
 
   const remoteFilename = `${uuid()}.${fileExt}`;
-  const remoteKey = `${type}s/${id}/${remoteFilename}`;
-
-  const client = new S3Client({
-    region: AWS_UPLOAD_REGION,
-  });
-  const command = new PutObjectCommand({
-    Bucket: type === "post" ? S3_MEDIA_UPLOAD_BUCKET : S3_BUCKET,
-    Key: remoteKey,
-  });
+  const isVideo = VIDEO_EXTS.some((ext) => fileExt === ext);
+  const remoteKey = `${
+    isVideo ? "uploads/" : ""
+  }${type}s/${id}/${remoteFilename}`;
 
   try {
-    const url = await getSignedUrl(client, command, { expiresIn: 60 });
+    const presigner = new S3RequestPresigner({
+      credentials: {
+        accessKeyId: AWS_ACCESS_KEY_ID,
+        secretAccessKey: AWS_SECRET_ACCESS_KEY,
+      },
+      region: AWS_UPLOAD_REGION,
+      sha256: Hash.bind(null, "sha256"),
+    });
+    const objectUrl = `https://${MRAP_ENDPOINT}.accesspoint.s3-global.amazonaws.com/${remoteKey}`;
+    const presignedUrl = await presigner.presign(
+      new HttpRequest({ ...parseUrl(objectUrl), method: "PUT" }),
+      {
+        expiresIn: 60,
+      }
+    );
+    const url = formatUrl(presignedUrl);
     return {
       remoteName: remoteFilename,
       uploadUrl: url,
@@ -71,29 +91,30 @@ export async function movePostMedia(
     };
   }
 
-  if (!AWS_UPLOAD_REGION || !S3_BUCKET || !S3_MEDIA_UPLOAD_BUCKET) {
+  if (!AWS_UPLOAD_REGION || !S3_BUCKET) {
     throw new InternalServerError("Missing AWS configuration");
   }
 
-  const originalKey = `posts/${userId}/${filename}`;
-  const newKey = `posts/${userId}/${postId}/${filename}`;
   const isVideo = VIDEO_EXTS.some((ext) =>
     filename.toLowerCase().trim().endsWith(ext)
   );
-  const destinationBucket = isVideo ? S3_MEDIA_UPLOAD_BUCKET : S3_BUCKET;
+  const originalKey = `${isVideo ? "uploads/" : ""}posts/${userId}/${filename}`;
+  const newKey = `${
+    isVideo ? "uploads/" : ""
+  }posts/${userId}/${postId}/${filename}`;
 
   const client = new S3Client({
     region: AWS_UPLOAD_REGION,
   });
 
-  const copySource = `${S3_MEDIA_UPLOAD_BUCKET}/${originalKey}`;
+  const copySource = `${S3_BUCKET}/${originalKey}`;
   const copyCommand = new CopyObjectCommand({
-    Bucket: destinationBucket,
+    Bucket: S3_BUCKET,
     CopySource: copySource,
     Key: newKey,
   });
   const deleteCommand = new DeleteObjectCommand({
-    Bucket: S3_MEDIA_UPLOAD_BUCKET,
+    Bucket: S3_BUCKET,
     Key: originalKey,
   });
 
@@ -102,18 +123,15 @@ export async function movePostMedia(
       "Copying asset from",
       copySource,
       "to",
-      `${destinationBucket}/${newKey}`
+      `${S3_BUCKET}/${newKey}`
     );
     await client.send(copyCommand);
-    console.log(
-      "Deleting asset at",
-      `${S3_MEDIA_UPLOAD_BUCKET}/${originalKey}`
-    );
+    console.log("Deleting asset at", `${S3_BUCKET}/${originalKey}`);
     await client.send(deleteCommand);
 
     return {
       success: true,
-      mediaReady: destinationBucket === S3_BUCKET,
+      mediaReady: !isVideo,
     };
   } catch (err) {
     console.error(err);

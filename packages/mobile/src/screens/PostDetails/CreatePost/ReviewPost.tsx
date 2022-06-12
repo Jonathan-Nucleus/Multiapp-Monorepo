@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 
 import UserSvg from 'shared/assets/images/user.svg';
@@ -6,11 +6,11 @@ import GlobalSvg from 'shared/assets/images/global.svg';
 import Avatar from 'mobile/src/components/common/Avatar';
 import Tag from 'mobile/src/components/common/Tag';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
+import PreviewLink from 'mobile/src/components/common/PreviewLink';
 import { showMessage } from 'mobile/src/services/utils';
 import pStyles from 'mobile/src/theme/pStyles';
 import { WHITE, PRIMARY } from 'shared/src/colors';
 
-import PreviewLink from './PreviewLink';
 import PostSelection from './PostSelection';
 import PostHeader from './PostHeader';
 import { PostMedia } from 'mobile/src/components/common/Media';
@@ -19,6 +19,10 @@ import { AUDIENCE_OPTIONS } from './index';
 import { useAccountContext } from 'shared/context/Account';
 import { useCreatePost, PostCategories } from 'shared/graphql/mutation/posts';
 import { useEditPost } from 'shared/graphql/mutation/posts/useEditPost';
+import {
+  useLinkPreview,
+  LinkPreview,
+} from 'shared/graphql/query/post/useLinkPreview';
 import { processPost } from 'shared/src/patterns';
 
 import { ReviewPostScreen } from 'mobile/src/navigations/PostDetailsStack';
@@ -38,7 +42,27 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
   const account = useAccountContext();
   const [createPost] = useCreatePost();
   const [editPost] = useEditPost();
+  const [fetchPreviewData] = useLinkPreview();
+  const [previewData, setPreviewData] = useState<LinkPreview>();
   const isSubmitted = useRef(false);
+
+  useEffect(() => {
+    const getData = async (): Promise<void> => {
+      if (!body) {
+        return;
+      }
+
+      const { data } = await fetchPreviewData({
+        variables: {
+          body,
+        },
+      });
+
+      setPreviewData(data?.linkPreview ?? undefined);
+    };
+
+    getData();
+  }, [body, fetchPreviewData]);
 
   const handleSubmit = async (): Promise<void> => {
     if (isSubmitted.current) {
@@ -59,6 +83,14 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
       mentionIds,
     };
 
+    const preview = previewData as LinkPreview & {
+      __typename?: string;
+    };
+
+    if (preview) {
+      delete preview.__typename;
+    }
+
     try {
       if (postData._id) {
         const result = await editPost({
@@ -66,6 +98,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
             post: {
               _id: postData._id.toString(),
               userId,
+              preview,
               ...finalPostData,
             },
           },
@@ -81,6 +114,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
             post: {
               ...finalPostData,
               ...(userId !== account._id ? { companyId: userId } : {}),
+              preview,
             },
           },
         });
@@ -176,8 +210,8 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
             />
           </View>
         ) : null}
-        {!localMediaPath && !route.params?.media?.url && (
-          <PreviewLink body={body ?? ''} />
+        {!localMediaPath && !route.params?.media?.url && previewData && (
+          <PreviewLink previewData={previewData} />
         )}
         {categories && categories.length > 0 && (
           <View style={styles.tagContainer}>

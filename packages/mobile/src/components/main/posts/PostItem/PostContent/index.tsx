@@ -6,6 +6,7 @@ import { DotsThreeVertical } from 'phosphor-react-native';
 import UserInfo from 'mobile/src/components/common/UserInfo';
 import { PostMedia } from 'mobile/src/components/common/Media';
 import PBodyText from 'mobile/src/components/common/PBodyText';
+import PreviewLink from 'mobile/src/components/common/PreviewLink';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 import pStyles from 'mobile/src/theme/pStyles';
 import { WHITE60 } from 'shared/src/colors';
@@ -29,7 +30,7 @@ const PostContent: React.FC<PostContentProps> = ({
   hideMenu = false,
   sharedBy,
 }) => {
-  const { user, company, body, media } = post;
+  const { user, company, body, media, preview } = post;
 
   const { data: { account } = {} } = useAccount({ fetchPolicy: 'cache-only' });
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -98,12 +99,7 @@ const PostContent: React.FC<PostContentProps> = ({
         )}
       </View>
       <View style={styles.contentPadding}>
-        <PBodyText
-          body={body}
-          hideLinkPreview={!!media}
-          collapseLongText={true}
-          style={styles.body}
-        />
+        <PBodyText body={body} collapseLongText={true} style={styles.body} />
         {media ? (
           <PostMedia
             userId={post.userId}
@@ -111,6 +107,8 @@ const PostContent: React.FC<PostContentProps> = ({
             media={media}
             style={styles.media}
           />
+        ) : preview ? (
+          <PreviewLink previewData={preview} />
         ) : null}
         {post.sharedPost && (
           <View style={styles.sharedPostContainer}>

@@ -42,8 +42,9 @@ const Login: LoginScreen = ({ navigation }) => {
   const [error, setError] = useState(false);
   const [login] = useMutation(LOGIN);
   const [loginOAuth] = useLoginOAuth();
+  const [loading, setLoading] = useState(false);
 
-  const saveAuthToken = async (token: string) => {
+  const saveAuthToken = async (token: string): Promise<void> => {
     await setToken(token);
     navigation.dispatch(
       CommonActions.reset({
@@ -55,7 +56,10 @@ const Login: LoginScreen = ({ navigation }) => {
 
   const handleNextPage = async (): Promise<void> => {
     Keyboard.dismiss();
+
+    setLoading(true);
     setError(false);
+
     try {
       const { data } = await login({
         variables: {
@@ -71,6 +75,8 @@ const Login: LoginScreen = ({ navigation }) => {
       setError(true);
       console.error('login error', e);
     }
+
+    setLoading(false);
   };
 
   const googleLogin = async (): Promise<void> => {
@@ -159,6 +165,7 @@ const Login: LoginScreen = ({ navigation }) => {
           label="log in"
           btnContainer={styles.btnContainer}
           onPress={handleNextPage}
+          isLoading={loading}
         />
         <PTextLine title="LOG IN WITH" containerStyle={styles.bottom} />
         <View style={styles.row}>

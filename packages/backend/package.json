@@ -18,6 +18,8 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.67.0",
     "@aws-sdk/s3-request-presigner": "^3.67.0",
+    "@aws-sdk/signature-v4": "^3.78.0",
+    "@aws-sdk/url-parser": "^3.78.0",
     "apollo-server": "3.8.0",
     "apollo-server-errors": "^3.3.1",
     "aws-sdk": "^2.1108.0",
@@ -29,6 +31,7 @@
     "google-auth-library": "^7.14.1",
     "graphql": "^16.3.0",
     "jsonwebtoken": "^8.5.1",
+    "link-preview-js": "^2.1.15",
     "lodash": "^4.17.21",
     "mongodb": "^4.4.1",
     "stream-chat": "^6.5.1",

@@ -1,39 +1,19 @@
 import React, { useState } from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  Pressable,
-  FlatList,
-  ListRenderItem,
-} from 'react-native';
-import { Buildings, UserCircle, Users } from 'phosphor-react-native';
+import { StyleSheet, View, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import PLabel from 'mobile/src/components/common/PLabel';
-import CheckboxLabel from 'mobile/src/components/common/CheckboxLabel';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import AccreditationHeader from './AccreditationHeader';
 import { showMessage } from 'mobile/src/services/utils';
 import pStyles from 'mobile/src/theme/pStyles';
-import { Body1Bold, Body2, Body2Bold, H6Bold } from 'mobile/src/theme/fonts';
-import {
-  BGDARK,
-  BLACK,
-  GRAY100,
-  PRIMARYSOLID,
-  PRIMARYSOLID7,
-  WHITE,
-  WHITE60,
-} from 'shared/src/colors';
+import { Body1Bold, H6Bold } from 'mobile/src/theme/fonts';
+import { BLACK, GRAY100, WHITE, WHITE60 } from 'shared/src/colors';
 
 import { useSaveQuestionnaire } from 'shared/graphql/mutation/account/useSaveQuestionnaire';
 import {
-  FinancialStatusOptions,
   AdvancedFinancialStatusData,
   FinancialStatus,
-  InvestorClass,
 } from 'backend/graphql/enumerations.graphql';
 import { SOMETHING_WRONG } from 'shared/src/constants';
 
@@ -43,7 +23,7 @@ const IndividualAdvancedStatus: IndividualAdvancedStatusScreen = ({
   navigation,
   route,
 }) => {
-  const { investorClass, baseStatus } = route.params;
+  const { ackCRS, investorClass, baseStatus } = route.params;
   const [selected, setSelected] = useState<
     Partial<Record<FinancialStatus, boolean>>
   >({});
@@ -56,14 +36,14 @@ const IndividualAdvancedStatus: IndividualAdvancedStatusScreen = ({
     setSelected(newSelection);
   };
 
-  const onSubmit = async () => {
+  const onSubmit = async (): Promise<void> => {
     const trueValues: FinancialStatus[] = [];
     Object.entries(selected).forEach(
       ([key, value]) => value && trueValues.push(key as FinancialStatus),
     );
 
     try {
-      const { data } = await saveQuestionnaire({
+      const { data: questionnaireData } = await saveQuestionnaire({
         variables: {
           questionnaire: {
             class: investorClass,
@@ -73,9 +53,10 @@ const IndividualAdvancedStatus: IndividualAdvancedStatusScreen = ({
         },
       });
 
-      data?.saveQuestionnaire?.accreditation
+      questionnaireData?.saveQuestionnaire?.accreditation
         ? navigation.push('AccreditationResult', {
-            accreditation: data.saveQuestionnaire.accreditation,
+            ackCRS,
+            accreditation: questionnaireData.saveQuestionnaire.accreditation,
             baseStatus,
             investorClass,
           })
@@ -85,7 +66,7 @@ const IndividualAdvancedStatus: IndividualAdvancedStatusScreen = ({
     }
   };
 
-  const goBack = () => navigation.goBack();
+  const goBack = (): void => navigation.goBack();
 
   return (
     <View style={pStyles.globalContainer}>
@@ -102,7 +83,7 @@ To find out if you qualify, complete the short questionnaire below.`}
           textStyle={styles.descriptionLabel}
         />
         <View style={styles.financialListContainer}>
-          {data.map((item, index) => {
+          {data.map((item) => {
             const isSelected = selected[item.value];
             return (
               <View key={item.value}>
@@ -180,14 +161,6 @@ const styles = StyleSheet.create({
     ...Body1Bold,
     marginBottom: 8,
     marginTop: 16,
-  },
-  greyButton: {
-    backgroundColor: BGDARK,
-    borderRadius: 7,
-    height: 48,
-    marginVertical: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   selectionContainer: {
     flexDirection: 'row',

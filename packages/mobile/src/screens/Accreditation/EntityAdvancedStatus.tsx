@@ -36,13 +36,13 @@ const EntityAdvancedStatus: EntityAdvancedStatusScreen = ({
   navigation,
   route,
 }) => {
-  const { investorClass, baseStatus } = route.params;
+  const { ackCRS, investorClass, baseStatus } = route.params;
   const [selected, setSelected] = useState<FinancialStatus[]>([]);
   const [saveQuestionnaire] = useSaveQuestionnaire();
 
   const data = AdvancedFinancialStatusData[investorClass];
   const handleChange = (categoryIndex: number): void => {
-    let newSelection = [...selected];
+    const newSelection = [...selected];
 
     const index = newSelection.indexOf(data[categoryIndex].value);
     index >= 0
@@ -52,9 +52,9 @@ const EntityAdvancedStatus: EntityAdvancedStatusScreen = ({
     setSelected(newSelection);
   };
 
-  const onSubmit = async () => {
+  const onSubmit = async (): Promise<void> => {
     try {
-      const { data } = await saveQuestionnaire({
+      const { data: questionnaireData } = await saveQuestionnaire({
         variables: {
           questionnaire: {
             class: investorClass,
@@ -64,9 +64,10 @@ const EntityAdvancedStatus: EntityAdvancedStatusScreen = ({
         },
       });
 
-      data?.saveQuestionnaire?.accreditation
+      questionnaireData?.saveQuestionnaire?.accreditation
         ? navigation.push('AccreditationResult', {
-            accreditation: data.saveQuestionnaire.accreditation,
+            ackCRS,
+            accreditation: questionnaireData.saveQuestionnaire.accreditation,
             baseStatus,
             investorClass,
           })
@@ -76,7 +77,7 @@ const EntityAdvancedStatus: EntityAdvancedStatusScreen = ({
     }
   };
 
-  const goBack = () => navigation.goBack();
+  const goBack = (): void => navigation.goBack();
 
   return (
     <View style={pStyles.globalContainer}>

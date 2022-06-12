@@ -15,6 +15,7 @@ import Avatar from "desktop/app/components/common/Avatar";
 import Button from "desktop/app/components/common/Button";
 import Input from "desktop/app/components/common/Input";
 import Label from "desktop/app/components/common/Label";
+import Spinner from "desktop/app/components/common/Spinner";
 
 import { DefaultValues, SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -41,6 +42,11 @@ import { getInitials } from "../../../../lib/utilities";
 import { useSharePost } from "shared/graphql/mutation/posts/useSharePost";
 import Dropdown from "../../../common/Dropdown";
 import Post from "../Post";
+
+import {
+  useLinkPreview,
+  LinkPreview as LinkPreviewResponse,
+} from "shared/graphql/query/post/useLinkPreview";
 
 const audienceOptions = Object.keys(AudienceOptions).map((key) => {
   if (key == "EVERYONE") {
@@ -134,6 +140,11 @@ const EditPostModal: FC<EditPostModalProps> = ({
   const [visibleEmoji, setVisibleEmoji] = useState(false);
   const [linkPreview, setLinkPreview] = useState<string>();
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  const [preview, setPreview] = useState<LinkPreviewResponse>();
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [fetchLinkPreview] = useLinkPreview();
+
   useEffect(() => {
     // Should focus textarea automatically when component mounted.
     // currently we are using setTimeout since focus() method does not work
@@ -162,22 +173,36 @@ const EditPostModal: FC<EditPostModalProps> = ({
       : [];
   const suggestionsContainer = useRef<HTMLDivElement>(null);
   const changeCallback = useRef(
-    _.debounce((body: string | undefined) => {
+    _.debounce(async (body: string | undefined) => {
       if (!body) {
         setLinkPreview(undefined);
+        setPreview(undefined);
         return;
       }
+
       const result = body.matchAll(LINK_PATTERN);
       const matches = Array.from(result);
       if (matches.length > 0) {
         const validLink = matches
           .map((match) => match[0])
           .find((link) => isWebLink(link));
+
         if (validLink && validLink != linkPreview) {
-          setLinkPreview(hrefFromLink(validLink));
+          setPreviewLoading(true);
+          const link = hrefFromLink(validLink);
+          const { data } = await fetchLinkPreview({
+            variables: {
+              body: link,
+            },
+          });
+
+          setLinkPreview(link);
+          setPreview(data?.linkPreview ?? undefined);
+          setPreviewLoading(false);
         }
       } else {
         setLinkPreview(undefined);
+        setPreview(undefined);
       }
     }, 500)
   ).current;
@@ -264,6 +289,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
               audience,
               categories,
               media,
+              preview,
               body: mentionInput.body,
               mentionIds: mentionInput.mentions?.map((mention) => mention.id),
               ...(user != account?._id ? { companyId: user } : {}),
@@ -283,6 +309,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
               audience,
               categories,
               media,
+              preview,
               body: mentionInput.body,
               mentionIds: mentionInput.mentions?.map((mention) => mention.id),
             },
@@ -412,14 +439,15 @@ const EditPostModal: FC<EditPostModalProps> = ({
                     }}
                   />
                 )}
-                {actionData.type != "share" &&
-                  linkPreview &&
-                  !watch("media") &&
-                  !selectedFile && (
-                    <div className="my-2">
-                      <LinkPreview link={linkPreview} />
-                    </div>
-                  )}
+                {actionData.type !== "share" && preview && !selectedFile && (
+                  <div className="my-2 w-100 aspect-video">
+                    {previewLoading ? (
+                      <Spinner />
+                    ) : (
+                      <LinkPreview previewData={preview} />
+                    )}
+                  </div>
+                )}
                 {actionData.type == "share" && (
                   <div className="border border-brand-overlay/[.1] rounded">
                     <div className="rounded overflow-hidden">

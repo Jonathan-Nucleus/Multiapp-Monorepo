@@ -18,6 +18,7 @@ export namespace Post {
     audience: Audience;
     body?: string;
     media?: Media;
+    preview?: LinkPreview;
     mentionIds?: ObjectId[];
     categories: PostCategory[];
     likeIds?: ObjectId[];
@@ -49,7 +50,10 @@ export namespace Post {
 
   // Defines the server-side input schema for posts after GraphQL enumarations
   // have been transformed to their Mongo types.
-  export type Input = Pick<GraphQL, "body" | "media" | "mentionIds"> &
+  export type Input = Pick<
+    GraphQL,
+    "body" | "media" | "preview" | "mentionIds"
+  > &
     Pick<Mongo, "audience" | "categories"> & {
       companyId?: string;
     };
@@ -59,7 +63,7 @@ export namespace Post {
 
   export type Update = Pick<
     GraphQL,
-    "_id" | "body" | "mentionIds" | "media" | "userId"
+    "_id" | "body" | "mentionIds" | "media" | "preview" | "userId"
   > &
     Pick<Mongo, "audience" | "categories">;
 }
@@ -68,6 +72,17 @@ interface Media {
   url: string;
   aspectRatio: number;
   transcoded?: boolean;
+}
+
+interface LinkPreview {
+  url: string;
+  mediaType: string;
+  contentType?: string;
+  favicons?: string[];
+  title?: string;
+  siteName?: string;
+  description?: string;
+  images?: string[];
 }
 
 /** Enumeration describing the audience targeted by a post. */
@@ -206,6 +221,7 @@ export const PostSchema = `
     audience: Audience!
     body: String
     media: Media
+    preview: LinkPreview
     mentionIds: [ID!]
     categories: [PostCategory!]!
     likeIds: [ID!]
@@ -241,6 +257,7 @@ export const PostSchema = `
     audience: Audience!
     body: String
     media: MediaInput
+    preview: LinkPreviewInput
     categories: [PostCategory!]!
     mentionIds: [ID!]
   }
@@ -251,6 +268,7 @@ export const PostSchema = `
     audience: Audience!
     body: String
     media: MediaInput
+    preview: LinkPreviewInput
     categories: [PostCategory!]!
     mentionIds: [ID!]
   }
@@ -259,6 +277,28 @@ export const PostSchema = `
     companyId: ID
     body: String!
     mentionIds: [ID!]
+  }
+
+  type LinkPreview {
+    url: String!
+    mediaType: String!
+    contentType: String
+    favicons: [String!]
+    title: String
+    siteName: String
+    description: String
+    images: [String!]
+  }
+
+  input LinkPreviewInput {
+    url: String!
+    mediaType: String!
+    contentType: String
+    favicons: [String!]
+    title: String
+    siteName: String
+    description: String
+    images: [String!]
   }
 
   enum Audience {

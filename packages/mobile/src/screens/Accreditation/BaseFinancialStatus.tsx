@@ -1,30 +1,18 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, Pressable } from 'react-native';
-import { Buildings, UserCircle, Users } from 'phosphor-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import PLabel from 'mobile/src/components/common/PLabel';
 import CheckboxLabel from 'mobile/src/components/common/CheckboxLabel';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import AccreditationHeader from './AccreditationHeader';
 import pStyles from 'mobile/src/theme/pStyles';
-import { Body1Bold, Body2, Body2Bold, H6Bold } from 'mobile/src/theme/fonts';
-import {
-  BGDARK300,
-  BLACK,
-  GRAY100,
-  PRIMARYSOLID,
-  PRIMARYSOLID7,
-  WHITE,
-  WHITE60,
-} from 'shared/src/colors';
+import { Body2, Body2Bold, H6Bold } from 'mobile/src/theme/fonts';
+import { BGDARK300, GRAY100 } from 'shared/src/colors';
 
 import {
-  FinancialStatusOptions,
   BaseFinancialStatusData,
   FinancialStatus,
-  InvestorClass,
 } from 'backend/graphql/enumerations.graphql';
 
 import { BaseFinancialStatusScreen } from 'mobile/src/navigations/AccreditationStack';
@@ -33,12 +21,12 @@ const BaseFinancialStatus: BaseFinancialStatusScreen = ({
   navigation,
   route,
 }) => {
-  const { investorClass } = route.params;
+  const { investorClass, ackCRS } = route.params;
   const [selected, setSelected] = useState<FinancialStatus[]>([]);
 
   const data = BaseFinancialStatusData[investorClass];
   const handleChange = (categoryIndex: number): void => {
-    let newSelection = [...selected];
+    const newSelection = [...selected];
 
     const index = newSelection.indexOf(data[categoryIndex].value);
     index >= 0
@@ -48,7 +36,7 @@ const BaseFinancialStatus: BaseFinancialStatusScreen = ({
     setSelected(newSelection);
   };
 
-  const onSubmit = () => {
+  const onSubmit = (): void => {
     const accreditation = selected.length === 0 ? 'NONE' : 'ACCREDITED';
     const nextRoute =
       accreditation === 'NONE'
@@ -58,6 +46,7 @@ const BaseFinancialStatus: BaseFinancialStatusScreen = ({
         : 'EntityAdvancedStatus';
 
     navigation.navigate('AccreditationResult', {
+      ackCRS,
       investorClass,
       baseStatus: selected,
       accreditation,
@@ -65,7 +54,7 @@ const BaseFinancialStatus: BaseFinancialStatusScreen = ({
     });
   };
 
-  const goBack = () => navigation.goBack();
+  const goBack = (): void => navigation.goBack();
 
   return (
     <View style={pStyles.globalContainer}>

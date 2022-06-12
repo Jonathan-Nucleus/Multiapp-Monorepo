@@ -23,7 +23,6 @@ import {
   VideoCamera,
   Image as GalleryImage,
 } from 'phosphor-react-native';
-const Buffer = global.Buffer || require('buffer').Buffer;
 
 import UserSvg from 'shared/assets/images/user.svg';
 import GlobalSvg from 'shared/assets/images/global.svg';
@@ -36,6 +35,7 @@ import PLabel from 'mobile/src/components/common/PLabel';
 import IconButton from 'mobile/src/components/common/IconButton';
 import PModal from 'mobile/src/components/common/PModal';
 import RoundIcon from 'mobile/src/components/common/RoundIcon';
+import PreviewLink from 'mobile/src/components/common/PreviewLink';
 import { PostMedia } from 'mobile/src/components/common/Media';
 import { showMessage } from 'mobile/src/services/utils';
 import pStyles from 'mobile/src/theme/pStyles';
@@ -57,15 +57,19 @@ import {
 } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import {
+  useLinkPreview,
+  LinkPreview,
+} from 'shared/graphql/query/post/useLinkPreview';
 import { useFetchUploadLink } from 'shared/graphql/mutation/posts';
 import { useAccountContext } from 'shared/context/Account';
+import { LINK_PATTERN } from 'shared/src/patterns';
 
 import type { Audience } from 'shared/graphql/query/post/usePosts';
 import { Audiences } from 'backend/graphql/enumerations.graphql';
 
 import PostHeader from './PostHeader';
 import PostSelection from './PostSelection';
-import PreviewLink from './PreviewLink';
 import ExpandingInput, {
   User,
   OnSelectUser,
@@ -74,7 +78,7 @@ import MentionsList from 'mobile/src/components/main/MentionsList';
 
 import { CreatePostScreen } from 'mobile/src/navigations/PostDetailsStack';
 
-const RadioBodyView = (props: any) => {
+const RadioBodyView = (props: any): React.ReactElement => {
   const { icon, label } = props;
   return (
     <View style={styles.radioBodyWrapper}>
@@ -172,7 +176,9 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
 
   const account = useAccountContext();
   const [fetchUploadLink] = useFetchUploadLink();
+  const [fetchPreviewData] = useLinkPreview();
 
+  const [previewData, setPreviewData] = useState<LinkPreview>();
   const [keyboardShowing, setKeyboardShowing] = useState(false);
   const [postAsModalVisible, setPostAsModalVisible] = useState(false);
   const [audienceModalVisible, setAudienceModalVisible] = useState(false);
@@ -242,6 +248,28 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     control,
   });
   const watchBody = watch('body', '');
+  const previewExists = !!previewData;
+  useEffect(() => {
+    const getData = async (): Promise<void> => {
+      if (!watchBody) {
+        return;
+      }
+
+      const { data } = await fetchPreviewData({
+        variables: {
+          body: watchBody,
+        },
+      });
+
+      setPreviewData(data?.linkPreview ?? undefined);
+    };
+
+    if (watchBody?.match(LINK_PATTERN)) {
+      getData();
+    } else if (previewExists) {
+      setPreviewData(undefined);
+    }
+  }, [watchBody, fetchPreviewData, previewExists]);
 
   const onSubmit = (values: FormValues): void => {
     if (!account) {
@@ -296,7 +324,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
 
   const uploadImage = async (image: ImageOrVideo): Promise<void> => {
     setUploading(true);
-    const fileUri = image.sourceURL ?? image.path;
+    const fileUri = image.path;
 
     const filename = fileUri.substring(fileUri.lastIndexOf('/') + 1);
     const { data } = await fetchUploadLink({
@@ -553,9 +581,10 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
                   {watchBody &&
                   !uploading &&
                   !imageData &&
-                  !post?.media?.url ? (
+                  !post?.media?.url &&
+                  previewData ? (
                     <PreviewLink
-                      body={watchBody}
+                      previewData={previewData}
                       containerStyle={styles.attachment}
                     />
                   ) : null}

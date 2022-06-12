@@ -1,18 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { StyleSheet, View, Text, Pressable } from 'react-native';
 import { PhoneCall, Envelope } from 'phosphor-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import {
-  useForm,
-  FieldValues,
-  DefaultValues,
-  Controller,
-} from 'react-hook-form';
+import { useForm, Controller, DefaultValues } from 'react-hook-form';
 import 'yup-phone';
 
-import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import PLabel from 'mobile/src/components/common/PLabel';
 import PTextInput from 'mobile/src/components/common/PTextInput';
 import SegmentedInput from 'mobile/src/components/common/SegmentedInput';
@@ -20,23 +14,8 @@ import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import AccreditationHeader from './AccreditationHeader';
 import { showMessage } from 'mobile/src/services/utils';
 import pStyles from 'mobile/src/theme/pStyles';
-import {
-  Body1Bold,
-  Body2,
-  Body2Medium,
-  Body2Bold,
-  H6Bold,
-} from 'mobile/src/theme/fonts';
-import {
-  BGDARK,
-  BLACK,
-  GRAY100,
-  GRAY600,
-  PRIMARYSOLID,
-  PRIMARYSOLID7,
-  WHITE,
-  WHITE60,
-} from 'shared/src/colors';
+import { Body1Bold, Body2Bold, H6Bold } from 'mobile/src/theme/fonts';
+import { BLACK, GRAY100, GRAY600, WHITE } from 'shared/src/colors';
 
 import { useSaveQuestionnaire } from 'shared/graphql/mutation/account/useSaveQuestionnaire';
 import { FAIntakeScreen } from 'mobile/src/navigations/AccreditationStack';
@@ -68,11 +47,10 @@ export const formSchema = yup
   })
   .required();
 
-const FAIntake: FAIntakeScreen = ({ navigation }) => {
+const FAIntake: FAIntakeScreen = ({ navigation, route }) => {
+  const { ackCRS } = route.params;
   const [saveQuestionnaire] = useSaveQuestionnaire();
-  const { register, handleSubmit, control, formState } = useForm<
-    yup.InferType<typeof formSchema>
-  >({
+  const { handleSubmit, control } = useForm<yup.InferType<typeof formSchema>>({
     resolver: yupResolver(formSchema),
     mode: 'onChange',
     defaultValues: formSchema.cast(
@@ -81,14 +59,14 @@ const FAIntake: FAIntakeScreen = ({ navigation }) => {
     ) as DefaultValues<FormData>,
   });
 
-  const goBack = () => navigation.goBack();
+  const goBack = (): void => navigation.goBack();
   const onSubmit = async ({
     firmName,
     firmCrd,
     phone,
     email,
     contactMethod,
-  }: FormData) => {
+  }: FormData): Promise<void> => {
     try {
       const { data } = await saveQuestionnaire({
         variables: {
@@ -109,6 +87,7 @@ const FAIntake: FAIntakeScreen = ({ navigation }) => {
 
       data?.saveQuestionnaire?.accreditation
         ? navigation.push('AccreditationResult', {
+            ackCRS,
             accreditation: 'NONE',
             baseStatus: [],
             investorClass: 'ADVISOR',

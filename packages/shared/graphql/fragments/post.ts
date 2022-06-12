@@ -9,6 +9,7 @@ export type PostSummary = Pick<
   | "body"
   | "categories"
   | "media"
+  | "preview"
   | "audience"
   | "mentionIds"
   | "userId"
@@ -40,6 +41,13 @@ export const POST_SUMMARY_FRAGMENT = gql`
     media {
       url
       aspectRatio
+    }
+    preview {
+      title
+      description
+      images
+      favicons
+      url
     }
     mentionIds
     likeIds

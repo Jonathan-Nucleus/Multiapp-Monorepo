@@ -1,7 +1,7 @@
 import { Professional } from "shared/graphql/query/user/useProfessionals";
 import { FC } from "react";
 import { useFollowUser } from "shared/graphql/mutation/account/useFollowUser";
-import Image from "next/image";
+import Avatar from "desktop/app/components/common/Avatar";
 import Button from "desktop/app/components/common/Button";
 import Link from "next/link";
 import { useAccountContext } from "shared/context/Account";
@@ -20,17 +20,7 @@ const ProfessionalItem: FC<ProfessionalItemProps> = ({ professional }) => {
         <a>
           <div className="w-40 h-40 relative">
             {professional.avatar && (
-              <Image
-                loader={() =>
-                  `${process.env.NEXT_PUBLIC_AVATAR_URL}/${professional.avatar}`
-                }
-                src={`${process.env.NEXT_PUBLIC_AVATAR_URL}/${professional.avatar}`}
-                alt=""
-                width={160}
-                height={160}
-                className="bg-background object-cover rounded-lg"
-                unoptimized={true}
-              />
+              <Avatar user={professional} size={160} shape="square" />
             )}
             <div className="absolute top-0 left-0 right-0 bottom-0">
               <div className="bg-gradient-to-b from-transparent to-black w-full h-full flex flex-col justify-end rounded-lg">

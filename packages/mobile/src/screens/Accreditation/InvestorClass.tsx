@@ -1,9 +1,7 @@
 import React from 'react';
-import { StyleSheet, View, Text, Pressable } from 'react-native';
-import { Buildings, UserCircle, Users } from 'phosphor-react-native';
+import { StyleSheet, View, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import PLabel from 'mobile/src/components/common/PLabel';
 import AccreditationHeader from './AccreditationHeader';
 import pStyles from 'mobile/src/theme/pStyles';
@@ -17,21 +15,11 @@ import {
 
 import { InvestorClassScreen } from 'mobile/src/navigations/AccreditationStack';
 
-const ICONS: Record<InvestorClassType, React.ReactNode> = {
-  INDIVIDUAL: <UserCircle size={24} color="currentColor" />,
-  ENTITY: <Buildings size={24} color="currentColor" />,
-  ADVISOR: <Users size={24} color="currentColor" />,
-};
-
 const InvestorClass: InvestorClassScreen = ({ navigation }) => {
   const next = (investorClass: InvestorClassType): void => {
-    if (investorClass === 'ADVISOR') {
-      navigation.navigate('FAIntake');
-    } else {
-      navigation.navigate('BaseFinancialStatus', {
-        investorClass: investorClass,
-      });
-    }
+    navigation.navigate('FormCRS', {
+      investorClass: investorClass,
+    });
   };
 
   return (
@@ -41,7 +29,7 @@ const InvestorClass: InvestorClassScreen = ({ navigation }) => {
         handleBack={() => navigation.goBack()}
       />
       <SafeAreaView style={styles.flex} edges={['bottom']}>
-        <View style={styles.flex}>
+        <View style={styles.container}>
           <PLabel
             label="Are you Investing as an:"
             textStyle={styles.titleLabel}
@@ -81,6 +69,10 @@ export default InvestorClass;
 const styles = StyleSheet.create({
   flex: {
     flex: 1,
+  },
+  container: {
+    flex: 1,
+    paddingHorizontal: 16,
   },
   titleLabel: {
     ...H6Bold,

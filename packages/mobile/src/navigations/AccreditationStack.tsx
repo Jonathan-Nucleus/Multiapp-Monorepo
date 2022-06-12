@@ -12,6 +12,7 @@ import type {
 import { Accreditation } from 'shared/graphql/mutation/account/useSaveQuestionnaire';
 
 import InvestorClass from '../screens/Accreditation/InvestorClass';
+import FormCRS from '../screens/Accreditation/FormCRS';
 import BaseFinancialStatus from '../screens/Accreditation/BaseFinancialStatus';
 import IndividualAdvancedStatus from '../screens/Accreditation/IndividualAdvancedStatus';
 import EntityAdvancedStatus from '../screens/Accreditation/EntityAdvancedStatus';
@@ -33,6 +34,7 @@ const AccreditationStack = () => {
       screenOptions={{ headerShown: false, gestureEnabled: true }}
       initialRouteName="InvestorClass">
       <Stack.Screen name="InvestorClass" component={InvestorClass} />
+      <Stack.Screen name="FormCRS" component={FormCRS} />
       <Stack.Screen
         name="BaseFinancialStatus"
         component={BaseFinancialStatus}
@@ -58,24 +60,33 @@ export default AccreditationStack;
 
 export type AccreditationStackParamList = {
   InvestorClass: undefined;
+  FormCRS: {
+    investorClass: InvestorClassType;
+  };
   BaseFinancialStatus: {
+    ackCRS: true;
     investorClass: Extract<InvestorClassType, 'INDIVIDUAL' | 'ENTITY'>;
   };
   IndividualAdvancedStatus: {
+    ackCRS: true;
     investorClass: Extract<InvestorClassType, 'INDIVIDUAL' | 'ENTITY'>;
     baseStatus: FinancialStatus[];
   };
   EntityAdvancedStatus: {
+    ackCRS: true;
     investorClass: Extract<InvestorClassType, 'INDIVIDUAL' | 'ENTITY'>;
     baseStatus: FinancialStatus[];
   };
   AccreditationResult: {
+    ackCRS: true;
     investorClass: InvestorClassType;
     baseStatus: FinancialStatus[];
     accreditation: Accreditation;
     nextRoute?: 'IndividualAdvancedStatus' | 'EntityAdvancedStatus';
   };
-  FAIntake: undefined;
+  FAIntake: {
+    ackCRS: true;
+  };
 };
 
 export type AccreditationScreenProps<
@@ -87,6 +98,10 @@ export type AccreditationScreenProps<
 
 export type InvestorClassScreen = (
   props: AccreditationScreenProps<'InvestorClass'>,
+) => ReactElement | null;
+
+export type FormCRSScreen = (
+  props: AccreditationScreenProps<'FormCRS'>,
 ) => ReactElement | null;
 
 export type BaseFinancialStatusScreen = (

@@ -1,47 +1,36 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
 import { StyleSheet, View, StyleProp, ViewStyle } from 'react-native';
-import {
-  getPreviewData,
-  PreviewData,
-} from '@flyerhq/react-native-link-preview';
 import FastImage from 'react-native-fast-image';
 
 import PLabel from 'mobile/src/components/common/PLabel';
-
 import { Body2Bold } from 'mobile/src/theme/fonts';
 import { WHITE12 } from 'shared/src/colors';
 
+import { LinkPreview } from 'shared/graphql/query/post/useLinkPreview';
+
 interface PostHeaderProps {
-  body: string;
+  previewData: LinkPreview;
   containerStyle?: StyleProp<ViewStyle>;
 }
 
-const PreviewLink: React.FC<PostHeaderProps> = ({ body, containerStyle }) => {
-  const [dataPreview, setDataPreview] = useState<PreviewData>();
-  useEffect(() => {
-    const getData = async () => {
-      const data: PreviewData = await getPreviewData(body);
-      setDataPreview(data.title ? data : undefined);
-    };
-
-    getData();
-  }, [body]);
-
-  if (!dataPreview) {
-    return null;
-  }
+const PreviewLink: React.FC<PostHeaderProps> = ({
+  previewData,
+  containerStyle,
+}) => {
+  const previewImage = previewData.images?.find((image) => !!image);
+  const previewFavicon = previewData.favicons?.find((image) => !!image);
 
   return (
     <View style={[styles.containerStyle, containerStyle]}>
       <View style={styles.previewContainer}>
         <View style={styles.metaDataContainer}>
           <FastImage
-            source={{ uri: dataPreview?.image?.url }}
+            source={{ uri: previewImage || previewFavicon }}
             style={styles.previewImage}
           />
-          <PLabel label={dataPreview?.title || ''} textStyle={styles.title} />
+          <PLabel label={previewData.title || ''} textStyle={styles.title} />
           <PLabel
-            label={dataPreview?.description || ''}
+            label={previewData.description || ''}
             textStyle={styles.description}
             numberOfLines={2}
           />
@@ -53,7 +42,7 @@ const PreviewLink: React.FC<PostHeaderProps> = ({ body, containerStyle }) => {
 
 const styles = StyleSheet.create({
   containerStyle: {
-    height: 224,
+    height: 280,
     marginVertical: 16,
     width: '100%',
   },

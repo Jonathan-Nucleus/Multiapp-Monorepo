@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Pressable, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
@@ -11,7 +11,7 @@ import QCSvg from 'shared/assets/images/QC.svg';
 import AISvg from 'shared/assets/images/AI.svg';
 import FASvg from 'shared/assets/images/FA.svg';
 import pStyles from 'mobile/src/theme/pStyles';
-import { GRAY100, PRIMARYSOLID, PRIMARYSOLID7 } from 'shared/src/colors';
+import { GRAY100 } from 'shared/src/colors';
 import { Body2, H6Bold } from 'mobile/src/theme/fonts';
 
 import AccreditationHeader from './AccreditationHeader';
@@ -53,21 +53,24 @@ const AccreditationResult: AccreditationResultScreen = ({
   navigation,
   route,
 }) => {
-  const { accreditation, baseStatus, investorClass, nextRoute } = route.params;
+  const { ackCRS, accreditation, baseStatus, investorClass, nextRoute } =
+    route.params;
   const { icon, title, subtitle } =
     investorClass === 'ADVISOR' ? RESPONSES.ADVISOR : RESPONSES[accreditation];
 
-  const next = () => {
+  const next = (): void => {
     if (!nextRoute || investorClass === 'ADVISOR') {
       return;
     }
     if (nextRoute === 'IndividualAdvancedStatus') {
       navigation.navigate(nextRoute, {
+        ackCRS,
         investorClass,
         baseStatus,
       });
     } else {
       navigation.navigate(nextRoute, {
+        ackCRS,
         investorClass,
         baseStatus,
       });

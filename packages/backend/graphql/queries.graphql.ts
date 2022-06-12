@@ -1,6 +1,7 @@
 import { gql } from "apollo-server";
 import * as yup from "yup";
 import _ from "lodash";
+import { getLinkPreview } from "link-preview-js";
 import {
   decodeToken,
   AccessTokenPayload,
@@ -48,6 +49,7 @@ const schema = gql`
       before: ID
       limit: Int
     ): [Post!]
+    linkPreview(body: String!): LinkPreview
     funds: [Fund!]
     fund(fundId: ID!): Fund
     fundManagers(featured: Boolean): FundManagers
@@ -73,6 +75,8 @@ const schema = gql`
     funds: [Fund!]!
   }
 `;
+
+export type LinkPreview = Exclude<Post.GraphQL["preview"], undefined>;
 
 export type FundManagers = {
   managers: User.Mongo[];
@@ -225,6 +229,36 @@ const resolvers = {
           before,
           limit
         );
+      }
+    ),
+
+    /**
+     * Fetch a link preview for links in any text body.
+     *
+     * @returns   The link preview data or null if none could be generated.
+     */
+    linkPreview: secureEndpoint(
+      async (
+        parentIgnored,
+        { body }: { body: string }
+      ): Promise<LinkPreview | null> => {
+        try {
+          const previewData =
+            (await getLinkPreview(body, {
+              headers: {
+                "User-Agent":
+                  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/85 Version/11.1.1 Safari/605.1.15",
+                "Accept-Lanugage": "en,en-US",
+                Accept:
+                  "text/html,application/xhtml+xml,application/xml;q=0.9,/;q=0.8",
+              },
+              followRedirects: true,
+            })) ?? null;
+          return previewData;
+        } catch (error) {
+          console.log("Error generating linking preview for", body);
+          return null;
+        }
       }
     ),
 
