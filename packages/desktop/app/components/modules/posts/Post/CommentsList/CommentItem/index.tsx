@@ -9,6 +9,7 @@ import {
 import { Comment } from "shared/graphql/query/post/usePost";
 import { useAccountContext } from "shared/context/Account";
 import Header from "./Header";
+import BodyText from "../../PostBody/BodyText";
 
 interface CommentItemProps {
   comment: Comment;
@@ -76,7 +77,7 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply }) => {
         </div>
       ) : (
         <div className="ml-12 mt-2">
-          <div className="text-sm text-white">{comment.body}</div>
+          <BodyText text={comment.body} accountId={account._id} />
           <div className="flex items-center mt-2">
             {!isMyComment && (
               <div>

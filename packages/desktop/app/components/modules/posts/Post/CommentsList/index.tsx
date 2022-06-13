@@ -99,7 +99,7 @@ const CommentsList: FC<CommentsListProps> = ({ show, postId }) => {
                 <div className="ml-10 mt-4 pl-2">
                   {comment.comments.map((nestedComment) => (
                     <div key={nestedComment._id}>
-                      <CommentItem comment={comment} />
+                      <CommentItem comment={nestedComment} />
                     </div>
                   ))}
                 </div>
