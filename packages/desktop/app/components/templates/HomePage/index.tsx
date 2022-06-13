@@ -27,7 +27,7 @@ const HomePage: FC = () => {
             <PostsSection user={account} />
           </div>
         </div>
-        <div className="w-80 hidden lg:block flex-shrink-0">
+        <div className="w-[350px] hidden lg:block flex-shrink-0">
           <InviteFriends />
           {(!account || account.watchlist.length > 0) && (
             <div className="mt-5">

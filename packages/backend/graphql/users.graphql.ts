@@ -130,6 +130,12 @@ export const contentCreatorResolvers = {
     parent.companyFollowingIds
       ? db.users.findAll(parent.companyFollowingIds)
       : [],
+
+  createdAt: async (
+    parent: User.Mongo,
+    argsIgnored: NoArgs,
+    contextIgnored: ApolloServerContext
+  ) => parent._id.getTimestamp(),
 };
 
 export const publicUserResolvers = {
@@ -210,12 +216,6 @@ const resolvers = {
   User: {
     ...contentCreatorResolvers,
     ...publicUserResolvers,
-
-    createdAt: async (
-      parent: User.Mongo,
-      argsIgnored: NoArgs,
-      contextIgnored: ApolloServerContext
-    ) => parent._id.getTimestamp(),
 
     mutedPosts: async (
       parent: User.Mongo,

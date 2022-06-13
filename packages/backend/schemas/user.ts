@@ -484,6 +484,8 @@ export const ContentCreatorSchema = `
   website: String
   linkedIn: String
   twitter: String
+  createdAt: Date!
+  updatedAt: Date
 
   posts(
     featured: Boolean
@@ -529,8 +531,6 @@ export const UserSchema = `
     chatToken: String
     emailToken: String
     inviteeIds: [ID!]
-    createdAt: Date!
-    updatedAt: Date
     notificationBadge: Int
     superUser: Boolean
 

@@ -5,6 +5,7 @@ import { File, Info, Share, Star, TelevisionSimple } from "phosphor-react";
 import { Tab } from "@headlessui/react";
 
 import Avatar from "../../../common/Avatar";
+import Accordian from "../../../common/Accordian";
 import Button from "../../../common/Button";
 import Card from "../../../common/Card";
 import FundMedia from "../../../modules/funds/FundMedia";
@@ -404,6 +405,17 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                 </Tab.Panel>
               </Tab.Panels>
             </Tab.Group>
+            {fund.disclosure ? (
+              <Accordian
+                title="Important Information"
+                titleClassName="text-xs uppercase tracking-widest"
+                className="mt-8"
+              >
+                <p className="text-xs leading-5 text-white/[0.4] whitespace-pre-line">
+                  {fund.disclosure}
+                </p>
+              </Accordian>
+            ) : null}
             <div className="border-t border-white/[.12] mt-6 mb-24 pt-2">
               <Button
                 variant="text"

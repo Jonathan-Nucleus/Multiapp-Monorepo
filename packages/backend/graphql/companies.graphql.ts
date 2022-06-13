@@ -16,11 +16,6 @@ const resolvers = {
   Company: {
     ...contentCreatorResolvers,
 
-    createdAt: secureEndpoint(
-      async (parent: Company.Mongo, argsIgnored, contextIgnored) =>
-        parent._id.getTimestamp()
-    ),
-
     members: secureEndpoint(
       async (parent: Company.Mongo, argsIgnored, { db }) =>
         parent.memberIds ? db.users.findAll(parent.memberIds) : []

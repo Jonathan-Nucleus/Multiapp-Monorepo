@@ -254,7 +254,7 @@ const resolvers = {
               (await getLinkPreview(fullLink, {
                 headers: {
                   "User-Agent":
-                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/85 Version/11.1.1 Safari/605.1.15",
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36",
                   "Accept-Lanugage": "en,en-US",
                   Accept:
                     "text/html,application/xhtml+xml,application/xml;q=0.9,/;q=0.8",

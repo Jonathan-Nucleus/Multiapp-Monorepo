@@ -16,6 +16,9 @@ const FeaturedProfessionals: FC = () => {
   if (professionals.length == 0) {
     return <></>;
   }
+
+  professionals.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+
   return (
     <>
       <div className="font-medium text-xl text-white">

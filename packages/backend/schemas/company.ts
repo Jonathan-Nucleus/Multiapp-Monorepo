@@ -47,8 +47,6 @@ export const CompanySchema = `
     memberIds: [ID!]!
     fundIds: [ID!]!
     ${ContentCreatorSchema}
-    createdAt: Date!
-    updatedAt: Date
 
     members: [UserProfile!]!
     funds: [Fund!]!

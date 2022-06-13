@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 export type Professional = Pick<
   User,
-  "_id" | "firstName" | "lastName" | "avatar" | "position"
+  "_id" | "firstName" | "lastName" | "avatar" | "position" | "createdAt"
 > & {
   company: Pick<Company, "_id" | "name">;
 };
@@ -38,14 +38,21 @@ export function useProfessionals(
             _id
             name
           }
+          createdAt
         }
       }
     `,
-    { variables: { featured } }
+    { variables: { featured }, fetchPolicy: "cache-and-network" }
   );
   useEffect(() => {
     if (!loading && data) {
-      setState(data);
+      const withDates = {
+        professionals: data.professionals.map((professional) => ({
+          ...professional,
+          createdAt: new Date(professional.createdAt),
+        })),
+      };
+      setState(withDates);
     }
   }, [data, loading]);
   return { data: state, loading, ...rest };
