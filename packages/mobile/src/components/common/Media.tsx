@@ -86,7 +86,7 @@ const Media: FC<MediaProps> = ({
       const appStateSubscription = AppState.addEventListener(
         'change',
         (newState) => {
-          if (newState === 'active' || newState === 'background') {
+          if (newState === 'active' || newState === 'background' || !paused) {
             console.log('Pausing video', mediaId);
             setPaused(true);
           }
@@ -94,7 +94,7 @@ const Media: FC<MediaProps> = ({
       );
 
       const unsubscribe = addVideoStateChangeListener(mediaId, (id) => {
-        if (id !== mediaId) {
+        if (id !== mediaId && !paused) {
           console.log('Pausing video', mediaId);
           setPaused(true);
         }
@@ -105,7 +105,7 @@ const Media: FC<MediaProps> = ({
         appStateSubscription.remove();
       };
     }
-  }, [media.url, mediaId]);
+  }, [media.url, mediaId, paused]);
 
   const togglePause = (): void => {
     const newState = !paused;

@@ -65,6 +65,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
   const { client, reconnect } = useChatContext() || {};
   const [visibleFollowerModal, setVisibleFollowerModal] = useState(false);
   const [visibleFollowingModal, setVisibleFollowingModal] = useState(false);
+  const [messagesLoading, setMessagesLoading] = useState(false);
 
   const account = useAccountContext();
   const { data: profileData } = useProfile(userId);
@@ -113,6 +114,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
       return;
     }
 
+    setMessagesLoading(true);
     const channel = await retry(
       async () => await createChannel(client, [account._id, userId]),
       {
@@ -133,6 +135,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
         },
       },
     });
+    setMessagesLoading(false);
   };
 
   const {
@@ -261,6 +264,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
                 onPress={messageUser}
                 gradientContainer={styles.button}
                 disabled={!client}
+                isLoading={messagesLoading}
               />
               <PGradientButton
                 label={isFollowing ? 'Unfollow' : 'Follow'}

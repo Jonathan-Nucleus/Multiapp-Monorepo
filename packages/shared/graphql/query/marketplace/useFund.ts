@@ -37,6 +37,7 @@ export type FundDetails = FundSummary &
     | "presentationUrl"
     | "metrics"
     | "videos"
+    | "disclosure"
     | "updatedAt"
   >;
 
@@ -88,6 +89,7 @@ export function useFund(fundId?: string): QueryResult<FundData, FundVariables> {
             date
           }
           presentationUrl
+          disclosure
           team {
             _id
             firstName

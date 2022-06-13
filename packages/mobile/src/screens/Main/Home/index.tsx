@@ -12,15 +12,20 @@ import {
 import isEqual from 'react-fast-compare';
 import { SlidersHorizontal } from 'phosphor-react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import retry from 'async-retry';
 
 import MainHeader from 'mobile/src/components/main/Header';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import PostItem from 'mobile/src/components/main/posts/PostItem';
-import { stopVideos, stopVideo } from 'mobile/src/components/common/Media';
+import {
+  stopVideos,
+  stopVideo,
+  isVideo,
+} from 'mobile/src/components/common/Media';
 import pStyles from 'mobile/src/theme/pStyles';
 
 import { usePosts, Post } from 'shared/graphql/query/post/usePosts';
-import { useAccount } from 'shared/graphql/query/account/useAccount';
+import { useAccountContext } from 'shared/context/Account';
 import { HomeScreen } from 'mobile/src/navigations/MainTabNavigator';
 import FilterModal from 'mobile/src/screens/PostDetails/FilterModal';
 import PostItemPlaceholder from '../../../components/placeholder/PostItemPlaceholder';
@@ -41,11 +46,12 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
   const [selectedRole, setSelectedRole] = useState<PostRoleFilter>('EVERYONE');
   const [visibleFilter, setVisibleFilter] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const { data: userData } = useAccount();
-  const { data, refetch, fetchMore } = usePosts(
-    selectedCategories,
-    selectedRole,
-  );
+  const account = useAccountContext();
+  const {
+    data: { posts: postData = [] } = {},
+    refetch,
+    fetchMore,
+  } = usePosts(selectedCategories, selectedRole);
 
   const renderItem: ListRenderItem<Post> = useMemo(
     () =>
@@ -62,12 +68,14 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
     Exclude<FlatListProps<Post>['onViewableItemsChanged'], null | undefined>
   >(({ changed }) => {
     changed.forEach((token) => {
-      !token.isViewable && stopVideo(token.key);
+      const item = token.item as Post;
+      const hasVideo = isVideo(item.media?.url ?? '');
+      if (!token.isViewable && hasVideo) {
+        const key = `${item.userId}/${item._id}`;
+        stopVideo(key);
+      }
     });
   }, []);
-
-  const account = userData?.account;
-  const postData = data?.posts ?? [];
 
   console.log('POSTS', postData.length);
 
@@ -99,11 +107,16 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
 
   const onRefresh = async (): Promise<void> => {
     setRefreshing(true);
-    await refetch();
+    await retry(
+      async () => {
+        return refetch();
+      },
+      { retries: 5 },
+    );
     setRefreshing(false);
   };
 
-  const onEndReached = () => {
+  const onEndReached = (): void => {
     console.log('Fetching more posts');
     const lastItem = postData[postData.length - 1]._id;
     fetchMore({
@@ -125,6 +138,7 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
       <FlatList
+        removeClippedSubviews={true}
         contentContainerStyle={styles.container}
         data={postData}
         extraData={account}

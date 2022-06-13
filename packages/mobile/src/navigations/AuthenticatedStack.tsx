@@ -97,7 +97,7 @@ const AuthenticatedStack: AuthenticatedScreen = () => {
     return () => detachTokenObserver(tokenObserver);
   }, [updateFcmToken]);
 
-  const onUnauthenticated = () => {
+  const onUnauthenticated = (): void => {
     console.log('Unauthenticated');
     clearToken();
   };

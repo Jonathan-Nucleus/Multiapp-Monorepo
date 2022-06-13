@@ -193,9 +193,11 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
             </>
           )}
         </View>
+        {/*
         <TouchableOpacity onPress={() => setIsVisible(true)}>
           <DotsThreeVerticalSvg />
         </TouchableOpacity>
+        */}
       </View>
       <Modal
         isVisible={isVisible}
@@ -312,6 +314,7 @@ const styles = StyleSheet.create({
   socialView: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingVertical: 8,
   },
   socialItem: {
     marginHorizontal: 16,

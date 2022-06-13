@@ -20,6 +20,7 @@ import { WHITE } from 'shared/src/colors';
 interface AccordionProps extends PropsWithChildren<unknown> {
   headerStyle?: StyleProp<ViewStyle>;
   titleStyle?: StyleProp<TextStyle>;
+  containerStyle?: StyleProp<ViewStyle>;
   title: string;
   initiallyExpanded?: boolean;
 }
@@ -27,6 +28,7 @@ interface AccordionProps extends PropsWithChildren<unknown> {
 const Accordion: React.FC<AccordionProps> = (props) => {
   const {
     children,
+    containerStyle,
     headerStyle,
     titleStyle,
     title,
@@ -48,7 +50,7 @@ const Accordion: React.FC<AccordionProps> = (props) => {
   };
 
   return (
-    <View>
+    <View style={[styles.containerStyle, containerStyle]}>
       <View style={[styles.header, headerStyle]}>
         <Pressable onPress={toggleView} style={styles.toggleButton}>
           {isExpanded ? (
@@ -91,6 +93,9 @@ const Accordion: React.FC<AccordionProps> = (props) => {
 export default Accordion;
 
 const styles = StyleSheet.create({
+  containerStyle: {
+    flex: 1,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

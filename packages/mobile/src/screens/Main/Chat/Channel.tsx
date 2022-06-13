@@ -34,6 +34,7 @@ import {
   isVideo,
   stopVideos,
   stopVideo,
+  MessageMedia,
 } from 'mobile/src/components/common/Media';
 import { Body1Bold, Body3, Body2Bold } from 'mobile/src/theme/fonts';
 import pStyles from 'mobile/src/theme/pStyles';
@@ -370,12 +371,20 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
               <View style={styles.imageContainer}>
                 {media.map((image, index) => (
                   <View key={image.uri} style={styles.imageView}>
-                    <FastImage
-                      style={styles.image}
-                      source={{
-                        uri: image.uri,
-                      }}
-                    />
+                    {isVideo(image.uri) ? (
+                      <MessageMedia
+                        mediaId={`video-${index}`}
+                        media={{ url: image.uri, aspectRatio: 1 }}
+                        style={styles.video}
+                      />
+                    ) : (
+                      <FastImage
+                        style={styles.image}
+                        source={{
+                          uri: image.uri,
+                        }}
+                      />
+                    )}
                     <Pressable
                       style={styles.removeImage}
                       onPress={() => removeImage(index)}>
@@ -472,6 +481,12 @@ const styles = StyleSheet.create({
   },
   image: {
     flex: 1,
+  },
+  video: {
+    width: 72,
+    height: 72,
+    borderRadius: 16,
+    marginVertical: 0,
   },
   removeImage: {
     position: 'absolute',

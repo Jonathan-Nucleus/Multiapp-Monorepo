@@ -41,6 +41,9 @@ export namespace Fund {
     /** Whether this fund should only be shown with a limited view. */
     limitedView?: boolean;
 
+    /** Fund-specific disclosure. */
+    disclosure?: string;
+
     updatedAt: Date;
   }
 
@@ -159,6 +162,7 @@ export const FundSchema = `
     offshore: Boolean
     feeder: Boolean
     limitedView: Boolean
+    disclosure: String
     createdAt: Date!
     updatedAt: Date!
 

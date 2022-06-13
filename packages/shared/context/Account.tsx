@@ -39,16 +39,16 @@ export const AccountProvider: React.FC<AccountProviderProps> = ({
   loadingComponent,
 }) => {
   const { account, loading } = useAccountStated();
-
+  const accountDefined = !!account;
   useEffect(() => {
     if (!loading) {
-      if (account) {
+      if (accountDefined) {
         onReady?.();
       } else {
         onUnauthenticated?.();
       }
     }
-  }, [account, loading]);
+  }, [accountDefined, loading]);
 
   if (loading || !account) {
     return loadingComponent || <></>;

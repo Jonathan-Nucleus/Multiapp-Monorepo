@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC } from 'react';
 import {
   View,
   ViewProps,
@@ -7,8 +7,6 @@ import {
   Pressable,
   Linking,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { MaterialTopTabNavigationProp } from '@react-navigation/material-top-tabs';
 import { File } from 'phosphor-react-native';
 import dayjs from 'dayjs';
 
@@ -26,32 +24,15 @@ import {
 
 import { useDocumentToken } from 'shared/graphql/query/account/useDocumentToken';
 
-import { FundDetailsTabs } from './FundDetails';
-
 interface FundDocumentsProps extends ViewProps {
   fund: FundDetails;
-  onFocus?: () => void;
 }
 
-const FundDocuments: FC<FundDocumentsProps> = ({
-  fund,
-  onFocus,
-  ...viewProps
-}) => {
+const FundDocuments: FC<FundDocumentsProps> = ({ fund, ...viewProps }) => {
   const { documents } = fund;
   const categories = new Set<DocumentCategory>();
 
   const [fetchDocumentToken] = useDocumentToken();
-
-  const navigation = useNavigation<FundDetailsTabs>();
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('tabPress', () => {
-      onFocus?.();
-    });
-
-    return unsubscribe;
-  }, [navigation, onFocus]);
-
   const documentsSorted = [...documents];
   documentsSorted.sort((a, b) => b.date.getTime() - a.date.getTime());
   documentsSorted.forEach((doc) => categories.add(doc.category));

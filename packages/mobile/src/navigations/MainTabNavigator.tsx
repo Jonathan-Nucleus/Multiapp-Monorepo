@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ReactElement } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import {
   createBottomTabNavigator,
@@ -23,13 +23,12 @@ import MoreStack, { MoreStackParamList } from './MoreStack';
 import { Body5Bold, Body5 } from '../theme/fonts';
 
 import { useChatContext, useUnreadCount } from 'mobile/src/context/Chat';
-import { useNotifications } from 'shared/graphql/query/notification/useNotifications';
 
 import type { AuthenticatedScreenProps } from './AuthenticatedStack';
 
 const Tab = createBottomTabNavigator();
-const MainTabNavigator = () => {
-  const { client, unreadCount: userUnreadCount } = useChatContext() || {};
+const MainTabNavigator = (): React.ReactElement => {
+  const { client } = useChatContext() || {};
   const unreadCount = useUnreadCount();
 
   return (

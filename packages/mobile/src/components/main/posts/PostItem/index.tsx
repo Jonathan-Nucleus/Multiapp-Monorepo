@@ -31,6 +31,11 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
   const { isLiked, toggleLike, likeCount } = useLikePost(post._id);
 
   const goToDetails = (comment?: boolean): void => {
+    const currentRoute = NavigationService.currentRoute();
+    if (!comment && currentRoute?.name === 'PostDetail') {
+      return;
+    }
+
     NavigationService.navigate('PostDetails', {
       screen: 'PostDetail',
       params: {

@@ -60,7 +60,6 @@ const PostDetail: PostDetailScreen = ({ route }) => {
   const [commentPost] = useCommentPost();
   const [editComment] = useEditCommentPost();
 
-  const [comment, setComment] = useState('');
   const [selectedUser, setSelectedUser] = useState<CommentUser | undefined>(
     undefined,
   );
@@ -76,7 +75,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
   const post = data?.post;
   const comments = post?.comments;
 
-  const { control, handleSubmit, reset } = useForm<FormValues>({
+  const { control, handleSubmit, reset, setValue } = useForm<FormValues>({
     resolver: yupResolver(schema),
     mode: 'onSubmit',
     defaultValues: schema.cast(
@@ -106,27 +105,37 @@ const PostDetail: PostDetailScreen = ({ route }) => {
 
   const onSubmit = async ({ message }: FormValues): Promise<void> => {
     try {
-      const commentData = {
-        body: message,
-        postId: post._id,
-        mentionIds: [],
-        ...(focusCommentId ? { commentId: focusCommentId } : {}),
-      };
+      let success = false;
+      if (isEditComment && focusCommentId) {
+        const result = await editComment({
+          variables: {
+            comment: {
+              _id: focusCommentId,
+              body: message,
+              mentionIds: [],
+              mediaUrl: '',
+            },
+          },
+        });
 
-      const { data } = await commentPost({
-        variables: {
-          comment: commentData,
-        },
-      });
+        success = !!result.data?.editComment;
+      } else {
+        const result = await commentPost({
+          variables: {
+            comment: {
+              body: message,
+              postId: post._id,
+              mentionIds: [],
+              ...(focusCommentId ? { commentId: focusCommentId } : {}),
+            },
+          },
+        });
 
-      if (data?.comment) {
-        //initInputComment();
-        reset(
-          schema.cast(
-            {},
-            { assert: false, stripUnknown: true },
-          ) as DefaultValues<FormValues>,
-        );
+        success = !!result.data?.comment;
+      }
+
+      if (success) {
+        initInputComment();
         await refetch();
 
         setTimeout(
@@ -139,37 +148,14 @@ const PostDetail: PostDetailScreen = ({ route }) => {
     }
   };
 
-  const handleEditComment = async (): Promise<void> => {
-    if (!focusCommentId) {
-      return;
-    }
-
-    try {
-      const { data } = await editComment({
-        variables: {
-          comment: {
-            _id: focusCommentId,
-            body: comment,
-            mentionIds: [],
-            mediaUrl: '',
-          },
-        },
-        refetchQueries: ['Posts'],
-      });
-
-      if (data?.editComment) {
-        console.log('edit comment success');
-        initInputComment();
-      } else {
-        console.log('edit comment error');
-      }
-    } catch (err) {
-      console.log('edit comment error', err);
-    }
-  };
-
   const initInputComment = (): void => {
-    setComment('');
+    reset(
+      schema.cast(
+        {},
+        { assert: false, stripUnknown: true },
+      ) as DefaultValues<FormValues>,
+    );
+
     setFocusCommentId(null);
     setReplyComment(false);
     setEditComment(false);
@@ -189,10 +175,12 @@ const PostDetail: PostDetailScreen = ({ route }) => {
         inputRef?.current?.focus();
       }}
       onEdit={(comment) => {
-        setComment(comment.body);
+        setValue('message', comment.body);
         setEditComment(true);
         setFocusCommentId(comment._id);
-        inputRef?.current?.focus();
+        setTimeout(() => {
+          inputRef?.current?.focus();
+        }, 500);
       }}
     />
   );
@@ -244,11 +232,17 @@ const PostDetail: PostDetailScreen = ({ route }) => {
                 setMentionUsers(users);
                 onMentionSelected.current = onSelected;
               }}
+              onFocus={() => {
+                setTimeout(() => {
+                  flatListRef.current?.scrollToEnd({ animated: true });
+                }, 1);
+              }}
               ref={(ref) => {
                 inputRef.current = ref;
                 if (focusCommentRef.current && ref) {
                   ref.focus();
                   flatListRef.current?.scrollToEnd({ animated: true });
+                  focusCommentRef.current = false;
                 }
               }}
             />
@@ -272,7 +266,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.updateBtn}
-              onPress={handleEditComment}>
+              onPress={handleSubmit(onSubmit)}>
               <PLabel label="Update" textStyle={Body3Bold} />
             </TouchableOpacity>
           </View>

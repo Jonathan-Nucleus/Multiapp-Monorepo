@@ -50,7 +50,7 @@ const OwnPostActionModal: React.FC<OwnPostActionModalProps> = ({
     return null;
   }
 
-  const handleEditPost = () => {
+  const handleEditPost = (): void => {
     NavigationService.navigate('PostDetails', {
       screen: 'CreatePost',
       params: {
@@ -59,21 +59,29 @@ const OwnPostActionModal: React.FC<OwnPostActionModalProps> = ({
     });
   };
 
-  const handleDeletePost = async () => {
+  const handleDeletePost = async (): Promise<void> => {
     try {
       const { data } = await deletePost({
         variables: { postId: post._id },
       });
 
-      data?.deletePost
-        ? showMessage('success', 'This post has been successfully deleted.')
-        : showMessage('error', SOMETHING_WRONG);
+      if (data?.deletePost) {
+        showMessage('success', 'This post has been successfully deleted.');
+        NavigationService.navigate('Authenticated', {
+          screen: 'Main',
+          params: {
+            screen: 'Home',
+          },
+        });
+      } else {
+        showMessage('error', SOMETHING_WRONG);
+      }
     } catch (err) {
       showMessage('error', SOMETHING_WRONG);
     }
   };
 
-  const handleMutePost = async () => {
+  const handleMutePost = async (): Promise<void> => {
     try {
       const { data } = await mutePost({
         variables: { mute: true, postId: post._id },

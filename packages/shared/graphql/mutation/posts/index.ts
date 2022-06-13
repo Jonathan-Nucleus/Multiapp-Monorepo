@@ -96,21 +96,24 @@ export function useCommentPost(): MutationTuple<
   CommentPostData,
   CommentPostVariables
 > {
-  return useMutation<CommentPostData, CommentPostVariables>(gql`
-    mutation Comment($comment: CommentInput!) {
-      comment(comment: $comment) {
-        _id
-        body
-        likeIds
-        mentions {
+  return useMutation<CommentPostData, CommentPostVariables>(
+    gql`
+      mutation Comment($comment: CommentInput!) {
+        comment(comment: $comment) {
           _id
-          firstName
-          lastName
+          body
+          likeIds
+          mentions {
+            _id
+            firstName
+            lastName
+          }
+          mediaUrl
         }
-        mediaUrl
       }
-    }
-  `);
+    `,
+    { refetchQueries: ["Post"] }
+  );
 }
 
 type EditCommentPostVariables = {

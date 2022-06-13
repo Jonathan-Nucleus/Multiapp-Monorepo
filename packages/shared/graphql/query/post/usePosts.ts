@@ -5,6 +5,7 @@ import {
   QueryResult,
   FetchMoreQueryOptions,
   ApolloQueryResult,
+  NetworkStatus,
 } from "@apollo/client";
 import {
   PostCategory,
@@ -44,6 +45,7 @@ export function usePosts(
 ): QueryResult<PostsData, PostsVariables> {
   const [state, setState] = useState<PostsData>();
   const isFetchMore = useRef(false);
+  const lastNetworkStatus = useRef(0);
   const { data, loading, ...rest } = useQuery<PostsData, PostsVariables>(
     gql`
       ${POST_SUMMARY_FRAGMENT}
@@ -75,12 +77,44 @@ export function usePosts(
       },
       fetchPolicy: "cache-and-network",
       skip: isFetchMore.current,
+      notifyOnNetworkStatusChange: true,
     }
   );
 
+  if (rest.networkStatus < 7) {
+    lastNetworkStatus.current = rest.networkStatus;
+  }
+
   useEffect(() => {
-    if (!loading && data) {
-      setState(data);
+    if (rest.networkStatus === NetworkStatus.ready) {
+      const newPosts = data?.posts || [];
+      if (lastNetworkStatus.current === NetworkStatus.loading && state) {
+        const newData = { ...state };
+        const existingPosts = newData.posts ? newData.posts : [];
+        newData.posts = [
+          ...existingPosts,
+          ...newPosts.filter(
+            (post) =>
+              !existingPosts.some(
+                (existingPost) =>
+                  existingPost._id.toString() === post._id.toString()
+              )
+          ),
+        ].sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+
+        if (existingPosts.length !== newData.posts?.length) {
+          setState(newData);
+        }
+      } else if (
+        !state ||
+        lastNetworkStatus.current === NetworkStatus.setVariables ||
+        lastNetworkStatus.current === NetworkStatus.refetch
+      ) {
+        setState(data);
+      }
     }
   }, [data, loading]);
 

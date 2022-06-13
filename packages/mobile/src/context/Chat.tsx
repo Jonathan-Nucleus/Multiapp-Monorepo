@@ -6,14 +6,15 @@ import React, {
   useCallback,
   PropsWithChildren,
 } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import retry from 'async-retry';
+import { StyleSheet, View, Text, AppState } from 'react-native';
 import { StreamChat } from 'stream-chat';
 
 import pStyles from 'mobile/src/theme/pStyles';
 
 import type { Client, StreamType } from 'mobile/src/services/chat';
 import { readToken } from 'mobile/src/services/PushNotificationService';
-import { useAccountContext } from 'shared/context/Account';
+import { useAccountContext, Account } from 'shared/context/Account';
 
 import { GETSTREAM_ACCESS_KEY } from 'react-native-dotenv';
 
@@ -60,6 +61,8 @@ export function useUnreadCount(): number {
   return unreadCount;
 }
 
+let chatClient: Client | undefined;
+
 interface ChatProviderProps extends PropsWithChildren<unknown> {
   token?: string;
 }
@@ -69,84 +72,33 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
   children,
 }) => {
   const user = useAccountContext();
-  const chatClient = useRef<Client>();
-  const fetchingClient = useRef(false);
   const [isReady, setReady] = useState<boolean>();
   const [unreadCount, setUnreadCount] = useState(0);
-  const retryCount = useRef(0);
 
-  const connect = useCallback(async (): Promise<void> => {
-    if (!token || !user) {
-      console.log('Invalid user or token');
-      return;
-    }
-
-    if (chatClient.current) {
-      await chatClient.current.disconnectUser();
-    }
-
-    const client = StreamChat.getInstance<StreamType>(GETSTREAM_ACCESS_KEY);
-    try {
-      fetchingClient.current = true;
-      const result = await client.connectUser(
-        {
-          id: user._id,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          name: `${user.firstName} ${user.lastName}`,
-          avatar: user.avatar,
-          company: user.companies?.[0]?.name,
-          position: user.position,
-        },
-        token,
-      );
-      chatClient.current = client;
-      if (result && result.me) {
-        setUnreadCount(result.me.total_unread_count);
+  const connectClient = async (): Promise<void> => {
+    if (!chatClient && token) {
+      const initialUnreadCount = await connect(user, token);
+      if (initialUnreadCount !== null) {
+        setUnreadCount(initialUnreadCount);
       }
 
-      const fcmToken = await readToken();
-      if (fcmToken) {
-        console.log('adding token', fcmToken.token, 'to user', user._id);
-        await client.addDevice(fcmToken.token, 'firebase');
-      }
-
-      setReady(true);
-    } catch (err) {
-      console.log('Error connect to stream chat', err);
-      setReady(false);
+      setReady(!!chatClient);
     }
-
-    fetchingClient.current = false;
-
-    if (!chatClient.current && retryCount.current < 3) {
-      retryCount.current++;
-      setReady(undefined);
-      console.log('Retrying');
-      connect();
-    }
-  }, [user, token]);
-
-  const disconnect = (): void => {
-    chatClient.current?.disconnectUser();
-    chatClient.current = undefined;
-    fetchingClient.current = false;
-    retryCount.current = 0;
-
-    setReady(undefined);
-    console.log('Stopped chat');
   };
 
-  useEffect(() => {
-    console.log('');
-    if (!chatClient.current && !fetchingClient.current) {
-      connect();
+  connectClient();
 
-      return () => {
+  useEffect(() => {
+    const result = AppState.addEventListener('change', (state) => {
+      if (state === 'background') {
         disconnect();
-      };
-    }
-  }, [connect]);
+      } else if (state === 'active' && token) {
+        connect(user, token);
+      }
+    });
+
+    return () => result.remove();
+  }, [user, token]);
 
   if (isReady !== undefined && !chatClient) {
     return (
@@ -156,14 +108,20 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
     );
   }
 
+  const reconnect = (): void => {
+    if (token) {
+      connect(user, token);
+    }
+  };
+
   return (
     <ChatContext.Provider
       value={
-        chatClient.current
+        chatClient
           ? {
-              client: chatClient.current,
+              client: chatClient,
               userId: user._id,
-              reconnect: connect,
+              reconnect,
               unreadCount,
             }
           : undefined
@@ -171,6 +129,63 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
       {children}
     </ChatContext.Provider>
   );
+};
+
+const connect = async (
+  user: Account,
+  token: string,
+): Promise<number | null> => {
+  if (chatClient) {
+    console.log('Chat client already connected');
+    return null;
+  }
+
+  const client = StreamChat.getInstance<StreamType>(GETSTREAM_ACCESS_KEY);
+  try {
+    console.log('Connecting to chat client');
+    const result = await retry(
+      async () => {
+        return client.connectUser(
+          {
+            id: user._id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            name: `${user.firstName} ${user.lastName}`,
+            avatar: user.avatar,
+            company: user.companies?.[0]?.name,
+            position: user.position,
+          },
+          token,
+        );
+      },
+      {
+        retries: 5,
+        onRetry: (err) => {
+          console.log('Error connecting', err);
+          console.log('Retrying chat connection...');
+        },
+      },
+    );
+
+    chatClient = client;
+
+    const fcmToken = await readToken();
+    if (fcmToken) {
+      console.log('adding token', fcmToken.token, 'to user', user._id);
+      await client.addDevice(fcmToken.token, 'firebase');
+    }
+
+    return result && result.me ? result.me.total_unread_count : 0;
+  } catch (err) {
+    console.log('Error connect to stream chat', err);
+    return null;
+  }
+};
+
+const disconnect = (): void => {
+  chatClient?.disconnectUser();
+  chatClient = undefined;
+  console.log('Stopped chat');
 };
 
 const styles = StyleSheet.create({

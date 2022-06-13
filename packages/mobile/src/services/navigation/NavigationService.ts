@@ -36,3 +36,8 @@ export function goBack(): void {
     config.navigator.dispatch(action);
   }
 }
+
+export const currentRoute: NavigationContainerRef<AppParamList>['getCurrentRoute'] =
+  function () {
+    return config.navigator?.getCurrentRoute();
+  };

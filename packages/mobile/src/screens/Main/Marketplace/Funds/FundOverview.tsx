@@ -1,7 +1,6 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { View, StyleSheet, ViewProps, Text, Pressable } from 'react-native';
 import { Presentation, Info } from 'phosphor-react-native';
-import { useNavigation } from '@react-navigation/native';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
@@ -18,6 +17,7 @@ import {
   PRIMARY,
   WHITE,
   GRAY100,
+  GRAY600,
   WHITE12,
   BLACK,
   WHITE60,
@@ -27,8 +27,6 @@ import NetReturnsTable from './NetReturnsTable';
 
 import { AssetClasses } from 'shared/graphql/fragments/fund';
 import { FundDetails } from 'shared/graphql/query/marketplace/useFund';
-
-import { FundDetailsTabs } from './FundDetails';
 
 interface PTitleProps {
   title: string;
@@ -53,21 +51,8 @@ const PTitle: FC<PTitleProps> = ({ title, subTitle, flex }) => {
 const LEFT_FLEX = 0.6;
 const RIGHT_FLEX = 0.4;
 
-const FundOverview: FC<FundOverviewProps> = ({
-  fund,
-  onFocus,
-  ...viewProps
-}) => {
-  const navigation = useNavigation<FundDetailsTabs>();
+const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
   const [disclosureVisible, setDisclosureVisible] = useState(false);
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('tabPress', () => {
-      onFocus?.();
-    });
-
-    return unsubscribe;
-  }, [navigation, onFocus]);
 
   const video = fund.videos?.[0];
   const dollarFormatter = Intl.NumberFormat('en', { notation: 'compact' });
@@ -170,9 +155,13 @@ const FundOverview: FC<FundOverviewProps> = ({
           <NetReturnsTable returns={fund.metrics} />
         </View>
       ) : null}
-      {/*<Accordion title="Important Information">
-        <Text style={{ color: 'white' }}>Test</Text>
-      </Accordion>*/}
+      {fund.disclosure ? (
+        <Accordion
+          title="Important Information"
+          containerStyle={styles.fundDisclosure}>
+          <Text style={styles.fundDisclosureText}>{fund.disclosure}</Text>
+        </Accordion>
+      ) : null}
       <Pressable
         onPress={() => setDisclosureVisible(true)}
         style={({ pressed }) => [
@@ -283,6 +272,14 @@ const styles = StyleSheet.create({
   memberContainer: {
     marginTop: 16,
     paddingHorizontal: 16,
+  },
+  fundDisclosure: {
+    marginTop: -8,
+    marginBottom: 8,
+  },
+  fundDisclosureText: {
+    color: GRAY600,
+    marginBottom: 8,
   },
   disclosureContainer: {
     flexDirection: 'row',

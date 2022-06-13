@@ -1,5 +1,4 @@
 import React, { ReactElement, useRef, useState, useEffect } from 'react';
-import { View } from 'react-native';
 import {
   NavigationContainer,
   NavigatorScreenParams,
@@ -9,7 +8,6 @@ import {
   createStackNavigator,
   StackScreenProps,
 } from '@react-navigation/stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import SplashScreen from 'react-native-splash-screen';
 
 import * as NavigationService from '../services/navigation/NavigationService';
@@ -19,7 +17,6 @@ import {
   detachTokenObserver,
   TokenAction,
 } from 'mobile/src/utils/auth-token';
-import { useUpdateFcmToken } from 'shared/graphql/mutation/account';
 
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 
@@ -30,7 +27,6 @@ import AuthenticatedStack, {
 
 import { MediaType } from 'backend/graphql/mutations.graphql';
 import { Accreditation } from 'shared/graphql/mutation/account/useSaveQuestionnaire';
-import { useVerifyToken } from 'shared/graphql/query/account/useVerifyToken';
 
 import { AccountProvider } from 'shared/context/Account';
 
@@ -42,13 +38,12 @@ const defaultScreenOptions = {
 const Stack = createStackNavigator();
 const verifying = false;
 
-const AppNavigator = () => {
+const AppNavigator = (): React.ReactElement => {
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const routeNameRef = useRef<string | undefined>(undefined);
   const navigationRef = useRef<NavigationContainerRef<AppParamList> | null>(
     null,
   );
-  //const [verifyToken] = useVerifyToken();
 
   useEffect(() => {
     NavigationService.setNavigator(navigationRef.current);
