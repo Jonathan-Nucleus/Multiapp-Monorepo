@@ -40,7 +40,7 @@ export const processPost = (text: string): string[] => {
     if (val.startsWith("@[")) {
       processedSplits.push(`@${splits[index + 2]}|${splits[index + 4]}`);
       index += 5;
-    } else if (val.trim() !== "" && val.match(LINK_PATTERN)) {
+    } else if (val.trim().length > 0 && val.match(LINK_PATTERN)) {
       processedSplits.push(`%%${val}`);
     } else {
       processedSplits.push(val);

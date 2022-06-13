@@ -1,69 +1,62 @@
-import { FC, ReactElement, useMemo, useState } from "react";
+import { FC, ReactElement, useCallback, useMemo, useState } from "react";
 import Link from "next/link";
-import { UserProfile } from "backend/graphql/users.graphql";
-import { hrefFromLink, isWebLink, processPost } from "shared/src/patterns";
+import { hrefFromLink, processPost } from "shared/src/patterns";
 import LinkPreview from "../../LinkPreview";
 import PostMedia from "../../PostMedia";
 import { Post as PostType } from "shared/graphql/query/post/usePosts";
 import Post from "..";
+import Button from "desktop/app/components/common/Button";
 
 interface PostBodyProps {
-  account: Pick<UserProfile, "_id"> | undefined;
+  accountId: string;
   post: PostType;
   isPreview?: boolean;
 }
 
 const PostBody: FC<PostBodyProps> = ({
-  account,
+  accountId,
   post,
   isPreview = false,
 }: PostBodyProps) => {
-  const [previewLink, setPreviewLink] = useState<string>();
+  const [isBodyClamped, setIsBodyClamped] = useState(false);
+  const [isBodyExpanded, setIsBodyExpanded] = useState(false);
+  const bodyRefCallback = useCallback((ref: HTMLDivElement) => {
+    if (ref && ref.scrollHeight > ref.clientHeight) {
+      setIsBodyClamped(true);
+    }
+  }, []);
   const elements = useMemo(() => {
     if (!post.body) {
       return [<></>];
     }
+    let wordCount = 0;
     const splitBody = processPost(post.body);
     const _elements: (string | ReactElement)[] = [];
-    let numLinks = 0;
-    splitBody.map((text, index) => {
+    splitBody.forEach((text) => {
       if (text.startsWith("$")) {
         _elements.push(
-          <Link
-            key={`${text}-${index}`}
-            href={`/search/posts?query=${text.slice(1)}`}
-          >
+          <Link href={`/search/posts?query=${text.slice(1)}`}>
             <a className="text-primary">{text}</a>
           </Link>
         );
+        wordCount++;
       } else if (text.startsWith("#")) {
         _elements.push(
-          <Link
-            key={`${text}-${index}`}
-            href={`/search/posts?query=${text.slice(1)}`}
-          >
+          <Link href={`/search/posts?query=${text.slice(1)}`}>
             <a className="text-primary">{text}</a>
           </Link>
         );
+        wordCount++;
       } else if (text.startsWith("@") && text.includes("|")) {
         const [name, id] = text.split("|");
         _elements.push(
-          <Link
-            key={`${text}-${index}`}
-            href={`/profile/${account?._id == id ? "me" : id}`}
-          >
+          <Link href={`/profile/${accountId == id ? "me" : id}`}>
             <a className="text-primary">{name}</a>
           </Link>
         );
       } else if (text.startsWith("%%")) {
         const link = text.substring(2).trim();
         const href = hrefFromLink(link);
-        if (isWebLink(href)) {
-          numLinks++;
-          if (numLinks == 1) {
-            setPreviewLink(href);
-          }
-        }
         _elements.push(
           <Link href={href}>
             <a
@@ -80,14 +73,30 @@ const PostBody: FC<PostBodyProps> = ({
       }
     });
     return _elements;
-  }, [account?._id, post.body]);
+  }, [accountId, post.body]);
   return (
     <>
       <div className="px-4">
-        <div className="text-sm text-white opacity-90 whitespace-pre-wrap break-words">
-          {elements.map((element, index) => (
-            <span key={index}>{element}</span>
-          ))}
+        <div className="pb-2">
+          <div
+            ref={bodyRefCallback}
+            className={`text-sm text-white opacity-90 whitespace-pre-wrap break-words ${
+              isBodyExpanded ? "line-clamp-none" : "line-clamp-5"
+            }`}
+          >
+            {elements.map((element, index) => (
+              <span key={index}>{element}</span>
+            ))}
+          </div>
+          {isBodyClamped && (
+            <Button
+              variant="text"
+              className="text-primary tracking-normal font-normal py-0"
+              onClick={() => setIsBodyExpanded(!isBodyExpanded)}
+            >
+              {isBodyExpanded ? "Read Less" : "Read More"}
+            </Button>
+          )}
         </div>
         {post.preview && !post.media && !post.sharedPost && (
           <div className="my-4">

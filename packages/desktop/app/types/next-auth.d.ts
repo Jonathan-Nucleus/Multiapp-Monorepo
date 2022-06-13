@@ -9,12 +9,4 @@ declare module "next-auth" {
     access_token: string;
     user?: DefaultSession["user"] & AccessTokenPayload;
   }
-
-  interface PagesOptions {
-    signUp: string;
-    forgotPassword: string;
-    resetPassword: string;
-    inviteCode: string;
-    preferences: string;
-  }
 }

@@ -126,7 +126,7 @@ const SignupPage: FC<LoginPageProps> = ({ ssoProviders }) => {
         password: password,
         redirect: false,
       }).then(async () => {
-        await router.replace("/");
+        await router.replace("/preferences");
       });
     } else {
       setError(
@@ -301,6 +301,7 @@ const SignupPage: FC<LoginPageProps> = ({ ssoProviders }) => {
                 onClick={async () => {
                   setLoadingSSO(true);
                   await signIn(provider);
+                  await router.replace("/preferences");
                 }}
               >
                 <span className="hidden md:inline-flex items-center">

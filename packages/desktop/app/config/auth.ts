@@ -59,7 +59,7 @@ const AppAuthOptions: NextAuthOptions = {
         const result = await createApolloClient(
           undefined,
           undefined,
-          process.env.NEXT_PUBLIC_GRAPHQL_URI
+          NEXT_PUBLIC_GRAPHQL_URI
         ).mutate({
           mutation: gql`
             mutation LoginOAuth($user: OAuthUserInput!) {
@@ -100,13 +100,8 @@ const AppAuthOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/login",
-    signUp: "/signup",
     signOut: "/logout",
     error: "/error",
-    forgotPassword: "/forgot-password",
-    resetPassword: "/reset-password",
-    inviteCode: "/invite-code",
-    preferences: "/preferences",
   },
 };
 

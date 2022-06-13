@@ -16,6 +16,6 @@ const Preferences: NextPageWithLayout = () => {
 };
 
 Preferences.layout = "auth";
-Preferences.middleware = "guest";
+Preferences.middleware = "auth";
 
 export default Preferences;

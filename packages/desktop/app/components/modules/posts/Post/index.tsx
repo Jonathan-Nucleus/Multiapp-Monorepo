@@ -30,9 +30,9 @@ const Post: FC<PostProps> = ({
   const [visiblePostLikeModal, setVisiblePostLikeModal] = useState(false);
   const [visibleComment, setVisibleComment] = useState(false);
   const isMyPost =
-    (post.user && post.user._id == account?._id) ||
-    (post.company && account?.companyIds?.includes(post.company._id));
-  const isMuted = account?.mutedPostIds?.includes(post._id) ?? false;
+    (post.user && post.user._id == account._id) ||
+    (post.company && account.companyIds?.includes(post.company._id));
+  const isMuted = account.mutedPostIds?.includes(post._id) ?? false;
   return (
     <>
       <Card
@@ -42,7 +42,7 @@ const Post: FC<PostProps> = ({
       >
         <div className="flex px-4 pt-4">
           <div>
-            <Header post={post} accountId={account?._id} />
+            <Header post={post} accountId={account._id} />
           </div>
           <div className={`ml-auto ${isPreview ? "hidden" : ""}`}>
             <ActionMenu
@@ -54,7 +54,7 @@ const Post: FC<PostProps> = ({
           </div>
         </div>
         <div className="mt-4">
-          <PostBody account={account} post={post} isPreview={isPreview} />
+          <PostBody accountId={account._id} post={post} isPreview={isPreview} />
         </div>
         {!isPreview && (
           <div className="flex items-center border-t border-brand-overlay/[.1] mt-4 px-4 py-3">

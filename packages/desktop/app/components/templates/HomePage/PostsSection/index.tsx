@@ -1,5 +1,4 @@
 import { FC, useEffect, useRef, useState, useCallback, memo } from "react";
-import { PostSummary } from "shared/graphql/fragments/post";
 import PostsList, {
   PostCategory,
   PostRoleFilter,
@@ -11,9 +10,8 @@ import AddPost from "./AddPost";
 import { UserProfileProps } from "../../../../types/common-props";
 import Button from "../../../common/Button";
 import { Plus } from "phosphor-react";
-import { Post, usePosts } from "shared/graphql/query/post/usePosts";
+import { usePosts } from "shared/graphql/query/post/usePosts";
 import _ from "lodash";
-import Spinner from "../../../common/Spinner";
 
 const POSTS_PER_SCROLL = 15;
 const SCROLL_OFFSET_THRESHOLD = 3000;
@@ -22,7 +20,6 @@ const PostsSection: FC<UserProfileProps> = ({ user }) => {
   const scrollOffset = useRef(0);
   const {
     data: { posts = [] } = {},
-    loading,
     refetch,
     fetchMore,
   } = usePosts(undefined, undefined, undefined, POSTS_PER_SCROLL);
@@ -30,13 +27,13 @@ const PostsSection: FC<UserProfileProps> = ({ user }) => {
   const [postAction, setPostAction] = useState<PostActionType>();
 
   const onEndReached = useCallback(() => {
-    const lastItem = posts[posts.length - 1]._id;
+    const lastItem = _.last(posts)?._id;
     fetchMore({
       variables: {
         before: lastItem,
       },
     });
-  }, [posts]);
+  }, [fetchMore, posts]);
 
   const onRefresh = useCallback(
     (categories?: PostCategory[], filter?: PostRoleFilter) =>

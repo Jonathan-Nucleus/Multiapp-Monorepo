@@ -307,7 +307,7 @@ const ProfileCard: FC<ProfileCardProps> = ({
             )}
             <div className="flex items-center p-4 border-t border-white/[.12]">
               <div className="flex items-center cursor-pointer">
-                <Link href={user.linkedIn ?? "/"}>
+                <Link href={user.linkedIn || "/"}>
                   <a
                     className="flex items-center text-white"
                     target="_blank"
@@ -321,7 +321,7 @@ const ProfileCard: FC<ProfileCardProps> = ({
                 </Link>
               </div>
               <div className="flex items-center cursor-pointer ml-8">
-                <Link href={user.twitter ?? "/"}>
+                <Link href={user.twitter || "/"}>
                   <a
                     className="flex items-center text-white"
                     target="_blank"
@@ -335,7 +335,7 @@ const ProfileCard: FC<ProfileCardProps> = ({
                 </Link>
               </div>
               <div className="flex items-center cursor-pointer ml-8">
-                <Link href={user.website ?? "/"}>
+                <Link href={user.website || "/"}>
                   <a
                     className="flex items-center text-white"
                     target="_blank"

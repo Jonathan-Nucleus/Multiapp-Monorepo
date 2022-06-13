@@ -2,78 +2,96 @@ import { ChangeEvent, FC, useState } from "react";
 import Checkbox from "../../common/Checkbox";
 import Label from "../../common/Label";
 import Button from "../../common/Button";
+import Link from "next/link";
+import { PostCategoryOptions } from "backend/schemas/post";
+import { UPDATE_SETTINGS } from "shared/graphql/mutation/account";
+import { useMutation } from "@apollo/client";
+import { useRouter } from "next/router";
+
+const categories = Object.keys(PostCategoryOptions);
 
 const PreferencesPage: FC = () => {
-  const preferences = [
-    "News",
-    "ESG",
-    "Politics",
-    "Venture Capital",
-    "Ideas",
-    "Financials",
-    "Education",
-    "Energy",
-    "Questions",
-    "Crypto",
-    "Tech",
-    "Private Equity",
-    "Consumer",
-    "Hedge Funds",
-    "Industrials",
-    "Entertainment",
-    "Healthcare",
-    "OpEd",
-  ];
   const [selections, setSelections] = useState<string[]>([]);
+  const [updateSettings] = useMutation(UPDATE_SETTINGS);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const onSubmit = async () => {
+    setLoading(true);
+    const { data } = await updateSettings({
+      variables: {
+        settings: {
+          interests: selections,
+        },
+      },
+    });
+    if (data && data.updateSettings) {
+      await router.replace("/");
+    }
+    setLoading(false);
+  };
   return (
     <div className="px-3">
       <div className="container mx-auto max-w-xl">
-        <div className="text-white">One last thing...</div>
         <h1 className="text-white text-2xl mt-4">
           Select at least 3 topics to help us personalize your experience.
         </h1>
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-          {preferences.map((preference) => (
+          {categories.map((key) => (
             <div
-              key={preference}
-              className="bg-primary-solid/[.3] rounded-full flex flex-row items-center px-3 py-2"
+              key={key}
+              className="flex items-center bg-background rounded-full overflow-hidden relative cursor-pointer"
             >
-              <Checkbox
-                id={`preference-${preference}`}
-                onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                  const _selections = [...selections];
-                  const index = _selections.indexOf(preference);
-                  if (event.target.checked) {
-                    if (index == -1) {
-                      _selections.push(preference);
-                    }
+              <div
+                className="w-full bg-primary-solid/[.24]"
+                onClick={() => {
+                  if (!selections.includes(key)) {
+                    setSelections([...selections, key]);
                   } else {
-                    if (index != -1) {
-                      _selections.splice(index, 1);
-                    }
+                    setSelections(selections.filter((item) => item != key));
                   }
-                  setSelections(_selections);
+                }}
+              >
+                <div
+                  className={`text-sm hover:bg-white/[.08] ${
+                    selections.includes(key) ? "bg-white/[.08]" : ""
+                  } transition pl-10 py-2`}
+                >
+                  {PostCategoryOptions[key].label}
+                </div>
+              </div>
+              <Checkbox
+                className="absolute left-3"
+                checked={selections.includes(key)}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                  if (event.target.checked) {
+                    setSelections([...selections, key]);
+                  } else {
+                    setSelections(selections.filter((item) => item != key));
+                  }
                 }}
               />
-              <Label htmlFor={`preference-${preference}`} className="ml-2">
-                {preference}
-              </Label>
             </div>
           ))}
         </div>
         <div className="mt-10 flex flex-row justify-between md:pl-24 pb-10">
           <div className="md:mx-auto">
-            <Button variant="text" className="text-primary">
-              SKIP
-            </Button>
+            <Link href={"/"}>
+              <a>
+                <Button variant="text" className="text-xs text-primary">
+                  Skip
+                </Button>
+              </a>
+            </Link>
           </div>
           <div>
             <Button
               variant="gradient-primary"
-              className="w-24"
+              className="w-32 text-sm font-medium"
               disabled={selections.length < 3}
+              loading={loading}
+              onClick={onSubmit}
             >
-              FINISH
+              Finish
             </Button>
           </div>
         </div>
