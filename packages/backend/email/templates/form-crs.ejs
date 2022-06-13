@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Acknowledgement of Form CRS</title>
+
+        <link rel="apple-touch-icon" sizes="180x180" href="img/favicon/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="img/favicon/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
+
+      <style>
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+        }
+      </style>
+    </head>
+    <body style="background:#121212; padding:0; margin:0">
+        The user, <%= firstName %> <%= lastName %>, has acknowledged they've
+        received and reviewed the Prometheus Financial Advisors LLC Form ADV
+        Part 2A and the Prometheus Financial LLC Brokerage Form CRS
+        Relationship Summary. The user was provided a direct link to each of
+        these forms (on the firm's publicly available  website) at the time of
+        the user's acknowledgement. *We are also capturing their name, email
+        and day/time they acknowledged the form CRS/Form ADV 2a.*
+
+        <ul>
+            <li>Name: <%= firstName %> <%= lastName %></li>
+            <li>Email: <%= email %></li>
+            <li>User ID: <%= id %></li>
+            <li>Date: <%= date %></li>
+        </ul>
+    </body>
+</html>

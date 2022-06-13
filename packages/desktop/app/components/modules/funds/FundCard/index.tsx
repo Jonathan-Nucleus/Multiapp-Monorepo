@@ -40,7 +40,7 @@ const FundCard: FC<FundCardProps> = ({
             <div className="flex items-center">
               {showImages && (
                 <div className="w-24 h-24 flex-shrink-0 mr-4">
-                  <Link href={`/company/${fund.company._id}`}>
+                  <Link href={`/funds/${fund._id}`}>
                     <a>
                       <Avatar
                         user={fund.company}

@@ -79,13 +79,6 @@ const AvatarEditor: FC<AvatarEditorProps> = ({
             className="hidden"
           />
         </Label>
-        <Button
-          variant="outline-primary"
-          className="w-10 h-10 text-white rounded-full ml-4 !p-0"
-          disabled={true}
-        >
-          <Trash size={24} color="currentColor" weight="bold" />
-        </Button>
       </div>
     </>
   );

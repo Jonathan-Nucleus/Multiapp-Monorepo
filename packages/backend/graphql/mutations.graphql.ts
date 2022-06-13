@@ -540,8 +540,21 @@ const resolvers = {
           status: Array.from(new Set(questionnaire.status)), // Ensure unique values
         });
 
-        if (userData && questionnaire.class === "advisor") {
-          await PrometheusMailer.sendFARequest(userData);
+        if (userData) {
+          let result = await PrometheusMailer.sendFormCRS(userData);
+          if (!result) {
+            console.log(
+              "Error sending form CRS confirmation for user",
+              userData._id
+            );
+          }
+
+          if (questionnaire.class === "advisor") {
+            result = await PrometheusMailer.sendFARequest(userData);
+            if (!result) {
+              console.log("Error sending FA request for user", userData._id);
+            }
+          }
         }
 
         return userData;

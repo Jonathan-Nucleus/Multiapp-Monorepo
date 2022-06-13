@@ -9,6 +9,7 @@ import {
   HelpRequestTypeMapping,
   PreferredTimeOfDayOptionsMapping,
 } from "../graphql/help-requests.graphql";
+import dayjs from "dayjs";
 
 import "dotenv/config";
 import { Fund } from "../schemas/fund";
@@ -17,6 +18,7 @@ const SENDER = process.env.EMAIL_SENDER as string;
 const PROMETHEUS_URL = process.env.PROMETHEUS_URL as string;
 const MAILER_TEMPLATE_PATH: string = path.join(__dirname, "./templates");
 const CS_EMAIL = process.env.CS_EMAIL as string;
+const COMPLIANCE_EMAIL = process.env.COMPLIANCE_EMAIL as string;
 const EMAIL_ENABLED = JSON.parse(
   (process.env.EMAIL_ENABLED ?? "true").toLowerCase()
 ) as boolean;
@@ -144,6 +146,33 @@ export const PrometheusMailer = {
       console.log("Error", err);
       throw new ApolloError(
         `Error sending password reset email to ${recipient}`
+      );
+    }
+  },
+
+  /**
+   * Sends an email the Prometheus compliance team when a user has acknowledged
+   * review of form CRS.
+   *
+   * @param user  User that acknowledged review of the forms.
+   */
+  sendFormCRS: async function (user: User.Mongo): Promise<boolean> {
+    try {
+      const { firstName, lastName, _id, email } = user;
+      const date = dayjs().format("h:mm A ZZ on MMM D, YYYY");
+      await sendEmail(COMPLIANCE_EMAIL, "form-crs", {
+        firstName,
+        lastName,
+        email,
+        id: _id,
+        date,
+      });
+
+      return true;
+    } catch (err) {
+      console.log("Error", err);
+      throw new ApolloError(
+        `Error sending form crs confirmation email to ${COMPLIANCE_EMAIL}`
       );
     }
   },

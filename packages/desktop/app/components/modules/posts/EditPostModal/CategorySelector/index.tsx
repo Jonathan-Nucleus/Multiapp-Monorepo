@@ -36,8 +36,9 @@ function CategorySelector<
       <div className="text-white/[.6] p-4 border-t md:border-t-0 border-b border-white/[.12]">
         <div className="text-sm">Categories</div>
         <div className="text-xs mt-2">
-          Select categories to make your post easier to find and visible to more
-          people.
+          Select a{" "}
+          <strong className="text-white/[0.8]">max of 3 categories</strong> to
+          make your post easier to find and visible to more people.
         </div>
         {error && <div className="text-xs text-error mt-2">{error}</div>}
       </div>

@@ -37,7 +37,6 @@ export const PMessageSimple = () => {
     onUserClick,
     onUserHover,
     reactionSelectorRef,
-    showDetailedReactions,
     threadList,
   } = useMessageContext<StreamType>("MessageSimple");
 
@@ -115,15 +114,6 @@ export const PMessageSimple = () => {
               : undefined
           }
         >
-          <>
-            <MessageOptions />
-            {hasReactions && !showDetailedReactions && isReactionEnabled && (
-              <ReactionsList reverse />
-            )}
-            {showDetailedReactions && isReactionEnabled && (
-              <ReactionSelector ref={reactionSelectorRef} />
-            )}
-          </>
           {message.attachments?.length && !message.quoted_message ? (
             <Attachment
               actionHandler={handleAction}

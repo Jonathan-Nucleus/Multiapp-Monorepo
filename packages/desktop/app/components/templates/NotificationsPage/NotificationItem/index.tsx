@@ -1,4 +1,5 @@
 import React, { FC } from "react";
+import { useRouter } from "next/router";
 import { ChatCenteredText, ThumbsUp, UserCirclePlus, At } from "phosphor-react";
 import moment from "moment";
 
@@ -7,13 +8,15 @@ import Avatar from "../../../common/Avatar";
 
 interface NotificationItemProps {
   notification: Notification;
-  handleReadNotification: (id: string) => void;
+  handleReadNotification: (id: string) => Promise<void>;
 }
 
 const NotificationItem: FC<NotificationItemProps> = ({
   notification,
   handleReadNotification,
 }) => {
+  const router = useRouter();
+
   let notificationIcon;
   switch (notification.type) {
     case "COMMENT_POST":
@@ -35,9 +38,17 @@ const NotificationItem: FC<NotificationItemProps> = ({
   return (
     <div
       className={`${notification.isNew && "bg-background-blue"}`}
-      onClick={() =>
-        notification.isNew && handleReadNotification(notification._id)
-      }
+      onClick={async () => {
+        if (notification.isNew) {
+          await handleReadNotification(notification._id);
+        }
+
+        if (notification.type === "FOLLOWED_BY_USER") {
+          router.push(`profile/${notification.data.userId}`);
+        } else {
+          router.push(`posts/${notification.data.postId}`);
+        }
+      }}
     >
       <div className="flex items-center cursor-pointer py-3">
         <div className={notification.isNew ? "" : "invisible"}>

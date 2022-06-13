@@ -59,9 +59,9 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
   const latestYear =
     sortedReturns[sortedReturns.length - 2]?.date.getFullYear(); // Assume last entry is YTD for last year
   const numYears = latestYear - earliestYear + 1;
-  const years = [...Array(!isNaN(numYears) ? numYears : 0)].map(
-    (_, index) => earliestYear + index
-  );
+  const years = [...Array(!isNaN(numYears) ? numYears : 0)]
+    .map((_, index) => earliestYear + index)
+    .reverse();
 
   const documentsSorted = [...fund.documents];
   documentsSorted.sort((a, b) => b.date.getTime() - a.date.getTime());
@@ -309,7 +309,10 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                     <div className="mt-3">
                       {documentsSorted.slice(0, 2)?.map((doc) => (
                         <div key={doc.url} className="mb-3">
-                          <Card className="p-0">
+                          <Card
+                            className="p-0 cursor-pointer"
+                            onClick={() => goToFile(doc.url)}
+                          >
                             <div className="flex items-center">
                               <div className="w-32 h-24 flex bg-gray-300 relative items-center justify-center">
                                 <Image src={RecentDoc} alt="" />
