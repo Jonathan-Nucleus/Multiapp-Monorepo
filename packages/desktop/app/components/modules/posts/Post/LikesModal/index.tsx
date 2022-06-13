@@ -14,7 +14,7 @@ const LikesModal: FC<LikesModalProps> = ({ show, onClose, members }) => {
     <>
       <ModalDialog
         title="People Who Liked This Post"
-        className="h-[80vh] flex-grow"
+        className="h-[80vh] flex-grow max-w-lg"
         show={show}
         onClose={onClose}
       >

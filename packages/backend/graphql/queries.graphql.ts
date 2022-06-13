@@ -32,6 +32,8 @@ import {
 import type { Fund } from "../schemas/fund";
 import type { Notification } from "../schemas/notification";
 
+import { LINK_PATTERN } from "shared/src/patterns";
+
 import "dotenv/config";
 
 const schema = gql`
@@ -243,22 +245,32 @@ const resolvers = {
         { body }: { body: string }
       ): Promise<LinkPreview | null> => {
         try {
-          const previewData =
-            (await getLinkPreview(body, {
-              headers: {
-                "User-Agent":
-                  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/85 Version/11.1.1 Safari/605.1.15",
-                "Accept-Lanugage": "en,en-US",
-                Accept:
-                  "text/html,application/xhtml+xml,application/xml;q=0.9,/;q=0.8",
-              },
-              followRedirects: true,
-            })) ?? null;
-          return previewData;
+          const link = body.match(LINK_PATTERN)?.[0]?.toLowerCase();
+          if (link) {
+            const fullLink = link.startsWith("http") ? link : `http://${link}`;
+            console.log("generating preview data for", fullLink);
+            const previewData =
+              (await getLinkPreview(fullLink, {
+                headers: {
+                  "User-Agent":
+                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/85 Version/11.1.1 Safari/605.1.15",
+                  "Accept-Lanugage": "en,en-US",
+                  Accept:
+                    "text/html,application/xhtml+xml,application/xml;q=0.9,/;q=0.8",
+                },
+                followRedirects: true,
+              })) ?? null;
+            return previewData;
+          }
         } catch (error) {
-          console.log("Error generating linking preview for", body);
-          return null;
+          console.log(
+            "Error generating linking preview for",
+            body,
+            JSON.stringify(error, null, 2)
+          );
         }
+
+        return null;
       }
     ),
 
