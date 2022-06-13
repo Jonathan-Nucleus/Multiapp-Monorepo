@@ -32,9 +32,10 @@ import {
 import type { Fund } from "../schemas/fund";
 import type { Notification } from "../schemas/notification";
 
-import { LINK_PATTERN } from "shared/src/patterns";
-
 import "dotenv/config";
+
+const LINK_PATTERN =
+  /((?:(?:https|http|ftp):\/\/)?(?:www\.)?(?:[-a-zA-Z\d@:%._+~#=]{2,256}\.[a-z]{2,6}\b)+(?:\/[/\d\w.\-?=&%+#]+)?)/gim;
 
 const schema = gql`
   type Query {
