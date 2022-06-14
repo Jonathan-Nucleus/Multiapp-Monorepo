@@ -61,10 +61,11 @@ export type DeserializedUser = {
 
 export const DEFAULT_USER_OPTIONS: Pick<
   User.Mongo,
-  "role" | "accreditation" | "settings"
+  "role" | "accreditation" | "settings" | "followingIds"
 > = {
   role: UserRoleOptions.USER,
   accreditation: AccreditationOptions.NONE.value,
+  followingIds: [toObjectId("628fee97fef84ea6746e08fb")], // Everyone follow Michael Wang
   settings: {
     interests: [],
     tagging: true,
