@@ -329,7 +329,8 @@ const resolvers = {
 
         return await PrometheusMailer.sendInviteCode(
           email.toLowerCase(),
-          stubUser.emailToken as string
+          stubUser.emailToken as string,
+          user
         );
       }
     ),

@@ -72,13 +72,15 @@ type EmailResponse = ReturnType<
 async function sendEmail(
   sendTo: string | string[],
   template: string,
-  templateData: EjsData
+  templateData: EjsData,
+  emailSubject?: string
 ): Promise<EmailResponse | true> {
   if (!EMAIL_ENABLED) return true;
 
   // Render the HTML email and extract the subject from the title
   const html: string = await renderTemplate(template, templateData);
-  const subject: string = html.match(/<title[^>]*>([^<]+)<\/title>/)?.[1] || "";
+  const subject: string =
+    emailSubject || html.match(/<title[^>]*>([^<]+)<\/title>/)?.[1] || "";
   return sesInstance
     .sendEmail({
       Source: SENDER,
@@ -114,10 +116,14 @@ export const PrometheusMailer = {
    */
   sendInviteCode: async function (
     recipient: string,
-    emailToken: string
+    emailToken: string,
+    sender?: User.Mongo
   ): Promise<boolean> {
     try {
-      await sendEmail(recipient, "send-invite", { token: emailToken });
+      const subject = sender
+        ? `${sender.firstName} ${sender.lastName} has invited you to Prometheus!`
+        : "You've been invited to Prometheus!";
+      await sendEmail(recipient, "send-invite", { token: emailToken }, subject);
 
       return true;
     } catch (err) {
