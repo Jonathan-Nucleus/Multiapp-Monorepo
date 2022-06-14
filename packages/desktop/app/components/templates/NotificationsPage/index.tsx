@@ -39,7 +39,7 @@ const NotificationPage: FC = () => {
   return (
     <div className="lg:ml-48 xl:ml-80 max-w-6xl m-auto mt-8 pl-12">
       <div className="flex items-center mb-4 px-2 max-w-2xl mr-96">
-        <div className="text-2xl mr-4">Notifications</div>
+        <div className="text-2xl mr-4 text-white">Notifications</div>
         <Button
           variant="text"
           className="flex items-center text-sm text-primary font-medium tracking-wider md:flex"

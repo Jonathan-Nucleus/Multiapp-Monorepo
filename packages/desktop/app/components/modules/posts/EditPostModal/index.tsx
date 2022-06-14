@@ -197,8 +197,18 @@ const EditPostModal: FC<EditPostModalProps> = ({
             },
           });
 
+          const previewData = data?.linkPreview as
+            | (LinkPreviewResponse & {
+                __typename?: string;
+              })
+            | undefined;
+
+          if (previewData) {
+            delete previewData.__typename;
+          }
+
           setLinkPreview(link);
-          setPreview(data?.linkPreview ?? undefined);
+          setPreview(previewData ?? undefined);
           setPreviewLoading(false);
         }
       } else {

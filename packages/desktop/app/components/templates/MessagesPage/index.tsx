@@ -15,7 +15,7 @@ import PThreadHeader from "./PChannel/PThreadHeader";
 import { PChannel } from "./PChannel";
 import { GiphyContext } from "../../../types/message";
 import { useAccountContext } from "shared/context/Account";
-import { useChatContext } from "shared/context/Chat";
+import { useChatContext } from "desktop/app/components/providers/ChatProvider";
 
 const TARGET_ORIGIN = "https://getstream.io";
 const options = { state: true, watch: true, presence: true };

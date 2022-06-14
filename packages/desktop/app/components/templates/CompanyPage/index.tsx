@@ -29,14 +29,16 @@ const CompanyPage: FC<CompanyPageProps> = ({ company }: CompanyPageProps) => {
           <div className="pb-5">
             <ProfileCard company={company} isEditable={isMyCompany} />
           </div>
-          <div className="py-5">
-            <div className="text-white mt-8 mb-2 ml-2 font-medium">Funds</div>
-            {funds.map((fund) => (
-              <div key={fund._id} className="mb-5">
-                <FundCard fund={fund} showImages={false} />
-              </div>
-            ))}
-          </div>
+          {funds.length > 0 ? (
+            <div className="py-5">
+              <div className="text-white mt-8 mb-2 ml-2 font-medium">Funds</div>
+              {funds.map((fund) => (
+                <div key={fund._id} className="mb-5">
+                  <FundCard fund={fund} showImages={false} />
+                </div>
+              ))}
+            </div>
+          ) : null}
           <div className="w-full block lg:hidden">
             <div className="font-medium text-white ml-4 md:m-0">
               Team Members

@@ -15,7 +15,7 @@ import { Menu } from "@headlessui/react";
 
 import Button from "../../../../components/common/Button";
 import Card from "../../../../components/common/Card";
-import Avatar from "../../../common/Avatar";
+import Avatar, { backgroundUrl } from "../../../common/Avatar";
 import { CompanyProfile } from "shared/graphql/query/company/useCompany";
 import FollowersModal from "../../../modules/users/FollowersModal";
 import { useFollowCompany } from "shared/graphql/mutation/account/useFollowCompany";
@@ -63,9 +63,9 @@ const ProfileCard: FC<CompanyPageProps> = ({
               {companyBackground?.url && (
                 <Image
                   loader={() =>
-                    `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${companyBackground.url}`
+                    backgroundUrl(company._id, companyBackground.url)
                   }
-                  src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${companyBackground.url}`}
+                  src={backgroundUrl(company._id, companyBackground.url)}
                   alt=""
                   layout="fill"
                   objectFit="cover"

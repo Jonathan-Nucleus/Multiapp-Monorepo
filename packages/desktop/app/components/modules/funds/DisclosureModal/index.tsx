@@ -48,7 +48,7 @@ const DisclosureModal: FC<DisclosureModalProps> = ({ show, onClose }) => {
                     <X color="white" size={24} />
                   </div>
                 </div>
-                <div className="mt-4">
+                <div className="mt-4 text-white/[0.8]">
                   Content provided is for educational purposes only. All
                   investments involve risk, including the possible loss of
                   capital. Private placements, also referred to as alternative

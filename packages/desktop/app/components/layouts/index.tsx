@@ -7,7 +7,7 @@ import MainLayout from "./MainLayout";
 import Background from "./Background";
 import { Toaster } from "react-hot-toast";
 import { AccountProvider } from "shared/context/Account";
-import { ChatProvider } from "shared/context/Chat";
+import { ChatProvider } from "desktop/app/components/providers/ChatProvider";
 import dynamic from "next/dynamic";
 import { useChatToken } from "shared/graphql/query/account/useChatToken";
 

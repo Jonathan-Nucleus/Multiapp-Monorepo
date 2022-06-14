@@ -1261,9 +1261,9 @@ const resolvers = {
 
         const { localFilename, type, id } = args;
 
-        const fileExt = localFilename.substring(
-          localFilename.lastIndexOf(".") + 1
-        );
+        const fileExt = localFilename
+          .toLowerCase()
+          .substring(localFilename.lastIndexOf(".") + 1);
         const uploadInfo = await getUploadUrl(
           fileExt,
           type.toLowerCase() as Lowercase<MediaType>,

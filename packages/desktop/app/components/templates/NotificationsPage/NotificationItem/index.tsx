@@ -60,12 +60,18 @@ const NotificationItem: FC<NotificationItemProps> = ({
             {notificationIcon}
           </div>
         </div>
-        <div className="text-sm flex-grow ml-3">
-          <div className={notification.isNew ? "font-bold" : "font-normal"}>
+        <div className="text-sm flex-grow ml-3 text-white">
+          <div
+            className={
+              notification.isNew
+                ? "font-semibold"
+                : "font-light text-white/[0.8]"
+            }
+          >
             {notification.body}
           </div>
         </div>
-        <div className="text-xs text-white flex-shrink-0 opacity-60 ml-3 mr-6">
+        <div className="text-xs text-white/[0.4] font-light flex-shrink-0 ml-3 mr-6">
           {moment(notification.createdAt).fromNow()}
         </div>
       </div>

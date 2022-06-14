@@ -37,7 +37,7 @@ const ContactEmail: FC<ContactEmailProps> = ({ funds, onComplete, onBack }) => {
     resolver: yupResolver(schema),
     mode: "onChange",
   });
-  const isValid = formState.isValid;
+  const { isValid } = formState;
   const fundOptions = funds.map((fund) => {
     return {
       label: fund.name,

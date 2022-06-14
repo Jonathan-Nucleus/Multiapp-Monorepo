@@ -14,7 +14,8 @@ import { Menu } from "@headlessui/react";
 
 import Button from "../../../../components/common/Button";
 import Card from "../../../../components/common/Card";
-import Avatar from "../../../common/Avatar";
+import Avatar, { backgroundUrl } from "../../../common/Avatar";
+import Media from "../../../common/Media";
 import FollowersModal from "../../../modules/users/FollowersModal";
 
 import LinkedIn from "shared/assets/images/linkedin.svg";
@@ -65,18 +66,17 @@ const ProfileCard: FC<ProfileCardProps> = ({
     }
   }
 
+  const { background } = user;
   return (
     <>
       <div className="relative">
         <Card className="rounded-none lg:rounded-2xl border-brand-overlay/[.1] p-0">
           <div>
             <div className="w-full h-16 lg:h-32 bg-gradient-to-r from-[#844AFF] to-primary relative">
-              {user.background && (
+              {background && (
                 <Image
-                  loader={() =>
-                    `${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${user.background?.url}`
-                  }
-                  src={`${process.env.NEXT_PUBLIC_BACKGROUND_URL}/${user.background?.url}`}
+                  loader={() => backgroundUrl(user._id, background.url)}
+                  src={backgroundUrl(user._id, background.url)}
                   alt=""
                   layout="fill"
                   objectFit="cover"
@@ -306,46 +306,52 @@ const ProfileCard: FC<ProfileCardProps> = ({
               </div>
             )}
             <div className="flex items-center p-4 border-t border-white/[.12]">
-              <div className="flex items-center cursor-pointer">
-                <Link href={user.linkedIn || "/"}>
-                  <a
-                    className="flex items-center text-white"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Image src={LinkedIn} alt="" layout={"intrinsic"} />
-                    <div className="text-sm text-primary ml-1 hidden md:block">
-                      Linkedin
-                    </div>
-                  </a>
-                </Link>
-              </div>
-              <div className="flex items-center cursor-pointer ml-8">
-                <Link href={user.twitter || "/"}>
-                  <a
-                    className="flex items-center text-white"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Image src={Twitter} alt="" layout={"intrinsic"} />
-                    <div className="text-sm text-primary ml-1 hidden md:block">
-                      Twitter
-                    </div>
-                  </a>
-                </Link>
-              </div>
-              <div className="flex items-center cursor-pointer ml-8">
-                <Link href={user.website || "/"}>
-                  <a
-                    className="flex items-center text-white"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Image src={Globe} alt="" layout={"intrinsic"} />
-                    <div className="text-sm text-primary ml-1">Website</div>
-                  </a>
-                </Link>
-              </div>
+              {user.linkedIn ? (
+                <div className="flex items-center cursor-pointer mr-8">
+                  <Link href={user.linkedIn || "/"}>
+                    <a
+                      className="flex items-center text-white"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Image src={LinkedIn} alt="" layout={"intrinsic"} />
+                      <div className="text-sm text-primary ml-1 hidden md:block">
+                        Linkedin
+                      </div>
+                    </a>
+                  </Link>
+                </div>
+              ) : null}
+              {user.twitter ? (
+                <div className="flex items-center cursor-pointer mr-8">
+                  <Link href={user.twitter || "/"}>
+                    <a
+                      className="flex items-center text-white"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Image src={Twitter} alt="" layout={"intrinsic"} />
+                      <div className="text-sm text-primary ml-1 hidden md:block">
+                        Twitter
+                      </div>
+                    </a>
+                  </Link>
+                </div>
+              ) : null}
+              {user.website ? (
+                <div className="flex items-center cursor-pointer mr-8">
+                  <Link href={user.website || "/"}>
+                    <a
+                      className="flex items-center text-white"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Image src={Globe} alt="" layout={"intrinsic"} />
+                      <div className="text-sm text-primary ml-1">Website</div>
+                    </a>
+                  </Link>
+                </div>
+              ) : null}
               <div className="ml-auto">
                 <Menu>
                   <Menu.Button>
@@ -388,13 +394,6 @@ const ProfileCard: FC<ProfileCardProps> = ({
                           </div>
                         </>
                       )}
-                      <div
-                        className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
-                        onClick={() => copyProfileLink()}
-                      >
-                        <Copy color="currentColor" size={24} />
-                        <span className="ml-4">Copy Profile Link</span>
-                      </div>
                     </div>
                   </Menu.Items>
                 </Menu>

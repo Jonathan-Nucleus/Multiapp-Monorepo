@@ -16,6 +16,10 @@ interface AvatarProps extends HTMLProps<HTMLDivElement> {
   shape?: "circle" | "square";
 }
 
+export function backgroundUrl(id: string, mediaUrl: string): string {
+  return `${NEXT_PUBLIC_AWS_BUCKET}/backgrounds/${id}/${mediaUrl}`;
+}
+
 const Avatar: FC<AvatarProps> = ({
   user,
   size = 56,

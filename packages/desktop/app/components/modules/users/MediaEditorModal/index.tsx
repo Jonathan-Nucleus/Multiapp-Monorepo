@@ -7,7 +7,7 @@ import { useFetchUploadLink } from "shared/graphql/mutation/posts";
 import { useAccountContext } from "shared/context/Account";
 import {
   useUpdateCompanyProfile,
-  useUpdateUserProfile
+  useUpdateUserProfile,
 } from "shared/graphql/mutation/account";
 import { UserProfile } from "shared/graphql/query/user/useProfile";
 import AvatarEditor from "./AvatarEditor";
@@ -47,7 +47,7 @@ const MediaEditorModal: FC<MediaEditorModalProps> = ({
       variables: {
         localFilename: selectedFile!.name,
         type: mediaType,
-        id: account._id,
+        id: user?._id || company?._id || "",
       },
     });
     if (!data?.uploadLink) {
@@ -125,6 +125,7 @@ const MediaEditorModal: FC<MediaEditorModalProps> = ({
       }
     }
     setLoading(false);
+    onClose();
   };
   return (
     <>

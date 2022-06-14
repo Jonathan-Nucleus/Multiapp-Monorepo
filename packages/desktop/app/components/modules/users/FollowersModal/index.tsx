@@ -33,7 +33,7 @@ const FollowersModal: FC<FollowersModalProps> = ({
       return followers.filter((user) =>
         `${user.firstName} ${user.lastName}`
           .toLowerCase()
-          .includes(keywordFollowers.toLowerCase()),
+          .includes(keywordFollowers.toLowerCase())
       );
     }
   }, [followers, keywordFollowers]);
@@ -44,7 +44,7 @@ const FollowersModal: FC<FollowersModalProps> = ({
       return following.filter((user) =>
         `${user.firstName} ${user.lastName}`
           .toLowerCase()
-          .includes(keywordFollowing.toLowerCase()),
+          .includes(keywordFollowing.toLowerCase())
       );
     }
   }, [following, keywordFollowing]);
@@ -53,7 +53,7 @@ const FollowersModal: FC<FollowersModalProps> = ({
       <ModalDialog
         show={show}
         onClose={onClose}
-        className="flex flex-col border-0 h-[80vh] p-0 z-20 w-full max-w-md"
+        className="flex flex-col border-0 h-[80vh] p-0 z-20 w-full max-w-lg"
       >
         <Tab.Group
           selectedIndex={selectedTabIndex}
@@ -112,7 +112,7 @@ const FollowersModal: FC<FollowersModalProps> = ({
                 {filteredFollowers.length > 0 ? (
                   <>
                     {filteredFollowers.map((user) => (
-                      <div key={user._id} className="px-3 py-3">
+                      <div key={user._id} className="px-4 py-3">
                         <UserItem user={user} />
                       </div>
                     ))}
@@ -137,7 +137,7 @@ const FollowersModal: FC<FollowersModalProps> = ({
                 {filteredFollowing.length > 0 ? (
                   <>
                     {filteredFollowing.map((user) => (
-                      <div key={user._id} className="px-3 py-3">
+                      <div key={user._id} className="px-4 py-3">
                         <UserItem user={user} />
                       </div>
                     ))}
