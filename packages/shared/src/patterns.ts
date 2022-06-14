@@ -49,3 +49,10 @@ export const processPost = (text: string): string[] => {
 
   return processedSplits;
 };
+
+export const parseMentions = (text: string): string[] => {
+  const matches = Array.from(text.matchAll(MENTION_PATTERN)).map(
+    (match) => match[5]
+  );
+  return matches;
+};

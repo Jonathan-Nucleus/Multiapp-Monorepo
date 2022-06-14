@@ -1167,6 +1167,7 @@ const resolvers = {
               "tagged-in-comment",
               mentionId,
               {
+                postId: postData._id,
                 commentId: newComment._id,
               }
             );

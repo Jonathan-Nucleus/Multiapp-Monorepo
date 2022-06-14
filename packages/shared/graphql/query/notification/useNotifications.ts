@@ -49,7 +49,8 @@ export function useNotifications(): QueryResult<
           updatedAt
         }
       }
-    `
+    `,
+    { fetchPolicy: "cache-and-network" }
   );
   useEffect(() => {
     if (!loading && data) {

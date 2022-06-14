@@ -1,0 +1,15 @@
+.mentions--multiLine .mentions__input {
+  @apply outline-none border border-transparent;
+}
+
+.mentions__highlighter {
+  @apply box-border overflow-hidden inset-0;
+}
+
+.mentions__suggestions__list {
+  @apply bg-background-popover w-96 max-h-80 p-2 overflow-y-auto shadow-black shadow-md;
+}
+
+.mentions__suggestions__item--focused {
+  @apply bg-primary-overlay/[.24];
+}

@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useRef, useState } from "react";
 import { Image as PhotoImage, PaperPlaneRight, Smiley } from "phosphor-react";
 import { useFetchUploadLink } from "shared/graphql/mutation/posts";
 
@@ -12,6 +12,7 @@ import MediaPreview from "../../../EditPostModal/MediaPreview";
 import * as yup from "yup";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import MentionTextarea from "../../../MentionTextarea";
 
 interface SendMessageProps {
   type: "create-comment" | "edit-comment";
@@ -22,13 +23,34 @@ interface SendMessageProps {
 }
 
 type FormValues = {
-  body: string;
+  mentionInput: {
+    body: string;
+    mentions: {
+      id: string;
+      name: string;
+    }[];
+  };
   mediaUrl?: string;
 };
 
 const schema = yup
   .object({
-    body: yup.string().required("Required"),
+    mentionInput: yup
+      .object({
+        body: yup.string().required(),
+        mentions: yup
+          .array()
+          .of(
+            yup
+              .object({
+                id: yup.string().required(),
+                name: yup.string().required(),
+              })
+              .required()
+          )
+          .default([]),
+      })
+      .required(),
     mediaUrl: yup.string().notRequired(),
   })
   .required();
@@ -45,23 +67,28 @@ const SendMessage: FC<SendMessageProps> = ({
   const [visibleEmoji, setVisibleEmoji] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File>();
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const suggestionsContainer = useRef<HTMLDivElement>(null);
   const {
     handleSubmit,
-    register,
-    setFocus,
+    control,
+    getValues,
     setValue,
-    watch,
     reset,
     formState: { isValid },
   } = useForm<yup.InferType<typeof schema>>({
     resolver: yupResolver(schema),
-    defaultValues: { body: message, mediaUrl: undefined },
+    defaultValues: {
+      mentionInput: { body: message, mentions: [] },
+      mediaUrl: undefined,
+    },
     mode: "onChange",
   });
   const onEmojiClick = (emojiObject: any) => {
-    setValue("body", watch("body") + emojiObject.native);
+    const body = getValues("mentionInput.body");
+    setValue("mentionInput.body", body + emojiObject.native);
     setVisibleEmoji(false);
-    setFocus("body");
+    inputRef.current?.focus();
   };
   const uploadMedia = async (file: File) => {
     const { data } = await fetchUploadLink({
@@ -86,13 +113,13 @@ const SendMessage: FC<SendMessageProps> = ({
     }
     return remoteName;
   };
-  const onSubmit: SubmitHandler<FormValues> = async ({ body }) => {
+  const onSubmit: SubmitHandler<FormValues> = async ({ mentionInput }) => {
     setLoading(true);
     let mediaUrl;
     if (selectedFile) {
       mediaUrl = await uploadMedia(selectedFile);
     }
-    await onSend(body, mediaUrl);
+    await onSend(mentionInput.body, mediaUrl);
     reset();
     setSelectedFile(undefined);
     setLoading(false);
@@ -108,15 +135,30 @@ const SendMessage: FC<SendMessageProps> = ({
           <div className={type == "create-comment" ? "" : "invisible"}>
             <Avatar user={account} size={36} className="mt-0.5" />
           </div>
-          <div className="flex-grow mx-2">
-            <div className="flex items-center relative">
-              <Input
-                placeholder={placeholder}
-                className="bg-background pl-4 pr-12 text-xs font-light !rounded-full"
-                disabled={loading}
-                {...register("body")}
-              />
-              <div className="absolute flex items-center right-4">
+          <div className="flex-grow min-w-0 mx-2">
+            <div ref={suggestionsContainer} className="relative">
+              <div className="w-full bg-white rounded-3xl text-xs text-black py-3">
+                <div className="max-h-28 overflow-y-auto pl-4 pr-10">
+                  <MentionTextarea
+                    inputRef={inputRef}
+                    name="mentionInput"
+                    placeholder={placeholder}
+                    control={control}
+                    type="comment"
+                    suggestionsContainer={
+                      suggestionsContainer.current ?? undefined
+                    }
+                    onKeyDown={(event) => {
+                      if (event.key == "Enter" && !event.shiftKey) {
+                        event.preventDefault();
+                        handleSubmit(onSubmit)();
+                      }
+                    }}
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+              <div className="absolute flex items-center right-4 top-1">
                 <Button
                   variant="text"
                   onClick={() => setVisibleEmoji(!visibleEmoji)}

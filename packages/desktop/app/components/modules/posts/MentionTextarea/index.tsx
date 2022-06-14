@@ -4,7 +4,8 @@ import {
   MentionsInput as MentionsInputReact17,
   MentionsInputProps,
 } from "react-mentions";
-import styles from "./index.module.scss";
+import postStyles from "./post.module.scss";
+import commentStyles from "./comment.module.scss";
 import { ShieldCheck } from "phosphor-react";
 
 import {
@@ -45,7 +46,11 @@ type MentionTextareaProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends Path<TFieldValues> = Path<TFieldValues>
 > = Omit<ControllerProps<TFieldValues, TName>, "render"> & {
+  type: "post" | "comment";
+  placeholder?: string;
+  disabled?: boolean;
   inputRef?: MentionsInputProps["inputRef"];
+  onKeyDown?: MentionsInputProps["onKeyDown"];
   suggestionsContainer?: Element;
 };
 
@@ -76,7 +81,7 @@ function MentionTextarea<
   };
 
   return (
-    <div className="text-sm text-white caret-primary min-h-[200px]">
+    <div className="caret-primary">
       <Controller
         {...controllerProps}
         name={`${controllerProps.name}.body` as TName}
@@ -85,17 +90,19 @@ function MentionTextarea<
             inputRef={controllerProps.inputRef}
             value={field.value}
             onChange={(evtIgnored, newValue) => field.onChange(newValue)}
-            placeholder={
-              "Create a post\nUse $ before ticker symbols: ex: $TSLA\nUse @ to tag a user, page or fund"
+            placeholder={controllerProps.placeholder}
+            classNames={
+              controllerProps.type == "post" ? postStyles : commentStyles
             }
-            classNames={styles}
             allowSuggestionsAboveCursor={true}
             suggestionsPortalHost={controllerProps.suggestionsContainer}
+            onKeyDown={controllerProps.onKeyDown}
+            disabled={controllerProps.disabled}
           >
             <Mention
               trigger="@"
               data={dataFunc}
-              className={styles.mentions__mention}
+              className="text-primary relative z-10"
               appendSpaceOnAdd
               onAdd={(id, display) => {
                 mentionsController.field.onChange([
@@ -113,7 +120,7 @@ function MentionTextarea<
                     <Avatar user={user} size={56} />
                     <div className="ml-2">
                       <div className="flex items-center">
-                        <div className="text-base">
+                        <div className="text-white">
                           {user?.firstName} {user?.lastName}
                         </div>
                         {user?.role == "PROFESSIONAL" && (

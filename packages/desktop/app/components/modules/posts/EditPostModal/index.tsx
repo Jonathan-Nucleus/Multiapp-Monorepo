@@ -445,11 +445,15 @@ const EditPostModal: FC<EditPostModalProps> = ({
                 ref={suggestionsContainer}
                 className="min-h-0 flex flex-col flex-grow overflow-y-auto mt-2 px-4"
               >
-                <div className="flex-grow">
+                <div className="text-sm text-white flex-grow">
                   <MentionTextarea
+                    type="post"
                     inputRef={inputRef}
                     control={control}
                     name="mentionInput"
+                    placeholder={
+                      "Create a post\nUse $ before ticker symbols: ex: $TSLA\nUse @ to tag a user, page or fund"
+                    }
                     suggestionsContainer={
                       suggestionsContainer.current ?? undefined
                     }

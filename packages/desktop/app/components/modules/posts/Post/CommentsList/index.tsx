@@ -4,6 +4,7 @@ import { Comment, usePost } from "shared/graphql/query/post/usePost";
 import SendMessage from "./SendMessage";
 import CommentItem from "./CommentItem";
 import { useCommentPost } from "shared/graphql/mutation/posts";
+import { parseMentions } from "shared/src/patterns";
 import Spinner from "../../../../common/Spinner";
 
 interface CommentsListProps {
@@ -39,7 +40,7 @@ const CommentsList: FC<CommentsListProps> = ({ show, postId }) => {
         comment: {
           body: message,
           postId,
-          mentionIds: [],
+          mentionIds: parseMentions(message),
           mediaUrl,
         },
       },
@@ -57,7 +58,7 @@ const CommentsList: FC<CommentsListProps> = ({ show, postId }) => {
           body: message,
           commentId,
           postId,
-          mentionIds: [],
+          mentionIds: parseMentions(message),
           mediaUrl,
         },
       },
