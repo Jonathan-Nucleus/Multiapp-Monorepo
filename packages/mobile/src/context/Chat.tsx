@@ -100,14 +100,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
     return () => result.remove();
   }, [user, token]);
 
-  if (isReady !== undefined && !chatClient) {
-    return (
-      <View style={[pStyles.globalContainer, styles.container]}>
-        <Text>Error connecting to messenger</Text>
-      </View>
-    );
-  }
-
   const reconnect = (): void => {
     if (token) {
       connect(user, token);

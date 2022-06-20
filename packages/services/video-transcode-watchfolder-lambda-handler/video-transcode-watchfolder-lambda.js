@@ -2,11 +2,7 @@ const { v4: uuidv4 } = require("uuid");
 const fs = require("fs");
 const AWS = require("aws-sdk");
 
-const requiredEnvVariables = [
-  "S3_DESTINATION_BUCKET",
-  "MEDIA_CONVERT_ROLE_ARN",
-  "AWS_DEFAULT_REGION",
-];
+const requiredEnvVariables = ["MEDIA_CONVERT_ROLE_ARN", "AWS_DEFAULT_REGION"];
 
 const configurationSanityCheck = function () {
   for (let envVariableIdx in requiredEnvVariables) {
@@ -74,11 +70,10 @@ exports.handler = async (event) => {
 
   let application = "ignite";
   let assetID = uuidv4();
-  let S3DestinationBucket = process.env.S3_DESTINATION_BUCKET;
-  let sourceS3Bucket = event["Records"][0]["s3"]["bucket"]["name"];
-  let sourceS3Key = event["Records"][0]["s3"]["object"]["key"];
-  let sourceS3 = `s3://${sourceS3Bucket}/${sourceS3Key}`;
-  let destinationS3 = `s3://${S3DestinationBucket}`;
+  let S3Bucket = event["detail"]["bucket"]["name"];
+  let sourceS3Key = event["detail"]["object"]["key"];
+  let sourceS3 = `s3://${S3Bucket}/${sourceS3Key}`;
+  let destinationS3 = `s3://${S3Bucket}`;
   let mediaConvertRole = process.env.MEDIA_CONVERT_ROLE_ARN;
 
   const { Endpoints } = await mediaConvert
@@ -134,7 +129,7 @@ exports.handler = async (event) => {
       // Update the job settings with the destination paths for converted videos.  We want to replace the
       // destination bucket of the output paths in the job settings, but keep the rest of the
       // path except for the file extension
-      destinationS3 = `s3://${S3DestinationBucket}/${sourceS3Key
+      destinationS3 = `s3://${S3Bucket}/${sourceS3Key
         .replace("uploads/", "")
         .replace(/\.[^/.]+$/, "")}`;
 

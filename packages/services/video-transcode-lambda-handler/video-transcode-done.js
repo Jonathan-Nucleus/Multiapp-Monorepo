@@ -13,13 +13,11 @@ const configurationSanityCheck = function () {
 };
 
 exports.handler = async (event) => {
+  console.log("event: ", JSON.stringify(event, null, 2));
+
   configurationSanityCheck();
 
-  console.log("event: ", JSON.stringify(event, null, 2));
-  const records = event["Records"];
-
-  let recordIdx = 0;
-  const keyPath = decodeURIComponent(records[recordIdx]["s3"]["object"]["key"]);
+  const keyPath = decodeURIComponent(event["detail"]["object"]["key"]);
   const API_URL = process.env.BACKEND_URL;
   const JWT_SECRET = process.env.JWT_SECRET;
 

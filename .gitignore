@@ -2,6 +2,9 @@
 .env
 !packages/desktop/.env
 
+# application files
+.ssl
+
 # yarn
 .yarn/
 .yarnrc
