@@ -11,13 +11,16 @@ import { ChatProvider } from "desktop/app/components/providers/ChatProvider";
 import dynamic from "next/dynamic";
 import { useChatToken } from "shared/graphql/query/account/useChatToken";
 
-type RootLayoutProps = PropsWithChildren<AppPageProps>;
+type RootLayoutProps = PropsWithChildren<AppPageProps> & {
+  getstreamKey: string;
+};
 
 const RootLayout: FC<RootLayoutProps> = ({
   middleware,
   layout,
   background = layout == "auth" ? "radial" : "default",
   children,
+  getstreamKey,
 }: RootLayoutProps) => {
   const { data: chatData } = useChatToken();
 
@@ -52,7 +55,7 @@ const RootLayout: FC<RootLayoutProps> = ({
               localStorage.clear();
             }}
           >
-            <ChatProvider apiKey="tr4bpwdeccc6" token={chatData?.chatToken}>
+            <ChatProvider apiKey={getstreamKey} token={chatData?.chatToken}>
               {appContent}
             </ChatProvider>
           </AccountProvider>

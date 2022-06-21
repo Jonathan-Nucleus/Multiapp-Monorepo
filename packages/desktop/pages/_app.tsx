@@ -15,6 +15,7 @@ initializeDatadogRum();
 type MyAppProps = {
   runtimeVars: {
     NEXT_PUBLIC_GRAPHQL_URI: string;
+    NEXT_PUBLIC_GETSTREAM_ACCESS_KEY: string;
   };
 };
 
@@ -41,6 +42,7 @@ function MyApp({
             middleware={Component.middleware}
             layout={Component.layout}
             background={Component.background}
+            getstreamKey={runtimeVars.NEXT_PUBLIC_GETSTREAM_ACCESS_KEY}
           >
             <Component {...pageProps} />
           </RootLayout>
@@ -59,7 +61,8 @@ MyApp.getInitialProps = async (
 ): Promise<AppInitialProps & MyAppProps> => {
   const appProps = await App.getInitialProps(context);
   const { publicRuntimeConfig } = getConfig();
-  const { NEXT_PUBLIC_GRAPHQL_URI } = publicRuntimeConfig;
+  const { NEXT_PUBLIC_GRAPHQL_URI, NEXT_PUBLIC_GETSTREAM_ACCESS_KEY } =
+    publicRuntimeConfig;
 
   // Determine redirect if needed.
   const session = await getSession(context.ctx);
@@ -89,6 +92,7 @@ MyApp.getInitialProps = async (
     },
     runtimeVars: {
       NEXT_PUBLIC_GRAPHQL_URI,
+      NEXT_PUBLIC_GETSTREAM_ACCESS_KEY,
     },
   };
 };
