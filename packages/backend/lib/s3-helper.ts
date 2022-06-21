@@ -35,7 +35,6 @@ interface AWSCredentialsResponse {
 async function fetchAWSCredentials(): Promise<SignatureV4Init["credentials"]> {
   const AWS_CREDENTIALS_URI =
     process.env.AWS_CONTAINER_CREDENTIALS_RELATIVE_URI;
-  console.log("AWS_CONTAINER_CREDENTIALS_RELATIVE_URI", AWS_CREDENTIALS_URI);
 
   try {
     const response = await fetch(`http://169.254.170.2${AWS_CREDENTIALS_URI}`, {
@@ -43,7 +42,6 @@ async function fetchAWSCredentials(): Promise<SignatureV4Init["credentials"]> {
     });
     if (!response.ok) console.log("response", response);
     const credentials = (await response.json()) as AWSCredentialsResponse;
-    console.log("credentials", credentials);
     return {
       accessKeyId: credentials.AccessKeyId,
       secretAccessKey: credentials.SecretAccessKey,
