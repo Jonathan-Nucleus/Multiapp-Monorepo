@@ -80,7 +80,7 @@ const EditProfile: EditUserProfileScreen = ({ navigation }) => {
           },
         },
       });
-      showMessage('success', 'Uer profile successfully updated.');
+      showMessage('success', 'User profile successfully updated.');
       navigation.goBack();
     } catch (e: any) {
       console.log(e.message);

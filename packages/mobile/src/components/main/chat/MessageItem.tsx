@@ -87,8 +87,9 @@ const MessageItem: React.FC<MessageItemProps> = ({
                 lastMessage ? styles.messageSpacer : null,
               ]}>
               {attachments.map((attachment, index) => {
-                const { image_url } = attachment;
-                if (!image_url) {
+                const { image_url, asset_url } = attachment;
+                const mediaUrl = image_url || asset_url;
+                if (!mediaUrl) {
                   return null;
                 }
 
@@ -96,14 +97,14 @@ const MessageItem: React.FC<MessageItemProps> = ({
                   attachment.type === 'video' ? (
                     <MessageMedia
                       mediaId={`${message.id}-${index}`}
-                      media={{ url: image_url, aspectRatio: 1 }}
+                      media={{ url: mediaUrl, aspectRatio: 1 }}
                     />
                   ) : (
                     <FastImage
                       key={image_url}
                       style={styles.image}
                       source={{
-                        uri: image_url,
+                        uri: mediaUrl,
                       }}
                     />
                   );
@@ -117,7 +118,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
                   </Pressable>
                 ) : attachment.type === 'image' ? (
                   <Pressable
-                    onPress={() => setModalImage(image_url)}
+                    onPress={() => setModalImage(mediaUrl)}
                     style={styles.image}>
                     {media}
                   </Pressable>

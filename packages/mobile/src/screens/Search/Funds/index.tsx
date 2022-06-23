@@ -69,7 +69,7 @@ const Funds: FC<FundsProps> = ({ funds, search }) => {
     <View style={pStyles.globalContainer}>
       {!!search && (
         <Text style={styles.alert}>
-          {funds.length} people results for "{search}" in Funds
+          {funds.length} results for "{search}" in Funds
         </Text>
       )}
       <FlatList

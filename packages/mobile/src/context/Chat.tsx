@@ -83,17 +83,27 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
       }
 
       setReady(!!chatClient);
+    } else if (!isReady) {
+      setReady(true);
     }
   };
 
-  connectClient();
+  if (AppState.currentState !== 'background') {
+    console.log('Establishing connection to getstream client');
+    connectClient();
+  }
+
+  const disconnectClient = async (): Promise<void> => {
+    await disconnect();
+    setReady(false);
+  };
 
   useEffect(() => {
     const result = AppState.addEventListener('change', (state) => {
       if (state === 'background') {
-        disconnect();
+        disconnectClient();
       } else if (state === 'active' && token) {
-        connect(user, token);
+        connectClient();
       }
     });
 
@@ -174,8 +184,8 @@ const connect = async (
   }
 };
 
-const disconnect = (): void => {
-  chatClient?.disconnectUser();
+const disconnect = async (): Promise<void> => {
+  await chatClient?.disconnectUser();
   chatClient = undefined;
   console.log('Stopped chat');
 };

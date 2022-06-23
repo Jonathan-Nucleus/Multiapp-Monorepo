@@ -72,7 +72,7 @@ const Posts: React.FC<PostProps> = ({ posts, search }: PostProps) => {
     <View style={pStyles.globalContainer}>
       {!!search && (
         <Text style={styles.alert}>
-          {allPosts.length} people results for "{search}" in Posts
+          {allPosts.length} results for "{search}" in Posts
         </Text>
       )}
       {posts.length > 0 && (

@@ -96,8 +96,11 @@ const Settings: SettingsScreen = ({ navigation }) => {
     },
     {
       id: 'Terms',
-      label: 'Prometheus Disclosures',
-      onPress: () => setDisclosureVisible(true),
+      label: 'Terms and Conditions',
+      onPress: () =>
+        Linking.openURL(
+          'https://www.prometheusalts.com/legals/disclosure-library',
+        ),
       icon: <ShieldWarning size={26} color={WHITE} />,
     },
     {

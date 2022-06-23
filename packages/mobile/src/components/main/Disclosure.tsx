@@ -6,6 +6,7 @@ import {
   Text,
   Pressable,
   SafeAreaView,
+  ScrollView,
   Linking,
 } from 'react-native';
 import Modal, { ModalProps } from 'react-native-modal';
@@ -27,7 +28,13 @@ const Disclosure: FC<DisclosureProps> = (props) => {
       'https://www.prometheusalts.com/legals/important-disclosure',
     );
   };
+  const showFormADV = (): void => {
+    Linking.openURL('https://www.prometheusalts.com/legals/form-adv-part-2a');
+  };
   const showFINRA = (): void => {
+    Linking.openURL('https://www.finra.org/');
+  };
+  const showSIPC = (): void => {
     Linking.openURL('https://www.sipc.org/');
   };
   const showBrokerage = (): void => {
@@ -59,57 +66,67 @@ const Disclosure: FC<DisclosureProps> = (props) => {
               <X color={WHITE} size={24} />
             </Pressable>
           </View>
-          <Text style={[styles.text, styles.white]}>
-            Content provided is for educational purposes only. All investments
-            involve risk, including the possible loss of capital. Private
-            placements, also referred to as alternative investments, are
-            complex, speculative, illiquid and carry a high degree of risk,
-            including the potential loss of your entire investment and are not
-            suitable for all investors. View our{' '}
-            <Text style={styles.link} onPress={showDisclosures}>
-              Important Disclosure
-            </Text>{' '}
-            for additional disclosures and information.
-            {'\n'}
-            {'\n'}
-            Prometheus means Prometheus Alternative Investments, Inc., and its
-            in-application and web experiences with its family of wholly owned
-            subsidiaries, which includes Prometheus Financial, LLC, Prometheus
-            Financial Advisors, LLC, Prometheus Access Administrator, LLC and
-            Studio Prometheus, LLC.
-            {'\n'}
-            {'\n'}
-            The Marketplace and investment opportunities offered by Prometheus
-            Financial Advisors, LLC, a Registered Investment Advisor (RIA). See
-            Prometheus Financial Advisors, LLC’s Form ADV Part 2A for more
-            information regarding the RIA. Securities products and services
-            offered are private placements only sold to accredited investors.
-            {'\n'}
-            {'\n'}
-            Securities transactions executed by Prometheus Financial, LLC, a
-            registered broker-dealer, member{' '}
-            <Text style={styles.link} onPress={showFINRA}>
-              FINRA/SIPC
+          <ScrollView style={styles.flex}>
+            <Text style={[styles.text, styles.white]}>
+              Content provided is for educational purposes only. All investments
+              involve risk, including the possible loss of capital. Private
+              placements, also referred to as alternative investments, are
+              complex, speculative, illiquid and carry a high degree of risk,
+              including the potential loss of your entire investment and are not
+              suitable for all investors. View our{' '}
+              <Text style={styles.link} onPress={showDisclosures}>
+                Important Disclosure
+              </Text>{' '}
+              for additional disclosures and information.
+              {'\n'}
+              {'\n'}
+              Prometheus means Prometheus Alternative Investments, Inc., and its
+              in-application and web experiences with its family of wholly owned
+              subsidiaries, which includes Prometheus Financial, LLC, Prometheus
+              Financial Advisors, LLC, Prometheus Access Administrator, LLC and
+              Studio Prometheus, LLC.
+              {'\n'}
+              {'\n'}
+              The Marketplace and investment opportunities offered by Prometheus
+              Financial Advisors, LLC, a Registered Investment Advisor (RIA).
+              See Prometheus Financial Advisors, LLC’s{' '}
+              <Text style={styles.link} onPress={showFormADV}>
+                Form ADV Part 2A
+              </Text>{' '}
+              for more information regarding the RIA. Securities products and
+              services offered are private placements only sold to accredited
+              investors.
+              {'\n'}
+              {'\n'}
+              Securities transactions executed by Prometheus Financial, LLC, a
+              registered broker-dealer, member{' '}
+              <Text style={styles.link} onPress={showFINRA}>
+                FINRA
+              </Text>
+              /
+              <Text style={styles.link} onPress={showSIPC}>
+                SIPC
+              </Text>
+              . See Prometheus Financial, LLC’s{' '}
+              <Text style={styles.link} onPress={showBrokerage}>
+                Brokerage Form CRS Relationship Summary
+              </Text>{' '}
+              for a summary of the types of services the broker dealer provides
+              and what they cost.
+              {'\n'}
+              {'\n'}
+              You can access all our disclosures in our{' '}
+              <Text style={styles.link} onPress={showLibrary}>
+                Disclosure Library
+              </Text>
+              . Click{' '}
+              <Text style={styles.link} onPress={showDefinitions}>
+                here
+              </Text>{' '}
+              for definitions and acronyms of financial terminology you may
+              encounter in our content.
             </Text>
-            . See Prometheus Financial, LLC’s{' '}
-            <Text style={styles.link} onPress={showBrokerage}>
-              Brokerage Form CRS Relationship Summary
-            </Text>{' '}
-            for a summary of the types of services the broker dealer provides
-            and what they cost.
-            {'\n'}
-            {'\n'}
-            You can access all our disclosures in our{' '}
-            <Text style={styles.link} onPress={showLibrary}>
-              Disclosure Library
-            </Text>
-            . Click{' '}
-            <Text style={styles.link} onPress={showDefinitions}>
-              here
-            </Text>{' '}
-            for definitions and acronyms of financial terminology you may
-            encounter in our content.
-          </Text>
+          </ScrollView>
           <Pressable
             onPress={onDismiss}
             style={({ pressed }) => [
@@ -163,6 +180,7 @@ const styles = StyleSheet.create({
     right: 0,
   },
   bottomClose: {
+    marginTop: 8,
     padding: 16,
     alignItems: 'center',
   },

@@ -72,6 +72,9 @@ const useAccountStated = (): AccountState => {
     fetchPolicy: "cache-and-network",
     notifyOnNetworkStatusChange: true,
   });
+  if (error) {
+    console.log("error fetching account", error);
+  }
   useEffect(() => {
     if (error) {
       setState({ account: undefined, loading: false });

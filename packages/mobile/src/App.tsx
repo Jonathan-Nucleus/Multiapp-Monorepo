@@ -10,6 +10,7 @@ import AppNavigator from './navigations/AppNavigator';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import { useInitializeClient } from './services/apolloClient';
 import { start } from './services/PushNotificationService';
+import pStyles from 'mobile/src/theme/pStyles';
 
 import { LogBox } from 'react-native';
 LogBox.ignoreAllLogs();
@@ -28,7 +29,7 @@ const App = (): ReactElement => {
 
   return (
     <ApolloProvider client={client}>
-      <SafeAreaProvider>
+      <SafeAreaProvider style={pStyles.globalContainer}>
         <AppNavigator />
         <Toast />
       </SafeAreaProvider>

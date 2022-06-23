@@ -157,7 +157,7 @@ const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
       ) : null}
       {fund.disclosure ? (
         <Accordion
-          title="Important Information"
+          title="Fund Disclosures"
           containerStyle={styles.fundDisclosure}>
           <Text style={styles.fundDisclosureText}>{fund.disclosure}</Text>
         </Accordion>

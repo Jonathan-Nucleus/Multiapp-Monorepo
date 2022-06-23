@@ -15,6 +15,7 @@ import { CommonActions } from '@react-navigation/native';
 import PHeader from 'mobile/src/components/common/PHeader';
 import SearchInput from 'mobile/src/components/common/SearchInput';
 import { Body1Bold, Body3Bold } from 'mobile/src/theme/fonts';
+import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import pStyles from 'mobile/src/theme/pStyles';
 import {
   PRIMARY,
@@ -90,7 +91,7 @@ const NewChat: NewChatScreen = ({ navigation }) => {
 
   if (!client || !userId) {
     // Return error state
-    return null;
+    return <PAppContainer noScroll />;
   }
 
   const onSubmit = async (): Promise<void> => {

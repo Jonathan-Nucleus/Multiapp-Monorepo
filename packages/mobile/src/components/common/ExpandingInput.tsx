@@ -5,6 +5,7 @@ import React, {
   useEffect,
   useState,
   useCallback,
+  LegacyRef,
 } from 'react';
 import {
   View,
@@ -14,6 +15,7 @@ import {
   StyleProp,
   ViewStyle,
   Pressable,
+  ScrollView,
 } from 'react-native';
 import {
   MentionInput,
@@ -54,6 +56,13 @@ declare module 'react' {
   ): (props: P & React.RefAttributes<T>) => React.ReactElement | null;
 }
 
+function stringDiffPos(a: string, b: string): number {
+  var i = 0;
+  if (a === b) return -1;
+  while (a[i] === b[i]) i++;
+  return i;
+}
+
 const ExpandingInput = forwardRef(function <TFieldValues extends FieldValues>(
   props: ExpandingInputProps<TFieldValues>,
   ref: React.ForwardedRef<TextInput>,
@@ -72,9 +81,11 @@ const ExpandingInput = forwardRef(function <TFieldValues extends FieldValues>(
 
   const { data: usersData, refetch } = useMentionUsers();
   const mentionUsers = useRef(usersData?.mentionUsers ?? []);
-  const [textInputHeight, setTextInputHeight] = useState<number>();
+  const [textInputHeight, setTextInputHeight] = useState<number>(16);
   const mentionUndefinedCount = useRef(0);
   const inputRef = useRef<TextInput>();
+  const scrollRef = useRef<ScrollView>();
+  const lastInput = useRef('');
   const currentSearch = useRef<string>();
   const lastSearch = useRef<string>();
   const nextSearch = useRef<string>();
@@ -170,7 +181,9 @@ const ExpandingInput = forwardRef(function <TFieldValues extends FieldValues>(
           style={[styles.container, containerStyle]}
           onPress={() => inputRef.current?.focus()}>
           {viewLeft ? viewLeft : null}
-          <View style={styles.flex}>
+          <ScrollView
+            style={styles.flex}
+            ref={scrollRef as LegacyRef<ScrollView>}>
             {viewAbove}
             <MentionInput
               placeholderTextColor={WHITE60}
@@ -188,7 +201,17 @@ const ExpandingInput = forwardRef(function <TFieldValues extends FieldValues>(
                 }
               }}
               value={field.value ?? ''}
-              onChange={field.onChange}
+              onChange={(value) => {
+                field.onChange(value);
+                const diffPosition = stringDiffPos(value, lastInput.current);
+                if (diffPosition === value.length - 1) {
+                  setTimeout(() => {
+                    scrollRef.current?.scrollToEnd({ animated: false });
+                  }, 10);
+                }
+
+                lastInput.current = value;
+              }}
               onContentSizeChange={(evt) => {
                 const {
                   nativeEvent: {
@@ -202,9 +225,7 @@ const ExpandingInput = forwardRef(function <TFieldValues extends FieldValues>(
               }}
               style={[
                 styles.textInput,
-                {
-                  height: textInputHeight,
-                },
+                { height: textInputHeight },
                 inputProps.style,
               ]}
               partTypes={[
@@ -226,7 +247,7 @@ const ExpandingInput = forwardRef(function <TFieldValues extends FieldValues>(
               ]}
             />
             {viewBelow}
-          </View>
+          </ScrollView>
           {viewRight ? viewRight : null}
         </Pressable>
       )}

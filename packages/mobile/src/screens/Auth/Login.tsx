@@ -46,12 +46,17 @@ const Login: LoginScreen = ({ navigation }) => {
 
   const saveAuthToken = async (token: string): Promise<void> => {
     await setToken(token);
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [{ name: 'Authenticated' }],
-      }),
-    );
+
+    // Allow time for apollo client to reload with new auth token
+    setTimeout(() => {
+      setLoading(false);
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: 'Authenticated' }],
+        }),
+      );
+    }, 500);
   };
 
   const handleNextPage = async (): Promise<void> => {
@@ -69,8 +74,10 @@ const Login: LoginScreen = ({ navigation }) => {
       });
       if (data.login) {
         saveAuthToken(data.login);
+        console.log('logged user', data);
+
+        return;
       }
-      console.log('logged user', data);
     } catch (e) {
       setError(true);
       console.error('login error', e);

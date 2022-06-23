@@ -31,11 +31,7 @@ export const renderItem: ListRenderItem<Company> = ({ item }) => {
         })
       }>
       <View style={styles.item}>
-        <Avatar
-          user={{ avatar: item.avatar }}
-          size={60}
-          style={styles.companyAvatar}
-        />
+        <Avatar user={item} size={64} style={styles.companyAvatar} />
         <View style={styles.rightItem}>
           <Text style={styles.name}>{item.name}</Text>
         </View>
@@ -52,7 +48,7 @@ const Companies: React.FC<CompanyProps> = ({
     <View style={pStyles.globalContainer}>
       {!!search && (
         <Text style={styles.alert}>
-          {companies.length} people results for "{search}" in Companies
+          {companies.length} results for "{search}" in Companies
         </Text>
       )}
       <FlatList
@@ -73,7 +69,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   companyAvatar: {
-    borderRadius: 4,
+    borderRadius: 8,
   },
   rightItem: {
     marginLeft: 16,

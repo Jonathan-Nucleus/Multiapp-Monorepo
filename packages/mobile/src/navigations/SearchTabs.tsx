@@ -71,7 +71,12 @@ const SearchTabs: SearchScreen = ({ navigation, route }) => {
           tabBarItemStyle: styles.tabBarItem,
           tabBarLabel: ({ focused, color }) => (
             <Text
-              style={[Body2, { color }, focused ? Body2Bold : {}]}
+              style={[
+                Body2,
+                styles.tabBarItem,
+                { color },
+                focused ? Body2Bold : {},
+              ]}
               allowFontScaling={false}>
               {route.name}
             </Text>
@@ -174,6 +179,7 @@ const styles = StyleSheet.create({
   },
   tabBarItem: {
     width: 105,
+    textAlign: 'center',
   },
   tabBarIndicator: {
     backgroundColor: PRIMARYSTATE,

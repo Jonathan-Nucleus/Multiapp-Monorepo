@@ -23,6 +23,7 @@ import dayjs from 'dayjs';
 dayjs.extend(relativeTime);
 
 import PHeader from 'mobile/src/components/common/PHeader';
+import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import ExpandingInput, {
   User,
   OnSelectUser,
@@ -56,6 +57,7 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 import { useChatContext } from 'mobile/src/context/Chat';
+import { useAccountContext } from 'shared/context/Account';
 import {
   channelName,
   processMessages,
@@ -84,9 +86,11 @@ const schema = yup
 const Channel: ChannelScreen = ({ navigation, route }) => {
   const { channelId, initialData } = route.params;
 
-  const { client, userId, reconnect } = useChatContext() || {};
+  const { client, reconnect } = useChatContext() || {};
+  const { _id: userId } = useAccountContext();
   const channel = useRef(initialData);
   const [uploading, setUploading] = useState(false);
+  const [isStale, setStale] = useState(!initialData);
   const [messages, setMessages] = useState(
     initialData?.state.messages
       ? processMessages(initialData?.state.messages)
@@ -95,6 +99,10 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
   const [media, setMedia] = useState<{ uri: string; data: ImageOrVideo }[]>([]);
   const [mentionUsers, setMentionUsers] = useState<User[]>([]);
   const onMentionSelected = useRef<OnSelectUser>();
+
+  if (!isStale && !client) {
+    setStale(true);
+  }
 
   useFocusEffect(() => () => {
     stopVideos();
@@ -147,11 +155,13 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
     if (
       !initialData ||
       initialData.state.messages.length === 0 ||
-      channel.current?.cid !== channelId
+      channel.current?.cid !== channelId ||
+      isStale
     ) {
+      console.log('refetching channel');
       fetchChannel();
     }
-  }, [fetchChannel, initialData, channelId]);
+  }, [fetchChannel, initialData, channelId, client]);
 
   useEffect(() => {
     if (!channel.current) {
@@ -208,13 +218,9 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
     });
   }, []);
 
-  if (!client || !userId) {
-    // Return error state
-    return null;
-  }
-
   const onSubmit = async ({ message }: FormValues): Promise<void> => {
-    if (!channel.current) {
+    const { current: chatChannel } = channel;
+    if (!chatChannel) {
       console.log('No channel available.');
       return;
     }
@@ -227,10 +233,20 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
             type: isVideo(image.uri) ? 'video' : 'image',
           }));
 
-    await channel.current.sendMessage({
-      text: message,
-      attachments,
-    });
+    retry(
+      async () => {
+        await chatChannel.sendMessage({
+          text: message,
+          attachments,
+        });
+      },
+      {
+        onRetry: (error) => {
+          reconnect?.();
+          console.log('retrying', error);
+        },
+      },
+    );
 
     reset(
       schema.cast(

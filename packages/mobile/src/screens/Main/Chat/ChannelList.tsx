@@ -13,6 +13,7 @@ import { NotePencil } from 'phosphor-react-native';
 import MainHeader from 'mobile/src/components/main/Header';
 import SearchInput from 'mobile/src/components/common/SearchInput';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
+import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import pStyles from 'mobile/src/theme/pStyles';
 import { WHITE, GRAY700, GRAY600 } from 'shared/src/colors';
 
@@ -117,7 +118,7 @@ const ChannelList: ChannelListScreen = ({ navigation, route }) => {
 
   if (!client || !userId) {
     // Return error state
-    return <View style={pStyles.globalContainer} />;
+    return <PAppContainer noScroll />;
   }
 
   const renderItem: ListRenderItem<Channel> = ({ item }) => (

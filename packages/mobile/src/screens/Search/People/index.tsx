@@ -64,7 +64,7 @@ const People: React.FC<PeopleProps> = ({ users, search }: PeopleProps) => {
     <View style={pStyles.globalContainer}>
       {!!search && (
         <Text style={styles.alert}>
-          {users.length} people results for "{search}" in People
+          {users.length} results for "{search}" in People
         </Text>
       )}
       <FlatList

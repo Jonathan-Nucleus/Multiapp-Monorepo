@@ -40,11 +40,11 @@ import { setToken } from 'mobile/src/utils/auth-token';
 import PMaskTextInput from '../../components/common/PMaskTextInput';
 import { validateEmail, validatePassword } from '../../utils/utils';
 
+// TODO: Refactor to leverage react-hook-form
 const Signup: SignupScreen = ({ navigation, route }) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
   const [pass, setPass] = useState('');
   const [confirmPass, setConfirmPass] = useState('');
   const [securePassEntry, setSecurePassEntry] = useState(true);
@@ -64,7 +64,6 @@ const Signup: SignupScreen = ({ navigation, route }) => {
       lastName &&
       email &&
       validateEmail(email) &&
-      phone &&
       pass &&
       confirmPass &&
       pass === confirmPass &&
@@ -81,7 +80,7 @@ const Signup: SignupScreen = ({ navigation, route }) => {
     }
     setPassError('');
     return true;
-  }, [firstName, lastName, email, phone, pass, confirmPass, agreed]);
+  }, [firstName, lastName, email, pass, confirmPass, agreed]);
 
   useEffect(() => {
     const validation = validatePassword(pass);
@@ -147,8 +146,8 @@ const Signup: SignupScreen = ({ navigation, route }) => {
     <SafeAreaView style={styles.container}>
       <PAppContainer>
         <PHeader centerIcon={<LogoSvg />} />
-        <PTitle title="You’re in!" subTitle="We a few more details..." />
-        {!!error && <ErrorText error="Verification code does not matched" />}
+        <PTitle title="You’re in!" subTitle="We need a few more details..." />
+        {!!error && <ErrorText error="Verification code does not match" />}
         <PTextInput
           label="First name"
           onChangeText={(val: string) => setFirstName(val)}
@@ -169,14 +168,6 @@ const Signup: SignupScreen = ({ navigation, route }) => {
           onChangeText={(val: string) => setEmail(val)}
           text={email}
           keyboardType="email-address"
-        />
-        <PMaskTextInput
-          label="Phone"
-          onChangeText={(val) => setPhone(val ?? '')}
-          text={phone}
-          keyboardType="number-pad"
-          labelTextStyle={styles.label}
-          mask={'([000])-[000]-[0000]'}
         />
         <PTextInput
           label="Password"
