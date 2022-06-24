@@ -65,7 +65,6 @@ export const DEFAULT_USER_OPTIONS: Pick<
 > = {
   role: UserRoleOptions.USER,
   accreditation: AccreditationOptions.NONE.value,
-  followingIds: [toObjectId("628fee97fef84ea6746e08fb")], // Everyone follow Michael Wang
   settings: {
     interests: [],
     tagging: true,
@@ -104,6 +103,8 @@ export const UNIVERSAL_INVITE_CODES = [
   "D19ACE",
   "269038",
 ];
+
+const MICHAEL_USER_ID = "628fee97fef84ea6746e08fb";
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 const createUsersCollection = (
@@ -278,6 +279,15 @@ const createUsersCollection = (
       };
 
       await usersCollection.insertOne(newUser);
+
+      // Everyone follow Michael Wang")
+      try {
+        await collection.setFollowingUser(true, MICHAEL_USER_ID, newUser._id);
+        await collection.setFollower(true, newUser._id, MICHAEL_USER_ID);
+      } catch (err) {
+        console.error("Error following Michael for new user", newUser._id);
+      }
+
       return newUser;
     },
 
@@ -337,6 +347,14 @@ const createUsersCollection = (
       await usersCollection.replaceOne({ _id: userData._id }, newUser, {
         upsert: true,
       });
+
+      // Everyone follow Michael Wang")
+      try {
+        await collection.setFollowingUser(true, MICHAEL_USER_ID, newUser._id);
+        await collection.setFollower(true, newUser._id, MICHAEL_USER_ID);
+      } catch (err) {
+        console.error("Error following Michael for new user", newUser._id);
+      }
 
       return newUser;
     },
