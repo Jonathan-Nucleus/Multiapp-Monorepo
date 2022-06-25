@@ -109,6 +109,11 @@ export const Body2Medium = {
   fontFamily: MetropolisMedium,
 };
 
+export const Body2Semibold = {
+  fontSize: 14,
+  fontFamily: MetropolisSemibold,
+};
+
 export const Body2Bold = {
   fontSize: 14,
   fontFamily: MetropolisBold,

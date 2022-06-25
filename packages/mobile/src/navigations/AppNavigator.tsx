@@ -1,4 +1,5 @@
 import React, { ReactElement, useRef, useState, useEffect } from 'react';
+import DeviceInfo from 'react-native-device-info';
 import {
   NavigationContainer,
   NavigatorScreenParams,
@@ -19,6 +20,7 @@ import {
 } from 'mobile/src/utils/auth-token';
 
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
+import UpdateModal from 'mobile/src/components/main/UpdateModal';
 
 import AuthStack, { AuthStackParamList } from './AuthStack';
 import AuthenticatedStack, {
@@ -27,6 +29,7 @@ import AuthenticatedStack, {
 
 import { MediaType } from 'backend/graphql/mutations.graphql';
 import { Accreditation } from 'shared/graphql/mutation/account/useSaveQuestionnaire';
+import { useRequiresUpdate } from 'shared/graphql/query/user/useRequiresUpdate';
 
 import { AccountProvider } from 'shared/context/Account';
 
@@ -43,6 +46,11 @@ const AppNavigator = (): React.ReactElement => {
   const routeNameRef = useRef<string | undefined>(undefined);
   const navigationRef = useRef<NavigationContainerRef<AppParamList> | null>(
     null,
+  );
+
+  const { data: { requiresUpdate = false } = {} } = useRequiresUpdate(
+    DeviceInfo.getVersion(),
+    DeviceInfo.getBuildNumber(),
   );
 
   useEffect(() => {
@@ -87,17 +95,20 @@ const AppNavigator = (): React.ReactElement => {
   }
 
   return (
-    <NavigationContainer
-      ref={navigationRef}
-      onReady={onReady}
-      onStateChange={onStateChange}>
-      <Stack.Navigator
-        screenOptions={defaultScreenOptions}
-        initialRouteName={authenticated ? 'Authenticated' : 'Auth'}>
-        <Stack.Screen name="Auth" component={AuthStack} />
-        <Stack.Screen name="Authenticated" component={AuthenticatedStack} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <>
+      <NavigationContainer
+        ref={navigationRef}
+        onReady={onReady}
+        onStateChange={onStateChange}>
+        <Stack.Navigator
+          screenOptions={defaultScreenOptions}
+          initialRouteName={authenticated ? 'Authenticated' : 'Auth'}>
+          <Stack.Screen name="Auth" component={AuthStack} />
+          <Stack.Screen name="Authenticated" component={AuthenticatedStack} />
+        </Stack.Navigator>
+      </NavigationContainer>
+      {requiresUpdate ? <UpdateModal isVisible={true} /> : null}
+    </>
   );
 };
 

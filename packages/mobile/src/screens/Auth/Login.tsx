@@ -127,7 +127,7 @@ const Login: LoginScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <PHeader centerIcon={<LogoSvg />} />
-      <PAppContainer>
+      <PAppContainer style={styles.content}>
         <PTitle title="Log In" />
         <View style={styles.wrap}>
           <Text style={styles.txt}>New here? </Text>
@@ -174,21 +174,22 @@ const Login: LoginScreen = ({ navigation }) => {
           onPress={handleNextPage}
           isLoading={loading}
         />
-        <PTextLine title="LOG IN WITH" containerStyle={styles.bottom} />
-        <View style={styles.row}>
-          {/**
-            * Hide until services have been properly configured.
+        {/**
+          * Hide until approach to bots has been finalized.
+          <PTextLine title="LOG IN WITH" containerStyle={styles.bottom} />
+          <View style={styles.row}>
             <TouchableOpacity style={styles.icon}>
               <AppleSvg />
             </TouchableOpacity>
             <TouchableOpacity style={styles.icon} onPress={linkedInLogin}>
               <LinkedinSvg />
             </TouchableOpacity>
-            */}
-          <TouchableOpacity style={styles.icon} onPress={googleLogin}>
-            <GoogleSvg />
-          </TouchableOpacity>
-        </View>
+
+            <TouchableOpacity style={styles.icon} onPress={googleLogin}>
+              <GoogleSvg />
+            </TouchableOpacity>
+          </View>
+        */}
       </PAppContainer>
     </SafeAreaView>
   );
@@ -200,6 +201,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: BLACK,
+  },
+  content: {
+    marginTop: 36,
   },
   btnContainer: {
     marginTop: 20,

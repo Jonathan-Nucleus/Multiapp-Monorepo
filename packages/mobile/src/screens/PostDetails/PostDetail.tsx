@@ -38,6 +38,7 @@ import {
   useEditCommentPost,
 } from 'shared/graphql/mutation/posts';
 import { usePost, Comment } from 'shared/graphql/query/post/usePost';
+import { parseMentions } from 'shared/src/patterns';
 
 import { PostDetailScreen } from 'mobile/src/navigations/PostDetailsStack';
 
@@ -112,7 +113,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
             comment: {
               _id: focusCommentId,
               body: message,
-              mentionIds: [],
+              mentionIds: parseMentions(message),
               mediaUrl: '',
             },
           },
@@ -125,7 +126,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
             comment: {
               body: message,
               postId: post._id,
-              mentionIds: [],
+              mentionIds: parseMentions(message),
               ...(focusCommentId ? { commentId: focusCommentId } : {}),
             },
           },

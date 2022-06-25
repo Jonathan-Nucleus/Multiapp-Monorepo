@@ -145,7 +145,7 @@ const Signup: SignupScreen = ({ navigation, route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <PAppContainer>
-        <PHeader centerIcon={<LogoSvg />} />
+        <PHeader centerIcon={<LogoSvg />} outerContainerStyle={styles.header} />
         <PTitle title="You’re in!" subTitle="We need a few more details..." />
         {!!error && <ErrorText error="Verification code does not match" />}
         <PTextInput
@@ -244,21 +244,21 @@ const Signup: SignupScreen = ({ navigation, route }) => {
           onPress={handleNextPage}
           disabled={disabled}
         />
-        <PTextLine title="OR, SIGN UP WITH" containerStyle={styles.bottom} />
-        <View style={styles.row}>
-          {/**
-            * Hide until these are configured 6/6/22
+        {/**
+          * Hide until approach to bots has been finalized.
+          <PTextLine title="OR, SIGN UP WITH" containerStyle={styles.bottom} />
+          <View style={styles.row}>
             <TouchableOpacity style={styles.icon}>
-            <AppleSvg />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.icon}>
-            <LinkedinSvg />
-          </TouchableOpacity>
-          */}
-          <TouchableOpacity style={styles.icon}>
-            <GoogleSvg />
-          </TouchableOpacity>
-        </View>
+              <AppleSvg />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.icon}>
+              <LinkedinSvg />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.icon}>
+              <GoogleSvg />
+            </TouchableOpacity>
+          </View>
+        */}
       </PAppContainer>
     </SafeAreaView>
   );
@@ -271,6 +271,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: BLACK,
   },
+  header: {
+    marginBottom: 28,
+  },
   textContainer: {
     marginTop: 21,
   },
@@ -281,7 +284,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   btnContainer: {
-    marginTop: 20,
+    marginVertical: 20,
   },
   subLabelText: {
     color: PRIMARY,

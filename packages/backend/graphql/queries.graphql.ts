@@ -42,6 +42,7 @@ const schema = gql`
     version: String
     verifyToken(token: String!): Boolean!
     verifyInvite(code: String!): Boolean!
+    requiresUpdate(version: String!, build: String!): Boolean!
     account: User
     chatToken: String
     documentToken(fundId: ID!, document: String!): String
@@ -143,6 +144,27 @@ const resolvers = {
 
       const { code } = args;
       return db.users.verifyInvite(code);
+    },
+
+    requiresUpdate: async (
+      parentIgnored: unknown,
+      args: { version: string; build: string }
+    ): Promise<boolean> => {
+      const validator = yup
+        .object()
+        .shape({
+          version: yup.string().required(),
+          build: yup.string().required(),
+        })
+        .required();
+
+      validateArgs(validator, args);
+
+      // Check version/build number to determine whether mobile build requires
+      // an update due to a breaking change
+      // const { version, build } = args;
+
+      return false;
     },
 
     /**

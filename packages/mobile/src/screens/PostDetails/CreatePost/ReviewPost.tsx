@@ -44,6 +44,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
   const [editPost] = useEditPost();
   const [fetchPreviewData] = useLinkPreview();
   const [previewData, setPreviewData] = useState<LinkPreview>();
+  const [isSubmitting, setSubmitting] = useState(false);
   const isSubmitted = useRef(false);
 
   useEffect(() => {
@@ -65,9 +66,11 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
   }, [body, fetchPreviewData]);
 
   const handleSubmit = async (): Promise<void> => {
-    if (isSubmitted.current) {
+    if (isSubmitted.current || isSubmitting) {
       return;
     }
+
+    setSubmitting(true);
 
     let success = false;
     const finalPostData = {
@@ -137,6 +140,8 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
       console.log('Error', err);
       showMessage('error', 'Uh oh! We encountered a problem.');
     }
+
+    setSubmitting(false);
   };
 
   const postAsLabel =
@@ -151,7 +156,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
       <PostHeader
         centerLabel="Preview Post"
         rightLabel="POST"
-        rightValidation={true}
+        rightValidation={!isSubmitting}
         handleNext={handleSubmit}
         handleBack={() => navigation.goBack()}
       />
