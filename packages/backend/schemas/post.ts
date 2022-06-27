@@ -22,8 +22,11 @@ export namespace Post {
     mentionIds?: ObjectId[];
     categories: PostCategory[];
     likeIds?: ObjectId[];
+    likeCount: number;
     commentIds?: ObjectId[];
+    commentCount: number;
     shareIds?: ObjectId[];
+    shareCount: number;
     sharedPostId?: ObjectId;
     visible: boolean;
     reporterIds?: ObjectId[];
@@ -225,8 +228,11 @@ export const PostSchema = `
     mentionIds: [ID!]
     categories: [PostCategory!]!
     likeIds: [ID!]
+    likeCount: Int!
     commentIds: [ID!]
+    commentCount: Int!
     shareIds: [ID!]
+    shareCount: Int!
     sharedPostId: ID
     reporterIds: [ID!]
     createdAt: Date!

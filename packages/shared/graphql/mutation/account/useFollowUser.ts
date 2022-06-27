@@ -10,8 +10,8 @@ type FollowUserVariables = {
 
 type FollowUserData = {
   followUser: {
-    account: Pick<UserProfile, "_id" | "followingIds">;
-    userAccount: Pick<UserProfile, "_id" | "followerIds">;
+    account: Pick<UserProfile, "_id" | "followingIds" | "followingCount">;
+    userAccount: Pick<UserProfile, "_id" | "followerIds" | "followingCount">;
   };
 };
 
@@ -53,10 +53,12 @@ export function useFollowUser(id?: string): FollowUserReturn {
           account {
             _id
             followingIds
+            followingCount
           }
           userAccount {
             _id
             followerIds
+            followingCount
           }
         }
       }

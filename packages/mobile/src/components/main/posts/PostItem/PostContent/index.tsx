@@ -157,6 +157,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   sharedPostContainer: {
-    marginTop: 16,
+    marginBottom: 16,
   },
 });

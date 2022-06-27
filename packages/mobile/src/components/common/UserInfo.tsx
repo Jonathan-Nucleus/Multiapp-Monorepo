@@ -13,7 +13,8 @@ import AISvg from 'shared/assets/images/AI.svg';
 import GlobalSvg from 'shared/assets/images/global.svg';
 
 import { useFollowUser } from 'shared/graphql/mutation/account/useFollowUser';
-import { useAccount } from 'shared/graphql/query/account/useAccount';
+import { useFollowCompany } from 'shared/graphql/mutation/account/useFollowCompany';
+import { useAccountContext } from 'shared/context/Account';
 import { Audience } from 'backend/graphql/posts.graphql';
 import { UserProfile } from 'backend/graphql/users.graphql';
 import { Company as CompanyProfile } from 'backend/graphql/companies.graphql';
@@ -45,23 +46,27 @@ const UserInfo: React.FC<UserInfoProps> = (props) => {
     audienceInfo,
     showFollow = true,
   } = props;
-  if (!user) {
-    return null;
-  }
-
   let userData: User | undefined;
   let companyData: Company | undefined;
-  if ('firstName' in user) {
+  if (user && 'firstName' in user) {
     userData = user;
-  } else {
+  } else if (user) {
     companyData = user as Company;
   }
 
-  const { data: { account } = {} } = useAccount({ fetchPolicy: 'cache-only' });
-  const { isFollowing, toggleFollow } = useFollowUser(user._id);
+  const account = useAccountContext();
+  const { isFollowing: isFollowingUser, toggleFollow: toggleFollowUser } =
+    useFollowUser(user?._id);
+  const { isFollowing: isFollowingCompany, toggleFollow: toggleFollowCompany } =
+    useFollowCompany(user?._id);
   const { role, company } = userData ?? {};
   const isPro = role === 'PROFESSIONAL' || role === 'VERIFIED';
   const isSelf = user?._id === account?._id;
+  const isFollowing = isFollowingUser || isFollowingCompany;
+
+  if (!user) {
+    return null;
+  }
 
   let audienceIcon;
   switch (audienceInfo) {
@@ -85,6 +90,10 @@ const UserInfo: React.FC<UserInfoProps> = (props) => {
       audienceIcon = <GlobalSvg width={12} height={12} />;
       break;
   }
+
+  const toggleFollow = (): void => {
+    companyData ? toggleFollowCompany() : toggleFollowUser();
+  };
 
   return (
     <View style={[styles.wrapper, viewStyle]}>

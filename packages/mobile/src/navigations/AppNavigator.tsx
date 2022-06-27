@@ -3,8 +3,10 @@ import DeviceInfo from 'react-native-device-info';
 import {
   NavigationContainer,
   NavigatorScreenParams,
+  DarkTheme,
 } from '@react-navigation/native';
 import { NavigationContainerRef } from '@react-navigation/core';
+import { DdRumReactNavigationTracking } from '@datadog/mobile-react-navigation';
 import {
   createStackNavigator,
   StackScreenProps,
@@ -79,6 +81,7 @@ const AppNavigator = (): React.ReactElement => {
   const onReady = (): void => {
     routeNameRef.current = navigationRef?.current?.getCurrentRoute()?.name;
     console.log('Running', routeNameRef.current);
+    DdRumReactNavigationTracking.startTrackingViews(navigationRef.current);
     SplashScreen.hide();
   };
 
@@ -99,6 +102,7 @@ const AppNavigator = (): React.ReactElement => {
       <NavigationContainer
         ref={navigationRef}
         onReady={onReady}
+        theme={DarkTheme}
         onStateChange={onStateChange}>
         <Stack.Navigator
           screenOptions={defaultScreenOptions}

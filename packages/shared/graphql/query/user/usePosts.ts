@@ -40,6 +40,9 @@ export function usePosts(
           _id
           posts(categories: $categories) {
             ...PostSummaryFields
+            sharedPost {
+              ...PostSummaryFields
+            }
           }
         }
       }

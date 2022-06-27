@@ -8,6 +8,7 @@ import {
   createStackNavigator,
   StackScreenProps,
 } from '@react-navigation/stack';
+import { DdSdkReactNative } from '@datadog/mobile-react-native';
 import dayjs from 'dayjs';
 
 import MainTabNavigator, { MainTabParamList } from './MainTabNavigator';
@@ -105,7 +106,14 @@ const AuthenticatedStack: AuthenticatedScreen = () => {
   return (
     <AccountProvider
       onUnauthenticated={onUnauthenticated}
-      loadingComponent={<PAppContainer noScroll />}>
+      loadingComponent={<PAppContainer noScroll />}
+      onReady={async (account) => {
+        await DdSdkReactNative.setUser({
+          id: account._id,
+          name: `${account.firstName} ${account.lastName}`,
+          email: account.email,
+        });
+      }}>
       <NotificationsProvider>
         <NotificationsManager>
           <ChatProvider token={token}>

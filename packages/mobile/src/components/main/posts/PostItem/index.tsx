@@ -86,18 +86,18 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
                   />
                 </Pressable>
               )}
-              {post.commentIds && post.commentIds.length > 0 && (
+              {post.commentCount > 0 && (
                 <PLabel
-                  label={`${post.commentIds.length} ${
-                    post.commentIds.length === 1 ? 'Comment' : 'Comments'
+                  label={`${post.commentCount} ${
+                    post.commentCount === 1 ? 'Comment' : 'Comments'
                   }`}
                   textStyle={styles.smallLabel}
                 />
               )}
-              {post.shareIds && post.shareIds.length > 0 && (
+              {post.shareCount > 0 && (
                 <PLabel
-                  label={`${post.shareIds.length} ${
-                    post.shareIds.length === 1 ? 'Share' : 'Shares'
+                  label={`${post.shareCount} ${
+                    post.shareCount === 1 ? 'Share' : 'Shares'
                   }`}
                   textStyle={styles.smallLabel}
                 />

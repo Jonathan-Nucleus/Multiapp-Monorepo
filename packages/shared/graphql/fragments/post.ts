@@ -14,8 +14,11 @@ export type PostSummary = Pick<
   | "mentionIds"
   | "userId"
   | "likeIds"
+  | "likeCount"
   | "shareIds"
+  | "shareCount"
   | "commentIds"
+  | "commentCount"
   | "createdAt"
   | "comments"
   | "likes"
@@ -51,8 +54,11 @@ export const POST_SUMMARY_FRAGMENT = gql`
     }
     mentionIds
     likeIds
+    likeCount
     shareIds
+    shareCount
     commentIds
+    commentCount
     createdAt
     userId
     user {
@@ -70,42 +76,6 @@ export const POST_SUMMARY_FRAGMENT = gql`
       _id
       name
       avatar
-    }
-    likes {
-      _id
-      firstName
-      lastName
-      avatar
-      position
-      role
-      company {
-        _id
-        name
-        avatar
-      }
-    }
-    comments {
-      _id
-      body
-      createdAt
-      likeIds
-      commentId
-      mentions {
-        _id
-        firstName
-        lastName
-        avatar
-        role
-        position
-      }
-      user {
-        _id
-        firstName
-        lastName
-        avatar
-        role
-        position
-      }
     }
   }
 `;

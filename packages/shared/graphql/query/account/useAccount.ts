@@ -22,6 +22,7 @@ export type AccountData = {
     | "_id"
     | "firstName"
     | "lastName"
+    | "email"
     | "avatar"
     | "role"
     | "accreditation"
@@ -87,6 +88,7 @@ export function useAccount(
           superUser
           firstName
           lastName
+          email
           avatar
           role
           accreditation

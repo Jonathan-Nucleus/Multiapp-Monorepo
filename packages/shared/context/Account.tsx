@@ -27,7 +27,7 @@ export function useAccountContext(): Account {
 }
 
 interface AccountProviderProps extends PropsWithChildren<unknown> {
-  onReady?: () => void;
+  onReady?: (account: Account) => void | Promise<void>;
   onUnauthenticated?: () => void;
   loadingComponent?: React.ReactElement;
 }
@@ -43,7 +43,7 @@ export const AccountProvider: React.FC<AccountProviderProps> = ({
   useEffect(() => {
     if (!loading) {
       if (accountDefined) {
-        onReady?.();
+        onReady?.(account);
       } else {
         onUnauthenticated?.();
       }

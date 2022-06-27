@@ -88,6 +88,9 @@ export default async function (
               )
             )
           ).map((index) => userIds[index]),
+          likeCount: 0,
+          commentCount: 0,
+          shareCount: 0,
         };
       });
     })

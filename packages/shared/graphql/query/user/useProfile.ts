@@ -23,11 +23,14 @@ export type UserProfile = Pick<
   | "overview"
   | "background"
   | "followerIds"
+  | "followerCount"
   | "followers"
   | "followingIds"
+  | "followingCount"
   | "following"
   | "watchlistIds"
   | "postIds"
+  | "postCount"
   | "linkedIn"
   | "twitter"
   | "website"
@@ -90,8 +93,11 @@ export function useProfile(
           tagline
           overview
           followerIds
+          followerCount
           followingIds
+          followingCount
           postIds
+          postCount
           following {
             _id
             firstName
@@ -118,6 +124,7 @@ export function useProfile(
             }
           }
           companyFollowingIds
+          companyFollowingCount
           background {
             url
             x

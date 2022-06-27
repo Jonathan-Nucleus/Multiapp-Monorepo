@@ -207,6 +207,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     ) as DefaultValues<FormValues>,
     mode: 'onChange',
   });
+  const postUserId = watch('userId');
 
   useEffect(() => {
     reset(
@@ -397,16 +398,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       value: company.name,
       labelView: (
         <RadioBodyView
-          icon={
-            <Avatar
-              user={{
-                avatar: company.avatar,
-                firstName: company.name,
-                lastName: '',
-              }}
-              size={32}
-            />
-          }
+          icon={<Avatar user={company} size={32} />}
           label={company.name}
         />
       ),
@@ -437,7 +429,14 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
         handleNext={handleSubmit(onSubmit)}
       />
       <View style={[styles.usersPart, styles.container]}>
-        <Avatar user={account} size={32} />
+        <Avatar
+          user={
+            postUserId === account._id
+              ? account
+              : account.companies.find((company) => company._id === postUserId)
+          }
+          size={32}
+        />
         <Controller
           control={control}
           name="userId"

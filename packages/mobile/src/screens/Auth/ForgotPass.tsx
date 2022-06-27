@@ -31,13 +31,13 @@ const ForgotPass: ForgotPassScreen = ({ navigation }) => {
   const [err, setErr] = useState('');
   const [forgotPassword] = useMutation(FORGOT_PASSWORD);
 
-  const handleReset = async () => {
+  const handleReset = async (): Promise<void> => {
     Keyboard.dismiss();
     setErr('');
     try {
       const { data } = await forgotPassword({
         variables: {
-          email: email,
+          email: email.toLowerCase(),
         },
       });
       if (data.requestPasswordReset) {
@@ -61,7 +61,7 @@ const ForgotPass: ForgotPassScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <PHeader centerIcon={<LogoSvg />} />
-      <PAppContainer>
+      <PAppContainer style={styles.content}>
         <PTitle title="Forgot Password" />
         {!!err && <ErrorText error={err} />}
         {sent ? (
@@ -83,6 +83,8 @@ const ForgotPass: ForgotPassScreen = ({ navigation }) => {
               text={email}
               keyboardType="email-address"
               containerStyle={styles.textContainer}
+              autoCapitalize="none"
+              autoCorrect={false}
             />
             <PGradientButton
               label="send email"
@@ -110,6 +112,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: BLACK,
   },
+  content: {
+    marginTop: 28,
+  },
   textContainer: {
     marginTop: 32,
   },
@@ -129,10 +134,5 @@ const styles = StyleSheet.create({
   txt: {
     ...Body2,
     color: WHITE,
-  },
-  back: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 24,
   },
 });

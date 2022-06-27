@@ -158,7 +158,9 @@ const FundProfileInfo: FC<FundProfileInfo> = ({
               styles.flex,
               pressed ? pStyles.pressedStyle : null,
             ]}>
-            <Text style={styles.link}>{fund.company.name}</Text>
+            <Text style={styles.link}>
+              {fund.limitedView ? 'View Company Profile' : fund.company.name}
+            </Text>
           </Pressable>
           <Pressable
             onPress={toggleWatch}
@@ -184,7 +186,7 @@ const FundProfileInfo: FC<FundProfileInfo> = ({
           <Text style={[styles.title, styles.center]}>Strategy</Text>
           <Text style={[styles.whiteText, styles.center]}>{fund.strategy}</Text>
         </View>
-        {category !== 'equity' && (
+        {!fund.limitedView && (
           <View style={[styles.fundDescriptorContainer, styles.leftSeparator]}>
             <Text style={[styles.title, styles.center]}>Minimum</Text>
             <Text style={[styles.whiteText, styles.center]}>
@@ -214,7 +216,13 @@ const FundProfileInfo: FC<FundProfileInfo> = ({
             </View>
           </Pressable>
         )}
-        {fund.highlights && fund.highlights.length > 0 && (
+        {fund.limitedView && fund.company.tagline ? (
+          <PLabel
+            label={fund.company.tagline}
+            textStyle={styles.highlightLabel}
+          />
+        ) : null}
+        {!fund.limitedView && fund.highlights && fund.highlights.length > 0 && (
           <View>
             <PLabel label="Fund Highlights" textStyle={styles.sectionTitle} />
             {fund.highlights.map((item, index) => (

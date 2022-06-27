@@ -35,7 +35,14 @@ export const PostCategories = Object.keys(PostCategoryOptions).reduce(
   {} as Record<PostCategoryEnum, string>
 );
 
-const orderedAssetClasses: AssetClassEnum[] = ["PE", "HEDGE", "CREDIT"];
+const orderedAssetClasses: AssetClassEnum[] = [
+  "PE",
+  "HEDGE",
+  "CREDIT",
+  "VC",
+  "CRYPTO",
+  "RE",
+];
 export const AssetClasses = orderedAssetClasses.map((assetClass) => {
   const { label } = AssetClassOptions[assetClass];
   return {

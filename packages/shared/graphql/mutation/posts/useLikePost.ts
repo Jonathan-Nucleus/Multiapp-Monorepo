@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect} from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import { useAccountContext } from "shared/context/Account";
 import {
@@ -8,11 +8,11 @@ import {
 
 type PostData = {
   post: PostSummary;
-}
+};
 
 type PostVariables = {
   postId: string;
-}
+};
 
 type LikePostVariables = {
   like: boolean;
@@ -20,7 +20,7 @@ type LikePostVariables = {
 };
 
 type LikePostData = {
-  likePost: Pick<PostSummary, "_id" | "likeIds">;
+  likePost: Pick<PostSummary, "_id" | "likeIds" | "likeCount">;
 };
 
 interface LikePostReturn {
@@ -49,9 +49,10 @@ export function useLikePost(id: string): LikePostReturn {
     {
       fetchPolicy: "cache-only",
       variables: {
-        postId: id
-      }
-    });
+        postId: id,
+      },
+    }
+  );
 
   const isLiked = postData?.post?.likeIds?.includes(account._id) ?? false;
   const [liked, setLiked] = useState(isLiked);
@@ -63,6 +64,7 @@ export function useLikePost(id: string): LikePostReturn {
         likePost(like: $like, postId: $postId) {
           _id
           likeIds
+          likeCount
         }
       }
     `,
@@ -133,6 +135,6 @@ export function useLikePost(id: string): LikePostReturn {
     isLiked: liked,
     toggleLike,
     like: setLike,
-    likeCount: postData?.post?.likeIds?.length ?? 0,
+    likeCount: postData?.post.likeCount ?? 0,
   };
 }

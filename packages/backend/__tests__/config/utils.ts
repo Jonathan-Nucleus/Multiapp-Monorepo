@@ -67,6 +67,11 @@ export const createUser = async (
     position: faker.name.jobTitle(),
     emailToken: faker.datatype.uuid(),
     featured,
+    postCount: 0,
+    followerCount: 0,
+    followingCount: 0,
+    companyFollowerCount: 0,
+    companyFollowingCount: 0,
   };
 
   try {
@@ -125,6 +130,9 @@ export const createPost = async (
           )
         )
       ).map((index) => categoryValues[index]),
+    likeCount: 0,
+    commentCount: 0,
+    shareCount: 0,
   };
 
   try {
@@ -153,6 +161,7 @@ export const createComment = async (
     userId: toObjectId(userId),
     body: faker.lorem.sentence(),
     postId: toObjectId(postId),
+    likeCount: 0,
   };
 
   try {
@@ -180,6 +189,11 @@ export const createCompany = async (
     _id: toObjectId(),
     name: faker.company.companyName(),
     memberIds: [toObjectId(userId)],
+    postCount: 0,
+    followerCount: 0,
+    followingCount: 0,
+    companyFollowerCount: 0,
+    companyFollowingCount: 0,
   };
 
   try {

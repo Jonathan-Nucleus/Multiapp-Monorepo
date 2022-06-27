@@ -61,7 +61,15 @@ export type DeserializedUser = {
 
 export const DEFAULT_USER_OPTIONS: Pick<
   User.Mongo,
-  "role" | "accreditation" | "settings" | "followingIds"
+  | "role"
+  | "accreditation"
+  | "settings"
+  | "followingIds"
+  | "postCount"
+  | "followerCount"
+  | "followingCount"
+  | "companyFollowerCount"
+  | "companyFollowingCount"
 > = {
   role: UserRoleOptions.USER,
   accreditation: AccreditationOptions.NONE.value,
@@ -79,6 +87,11 @@ export const DEFAULT_USER_OPTIONS: Pick<
       tagCreate: "sms",
     },
   },
+  postCount: 0,
+  followerCount: 0,
+  followingCount: 0,
+  companyFollowerCount: 0,
+  companyFollowingCount: 0,
 };
 
 export const UNIVERSAL_INVITE_CODES = [
@@ -932,7 +945,9 @@ const createUsersCollection = (
       let accreditation: Accreditation = "none";
       const { class: investorClass, status } = questionnaire;
 
-      if (investorClass !== "advisor") {
+      if (investorClass === "advisor") {
+        accreditation = "purchaser";
+      } else {
         if (status.length > 0) {
           accreditation = "accredited";
         }

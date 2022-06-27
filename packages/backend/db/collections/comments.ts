@@ -64,13 +64,14 @@ const createCommentsCollection = (
         mentionIds: mentionIds ? toObjectIds(mentionIds) : undefined,
         userId: toObjectId(userId),
         mediaUrl,
+        likeCount: 0,
       };
       await commentsCollection.insertOne(commentData);
       await postsCollection.updateOne(
         { _id: toObjectId(postId) },
         {
           $addToSet: { commentIds: commentData._id },
-          $set: { updatedAt: new Date() },
+          $inc: { commentCount: 1 },
         }
       );
 
@@ -131,12 +132,19 @@ const createCommentsCollection = (
           _id: toObjectId(commentId),
           userId: toObjectId(userId),
         },
-        { $set: { deleted: true } }
+        { $set: { deleted: true } },
+        { returnDocument: "after" }
       );
 
       if (!result.ok || !result.value) {
         throw new NotFoundError("Comment");
       }
+
+      const { postId } = result.value;
+      await postsCollection.updateOne(
+        { _id: toObjectId(postId) },
+        { $inc: { commentCount: -1 } }
+      );
 
       return true;
     },
@@ -155,7 +163,10 @@ const createCommentsCollection = (
     ): Promise<Comment.Mongo> => {
       const result = await commentsCollection.findOneAndUpdate(
         { _id: toObjectId(commentId), deleted: { $exists: false } },
-        { $addToSet: { likeIds: toObjectId(userId) } },
+        {
+          $addToSet: { likeIds: toObjectId(userId) },
+          $inc: { likeCount: 1 },
+        },
         { returnDocument: "after" }
       );
 
@@ -180,7 +191,10 @@ const createCommentsCollection = (
     ): Promise<Comment.Mongo> => {
       const result = await commentsCollection.findOneAndUpdate(
         { _id: toObjectId(commentId), deleted: { $exists: false } },
-        { $pull: { likeIds: toObjectId(userId) } },
+        {
+          $pull: { likeIds: toObjectId(userId) },
+          $inc: { postCount: -1 },
+        },
         { returnDocument: "after" }
       );
 

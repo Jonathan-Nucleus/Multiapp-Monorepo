@@ -48,7 +48,7 @@ const FollowModal: FC<ModalProps> = ({
     return following;
   }, [currentTab, followers, following]);
 
-  const goToProfile = (userId: string) => {
+  const goToProfile = (userId: string): void => {
     NavigationService.navigate('UserDetails', {
       screen: 'UserProfile',
       params: {

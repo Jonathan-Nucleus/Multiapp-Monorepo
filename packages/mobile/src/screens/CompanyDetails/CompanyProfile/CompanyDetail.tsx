@@ -28,7 +28,6 @@ import {
   BLACK,
 } from 'shared/src/colors';
 
-import { useAccount } from 'shared/graphql/query/account/useAccount';
 import { useFollowCompany } from 'shared/graphql/mutation/account/useFollowCompany';
 import type { CompanyProfile } from 'shared/graphql/query/company/useCompany';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
@@ -43,7 +42,6 @@ interface CompanyDetailProps {
 const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [visibleFollow, setVisibleFollow] = useState(false);
-  const { data: accountData } = useAccount();
   const { isFollowing, toggleFollow } = useFollowCompany(company._id);
 
   const {
@@ -237,8 +235,8 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
       </Modal>
       <FollowModal
         onClose={() => setVisibleFollow(false)}
-        following={accountData?.account.following ?? []}
-        followers={accountData?.account.followers ?? []}
+        following={company.following ?? []}
+        followers={company.followers ?? []}
         isVisible={visibleFollow}
       />
     </>

@@ -67,6 +67,11 @@ export default async function (
       },
       tagline: faker.lorem.sentence(),
       overview: faker.lorem.paragraph(),
+      postCount: 0,
+      followerCount: 0,
+      followingCount: 0,
+      companyFollowerCount: 0,
+      companyFollowingCount: 0,
     })
   );
 

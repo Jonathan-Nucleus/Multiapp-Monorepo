@@ -48,6 +48,7 @@ export type FundManager = {
     | "lastName"
     | "avatar"
     | "position"
+    | "profile"
     | "role"
     | "followerIds"
     | "postIds"
@@ -65,6 +66,10 @@ export const FUND_MANAGER_FRAGMENT = gql`
       postIds
       position
       role
+      profile {
+        title
+        desc
+      }
     }
   }
 `;
@@ -76,6 +81,7 @@ export type FundCompany = {
     | "name"
     | "avatar"
     | "background"
+    | "tagline"
     | "followerIds"
     | "postIds"
     | "followingIds"
@@ -96,6 +102,7 @@ export const FUND_COMPANY_FRAGMENT = gql`
         height
         scale
       }
+      tagline
       followerIds
       followingIds
       postIds

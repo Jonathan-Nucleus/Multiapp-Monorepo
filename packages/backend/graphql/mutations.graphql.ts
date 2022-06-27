@@ -883,7 +883,7 @@ const resolvers = {
 
         const { postId } = args;
 
-        return db.posts.delete(postId, user._id);
+        return db.posts.delete(postId, user._id, user.companyIds ?? []);
       }
     ),
 

@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import isEqual from 'react-fast-compare';
 import { SlidersHorizontal } from 'phosphor-react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import retry from 'async-retry';
 
 import MainHeader from 'mobile/src/components/main/Header';
@@ -40,17 +40,19 @@ import { Body2Bold } from '../../../theme/fonts';
 const PLACE_HOLDERS = 7;
 
 const HomeComponent: HomeScreen = ({ navigation }) => {
-  const [selectedCategories, setSelectedCategories] = useState<
-    PostCategory[] | undefined
-  >(undefined);
+  const [selectedCategories, setSelectedCategories] =
+    useState<PostCategory[]>();
   const [selectedRole, setSelectedRole] = useState<PostRoleFilter>('EVERYONE');
   const [visibleFilter, setVisibleFilter] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const currentFocus = useIsFocused();
+  const [isFocused, setFocused] = useState(currentFocus);
   const account = useAccountContext();
   const {
     data: { posts: postData = [] } = {},
     refetch,
     fetchMore,
+    loading,
   } = usePosts(selectedCategories, selectedRole);
 
   const renderItem: ListRenderItem<Post> = useMemo(
@@ -60,9 +62,11 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
     [],
   );
 
-  useFocusEffect(() => () => {
+  if (isFocused !== currentFocus) {
+    setFocused(currentFocus);
+    refetch();
     stopVideos();
-  });
+  }
 
   const onViewableItemsChanged = useCallback<
     Exclude<FlatListProps<Post>['onViewableItemsChanged'], null | undefined>
@@ -77,9 +81,7 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
     });
   }, []);
 
-  console.log('POSTS', postData.length);
-
-  if (!postData || !account) {
+  if (loading && postData.length === 0) {
     return (
       <View style={pStyles.globalContainer}>
         <MainHeader />
@@ -126,6 +128,8 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
     });
   };
 
+  console.log('postData', postData[0]?.body);
+
   return (
     <View style={pStyles.globalContainer}>
       <MainHeader />
@@ -141,7 +145,7 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
         removeClippedSubviews={true}
         contentContainerStyle={styles.container}
         data={postData}
-        extraData={account}
+        extraData={isFocused}
         renderItem={renderItem}
         keyExtractor={(item) => item._id}
         onViewableItemsChanged={onViewableItemsChanged}

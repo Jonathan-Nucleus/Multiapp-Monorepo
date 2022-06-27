@@ -4,7 +4,6 @@ import { ValueOf, GraphQLEntity } from "../lib/mongo-helper";
 import { Post, PostCategory, PostCategoryEnum } from "./post";
 import { Company } from "./company";
 import { Fund } from "./fund";
-import { Comment } from "./comment";
 import { HelpRequestType, HelpRequestTypeEnum } from "./help-request";
 
 export namespace ContentCreator {
@@ -14,11 +13,15 @@ export namespace ContentCreator {
     tagline?: string;
     overview?: string;
     postIds?: ObjectId[];
-    commentIds?: ObjectId[];
+    postCount: number;
     followerIds?: ObjectId[];
+    followerCount: number;
     followingIds?: ObjectId[];
+    followingCount: number;
     companyFollowerIds?: ObjectId[];
+    companyFollowerCount: number;
     companyFollowingIds?: ObjectId[];
+    companyFollowingCount: number;
     website?: string;
     linkedIn?: string;
     twitter?: string;
@@ -26,7 +29,6 @@ export namespace ContentCreator {
 
   export type GraphQL = GraphQLEntity<Mongo> & {
     posts: Post.GraphQL[];
-    comments: Comment.GraphQL[];
     followers: User.Profile[];
     following: User.Profile[];
     companyFollowers: User.Profile[];
@@ -53,6 +55,7 @@ export namespace User {
     questionnaire?: Questionnaire;
     proRequest?: ProRequest;
     position?: string;
+    profile?: ProfileSection[];
     companyIds?: ObjectId[];
     watchlistIds?: ObjectId[];
     settings?: Settings;
@@ -98,11 +101,15 @@ export namespace User {
       | "overview"
       | "managedFundsIds"
       | "postIds"
-      | "commentIds"
+      | "postCount"
       | "followerIds"
+      | "followerCount"
       | "followingIds"
+      | "followingCount"
       | "companyFollowerIds"
+      | "companyFollowerCount"
       | "companyFollowingIds"
+      | "companyFollowingCount"
       | "website"
       | "linkedIn"
       | "twitter"
@@ -176,6 +183,11 @@ export namespace User {
         | "twitter"
       >
     >;
+}
+
+export interface ProfileSection {
+  title: string;
+  desc: string;
 }
 
 export interface Settings {
@@ -476,11 +488,15 @@ export const ContentCreatorSchema = `
   tagline: String
   overview: String
   postIds: [ID!]
-  commentIds: [ID!]
+  postCount: Int!
   followerIds: [ID!]
+  followerCount: Int!
   followingIds: [ID!]
+  followingCount: Int!
   companyFollowerIds: [ID!]
+  companyFollowerCount: Int!
   companyFollowingIds: [ID!]
+  companyFollowingCount: Int!
   website: String
   linkedIn: String
   twitter: String
@@ -505,6 +521,7 @@ const UserProfileSchema = `
   firstName: String!
   lastName: String!
   position: String
+  profile: [ProfileSection!]
   role: UserRole!
   companyIds: [ID!]
   watchlistIds : [ID!]
@@ -547,6 +564,11 @@ export const UserSchema = `
 
   type UserProfile {
     ${UserProfileSchema}
+  }
+
+  type ProfileSection {
+    title: String!
+    desc: String!
   }
 
   union Invitee = User | UserStub

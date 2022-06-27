@@ -39,6 +39,7 @@ export default async function (
           userId,
           postId,
           body: faker.lorem.paragraph(),
+          likeCount: 0,
         };
       });
     })

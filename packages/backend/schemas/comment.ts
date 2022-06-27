@@ -12,6 +12,7 @@ export namespace Comment {
     postId: ObjectId;
     commentId?: ObjectId;
     likeIds?: ObjectId[];
+    likeCount: number;
     mentionIds?: ObjectId[];
     mediaUrl?: string;
     updatedAt?: Date;
@@ -46,6 +47,7 @@ export const CommentSchema = `
     postId: ID!
     commentId: ID
     likeIds: [ID!]
+    likeCount: Int!
     mentionIds: [ID!]
     mediaUrl: String
     createdAt: Date!

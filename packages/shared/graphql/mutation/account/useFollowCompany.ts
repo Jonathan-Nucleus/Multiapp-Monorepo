@@ -11,8 +11,11 @@ type FollowCompanyVariables = {
 
 type FollowCompanyData = {
   followCompany: {
-    account: Pick<UserProfile, "_id" | "companyFollowingIds">;
-    company: Pick<Company, "_id" | "followerIds">;
+    account: Pick<
+      UserProfile,
+      "_id" | "companyFollowingIds" | "companyFollowingCount"
+    >;
+    company: Pick<Company, "_id" | "followerIds" | "followerCount">;
   };
 };
 
@@ -54,10 +57,12 @@ export function useFollowCompany(id?: string): FollowCompanyReturn {
           account {
             _id
             companyFollowingIds
+            companyFollowingCount
           }
           company {
             _id
             followerIds
+            followerCount
           }
         }
       }

@@ -31,6 +31,11 @@ const seedDb = async (): Promise<void> => {
           _id: companyId,
           memberIds: [managerId],
           fundIds: [fundId],
+          postCount: 0,
+          followerCount: 0,
+          followingCount: 0,
+          companyFollowerCount: 0,
+          companyFollowingCount: 0,
           ...fundData.company,
         };
 
@@ -45,6 +50,11 @@ const seedDb = async (): Promise<void> => {
           fullName: `${fundData.manager.firstName} ${fundData.manager.lastName}`,
           password: hashPassword("pro-ignite-pass", salt),
           managedFundsIds: [fundId],
+          postCount: 0,
+          followerCount: 0,
+          followingCount: 0,
+          companyFollowerCount: 0,
+          companyFollowingCount: 0,
           ...fundData.manager,
         };
 
@@ -58,6 +68,11 @@ const seedDb = async (): Promise<void> => {
           fullName: `${member.firstName} ${member.lastName}`,
           password: hashPassword("pro-ignite-pass", salt),
           managedFundsIds: [fundId],
+          postCount: 0,
+          followerCount: 0,
+          followingCount: 0,
+          companyFollowerCount: 0,
+          companyFollowingCount: 0,
           ...member,
         }));
 

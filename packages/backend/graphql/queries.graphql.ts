@@ -249,7 +249,10 @@ const resolvers = {
             roleFilter,
             ignorePosts: userData.hiddenPostIds,
             ignoreUsers: userData.hiddenUserIds,
-            followingUsers: userData.followingIds,
+            followingUsers: [
+              ...(userData.followingIds || []),
+              ...(userData.companyFollowingIds || []),
+            ],
           },
           before,
           limit

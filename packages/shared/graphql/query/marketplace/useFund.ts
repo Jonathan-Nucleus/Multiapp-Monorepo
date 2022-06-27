@@ -20,7 +20,14 @@ export { DocumentCategories };
 
 export type TeamMember = Pick<
   GraphQLFund["team"][number],
-  "_id" | "firstName" | "lastName" | "avatar" | "position"
+  | "_id"
+  | "firstName"
+  | "lastName"
+  | "avatar"
+  | "position"
+  | "profile"
+  | "followerIds"
+  | "postIds"
 >;
 export type FundDetails = FundSummary &
   FundManager &
@@ -96,6 +103,12 @@ export function useFund(fundId?: string): QueryResult<FundData, FundVariables> {
             lastName
             avatar
             position
+            profile {
+              title
+              desc
+            }
+            followerIds
+            postIds
           }
           updatedAt
         }

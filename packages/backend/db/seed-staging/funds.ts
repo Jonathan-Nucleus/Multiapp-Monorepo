@@ -5,7 +5,7 @@ import type { User } from "backend/schemas/user";
 type FundMember = Pick<User.Mongo, "firstName" | "lastName" | "position">;
 type FundData = {
   fund: Omit<Fund.Mongo, "_id" | "companyId" | "managerId" | "teamIds">;
-  company: Omit<Company.Mongo, "_id" | "memberIds">;
+  company: Pick<Company.Mongo, "name">;
   manager: FundMember;
   team: FundMember[];
 };

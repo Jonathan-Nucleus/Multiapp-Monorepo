@@ -3,6 +3,39 @@
  * from a MongoDB database.
  */
 
+/**
+ * Migration command.
+ *
+ * db.posts.aggregate([
+   {
+     $addFields: {
+       likeCount: {
+         $cond: {
+           if: { $not: "$likeIds" },
+           then: 0,
+           else: { $size: "$likeIds" },
+         },
+       },
+     },
+   },
+   { $out: "posts" },
+ ]);
+  posts.likeCount
+  posts.commentCount
+  posts.shareCount
+  users.postCount
+  users.followerCount
+  users.followingCount
+  users.companyFollowerCount
+  users.companyFollowingCount
+  company.postCount
+  company.followerCount
+  company.followingCount
+  company.companyFollowerCount
+  company.companyFollowingCount
+  comments.likeCount
+ */
+
 import { Collection, ObjectId, UpdateFilter } from "mongodb";
 import _ from "lodash";
 import { MongoId, toObjectId, toObjectIds } from "../../lib/mongo-helper";
@@ -204,6 +237,9 @@ const createPostsCollection = (
         visible,
         userId: toObjectId(companyId ?? userId),
         isCompany,
+        likeCount: 0,
+        commentCount: 0,
+        shareCount: 0,
       };
 
       const insertResult = await postsCollection.insertOne(postData);
@@ -214,7 +250,10 @@ const createPostsCollection = (
       if (isCompany) {
         const updateResult = await companiesCollection.updateOne(
           { _id: toObjectId(companyId), deletedAt: { $exists: false } },
-          { $addToSet: { postIds: postData._id } }
+          {
+            $addToSet: { postIds: postData._id },
+            $inc: { postCount: visible ? 1 : 0 },
+          }
         );
         if (!updateResult.acknowledged || updateResult.modifiedCount === 0) {
           throw new InternalServerError("Not able assign company.");
@@ -222,7 +261,10 @@ const createPostsCollection = (
       } else {
         const updateResult = await usersCollection.updateOne(
           { _id: toObjectId(userId), deletedAt: { $exists: false } },
-          { $addToSet: { postIds: postData._id } }
+          {
+            $addToSet: { postIds: postData._id },
+            $inc: { postCount: visible ? 1 : 0 },
+          }
         );
         if (!updateResult.acknowledged || updateResult.modifiedCount === 0) {
           throw new InternalServerError("Not able to assign user.");
@@ -298,6 +340,15 @@ const createPostsCollection = (
         throw new NotFoundError("Post");
       }
 
+      await usersCollection.updateOne(
+        { _id: toObjectId(userId) },
+        { $inc: { postCount: visible ? 1 : -1 } }
+      );
+      await companiesCollection.updateOne(
+        { _id: toObjectId(userId) },
+        { $inc: { postCount: visible ? 1 : -1 } }
+      );
+
       return result.value;
     },
 
@@ -316,9 +367,9 @@ const createPostsCollection = (
       post: Post.ShareInput,
       userId: MongoId
     ): Promise<Post.Mongo> => {
-      const postOid = toObjectId(postId);
+      const originalPostId = toObjectId(postId);
       const originalPost = await postsCollection.findOne({
-        _id: postOid,
+        _id: originalPostId,
       });
       if (!originalPost) {
         throw new UnprocessableEntityError("Post not found.");
@@ -335,7 +386,10 @@ const createPostsCollection = (
         isCompany,
         categories: originalPost.categories,
         audience: originalPost.audience,
-        sharedPostId: postOid,
+        sharedPostId: originalPostId,
+        likeCount: 0,
+        commentCount: 0,
+        shareCount: 0,
       };
 
       const insertResult = await postsCollection.insertOne(postData);
@@ -344,8 +398,11 @@ const createPostsCollection = (
       }
 
       const updateResult = await postsCollection.updateOne(
-        { _id: postOid },
-        { $addToSet: { shareIds: postData._id } }
+        { _id: originalPostId },
+        {
+          $addToSet: { shareIds: postData._id },
+          $inc: { shareCount: 1 },
+        }
       );
 
       if (!updateResult.acknowledged || updateResult.modifiedCount !== 1) {
@@ -382,17 +439,35 @@ const createPostsCollection = (
      * @returns   True if the post was successfully deleted and false
      *            otherwise.
      */
-    delete: async (postId: MongoId, userId: MongoId): Promise<boolean> => {
+    delete: async (
+      postId: MongoId,
+      userId: MongoId,
+      companyIds: MongoId[]
+    ): Promise<boolean> => {
       const result = await postsCollection.findOneAndUpdate(
         {
           _id: toObjectId(postId),
-          userId: toObjectId(userId),
+          userId: { $in: toObjectIds([userId, ...companyIds]) },
         },
-        { $set: { deleted: true } }
+        { $set: { deleted: true } },
+        { returnDocument: "after" }
       );
 
       if (!result.ok || !result.value) {
         throw new NotFoundError("Post");
+      }
+
+      const { userId: postUserId } = result.value;
+      if (postUserId === userId) {
+        await usersCollection.updateOne(
+          { _id: toObjectId(postUserId) },
+          { $inc: { postCount: -1 } }
+        );
+      } else {
+        await companiesCollection.updateOne(
+          { _id: toObjectId(postUserId) },
+          { $inc: { postCount: -1 } }
+        );
       }
 
       return true;
@@ -474,7 +549,10 @@ const createPostsCollection = (
     likePost: async (postId: MongoId, userId: MongoId): Promise<Post.Mongo> => {
       const result = await postsCollection.findOneAndUpdate(
         { _id: toObjectId(postId), deleted: { $exists: false } },
-        { $addToSet: { likeIds: toObjectId(userId) } },
+        {
+          $addToSet: { likeIds: toObjectId(userId) },
+          $inc: { likeCount: 1 },
+        },
         { returnDocument: "after" }
       );
 
@@ -499,7 +577,10 @@ const createPostsCollection = (
     ): Promise<Post.Mongo> => {
       const result = await postsCollection.findOneAndUpdate(
         { _id: toObjectId(postId), deleted: { $exists: false } },
-        { $pull: { likeIds: toObjectId(userId) } },
+        {
+          $pull: { likeIds: toObjectId(userId) },
+          $inc: { likeCount: -1 },
+        },
         { returnDocument: "after" }
       );
 
@@ -580,10 +661,6 @@ const createPostsCollection = (
 
       return posts;
     },
-
-    // TODO: Outstanding endpoints to implement
-    // updatePost(post: PostUpdate) → Post
-    // sharePost(postId: ID) → Post
   };
 };
 

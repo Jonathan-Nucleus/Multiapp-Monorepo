@@ -133,10 +133,6 @@ describe("Mutations - comment", () => {
 
     const newPost = (await posts.find(toObjectId(post1._id))) as Post.Mongo;
 
-    expect(post1?.updatedAt?.toISOString()).not.toBe(
-      newPost.updatedAt?.toISOString()
-    );
-
     const newCommentCount = await db
       .collection(DbCollection.COMMENTS)
       .countDocuments();

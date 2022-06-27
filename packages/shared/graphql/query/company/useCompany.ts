@@ -29,7 +29,9 @@ export type CompanyProfile = Pick<
   | "background"
   | "postIds"
   | "followerIds"
+  | "followerCount"
   | "followingIds"
+  | "followingCount"
   | "website"
   | "linkedIn"
   | "twitter"
@@ -73,7 +75,9 @@ export function useCompany(
           overview
           avatar
           followerIds
+          followerCount
           followingIds
+          followingCount
           website
           linkedIn
           twitter

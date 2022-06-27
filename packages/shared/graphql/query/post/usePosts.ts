@@ -7,6 +7,7 @@ import {
   ApolloQueryResult,
   NetworkStatus,
 } from "@apollo/client";
+import _isEqual from "lodash/isEqual";
 import {
   PostCategory,
   Audience,
@@ -44,9 +45,14 @@ export function usePosts(
   limit = 10
 ): QueryResult<PostsData, PostsVariables> {
   const [state, setState] = useState<PostsData>();
+  const [queryCategories, setCategories] = useState(categories);
+  const [queryRoleFilter, setRoleFilter] = useState(roleFilter);
   const isFetchMore = useRef(false);
   const lastNetworkStatus = useRef(0);
-  const { data, loading, ...rest } = useQuery<PostsData, PostsVariables>(
+  const { data, loading, networkStatus, ...rest } = useQuery<
+    PostsData,
+    PostsVariables
+  >(
     gql`
       ${POST_SUMMARY_FRAGMENT}
       query Posts(
@@ -81,42 +87,81 @@ export function usePosts(
     }
   );
 
-  if (rest.networkStatus < 7) {
-    lastNetworkStatus.current = rest.networkStatus;
+  if (networkStatus < 7) {
+    lastNetworkStatus.current = networkStatus;
+  }
+
+  if (
+    !_isEqual(categories, queryCategories) ||
+    roleFilter !== queryRoleFilter
+  ) {
+    setCategories(categories);
+    setRoleFilter(roleFilter);
+    setState(undefined);
   }
 
   useEffect(() => {
-    if (rest.networkStatus === NetworkStatus.ready) {
+    if (networkStatus === NetworkStatus.ready) {
       const newPosts = data?.posts || [];
-      if (lastNetworkStatus.current === NetworkStatus.loading && state) {
-        const newData = { ...state };
-        const existingPosts = newData.posts ? newData.posts : [];
-        newData.posts = [
-          ...existingPosts,
-          ...newPosts.filter(
-            (post) =>
-              !existingPosts.some(
-                (existingPost) =>
-                  existingPost._id.toString() === post._id.toString()
-              )
-          ),
-        ].sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      const newData = { ...state };
+      let existingPosts = newData.posts ? newData.posts : [];
+
+      if (!rest.variables?.before) {
+        const firstIndex = existingPosts.findIndex(
+          (post) => post._id === newPosts[0]?._id
+        );
+        const lastIndex = existingPosts.findIndex(
+          (post) => post._id === newPosts[newPosts.length - 1]?._id
         );
 
-        if (existingPosts.length !== newData.posts?.length) {
-          setState(newData);
+        // Splice out potentially deleted posts
+        if (firstIndex !== lastIndex) {
+          existingPosts.splice(0, lastIndex + 1).splice(0, 0, ...newPosts);
         }
-      } else if (
-        !state ||
-        lastNetworkStatus.current === NetworkStatus.setVariables ||
-        lastNetworkStatus.current === NetworkStatus.refetch
-      ) {
-        setState(data);
+
+        // Update remaining posts from local cache
+        for (
+          let index = Math.max(0, newPosts.length - 1);
+          index < existingPosts.length;
+          index++
+        ) {
+          const cachePost = rest.client.cache.readFragment({
+            id: `Post:${existingPosts[index]._id}`,
+            fragment: gql`
+              ${POST_SUMMARY_FRAGMENT}
+            `,
+          }) as PostSummary | null;
+
+          if (cachePost) {
+            existingPosts[index] = cachePost;
+          }
+        }
+      } else {
+        existingPosts = existingPosts.map((existingPost) => {
+          const updatedPost = newPosts.find(
+            (newPost) => newPost._id === existingPost._id
+          );
+          return updatedPost || existingPost;
+        });
       }
+
+      newData.posts = [
+        ...existingPosts,
+        ...newPosts.filter(
+          (post) =>
+            !existingPosts.some(
+              (existingPost) =>
+                existingPost._id.toString() === post._id.toString()
+            )
+        ),
+      ].sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+
+      setState(newData);
     }
-  }, [data, loading]);
+  }, [data, networkStatus]);
 
   const fetchMore: typeof rest.fetchMore = async (
     params: FetchMoreQueryOptions<PostsVariables>
@@ -148,5 +193,5 @@ export function usePosts(
     return result as any; // TODO: Resolve type mismatch error
   };
 
-  return { data: state, loading, ...rest, fetchMore };
+  return { data: state, loading, ...rest, fetchMore, networkStatus };
 }

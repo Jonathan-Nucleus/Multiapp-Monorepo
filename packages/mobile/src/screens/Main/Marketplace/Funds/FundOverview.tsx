@@ -1,5 +1,12 @@
 import React, { FC, useState } from 'react';
-import { View, StyleSheet, ViewProps, Text, Pressable } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ViewProps,
+  Pressable,
+  FlatList,
+  ListRenderItem,
+} from 'react-native';
 import { Presentation, Info } from 'phosphor-react-native';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -7,12 +14,21 @@ dayjs.extend(utc);
 
 import Tag from 'mobile/src/components/common/Tag';
 import PLabel from 'mobile/src/components/common/PLabel';
+import PText from 'mobile/src/components/common/PText';
+import PMarkdown from 'mobile/src/components/common/PMarkdown';
 import Accordion from 'mobile/src/components/common/Accordion';
 import TeamList from 'mobile/src/components/main/funds/TeamList';
+import DetailedTeamList from 'mobile/src/components/main/funds/DetailedTeamList';
 import { FundMedia } from 'mobile/src/components/common/Media';
 import Disclosure from 'mobile/src/components/main/Disclosure';
 import pStyles from 'mobile/src/theme/pStyles';
-import { Body2Bold, Body2, Body3, H6Bold } from 'mobile/src/theme/fonts';
+import {
+  Body1Semibold,
+  Body2Bold,
+  Body2,
+  Body3,
+  H6Bold,
+} from 'mobile/src/theme/fonts';
 import {
   PRIMARY,
   WHITE,
@@ -53,9 +69,19 @@ const RIGHT_FLEX = 0.4;
 
 const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
   const [disclosureVisible, setDisclosureVisible] = useState(false);
+  const [videoIndex, setVideoIndex] = useState(0);
 
-  const video = fund.videos?.[0];
+  const video = fund.videos?.[videoIndex];
   const dollarFormatter = Intl.NumberFormat('en', { notation: 'compact' });
+
+  const renderVideo: ListRenderItem<string> = ({ item: vid, index }) => (
+    <Pressable
+      key={vid}
+      style={styles.videoPreview}
+      onPress={() => setVideoIndex(index)}>
+      <FundMedia media={{ url: vid, aspectRatio: 1.58 }} mediaId={fund._id} />
+    </Pressable>
+  );
 
   return (
     <View {...viewProps} style={[styles.overviewContainer, viewProps.style]}>
@@ -67,9 +93,18 @@ const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
           />
         </View>
       ) : null}
+      {/*fund.videos && fund.videos.length > 1 ? (
+        <FlatList
+          data={fund.videos}
+          renderItem={renderVideo}
+          keyExtractor={(item) => item}
+          horizontal={true}
+          style={styles.videoList}
+        />
+      ) : null*/}
       <View style={styles.fundDetailsContainer}>
         <PLabel textStyle={styles.fund} label="Strategy Overview" />
-        <Text style={styles.overview}>{fund.overview}</Text>
+        <PMarkdown>{fund.overview}</PMarkdown>
         {fund.presentationUrl ? (
           <View style={styles.presentationContainer}>
             <Presentation size={32} color={WHITE} />
@@ -85,71 +120,82 @@ const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
               <React.Fragment key={tag}>
                 <Tag label={tag} viewStyle={styles.tagStyle} />
                 {index < fund.tags.length - 1 ? (
-                  <Text style={styles.tagSeparator}>•</Text>
+                  <PText style={styles.tagSeparator}>•</PText>
                 ) : null}
               </React.Fragment>
             ))}
           </View>
         )}
       </View>
-      <View>
-        <View style={styles.infoContainer}>
-          <PLabel textStyle={styles.fund} label="Fund Details" />
+      {!fund.limitedView ? (
+        <View>
+          <View style={styles.infoContainer}>
+            <PLabel textStyle={styles.fund} label="Fund Details" />
+          </View>
+          <View style={styles.infoContainer}>
+            <PTitle
+              title="Asset Class"
+              subTitle={
+                AssetClasses.find(
+                  (assetClass) => assetClass.value === fund.class,
+                )?.label ?? ''
+              }
+              flex={LEFT_FLEX}
+            />
+            <PTitle
+              title="Strategy"
+              subTitle={fund.strategy}
+              flex={RIGHT_FLEX}
+            />
+          </View>
+          <View style={styles.infoContainer}>
+            <PTitle
+              title="AUM"
+              subTitle={`$${dollarFormatter.format(fund.aum)}`}
+            />
+          </View>
+          <View style={styles.infoContainer}>
+            <PTitle
+              title="Minimum Investment"
+              subTitle={`$${dollarFormatter.format(fund.min)}`}
+              flex={LEFT_FLEX}
+            />
+            <PTitle
+              title="Lockup Period"
+              subTitle={fund.lockup}
+              flex={RIGHT_FLEX}
+            />
+          </View>
+          <View style={styles.infoContainer}>
+            <PTitle title="liquidity" subTitle={fund.liquidity} />
+          </View>
+          <View style={styles.infoContainer}>
+            <PText style={styles.fee}>
+              {fund.fees.map((fee) => `${fee.label}: ${fee.value}`).join(' • ')}
+            </PText>
+          </View>
+          <View style={styles.infoContainer}>
+            <PLabel textStyle={styles.fund} label="Highlights" />
+            <PLabel
+              textStyle={styles.asOf}
+              label={`As of ${dayjs(fund.updatedAt).utc().format('M/DD/YYYY')}`}
+            />
+          </View>
+          <View style={styles.attributesContainer}>
+            {fund.attributes.map((attribute) => (
+              <View key={attribute.label} style={styles.attribute}>
+                <PTitle title={attribute.label} subTitle={attribute.value} />
+              </View>
+            ))}
+          </View>
         </View>
-        <View style={styles.infoContainer}>
-          <PTitle
-            title="Asset Class"
-            subTitle={
-              AssetClasses.find((assetClass) => assetClass.value === fund.class)
-                ?.label ?? ''
-            }
-            flex={LEFT_FLEX}
-          />
-          <PTitle title="Strategy" subTitle={fund.strategy} flex={RIGHT_FLEX} />
-        </View>
-        <View style={styles.infoContainer}>
-          <PTitle
-            title="AUM"
-            subTitle={`$${dollarFormatter.format(fund.aum)}`}
-          />
-        </View>
-        <View style={styles.infoContainer}>
-          <PTitle
-            title="Minimum Investment"
-            subTitle={`$${dollarFormatter.format(fund.min)}`}
-            flex={LEFT_FLEX}
-          />
-          <PTitle
-            title="Lockup Period"
-            subTitle={fund.lockup}
-            flex={RIGHT_FLEX}
-          />
-        </View>
-        <View style={styles.infoContainer}>
-          <PTitle title="liquidity" subTitle={fund.liquidity} />
-        </View>
-        <View style={styles.infoContainer}>
-          <Text style={styles.fee}>
-            {fund.fees.map((fee) => `${fee.label}: ${fee.value}`).join(' • ')}
-          </Text>
-        </View>
-        <View style={styles.infoContainer}>
-          <PLabel textStyle={styles.fund} label="Highlights" />
-          <PLabel
-            textStyle={styles.asOf}
-            label={`As of ${dayjs(fund.updatedAt).utc().format('M/DD/YYYY')}`}
-          />
-        </View>
-        <View style={styles.attributesContainer}>
-          {fund.attributes.map((attribute) => (
-            <View key={attribute.label} style={styles.attribute}>
-              <PTitle title={attribute.label} subTitle={attribute.value} />
-            </View>
-          ))}
-        </View>
-      </View>
-      <TeamList team={[fund.manager, ...fund.team]} />
-      {fund.metrics && fund.metrics.length > 0 ? (
+      ) : null}
+      {fund.limitedView ? (
+        <DetailedTeamList team={[fund.manager, ...fund.team]} />
+      ) : (
+        <TeamList team={[fund.manager, ...fund.team]} />
+      )}
+      {!fund.limitedView && fund.metrics && fund.metrics.length > 0 ? (
         <View style={styles.memberContainer}>
           <PLabel textStyle={styles.fund} label="Monthly Net Return" />
           <NetReturnsTable returns={fund.metrics} />
@@ -158,8 +204,9 @@ const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
       {fund.disclosure ? (
         <Accordion
           title="Fund Disclosures"
+          titleStyle={styles.fundDisclosureHeader}
           containerStyle={styles.fundDisclosure}>
-          <Text style={styles.fundDisclosureText}>{fund.disclosure}</Text>
+          <PText style={styles.fundDisclosureText}>{fund.disclosure}</PText>
         </Accordion>
       ) : null}
       <Pressable
@@ -169,7 +216,7 @@ const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
           pressed ? pStyles.pressedStyle : null,
         ]}>
         <Info color={WHITE60} size={20} />
-        <Text style={styles.disclosureText}>Prometheus Disclosures</Text>
+        <PText style={styles.disclosureText}>Prometheus Disclosures</PText>
       </Pressable>
       <Disclosure
         isVisible={disclosureVisible}
@@ -188,6 +235,13 @@ const styles = StyleSheet.create({
   videoContainer: {
     marginTop: 8,
     paddingHorizontal: 16,
+  },
+  videoPreview: {
+    width: 88,
+    backgroundColor: 'red',
+  },
+  videoList: {
+    marginHorizontal: 16,
   },
   fundDetailsContainer: {
     padding: 16,
@@ -222,7 +276,7 @@ const styles = StyleSheet.create({
   tags: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginVertical: 16,
+    marginTop: 16,
     alignItems: 'center',
   },
   tagStyle: {
@@ -251,12 +305,6 @@ const styles = StyleSheet.create({
     color: GRAY100,
     ...Body2,
   },
-  overview: {
-    color: WHITE,
-    marginTop: 8,
-    lineHeight: 20,
-    ...Body2,
-  },
   attributesContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -277,9 +325,17 @@ const styles = StyleSheet.create({
     marginTop: -8,
     marginBottom: 8,
   },
+  fundDisclosureHeader: {
+    textTransform: 'uppercase',
+    letterSpacing: 1.25,
+    ...Body1Semibold,
+  },
   fundDisclosureText: {
     color: GRAY600,
     marginBottom: 8,
+    lineHeight: 18,
+    letterSpacing: 1.125,
+    ...Body3,
   },
   disclosureContainer: {
     flexDirection: 'row',

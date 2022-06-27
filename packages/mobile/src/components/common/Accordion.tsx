@@ -51,16 +51,16 @@ const Accordion: React.FC<AccordionProps> = (props) => {
 
   return (
     <View style={[styles.containerStyle, containerStyle]}>
-      <View style={[styles.header, headerStyle]}>
-        <Pressable onPress={toggleView} style={styles.toggleButton}>
+      <Pressable style={[styles.header, headerStyle]} onPress={toggleView}>
+        <View style={styles.toggleButton}>
           {isExpanded ? (
             <CaretUp size={24} color={WHITE} />
           ) : (
             <CaretDown size={24} color={WHITE} />
           )}
-        </Pressable>
+        </View>
         <PText style={[styles.title, titleStyle]}>{title}</PText>
-      </View>
+      </Pressable>
       <View
         style={[
           styles.collapseContainer,

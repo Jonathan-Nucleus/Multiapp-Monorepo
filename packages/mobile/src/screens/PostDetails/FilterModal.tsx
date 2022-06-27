@@ -75,7 +75,7 @@ const FilterModal: FC<ModalProps> = ({
   }, [role]);
 
   const toggleTopic = (categoryIndex: number): void => {
-    let newValue = [...selectedTopics];
+    const newValue = [...selectedTopics];
 
     const index = newValue.indexOf(CATEGORY_OPTIONS[categoryIndex].value);
     index >= 0
@@ -83,27 +83,6 @@ const FilterModal: FC<ModalProps> = ({
       : newValue.push(CATEGORY_OPTIONS[categoryIndex].value);
 
     setSelectedTopics(newValue.length > 0 ? newValue : []);
-  };
-
-  const renderRole: ListRenderItem<typeof ROLE_OPTIONS[number]> = ({
-    item,
-  }) => {
-    return (
-      <TouchableOpacity onPress={() => setSelectedRole(item.value)}>
-        <View
-          style={[
-            styles.fromContainer,
-            item.value === selectedRole && styles.selectedRole,
-          ]}>
-          {item.value === selectedRole ? (
-            <RadioButton size={24} color={WHITE} weight="fill" />
-          ) : (
-            <Circle size={24} color={WHITE} />
-          )}
-          <Text style={styles.topic}>{item.label}</Text>
-        </View>
-      </TouchableOpacity>
-    );
   };
 
   const renderTopic: ListRenderItem<typeof CATEGORY_OPTIONS[number]> = ({
@@ -121,10 +100,11 @@ const FilterModal: FC<ModalProps> = ({
   return (
     <Modal
       isVisible={isVisible}
-      swipeDirection="down"
       onBackdropPress={() => onClose()}
       style={styles.bottomHalfModal}
+      coverScreen={true}
       propagateSwipe={true}
+      scrollOffset={1}
       backdropOpacity={0.5}>
       <View style={styles.modalContent}>
         <View style={styles.titleContainer}>
@@ -133,38 +113,40 @@ const FilterModal: FC<ModalProps> = ({
           </TouchableOpacity>
           <Text style={styles.title}>Customize Your Feed</Text>
         </View>
-        <ScrollView>
-          <View
-            onStartShouldSetResponder={() => true}
-            style={styles.flatContainer}>
-            <FlatList
-              data={ROLE_OPTIONS}
-              keyExtractor={(item) => `role_${item.id}`}
-              renderItem={renderRole}
-              listKey="from"
-              keyboardShouldPersistTaps="always"
-              nestedScrollEnabled
-              scrollEnabled={false}
-              ListHeaderComponent={
-                <Text style={styles.topic}>View Posts From:</Text>
-              }
-              ListHeaderComponentStyle={styles.listHeader}
-            />
-            <FlatList
-              data={CATEGORY_OPTIONS}
-              keyExtractor={(item) => `topic_${item.id}`}
-              numColumns={2}
-              renderItem={renderTopic}
-              listKey="topic"
-              keyboardShouldPersistTaps="always"
-              nestedScrollEnabled
-              scrollEnabled={false}
-              ListHeaderComponent={<Text style={styles.topic}>Topics</Text>}
-              ListHeaderComponentStyle={styles.listHeader}
-              columnWrapperStyle={styles.column}
-            />
-          </View>
-        </ScrollView>
+        <FlatList
+          data={CATEGORY_OPTIONS}
+          style={styles.list}
+          keyExtractor={(item) => `topic_${item.id}`}
+          numColumns={2}
+          renderItem={renderTopic}
+          listKey="topic"
+          keyboardShouldPersistTaps="always"
+          ListHeaderComponent={
+            <View>
+              <Text style={styles.topic}>View Posts From:</Text>
+              {ROLE_OPTIONS.map((option) => (
+                <TouchableOpacity
+                  key={option.value}
+                  onPress={() => setSelectedRole(option.value)}>
+                  <View
+                    style={[
+                      styles.fromContainer,
+                      option.value === selectedRole && styles.selectedRole,
+                    ]}>
+                    {option.value === selectedRole ? (
+                      <RadioButton size={24} color={WHITE} weight="fill" />
+                    ) : (
+                      <Circle size={24} color={WHITE} />
+                    )}
+                    <Text style={styles.topic}>{option.label}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+              <Text style={styles.topic}>Topics</Text>
+            </View>
+          }
+          columnWrapperStyle={styles.column}
+        />
         <View style={styles.bottom}>
           <PGradientOutlineButton
             label="done"
@@ -192,28 +174,14 @@ const styles = StyleSheet.create({
     height: Dimensions.get('screen').height,
     justifyContent: 'center',
   },
-  likeCountLabel: {
-    ...Body1Bold,
-    marginBottom: 16,
-  },
-  separator: {
-    height: 1,
-    backgroundColor: WHITE12,
-  },
-  modalKnobContainer: {
-    alignItems: 'center',
-  },
-  modalKnob: {
-    width: 72,
-    height: 8,
-    borderRadius: 30,
-    backgroundColor: GRAY800,
-  },
   title: {
     ...Body1Bold,
     color: WHITE,
   },
-  flatContainer: { paddingHorizontal: 16 },
+  list: {
+    paddingHorizontal: 16,
+    flex: 1,
+  },
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -239,6 +207,7 @@ const styles = StyleSheet.create({
     color: WHITE,
     ...Body2Bold,
     marginLeft: 8,
+    marginVertical: 8,
   },
   selectedRole: {
     backgroundColor: PRIMARYSOLID,
@@ -253,17 +222,6 @@ const styles = StyleSheet.create({
     borderColor: PRIMARYSOLID,
     marginVertical: 4,
     paddingHorizontal: 16,
-  },
-  listHeader: {
-    marginVertical: 10,
-    marginLeft: 12,
-  },
-  radioCircle: {
-    width: 24,
-    height: 24,
-    fillColor: PRIMARY,
-    borderColor: PRIMARY,
-    borderWidth: 2,
   },
   bottom: {
     backgroundColor: BLACK,
