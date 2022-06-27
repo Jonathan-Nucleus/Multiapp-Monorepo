@@ -68,14 +68,14 @@ MyApp.getInitialProps = async (
   const session = await getSession(context.ctx);
   const middleware = context.Component.middleware;
   let redirect;
-  if (middleware == "auth" && !session) {
+  if (middleware == "auth" && !session?.access_token) {
     redirect = `${AppAuthOptions.pages?.signIn}?redirect=${context.router.asPath}`;
-  } else if (middleware == "guest" && session) {
+  } else if (middleware == "guest" && session?.access_token) {
     redirect = "/";
   }
   if (redirect) {
     if (context.ctx.res) {
-      context.ctx.res.writeHead(301, {
+      context.ctx.res.writeHead(307, {
         Location: redirect,
       });
       context.ctx.res.end();

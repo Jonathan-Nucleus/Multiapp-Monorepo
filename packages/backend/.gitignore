@@ -1,4 +1,5 @@
 .env.staging
+.env.production
 
 __snapshots__
 coverage
