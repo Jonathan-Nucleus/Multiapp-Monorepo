@@ -2,6 +2,22 @@
 
 React Native front-end application for Prometheus.
 
+## Setting up the development environment
+
+Create a `.env` file in the mobile application directory and populate it with
+the following variables:
+
+```
+ENV=dev
+GRAPHQL_URI=https://api-dev2.prometheusalts.com
+WATRMARKING_SERVICE_URL=https://api-dev2.prometheusalts.com/pdf-watermark
+S3_BUCKET=https://media-dev2.prometheusalts.com
+GETSTREAM_ACCESS_KEY=p2n5abqg47rf
+
+DD_APP_ID={datadog app id}
+DD_TOKEN={datadog token}
+```
+
 ## Building for iOS
 
 To build and run the application for iOS, complete the following steps:

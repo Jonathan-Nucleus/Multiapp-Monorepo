@@ -1,3 +1,5 @@
+.env.staging
+
 __snapshots__
 coverage
 .firebase/*

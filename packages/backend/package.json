@@ -9,6 +9,7 @@
     "seed": "ts-node-dev --transpile-only --no-notify --exit-child db/seed/index.ts",
     "seed-staging": "ts-node-dev --transpile-only --no-notify --exit-child db/seed-staging/index.ts",
     "dev": "ts-node-dev --script-mode --transpile-only --no-notify --exit-child index.ts",
+    "staging": "ts-node-dev -r dotenv/config --script-mode --transpile-only --no-notify --exit-child index.ts dotenv_config_path=.env.staging dotenv_config_debug=true",
     "prod": "ts-node -P tsconfig-prod.json --transpile-only index.ts",
     "test": "export NODE_OPTIONS=\"--max-old-space-size=8192\" && jest --no-cache --runInBand --logHeapUsage",
     "typecheck": "tsc --noEmit -p ./tsconfig.json",
