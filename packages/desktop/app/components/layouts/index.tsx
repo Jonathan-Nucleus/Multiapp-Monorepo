@@ -11,6 +11,7 @@ import dynamic from "next/dynamic";
 import { useChatToken } from "shared/graphql/query/account/useChatToken";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
+import AnalyticsScripts from "./AnalyticsScripts";
 
 type RootLayoutProps = PropsWithChildren<AppPageProps> & {
   getstreamKey: string;
@@ -77,6 +78,7 @@ const RootLayout: FC<RootLayoutProps> = ({
         ) : (
           appContent
         )}
+        <AnalyticsScripts />
       </main>
     </>
   );

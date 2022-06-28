@@ -8,37 +8,6 @@ export const UPDATE_SETTINGS = gql`
   }
 `;
 
-export const INVITE_USER = gql`
-  mutation Invite($email: String!) {
-    inviteUser(email: $email)
-  }
-`;
-
-type WatchFundVariables = {
-  fundId: string;
-  watch: boolean;
-};
-
-type WatchFundData = {
-  watchFund: boolean;
-};
-
-export function useWatchFund(): MutationTuple<
-  WatchFundData,
-  WatchFundVariables
-> {
-  return useMutation<WatchFundData, WatchFundVariables>(
-    gql`
-      mutation WatchFund($watch: Boolean!, $fundId: ID!) {
-        watchFund(watch: $watch, fundId: $fundId)
-      }
-    `,
-    {
-      refetchQueries: ["Funds"],
-    }
-  );
-}
-
 type HideUserVariables = {
   hide: boolean;
   userId: string;

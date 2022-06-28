@@ -4,23 +4,24 @@ import Avatar from "desktop/app/components/common/Avatar";
 import Input from "desktop/app/components/common/Input";
 import Button from "desktop/app/components/common/Button";
 import { Plus, Image as ImageIcon } from "phosphor-react";
-import { UserProfileProps } from "desktop/app/types/common-props";
 import Skeleton from "./Skeleton";
 import Label from "../../../../common/Label";
+import { Account } from "shared/context/Account";
 
-interface AddPostProps extends UserProfileProps {
+interface AddPostProps {
+  account: Account;
   onClick: (file?: File) => void;
 }
 
-const AddPost: FC<AddPostProps> = ({ user, onClick }) => {
-  if (!user) {
+const AddPost: FC<AddPostProps> = ({ account, onClick }) => {
+  if (!account) {
     return <Skeleton />;
   }
   return (
     <div>
       <Card className="bg-background-blue p-4">
         <div className="flex items-center">
-          <Avatar user={user} size={56} />
+          <Avatar user={account} size={56} />
           <Input
             placeholder="Create a Post"
             className="text-sm rounded-3xl mx-4 px-5 h-12"

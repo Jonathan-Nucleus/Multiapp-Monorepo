@@ -7,16 +7,20 @@ import EditPostModal, {
   PostActionType,
 } from "../../../modules/posts/EditPostModal";
 import AddPost from "./AddPost";
-import { UserProfileProps } from "../../../../types/common-props";
 import Button from "../../../common/Button";
 import { Plus } from "phosphor-react";
 import { usePosts } from "shared/graphql/query/post/usePosts";
 import _ from "lodash";
+import { Account } from "shared/context/Account";
 
 const POSTS_PER_SCROLL = 15;
 const SCROLL_OFFSET_THRESHOLD = 3000;
 
-const PostsSection: FC<UserProfileProps> = ({ user }) => {
+interface PostsSectionProps {
+  account: Account;
+}
+
+const PostsSection: FC<PostsSectionProps> = ({ account }) => {
   const scrollOffset = useRef(0);
   const {
     data: { posts } = {},
@@ -76,7 +80,7 @@ const PostsSection: FC<UserProfileProps> = ({ user }) => {
     <>
       <div className="hidden md:block">
         <AddPost
-          user={user}
+          account={account}
           onClick={(file) => setPostAction({ type: "create", file })}
         />
       </div>

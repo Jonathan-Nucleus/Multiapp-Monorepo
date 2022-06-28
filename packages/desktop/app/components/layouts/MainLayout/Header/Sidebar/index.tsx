@@ -18,11 +18,11 @@ import {
 import Button from "../../../../common/Button";
 import SidebarItem from "./SidebarItem";
 import Avatar from "../../../../common/Avatar";
-import { UserProfile } from "shared/graphql/query/user/useProfile";
 import ModalDialog from "../../../../common/ModalDialog";
+import { Account } from "shared/context/Account";
 
 interface SidebarProps {
-  account: UserProfile | undefined;
+  account: Account | undefined;
   show: boolean;
   onClose: () => void;
 }

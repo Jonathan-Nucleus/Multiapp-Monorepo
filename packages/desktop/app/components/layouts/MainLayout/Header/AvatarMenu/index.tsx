@@ -1,6 +1,5 @@
 import { Popover, Transition } from "@headlessui/react";
 import { FC, Fragment, useState } from "react";
-import { signOut } from "next-auth/react";
 import {
   CaretDown,
   CircleWavy,
@@ -14,29 +13,27 @@ import MenuItem from "./MenuItem";
 import Avatar from "desktop/app/components/common/Avatar";
 import Link from "next/link";
 import ModalDialog from "../../../../common/ModalDialog";
-import Button from "../../../../common/Button";
 import InviteFriends from "../../../../modules/users/InviteFriends";
-import { UserProfile } from "shared/graphql/query/user/useProfile";
 import BecomeProModal from "../../../../modules/account/BecomeProModal";
 import { getInitials } from "../../../../../lib/utilities";
 import { AccreditationOptions } from "backend/schemas/user";
 import SignOutModal from "./SignOutModal";
+import { Account } from "shared/context/Account";
 
 interface AvatarMenuProps {
-  account: UserProfile;
+  account: Account;
 }
 
 const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showBecomeProModal, setShowBecomeProModal] = useState(false);
-  const [signingOut, setSigningOut] = useState(false);
   const items = [
     {
       icon: (
         <div className="relative text-success">
           <CircleWavy color="currentColor" weight="fill" size={24} />
-          <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-xs font-bold scale-75 text-background">
+          <div className="absolute inset-0 flex items-center justify-center text-tiny font-bold text-background">
             {getInitials(AccreditationOptions[account.accreditation].label)}
           </div>
         </div>
@@ -58,7 +55,7 @@ const AvatarMenu: FC<AvatarMenuProps> = ({ account }) => {
     },
     /**
      * Omit until post-launch.
-    {
+     {
       icon: <Gear color="white" weight="light" size={24} />,
       title: "Account Settings",
       path: "/settings",

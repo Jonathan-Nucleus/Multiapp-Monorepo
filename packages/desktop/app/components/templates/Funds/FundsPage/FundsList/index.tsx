@@ -1,4 +1,4 @@
-import { FC, useMemo, Fragment } from "react";
+import { FC, Fragment, useMemo } from "react";
 import FundCard from "desktop/app/components/modules/funds/FundCard";
 import { Fund } from "shared/graphql/query/marketplace/useFunds";
 import Skeleton from "./Skeleton";
@@ -10,18 +10,20 @@ interface FundsListProps {
 }
 
 const FundsList: FC<FundsListProps> = ({ funds }: FundsListProps) => {
+  const sectionedFunds = useMemo(() => {
+    if (funds) {
+      return AssetClasses.map((assetClass) => ({
+        title: assetClass.label,
+        data: funds.filter((fund) => fund.class === assetClass.value) ?? [],
+      })).filter((section) => section.data.length > 0);
+    } else {
+      return [];
+    }
+  }, [funds]);
+
   if (!funds) {
     return <Skeleton />;
   }
-
-  const sectionedFunds = useMemo(() => {
-    const sectionedData = AssetClasses.map((assetClass) => ({
-      title: assetClass.label,
-      data: funds.filter((fund) => fund.class === assetClass.value) ?? [],
-    })).filter((section) => section.data.length > 0);
-
-    return sectionedData;
-  }, [funds]);
 
   return (
     <>

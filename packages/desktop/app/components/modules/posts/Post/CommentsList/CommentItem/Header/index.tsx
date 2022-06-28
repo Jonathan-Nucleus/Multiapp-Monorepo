@@ -6,6 +6,8 @@ import { DotsThreeOutlineVertical, Pen, Trash } from "phosphor-react";
 import { Comment } from "shared/graphql/query/post/usePost";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import Link from "next/link";
+import { useAccountContext } from "shared/context/Account";
 
 dayjs.extend(relativeTime);
 
@@ -22,13 +24,24 @@ const Header: FC<HeaderProps> = ({
   onEdit,
   onDelete,
 }) => {
+  const account = useAccountContext();
   return (
     <>
       <div className="flex items-center">
-        <div className="flex-shrink-0">
-          <Avatar user={comment.user} size={36} />
-        </div>
-        <div className="flex-grow ml-3">
+        <Link
+          href={
+            comment.user._id == account._id
+              ? "/profile/me"
+              : `/profile/${comment.user._id}`
+          }
+        >
+          <a>
+            <div className="flex-shrink-0">
+              <Avatar user={comment.user} size={36} />
+            </div>
+          </a>
+        </Link>
+        <div className="ml-3">
           <div className="text-sm text-white/[.6]">
             {comment.user.firstName} {comment.user.lastName}
           </div>
@@ -40,7 +53,7 @@ const Header: FC<HeaderProps> = ({
             )}
           </div>
         </div>
-        <div className="flex items-center">
+        <div className="flex items-center ml-auto">
           <div className="text-xs text-white/[.38]">
             {dayjs(comment.createdAt).fromNow(true)}
           </div>

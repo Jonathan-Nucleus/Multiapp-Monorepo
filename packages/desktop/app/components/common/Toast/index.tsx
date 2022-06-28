@@ -3,7 +3,7 @@ import { FC } from "react";
 import { toast as toaster } from "react-toastify";
 
 interface ToastProps {
-  variant?: "success" | "default";
+  variant?: "success" | "error" | "default";
   message: string;
 }
 
@@ -13,13 +13,15 @@ const Toast: FC<ToastProps> = ({ variant = "success", message }) => {
       <div
         className={`min-w-[320px] flex items-center ${
           variant == "success" ? "bg-success/[.7]" : ""
-        } px-3 py-2`}
+        } ${variant == "error" ? "bg-error/[.7]" : ""} px-3 py-2`}
       >
-        <CheckCircle
-          className="flex-shrink-0 text-white"
-          size={32}
-          weight="light"
-        />
+        {variant == "success" && (
+          <CheckCircle
+            className="flex-shrink-0 text-white"
+            size={32}
+            weight="light"
+          />
+        )}
         <div className="text-sm text-white ml-2 mr-5">{message}</div>
       </div>
     </div>
@@ -28,6 +30,9 @@ const Toast: FC<ToastProps> = ({ variant = "success", message }) => {
 
 export const toast = {
   success: (message: string) => {
-    toaster(<Toast message={message} />);
+    toaster(<Toast variant="success" message={message} />);
+  },
+  error: (message: string) => {
+    toaster(<Toast variant="error" message={message} />);
   },
 };

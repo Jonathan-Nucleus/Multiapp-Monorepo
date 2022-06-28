@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useMemo, useState } from "react";
 import * as yup from "yup";
 import { useHelpRequest } from "shared/graphql/mutation/account";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -17,8 +17,8 @@ type FormValues = {
 const schema = yup
   .object({
     email: yup.string().email("Must be a valid email").required("Required"),
-    fund: yup.string().default("").required("Required"),
-    message: yup.string().default("").required("Required"),
+    fund: yup.string().required("Required"),
+    message: yup.string().required("Required"),
   })
   .required();
 
@@ -31,19 +31,25 @@ interface ContactEmailProps {
 const ContactEmail: FC<ContactEmailProps> = ({ funds, onComplete, onBack }) => {
   const [helpRequestCallback] = useHelpRequest();
   const [loading, setLoading] = useState(false);
-  const { register, formState, handleSubmit } = useForm<
+  const fundOptions = useMemo(() => {
+    return funds.map((fund) => {
+      return {
+        label: fund.name,
+        value: fund._id,
+      };
+    });
+  }, [funds]);
+  const { register, setValue, formState, handleSubmit } = useForm<
     yup.InferType<typeof schema>
   >({
     resolver: yupResolver(schema),
     mode: "onChange",
   });
-  const { isValid } = formState;
-  const fundOptions = funds.map((fund) => {
-    return {
-      label: fund.name,
-      value: fund._id,
-    };
-  });
+  useEffect(() => {
+    if (fundOptions.length > 0) {
+      setValue("fund", fundOptions[0].value);
+    }
+  }, [fundOptions, setValue]);
   const onSubmit: SubmitHandler<FormValues> = async ({
     email,
     fund,
@@ -101,7 +107,7 @@ const ContactEmail: FC<ContactEmailProps> = ({ funds, onComplete, onBack }) => {
             type="button"
             variant="text"
             disabled={loading}
-            className="text-primary"
+            className="invisible text-primary"
             onClick={onBack}
           >
             <ArrowLeft color="currentColor" size={24} weight="bold" />
@@ -111,7 +117,7 @@ const ContactEmail: FC<ContactEmailProps> = ({ funds, onComplete, onBack }) => {
             type="submit"
             variant="outline-primary"
             className="w-28 text-white"
-            disabled={!isValid}
+            disabled={!formState.isValid}
             loading={loading}
           >
             Continue

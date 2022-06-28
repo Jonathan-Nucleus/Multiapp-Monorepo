@@ -1,9 +1,8 @@
 import React, { ChangeEvent, FC, useMemo } from "react";
 import Image from "next/image";
 import Label from "../../../../common/Label";
-import { Trash, UploadSimple } from "phosphor-react";
+import { UploadSimple } from "phosphor-react";
 import Input from "../../../../common/Input";
-import Button from "../../../../common/Button";
 import { Company, User } from "..";
 import getConfig from "next/config";
 

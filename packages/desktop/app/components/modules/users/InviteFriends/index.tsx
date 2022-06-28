@@ -2,20 +2,22 @@ import React, { FC, useState } from "react";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { useMutation } from "@apollo/client";
 import Card from "../../../common/Card";
 import Field from "../../../common/Field";
 import Button from "../../../common/Button";
 import InvitationCoin from "./InvitationCoin";
-import { INVITE_USER } from "shared/graphql/mutation/account";
 import { X } from "phosphor-react";
 import Skeleton from "./Skeleton";
 import { useInvites } from "shared/graphql/query/account/useInvites";
 import { useAccountContext } from "shared/context/Account";
+import { useInviteUser } from "shared/graphql/mutation/account/useInviteUser";
+import { toast } from "../../../common/Toast";
+import { ERROR_CODES } from "backend/lib/constants";
 
 const MAX_INVITES = 10;
 
 type FormValues = { email: string };
+
 const schema = yup
   .object({
     email: yup.string().email("Must be a valid email").required(),
@@ -31,22 +33,24 @@ const InviteFriends: FC<InviteFriendsProps> = ({ onClose }) => {
   const account = useAccountContext();
   const { data: invitesData } = useInvites();
   const invitedFriends = invitesData?.account?.invitees;
-  const [inviteUser] = useMutation(INVITE_USER, {
-    refetchQueries: ["Invites"],
-  });
-  const { register, handleSubmit, formState, reset } = useForm<yup.InferType<typeof schema>>({
+  const [inviteUser] = useInviteUser();
+  const { register, handleSubmit, formState, reset } = useForm<
+    yup.InferType<typeof schema>
+  >({
     resolver: yupResolver(schema),
     mode: "onBlur",
   });
 
-  if (!account || !invitedFriends) {
+  if (!invitedFriends) {
     return <Skeleton />;
   }
 
-  const label = account?.role === "PROFESSIONAL" ?
-    "Enter Email Addresses"
-    :
-    `Enter (up to ${MAX_INVITES - invitedFriends.length} more) Email Addresses`;
+  const label =
+    account?.role === "PROFESSIONAL"
+      ? "Enter Email Addresses"
+      : `Enter (up to ${
+          MAX_INVITES - invitedFriends.length
+        } more) Email Addresses`;
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     if (
       account?.role !== "PROFESSIONAL" &&
@@ -56,15 +60,17 @@ const InviteFriends: FC<InviteFriendsProps> = ({ onClose }) => {
     }
 
     setLoading(true);
-    try {
-      await inviteUser({
-        variables: {
-          email: data.email,
-        },
-      });
+    const { errors, data: response } = await inviteUser({
+      variables: {
+        email: data.email,
+      },
+    });
+    if (response?.inviteUser) {
       reset({ email: "" });
-    } catch (err) {
-      console.log("invite user error", err);
+    } else if (errors && errors.length > 0) {
+      if (errors[0].message == ERROR_CODES.USER_ALREADY_EXIST) {
+        toast.error("Email already associated with an account");
+      }
     }
     setLoading(false);
   };

@@ -59,10 +59,7 @@ const Navbar: FC = () => {
         >
           <div className="fixed inset-0 overflow-auto z-20">
             <Card className="w-96 max-w-full min-h-full rounded-none ml-auto p-0">
-              <Watchlist
-                user={account}
-                onClose={() => setShowWatchlist(false)}
-              />
+              <Watchlist onClose={() => setShowWatchlist(false)} />
             </Card>
           </div>
         </Transition.Child>

@@ -4,7 +4,6 @@ import { DialogProps } from "../../../../types/common-props";
 import Button from "../../../common/Button";
 import { MediaType } from "backend/graphql/mutations.graphql";
 import { useFetchUploadLink } from "shared/graphql/mutation/posts";
-import { useAccountContext } from "shared/context/Account";
 import {
   useUpdateCompanyProfile,
   useUpdateUserProfile,
@@ -35,7 +34,6 @@ const MediaEditorModal: FC<MediaEditorModalProps> = ({
   show,
   onClose,
 }) => {
-  const account = useAccountContext();
   const [fetchUploadLink] = useFetchUploadLink();
   const [updateUserProfile] = useUpdateUserProfile();
   const [updateCompanyProfile] = useUpdateCompanyProfile();
@@ -131,6 +129,7 @@ const MediaEditorModal: FC<MediaEditorModalProps> = ({
     <>
       <ModalDialog
         title={mediaType == "AVATAR" ? "Profile Photo" : "Cover Photo"}
+        titleClass="text-base"
         className={`${mediaType == "AVATAR" ? "max-w-2xl" : ""} ${
           mediaType == "BACKGROUND" ? "w-full max-w-4xl" : ""
         }`}

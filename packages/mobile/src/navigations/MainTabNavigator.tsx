@@ -10,7 +10,7 @@ import {
 } from '@react-navigation/native';
 import { House, Star, Chats, DotsThreeCircle } from 'phosphor-react-native';
 
-import FundsSVG from 'shared/assets/images/fund.svg';
+import FundsSVG from 'shared/assets/images/logo-icon.svg';
 import GreyFundsSVG from 'shared/assets/images/grey-fund.svg';
 import { WHITE, BLACK, GRAY400, GRAY700, WHITE12 } from 'shared/src/colors';
 import { Body3 } from 'mobile/src/theme/fonts';

@@ -225,18 +225,31 @@ const SignupPage: FC<LoginPageProps> = ({ ssoProviders }) => {
               />
               <Label htmlFor="terms-check" className="font-medium ml-2">
                 <span>I agree to the Prometheus Alts</span>
-                <a href="/terms" className="text-primary text-sm">
-                  {" "}
+                <span> </span>
+                <a
+                  href="https://prometheusalts.com/legals/terms-of-use"
+                  className="text-primary text-sm"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Terms
                 </a>
-                ,
-                <a href="/community" className="text-primary text-sm">
-                  {" "}
-                  Community{" "}
+                <span>, </span>
+                <a
+                  href="https://prometheusalts.com/legals/community-guidelines"
+                  className="text-primary text-sm"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Community
                 </a>
-                and
-                <a href="/privacy" className="text-primary text-sm">
-                  {" "}
+                <span> and </span>
+                <a
+                  href="https://prometheusalts.com/legals/privacy-policy"
+                  className="text-primary text-sm"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Privacy Policy
                 </a>
               </Label>

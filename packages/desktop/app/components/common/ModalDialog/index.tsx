@@ -5,6 +5,7 @@ import Button from "../Button";
 
 type ModalDialogProps = PropsWithChildren<{
   title?: ReactNode;
+  titleClass?: string;
   className?: string;
   show: boolean;
   onClose: () => void;
@@ -12,6 +13,7 @@ type ModalDialogProps = PropsWithChildren<{
 
 const ModalDialog: FC<ModalDialogProps> = ({
   title,
+  titleClass,
   className,
   show,
   onClose,
@@ -56,7 +58,9 @@ const ModalDialog: FC<ModalDialogProps> = ({
                 >
                   {title && (
                     <Dialog.Title className="flex items-center border-b border-white/[.12] px-5 py-3">
-                      <div className="text-xl font-medium">{title}</div>
+                      <div className={titleClass ?? "text-xl font-medium"}>
+                        {title}
+                      </div>
                       <div className="ml-auto">
                         <Button
                           variant="text"

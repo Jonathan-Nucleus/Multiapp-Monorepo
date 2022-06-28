@@ -16,7 +16,6 @@ import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import PGradientOutlineButton from 'mobile/src/components/common/PGradientOutlineButton';
 import LinkedinSvg from 'shared/assets/images/linkedin.svg';
 import TwitterSvg from 'shared/assets/images/twitter.svg';
-import DotsThreeVerticalSvg from 'shared/assets/images/dotsThreeVertical.svg';
 import FollowModal from 'mobile/src/components/main/FollowModal';
 import { Body2, Body3, H5Bold, H6Bold } from 'mobile/src/theme/fonts';
 import {

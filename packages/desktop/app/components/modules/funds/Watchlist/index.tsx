@@ -4,14 +4,15 @@ import Avatar from "../../../common/Avatar";
 import Button from "../../../common/Button";
 import Link from "next/link";
 import Skeleton from "./Skeleton";
-import { UserProfileProps } from "../../../../types/common-props";
 import { useWatchFund } from "shared/graphql/mutation/funds/useWatchFund";
+import { useAccountContext } from "shared/context/Account";
 
-interface WatchlistProps extends UserProfileProps {
+interface WatchlistProps {
   onClose?: () => void;
 }
 
-const Watchlist: FC<WatchlistProps> = ({ user, onClose }) => {
+const Watchlist: FC<WatchlistProps> = ({ onClose }) => {
+  const account = useAccountContext();
   const [watchFund] = useWatchFund();
   const handleRemoveWatchList = async (id: string) => {
     try {
@@ -19,10 +20,9 @@ const Watchlist: FC<WatchlistProps> = ({ user, onClose }) => {
         variables: { watch: false, fundId: id },
         refetchQueries: ["Account"],
       });
-    } catch (err) {
-    }
+    } catch (err) {}
   };
-  if (!user) {
+  if (!account) {
     return <Skeleton />;
   }
   return (
@@ -41,7 +41,7 @@ const Watchlist: FC<WatchlistProps> = ({ user, onClose }) => {
           </div>
         )}
       </div>
-      {user.watchlist.map((item) => (
+      {account.watchlist.map((item) => (
         <div
           key={item._id}
           className="flex items-center p-4 hover:bg-primary-overlay/[.24] transition-all"
@@ -72,9 +72,9 @@ const Watchlist: FC<WatchlistProps> = ({ user, onClose }) => {
           </div>
         </div>
       ))}
-      {user.watchlist.length == 0 &&
+      {account.watchlist.length == 0 && (
         <div className="text-xs text-gray-500 text-center p-4"></div>
-      }
+      )}
     </div>
   );
 };

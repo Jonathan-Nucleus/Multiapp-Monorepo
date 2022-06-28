@@ -1,9 +1,6 @@
-import { FC, useEffect, useState } from "react";
+import { FC } from "react";
 import Image from "next/image";
-import {
-  useLinkPreview,
-  LinkPreview as LinkPreviewResponse,
-} from "shared/graphql/query/post/useLinkPreview";
+import { LinkPreview as LinkPreviewResponse } from "shared/graphql/query/post/useLinkPreview";
 
 interface LinkPreviewProps {
   previewData: LinkPreviewResponse;
@@ -37,9 +34,14 @@ const LinkPreview: FC<LinkPreviewProps> = ({
           </a>
         </div>
       </div>
-      <div className="items-center justify-center aspect-video w-full relative">
+      <a
+        href={previewData.url}
+        className="block"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         {previewImage && (
-          <a href={previewData.url} target="_blank" rel="noopener noreferrer">
+          <div className="w-full aspect-video relative">
             <Image
               loader={() => previewImage}
               src={previewImage}
@@ -47,16 +49,17 @@ const LinkPreview: FC<LinkPreviewProps> = ({
               layout="fill"
               objectFit="cover"
               unoptimized={true}
+              priority={false}
               className="rounded"
             />
-          </a>
+          </div>
         )}
         {!previewFavicon && !previewImage && (
           <div className="text-sm text-center text-gray-400">
             Preview not available
           </div>
         )}
-      </div>
+      </a>
     </div>
   );
 };

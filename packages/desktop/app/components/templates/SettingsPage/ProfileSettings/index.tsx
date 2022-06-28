@@ -4,12 +4,16 @@ import Link from "next/link";
 
 import Card from "../../../common/Card";
 import Avatar from "desktop/app/components/common/Avatar";
-import { UserProfileProps } from "../../../../types/common-props";
 import Button from "../../../common/Button";
 import AccreditationQuestionnaire from "../../Funds/AccreditationQuestionnaire";
 import BecomeProModal from "../../../modules/account/BecomeProModal";
+import { Account } from "shared/context/Account";
 
-const ProfileSettings: FC<UserProfileProps> = ({ user }) => {
+interface ProfileSettingsProps {
+  account: Account;
+}
+
+const ProfileSettings: FC<ProfileSettingsProps> = ({ account }) => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [showBecomePro, setShowBecomePro] = useState(false);
 
@@ -21,13 +25,10 @@ const ProfileSettings: FC<UserProfileProps> = ({ user }) => {
             <Link href={"/profile/me"}>
               <a>
                 <div className="flex items-center px-5 py-4">
-                  <Avatar
-                    size={64}
-                    user={user}
-                  />
+                  <Avatar size={64} user={account} />
                   <div className="text-left ml-3">
                     <div className="text-xl text-white">
-                      {user?.firstName} {user?.lastName}
+                      {account.firstName} {account.lastName}
                     </div>
                     <div className="text-sm text-white opacity-60">
                       See your profile
@@ -38,7 +39,7 @@ const ProfileSettings: FC<UserProfileProps> = ({ user }) => {
             </Link>
           </div>
           <div className="flex items-center px-5 py-4">
-            {user?.accreditation === "NONE" ? (
+            {account.accreditation === "NONE" ? (
               <Button
                 variant="gradient-primary"
                 onClick={() => setIsVerifying(true)}
@@ -50,7 +51,7 @@ const ProfileSettings: FC<UserProfileProps> = ({ user }) => {
               <>
                 <div className="text-success relative">
                   <CircleWavy color="currentColor" weight="fill" size={30} />
-                  <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-md font-bold scale-75 text-black">
+                  <div className="absolute inset-0 flex items-center justify-center text-md font-bold text-black">
                     AI
                   </div>
                 </div>
@@ -77,12 +78,12 @@ const ProfileSettings: FC<UserProfileProps> = ({ user }) => {
           onClose={() => setIsVerifying(false)}
         />
       )}
-      {showBecomePro &&
+      {showBecomePro && (
         <BecomeProModal
           show={showBecomePro}
           onClose={() => setShowBecomePro(false)}
         />
-      }
+      )}
     </>
   );
 };

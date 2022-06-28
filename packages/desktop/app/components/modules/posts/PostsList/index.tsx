@@ -28,7 +28,6 @@ const PostsList: FC<PostsListProps> = ({
     return <PostSkeleton />;
   }
 
-  console.log("Total posts", posts.length);
   return (
     <>
       {displayFilter && (

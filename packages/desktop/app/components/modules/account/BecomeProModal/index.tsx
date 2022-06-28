@@ -39,11 +39,9 @@ const BecomeProModal: FC<BecomeProModalProps> = ({ show, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [proRequest] = useProRequest();
-  const {
-    register,
-    handleSubmit,
-    formState,
-  } = useForm<yup.InferType<typeof schema>>({
+  const { register, handleSubmit, formState } = useForm<
+    yup.InferType<typeof schema>
+  >({
     resolver: yupResolver(schema),
     mode: "onTouched",
   });
@@ -71,8 +69,7 @@ const BecomeProModal: FC<BecomeProModalProps> = ({ show, onClose }) => {
       if (data?.proRequest) {
         setShowSuccess(true);
       }
-    } catch (err) {
-    }
+    } catch (err) {}
     setLoading(false);
   };
   return (
@@ -83,13 +80,11 @@ const BecomeProModal: FC<BecomeProModalProps> = ({ show, onClose }) => {
         show={show}
         onClose={onClose}
       >
-        {showSuccess ?
+        {showSuccess ? (
           <div className="px-4 py-6">
-            <div className="text-white">
-              Confirmation message
-            </div>
+            <div className="text-white">Confirmation message</div>
           </div>
-          :
+        ) : (
           <div className="mt-6 px-4">
             <header className="text-white">
               <div>
@@ -99,7 +94,7 @@ const BecomeProModal: FC<BecomeProModalProps> = ({ show, onClose }) => {
               <div className="mt-3">
                 Pros are given special features within the Prometheus ecosystem
                 and their posts are more likely to be seen. If you’d like us to
-                consider you for the role of pro please fill out the following
+                consider you for the role of Pro please fill out the following
                 form.
               </div>
             </header>
@@ -127,7 +122,7 @@ const BecomeProModal: FC<BecomeProModalProps> = ({ show, onClose }) => {
                   register={register}
                   state={formState}
                   name="email"
-                  label="Employer:"
+                  label="Employee Email:"
                   autoComplete="email"
                 />
                 <Field
@@ -152,9 +147,9 @@ const BecomeProModal: FC<BecomeProModalProps> = ({ show, onClose }) => {
               </div>
             </form>
           </div>
-        }
+        )}
         <div className="border-t border-white/[.12] text-right mt-24 p-5">
-          {showSuccess ?
+          {showSuccess ? (
             <Button
               variant="outline-primary"
               className="w-full md:w-48"
@@ -164,7 +159,7 @@ const BecomeProModal: FC<BecomeProModalProps> = ({ show, onClose }) => {
             >
               Close
             </Button>
-            :
+          ) : (
             <Button
               type="submit"
               variant="outline-primary"
@@ -175,7 +170,7 @@ const BecomeProModal: FC<BecomeProModalProps> = ({ show, onClose }) => {
             >
               Continue
             </Button>
-          }
+          )}
         </div>
       </ModalDialog>
     </>

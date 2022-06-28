@@ -2,7 +2,7 @@ import { FC } from "react";
 import CompanyCard from "./CompanyCard";
 import FeaturedProfessionals from "./FeaturedProfessionals";
 import InviteFriends from "desktop/app/components/modules/users/InviteFriends";
-import ProfileCardSmall from "desktop/app/components/modules/users/ProfileCardSmall";
+import ProfileCardSmall from "./ProfileCardSmall";
 import DisclosureCard from "desktop/app/components/modules/funds/DisclosureCard";
 import Watchlist from "desktop/app/components/modules/funds/Watchlist";
 import PostsSection from "./PostsSection";
@@ -24,7 +24,7 @@ const HomePage: FC = () => {
         <div className="min-w-0 flex-grow lg:mx-4">
           <div className="px-4">
             <FeaturedProfessionals />
-            <PostsSection user={account} />
+            <PostsSection account={account} />
           </div>
         </div>
         <div className="w-[350px] hidden lg:block flex-shrink-0">
@@ -32,11 +32,11 @@ const HomePage: FC = () => {
           {(!account || account.watchlist.length > 0) && (
             <div className="mt-5">
               <Card className="p-0">
-                <Watchlist user={account} />
+                <Watchlist />
               </Card>
             </div>
           )}
-          <DisclosureCard className="mt-5" />
+          <DisclosureCard className="mt-5" title="Prometheus Disclosures" />
         </div>
       </div>
     </div>

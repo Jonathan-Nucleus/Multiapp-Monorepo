@@ -313,7 +313,7 @@ const SettingsPage: FC = () => {
           {account && (
             <>
               <div className="mt-8">
-                <ProfileSettings user={account} />
+                <ProfileSettings account={account} />
               </div>
               <div className="mt-8">
                 <AdminSettings />

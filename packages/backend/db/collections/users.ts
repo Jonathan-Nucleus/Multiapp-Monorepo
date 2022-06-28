@@ -35,6 +35,7 @@ import {
 } from "../../lib/validate";
 
 import "dotenv/config";
+import { ERROR_CODES } from "../../lib/constants";
 
 // Read salt length from .env file and parse to a number. This represents
 // the number of bytes used for the salt. A default of 32 bytes (256 bits)
@@ -393,7 +394,7 @@ const createUsersCollection = (
       const user = await usersCollection.findOne({ email });
       if (user) {
         if (isUser(user)) {
-          throw new UnprocessableEntityError("User already exists.");
+          throw new UnprocessableEntityError(ERROR_CODES.USER_ALREADY_EXIST);
         }
         await usersCollection.deleteOne({ _id: user._id });
       }

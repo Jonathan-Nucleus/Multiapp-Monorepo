@@ -1,7 +1,7 @@
 import React, { FC, useState } from "react";
 import ModalDialog from "../../../common/ModalDialog";
 import { DialogProps } from "../../../../types/common-props";
-import ContactOptions, { ContactType } from "./ContactOptions";
+import { ContactType } from "./ContactOptions";
 import ContactPhone from "./ContactPhone";
 import { useFunds } from "shared/graphql/query/marketplace/useFunds";
 import ContactEmail from "./ContactEmail";

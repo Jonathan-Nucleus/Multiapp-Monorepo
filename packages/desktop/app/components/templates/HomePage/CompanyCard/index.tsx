@@ -1,12 +1,12 @@
 import { FC } from "react";
 import Link from "next/link";
 import Card from "../../../common/Card";
-import { UserProfile } from "shared/graphql/query/user/useProfile";
 import Avatar from "../../../common/Avatar";
 import Skeleton from "./Skeleton";
+import { Account } from "shared/context/Account";
 
 interface CompanyCardProps {
-  user: UserProfile | undefined;
+  user: Account | undefined;
 }
 
 const CompanyCard: FC<CompanyCardProps> = ({ user }) => {

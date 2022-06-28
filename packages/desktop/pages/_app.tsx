@@ -9,6 +9,7 @@ import { getSession, SessionProvider } from "next-auth/react";
 import { NextPageWithLayout } from "../app/types/next-page";
 import { initializeDatadogRum } from "../app/lib/datadog";
 import AppAuthOptions from "../app/config/auth";
+import Head from "next/head";
 
 initializeDatadogRum();
 
@@ -30,25 +31,30 @@ function MyApp({
   runtimeVars,
 }: AppPropsWithLayout) {
   return (
-    <SessionProvider session={session}>
-      <SecureApolloProvider
-        apolloProps={{
-          ...pageProps,
-          graphqlUri: runtimeVars.NEXT_PUBLIC_GRAPHQL_URI,
-        }}
-      >
-        <ThemeProvider>
-          <RootLayout
-            middleware={Component.middleware}
-            layout={Component.layout}
-            background={Component.background}
-            getstreamKey={runtimeVars.NEXT_PUBLIC_GETSTREAM_ACCESS_KEY}
-          >
-            <Component {...pageProps} />
-          </RootLayout>
-        </ThemeProvider>
-      </SecureApolloProvider>
-    </SessionProvider>
+    <>
+      <Head>
+        <title>Prometheus</title>
+      </Head>
+      <SessionProvider session={session}>
+        <SecureApolloProvider
+          apolloProps={{
+            ...pageProps,
+            graphqlUri: runtimeVars.NEXT_PUBLIC_GRAPHQL_URI,
+          }}
+        >
+          <ThemeProvider>
+            <RootLayout
+              middleware={Component.middleware}
+              layout={Component.layout}
+              background={Component.background}
+              getstreamKey={runtimeVars.NEXT_PUBLIC_GETSTREAM_ACCESS_KEY}
+            >
+              <Component {...pageProps} />
+            </RootLayout>
+          </ThemeProvider>
+        </SecureApolloProvider>
+      </SessionProvider>
+    </>
   );
 }
 

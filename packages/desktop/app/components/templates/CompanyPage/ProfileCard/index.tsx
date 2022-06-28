@@ -1,15 +1,7 @@
-import { FC, Fragment, useState } from "react";
+import { FC, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  DotsThreeOutlineVertical,
-  Globe,
-  Copy,
-  Chats,
-  Share,
-  Pencil,
-} from "phosphor-react";
-import { Menu, Transition } from "@headlessui/react";
+import { Globe, Pencil } from "phosphor-react";
 
 import Button from "../../../../components/common/Button";
 import Card from "../../../../components/common/Card";
@@ -253,7 +245,13 @@ const ProfileCard: FC<CompanyPageProps> = ({
                 </Button>
               )}
             </div>
-            <div className="flex items-center p-4 border-t border-white/[.12]">
+            <div
+              className={`flex items-center p-4 border-t border-white/[.12] ${
+                company.linkedIn || company.twitter || company.website
+                  ? ""
+                  : "hidden"
+              }`}
+            >
               {company.linkedIn && (
                 <div className="flex items-center cursor-pointer mr-8">
                   <Link href={company.linkedIn}>
@@ -312,53 +310,6 @@ const ProfileCard: FC<CompanyPageProps> = ({
                   </Link>
                 </div>
               )}
-              <div className="ml-auto">
-                <Menu>
-                  <Menu.Button className="block">
-                    <DotsThreeOutlineVertical
-                      color="currentColor"
-                      size={24}
-                      weight="fill"
-                      className="text-white opacity-60"
-                    />
-                  </Menu.Button>
-                  <Transition
-                    as={Fragment}
-                    enter="transition ease-out duration-100"
-                    enterFrom="transform opacity-0 scale-95"
-                    enterTo="transform opacity-100 scale-100"
-                    leave="transition ease-in duration-75"
-                    leaveFrom="transform opacity-100 scale-100"
-                    leaveTo="transform opacity-0 scale-95"
-                  >
-                    <Menu.Items className="z-10	absolute right-0 w-48 bg-background-popover shadow-md shadow-black rounded">
-                      <div className="py-2">
-                        <div
-                          className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
-                          onClick={() => {}}
-                        >
-                          <Chats color="currentColor" size={24} />
-                          <span className="ml-4">Message</span>
-                        </div>
-                        <div
-                          className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
-                          onClick={() => {}}
-                        >
-                          <Share color="currentColor" size={24} />
-                          <span className="ml-4">Share</span>
-                        </div>
-                        <div
-                          className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
-                          onClick={() => {}}
-                        >
-                          <Copy color="currentColor" size={24} />
-                          <span className="ml-4">Copy Link</span>
-                        </div>
-                      </div>
-                    </Menu.Items>
-                  </Transition>
-                </Menu>
-              </div>
             </div>
           </div>
         </Card>
