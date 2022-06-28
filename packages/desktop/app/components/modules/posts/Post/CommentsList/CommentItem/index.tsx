@@ -10,6 +10,7 @@ import { Comment } from "shared/graphql/query/post/usePost";
 import { useAccountContext } from "shared/context/Account";
 import Header from "./Header";
 import BodyText from "../../PostBody/BodyText";
+import LikesModal from "../../LikesModal";
 
 interface CommentItemProps {
   comment: Comment;
@@ -29,6 +30,7 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply }) => {
   const isLiked = comment.likeIds?.includes(account._id) ?? false;
   const [showEditor, setShowEditor] = useState(false);
   const [showReplyForm, setShowReplyForm] = useState(false);
+  const [showLikesModal, setShowLikesModal] = useState(false);
   const toggleLike = async () => {
     await likeComment({
       variables: {
@@ -79,30 +81,29 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply }) => {
         <div className="ml-12 mt-2">
           <BodyText text={comment.body} accountId={account._id} />
           <div className="flex items-center mt-2">
-            {!isMyComment && (
-              <div>
+            <div>
+              <Button
+                variant="text"
+                className="text-xs tracking-normal font-normal text-white/[.87]"
+                onClick={toggleLike}
+              >
+                {isLiked ? "Unlike" : "Like"}
+              </Button>
+              {onReply && (
                 <Button
                   variant="text"
-                  className="text-xs tracking-normal font-normal text-white/[.87]"
-                  onClick={toggleLike}
+                  className="text-xs tracking-normal font-normal text-white/[.87] ml-3"
+                  onClick={() => setShowReplyForm(!showReplyForm)}
                 >
-                  {isLiked ? "Unlike" : "Like"}
+                  Reply
                 </Button>
-                {onReply && (
-                  <Button
-                    variant="text"
-                    className="text-xs tracking-normal font-normal text-white/[.87] ml-3"
-                    onClick={() => setShowReplyForm(!showReplyForm)}
-                  >
-                    Reply
-                  </Button>
-                )}
-              </div>
-            )}
+              )}
+            </div>
             {comment.likeIds && comment.likeIds.length > 0 && (
               <Button
                 variant="text"
                 className="text-xs tracking-normal font-normal text-white/[.6] ml-auto"
+                onClick={() => setShowLikesModal(true)}
               >
                 {comment.likeIds.length}{" "}
                 {comment.likeIds.length == 1 ? "Like" : "Likes"}
@@ -121,6 +122,14 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply }) => {
             </div>
           )}
         </div>
+      )}
+      {showLikesModal && (
+        <LikesModal
+          title="People Who Liked This Comment"
+          members={comment.likes}
+          show={showLikesModal}
+          onClose={() => setShowLikesModal(false)}
+        />
       )}
     </div>
   );

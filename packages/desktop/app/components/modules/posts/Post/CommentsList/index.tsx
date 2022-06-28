@@ -95,12 +95,29 @@ const CommentsList: FC<CommentsListProps> = ({ show, postId }) => {
           </div>
           {comments.map((comment) => (
             <div key={comment._id} className="pb-4">
-              <CommentItem comment={comment} onReply={replyToComment} />
+              <div
+                className={`relative ${
+                  comment.comments.length == 0 ? "after:hidden" : ""
+                } after:w-8 after:border-elevation-overlay after:border-l-2 after:absolute after:left-4 after:top-9 after:-bottom-4`}
+              >
+                <CommentItem comment={comment} onReply={replyToComment} />
+              </div>
               {comment.comments.length > 0 && (
-                <div className="ml-10 mt-4 pl-2">
-                  {comment.comments.map((nestedComment) => (
-                    <div key={nestedComment._id}>
-                      <CommentItem comment={nestedComment} />
+                <div className="ml-12 mt-4">
+                  {comment.comments.map((nestedComment, index) => (
+                    <div
+                      key={nestedComment._id}
+                      className="relative before:absolute before:w-8 before:-left-8 before:border-elevation-overlay before:border-l-2 before:border-b-2 before:h-[18px] before:rounded-bl-2xl"
+                    >
+                      <div
+                        className={`${
+                          index == comment.comments.length - 1
+                            ? "before:hidden"
+                            : ""
+                        } before:absolute before:w-8 before:-left-8 before:top-0 before:bottom-0 before:border-elevation-overlay before:border-l-2`}
+                      >
+                        <CommentItem comment={nestedComment} />
+                      </div>
                     </div>
                   ))}
                 </div>

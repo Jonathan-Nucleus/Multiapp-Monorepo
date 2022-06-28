@@ -1,6 +1,5 @@
 import { FC, useState } from "react";
 import { useRouter } from "next/router";
-import Link from "next/link";
 import { signIn } from "next-auth/react";
 import * as yup from "yup";
 import "yup-phone";
@@ -38,7 +37,6 @@ type FormValues = {
   password: string;
   confirmPassword: string;
   acceptTerms: boolean;
-  crsCheck: boolean;
 };
 
 const schema = yup
@@ -70,10 +68,6 @@ const schema = yup
       .boolean()
       .oneOf([true], "You must accept the terms and conditions")
       .required(),
-    crsCheck: yup
-      .boolean()
-      .oneOf([true], "You must acknowledge receipt Form CRS")
-      .required(),
   })
   .required();
 
@@ -96,17 +90,12 @@ const SignupPage: FC<LoginPageProps> = ({ ssoProviders }) => {
     Object.keys(dirtyFields).length === Object.keys(schema.fields).length &&
     Object.keys(errors).length === 0;
   const { code } = router.query as Record<string, string>;
-  const onSubmit: SubmitHandler<FormValues> = async (values) => {
-    const {
-      firstName,
-      lastName,
-      acceptTerms,
-      crsCheck,
-      email,
-      password,
-      phoneNumber,
-    } = values;
-
+  const onSubmit: SubmitHandler<FormValues> = async ({
+    firstName,
+    lastName,
+    email,
+    password,
+  }) => {
     setLoading(true);
     const result = await registerUser({
       variables: {
@@ -253,23 +242,6 @@ const SignupPage: FC<LoginPageProps> = ({ ssoProviders }) => {
               </Label>
             </div>
             <ErrorMessage name="acceptTerms" errors={errors} className="ml-6" />
-          </div>
-          <div className="mt-5">
-            <div className="flex flex-row items-center">
-              <Checkbox
-                id="form-crs-check"
-                className="flex-shrink-0"
-                {...register("crsCheck")}
-              />
-              <Label htmlFor="form-crs-check" className="font-medium ml-2">
-                I also hereby acknowledge the receipt of
-                <Link href="/form-crs">
-                  <a className="text-primary"> Prometheus’s Form CRS</a>
-                </Link>
-                .
-              </Label>
-            </div>
-            <ErrorMessage name="crsCheck" errors={errors} className="ml-6" />
           </div>
           <div className="text-right mt-7">
             <Button

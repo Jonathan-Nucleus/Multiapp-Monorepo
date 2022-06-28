@@ -17,7 +17,7 @@ import { useHidePost, useMutePost } from "shared/graphql/mutation/posts";
 import ConfirmDeleteModal from "../ConfirmDeleteModal";
 import FollowUserMenu from "./FollowUserMenu";
 import FollowCompanyMenu from "./FollowCompanyMenu";
-import { Toast } from "../../../../common/Toast";
+import { toast } from "desktop/app/components/common/Toast";
 
 interface ActionMenuProps {
   post: PostSummary;
@@ -44,7 +44,7 @@ const ActionMenu: FC<ActionMenuProps> = ({
       refetchQueries: ["Account"],
     });
     if (data?.mutePost && !isMuted) {
-      Toast.success("You won't be notified about updates to this post");
+      toast.success("You won't be notified about updates to this post");
     }
   };
   const hidePostCallback = async () => {

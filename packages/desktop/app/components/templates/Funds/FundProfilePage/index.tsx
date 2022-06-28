@@ -1,7 +1,6 @@
 import { FC, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { File, Info, Share, Star, TelevisionSimple } from "phosphor-react";
+import { Info, Share, Star, TelevisionSimple } from "phosphor-react";
 import { Tab } from "@headlessui/react";
 
 import Avatar from "../../../common/Avatar";
@@ -11,15 +10,9 @@ import Card from "../../../common/Card";
 import FundMedia from "../../../modules/funds/FundMedia";
 import DisclosureModal from "../../../modules/funds/DisclosureModal";
 import TeamMembersList from "../../../modules/teams/TeamMembersList";
-import RecentDoc from "shared/assets/images/recent-doc.svg";
 
-import {
-  useFund,
-  DocumentCategories,
-  DocumentCategory,
-} from "shared/graphql/query/marketplace/useFund";
+import { useFund } from "shared/graphql/query/marketplace/useFund";
 import { useWatchFund } from "shared/graphql/mutation/funds/useWatchFund";
-import { useDocumentToken } from "shared/graphql/query/account/useDocumentToken";
 import { AssetClasses } from "shared/graphql/fragments/fund";
 import Skeleton from "./Skeleton";
 import ContactSpecialist from "../../../modules/funds/ContactSpecialist";
@@ -27,6 +20,7 @@ import ContactSpecialist from "../../../modules/funds/ContactSpecialist";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import localData from "dayjs/plugin/localeData";
+import FundDocuments from "./FundDocuments";
 
 dayjs.extend(localData);
 dayjs.extend(utc);
@@ -41,11 +35,8 @@ interface FundProfileProps {
 const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
   const { data: { fund } = {} } = useFund(fundId);
   const { isWatching, toggleWatch } = useWatchFund(fundId);
-  const [more, setMore] = useState(false);
   const [showContactSpecialist, setShowContactSpecialist] = useState(false);
   const [showDisclosureModal, setShowDisclosureModal] = useState(false);
-  const categories = new Set<DocumentCategory>();
-  const [fetchDocumentToken] = useDocumentToken();
 
   if (!fund) {
     return <Skeleton />;
@@ -63,29 +54,6 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
   const years = [...Array(!isNaN(numYears) ? numYears : 0)]
     .map((_, index) => earliestYear + index)
     .reverse();
-
-  const documentsSorted = [...fund.documents];
-  documentsSorted.sort((a, b) => b.date.getTime() - a.date.getTime());
-  documentsSorted.forEach((doc) => categories.add(doc.category));
-
-  const goToFile = async (url: string): Promise<void> => {
-    try {
-      const { data } = await fetchDocumentToken({
-        variables: {
-          fundId: fund._id,
-          document: url,
-        },
-      });
-
-      if (data && data.documentToken) {
-        window.open(
-          `https://api-dev.prometheusalts.com/pdf-watermark?token=${data.documentToken}`
-        );
-      }
-    } catch (err) {
-      console.log(err instanceof Error ? err.message : err);
-    }
-  };
 
   return (
     <div className="mt-5 px-2 flex justify-center">
@@ -303,105 +271,14 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                   ) : null}
                 </Tab.Panel>
                 <Tab.Panel>
-                  <div className="mt-8">
-                    <div className="text-xl text-white font-medium">
-                      Recently Added
+                  {fund.documents && (
+                    <div className="mt-8">
+                      <FundDocuments
+                        fundId={fund._id}
+                        documents={fund.documents}
+                      />
                     </div>
-                    <div className="mt-3">
-                      {documentsSorted.slice(0, 2)?.map((doc) => (
-                        <div key={doc.url} className="mb-3">
-                          <Card
-                            className="p-0 cursor-pointer"
-                            onClick={() => goToFile(doc.url)}
-                          >
-                            <div className="flex items-center">
-                              <div className="w-32 h-24 flex bg-gray-300 relative items-center justify-center">
-                                <Image src={RecentDoc} alt="" />
-                              </div>
-                              <div className="ml-5">
-                                <div className="text-white">{doc.title}</div>
-                                <div className="text-white opacity-60">
-                                  {dayjs(doc.date).format("MMMM D, YYYY h:mmA")}
-                                </div>
-                              </div>
-                            </div>
-                          </Card>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  {DocumentCategories.map((orderedCategory, index) => {
-                    const category = orderedCategory.value;
-                    if (!categories.has(category)) {
-                      return null;
-                    }
-
-                    const categoryDocuments = documentsSorted.filter(
-                      (doc) => doc.category === category
-                    );
-
-                    return (
-                      <div key={index} className="mt-10">
-                        <div className="text-xl text-white font-medium">
-                          {orderedCategory.label}
-                        </div>
-                        <div className="border-white/[.12] divide-y divide-inherit mt-5">
-                          {categoryDocuments.slice(0, 5).map((item, index) => (
-                            <div
-                              key={index}
-                              className="flex py-5 cursor-pointer"
-                              onClick={() => goToFile(item.url)}
-                            >
-                              <div className="text-white">
-                                <File color="currentColor" size={24} />
-                              </div>
-                              <div className="ml-3">
-                                <div className="text-white">{item.title}</div>
-                                <div className="text-xs text-white/[0.6] mt-1 tracking-wider">
-                                  {dayjs(item.date).format(
-                                    "MMMM D, YYYY h:mmA"
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                          {more &&
-                            categoryDocuments.slice(5).map((item, index) => (
-                              <div
-                                key={index}
-                                className="flex py-5 cursor-pointer"
-                                onClick={() => goToFile(item.url)}
-                              >
-                                <div className="text-white">
-                                  <File color="currentColor" size={24} />
-                                </div>
-                                <div className="ml-3">
-                                  <div className="text-white">{item.title}</div>
-                                  <div className="text-xs text-white/[0.6] mt-1 tracking-wider">
-                                    {dayjs(item.date).format(
-                                      "MMMM D, YYYY h:mmA"
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          {categoryDocuments.length > 5 && (
-                            <div className="py-5">
-                              <Button
-                                variant="text"
-                                className="text-primary font-medium"
-                                onClick={() => setMore(!more)}
-                              >
-                                {more
-                                  ? `LESS ${orderedCategory.label}`
-                                  : `MORE ${orderedCategory.label}`}
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
+                  )}
                 </Tab.Panel>
               </Tab.Panels>
             </Tab.Group>
@@ -428,7 +305,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
             </div>
           </div>
         </div>
-        <div className="ml-8">
+        <div className="lg:ml-8">
           <Card className="p-0 rounded-lg">
             <div className="border-white/[.12] divide-y divide-inherit">
               <div className="p-5">

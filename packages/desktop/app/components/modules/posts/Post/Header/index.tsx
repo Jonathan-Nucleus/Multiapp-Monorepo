@@ -1,8 +1,8 @@
 import { FC } from "react";
-import moment from "moment";
 import { PostSummary } from "shared/graphql/fragments/post";
 import CompanyHeader from "./CompanyHeader";
 import UserHeader from "./UserHeader";
+import dayjs from "dayjs";
 
 interface HeaderProps {
   post: PostSummary;
@@ -15,18 +15,18 @@ const Header: FC<HeaderProps> = ({
 }: HeaderProps) => {
   return (
     <>
-      {company ?
+      {company ? (
         <CompanyHeader
           company={company}
-          createdAt={moment(createdAt).format("MMM DD")}
+          createdAt={dayjs(createdAt).format("MMM DD")}
         />
-        :
+      ) : (
         <UserHeader
           user={user!}
           accountId={accountId}
-          createdAt={moment(createdAt).format("MMM DD")}
+          createdAt={dayjs(createdAt).format("MMM DD")}
         />
-      }
+      )}
     </>
   );
 };

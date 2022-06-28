@@ -1,17 +1,15 @@
-import { FC, useState } from "react";
+import { FC, Fragment, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
   DotsThreeOutlineVertical,
-  LinkedinLogo,
-  TwitterLogo,
   Globe,
   Copy,
   Chats,
   Share,
   Pencil,
 } from "phosphor-react";
-import { Menu } from "@headlessui/react";
+import { Menu, Transition } from "@headlessui/react";
 
 import Button from "../../../../components/common/Button";
 import Card from "../../../../components/common/Card";
@@ -22,6 +20,8 @@ import { useFollowCompany } from "shared/graphql/mutation/account/useFollowCompa
 import EditModal from "../EditModal";
 import { MediaType } from "backend/graphql/mutations.graphql";
 import MediaEditorModal from "../../../modules/users/MediaEditorModal";
+import Twitter from "shared/assets/images/twitter.svg";
+import LinkedIn from "shared/assets/images/linkedin.svg";
 
 interface CompanyPageProps {
   company: CompanyProfile;
@@ -254,99 +254,109 @@ const ProfileCard: FC<CompanyPageProps> = ({
               )}
             </div>
             <div className="flex items-center p-4 border-t border-white/[.12]">
-              <div className="flex items-center -mx-4">
-                {company.linkedIn && (
-                  <div className="flex items-center cursor-pointer px-4">
-                    <Link href={company.linkedIn}>
-                      <a
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center text-white"
-                      >
-                        <LinkedinLogo
-                          color="currentColor"
-                          size={24}
-                          weight="fill"
-                        />
-                        <div className="text-sm text-primary ml-1 hidden md:block">
-                          Linkedin
-                        </div>
-                      </a>
-                    </Link>
-                  </div>
-                )}
-                {company.twitter && (
-                  <div className="flex items-center cursor-pointer px-4">
-                    <Link href={company.twitter}>
-                      <a
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center text-white"
-                      >
-                        <TwitterLogo
-                          color="currentColor"
-                          size={24}
-                          weight="fill"
-                        />
-                        <div className="text-sm text-primary ml-1 hidden md:block">
-                          Twitter
-                        </div>
-                      </a>
-                    </Link>
-                  </div>
-                )}
-                {company.website && (
-                  <div className="flex items-center cursor-pointer px-4">
-                    <Link href={company.website}>
-                      <a
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center text-white"
-                      >
-                        <Globe color="currentColor" size={24} weight="fill" />
-                        <div className="text-sm text-primary ml-2">Website</div>
-                      </a>
-                    </Link>
-                  </div>
-                )}
-              </div>
+              {company.linkedIn && (
+                <div className="flex items-center cursor-pointer mr-8">
+                  <Link href={company.linkedIn}>
+                    <a
+                      className="flex items-center text-white"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Image
+                        src={LinkedIn}
+                        alt=""
+                        layout="intrinsic"
+                        width={24}
+                        height={24}
+                      />
+                      <div className="text-sm text-primary ml-2 hidden md:block">
+                        Linkedin
+                      </div>
+                    </a>
+                  </Link>
+                </div>
+              )}
+              {company.twitter && (
+                <div className="flex items-center cursor-pointer mr-8">
+                  <Link href={company.twitter}>
+                    <a
+                      className="flex items-center text-white"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Image
+                        src={Twitter}
+                        alt=""
+                        layout="intrinsic"
+                        width={24}
+                        height={24}
+                      />
+                      <div className="text-sm text-primary ml-2 hidden md:block">
+                        Twitter
+                      </div>
+                    </a>
+                  </Link>
+                </div>
+              )}
+              {company.website && (
+                <div className="flex items-center cursor-pointer mr-8">
+                  <Link href={company.website}>
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center text-white"
+                    >
+                      <Globe color="currentColor" size={24} weight="fill" />
+                      <div className="text-sm text-primary ml-2">Website</div>
+                    </a>
+                  </Link>
+                </div>
+              )}
               <div className="ml-auto">
                 <Menu>
-                  <Menu.Button>
-                    <div className="flex items-center">
-                      <DotsThreeOutlineVertical
-                        color="currentColor"
-                        size={24}
-                        weight="fill"
-                        className="text-white opacity-60"
-                      />
-                    </div>
+                  <Menu.Button className="block">
+                    <DotsThreeOutlineVertical
+                      color="currentColor"
+                      size={24}
+                      weight="fill"
+                      className="text-white opacity-60"
+                    />
                   </Menu.Button>
-                  <Menu.Items className="z-10	absolute right-0 w-48 bg-background-popover shadow-md shadow-black rounded">
-                    <div className="py-2">
-                      <div
-                        className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
-                        onClick={() => {}}
-                      >
-                        <Chats color="currentColor" size={24} />
-                        <span className="ml-4">Message</span>
+                  <Transition
+                    as={Fragment}
+                    enter="transition ease-out duration-100"
+                    enterFrom="transform opacity-0 scale-95"
+                    enterTo="transform opacity-100 scale-100"
+                    leave="transition ease-in duration-75"
+                    leaveFrom="transform opacity-100 scale-100"
+                    leaveTo="transform opacity-0 scale-95"
+                  >
+                    <Menu.Items className="z-10	absolute right-0 w-48 bg-background-popover shadow-md shadow-black rounded">
+                      <div className="py-2">
+                        <div
+                          className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
+                          onClick={() => {}}
+                        >
+                          <Chats color="currentColor" size={24} />
+                          <span className="ml-4">Message</span>
+                        </div>
+                        <div
+                          className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
+                          onClick={() => {}}
+                        >
+                          <Share color="currentColor" size={24} />
+                          <span className="ml-4">Share</span>
+                        </div>
+                        <div
+                          className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
+                          onClick={() => {}}
+                        >
+                          <Copy color="currentColor" size={24} />
+                          <span className="ml-4">Copy Link</span>
+                        </div>
                       </div>
-                      <div
-                        className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
-                        onClick={() => {}}
-                      >
-                        <Share color="currentColor" size={24} />
-                        <span className="ml-4">Share</span>
-                      </div>
-                      <div
-                        className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
-                        onClick={() => {}}
-                      >
-                        <Copy color="currentColor" size={24} />
-                        <span className="ml-4">Copy Link</span>
-                      </div>
-                    </div>
-                  </Menu.Items>
+                    </Menu.Items>
+                  </Transition>
                 </Menu>
               </div>
             </div>
@@ -359,11 +369,13 @@ const ProfileCard: FC<CompanyPageProps> = ({
         followers={company.followers}
         following={company.following}
       />
-      <EditModal
-        show={editableModal}
-        onClose={() => setEditableModal(false)}
-        company={company}
-      />
+      {editableModal && (
+        <EditModal
+          show={editableModal}
+          onClose={() => setEditableModal(false)}
+          company={company}
+        />
+      )}
       {mediaToEdit && (
         <MediaEditorModal
           mediaType={mediaToEdit}

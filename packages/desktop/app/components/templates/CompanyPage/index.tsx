@@ -1,10 +1,5 @@
 import { FC } from "react";
-import "@splidejs/react-splide/css";
-import { Splide, SplideSlide } from "@splidejs/react-splide";
-
 import PostsList from "../../modules/posts/PostsList";
-import Card from "../../common/Card";
-import Avatar from "../../common/Avatar";
 import ProfileCard from "./ProfileCard";
 import TeamMembersList from "../../modules/teams/TeamMembersList";
 import DisclosureCard from "desktop/app/components/modules/funds/DisclosureCard";
@@ -40,45 +35,12 @@ const CompanyPage: FC<CompanyPageProps> = ({ company }: CompanyPageProps) => {
             </div>
           ) : null}
           <div className="w-full block lg:hidden">
-            <div className="font-medium text-white ml-4 md:m-0">
-              Team Members
+            <div className="mt-5">
+              <TeamMembersList
+                direction="horizontal"
+                members={company.members}
+              />
             </div>
-            <Card className="border-0 mt-5 bg-transparent	shadow-none">
-              <Splide
-                options={{
-                  autoWidth: true,
-                  rewind: true,
-                  lazyLoad: "nearby",
-                  cover: true,
-                  pagination: false,
-                }}
-              >
-                {members.map((member, index) => (
-                  <SplideSlide key={index}>
-                    <div className="mx-2">
-                      <div className="w-40 h-40 relative">
-                        <Avatar user={member} size={56} shape="circle" />
-                        <div className="absolute top-0 left-0 right-0 bottom-0">
-                          <div className="bg-gradient-to-b from-transparent to-black w-full h-full flex flex-col justify-end rounded-lg">
-                            <div className="p-3 text-center">
-                              <div className="text-white">
-                                {member.firstName} {member.lastName}
-                              </div>
-                              <div className="text-white text-xs font-semibold">
-                                {member.position}
-                              </div>
-                              <div className="text-white text-xs">
-                                {company?.name}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </SplideSlide>
-                ))}
-              </Splide>
-            </Card>
           </div>
           {company.posts && (
             <div className="py-5">

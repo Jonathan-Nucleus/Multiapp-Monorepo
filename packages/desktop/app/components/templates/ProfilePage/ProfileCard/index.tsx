@@ -1,26 +1,24 @@
-import { FC, useState } from "react";
+import { FC, Fragment, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
   DotsThreeOutlineVertical,
-  Copy,
   Users,
   WarningCircle,
   MinusCircle,
   Chats,
   Pencil,
+  Globe,
 } from "phosphor-react";
-import { Menu } from "@headlessui/react";
+import { Menu, Transition } from "@headlessui/react";
 
 import Button from "../../../../components/common/Button";
 import Card from "../../../../components/common/Card";
 import Avatar, { backgroundUrl } from "../../../common/Avatar";
-import Media from "../../../common/Media";
 import FollowersModal from "../../../modules/users/FollowersModal";
 
 import LinkedIn from "shared/assets/images/linkedin.svg";
 import Twitter from "shared/assets/images/twitter.svg";
-import Globe from "shared/assets/images/globe.svg";
 import ConfirmHideUserModal from "./ConfirmHideUserModal";
 import { MediaType } from "backend/graphql/mutations.graphql";
 import { UserProfile } from "shared/graphql/query/user/useProfile";
@@ -45,9 +43,6 @@ const ProfileCard: FC<ProfileCardProps> = ({
   const [showHideUser, setShowHideUser] = useState(false);
   const { isFollowing, toggleFollow } = useFollowUser(user._id);
   const isMyProfile = account?._id == user._id;
-  const copyProfileLink = async () => {
-    await navigator.clipboard.writeText(user?.linkedIn ?? "");
-  };
   let overviewShort: string | undefined = undefined;
   const [showFullOverView, setShowFullOverView] = useState(false);
   const [mediaToEdit, setMediaToEdit] = useState<MediaType>();
@@ -141,7 +136,9 @@ const ProfileCard: FC<ProfileCardProps> = ({
                     onClick={onSelectToEditProfile}
                   >
                     <Pencil size={24} color="white" />
-                    <div className="text-white ml-2">Edit Profile</div>
+                    <div className="text-white font-semibold ml-2">
+                      Edit Profile
+                    </div>
                   </Button>
                 )}
               </div>
@@ -306,96 +303,116 @@ const ProfileCard: FC<ProfileCardProps> = ({
               </div>
             )}
             <div className="flex items-center p-4 border-t border-white/[.12]">
-              {user.linkedIn ? (
+              {user.linkedIn && (
                 <div className="flex items-center cursor-pointer mr-8">
-                  <Link href={user.linkedIn || "/"}>
+                  <Link href={user.linkedIn}>
                     <a
                       className="flex items-center text-white"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <Image src={LinkedIn} alt="" layout={"intrinsic"} />
-                      <div className="text-sm text-primary ml-1 hidden md:block">
+                      <Image
+                        src={LinkedIn}
+                        alt=""
+                        layout="intrinsic"
+                        width={24}
+                        height={24}
+                      />
+                      <div className="text-sm text-primary ml-2 hidden md:block">
                         Linkedin
                       </div>
                     </a>
                   </Link>
                 </div>
-              ) : null}
-              {user.twitter ? (
+              )}
+              {user.twitter && (
                 <div className="flex items-center cursor-pointer mr-8">
-                  <Link href={user.twitter || "/"}>
+                  <Link href={user.twitter}>
                     <a
                       className="flex items-center text-white"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <Image src={Twitter} alt="" layout={"intrinsic"} />
-                      <div className="text-sm text-primary ml-1 hidden md:block">
+                      <Image
+                        src={Twitter}
+                        alt=""
+                        layout="intrinsic"
+                        width={24}
+                        height={24}
+                      />
+                      <div className="text-sm text-primary ml-2 hidden md:block">
                         Twitter
                       </div>
                     </a>
                   </Link>
                 </div>
-              ) : null}
-              {user.website ? (
+              )}
+              {user.website && (
                 <div className="flex items-center cursor-pointer mr-8">
-                  <Link href={user.website || "/"}>
+                  <Link href={user.website}>
                     <a
                       className="flex items-center text-white"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <Image src={Globe} alt="" layout={"intrinsic"} />
-                      <div className="text-sm text-primary ml-1">Website</div>
+                      <Globe color="currentColor" size={24} weight="fill" />
+                      <div className="text-sm text-primary ml-2">Website</div>
                     </a>
                   </Link>
                 </div>
-              ) : null}
+              )}
               <div className="ml-auto">
                 <Menu>
-                  <Menu.Button>
-                    <div className="flex items-center">
-                      <DotsThreeOutlineVertical
-                        color="currentColor"
-                        size={24}
-                        weight="fill"
-                        className="text-white opacity-60"
-                      />
-                    </div>
+                  <Menu.Button className="block">
+                    <DotsThreeOutlineVertical
+                      color="currentColor"
+                      size={24}
+                      weight="fill"
+                      className="text-white opacity-60"
+                    />
                   </Menu.Button>
-                  <Menu.Items className="z-10	absolute right-0 w-64 bg-background-popover shadow-md shadow-black rounded">
-                    <div className="py-2">
-                      <div
-                        className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
-                        onClick={() => {
-                          setFollowersModalTab(0);
-                          setVisible(true);
-                        }}
-                      >
-                        <Users color="currentColor" size={24} />
-                        <span className="ml-4">View All Followers</span>
+                  <Transition
+                    as={Fragment}
+                    enter="transition ease-out duration-100"
+                    enterFrom="transform opacity-0 scale-95"
+                    enterTo="transform opacity-100 scale-100"
+                    leave="transition ease-in duration-75"
+                    leaveFrom="transform opacity-100 scale-100"
+                    leaveTo="transform opacity-0 scale-95"
+                  >
+                    <Menu.Items className="z-10	absolute right-0 w-64 bg-background-popover shadow-md shadow-black rounded">
+                      <div className="py-2">
+                        <div
+                          className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
+                          onClick={() => {
+                            setFollowersModalTab(0);
+                            setVisible(true);
+                          }}
+                        >
+                          <Users color="currentColor" size={24} />
+                          <span className="ml-4">View All Followers</span>
+                        </div>
+                        {!isMyProfile && (
+                          <>
+                            <div
+                              className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
+                              onClick={() => setShowHideUser(true)}
+                            >
+                              <MinusCircle color="currentColor" size={24} />
+                              <span className="ml-4">Hide User</span>
+                            </div>
+                            <div
+                              className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
+                              onClick={() => {}}
+                            >
+                              <WarningCircle color="currentColor" size={24} />
+                              <span className="ml-4">Report Profile</span>
+                            </div>
+                          </>
+                        )}
                       </div>
-                      {!isMyProfile && (
-                        <>
-                          <div
-                            className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
-                            onClick={() => setShowHideUser(true)}
-                          >
-                            <MinusCircle color="currentColor" size={24} />
-                            <span className="ml-4">Hide User</span>
-                          </div>
-                          <div
-                            className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
-                            onClick={() => {}}
-                          >
-                            <WarningCircle color="currentColor" size={24} />
-                            <span className="ml-4">Report Profile</span>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </Menu.Items>
+                    </Menu.Items>
+                  </Transition>
                 </Menu>
               </div>
             </div>

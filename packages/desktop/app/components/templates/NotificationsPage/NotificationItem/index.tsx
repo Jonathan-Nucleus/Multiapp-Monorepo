@@ -1,10 +1,14 @@
 import React, { FC } from "react";
 import { useRouter } from "next/router";
 import { ChatCenteredText, ThumbsUp, UserCirclePlus, At } from "phosphor-react";
-import moment from "moment";
 
 import { Notification } from "backend/graphql/notifications.graphql";
 import Avatar from "../../../common/Avatar";
+
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime);
 
 interface NotificationItemProps {
   notification: Notification;
@@ -72,7 +76,7 @@ const NotificationItem: FC<NotificationItemProps> = ({
           </div>
         </div>
         <div className="text-xs text-white/[0.4] font-light flex-shrink-0 ml-3 mr-6">
-          {moment(notification.createdAt).fromNow()}
+          {dayjs(notification.createdAt).fromNow()}
         </div>
       </div>
     </div>

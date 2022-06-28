@@ -20,8 +20,8 @@ const ProfilePage: FC<ProfilePageProps> = ({ user, loading, isMyProfile }) => {
   return (
     <>
       <div className="lg:mt-12 mb-12">
-        <div className="flex justify-center mx-auto">
-          <div className="flex-grow max-w-3xl lg:mx-4">
+        <div className="lg:grid grid-cols-6 gap-8">
+          <div className="col-span-4">
             <div className="divide-y divide-inherit border-white/[.12]">
               <div className="pb-5">
                 {user ? (
@@ -57,18 +57,12 @@ const ProfilePage: FC<ProfilePageProps> = ({ user, loading, isMyProfile }) => {
               </div>
             </div>
           </div>
-          <div className="flex-shrink-0">
-            <div className="hidden lg:block w-80">
-              {loading && (
-                <div className="mx-4">
-                  <CompaniesListSkeleton />
-                </div>
-              )}
-              {user?.companies && user.companies.length > 0 && (
-                <div className="mx-4">
-                  <CompaniesList companies={user?.companies} />
-                </div>
-              )}
+          <div className="col-span-2 hidden lg:block">
+            {loading && <CompaniesListSkeleton />}
+            {user?.companies && user.companies.length > 0 && (
+              <CompaniesList companies={user?.companies} />
+            )}
+            <div className="mt-8">
               <DisclosureCard />
             </div>
           </div>

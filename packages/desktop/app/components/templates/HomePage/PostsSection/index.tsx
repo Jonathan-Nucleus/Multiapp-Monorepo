@@ -19,7 +19,7 @@ const SCROLL_OFFSET_THRESHOLD = 3000;
 const PostsSection: FC<UserProfileProps> = ({ user }) => {
   const scrollOffset = useRef(0);
   const {
-    data: { posts = [] } = {},
+    data: { posts } = {},
     refetch,
     fetchMore,
   } = usePosts(undefined, undefined, undefined, POSTS_PER_SCROLL);

@@ -7,7 +7,7 @@ import Label from "../../../../common/Label";
 import Textarea from "../../../../common/Textarea";
 import { useReportPost } from "shared/graphql/mutation/posts";
 import { PostViolationOptions } from "backend/schemas/user";
-import { Toast } from "../../../../common/Toast";
+import { toast } from "desktop/app/components/common/Toast";
 
 interface ReportPostModalProps {
   post: PostSummary;
@@ -39,7 +39,7 @@ const ReportPostModal: FC<ReportPostModalProps> = ({ post, show, onClose }) => {
     setLoading(false);
     if (data?.reportPost) {
       onClose();
-      Toast.success("Thanks for letting us know");
+      toast.success("Thanks for letting us know");
     }
   };
   return (

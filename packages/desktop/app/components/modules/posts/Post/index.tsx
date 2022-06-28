@@ -36,7 +36,7 @@ const Post: FC<PostProps> = ({
   return (
     <>
       <Card
-        className={`border-0 p-0 rounded-none overflow-visible	md:rounded-2xl ${
+        className={`border-0 p-0 rounded-none overflow-visible md:rounded-2xl ${
           className ?? ""
         }`}
       >
@@ -129,6 +129,7 @@ const Post: FC<PostProps> = ({
         )}
       </Card>
       <LikesModal
+        title="People Who Liked This Post"
         show={visiblePostLikeModal}
         onClose={() => setVisiblePostLikeModal(false)}
         members={post.likes}

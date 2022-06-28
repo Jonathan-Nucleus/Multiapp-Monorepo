@@ -5,11 +5,12 @@ import { AppPageProps } from "../../types/next-page";
 import AuthLayout from "./AuthLayout";
 import MainLayout from "./MainLayout";
 import Background from "./Background";
-import { Toaster } from "react-hot-toast";
 import { AccountProvider } from "shared/context/Account";
 import { ChatProvider } from "desktop/app/components/providers/ChatProvider";
 import dynamic from "next/dynamic";
 import { useChatToken } from "shared/graphql/query/account/useChatToken";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 type RootLayoutProps = PropsWithChildren<AppPageProps> & {
   getstreamKey: string;
@@ -46,7 +47,21 @@ const RootLayout: FC<RootLayoutProps> = ({
         options={{ easing: "ease", speed: 500, showSpinner: false }}
         nonce=""
       />
-      <Toaster />
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={true}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        closeButton={false}
+        className="!w-auto !px-2 !top-8"
+        toastClassName="!bg-transparent !mb-0 !p-0"
+        bodyClassName="!my-0 !p-0"
+      />
       <main>
         {middleware == "auth" ? (
           <AccountProvider

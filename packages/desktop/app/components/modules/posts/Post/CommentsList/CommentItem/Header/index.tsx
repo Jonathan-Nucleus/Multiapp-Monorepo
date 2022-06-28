@@ -1,10 +1,13 @@
 import { FC } from "react";
 import Avatar from "../../../../../../common/Avatar";
-import moment from "moment";
 import { Menu } from "@headlessui/react";
 import Button from "../../../../../../common/Button";
 import { DotsThreeOutlineVertical, Pen, Trash } from "phosphor-react";
 import { Comment } from "shared/graphql/query/post/usePost";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime);
 
 interface HeaderProps {
   comment: Comment;
@@ -39,7 +42,7 @@ const Header: FC<HeaderProps> = ({
         </div>
         <div className="flex items-center">
           <div className="text-xs text-white/[.38]">
-            {moment(comment.createdAt).fromNow(true)}
+            {dayjs(comment.createdAt).fromNow(true)}
           </div>
           <div className={`${isMyComment ? "" : "hidden"} ml-3`}>
             <Menu as="div" className="relative">
