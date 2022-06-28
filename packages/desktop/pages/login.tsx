@@ -8,10 +8,11 @@ export interface LoginProps {
   providers: UnwrapPromise<ReturnType<typeof getProviders>>;
 }
 
-const Login: NextPageWithLayout<LoginProps> = ({ providers }) => {
-  const ssoProviders = Object.keys(providers).filter(
-    (provider) => provider == "google"
-  );
+const Login: NextPageWithLayout<LoginProps> = ({}) => {
+  // Disabled until a strategy for handling bots has been identified (06/29/2022)
+  // const ssoProviders = Object.keys(providers).filter(
+  //   (provider) => provider == "google"
+  // );
   return (
     <div>
       <Head>
@@ -19,7 +20,7 @@ const Login: NextPageWithLayout<LoginProps> = ({ providers }) => {
         <meta name="description" content="" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <LoginPage ssoProviders={ssoProviders} />
+      <LoginPage ssoProviders={[]} />
     </div>
   );
 };

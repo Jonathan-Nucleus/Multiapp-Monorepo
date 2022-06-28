@@ -8,13 +8,14 @@ import { GetServerSideProps } from "next";
 import { getProviders } from "next-auth/react";
 import { LoginProps } from "./login";
 
-const Signup: NextPageWithLayout<LoginProps> = ({ providers }) => {
+const Signup: NextPageWithLayout<LoginProps> = ({}) => {
   const router = useRouter();
   const { code } = router.query as Record<string, string>;
   const { data, loading } = useVerifyInvite(code ?? "");
-  const ssoProviders = Object.keys(providers).filter(
-    (provider) => provider == "google"
-  );
+  // Disabled until a strategy for handling bots has been identified (06/29/2022)
+  // const ssoProviders = Object.keys(providers).filter(
+  //   (provider) => provider == "google"
+  // );
   useEffect(() => {
     if (!loading) {
       if (data && !data.verifyInvite) {
@@ -30,7 +31,7 @@ const Signup: NextPageWithLayout<LoginProps> = ({ providers }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {!loading && data?.verifyInvite && (
-        <SignupPage ssoProviders={ssoProviders} />
+        <SignupPage ssoProviders={[]} />
       )}
     </div>
   );
