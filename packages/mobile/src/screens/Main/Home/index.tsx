@@ -1,4 +1,11 @@
-import React, { useState, memo, useMemo, useCallback } from 'react';
+import React, {
+  useState,
+  memo,
+  useMemo,
+  useCallback,
+  useEffect,
+  useRef,
+} from 'react';
 import {
   ListRenderItem,
   FlatList,
@@ -11,7 +18,7 @@ import {
 } from 'react-native';
 import isEqual from 'react-fast-compare';
 import { SlidersHorizontal } from 'phosphor-react-native';
-import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+import { useIsFocused } from '@react-navigation/native';
 import retry from 'async-retry';
 
 import MainHeader from 'mobile/src/components/main/Header';
@@ -48,12 +55,40 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
   const currentFocus = useIsFocused();
   const [isFocused, setFocused] = useState(currentFocus);
   const account = useAccountContext();
+  const listRef = useRef<FlatList>(null);
   const {
     data: { posts: postData = [] } = {},
     refetch,
     fetchMore,
     loading,
   } = usePosts(selectedCategories, selectedRole);
+
+  const onRefresh = useCallback(async (): Promise<void> => {
+    setRefreshing(true);
+    await retry(
+      async () => {
+        return refetch();
+      },
+      { retries: 5 },
+    );
+    setRefreshing(false);
+  }, [refetch]);
+
+  const handleSelfRefresh = useCallback(
+    async (_e) => {
+      if (isFocused && listRef.current) {
+        await onRefresh();
+        listRef.current.scrollToOffset({ animated: true, offset: 0 });
+      }
+    },
+    [isFocused, onRefresh],
+  );
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('tabPress', handleSelfRefresh);
+
+    return unsubscribe;
+  }, [navigation, handleSelfRefresh]);
 
   const renderItem: ListRenderItem<Post> = useMemo(
     () =>
@@ -107,17 +142,6 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
     setSelectedCategories(cateogies.length > 0 ? cateogies : undefined);
   };
 
-  const onRefresh = async (): Promise<void> => {
-    setRefreshing(true);
-    await retry(
-      async () => {
-        return refetch();
-      },
-      { retries: 5 },
-    );
-    setRefreshing(false);
-  };
-
   const onEndReached = (): void => {
     console.log('Fetching more posts');
     const lastItem = postData[postData.length - 1]._id;
@@ -142,6 +166,7 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
       <FlatList
+        ref={listRef}
         removeClippedSubviews={true}
         contentContainerStyle={styles.container}
         data={postData}

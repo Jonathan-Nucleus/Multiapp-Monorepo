@@ -139,8 +139,8 @@ const MainTabNavigator = (): React.ReactElement => {
 export default MainTabNavigator;
 
 export type MainTabParamList = {
-  Home: undefined;
-  Watchlist: undefined;
+  Home: BottomTabScreenProps<Record<string, never>>;
+  Watchlist: BottomTabScreenProps<Record<string, never>>;
   Marketplace: NavigatorScreenParams<MarketplaceTabsParamList> | undefined;
   Chat: NavigatorScreenParams<ChatStackParamList> | undefined;
   More: NavigatorScreenParams<MoreStackParamList> | undefined;
