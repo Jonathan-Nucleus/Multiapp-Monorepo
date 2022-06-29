@@ -6,13 +6,11 @@ import Post from "..";
 import BodyText from "./BodyText";
 
 interface PostBodyProps {
-  accountId: string;
   post: PostType;
   isPreview?: boolean;
 }
 
 const PostBody: FC<PostBodyProps> = ({
-  accountId,
   post,
   isPreview = false,
 }: PostBodyProps) => {
@@ -20,9 +18,7 @@ const PostBody: FC<PostBodyProps> = ({
     <>
       <div className="px-4">
         <div className="pb-2">
-          {post.body && (
-            <BodyText text={post.body ?? ""} accountId={accountId} />
-          )}
+          {post.body && <BodyText text={post.body ?? ""} />}
         </div>
         {post.preview && !post.media && !post.sharedPost && (
           <div className="my-4">

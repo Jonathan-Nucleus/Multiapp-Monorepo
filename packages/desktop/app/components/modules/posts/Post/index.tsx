@@ -54,7 +54,7 @@ const Post: FC<PostProps> = ({
           </div>
         </div>
         <div className="mt-4">
-          <PostBody accountId={account._id} post={post} isPreview={isPreview} />
+          <PostBody post={post} isPreview={isPreview} />
         </div>
         {!isPreview && (
           <div className="flex items-center border-t border-brand-overlay/[.1] mt-4 px-4 py-3">

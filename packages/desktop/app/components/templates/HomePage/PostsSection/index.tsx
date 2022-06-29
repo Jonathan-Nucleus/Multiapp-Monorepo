@@ -22,21 +22,26 @@ interface PostsSectionProps {
 
 const PostsSection: FC<PostsSectionProps> = ({ account }) => {
   const scrollOffset = useRef(0);
+  const isFetchingMore = useRef(false);
   const {
-    data: { posts } = {},
+    data: { posts = [] } = {},
     refetch,
     fetchMore,
   } = usePosts(undefined, undefined, undefined, POSTS_PER_SCROLL);
   const triggeredOffset = useRef(false);
   const [postAction, setPostAction] = useState<PostActionType>();
 
-  const onEndReached = useCallback(() => {
+  const onEndReached = useCallback(async () => {
+    if (isFetchingMore.current) return;
+
+    isFetchingMore.current = true;
     const lastItem = _.last(posts)?._id;
-    fetchMore({
+    await fetchMore({
       variables: {
         before: lastItem,
       },
     });
+    isFetchingMore.current = false;
   }, [fetchMore, posts]);
 
   const onRefresh = useCallback(

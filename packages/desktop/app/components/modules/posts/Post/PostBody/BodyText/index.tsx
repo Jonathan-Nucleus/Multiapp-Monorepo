@@ -1,14 +1,15 @@
 import { FC, ReactElement, useCallback, useMemo, useState } from "react";
 import { hrefFromLink, processPost } from "shared/src/patterns";
+import { useAccountContext } from "shared/context/Account";
 import Link from "next/link";
 import Button from "../../../../../common/Button";
 
 interface BodyTextProps {
   text: string;
-  accountId: string;
 }
 
-const BodyText: FC<BodyTextProps> = ({ text, accountId }) => {
+const BodyText: FC<BodyTextProps> = ({ text }) => {
+  const { _id: accountId } = useAccountContext();
   const [isBodyClamped, setIsBodyClamped] = useState(false);
   const [isBodyExpanded, setIsBodyExpanded] = useState(false);
   const bodyRefCallback = useCallback((ref: HTMLDivElement) => {

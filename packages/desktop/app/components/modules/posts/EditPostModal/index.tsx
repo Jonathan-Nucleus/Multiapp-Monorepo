@@ -451,9 +451,11 @@ const EditPostModal: FC<EditPostModalProps> = ({
                     inputRef={inputRef}
                     control={control}
                     name="mentionInput"
-                    placeholder={
-                      "Create a post\nUse $ before ticker symbols: ex: $TSLA\nUse @ to tag a user, page or fund"
-                    }
+                    placeholder={`Create a post${
+                      actionData.type !== "share"
+                        ? "\nUse $ before ticker symbols: ex: $TSLA\nUse @ to tag a user, page or fund"
+                        : ""
+                    }`}
                     suggestionsContainer={
                       suggestionsContainer.current ?? undefined
                     }
@@ -486,7 +488,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
                   </div>
                 )}
                 {actionData.type == "share" && (
-                  <div className="border border-brand-overlay/[.1] rounded">
+                  <div className="border border-brand-overlay/[.1] rounded mt-2">
                     <div className="rounded overflow-hidden">
                       <Post
                         post={actionData.post}

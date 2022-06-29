@@ -79,7 +79,7 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply }) => {
         </div>
       ) : (
         <div className="ml-12 mt-2">
-          <BodyText text={comment.body} accountId={account._id} />
+          <BodyText text={comment.body} />
           <div className="flex items-center mt-2">
             <div>
               <Button

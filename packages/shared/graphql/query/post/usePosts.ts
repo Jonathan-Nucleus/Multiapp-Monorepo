@@ -125,15 +125,29 @@ export function usePosts(
           index < existingPosts.length;
           index++
         ) {
+          const existingPost = existingPosts[index];
           const cachePost = rest.client.cache.readFragment({
-            id: `Post:${existingPosts[index]._id}`,
+            id: `Post:${existingPost._id}`,
             fragment: gql`
               ${POST_SUMMARY_FRAGMENT}
             `,
           }) as PostSummary | null;
 
+          const { sharedPost } = existingPost;
+          const cacheSharedPost = sharedPost
+            ? (rest.client.cache.readFragment({
+                id: `Post:${sharedPost._id}`,
+                fragment: gql`
+                  ${POST_SUMMARY_FRAGMENT}
+                `,
+              }) as PostSummary | null)
+            : null;
+
           if (cachePost) {
-            existingPosts[index] = cachePost;
+            existingPosts[index] = {
+              ...cachePost,
+              sharedPost: cacheSharedPost ?? undefined,
+            };
           }
         }
       } else {
