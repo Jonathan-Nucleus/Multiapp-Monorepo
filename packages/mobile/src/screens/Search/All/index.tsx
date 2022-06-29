@@ -10,7 +10,6 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { SlidersHorizontal } from 'phosphor-react-native';
-import dayjs from 'dayjs';
 
 import { BLACK, WHITE, WHITE12, WHITE60, PRIMARY } from 'shared/src/colors';
 import { Body2Bold, H6Bold } from '../../../theme/fonts';
@@ -32,6 +31,7 @@ import {
   Fund,
   Company,
 } from 'shared/graphql/query/search/useGlobalSearch';
+import { getPostTime } from '../../../utils/dateTimeUtil';
 
 interface AllSearchResultsProps {
   searchResults: GlobalSearchData['globalSearch'];
@@ -61,7 +61,7 @@ const renderPostItem: ListRenderItem<Post> = ({ item }) => (
         user={item.user || item.company}
         avatarSize={56}
         showFollow
-        auxInfo={dayjs(item.createdAt).format('MMM D')}
+        auxInfo={getPostTime(item.createdAt)}
         audienceInfo={item.audience}
       />
       <PBodyText body={item.body} style={styles.body} collapseLongText={true} />
