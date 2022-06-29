@@ -4,6 +4,7 @@ import {
   StyleSheet,
   ViewProps,
   Pressable,
+  Linking,
   FlatList,
   ListRenderItem,
 } from 'react-native';
@@ -41,6 +42,7 @@ import {
 
 import NetReturnsTable from './NetReturnsTable';
 
+import { useDocumentToken } from 'shared/graphql/query/account/useDocumentToken';
 import { AssetClasses } from 'shared/graphql/fragments/fund';
 import { FundDetails } from 'shared/graphql/query/marketplace/useFund';
 
@@ -70,6 +72,7 @@ const RIGHT_FLEX = 0.4;
 const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
   const [disclosureVisible, setDisclosureVisible] = useState(false);
   const [videoIndex, setVideoIndex] = useState(0);
+  const [fetchDocumentToken] = useDocumentToken();
 
   const video = fund.videos?.[videoIndex];
   const dollarFormatter = Intl.NumberFormat('en', { notation: 'compact' });
@@ -82,6 +85,31 @@ const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
       <FundMedia media={{ url: vid, aspectRatio: 1.58 }} mediaId={fund._id} />
     </Pressable>
   );
+
+  const presentation = fund.documents
+    ?.filter((doc) => doc.category === 'PRESENTATION')
+    ?.sort((a, b) => b.date.getTime() - a.date.getTime())?.[0];
+
+  const goToPresentation = async (): Promise<void> => {
+    if (!presentation) return;
+
+    try {
+      const { data } = await fetchDocumentToken({
+        variables: {
+          fundId: fund._id,
+          document: presentation.url,
+        },
+      });
+
+      if (data && data.documentToken) {
+        Linking.openURL(
+          `${process.env.WATRMARKING_SERVICE_URL}?token=${data.documentToken}`,
+        );
+      }
+    } catch (err) {
+      console.log(err instanceof Error ? err.message : err);
+    }
+  };
 
   return (
     <View {...viewProps} style={[styles.overviewContainer, viewProps.style]}>
@@ -105,14 +133,19 @@ const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
       <View style={styles.fundDetailsContainer}>
         <PLabel textStyle={styles.fund} label="Strategy Overview" />
         <PMarkdown>{fund.overview}</PMarkdown>
-        {fund.presentationUrl ? (
-          <View style={styles.presentationContainer}>
+        {presentation ? (
+          <Pressable
+            style={({ pressed }) => [
+              styles.presentationContainer,
+              pressed ? pStyles.pressedStyle : null,
+            ]}
+            onPress={goToPresentation}>
             <Presentation size={32} color={WHITE} />
             <PLabel
               textStyle={styles.presentationLabel}
               label="View Presentation"
             />
-          </View>
+          </Pressable>
         ) : null}
         {fund.tags && fund.tags.length > 0 && (
           <View style={styles.tags}>
@@ -264,7 +297,7 @@ const styles = StyleSheet.create({
     ...Body3,
   },
   presentationContainer: {
-    marginVertical: 36,
+    marginTop: 36,
     flexDirection: 'row',
     alignItems: 'center',
   },

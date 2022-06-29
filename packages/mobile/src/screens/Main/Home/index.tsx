@@ -32,7 +32,6 @@ import {
 import pStyles from 'mobile/src/theme/pStyles';
 
 import { usePosts, Post } from 'shared/graphql/query/post/usePosts';
-import { useAccountContext } from 'shared/context/Account';
 import { HomeScreen } from 'mobile/src/navigations/MainTabNavigator';
 import FilterModal from 'mobile/src/screens/PostDetails/FilterModal';
 import PostItemPlaceholder from '../../../components/placeholder/PostItemPlaceholder';
@@ -54,7 +53,6 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const currentFocus = useIsFocused();
   const [isFocused, setFocused] = useState(currentFocus);
-  const account = useAccountContext();
   const listRef = useRef<FlatList>(null);
   const {
     data: { posts: postData = [] } = {},
@@ -151,8 +149,6 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
       },
     });
   };
-
-  console.log('postData', postData[0]?.body);
 
   return (
     <View style={pStyles.globalContainer}>

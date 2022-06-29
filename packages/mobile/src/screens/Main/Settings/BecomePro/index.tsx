@@ -1,7 +1,18 @@
 import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  Pressable,
+} from 'react-native';
 import { CaretLeft, ShieldCheck } from 'phosphor-react-native';
-import { useForm, DefaultValues, Controller } from 'react-hook-form';
+import {
+  useForm,
+  DefaultValues,
+  Controller,
+  SubmitHandler,
+} from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
@@ -11,9 +22,10 @@ import PTitle from 'mobile/src/components/common/PTitle';
 import PTextInput from 'mobile/src/components/common/PTextInput';
 import PPicker from 'mobile/src/components/common/PPicker';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
-import { showMessage } from 'mobile/src/services/utils';
+import { showMessage } from 'mobile/src/services/ToastService';
 import { Body2, H6Bold, Body1Bold, Body2Bold } from 'mobile/src/theme/fonts';
 import { BLACK, WHITE, SUCCESS, GRAY600, GRAY900 } from 'shared/src/colors';
+import pStyles from 'mobile/src/theme/pStyles';
 import {
   useProRequest,
   ProRequest,
@@ -55,13 +67,13 @@ const BecomePro: BecomeProScreen = ({ navigation }) => {
     ) as DefaultValues<FormValues>,
   });
 
-  const onSubmit = async ({
+  const onSubmit: SubmitHandler<FormValues> = async ({
     role,
     email,
     organization,
     position,
     info,
-  }: FormValues) => {
+  }) => {
     try {
       const { data } = await proRequest({
         variables: {
@@ -173,9 +185,11 @@ const BecomePro: BecomeProScreen = ({ navigation }) => {
         />
       </PAppContainer>
       <View style={styles.bottom}>
-        <TouchableOpacity>
+        <Pressable
+          onPress={() => navigation.goBack()}
+          style={(pressed) => (pressed ? pStyles.pressedStyle : null)}>
           <Text style={styles.cancel}>Cancel</Text>
-        </TouchableOpacity>
+        </Pressable>
         <PGradientButton
           label="Submit"
           btnContainer={styles.btnContainer}

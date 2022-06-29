@@ -20,7 +20,7 @@ const Buffer = global.Buffer || require('buffer').Buffer;
 import MainHeader from 'mobile/src/components/main/Header';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
-import { showMessage } from 'mobile/src/services/utils';
+import { showMessage } from 'mobile/src/services/ToastService';
 import pStyles from 'mobile/src/theme/pStyles';
 import { Body1Bold, Body2, Body2Bold } from 'mobile/src/theme/fonts';
 import { WHITE, WHITE12, WHITE60, PRIMARY } from 'shared/src/colors';

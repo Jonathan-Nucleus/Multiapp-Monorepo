@@ -7,7 +7,7 @@ import Avatar from 'mobile/src/components/common/Avatar';
 import Tag from 'mobile/src/components/common/Tag';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import PreviewLink from 'mobile/src/components/common/PreviewLink';
-import { showMessage } from 'mobile/src/services/utils';
+import { showMessage } from 'mobile/src/services/ToastService';
 import pStyles from 'mobile/src/theme/pStyles';
 import { WHITE, PRIMARY } from 'shared/src/colors';
 

@@ -20,10 +20,9 @@ export interface FundItemProps {
   fund: Fund;
   showOverview?: boolean;
   showTags?: boolean;
-  category?: string;
 }
 
-const FundItem: FC<FundItemProps> = ({ fund, category }) => {
+const FundItem: FC<FundItemProps> = ({ fund }) => {
   const { isWatching, toggleWatch } = useWatchFund(fund._id);
 
   const goToFund = (): void => {
@@ -32,18 +31,11 @@ const FundItem: FC<FundItemProps> = ({ fund, category }) => {
 
   return (
     <View>
-      <FundProfileInfo
-        fund={fund}
-        category={category}
-        showTags
-        highlightManager
-      />
+      <FundProfileInfo fund={fund} showTags highlightManager />
       <View style={styles.actionBar}>
         <PGradientOutlineButton
           label={
-            category === 'equity'
-              ? 'View Strategy Overview'
-              : 'View Fund Details'
+            fund.limitedView ? 'View Strategy Overview' : 'View Fund Details'
           }
           textStyle={styles.button}
           btnContainer={styles.buttonContainer}
