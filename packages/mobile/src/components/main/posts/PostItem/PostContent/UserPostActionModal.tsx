@@ -4,6 +4,7 @@ import {
   BellSlash,
   EyeClosed,
   UserCirclePlus,
+  WarningOctagon,
   XSquare,
 } from 'phosphor-react-native';
 
@@ -79,11 +80,11 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
         icon: <XSquare size={26} color={WHITE} />,
         key: 'hidePost' as const,
       },
-      // {
-      //   label: 'Report post',
-      //   icon: <WarningOctagon size={26} color={WHITE} />,
-      //   key: 'report' as const,
-      // },
+      {
+        label: 'Report post',
+        icon: <WarningOctagon size={26} color={WHITE} />,
+        key: 'report' as const,
+      },
       ...(user // Only supported for users, not company posts
         ? [
             {
@@ -172,6 +173,12 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
     }
   };
 
+  const handlePressReportPost = (): void => {
+    setTimeout(() => {
+      setReportPostModalVisible(true);
+    }, 400); // it should be greater than the timing of Modal animation
+  };
+
   const handleReportPost = async (violations: string[], comment: string) => {
     try {
       const { data } = await reportPost({
@@ -185,7 +192,7 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
       });
 
       data?.reportPost
-        ? showMessage('info', 'Thanks for letting us know')
+        ? showMessage('customizedSuccess', 'Thanks for letting us know')
         : showMessage('error', SOMETHING_WRONG);
     } catch (err) {
       showMessage('error', SOMETHING_WRONG);
@@ -211,6 +218,8 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
               return handleHidePost();
             case 'mute':
               return handleMutePost();
+            case 'report':
+              return handlePressReportPost();
           }
         }}
       />

@@ -26,12 +26,12 @@
 		8F3D1D9D68224AD4BEC4F792 /* Metropolis-ExtraLight.otf in Resources */ = {isa = PBXBuildFile; fileRef = 9D47D819FA704E7AB9343B65 /* Metropolis-ExtraLight.otf */; };
 		97D6A18DF59E41AAB6A5AF20 /* Metropolis-BoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = CDD5876D317F4E10957F10E9 /* Metropolis-BoldItalic.otf */; };
 		9CD51DB2E06B4EEBBFD5B26F /* Metropolis-SemiBold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 0998309A196045D4A48224AB /* Metropolis-SemiBold.otf */; };
+		9D77D3CE286A7721008A42C9 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9D77D3CD286A7721008A42C9 /* GoogleService-Info.plist */; };
 		AF3320DE6A514839B5F91988 /* Metropolis-LightItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2C9159AEF6884EA2BA9B43AA /* Metropolis-LightItalic.otf */; };
 		B58AE7C8BBFF41BC9DA00D9C /* Metropolis-RegularItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = A901EB469198448FB09AA522 /* Metropolis-RegularItalic.otf */; };
 		C810E1CD2EBF4F8CB7338C44 /* Metropolis-Thin.otf in Resources */ = {isa = PBXBuildFile; fileRef = EE4E9E90769A4A9DAE58B145 /* Metropolis-Thin.otf */; };
 		D44607F588FD479FB6466355 /* Metropolis-ExtraLightItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = EB4F048B819C4FBEB678827A /* Metropolis-ExtraLightItalic.otf */; };
 		DCC5F91C47BF4F51A4CDC2FF /* Metropolis-BlackItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 7BCF10AC6ECE4B83912F41BB /* Metropolis-BlackItalic.otf */; };
-		F56963F2281A352100D4F835 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F56963F1281A352100D4F835 /* GoogleService-Info.plist */; };
 		FC5327EE635746A297153C5C /* Metropolis-ThinItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 873D0396048C4C7AA6308678 /* Metropolis-ThinItalic.otf */; };
 /* End PBXBuildFile section */
 
@@ -73,6 +73,7 @@
 		9891E24D22B046ED9A9414F1 /* Metropolis-ExtraBold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Metropolis-ExtraBold.otf"; path = "../src/assets/fonts/Metropolis-ExtraBold.otf"; sourceTree = "<group>"; };
 		9BB14D29503C4CC29EECBAA1 /* Metropolis-ExtraBoldItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Metropolis-ExtraBoldItalic.otf"; path = "../src/assets/fonts/Metropolis-ExtraBoldItalic.otf"; sourceTree = "<group>"; };
 		9D47D819FA704E7AB9343B65 /* Metropolis-ExtraLight.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Metropolis-ExtraLight.otf"; path = "../src/assets/fonts/Metropolis-ExtraLight.otf"; sourceTree = "<group>"; };
+		9D77D3CD286A7721008A42C9 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		A901EB469198448FB09AA522 /* Metropolis-RegularItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Metropolis-RegularItalic.otf"; path = "../src/assets/fonts/Metropolis-RegularItalic.otf"; sourceTree = "<group>"; };
 		AE3CA35CC67B45C0836C0BCB /* Metropolis-Black.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Metropolis-Black.otf"; path = "../src/assets/fonts/Metropolis-Black.otf"; sourceTree = "<group>"; };
 		AF994B59281D89020007E252 /* mobile.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = mobile.entitlements; path = mobile/mobile.entitlements; sourceTree = "<group>"; };
@@ -82,7 +83,6 @@
 		EB4F048B819C4FBEB678827A /* Metropolis-ExtraLightItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Metropolis-ExtraLightItalic.otf"; path = "../src/assets/fonts/Metropolis-ExtraLightItalic.otf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		EE4E9E90769A4A9DAE58B145 /* Metropolis-Thin.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Metropolis-Thin.otf"; path = "../src/assets/fonts/Metropolis-Thin.otf"; sourceTree = "<group>"; };
-		F56963F1281A352100D4F835 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,7 +126,7 @@
 			isa = PBXGroup;
 			children = (
 				AF994B59281D89020007E252 /* mobile.entitlements */,
-				F56963F1281A352100D4F835 /* GoogleService-Info.plist */,
+				9D77D3CD286A7721008A42C9 /* GoogleService-Info.plist */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -268,7 +268,7 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1210;
+				LastUpgradeCheck = 1340;
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
 						CreatedOnToolsVersion = 6.2;
@@ -312,7 +312,6 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				F56963F2281A352100D4F835 /* GoogleService-Info.plist in Resources */,
 				7A6AC48569BE4863BC4206B1 /* Metropolis-Black.otf in Resources */,
 				DCC5F91C47BF4F51A4CDC2FF /* Metropolis-BlackItalic.otf in Resources */,
 				6881C0196EBE4613B8624048 /* Metropolis-Bold.otf in Resources */,
@@ -331,6 +330,7 @@
 				0629775D6BA54F51B4097A55 /* Metropolis-SemiBoldItalic.otf in Resources */,
 				C810E1CD2EBF4F8CB7338C44 /* Metropolis-Thin.otf in Resources */,
 				FC5327EE635746A297153C5C /* Metropolis-ThinItalic.otf in Resources */,
+				9D77D3CE286A7721008A42C9 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -530,13 +530,14 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5B7EB9410499542E8C5724F5 /* Pods-mobile-mobileTests.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = mobileTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -557,10 +558,11 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 89C6BE57DB24E9ADA2F236DE /* Pods-mobile-mobileTests.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = mobileTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -683,7 +685,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
 					"$(inherited)",
@@ -747,7 +749,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
 					"$(inherited)",

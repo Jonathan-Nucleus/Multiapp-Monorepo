@@ -16,6 +16,7 @@ import {
   DdSdkReactNative,
   DdSdkReactNativeConfiguration,
 } from '@datadog/mobile-react-native';
+
 const config = new DdSdkReactNativeConfiguration(
   process.env.DD_TOKEN ?? '',
   process.env.ENV ?? 'dev',
@@ -28,6 +29,8 @@ config.site = 'US';
 config.nativeCrashReportEnabled = true;
 
 import { LogBox } from 'react-native';
+import { toastConfig } from './utils/toastUtil';
+
 LogBox.ignoreAllLogs();
 
 const App = (): ReactElement => {
@@ -47,7 +50,7 @@ const App = (): ReactElement => {
     <ApolloProvider client={client}>
       <SafeAreaProvider style={pStyles.globalContainer}>
         <AppNavigator />
-        <Toast />
+        <Toast config={toastConfig} />
       </SafeAreaProvider>
     </ApolloProvider>
   );

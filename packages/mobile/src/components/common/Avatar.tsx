@@ -14,6 +14,7 @@ type User = Partial<
   Pick<UserProfile, '_id' | 'firstName' | 'lastName' | 'avatar'>
 >;
 type Company = Pick<CompanyProfile, '_id' | 'name' | 'avatar'>;
+
 interface AvatarProps {
   user?: User | Company;
   size?: number;

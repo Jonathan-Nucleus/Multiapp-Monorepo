@@ -10,10 +10,17 @@ import {
 } from 'react-native';
 import Modal from 'react-native-modal';
 
-import { GRAY3, PRIMARYSOLID, PRIMARYSOLID7, WHITE } from 'shared/src/colors';
+import {
+  BLACK,
+  PRIMARYSOLID,
+  PRIMARYSOLID7,
+  WHITE,
+  PRIMARYSOLID36,
+} from 'shared/src/colors';
 import CheckboxLabel from 'mobile/src/components/common/CheckboxLabel';
 import PLabel from 'mobile/src/components/common/PLabel';
 import { Body1Bold } from 'mobile/src/theme/fonts';
+import pStyles from '../../../../../theme/pStyles';
 
 interface ReportPostModalProps {
   title?: string;
@@ -91,6 +98,11 @@ const ReportPostModal: React.FC<ReportPostModalProps> = (props) => {
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'position' : undefined}>
         <View style={styles.modalWrapper}>
+          <View style={pStyles.modalKnobContainer}>
+            <View
+              style={[pStyles.modalKnob, { backgroundColor: PRIMARYSOLID36 }]}
+            />
+          </View>
           <PLabel label="Report post" textStyle={styles.title} />
           <FlatList
             data={violations}
@@ -130,7 +142,7 @@ export default ReportPostModal;
 
 const styles = StyleSheet.create({
   modalWrapper: {
-    backgroundColor: GRAY3,
+    backgroundColor: BLACK,
     paddingHorizontal: 28,
     paddingVertical: 32,
     borderTopLeftRadius: 20,
