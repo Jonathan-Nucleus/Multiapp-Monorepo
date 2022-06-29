@@ -1,11 +1,12 @@
 import { Transition } from "@headlessui/react";
 import { FC, useEffect, useState } from "react";
-import { Comment, usePost } from "shared/graphql/query/post/usePost";
+import { Comment } from "shared/graphql/query/post/usePost";
 import SendMessage from "./SendMessage";
 import CommentItem from "./CommentItem";
 import { useCommentPost } from "shared/graphql/mutation/posts";
 import { parseMentions } from "shared/src/patterns";
 import Spinner from "../../../../common/Spinner";
+import { usePostComments } from "shared/graphql/query/post/usePostComments";
 
 interface CommentsListProps {
   show: boolean;
@@ -13,7 +14,7 @@ interface CommentsListProps {
 }
 
 const CommentsList: FC<CommentsListProps> = ({ show, postId }) => {
-  const { data: { post } = {}, refetch } = usePost(postId);
+  const { data: { post } = {}, refetch } = usePostComments(postId);
   const [commentPost] = useCommentPost();
   const [comments, setComments] = useState<
     (Comment & { comments: Comment[] })[]

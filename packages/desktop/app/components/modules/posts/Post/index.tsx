@@ -128,12 +128,13 @@ const Post: FC<PostProps> = ({
           <CommentsList show={visibleComment} postId={post._id} />
         )}
       </Card>
-      <LikesModal
-        title="People Who Liked This Post"
-        show={visiblePostLikeModal}
-        onClose={() => setVisiblePostLikeModal(false)}
-        members={post.likes}
-      />
+      {visiblePostLikeModal && (
+        <LikesModal
+          postId={post._id}
+          show={visiblePostLikeModal}
+          onClose={() => setVisiblePostLikeModal(false)}
+        />
+      )}
     </>
   );
 };

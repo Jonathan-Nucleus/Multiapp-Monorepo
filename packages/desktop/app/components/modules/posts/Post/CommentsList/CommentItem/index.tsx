@@ -10,7 +10,7 @@ import { Comment } from "shared/graphql/query/post/usePost";
 import { useAccountContext } from "shared/context/Account";
 import Header from "./Header";
 import BodyText from "../../PostBody/BodyText";
-import LikesModal from "../../LikesModal";
+import LikesModal from "./LikesModal";
 
 interface CommentItemProps {
   comment: Comment;
@@ -27,7 +27,7 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply }) => {
   const [deleteComment] = useDeleteComment();
   const [editComment] = useEditCommentPost();
   const isMyComment = account._id == comment.user._id;
-  const isLiked = comment.likeIds?.includes(account._id) ?? false;
+  const isLiked = comment.likes.some((value) => value._id == account._id);
   const [showEditor, setShowEditor] = useState(false);
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [showLikesModal, setShowLikesModal] = useState(false);
@@ -99,14 +99,14 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply }) => {
                 </Button>
               )}
             </div>
-            {comment.likeIds && comment.likeIds.length > 0 && (
+            {comment.likes.length > 0 && (
               <Button
                 variant="text"
                 className="text-xs tracking-normal font-normal text-white/[.6] ml-auto"
                 onClick={() => setShowLikesModal(true)}
               >
-                {comment.likeIds.length}{" "}
-                {comment.likeIds.length == 1 ? "Like" : "Likes"}
+                {comment.likes.length}{" "}
+                {comment.likes.length == 1 ? "Like" : "Likes"}
               </Button>
             )}
           </div>
@@ -125,8 +125,7 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply }) => {
       )}
       {showLikesModal && (
         <LikesModal
-          title="People Who Liked This Comment"
-          members={comment.likes}
+          likes={comment.likes}
           show={showLikesModal}
           onClose={() => setShowLikesModal(false)}
         />
