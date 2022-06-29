@@ -4503,27 +4503,10 @@
   dependencies:
     "@types/react" "^17"
 
-"@types/react@*", "@types/react@^17":
+"@types/react@*", "@types/react@17.0.2", "@types/react@18.0.5", "@types/react@^17":
   version "17.0.44"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.44.tgz#c3714bd34dd551ab20b8015d9d0dbec812a51ec7"
   integrity sha512-Ye0nlw09GeMp2Suh8qoOv0odfgCoowfM/9MG6WeRD60Gq9wS90bdkdRtYbRkNhXOpG4H+YXGvj4wOWhAC0LJ1g==
-  dependencies:
-    "@types/prop-types" "*"
-    "@types/scheduler" "*"
-    csstype "^3.0.2"
-
-"@types/react@17.0.2":
-  version "17.0.2"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.2.tgz#3de24c4efef902dd9795a49c75f760cbe4f7a5a8"
-  integrity sha512-Xt40xQsrkdvjn1EyWe1Bc0dJLcil/9x2vAuW7ya+PuQip4UYUaXyhzWmAbwRsdMgwOFHpfp7/FFZebDU6Y8VHA==
-  dependencies:
-    "@types/prop-types" "*"
-    csstype "^3.0.2"
-
-"@types/react@18.0.5":
-  version "18.0.5"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-18.0.5.tgz#1a4d4b705ae6af5aed369dec22800b20f89f5301"
-  integrity sha512-UPxNGInDCIKlfqBrm8LDXYWNfLHwIdisWcsH5GpMyGjhEDLFgTtlRBaoWuCua9HcyuE0rMkmAeZ3FXV1pYLIYQ==
   dependencies:
     "@types/prop-types" "*"
     "@types/scheduler" "*"
@@ -13566,6 +13549,23 @@ react-native-picker-select@^8.0.4:
   dependencies:
     "@react-native-picker/picker" "^1.8.3"
     lodash.isequal "^4.5.0"
+
+react-native-pinch-zoom-image@^0.0.10:
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/react-native-pinch-zoom-image/-/react-native-pinch-zoom-image-0.0.10.tgz#fd605bbdf9015deffc3028049d9e01f50c8dc824"
+  integrity sha512-dEZuxeylT9oTmK0dWFKaLImXs1Ps6w+rpxVeh3a9ccNdjNScNI0Ii/3XKtvBJ0YDsHvR8YfGO/oI3X/lSxRlBA==
+
+react-native-pinch-zoom-view@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/react-native-pinch-zoom-view/-/react-native-pinch-zoom-view-0.2.0.tgz#5ff469e7b1b4a69629a8fb31a226d3855e813799"
+  integrity sha512-KPrJCSKX/NZuNjyS9gl4gR1AhV0sWo2KgJOI5tD8+YhzjtSRHnaq9XvOdO4ero3oyU2oFXyFHEVH+DzOfaXqOg==
+  dependencies:
+    prop-types "^15.6.0"
+
+react-native-pinchable@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/react-native-pinchable/-/react-native-pinchable-0.2.1.tgz#93cf6ce78f65cef2f1364187320e363170d2e212"
+  integrity sha512-LRSLCrizUX/XtYwwBxyuYL4xDLUhyPbBvD/tUpzns0PX2Zs0pR0fd/LsFm/n6tEigCLL/0KlDrOVhOdW3wtz+Q==
 
 react-native-progress@^5.0.0:
   version "5.0.0"

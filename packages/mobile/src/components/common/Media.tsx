@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect, useRef } from 'react';
+import React, { FC, useState, useEffect, useRef, useMemo } from 'react';
 import {
   AppState,
   AppStateStatus,
@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 import FastImage, { ResizeMode, ImageStyle } from 'react-native-fast-image';
 import Video, { VideoProperties } from 'react-native-video';
+import Pinchable from 'react-native-pinchable';
+
 import { Media as MediaType } from 'shared/graphql/fragments/post';
 
 import { S3_BUCKET } from 'react-native-dotenv';
@@ -159,20 +161,22 @@ const Media: FC<MediaProps> = ({
       </View>
     </Pressable>
   ) : (
-    <FastImage
-      style={[
-        styles.media,
-        style,
-        { aspectRatio: media.aspectRatio },
-        media.aspectRatio < 1 && resizeMode === 'contain'
-          ? styles.contain
-          : null,
-      ]}
-      source={{
-        uri: media.url.includes('/') ? media.url : mediaUrl,
-      }}
-      resizeMode={resizeMode}
-    />
+    <Pinchable maximumZoomScale={5}>
+      <FastImage
+        style={[
+          styles.media,
+          style,
+          { aspectRatio: media.aspectRatio },
+          media.aspectRatio < 1 && resizeMode === 'contain'
+            ? styles.contain
+            : null,
+        ]}
+        source={{
+          uri: media.url.includes('/') ? media.url : mediaUrl,
+        }}
+        resizeMode={resizeMode}
+      />
+    </Pinchable>
   );
 };
 
