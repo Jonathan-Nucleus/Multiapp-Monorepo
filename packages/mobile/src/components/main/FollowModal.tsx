@@ -1,6 +1,5 @@
 import React, { FC, useEffect, useMemo, useState } from 'react';
 import {
-  Dimensions,
   ListRenderItem,
   StyleSheet,
   View,
@@ -17,11 +16,9 @@ import { Body2Bold } from 'mobile/src/theme/fonts';
 import pStyles from 'mobile/src/theme/pStyles';
 import { WHITE, WHITE60, PRIMARYSTATE, BLACK } from 'shared/src/colors';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
+import { appHeight, appWidth } from 'mobile/src/utils/utils';
 
 import type { UserProfile } from 'backend/graphql/users.graphql';
-
-const APP_WIDTH = Dimensions.get('window').width;
-const APP_HEIGHT = Dimensions.get('window').height;
 
 interface ModalProps {
   tab?: string;
@@ -153,8 +150,8 @@ const styles = StyleSheet.create({
     backgroundColor: BLACK,
     padding: 20,
     borderRadius: 32,
-    maxHeight: APP_HEIGHT - 100,
-    height: APP_HEIGHT * 0.6,
+    maxHeight: appHeight - 100,
+    height: appHeight * 0.6,
   },
   topTab: {
     flexDirection: 'row',
@@ -170,7 +167,7 @@ const styles = StyleSheet.create({
   tab: {
     paddingVertical: 16,
     paddingHorizontal: 25,
-    width: (APP_WIDTH - 40) / 2,
+    width: (appWidth - 40) / 2,
     alignItems: 'center',
   },
   selectedTab: {

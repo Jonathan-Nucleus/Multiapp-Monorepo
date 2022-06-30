@@ -60,7 +60,3 @@ export type BecomeProScreen = (
 export type InviteFriendsScreen = (
   props: MoreScreenProps<'InviteFriends'>,
 ) => ReactElement;
-
-export type ChangePassScreen = (
-  props: MoreScreenProps<'ChangePass'>,
-) => ReactElement;

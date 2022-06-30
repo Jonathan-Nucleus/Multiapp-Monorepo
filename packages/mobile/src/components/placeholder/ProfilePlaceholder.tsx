@@ -1,10 +1,9 @@
 import React from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 
 import { BLACK, GRAY800, WHITE12 } from 'shared/src/colors';
-
-const APP_WIDTH = Dimensions.get('window').width;
+import { appWidth } from '../../utils/utils';
 
 interface IProfilePlaceholderProps {
   variant: string;
@@ -72,7 +71,7 @@ const ProfilePlaceholder: React.FC<IProfilePlaceholderProps> = ({
         flexDirection="row"
         justifyContent="space-between">
         <SkeletonPlaceholder.Item
-          width={APP_WIDTH * 0.45}
+          width={appWidth * 0.45}
           height={40}
           borderRadius={32}
           borderColor={WHITE12}
@@ -80,7 +79,7 @@ const ProfilePlaceholder: React.FC<IProfilePlaceholderProps> = ({
           backgroundColor={BLACK}
         />
         <SkeletonPlaceholder.Item
-          width={APP_WIDTH * 0.45}
+          width={appWidth * 0.45}
           height={40}
           borderRadius={32}
           backgroundColor={WHITE12}

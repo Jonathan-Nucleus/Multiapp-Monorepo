@@ -18,7 +18,7 @@ import * as yup from 'yup';
 import MainHeader from 'mobile/src/components/main/Header';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import PTextInput from 'mobile/src/components/common/PTextInput';
-import { showMessage } from 'mobile/src/services/ToastService';
+import { showMessage } from 'mobile/src/services/utils';
 import { Body1Bold, Body2, Body4 } from 'mobile/src/theme/fonts';
 import { PRIMARY, WHITE, WHITE12, WHITE60 } from 'shared/src/colors';
 import pStyles from 'mobile/src/theme/pStyles';

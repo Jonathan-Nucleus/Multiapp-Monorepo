@@ -29,7 +29,7 @@ import PLabel from 'mobile/src/components/common/PLabel';
 import Disclosure from 'mobile/src/components/main/Disclosure';
 import pStyles from 'mobile/src/theme/pStyles';
 import { Body3, H6Bold, Body4Bold, Body2Bold } from 'mobile/src/theme/fonts';
-import { useAccountContext } from 'shared/context/Account';
+import { useAccount } from 'shared/graphql/query/account/useAccount';
 import AIUserSvg from 'shared/assets/images/ai-user.svg';
 import QPSvg from 'shared/assets/images/QP.svg';
 import QCSvg from 'shared/assets/images/QC.svg';
@@ -47,14 +47,15 @@ interface MenuItem {
 }
 
 const Settings: SettingsScreen = ({ navigation }) => {
-  const account = useAccountContext();
+  const { data } = useAccount();
   const [disclosureVisible, setDisclosureVisible] = useState(false);
 
+  const account = data?.account;
   const isAccredited = account?.accreditation !== 'NONE';
 
   const MENU_ITEMS = [
     {
-      id: 'Accreditation',
+      id: 'accreditation',
       label: 'Accreditation',
       comment: isAccredited ? 'You are accredited!' : 'Verify Accreditation',
       onPress: !isAccredited
@@ -109,8 +110,7 @@ const Settings: SettingsScreen = ({ navigation }) => {
       icon: <EnvelopeSimple size={26} color={WHITE} />,
     },
   ];
-
-  if (account.accreditation !== 'NONE') {
+  if (account?.accreditation !== 'NONE') {
     MENU_ITEMS.push({
       id: 'Contact',
       label: 'Contact Fund Specialist',
@@ -118,7 +118,7 @@ const Settings: SettingsScreen = ({ navigation }) => {
       icon: <Headset size={26} color={WHITE} />,
     });
   }
-  if (account.role === 'USER') {
+  if (account?.role === 'USER') {
     MENU_ITEMS.push({
       id: 'Become',
       label: 'Become a Verified Pro',
@@ -162,11 +162,9 @@ const Settings: SettingsScreen = ({ navigation }) => {
               )}
             </View>
           </View>
-          {item.id !== 'Accreditation' || account.accreditation === 'NONE' ? (
-            <View>
-              <CaretRight size={28} color={WHITE} />
-            </View>
-          ) : null}
+          <View>
+            <CaretRight size={28} color={WHITE} />
+          </View>
         </View>
       </Pressable>
     );

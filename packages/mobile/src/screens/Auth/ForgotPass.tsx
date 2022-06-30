@@ -10,15 +10,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useMutation } from '@apollo/client';
 import { NavigationProp } from '@react-navigation/native';
 
-import * as yup from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
-import {
-  SubmitHandler,
-  useForm,
-  Controller,
-  DefaultValues,
-} from 'react-hook-form';
-
 import PAppContainer from '../../components/common/PAppContainer';
 import PHeader from '../../components/common/PHeader';
 import PTitle from '../../components/common/PTitle';
@@ -32,42 +23,15 @@ import SuccessText from '../../components/common/SuccessText';
 import ErrorText from '../../components/common/ErrorTxt';
 
 import type { ForgotPassScreen } from 'mobile/src/navigations/AuthStack';
-
-type FormValues = {
-  email: string;
-};
-
-const schema = yup
-  .object({
-    email: yup
-      .string()
-      .email('Must be a valid email')
-      .required('Required')
-      .default(''),
-  })
-  .required();
+import { validateEmail } from '../../utils/utils';
 
 const ForgotPass: ForgotPassScreen = ({ navigation }) => {
+  const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
   const [err, setErr] = useState('');
   const [forgotPassword] = useMutation(FORGOT_PASSWORD);
 
-  const {
-    handleSubmit,
-    formState: { isValid },
-    watch,
-    control,
-  } = useForm<yup.InferType<typeof schema>>({
-    resolver: yupResolver(schema),
-    mode: 'onChange',
-    defaultValues: schema.cast(
-      {},
-      { assert: false, stripUnknown: true },
-    ) as DefaultValues<FormValues>,
-  });
-  const userEmail = watch('email');
-
-  const onSubmit: SubmitHandler<FormValues> = async ({ email }) => {
+  const handleReset = async (): Promise<void> => {
     Keyboard.dismiss();
     setErr('');
     try {
@@ -87,6 +51,13 @@ const ForgotPass: ForgotPassScreen = ({ navigation }) => {
     }
   };
 
+  const disabled = useMemo(() => {
+    if (email && validateEmail(email)) {
+      return false;
+    }
+    return true;
+  }, [email]);
+
   return (
     <SafeAreaView style={styles.container}>
       <PHeader centerIcon={<LogoSvg />} />
@@ -95,7 +66,7 @@ const ForgotPass: ForgotPassScreen = ({ navigation }) => {
         {!!err && <ErrorText error={err} />}
         {sent ? (
           <SuccessText
-            message={`We sent an email to ${userEmail} with a link to reset your password.`}
+            message={`We sent an email to ${email} with a link to reset your password.`}
           />
         ) : (
           <>
@@ -103,24 +74,23 @@ const ForgotPass: ForgotPassScreen = ({ navigation }) => {
               Enter your email below and we’ll send you a link to reset your
               password.
             </Text>
-            <Controller
-              control={control}
-              name="email"
-              render={({ field, fieldState }) => (
-                <PTextInput
-                  label="Email"
-                  onChangeText={field.onChange}
-                  text={field.value}
-                  keyboardType="email-address"
-                  error={fieldState.error?.message}
-                />
-              )}
+            <PTextInput
+              label="Email"
+              onChangeText={(val: string) => {
+                setErr('');
+                setEmail(val);
+              }}
+              text={email}
+              keyboardType="email-address"
+              containerStyle={styles.textContainer}
+              autoCapitalize="none"
+              autoCorrect={false}
             />
             <PGradientButton
               label="send email"
               btnContainer={styles.btnContainer}
-              onPress={handleSubmit(onSubmit)}
-              disabled={!isValid}
+              onPress={handleReset}
+              disabled={disabled}
             />
           </>
         )}
