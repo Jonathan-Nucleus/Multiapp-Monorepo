@@ -1,11 +1,5 @@
-import React, {ReactElement, useEffect, useState} from 'react';
-import {
-  DeviceEventEmitter,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import React, { ReactElement } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import {
   createBottomTabNavigator,
   BottomTabScreenProps,
@@ -15,7 +9,6 @@ import {
   NavigatorScreenParams,
 } from '@react-navigation/native';
 import { House, Star, Chats, DotsThreeCircle } from 'phosphor-react-native';
-import Tooltip from 'react-native-walkthrough-tooltip';
 
 import FundsSVG from 'shared/assets/images/logo-icon.svg';
 import GreyFundsSVG from 'shared/assets/images/grey-fund.svg';
@@ -32,26 +25,11 @@ import { Body5Bold, Body5 } from '../theme/fonts';
 import { useChatContext, useUnreadCount } from 'mobile/src/context/Chat';
 
 import type { AuthenticatedScreenProps } from './AuthenticatedStack';
-import pStyles from '../theme/pStyles';
 
 const Tab = createBottomTabNavigator();
 const MainTabNavigator = (): React.ReactElement => {
   const { client } = useChatContext() || {};
   const unreadCount = useUnreadCount();
-  const [showTutorial, setShowTutorial] = useState(false);
-  useEffect(() => {
-    DeviceEventEmitter.addListener('tabTutorial', () => {
-      setShowTutorial(true);
-      // do something
-      console.log('Hello World! from tabTutorial');
-    });
-    // emitter.remove();
-  });
-
-  const closeTutorial = () => {
-    DeviceEventEmitter.emit('homeTutorial');
-    setShowTutorial(false);
-  };
 
   return (
     <Tab.Navigator
@@ -76,25 +54,7 @@ const MainTabNavigator = (): React.ReactElement => {
           ),
           tabBarIcon: ({ focused, size }) =>
             focused ? (
-              <Tooltip
-                isVisible={showTutorial}
-                content={
-                  <View style={pStyles.tooltipContainer}>
-                    <Text style={pStyles.tooltipText}>
-                        This is your newsfeed!
-                        Market insights from
-                        professionals live here.
-                    </Text>
-                    <Pressable onPress={() =>  closeTutorial()} style={pStyles.tooltipButton}>
-                      <Text style={pStyles.tooltipButtonText}>Next</Text>
-                    </Pressable>
-                  </View>
-                }
-                contentStyle={pStyles.tooltipContent}
-                placement="top"
-                onClose={() => console.log('')}>
-                <House size={size} color={WHITE} weight="fill" />
-              </Tooltip>
+              <House size={size} color={WHITE} weight="fill" />
             ) : (
               <House size={size} color={GRAY400} />
             ),
@@ -179,8 +139,8 @@ const MainTabNavigator = (): React.ReactElement => {
 export default MainTabNavigator;
 
 export type MainTabParamList = {
-  Home: undefined;
-  Watchlist: undefined;
+  Home: BottomTabScreenProps<Record<string, never>>;
+  Watchlist: BottomTabScreenProps<Record<string, never>>;
   Marketplace: NavigatorScreenParams<MarketplaceTabsParamList> | undefined;
   Chat: NavigatorScreenParams<ChatStackParamList> | undefined;
   More: NavigatorScreenParams<MoreStackParamList> | undefined;

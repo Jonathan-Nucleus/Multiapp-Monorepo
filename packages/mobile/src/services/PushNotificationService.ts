@@ -12,7 +12,7 @@ interface FCMToken {
 /**
  * Fetches a Firebase Cloud Messaging (FCM) token for push notifications.
  */
-const getToken = async () => {
+const getToken = async (): Promise<string> => {
   const fcmToken = await firebase.messaging().getToken();
   console.log('Retreived FCM token', fcmToken);
   return fcmToken;

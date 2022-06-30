@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, Fragment } from 'react';
 import {
   StyleSheet,
   Keyboard,
@@ -8,8 +8,15 @@ import {
   Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useMutation } from '@apollo/client';
 import CheckBox from '@react-native-community/checkbox';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+import {
+  SubmitHandler,
+  useForm,
+  Controller,
+  DefaultValues,
+} from 'react-hook-form';
 
 import PAppContainer from '../../components/common/PAppContainer';
 import PHeader from '../../components/common/PHeader';
@@ -18,8 +25,7 @@ import PTextInput from '../../components/common/PTextInput';
 import PGradientButton from '../../components/common/PGradientButton';
 import PTextLine from '../../components/common/PTextLine';
 import ErrorText from '../../components/common/ErrorTxt';
-import { REGISTER } from 'shared/graphql/mutation/auth';
-import { Body2, Body2Bold } from '../../theme/fonts';
+import { Body2, Body2Bold, Body3 } from '../../theme/fonts';
 import {
   BLACK,
   PRIMARY,
@@ -27,83 +33,110 @@ import {
   BLUE200,
   WHITE12,
   BGHEADER,
+  DANGER,
 } from 'shared/src/colors';
 import LogoSvg from '../../assets/icons/logo.svg';
-import AppleSvg from '../../assets/icons/apple.svg';
-import GoogleSvg from '../../assets/icons/google.svg';
-import LinkedinSvg from '../../assets/icons/linkedin.svg';
+// import AppleSvg from '../../assets/icons/apple.svg';
+// import GoogleSvg from '../../assets/icons/google.svg';
+// import LinkedinSvg from '../../assets/icons/linkedin.svg';
 import CheckCircleSvg from '../../assets/icons/CheckCircle.svg';
 import CircleSvg from '../../assets/icons/Circle.svg';
 
 import type { SignupScreen } from 'mobile/src/navigations/AuthStack';
 import { setToken } from 'mobile/src/utils/auth-token';
-import PMaskTextInput from '../../components/common/PMaskTextInput';
-import { validateEmail, validatePassword } from '../../utils/utils';
 
-// TODO: Refactor to leverage react-hook-form
+import { PASSWORD_PATTERN, passwordRequirements } from 'shared/src/patterns';
+import { useRegister } from 'shared/graphql/mutation/auth/useRegister';
+
+type FormValues = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  acceptTerms: boolean;
+  oAuth: string;
+};
+
+const schema = yup
+  .object({
+    firstName: yup.string().required('Required').default(''),
+    lastName: yup.string().required('Required').default(''),
+    email: yup
+      .string()
+      .email('Must be a valid email')
+      .required('Required')
+      .default(''),
+    password: yup
+      .string()
+      .when('oAuth', {
+        is: '',
+        then: yup
+          .string()
+          .matches(
+            PASSWORD_PATTERN,
+            "Oops, your password doesn't meet the requirements below",
+          )
+          .required('Required'),
+      })
+      .default(''),
+    confirmPassword: yup
+      .string()
+      .when('oAuth', {
+        is: '',
+        then: yup
+          .string()
+          .oneOf([yup.ref('password')], 'Confirm password mismatch')
+          .required('Required'),
+      })
+      .default(''),
+    acceptTerms: yup
+      .boolean()
+      .oneOf([true], 'You must accept the terms and conditions')
+      .required()
+      .default(false),
+    oAuth: yup.string().default(''),
+  })
+  .required();
+
 const Signup: SignupScreen = ({ navigation, route }) => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [pass, setPass] = useState('');
-  const [confirmPass, setConfirmPass] = useState('');
+  const [register] = useRegister();
   const [securePassEntry, setSecurePassEntry] = useState(true);
   const [secureConfirmPassEntry, setSecureConfirmPassEntry] = useState(true);
-  const [error, setError] = useState('');
-  const [agreed, setAgreed] = useState(false);
-  const [checkedString, setCheckedString] = useState(false);
-  const [checkedSpecial, setCheckedSpecial] = useState(false);
-  const [checkedNumber, setCheckedNumber] = useState(false);
-  const [checkedLength, setCheckedLength] = useState(false);
-  const [passError, setPassError] = useState('');
-  const [register] = useMutation(REGISTER);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string>();
 
-  const disabled = useMemo(() => {
-    if (
-      firstName &&
-      lastName &&
-      email &&
-      validateEmail(email) &&
-      pass &&
-      confirmPass &&
-      pass === confirmPass &&
-      validatePassword(pass).checkedLength &&
-      validatePassword(pass).checkedString &&
-      validatePassword(pass).checkedSpecial &&
-      validatePassword(pass).checkedNumber &&
-      agreed
-    ) {
-      return false;
-    } else if (pass && confirmPass && pass !== confirmPass) {
-      setPassError('Confirm Password does not match');
-      return;
-    }
-    setPassError('');
-    return true;
-  }, [firstName, lastName, email, pass, confirmPass, agreed]);
+  const {
+    handleSubmit,
+    formState: { isValid },
+    control,
+    watch,
+    setValue,
+  } = useForm<yup.InferType<typeof schema>>({
+    resolver: yupResolver(schema),
+    mode: 'onChange',
+    defaultValues: schema.cast(
+      {},
+      { assert: false, stripUnknown: true },
+    ) as DefaultValues<FormValues>,
+  });
 
-  useEffect(() => {
-    const validation = validatePassword(pass);
-    setCheckedLength(false);
-    setCheckedString(false);
-    setCheckedNumber(false);
-    setCheckedSpecial(false);
-    if (validation.checkedLength) {
-      setCheckedLength(true);
-    }
-    if (validation.checkedString) {
-      setCheckedString(true);
-    }
-    if (validation.checkedSpecial) {
-      setCheckedSpecial(true);
-    }
-    if (validation.checkedNumber) {
-      setCheckedNumber(true);
-    }
-  }, [pass]);
+  const password = watch('password');
+  const oAuthProvider = watch('oAuth');
+  const passesRequirements = passwordRequirements.map(({ label, pattern }) => ({
+    label,
+    met: !!password.match(pattern),
+  }));
 
-  const handleNextPage = async (): Promise<void> => {
+  const onSubmit: SubmitHandler<FormValues> = async ({
+    firstName,
+    lastName,
+    email,
+    password: confirmedPassword,
+  }): Promise<void> => {
     Keyboard.dismiss();
+    setLoading(true);
+
     try {
       const { data } = await register({
         variables: {
@@ -112,22 +145,22 @@ const Signup: SignupScreen = ({ navigation, route }) => {
             firstName,
             lastName,
             inviteCode: route.params.code,
-            password: pass,
+            password: confirmedPassword,
           },
         },
       });
+
       console.log('Registration result', data);
-      if (data.register) {
+      if (data?.register) {
         await setToken(data.register);
         navigation.navigate('Topic');
-        return;
       }
-    } catch (e) {
-      console.log('error', e);
-      if (e instanceof Error) {
-        setError(e.message);
-      }
+    } catch (err) {
+      console.log('error', err);
+      setError(err instanceof Error ? err.message : 'Unexpected error');
     }
+
+    setLoading(false);
   };
 
   const renderItem = (
@@ -142,122 +175,185 @@ const Signup: SignupScreen = ({ navigation, route }) => {
     );
   };
 
+  /*const handleRegisterOAuth = async (provider: string): Promise<void> => {
+    setValue('oAuth', provider);
+    handleSubmit(onSubmit)();
+  };*/
+
   return (
     <SafeAreaView style={styles.container}>
       <PAppContainer>
-        <PHeader centerIcon={<LogoSvg />} outerContainerStyle={styles.header} />
-        <PTitle title="You’re in!" subTitle="We need a few more details..." />
-        {!!error && <ErrorText error="Verification code does not match" />}
-        <PTextInput
-          label="First name"
-          onChangeText={(val: string) => setFirstName(val)}
-          text={firstName}
-          containerStyle={styles.textContainer}
-          autoCapitalize="words"
-          autoCorrect={false}
+        <PHeader centerIcon={<LogoSvg />} />
+        <PTitle
+          title="You’re in!"
+          subTitle="We need a few more details..."
+          textStyle={styles.title}
         />
-        <PTextInput
-          label="Last name"
-          onChangeText={(val: string) => setLastName(val)}
-          text={lastName}
-          autoCapitalize="words"
-          autoCorrect={false}
+        {error ? <ErrorText error={error} /> : null}
+        <Controller
+          control={control}
+          name="firstName"
+          render={({ field, fieldState }) => (
+            <PTextInput
+              label="First name"
+              onChangeText={field.onChange}
+              text={field.value}
+              containerStyle={styles.textContainer}
+              autoCapitalize="words"
+              autoCorrect={false}
+              error={fieldState.error?.message}
+            />
+          )}
         />
-        <PTextInput
-          label="Email"
-          onChangeText={(val: string) => setEmail(val)}
-          text={email}
-          keyboardType="email-address"
+        <Controller
+          control={control}
+          name="lastName"
+          render={({ field, fieldState }) => (
+            <PTextInput
+              label="Last name"
+              onChangeText={field.onChange}
+              text={field.value}
+              autoCapitalize="words"
+              autoCorrect={false}
+              error={fieldState.error?.message}
+            />
+          )}
         />
-        <PTextInput
-          label="Password"
-          subLabel={securePassEntry ? 'Show' : 'Hide'}
-          secureTextEntry={securePassEntry}
-          onChangeText={(val: string) => setPass(val)}
-          onPressText={() => setSecurePassEntry(!securePassEntry)}
-          subLabelTextStyle={styles.subLabelText}
-          text={pass}
+        <Controller
+          control={control}
+          name="email"
+          render={({ field, fieldState }) => (
+            <PTextInput
+              label="Email"
+              onChangeText={field.onChange}
+              text={field.value}
+              keyboardType="email-address"
+              error={fieldState.error?.message}
+            />
+          )}
         />
-        <PTextInput
-          label="Confirm Password"
-          subLabel={secureConfirmPassEntry ? 'Show' : 'Hide'}
-          secureTextEntry={secureConfirmPassEntry}
-          onChangeText={(val: string) => setConfirmPass(val)}
-          onPressText={() => setSecureConfirmPassEntry(!secureConfirmPassEntry)}
-          text={confirmPass}
-          subLabelTextStyle={styles.subLabelText}
-          error={passError}
+        <Controller
+          control={control}
+          name="password"
+          render={({ field, fieldState }) => (
+            <PTextInput
+              label="Password"
+              subLabel={securePassEntry ? 'Show' : 'Hide'}
+              secureTextEntry={securePassEntry}
+              onChangeText={field.onChange}
+              text={field.value}
+              onPressText={() => setSecurePassEntry(!securePassEntry)}
+              subLabelTextStyle={styles.subLabelText}
+              error={fieldState.error?.message}
+            />
+          )}
         />
-        <View style={styles.info}>
-          {renderItem('8-16 characters', checkedLength)}
-          {renderItem('Upper and lower case', checkedString)}
-          {renderItem('Numbers', checkedNumber)}
-          {renderItem('Special characters (ex: @#$)', checkedSpecial)}
-        </View>
-        <View style={styles.wrap}>
-          <CheckBox
-            value={agreed}
-            boxType="square"
-            onCheckColor={WHITE}
-            onFillColor={PRIMARY}
-            onTintColor={PRIMARY}
-            lineWidth={2}
-            onValueChange={setAgreed}
-            style={styles.checkBox}
-          />
-          <View style={styles.checkBoxLabel}>
-            <Text style={styles.txt}>
-              I agree to the Prometheus Alts
-              <Text
-                onPress={() =>
-                  Linking.openURL(
-                    'https://prometheusalts.com/legals/disclosure-library',
-                  )
-                }>
-                <Text style={styles.hyperText}> Terms</Text>
+        <Controller
+          control={control}
+          name="confirmPassword"
+          render={({ field, fieldState }) => (
+            <>
+              <PTextInput
+                label="Confirm Password"
+                subLabel={secureConfirmPassEntry ? 'Show' : 'Hide'}
+                secureTextEntry={secureConfirmPassEntry}
+                onChangeText={field.onChange}
+                text={field.value}
+                onPressText={() =>
+                  setSecureConfirmPassEntry(!secureConfirmPassEntry)
+                }
+                subLabelTextStyle={styles.subLabelText}
+                error={fieldState.error?.message}
+              />
+              <View style={styles.info}>
+                {passesRequirements.map(({ label, met }) => (
+                  <Fragment key={label}>{renderItem(label, met)}</Fragment>
+                ))}
+              </View>
+            </>
+          )}
+        />
+        <Controller
+          control={control}
+          name="acceptTerms"
+          render={({ field, fieldState }) => (
+            <>
+              <View style={styles.wrap}>
+                <CheckBox
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  boxType="square"
+                  onCheckColor={WHITE}
+                  onFillColor={PRIMARY}
+                  onTintColor={PRIMARY}
+                  lineWidth={2}
+                  style={styles.checkBox}
+                />
+                <View style={styles.checkBoxLabel}>
+                  <Text style={styles.txt}>
+                    I agree to the Prometheus Alts
+                    <Text
+                      onPress={() =>
+                        Linking.openURL(
+                          'https://prometheusalts.com/legals/disclosure-library',
+                        )
+                      }>
+                      <Text style={styles.hyperText}> Terms</Text>
+                    </Text>
+                    <Text style={styles.txt}>, </Text>
+                    <Text
+                      onPress={() =>
+                        Linking.openURL(
+                          'https://prometheusalts.com/legals/disclosure-library',
+                        )
+                      }>
+                      <Text style={styles.hyperText}> Community</Text>
+                    </Text>
+                    <Text style={styles.txt}> and </Text>
+                    <Text
+                      onPress={() =>
+                        Linking.openURL(
+                          'https://prometheusalts.com/legals/disclosure-library',
+                        )
+                      }>
+                      <Text style={styles.hyperText}>Privacy Policy</Text>
+                    </Text>
+                    <Text style={styles.txt}>.</Text>
+                  </Text>
+                </View>
+              </View>
+              <Text style={styles.error}>
+                {fieldState.error?.message ?? null}
               </Text>
-              <Text style={styles.txt}>, </Text>
-              <Text
-                onPress={() =>
-                  Linking.openURL(
-                    'https://prometheusalts.com/legals/disclosure-library',
-                  )
-                }>
-                <Text style={styles.hyperText}> Community</Text>
-              </Text>
-              <Text style={styles.txt}> and </Text>
-              <Text
-                onPress={() =>
-                  Linking.openURL(
-                    'https://prometheusalts.com/legals/disclosure-library',
-                  )
-                }>
-                <Text style={styles.hyperText}>Privacy Policy</Text>
-              </Text>
-              <Text style={styles.txt}>.</Text>
-            </Text>
-          </View>
-        </View>
+            </>
+          )}
+        />
+
         <PGradientButton
           label="SIGN UP"
           btnContainer={styles.btnContainer}
-          onPress={handleNextPage}
-          disabled={disabled}
+          onPress={handleSubmit(onSubmit)}
+          disabled={!isValid && oAuthProvider === ''}
+          isLoading={loading}
         />
         {/**
-          * Hide until approach to bots has been finalized.
-          <PTextLine title="OR, SIGN UP WITH" containerStyle={styles.bottom} />
-          <View style={styles.row}>
-            <TouchableOpacity style={styles.icon}>
-              <AppleSvg />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.icon}>
-              <LinkedinSvg />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.icon}>
-              <GoogleSvg />
-            </TouchableOpacity>
-          </View>
+          * Hide until these are configured 6/6/22
+        <PTextLine title="OR, SIGN UP WITH" containerStyle={styles.bottom} />
+        <View style={styles.row}>
+          <TouchableOpacity style={styles.icon}>
+            <LinkedinSvg />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.icon}
+            onPress={() => handleRegisterOAuth('apple')}>
+            <AppleSvg />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.icon}
+            onPress={() => handleRegisterOAuth('google')}>
+            <GoogleSvg />
+          </TouchableOpacity>
+        </View>
         */}
       </PAppContainer>
     </SafeAreaView>
@@ -271,8 +367,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: BLACK,
   },
-  header: {
-    marginBottom: 28,
+  title: {
+    marginTop: 30,
+    marginBottom: 4,
   },
   textContainer: {
     marginTop: 21,
@@ -350,5 +447,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
+  },
+  error: {
+    color: DANGER,
+    ...Body3,
+    marginBottom: 10,
+    height: 12,
   },
 });

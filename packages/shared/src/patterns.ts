@@ -1,11 +1,27 @@
-export const EMAIL_PATTERN =
-  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/i;
-export const NAME_PATTERN = /^[a-zA-Z]+(\s+[a-zA-Z]+)*$/i;
-export const SSN_PATTERN = /^(?!(000|666|9))\d{3}-(?!00)\d{2}-(?!0000)\d{4}$/i;
-export const ZIPCODE_PATTERN = /^[0-9]{5}(?:-[0-9]{4})?$/i;
-export const PHONE_PATTERN = /^\d{3}-\d{3}-\d{4}$/i;
-export const PASSWORD_PATTERN =
-  /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&.^]).{8,}$/;
+export const passwordRequirements = [
+  {
+    label: "Upper and lower case",
+    pattern: /(?=.*[a-z])(?=.*[A-Z])/,
+  },
+  {
+    label: "Numbers",
+    pattern: /(?=.*\d)/,
+  },
+  {
+    label: "Special characters (ex: @$!%*?&.^#)",
+    pattern: /(?=.*[@$!%*?&.^#])/,
+  },
+  {
+    label: "8+ characters",
+    pattern: /.{8,}/,
+  },
+];
+export const PASSWORD_PATTERN = new RegExp(
+  `^${passwordRequirements
+    .map((requirement) => requirement.pattern.source)
+    .join("")}$`
+);
+
 export const LINK_PATTERN =
   /((?:(?:https|http|ftp):\/\/)?(?:www\.)?(?:[-a-zA-Z\d@:%._+~#=]{2,256}\.[a-z]{2,6}\b)+(?:\/[/\d\w.\-?=&%+#]+)?)/gim;
 export const TAG_PATTERN = /(^|\W)([$|#]\D\w*)/gim;

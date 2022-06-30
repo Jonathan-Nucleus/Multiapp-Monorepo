@@ -22,7 +22,7 @@ import Avatar from '../../../../components/common/Avatar';
 import pStyles from 'mobile/src/theme/pStyles';
 import { Body1Bold, Body2, Body2Bold } from 'mobile/src/theme/fonts';
 
-import { showMessage } from 'mobile/src/services/utils';
+import { showMessage } from 'mobile/src/services/ToastService';
 import { useAccountContext } from 'shared/context/Account';
 import { useInvites } from 'shared/graphql/query/account/useInvites';
 import { useInviteUser } from 'shared/graphql/mutation/account/useInviteUser';

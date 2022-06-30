@@ -9,7 +9,7 @@ import {
 } from 'phosphor-react-native';
 
 import SelectionModal from 'mobile/src/components/common/SelectionModal';
-import { showMessage } from 'mobile/src/services/utils';
+import { showMessage } from 'mobile/src/services/ToastService';
 import { WHITE } from 'shared/src/colors';
 import { SOMETHING_WRONG } from 'shared/src/constants';
 

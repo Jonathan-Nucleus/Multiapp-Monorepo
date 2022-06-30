@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
-import dayjs from 'dayjs';
 
 import PLabel from '../../common/PLabel';
 import { PostMedia } from '../../common/Media';
@@ -9,6 +8,7 @@ import { WHITE12 } from 'shared/src/colors';
 
 import { Post } from 'shared/graphql/query/post/usePosts';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
+import { getPostTime } from "../../../utils/dateTimeUtil";
 
 interface FeedItemProps {
   post: Post;
@@ -52,7 +52,7 @@ const FeaturedItem: React.FC<FeedItemProps> = ({ post }) => {
             <UserInfo
               user={user || company}
               avatarSize={56}
-              auxInfo={dayjs(post.createdAt).format('MMM D')}
+              auxInfo={getPostTime(post.createdAt)}
             />
           </View>
         </Pressable>

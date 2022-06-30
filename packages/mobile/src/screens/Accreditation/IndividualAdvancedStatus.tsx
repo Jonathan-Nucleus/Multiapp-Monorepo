@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import PLabel from 'mobile/src/components/common/PLabel';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import AccreditationHeader from './AccreditationHeader';
-import { showMessage } from 'mobile/src/services/utils';
+import { showMessage } from 'mobile/src/services/ToastService';
 import pStyles from 'mobile/src/theme/pStyles';
 import { Body1Bold, H6Bold } from 'mobile/src/theme/fonts';
 import { BLACK, GRAY100, WHITE, WHITE60 } from 'shared/src/colors';

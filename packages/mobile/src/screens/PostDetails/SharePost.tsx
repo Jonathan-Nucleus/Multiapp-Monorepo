@@ -34,7 +34,7 @@ import ExpandingInput, {
   OnSelectUser,
 } from 'mobile/src/components/common/ExpandingInput';
 import MentionsList from 'mobile/src/components/main/MentionsList';
-import { showMessage } from 'mobile/src/services/utils';
+import { showMessage } from 'mobile/src/services/ToastService';
 import pStyles from 'mobile/src/theme/pStyles';
 import {
   WHITE60,

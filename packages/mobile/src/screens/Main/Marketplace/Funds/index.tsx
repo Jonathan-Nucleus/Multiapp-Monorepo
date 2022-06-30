@@ -67,8 +67,8 @@ const Funds: FundsScreen = () => {
   }
 
   const keyExtractor = (item: Fund): string => item._id;
-  const renderItem: ListRenderItem<Fund> = ({ item, index }) => {
-    return <FundItem fund={item} index={index} />;
+  const renderItem: ListRenderItem<Fund> = ({ item }) => {
+    return <FundItem fund={item} />;
   };
 
   return (

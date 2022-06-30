@@ -1,16 +1,17 @@
 import 'react-native-gesture-handler';
 
-import React, {ReactElement, useEffect, useState} from 'react';
-import { StatusBar } from 'react-native';
+import React, { ReactElement, useEffect } from 'react';
+import { StatusBar, LogBox } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ApolloProvider } from '@apollo/react-hooks';
-import Toast from 'react-native-toast-message';
 
 import AppNavigator from './navigations/AppNavigator';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import { useInitializeClient } from './services/apolloClient';
 import { start } from './services/PushNotificationService';
 import pStyles from 'mobile/src/theme/pStyles';
+
+import Toast from 'mobile/src/services/ToastService';
 
 import {
   DdSdkReactNative,
@@ -27,9 +28,6 @@ const config = new DdSdkReactNativeConfiguration(
 );
 config.site = 'US';
 config.nativeCrashReportEnabled = true;
-
-import { LogBox } from 'react-native';
-import { toastConfig } from './utils/toastUtil';
 
 LogBox.ignoreAllLogs();
 
@@ -50,7 +48,7 @@ const App = (): ReactElement => {
     <ApolloProvider client={client}>
       <SafeAreaProvider style={pStyles.globalContainer}>
         <AppNavigator />
-        <Toast config={toastConfig} />
+        <Toast />
       </SafeAreaProvider>
     </ApolloProvider>
   );

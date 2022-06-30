@@ -1,11 +1,14 @@
 import React, { FC, PropsWithChildren, useEffect } from 'react';
 import { NotificationsProvider } from 'shared/context/Notifications';
 
-import { navigate } from 'mobile/src/services/navigation/NavigationService';
+import {
+  navigate,
+  currentRoute,
+} from 'mobile/src/services/navigation/NavigationService';
 import messaging, {
   FirebaseMessagingTypes,
 } from '@react-native-firebase/messaging';
-import { showMessage } from 'mobile/src/services/utils';
+import { showMessage } from 'mobile/src/services/ToastService';
 import { useNotificationsContext } from 'shared/context/Notifications';
 
 const NotificationsManager: FC<PropsWithChildren<unknown>> = ({ children }) => {
@@ -66,13 +69,21 @@ const NotificationsManager: FC<PropsWithChildren<unknown>> = ({ children }) => {
     const unsubscribe = messaging().onMessage(async (remoteMessage) => {
       // refetch notification logic
       console.log('A new FCM message arrived!', JSON.stringify(remoteMessage));
+      const route = currentRoute();
+      const channelId = (route?.params as Record<string, unknown> | undefined)
+        ?.channelId as string | undefined;
+      const messageChannelId = remoteMessage?.data?.cid as string | undefined;
+
+      refetch();
+      if (channelId && messageChannelId && channelId === messageChannelId) {
+        return;
+      }
+
       showMessage(
         'info',
         remoteMessage.notification?.title || '',
         remoteMessage.notification?.body,
       );
-
-      refetch();
     });
     return unsubscribe;
   }, [refetch]);

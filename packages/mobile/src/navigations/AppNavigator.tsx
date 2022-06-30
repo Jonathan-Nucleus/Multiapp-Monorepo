@@ -34,7 +34,6 @@ import { Accreditation } from 'shared/graphql/mutation/account/useSaveQuestionna
 import { useRequiresUpdate } from 'shared/graphql/query/user/useRequiresUpdate';
 
 import { AccountProvider } from 'shared/context/Account';
-import { DeviceEventEmitter } from 'react-native';
 
 const defaultScreenOptions = {
   headerShown: false,
