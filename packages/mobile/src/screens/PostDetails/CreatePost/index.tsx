@@ -37,7 +37,7 @@ import PModal from 'mobile/src/components/common/PModal';
 import RoundIcon from 'mobile/src/components/common/RoundIcon';
 import PreviewLink from 'mobile/src/components/common/PreviewLink';
 import { PostMedia } from 'mobile/src/components/common/Media';
-import { showMessage } from 'mobile/src/services/ToastService';
+import { showMessage } from 'mobile/src/services/utils';
 import pStyles from 'mobile/src/theme/pStyles';
 import {
   WHITE60,

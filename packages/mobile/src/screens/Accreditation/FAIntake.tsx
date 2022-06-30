@@ -12,7 +12,7 @@ import PTextInput from 'mobile/src/components/common/PTextInput';
 import SegmentedInput from 'mobile/src/components/common/SegmentedInput';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import AccreditationHeader from './AccreditationHeader';
-import { showMessage } from 'mobile/src/services/ToastService';
+import { showMessage } from 'mobile/src/services/utils';
 import pStyles from 'mobile/src/theme/pStyles';
 import { Body1Bold, Body2Bold, H6Bold } from 'mobile/src/theme/fonts';
 import { BLACK, GRAY100, GRAY600, WHITE } from 'shared/src/colors';

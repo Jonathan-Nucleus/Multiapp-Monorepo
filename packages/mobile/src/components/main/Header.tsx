@@ -1,11 +1,11 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
-  View,
-  StyleSheet,
-  ViewStyle,
-  Pressable,
-  Text,
-  StyleProp,
+    View,
+    StyleSheet,
+    ViewStyle,
+    Pressable,
+    Text,
+    StyleProp, DeviceEventEmitter,
 } from 'react-native';
 
 import Avatar from '../common/Avatar';
@@ -22,6 +22,9 @@ import { H6, Body3 } from '../../theme/fonts';
 
 import { useAccountContext } from 'shared/context/Account';
 import { useNotificationsContext } from 'shared/context/Notifications';
+import Tooltip from "react-native-walkthrough-tooltip";
+import {useNavigation} from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface HeaderProps {
   containerStyle?: StyleProp<ViewStyle>;
@@ -43,10 +46,43 @@ const MainHeader: React.FC<HeaderProps> = (props) => {
   } = props;
   const account = useAccountContext();
   const { notifications } = useNotificationsContext();
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [isUploadTutorial, setIsUploadTutorial] = useState(false);
+  const navigation  = useNavigation();
 
   const newNotificationCount = notifications.filter(
     (notification) => notification.isNew,
   ).length;
+
+    useEffect(() => {
+        DeviceEventEmitter.addListener('headerTutorial', () => {
+           setShowTutorial(true);
+            // do something
+            console.log('Hello World! from homeTutorial');
+        });
+        // emitter.remove();
+    });
+
+    const setHomeTutorialDone = async(gotoUploadPage = false) => {
+        setShowTutorial(false);
+        if(gotoUploadPage) {
+            await AsyncStorage.setItem('homePageTutorial', JSON.stringify(true));
+            NavigationService.navigate('UserDetails', {
+                screen: 'UserProfile',
+                params: {
+                    userId: account._id,
+                },
+            })
+        } else {
+            await AsyncStorage.setItem('homePageTutorial', JSON.stringify(true));
+        }
+    }
+
+    const changeTutorialView = () => {
+        setShowTutorial(false);
+        setIsUploadTutorial(true);
+        setShowTutorial(true);
+    }
 
   return (
     <PHeader
@@ -87,6 +123,29 @@ const MainHeader: React.FC<HeaderProps> = (props) => {
                 </View>
               ) : null}
             </Pressable>
+              <Tooltip
+                  isVisible={showTutorial}
+                  content={
+                      isUploadTutorial ? <View style={{...pStyles.tooltipContainer, flex: 1, alignItems: 'center', justifyContent: 'flex-start'}}>
+                              <Pressable onPress={() =>  setHomeTutorialDone(true)} style={{...pStyles.tooltipButton, width: 130}}>
+                                  <Text style={pStyles.tooltipButtonText}>Upload</Text>
+                              </Pressable>
+                              <Pressable onPress={() =>  setHomeTutorialDone()} style={{...pStyles.tooltipButtonOutline, width: 130}}>
+                                  <Text style={pStyles.tooltipButtonOutlineText}>Skip this Step</Text>
+                              </Pressable>
+                      </View> :
+                          <View style={{...pStyles.tooltipContainer}}>
+                              <Text style={pStyles.tooltipText}>
+                                  Tap here to go to your profile.
+                              </Text>
+                              <Pressable onPress={() =>  changeTutorialView()} style={pStyles.tooltipButton}>
+                                  <Text style={pStyles.tooltipButtonText}>Next</Text>
+                              </Pressable>
+                          </View>
+                  }
+                  contentStyle={pStyles.tooltipContent}
+                  placement="bottom"
+                  onClose={() => console.log('')}>
             <Pressable
               style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}
               onPress={() =>
@@ -99,6 +158,7 @@ const MainHeader: React.FC<HeaderProps> = (props) => {
               }>
               <Avatar user={account} size={32} />
             </Pressable>
+              </Tooltip>
           </View>
         )
       }

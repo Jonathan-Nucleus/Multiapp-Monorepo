@@ -39,12 +39,14 @@ import { useWatchFund } from 'shared/graphql/mutation/funds/useWatchFund';
 export type Fund = FundSummary & FundManager & FundCompany;
 export interface FundProfileInfo {
   fund: Fund;
+  category?: string;
   highlightManager?: boolean;
   showTags?: boolean;
 }
 
 const FundProfileInfo: FC<FundProfileInfo> = ({
   fund,
+  category,
   highlightManager = false,
   showTags = false,
 }) => {
@@ -214,7 +216,13 @@ const FundProfileInfo: FC<FundProfileInfo> = ({
             </View>
           </Pressable>
         )}
-        {fund.highlights && fund.highlights.length > 0 && (
+        {fund.limitedView && fund.company.tagline ? (
+          <PLabel
+            label={fund.company.tagline}
+            textStyle={styles.highlightLabel}
+          />
+        ) : null}
+        {!fund.limitedView && fund.highlights && fund.highlights.length > 0 && (
           <View>
             <PLabel label="Fund Highlights" textStyle={styles.sectionTitle} />
             {fund.highlights.map((item, index) => (

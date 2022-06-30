@@ -9,7 +9,7 @@ import {
 } from 'phosphor-react-native';
 
 import SelectionModal from 'mobile/src/components/common/SelectionModal';
-import { showMessage } from 'mobile/src/services/ToastService';
+import { showMessage } from 'mobile/src/services/utils';
 import { WHITE } from 'shared/src/colors';
 import { SOMETHING_WRONG } from 'shared/src/constants';
 
@@ -192,7 +192,7 @@ const UserPostActionModal: React.FC<UserPostActionModalProps> = ({
       });
 
       data?.reportPost
-        ? showMessage('success', 'Thanks for letting us know')
+        ? showMessage('customizedSuccess', 'Thanks for letting us know')
         : showMessage('error', SOMETHING_WRONG);
     } catch (err) {
       showMessage('error', SOMETHING_WRONG);

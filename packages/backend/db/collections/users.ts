@@ -472,49 +472,6 @@ const createUsersCollection = (
       return user;
     },
 
-    /**
-     * Changes the password for an authenticated user. This should only be used
-     * for endpoints that are secured (i.e., the user is already logged into)
-     * the app and wants to change their password. For a forgot password flow,
-     * resetPassword() should be used.
-     *
-     * @param oldPassword   The original password.
-     * @param newPassword   The new password.
-     * @param email         The email address of the user.
-     *
-     * @returns   The user record if the password could successfully be changed
-     *            and null otherwise.
-     */
-    updatePassword: async (
-      oldPassword: string,
-      newPasword: string,
-      email: string
-    ): Promise<User.Mongo> => {
-      const user = await usersCollection.findOne({
-        email,
-        deletedAt: { $exists: false },
-      });
-      if (!user) {
-        throw new NotFoundError();
-      }
-      if (!isUser(user) || !user.salt) {
-        throw new UnprocessableEntityError("Invalid user.");
-      }
-      if (hashPassword(oldPassword, user.salt) != user.password) {
-        throw new InvalidateError("password", "password is not correct");
-      }
-
-      const salt = crypto.randomBytes(SALT_LENGTH).toString("hex");
-      const hash = hashPassword(newPasword, salt);
-
-      await usersCollection.updateOne(
-        { _id: user._id },
-        { $set: { password: hash, salt, emailToken: "" } }
-      );
-
-      return user;
-    },
-
     /*
      * Verifies and invite code used to determine whethers users can continue
      * to registration. Note, this is only used as a preliminary screen and

@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
+import dayjs from 'dayjs';
 import { DotsThreeVertical } from 'phosphor-react-native';
 
 import UserInfo from 'mobile/src/components/common/UserInfo';
@@ -17,7 +18,6 @@ import SharePostItem from 'mobile/src/components/main/posts/SharePostItem';
 import { Post } from 'shared/graphql/query/post/usePosts';
 
 import { useAccount } from 'shared/graphql/query/account/useAccount';
-import { getPostTime } from '../../../../../utils/dateTimeUtil';
 
 export interface PostContentProps {
   post: Post;
@@ -86,7 +86,7 @@ const PostContent: React.FC<PostContentProps> = ({
           <UserInfo
             user={user || company}
             avatarSize={56}
-            auxInfo={getPostTime(post.createdAt)}
+            auxInfo={dayjs(post.createdAt).format('MMM D')}
             audienceInfo={post.audience}
           />
         </Pressable>

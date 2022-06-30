@@ -57,7 +57,6 @@ const schema = gql`
     loginOAuth(user: OAuthUserInput!): String
     requestPasswordReset(email: String!): Boolean!
     resetPassword(password: String!, token: String!): String
-    updatePassword(oldPassword: String!, newPassword: String!): String
     requestInvite(email: String!): Boolean
     inviteUser(email: String!): Boolean!
     updateSettings(settings: SettingsInput!): Boolean
@@ -308,34 +307,6 @@ const resolvers = {
       const deserializedUser = await db.users.deserialize(user._id);
       return getAccessToken(deserializedUser);
     },
-
-    updatePassword: secureEndpoint(
-      async (
-        parentIgnored,
-        args: { oldPassword: string; newPassword: string },
-        { db, user }
-      ): Promise<AccessToken | null> => {
-        const validator = yup
-          .object()
-          .shape({
-            oldPassword: yup.string().required(),
-            newPassword: yup.string().required(),
-          })
-          .required();
-
-        validateArgs(validator, args);
-
-        const { oldPassword, newPassword } = args;
-        const updatedUser = await db.users.updatePassword(
-          oldPassword,
-          newPassword,
-          user.email
-        );
-
-        const deserializedUser = await db.users.deserialize(updatedUser._id);
-        return getAccessToken(deserializedUser);
-      }
-    ),
 
     inviteUser: secureEndpoint(
       async (
