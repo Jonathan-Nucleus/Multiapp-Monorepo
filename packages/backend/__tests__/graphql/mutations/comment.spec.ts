@@ -1,7 +1,7 @@
 import { ApolloServer, gql } from "apollo-server";
 import * as FirebaseModule from "../../../lib/firebase-helper";
-import { createTestApolloServer } from "../../../lib/server";
-import { ErrorCode } from "../../../lib/validate";
+import { createTestApolloServer } from "../../../lib/apollo/server";
+import { ErrorCode } from "../../../lib/apollo/validate";
 import { User } from "../../../schemas/user";
 import {
   createPost,

@@ -1,6 +1,6 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import type { DeserializedUser } from "../db/collections/users";
-import { BadRequestError } from "./validate";
+import { BadRequestError } from "./apollo/validate";
 
 import "dotenv/config";
 

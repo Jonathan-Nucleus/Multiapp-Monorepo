@@ -6,7 +6,7 @@
 import { Collection } from "mongodb";
 import { MongoId, toObjectId, toObjectIds } from "../../lib/mongo-helper";
 import type { Company } from "../../schemas/company";
-import { InternalServerError, NotFoundError } from "../../lib/validate";
+import { InternalServerError, NotFoundError } from "../../lib/apollo/validate";
 import { createSearchStage } from "../../lib/utils";
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */

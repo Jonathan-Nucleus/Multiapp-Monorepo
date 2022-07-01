@@ -7,7 +7,7 @@ import _ from "lodash";
 import { Collection, ObjectId } from "mongodb";
 import { sendPushNotification } from "../../lib/firebase-helper";
 import { MongoId, toObjectId } from "../../lib/mongo-helper";
-import { InternalServerError, NotFoundError } from "../../lib/validate";
+import { InternalServerError, NotFoundError } from "../../lib/apollo/validate";
 import {
   generateNotification,
   Notification,

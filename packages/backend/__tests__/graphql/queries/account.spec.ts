@@ -1,5 +1,5 @@
 import { ApolloServer, gql } from "apollo-server";
-import { createTestApolloServer } from "../../../lib/server";
+import { createTestApolloServer } from "../../../lib/apollo/server";
 import { User } from "../../../schemas/user";
 import { Post } from "../../../schemas/post";
 import {
@@ -10,7 +10,7 @@ import {
   getErrorCode,
 } from "../../config/utils";
 import { Company } from "../../../schemas/company";
-import { ErrorCode } from "../../../lib/validate";
+import { ErrorCode } from "../../../lib/apollo/validate";
 import { getIgniteDb } from "../../../db";
 
 describe("Query - account", () => {

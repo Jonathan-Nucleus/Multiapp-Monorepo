@@ -5,7 +5,7 @@
 
 import { Collection, ObjectId, UpdateFilter } from "mongodb";
 import { MongoId, toObjectId, toObjectIds } from "../../lib/mongo-helper";
-import { NotFoundError } from "../../lib/validate";
+import { NotFoundError } from "../../lib/apollo/validate";
 import type { Comment } from "../../schemas/comment";
 import type { Post } from "../../schemas/post";
 

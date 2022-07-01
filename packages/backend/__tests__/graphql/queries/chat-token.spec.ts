@@ -1,7 +1,7 @@
 import faker from "@faker-js/faker";
 import { ApolloServer, gql } from "apollo-server";
 import { StreamChat } from "stream-chat";
-import { createTestApolloServer } from "../../../lib/server";
+import { createTestApolloServer } from "../../../lib/apollo/server";
 import { User } from "../../../schemas/user";
 import { createUser } from "../../config/utils";
 

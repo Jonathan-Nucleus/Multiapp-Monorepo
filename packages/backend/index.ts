@@ -1,5 +1,5 @@
 import { initializeFirebase } from "./lib/firebase-helper";
-import { createApolloServer } from "./lib/server";
+import { createApolloServer } from "./lib/apollo/server";
 
 initializeFirebase();
 

@@ -3,7 +3,7 @@ import {
   PartialSchema,
   ApolloServerContext,
   NoArgs,
-} from "../lib/apollo-helper";
+} from "../lib/apollo/apollo-helper";
 
 import type { Comment } from "../schemas/comment";
 import { CommentSchema } from "../schemas/comment";

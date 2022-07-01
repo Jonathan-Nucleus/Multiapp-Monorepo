@@ -49,7 +49,7 @@ import {
   InternalServerError,
   NotFoundError,
   UnprocessableEntityError,
-} from "../../lib/validate";
+} from "../../lib/apollo/validate";
 import { User, Accreditation } from "../../schemas/user";
 import { Company } from "../../schemas/company";
 import { createSearchStage } from "../../lib/utils";

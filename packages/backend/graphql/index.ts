@@ -1,5 +1,5 @@
 import { makeExecutableSchema } from "@graphql-tools/schema";
-import type { PartialSchema } from "../lib/apollo-helper";
+import type { PartialSchema } from "../lib/apollo/apollo-helper";
 
 import commentsDefinitions from "./comments.graphql";
 import companiesDefinitions from "./companies.graphql";

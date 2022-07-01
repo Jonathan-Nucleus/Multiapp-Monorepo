@@ -1,8 +1,8 @@
 import faker from "@faker-js/faker";
 import { ApolloServer, gql } from "apollo-server";
 import _ from "lodash";
-import { createTestApolloServer } from "../../../lib/server";
-import { ErrorCode } from "../../../lib/validate";
+import { createTestApolloServer } from "../../../lib/apollo/server";
+import { ErrorCode } from "../../../lib/apollo/validate";
 import { PostViolationOptions, User } from "../../../schemas/user";
 import { Post } from "../../../schemas/post";
 import {

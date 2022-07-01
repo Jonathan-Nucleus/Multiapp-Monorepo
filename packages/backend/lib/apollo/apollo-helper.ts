@@ -3,8 +3,8 @@ import { MongoError } from "mongodb";
 import { AuthenticationError, ApolloError } from "apollo-server-errors";
 import type { IResolvers } from "@graphql-tools/utils";
 
-import type { IgniteDb } from "../db";
-import type { User } from "../schemas/user";
+import type { IgniteDb } from "../../db";
+import type { User } from "../../schemas/user";
 import { InternalServerError } from "./validate";
 
 export type PartialSchema = {

@@ -1,6 +1,6 @@
 import { ApolloServer, gql } from "apollo-server";
 import _ from "lodash";
-import { createTestApolloServer } from "../../../lib/server";
+import { createTestApolloServer } from "../../../lib/apollo/server";
 import { User } from "../../../schemas/user";
 import { Notification } from "../../../schemas/notification";
 import { createNotification, createUser } from "../../config/utils";

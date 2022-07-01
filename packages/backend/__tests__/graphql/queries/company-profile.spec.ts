@@ -1,6 +1,6 @@
 import { ApolloServer, gql } from "apollo-server";
 import _ from "lodash";
-import { createTestApolloServer } from "../../../lib/server";
+import { createTestApolloServer } from "../../../lib/apollo/server";
 import { User } from "../../../schemas/user";
 import {
   createCompany,
@@ -9,7 +9,7 @@ import {
   getFieldError,
 } from "../../config/utils";
 import { Company } from "../../../schemas/company";
-import { ErrorCode } from "../../../lib/validate";
+import { ErrorCode } from "../../../lib/apollo/validate";
 import { toObjectId } from "../../../lib/mongo-helper";
 
 describe("Query - companyProfile", () => {

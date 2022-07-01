@@ -3,7 +3,7 @@ import {
   PartialSchema,
   ApolloServerContext,
   NoArgs,
-} from "../lib/apollo-helper";
+} from "../lib/apollo/apollo-helper";
 
 import { Notification, NotificationTypeOptions } from "../schemas/notification";
 import { NotificationSchema } from "../schemas/notification";

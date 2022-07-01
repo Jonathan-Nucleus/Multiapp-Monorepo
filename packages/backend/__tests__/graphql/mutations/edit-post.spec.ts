@@ -1,7 +1,7 @@
 import faker from "@faker-js/faker";
 import { ApolloServer, gql } from "apollo-server";
-import { createTestApolloServer } from "../../../lib/server";
-import { ErrorCode } from "../../../lib/validate";
+import { createTestApolloServer } from "../../../lib/apollo/server";
+import { ErrorCode } from "../../../lib/apollo/validate";
 import { User } from "../../../schemas/user";
 import { Company } from "../../../schemas/company";
 import {

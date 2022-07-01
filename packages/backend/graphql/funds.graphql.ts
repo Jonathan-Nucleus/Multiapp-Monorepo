@@ -3,7 +3,7 @@ import {
   PartialSchema,
   ApolloServerContext,
   NoArgs,
-} from "../lib/apollo-helper";
+} from "../lib/apollo/apollo-helper";
 
 import type { Fund } from "../schemas/fund";
 import type { AccreditationEnum } from "../schemas/user";

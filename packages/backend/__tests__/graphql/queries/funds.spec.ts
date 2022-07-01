@@ -1,6 +1,6 @@
 import { ApolloServer, gql } from "apollo-server";
 import _ from "lodash";
-import { createTestApolloServer } from "../../../lib/server";
+import { createTestApolloServer } from "../../../lib/apollo/server";
 import { User } from "../../../schemas/user";
 import { createCompany, createFund, createUser } from "../../config/utils";
 import { Fund } from "../../../schemas/fund";

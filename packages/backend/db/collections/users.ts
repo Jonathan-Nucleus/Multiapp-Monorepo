@@ -32,7 +32,7 @@ import {
   InvalidateError,
   NotFoundError,
   UnprocessableEntityError,
-} from "../../lib/validate";
+} from "../../lib/apollo/validate";
 
 import "dotenv/config";
 import { ERROR_CODES } from "../../lib/constants";

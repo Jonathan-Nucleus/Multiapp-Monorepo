@@ -12,13 +12,13 @@ import {
   PartialSchema,
   ApolloServerContext,
   secureEndpoint,
-} from "../lib/apollo-helper";
+} from "../lib/apollo/apollo-helper";
 import {
   isObjectId,
   NotFoundError,
   UnprocessableEntityError,
   validateArgs,
-} from "../lib/validate";
+} from "../lib/apollo/validate";
 
 import { User, isUser, compareAccreditation } from "../schemas/user";
 import type { Company } from "../schemas/company";

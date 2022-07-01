@@ -8,7 +8,7 @@ import {
   PartialSchema,
   ApolloServerContext,
   secureEndpoint,
-} from "../lib/apollo-helper";
+} from "../lib/apollo/apollo-helper";
 import {
   getAccessToken,
   getResetToken,
@@ -26,7 +26,7 @@ import {
   BadRequestError,
   validateArgs,
   InternalServerError,
-} from "../lib/validate";
+} from "../lib/apollo/validate";
 
 import {
   User,

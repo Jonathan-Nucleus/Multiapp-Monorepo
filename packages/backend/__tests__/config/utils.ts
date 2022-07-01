@@ -21,7 +21,7 @@ import { MongoId, toObjectId } from "../../lib/mongo-helper";
 import { Comment } from "../../schemas/comment";
 import { Company } from "../../schemas/company";
 import { Fund } from "../../schemas/fund";
-import { InternalServerError } from "../../lib/validate";
+import { InternalServerError } from "../../lib/apollo/validate";
 import { NotificationType, Notification } from "../../schemas/notification";
 
 export const getFieldError = (

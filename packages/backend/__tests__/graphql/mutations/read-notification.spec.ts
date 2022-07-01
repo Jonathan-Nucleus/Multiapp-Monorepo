@@ -1,5 +1,5 @@
 import { ApolloServer, gql } from "apollo-server";
-import { createTestApolloServer } from "../../../lib/server";
+import { createTestApolloServer } from "../../../lib/apollo/server";
 import { User } from "../../../schemas/user";
 import { Notification } from "../../../schemas/notification";
 import {
@@ -10,7 +10,7 @@ import {
 } from "../../config/utils";
 import { getIgniteDb } from "../../../db";
 import { toObjectId } from "../../../lib/mongo-helper";
-import { ErrorCode } from "../../../lib/validate";
+import { ErrorCode } from "../../../lib/apollo/validate";
 
 describe("Mutations - readNotification", () => {
   const query = gql`

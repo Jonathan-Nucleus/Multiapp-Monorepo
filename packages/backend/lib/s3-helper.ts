@@ -12,7 +12,7 @@ import type { SignatureV4Init } from "@aws-sdk/signature-v4";
 import { v4 as uuid } from "uuid";
 import { formatUrl } from "@aws-sdk/util-format-url";
 
-import { InternalServerError } from "./validate";
+import { InternalServerError } from "./apollo/validate";
 
 import "dotenv/config";
 

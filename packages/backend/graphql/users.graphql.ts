@@ -4,7 +4,7 @@ import {
   ApolloServerContext,
   NoArgs,
   secureEndpoint,
-} from "../lib/apollo-helper";
+} from "../lib/apollo/apollo-helper";
 import {
   UserSchema,
   UserRoleOptions,
