@@ -116,6 +116,16 @@ export const UNIVERSAL_INVITE_CODES = [
   "435847",
   "D19ACE",
   "269038",
+  "5BQ2ZK",
+  "V2HSQW",
+  "9IOPE8",
+  "BV4E4E",
+  "PL77KF",
+  "27XLDQ",
+  "YJ6D4J",
+  "Z6QWPS",
+  "UWTKXU",
+  "K2Q06A",
 ];
 
 const MICHAEL_USER_ID = "628fee97fef84ea6746e08fb";
