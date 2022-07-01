@@ -76,7 +76,6 @@ const FollowModal: FC<ModalProps> = ({
   return (
     <Modal
       isVisible={isVisible}
-      swipeDirection="down"
       animationIn="slideInUp"
       animationInTiming={400}
       animationOut="slideOutDown"
