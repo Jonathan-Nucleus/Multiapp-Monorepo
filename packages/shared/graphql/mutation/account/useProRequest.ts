@@ -2,6 +2,7 @@ import { gql, MutationTuple, useMutation } from "@apollo/client";
 
 export type ProRequest = {
   role: string;
+  otherRole: string;
   email: string;
   organization: string;
   position: string;

@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  TouchableOpacity,
-  Pressable,
-} from 'react-native';
+import { StyleSheet, View, Text, Pressable } from 'react-native';
 import { CaretLeft, ShieldCheck } from 'phosphor-react-native';
 import {
   useForm,
@@ -39,6 +33,13 @@ type FormValues = ProRequest;
 const schema = yup
   .object({
     role: yup.string().required('Required').default(''),
+    otherRole: yup
+      .string()
+      .when('role', {
+        is: 'OTHER',
+        then: yup.string().required(),
+      })
+      .default(''),
     email: yup.string().email().required('Required').default(''),
     organization: yup.string().required('Required').default(''),
     position: yup.string().required('Required').default(''),
@@ -57,6 +58,7 @@ const BecomePro: BecomeProScreen = ({ navigation }) => {
   const {
     handleSubmit,
     control,
+    watch,
     formState: { isValid },
   } = useForm<yup.InferType<typeof schema>>({
     resolver: yupResolver(schema),
@@ -67,8 +69,11 @@ const BecomePro: BecomeProScreen = ({ navigation }) => {
     ) as DefaultValues<FormValues>,
   });
 
+  const watchRole = watch('role');
+
   const onSubmit: SubmitHandler<FormValues> = async ({
     role,
+    otherRole,
     email,
     organization,
     position,
@@ -79,6 +84,7 @@ const BecomePro: BecomeProScreen = ({ navigation }) => {
         variables: {
           request: {
             role,
+            otherRole,
             email,
             organization,
             position,
@@ -103,17 +109,42 @@ const BecomePro: BecomeProScreen = ({ navigation }) => {
       />
       <PAppContainer>
         <PTitle
-          title="Are you a pro?"
+          title="Are you a Pro?"
           style={styles.textContainer}
           textStyle={styles.title}
         />
         <Text style={styles.description}>
-          Verified pros have a green badge{' '}
+          Verified Pros have a green badge{' '}
           <ShieldCheck size={14} color={SUCCESS} weight="fill" /> next to their
           name to show that Prometheus has confirmed their status as a
           professional.
         </Text>
         <PPicker control={control} name="role" label="I am a" options={ROLES} />
+        {watchRole === 'OTHER' && (
+          <Controller
+            control={control}
+            name="otherRole"
+            render={({ field, fieldState }) => (
+              <PTextInput
+                label="What is your title"
+                onChangeText={field.onChange}
+                text={field.value}
+                multiline={true}
+                underlineColorAndroid="transparent"
+                numberOfLines={4}
+                labelTextStyle={styles.label}
+                textContainerStyle={[
+                  styles.inputContainerStyle,
+                  styles.longInput,
+                ]}
+                error={fieldState.error?.message}
+                autoCapitalize="sentences"
+                autoCorrect={true}
+                maxLength={100}
+              />
+            )}
+          />
+        )}
         <Controller
           control={control}
           name="email"

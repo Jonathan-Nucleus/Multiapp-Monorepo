@@ -94,6 +94,7 @@ describe("Mutations - proRequest", () => {
         request: {
           ...requestData,
           role: "OTHER",
+          otherRole: "Developer",
           organization: "test organizations",
         },
       },

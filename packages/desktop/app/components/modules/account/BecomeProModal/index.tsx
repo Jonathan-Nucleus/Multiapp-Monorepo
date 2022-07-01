@@ -18,6 +18,7 @@ const ROLES = Object.keys(ProRoleOptions).map((option) => ({
 
 type FormValues = {
   role: string;
+  otherRole: string;
   organization?: string;
   email: string;
   position: string;
@@ -26,6 +27,13 @@ type FormValues = {
 
 const schema = yup.object({
   role: yup.string().default("").required("Required"),
+  otherRole: yup
+    .string()
+    .when("role", {
+      is: "OTHER",
+      then: yup.string().required(),
+    })
+    .default(""),
   organization: yup.string().when("role", {
     is: "OTHER",
     then: (schema) => schema.default("").required("Required"),
@@ -48,6 +56,7 @@ const BecomeProModal: FC<BecomeProModalProps> = ({ show, onClose }) => {
   const { isValid } = formState;
   const onSubmit: SubmitHandler<FormValues> = async ({
     role,
+    otherRole,
     email,
     organization,
     info,
@@ -59,6 +68,7 @@ const BecomeProModal: FC<BecomeProModalProps> = ({ show, onClose }) => {
         variables: {
           request: {
             role,
+            otherRole,
             email,
             organization: organization ?? "",
             info: info ?? "",

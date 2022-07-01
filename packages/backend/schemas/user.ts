@@ -251,6 +251,7 @@ export type QuestionnaireInput = {
 
 export interface ProRequest {
   role: ProRoleEnum;
+  otherRole?: string;
   email: string;
   organization?: string;
   position: string;
@@ -456,23 +457,27 @@ export type PostViolationEnum = keyof typeof PostViolationOptions;
 export const ProRoleOptions = {
   MANAGER: {
     value: "manager",
-    label: "Fund manager",
+    label: "Buy-side Fund Manager/Analyst",
+  },
+  ANALYST: {
+    value: "analyst",
+    label: "Sell-side Research Analyst",
+  },
+  ALLOCATOR: {
+    value: "allocator",
+    label: "Institutional/Family Office Allocator",
+  },
+  ADVISOR: {
+    value: "advisor",
+    label: "RIA/Wealth Advisor",
   },
   JOURNALIST: {
     value: "journalist",
-    label: "Journalist",
+    label: "Financial Journalist/Content Creator",
   },
-  C_LEVEL: {
-    value: "c-level",
-    label: "C level manager",
-  },
-  FOUNDER: {
-    value: "founder",
-    label: "Promotional content",
-  },
-  EX_MANAGER: {
-    value: "ex-manager",
-    label: "Ex fund manager",
+  C_SUITE: {
+    value: "c-suite",
+    label: "C-Suite Executive",
   },
   OTHER: {
     value: "other",
@@ -612,6 +617,7 @@ export const UserSchema = `
 
   input ProRequestInput {
     role: ProRole!
+    otherRole: String
     email: String!
     organization: String
     position: String!

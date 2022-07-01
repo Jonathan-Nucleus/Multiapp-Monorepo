@@ -607,6 +607,10 @@ const resolvers = {
                     Object.values(ProRoleOptions).map((option) => option.value)
                   )
                   .required(),
+                otherRole: yup.string().when("role", {
+                  is: "other",
+                  then: yup.string().required(),
+                }),
                 email: yup.string().email().required(),
                 organization: yup.string().when("role", {
                   is: "other",
