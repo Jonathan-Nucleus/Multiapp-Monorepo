@@ -18,14 +18,16 @@ const PreviewLink: React.FC<PostHeaderProps> = ({
   containerStyle,
 }) => {
   const previewImage = previewData.images?.find((image) => !!image);
-  const previewFavicon = previewData.favicons?.find((image) => !!image);
+  if (!previewImage) {
+    return null;
+  }
 
   return (
     <View style={[styles.containerStyle, containerStyle]}>
       <View style={styles.previewContainer}>
         <View style={styles.metaDataContainer}>
           <FastImage
-            source={{ uri: previewImage || previewFavicon }}
+            source={{ uri: previewImage }}
             style={styles.previewImage}
           />
           <PLabel label={previewData.title || ''} textStyle={styles.title} />

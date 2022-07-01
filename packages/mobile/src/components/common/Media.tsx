@@ -17,6 +17,7 @@ import { S3_BUCKET } from 'react-native-dotenv';
 
 interface MediaProps {
   media: MediaType;
+  controls?: boolean;
   style?: StyleProp<ImageStyle>;
   resizeMode?: 'contain' | 'cover';
   onLoad?: VideoProperties['onLoad'];
@@ -73,6 +74,7 @@ const Media: FC<MediaProps> = ({
   media,
   style,
   onLoad,
+  controls = true,
   resizeMode = 'cover',
   type = 'post',
 }) => {
@@ -138,6 +140,7 @@ const Media: FC<MediaProps> = ({
       ]}>
       <View style={[styles.videoContainer, style]}>
         <Video
+          key={media.url}
           ref={(ref) => (player.current = ref)}
           source={{
             uri: media.url.includes('/') ? media.url : mediaUrl,
@@ -146,7 +149,7 @@ const Media: FC<MediaProps> = ({
           onLoad={onLoad}
           onError={(err) => console.log('error', err)}
           onEnd={onVideoEnd}
-          controls={true}
+          controls={controls}
           onSeek={(data) => {
             if (data.seekTime === 0) {
               setPaused(true);

@@ -3,39 +3,6 @@
  * from a MongoDB database.
  */
 
-/**
- * Migration command.
- *
- * db.posts.aggregate([
-   {
-     $addFields: {
-       likeCount: {
-         $cond: {
-           if: { $not: "$likeIds" },
-           then: 0,
-           else: { $size: "$likeIds" },
-         },
-       },
-     },
-   },
-   { $out: "posts" },
- ]);
-  posts.likeCount
-  posts.commentCount
-  posts.shareCount
-  users.postCount
-  users.followerCount
-  users.followingCount
-  users.companyFollowerCount
-  users.companyFollowingCount
-  company.postCount
-  company.followerCount
-  company.followingCount
-  company.companyFollowerCount
-  company.companyFollowingCount
-  comments.likeCount
- */
-
 import { Collection, ObjectId, UpdateFilter } from "mongodb";
 import _ from "lodash";
 import { MongoId, toObjectId, toObjectIds } from "../../lib/mongo-helper";

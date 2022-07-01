@@ -93,28 +93,23 @@ export const generateNotification = (
   type: NotificationType,
   user: User.Mongo
 ): { title: string; body: string } => {
-  let title = "";
+  const title = "Prometheus";
   let body = "";
 
   switch (type) {
     case "followed-by-user":
-      title = "Followed";
       body = `${user.fullName} is following you.`;
       break;
     case "like-post":
-      title = "Liked";
       body = `${user.fullName} liked your post.`;
       break;
     case "comment-post":
-      title = "Commented";
       body = `${user.fullName} commented on your post`;
       break;
     case "tagged-in-post":
-      title = "Tagged";
       body = `${user.fullName} tagged you in a post`;
       break;
     case "tagged-in-comment":
-      title = "Tagged";
       body = `${user.fullName} tagged you in a comment`;
       break;
     default:

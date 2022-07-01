@@ -82,7 +82,15 @@ const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
       key={vid}
       style={styles.videoPreview}
       onPress={() => setVideoIndex(index)}>
-      <FundMedia media={{ url: vid, aspectRatio: 1.58 }} mediaId={fund._id} />
+      <View pointerEvents="none">
+        <FundMedia
+          media={{ url: vid, aspectRatio: 1.58 }}
+          mediaId={fund._id}
+          style={styles.videoPreviewItem}
+          controls={false}
+          onLoad={() => console.log('loaded')}
+        />
+      </View>
     </Pressable>
   );
 
@@ -91,7 +99,9 @@ const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
     ?.sort((a, b) => b.date.getTime() - a.date.getTime())?.[0];
 
   const goToPresentation = async (): Promise<void> => {
-    if (!presentation) return;
+    if (!presentation) {
+      return;
+    }
 
     try {
       const { data } = await fetchDocumentToken({
@@ -121,7 +131,7 @@ const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
           />
         </View>
       ) : null}
-      {/*fund.videos && fund.videos.length > 1 ? (
+      {fund.videos && fund.videos.length > 1 ? (
         <FlatList
           data={fund.videos}
           renderItem={renderVideo}
@@ -129,7 +139,7 @@ const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
           horizontal={true}
           style={styles.videoList}
         />
-      ) : null*/}
+      ) : null}
       <View style={styles.fundDetailsContainer}>
         <PLabel textStyle={styles.fund} label="Strategy Overview" />
         <PMarkdown>{fund.overview}</PMarkdown>
@@ -271,7 +281,14 @@ const styles = StyleSheet.create({
   },
   videoPreview: {
     width: 88,
-    backgroundColor: 'red',
+    borderColor: WHITE12,
+    borderWidth: 1,
+    borderRadius: 4,
+    marginRight: 16,
+  },
+  videoPreviewItem: {
+    borderRadius: 4,
+    marginVertical: 0,
   },
   videoList: {
     marginHorizontal: 16,
