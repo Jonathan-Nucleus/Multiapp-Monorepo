@@ -129,17 +129,11 @@ const BecomePro: BecomeProScreen = ({ navigation }) => {
                 label="What is your title"
                 onChangeText={field.onChange}
                 text={field.value}
-                multiline={true}
-                underlineColorAndroid="transparent"
-                numberOfLines={4}
                 labelTextStyle={styles.label}
-                textContainerStyle={[
-                  styles.inputContainerStyle,
-                  styles.longInput,
-                ]}
-                error={fieldState.error?.message}
+                textContainerStyle={styles.inputContainerStyle}
                 autoCapitalize="sentences"
                 autoCorrect={true}
+                error={fieldState.error?.message}
                 maxLength={100}
               />
             )}
