@@ -5,10 +5,10 @@ import path from "path";
 import ejs, { Data as EjsData } from "ejs";
 import dayjs from "dayjs";
 
-import { User, ReportedPost, PostViolationOptions } from "backend/schemas/user";
-import { Fund } from "backend/schemas/fund";
-import { Post } from "backend/schemas/post";
-import { HelpRequest } from "backend/schemas/help-request";
+import { User, ReportedPost, PostViolationOptions } from "../schemas/user";
+import { Fund } from "../schemas/fund";
+import { Post } from "../schemas/post";
+import { HelpRequest } from "../schemas/help-request";
 import {
   HelpRequestTypeMapping,
   PreferredTimeOfDayOptionsMapping,
