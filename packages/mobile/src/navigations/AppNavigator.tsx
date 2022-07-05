@@ -12,6 +12,7 @@ import {
   StackScreenProps,
 } from '@react-navigation/stack';
 import SplashScreen from 'react-native-splash-screen';
+import analytics from '@react-native-firebase/analytics';
 
 import * as NavigationService from '../services/navigation/NavigationService';
 import {
@@ -91,6 +92,13 @@ const AppNavigator = (): React.ReactElement => {
     console.log('Current: ', current);
     console.log('Prev: ', prev);
     routeNameRef.current = current;
+
+    if (prev !== current) {
+      await analytics().logScreenView({
+        screen_name: current,
+        screen_class: current,
+      });
+    }
   };
 
   if (authenticated === null) {

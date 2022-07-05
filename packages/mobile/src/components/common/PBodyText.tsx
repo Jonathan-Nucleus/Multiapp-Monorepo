@@ -13,7 +13,7 @@ import * as NavigationService from 'mobile/src/services/navigation/NavigationSer
 import pStyles from 'mobile/src/theme/pStyles';
 import { WHITE, PRIMARY } from 'shared/src/colors';
 
-import { processPost } from 'shared/src/patterns';
+import { processPost, TAG_PATTERN } from 'shared/src/patterns';
 
 interface PBodyTextProps {
   body?: string;
@@ -64,7 +64,10 @@ const PBodyText: FC<PBodyTextProps> = ({
         style={[styles.body, style]}
         selectable={true}>
         {processPost(body).map((split, index) => {
-          if (split.startsWith('$') || split.startsWith('#')) {
+          if (
+            (split.startsWith('$') || split.startsWith('#')) &&
+            split.match(TAG_PATTERN)
+          ) {
             return (
               <Text
                 key={`${split}-${index}`}

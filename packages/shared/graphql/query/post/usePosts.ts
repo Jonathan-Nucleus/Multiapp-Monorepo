@@ -4,7 +4,6 @@ import {
   useQuery,
   QueryResult,
   FetchMoreQueryOptions,
-  ApolloQueryResult,
   NetworkStatus,
 } from "@apollo/client";
 import _isEqual from "lodash/isEqual";

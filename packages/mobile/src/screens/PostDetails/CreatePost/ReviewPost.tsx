@@ -14,6 +14,7 @@ import { WHITE, PRIMARY } from 'shared/src/colors';
 import PostSelection from './PostSelection';
 import PostHeader from './PostHeader';
 import { PostMedia } from 'mobile/src/components/common/Media';
+import PBodyText from 'mobile/src/components/common/PBodyText';
 import { AUDIENCE_OPTIONS } from './index';
 
 import { useAccountContext } from 'shared/context/Account';
@@ -23,7 +24,6 @@ import {
   useLinkPreview,
   LinkPreview,
 } from 'shared/graphql/query/post/useLinkPreview';
-import { processPost } from 'shared/src/patterns';
 
 import { ReviewPostScreen } from 'mobile/src/navigations/PostDetailsStack';
 
@@ -167,36 +167,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
           <PostSelection icon={<GlobalSvg />} label={selectedAudienceLabel} />
         </View>
         <Text style={styles.body} selectable={true}>
-          {body
-            ? processPost(body).map((split, index) => {
-                if (split.startsWith('$') || split.startsWith('#')) {
-                  return (
-                    <Text key={`${split}-${index}`} style={styles.tagLink}>
-                      {split}
-                    </Text>
-                  );
-                } else if (split.startsWith('@') && split.includes('|')) {
-                  const [name, id] = split.substring(1).split('|');
-                  return (
-                    <Text key={id} style={styles.tagLink}>
-                      @{name}
-                    </Text>
-                  );
-                } else if (split.startsWith('%%')) {
-                  return (
-                    <Text key={`${split}-${index}`} style={styles.tagLink}>
-                      {split.substring(2)}
-                    </Text>
-                  );
-                } else {
-                  return (
-                    <React.Fragment key={`${split}-${index}`}>
-                      {split}
-                    </React.Fragment>
-                  );
-                }
-              })
-            : null}
+          {body ? <PBodyText body={body} collapseLongText={false} /> : null}
         </Text>
         {media ? (
           <View style={[styles.postImage, { aspectRatio: media.aspectRatio }]}>

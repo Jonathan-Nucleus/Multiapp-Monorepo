@@ -1,18 +1,10 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { gql, useQuery, useMutation } from "@apollo/client";
+import { gql, useMutation, useApolloClient } from "@apollo/client";
 import { useAccountContext } from "shared/context/Account";
 import {
   POST_SUMMARY_FRAGMENT,
   PostSummary,
 } from "shared/graphql/fragments/post";
-
-type PostData = {
-  post: PostSummary;
-};
-
-type PostVariables = {
-  postId: string;
-};
 
 type LikePostVariables = {
   like: boolean;
@@ -37,24 +29,15 @@ interface LikePostReturn {
  */
 export function useLikePost(id: string): LikePostReturn {
   const account = useAccountContext();
-  const { data: postData } = useQuery<PostData, PostVariables>(
-    gql`
+  const client = useApolloClient();
+  const post = client.readFragment({
+    id: `Post:${id}`,
+    fragment: gql`
       ${POST_SUMMARY_FRAGMENT}
-      query Post($postId: ID!) {
-        post(postId: $postId) {
-          ...PostSummaryFields
-        }
-      }
     `,
-    {
-      fetchPolicy: "cache-only",
-      variables: {
-        postId: id,
-      },
-    }
-  );
+  }) as PostSummary | null;
 
-  const isLiked = postData?.post?.likeIds?.includes(account._id) ?? false;
+  const isLiked = post?.likeIds?.includes(account._id) ?? false;
   const [liked, setLiked] = useState(isLiked);
   const [loading, setLoading] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout>();
@@ -135,6 +118,6 @@ export function useLikePost(id: string): LikePostReturn {
     isLiked: liked,
     toggleLike,
     like: setLike,
-    likeCount: postData?.post.likeCount ?? 0,
+    likeCount: post?.likeCount ?? 0,
   };
 }
