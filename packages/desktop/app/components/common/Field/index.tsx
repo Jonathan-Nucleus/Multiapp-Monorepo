@@ -69,6 +69,7 @@ function Field<TFieldValues = FieldValues>({
           {...register(name)}
           className={textareaClassName ?? ""}
           rows={rows}
+          maxLength={inputProps.maxLength}
         />
       ) : (
         <Input

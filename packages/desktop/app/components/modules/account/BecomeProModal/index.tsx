@@ -47,7 +47,7 @@ const BecomeProModal: FC<BecomeProModalProps> = ({ show, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [proRequest] = useProRequest();
-  const { register, handleSubmit, formState } = useForm<
+  const { register, handleSubmit, watch, formState } = useForm<
     yup.InferType<typeof schema>
   >({
     resolver: yupResolver(schema),
@@ -127,6 +127,21 @@ const BecomeProModal: FC<BecomeProModalProps> = ({ show, onClose }) => {
                   autoComplete="organization"
                 />
               </div>
+              {watch("role") == "OTHER" && (
+                <div className="mt-2">
+                  <Field
+                    register={register}
+                    state={formState}
+                    name="otherRole"
+                    label="What is your title"
+                    autoComplete="info"
+                    textareaClassName="block w-full bg-white rounded-lg text-sm text-black p-2"
+                    maxLength={100}
+                    rows={5}
+                    textarea
+                  />
+                </div>
+              )}
               <div className="lg:grid grid-cols-2 gap-8 mt-2">
                 <Field
                   register={register}
@@ -148,7 +163,7 @@ const BecomeProModal: FC<BecomeProModalProps> = ({ show, onClose }) => {
                   register={register}
                   state={formState}
                   name="info"
-                  label="Anything further we should consider in your application? "
+                  label="Anything further we should consider in your application?"
                   autoComplete="info"
                   textareaClassName="block w-full bg-white rounded-lg text-sm text-black p-2"
                   rows={5}
