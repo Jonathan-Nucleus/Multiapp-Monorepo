@@ -24,7 +24,7 @@ const PostsSection: FC<PostsSectionProps> = ({ account }) => {
   const scrollOffset = useRef(0);
   const isFetchingMore = useRef(false);
   const {
-    data: { posts = [] } = {},
+    data: { posts } = {},
     refetch,
     fetchMore,
   } = usePosts(undefined, undefined, undefined, POSTS_PER_SCROLL);

@@ -80,7 +80,7 @@ const FundCard: FC<FundCardProps> = ({
           </div>
           <div className="bg-white/[.12] w-px my-5" />
           {profileType === "manager" ? (
-            <div className="w-64 flex-shrink-0 flex flex-col items-center p-4">
+            <div className="w-80 flex-shrink-0 flex flex-col items-center p-4">
               <Link href={`/company/${fund.company._id}`}>
                 <a>
                   <Avatar user={fund.company} size={128} shape="square" />
@@ -88,7 +88,9 @@ const FundCard: FC<FundCardProps> = ({
               </Link>
               <Link href={`/company/${fund.company._id}`}>
                 <a className="text-sm text-white text-center mt-2 tracking-wide">
-                  {fund.company.name}
+                  {fund.limitedView
+                    ? "View Company Profile"
+                    : fund.company.name}
                 </a>
               </Link>
               <div className="text-xs text-white opacity-60 tracking-wider">
@@ -114,18 +116,20 @@ const FundCard: FC<FundCardProps> = ({
                 </div>
               </div>
               <Link href={`/funds/${fund._id}`}>
-                <a>
+                <a className="w-full">
                   <Button
                     variant="gradient-primary"
-                    className="w-full text-sm font-medium"
+                    className="w-full text-sm font-medium uppercase"
                   >
-                    View Fund Details
+                    {fund.limitedView
+                      ? "View Strategy Overview"
+                      : "View Fund Details"}
                   </Button>
                 </a>
               </Link>
             </div>
           ) : (
-            <div className="w-64 flex-shrink-0 flex flex-col items-center p-4">
+            <div className="w-80 flex-shrink-0 flex flex-col items-center p-4">
               <Link href={`/profile/${fund.manager._id}`}>
                 <a>
                   <Avatar user={fund.manager} size={128} />
@@ -155,12 +159,14 @@ const FundCard: FC<FundCardProps> = ({
                 </div>
               </div>
               <Link href={`/funds/${fund._id}`}>
-                <a>
+                <a className="w-full">
                   <Button
                     variant="gradient-primary"
-                    className="w-full text-sm font-medium"
+                    className="w-full text-sm font-medium uppercase"
                   >
-                    View Fund Details
+                    {fund.limitedView
+                      ? "View Strategy Overview"
+                      : "View Fund Details"}
                   </Button>
                 </a>
               </Link>
@@ -170,11 +176,11 @@ const FundCard: FC<FundCardProps> = ({
         <div className="border-t border-white/[.12]">
           <div className="flex border-white/[.12] divide-x divide-inherit">
             <div className="flex-grow grid grid-cols-4 border-white/[.12] divide-x divide-inherit">
-              <div className="flex flex-col items-center justify-center py-2">
-                <div className="text-tiny text-white opacity-60 tracking-widest mb-1">
+              <div className="flex flex-col items-center justify-center px-2 py-2">
+                <div className="text-tiny text-white text-center opacity-60 tracking-widest mb-1">
                   ASSET CLASS
                 </div>
-                <div className="text-white">
+                <div className="text-white text-center">
                   {
                     AssetClasses.find(
                       (assetClass) => assetClass.value === fund.class
@@ -182,30 +188,36 @@ const FundCard: FC<FundCardProps> = ({
                   }
                 </div>
               </div>
-              <div className="flex flex-col items-center justify-center py-2">
-                <div className="text-tiny text-white opacity-60 tracking-widest mb-1">
+              <div className="flex flex-col items-center justify-center px-2 py-2">
+                <div className="text-tiny text-white text-center opacity-60 tracking-widest mb-1">
                   STRATEGY
                 </div>
-                <div className="text-white">{fund.strategy}</div>
+                <div className="text-white text-center">{fund.strategy}</div>
               </div>
-              <div className="flex flex-col items-center justify-center py-2">
-                <div className="text-tiny text-white opacity-60 tracking-widest mb-1">
+              <div className="flex flex-col items-center justify-center px-2 py-2">
+                <div className="text-tiny text-white text-center opacity-60 tracking-widest mb-1">
                   AUM
                 </div>
-                <div className="text-white">{`$${dollarFormatter.format(
-                  fund.aum
-                )}`}</div>
-              </div>
-              <div className="flex flex-col items-center justify-center py-2">
-                <div className="text-tiny text-white opacity-60 tracking-widest mb-1">
-                  MIN INVESTMENT
+                <div className="text-white text-center">
+                  {`$${dollarFormatter.format(fund.aum)}`}
                 </div>
-                <div className="text-white">{`$${dollarFormatter.format(
-                  fund.min
-                )}`}</div>
+              </div>
+              <div>
+                <div
+                  className={`flex flex-col items-center justify-center px-2 py-2 ${
+                    fund.limitedView ? "invisible" : ""
+                  }`}
+                >
+                  <div className="text-tiny text-white text-center opacity-60 tracking-widest mb-1">
+                    MIN INVESTMENT
+                  </div>
+                  <div className="text-white">
+                    {`$${dollarFormatter.format(fund.min)}`}
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="w-64 text-right flex items-center justify-between px-4">
+            <div className="flex-shrink-0 w-80 text-right flex items-center justify-between px-4">
               <div className="flex items-center">
                 <div className="w-3 h-3 bg-success rounded-full" />
                 <div className="text-xs text-success ml-1">{fund.status}</div>
@@ -241,12 +253,16 @@ const FundCard: FC<FundCardProps> = ({
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-3 border-y border-white/[.12] divide-x divide-inherit">
-          <div className="flex flex-col items-center justify-center py-2">
+        <div
+          className={`grid ${
+            fund.limitedView ? "grid-cols-2" : "grid-cols-3"
+          } border-y border-white/[.12] divide-x divide-inherit`}
+        >
+          <div className="flex flex-col items-center justify-center px-2 py-2">
             <div className="text-tiny text-white opacity-60 mb-1">
               ASSET CLASS
             </div>
-            <div className="text-xs text-white">
+            <div className="text-xs text-white text-center">
               {
                 AssetClasses.find(
                   (assetClass) => assetClass.value === fund.class
@@ -254,16 +270,22 @@ const FundCard: FC<FundCardProps> = ({
               }
             </div>
           </div>
-          <div className="flex flex-col items-center justify-center py-2">
+          <div className="flex flex-col items-center justify-center px-2 py-2">
             <div className="text-tiny text-white opacity-60 mb-1">STRATEGY</div>
-            <div className="text-xs text-white">{fund.strategy}</div>
+            <div className="text-xs text-white text-center">
+              {fund.strategy}
+            </div>
           </div>
-          <div className="flex flex-col items-center justify-center py-2">
-            <div className="text-tiny text-white opacity-60 mb-1">MINIMUM</div>
-            <div className="text-xs text-white">{`$${dollarFormatter.format(
-              fund.min
-            )}`}</div>
-          </div>
+          {!fund.limitedView && (
+            <div className="flex flex-col items-center justify-center px-2 py-2">
+              <div className="text-tiny text-white opacity-60 mb-1">
+                MINIMUM
+              </div>
+              <div className="text-xs text-white text-center">
+                {`$${dollarFormatter.format(fund.min)}`}
+              </div>
+            </div>
+          )}
         </div>
         <div className="flex items-center mt-4 px-5">
           <Link href={`/profile/${isMyFund ? "me" : fund.manager._id}`}>
@@ -286,9 +308,11 @@ const FundCard: FC<FundCardProps> = ({
               <a>
                 <Button
                   variant="outline-primary"
-                  className="w-full text-xs text-white font-bold"
+                  className="w-full text-xs text-white font-bold uppercase"
                 >
-                  View Fund Details
+                  {fund.limitedView
+                    ? "View Strategy Overview"
+                    : "View Fund Details"}
                 </Button>
               </a>
             </Link>

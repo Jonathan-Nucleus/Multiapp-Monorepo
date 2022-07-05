@@ -63,7 +63,7 @@ const FundCard: FC<FundCardProps> = ({ fund }) => {
                 <a>
                   <Button
                     variant="gradient-primary"
-                    className="text-sm font-medium py-2"
+                    className="text-sm font-medium uppercase py-2"
                   >
                     View Fund Details
                   </Button>

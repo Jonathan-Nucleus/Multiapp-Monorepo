@@ -136,7 +136,7 @@ const ProfileCard: FC<ProfileCardProps> = ({
                     onClick={onSelectToEditProfile}
                   >
                     <Pencil size={24} color="white" />
-                    <div className="text-white font-semibold ml-2">
+                    <div className="text-white font-semibold uppercase ml-2">
                       Edit Profile
                     </div>
                   </Button>

@@ -19,6 +19,8 @@ import utc from "dayjs/plugin/utc";
 import localData from "dayjs/plugin/localeData";
 import FundDocuments from "./FundDocuments";
 import ManagerCard from "./ManagerCard";
+import ReactMarkdown from "react-markdown";
+import DetailedTeamMemberList from "./DetailedTeamMemberList";
 
 dayjs.extend(localData);
 dayjs.extend(utc);
@@ -152,7 +154,9 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                       Strategy Overview
                     </div>
                     <div className="text-sm text-white mt-3">
-                      {fund.overview}
+                      <ReactMarkdown className="whitespace-pre-wrap break-words">
+                        {fund.overview}
+                      </ReactMarkdown>
                     </div>
                   </div>
                   {fund.presentationUrl ? (
@@ -187,7 +191,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                             key={index}
                             className="flex flex-1 flex-col items-center py-6"
                           >
-                            <div className="text-tiny text-white/[0.60] uppercase">
+                            <div className="text-tiny text-white/[.6] text-center uppercase">
                               {attribute.label}
                             </div>
                             <div className="text-sm text-white mt-1">
@@ -198,7 +202,7 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
                       </div>
                     </Card>
                   </div>
-                  {fund.metrics.length > 0 ? (
+                  {!fund.limitedView && fund.metrics.length > 0 ? (
                     <div className="mt-6 text-white/[0.3]">
                       <div className="mb-2 font-light tracking-widest">
                         Monthly Net Return
@@ -303,8 +307,12 @@ const FundProfilePage: FC<FundProfileProps> = ({ fundId }) => {
         </div>
         <div className="lg:ml-8">
           <ManagerCard fund={fund} />
-          <div className="mt-9">
-            {fundTeam.length > 0 && <TeamMembersList members={fundTeam} />}
+          <div className="mt-9 px-3">
+            {fund.limitedView ? (
+              <DetailedTeamMemberList members={fundTeam} />
+            ) : (
+              <TeamMembersList members={fundTeam} />
+            )}
           </div>
         </div>
       </div>
