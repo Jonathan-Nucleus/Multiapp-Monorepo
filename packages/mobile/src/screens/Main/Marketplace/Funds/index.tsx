@@ -1,14 +1,13 @@
 import React, { useMemo, useState } from 'react';
 import {
-  StyleSheet,
-  FlatList,
-  View,
-  Text,
   ListRenderItem,
-  SectionList,
   Pressable,
+  SectionList,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
-import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+import { useIsFocused } from '@react-navigation/native';
 import { Info } from 'phosphor-react-native';
 
 import Disclosure from 'mobile/src/components/main/Disclosure';
@@ -22,9 +21,9 @@ import FundsPlaceholder from '../../../../components/placeholder/FundsPlaceholde
 import { FundsScreen } from 'mobile/src/navigations/MarketplaceTabs';
 
 import {
-  useFunds,
-  Fund,
   AssetClasses,
+  Fund,
+  useFunds,
 } from 'shared/graphql/query/marketplace/useFunds';
 
 const PLACE_HOLDERS = 7;
@@ -67,8 +66,8 @@ const Funds: FundsScreen = () => {
   }
 
   const keyExtractor = (item: Fund): string => item._id;
-  const renderItem: ListRenderItem<Fund> = ({ item }) => {
-    return <FundItem fund={item} />;
+  const renderItem: ListRenderItem<Fund> = ({ item, index }) => {
+    return <FundItem fund={item} index={index} />;
   };
 
   return (

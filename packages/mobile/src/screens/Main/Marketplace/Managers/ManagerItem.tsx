@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
-import { View, StyleSheet, Pressable } from 'react-native';
-import { PRIMARY, WHITE, WHITE12, BLACK } from 'shared/src/colors';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { BLACK, PRIMARY, WHITE12 } from 'shared/src/colors';
 import { Body1Bold, Body2, Body3, Body3Bold } from 'mobile/src/theme/fonts';
 import pStyles from 'mobile/src/theme/pStyles';
 
@@ -9,8 +9,8 @@ import PLabel from 'mobile/src/components/common/PLabel';
 import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 
 import {
-  FundManager as FundManagerType,
   FundListItem,
+  FundManager as FundManagerType,
 } from 'shared/graphql/query/marketplace/useFundManagers';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 

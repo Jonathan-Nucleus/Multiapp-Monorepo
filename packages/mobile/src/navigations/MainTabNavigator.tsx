@@ -1,18 +1,18 @@
-import React, { ReactElement } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { ReactElement, useEffect, useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import {
-  createBottomTabNavigator,
   BottomTabScreenProps,
+  createBottomTabNavigator,
 } from '@react-navigation/bottom-tabs';
 import {
   CompositeScreenProps,
   NavigatorScreenParams,
 } from '@react-navigation/native';
-import { House, Star, Chats, DotsThreeCircle } from 'phosphor-react-native';
+import { Chats, DotsThreeCircle, House, Star } from 'phosphor-react-native';
 
 import FundsSVG from 'shared/assets/images/logo-icon.svg';
 import GreyFundsSVG from 'shared/assets/images/grey-fund.svg';
-import { WHITE, BLACK, GRAY400, GRAY700, WHITE12 } from 'shared/src/colors';
+import { BLACK, GRAY400, GRAY700, WHITE, WHITE12 } from 'shared/src/colors';
 import { Body3 } from 'mobile/src/theme/fonts';
 
 import { Home } from 'mobile/src/screens/Main/Home';
@@ -20,16 +20,30 @@ import WatchList from 'mobile/src/screens/Main/WatchList';
 import MarketplaceTabs, { MarketplaceTabsParamList } from './MarketplaceTabs';
 import ChatStack, { ChatStackParamList } from './ChatStack';
 import MoreStack, { MoreStackParamList } from './MoreStack';
-import { Body5Bold, Body5 } from '../theme/fonts';
+import { Body5, Body5Bold } from '../theme/fonts';
 
 import { useChatContext, useUnreadCount } from 'mobile/src/context/Chat';
 
 import type { AuthenticatedScreenProps } from './AuthenticatedStack';
+import pStyles from '../theme/pStyles';
+import Tooltip from 'react-native-walkthrough-tooltip';
+import { EventRegister } from 'react-native-event-listeners';
 
 const Tab = createBottomTabNavigator();
 const MainTabNavigator = (): React.ReactElement => {
   const { client } = useChatContext() || {};
   const unreadCount = useUnreadCount();
+  const [showTutorial, setShowTutorial] = useState(false);
+  useEffect(() => {
+    EventRegister.addEventListener('tabTutorial', () => {
+      setShowTutorial(true);
+    });
+  }, []);
+
+  const closeTutorial = () => {
+    EventRegister.emit('homeTutorial');
+    setShowTutorial(false);
+  };
 
   return (
     <Tab.Navigator
@@ -54,7 +68,26 @@ const MainTabNavigator = (): React.ReactElement => {
           ),
           tabBarIcon: ({ focused, size }) =>
             focused ? (
-              <House size={size} color={WHITE} weight="fill" />
+              <Tooltip
+                isVisible={showTutorial}
+                content={
+                  <View style={pStyles.tooltipContainer}>
+                    <Text style={pStyles.tooltipText}>
+                      This is your newsfeed! Market insights from professionals
+                      live here.
+                    </Text>
+                    <Pressable
+                      onPress={() => closeTutorial()}
+                      style={pStyles.tooltipButton}>
+                      <Text style={pStyles.tooltipButtonText}>Next</Text>
+                    </Pressable>
+                  </View>
+                }
+                contentStyle={pStyles.tooltipContent}
+                placement="top"
+                onClose={() => console.log('')}>
+                <House size={size} color={WHITE} weight="fill" />
+              </Tooltip>
             ) : (
               <House size={size} color={GRAY400} />
             ),

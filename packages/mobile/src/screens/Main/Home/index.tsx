@@ -1,20 +1,21 @@
 import React, {
-  useState,
   memo,
-  useMemo,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
+  useState,
 } from 'react';
 import {
-  ListRenderItem,
   FlatList,
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  Text,
-  RefreshControl,
   FlatListProps,
+  ListRenderItem,
+  Pressable,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import isEqual from 'react-fast-compare';
 import { SlidersHorizontal } from 'phosphor-react-native';
@@ -25,13 +26,13 @@ import MainHeader from 'mobile/src/components/main/Header';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import PostItem from 'mobile/src/components/main/posts/PostItem';
 import {
-  stopVideos,
-  stopVideo,
   isVideo,
+  stopVideo,
+  stopVideos,
 } from 'mobile/src/components/common/Media';
 import pStyles from 'mobile/src/theme/pStyles';
 
-import { usePosts, Post } from 'shared/graphql/query/post/usePosts';
+import { Post, usePosts } from 'shared/graphql/query/post/usePosts';
 import { HomeScreen } from 'mobile/src/navigations/MainTabNavigator';
 import FilterModal from 'mobile/src/screens/PostDetails/FilterModal';
 import PostItemPlaceholder from '../../../components/placeholder/PostItemPlaceholder';
@@ -42,6 +43,9 @@ import type {
 } from 'backend/graphql/posts.graphql';
 import { PostRoleFilterOptions } from 'backend/schemas/post';
 import { Body2Bold } from '../../../theme/fonts';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Tooltip from 'react-native-walkthrough-tooltip';
+import { EventRegister } from 'react-native-event-listeners';
 
 const PLACE_HOLDERS = 7;
 
@@ -54,6 +58,11 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
   const currentFocus = useIsFocused();
   const [isFocused, setFocused] = useState(currentFocus);
   const listRef = useRef<FlatList>(null);
+  const [showTutorial, setShowTutorial] = useState(true);
+  const [tutorialOptions, setTutorialOptions] = useState({
+    filter: false,
+    add: false,
+  });
   const {
     data: { posts: postData = [] } = {},
     refetch,
@@ -87,6 +96,28 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
 
     return unsubscribe;
   }, [navigation, handleSelfRefresh]);
+
+  useEffect(() => {
+    (async () => {
+      const valueFromStorage = await AsyncStorage.getItem('homePageTutorial');
+      setTimeout(() => {
+        if (!valueFromStorage) {
+          EventRegister.emit('tabTutorial');
+        }
+        setShowTutorial(false);
+      }, 1000);
+    })();
+  }, [showTutorial]);
+
+  useEffect(() => {
+    EventRegister.addEventListener('homeTutorial', () => {
+      setTutorialOptions({
+        ...tutorialOptions,
+        filter: true,
+        add: false,
+      });
+    });
+  }, []);
 
   const renderItem: ListRenderItem<Post> = useMemo(
     () =>
@@ -150,6 +181,11 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
     });
   };
 
+  const showHeaderTutorial = () => {
+    EventRegister.emit('headerTutorial');
+    setTutorialOptions({ ...tutorialOptions, add: false, filter: false });
+  };
+
   return (
     <View style={pStyles.globalContainer}>
       <MainHeader />
@@ -157,9 +193,34 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
         <Text style={styles.filter}>
           Posts from {PostRoleFilterOptions[selectedRole].label}
         </Text>
-        <TouchableOpacity onPress={() => setVisibleFilter(true)}>
-          <SlidersHorizontal color={WHITE} size={24} />
-        </TouchableOpacity>
+        <Tooltip
+          isVisible={tutorialOptions.filter}
+          content={
+            <View style={pStyles.tooltipContainer}>
+              <Text style={pStyles.tooltipText}>
+                {' '}
+                Tap here to filter your newsfeed.
+              </Text>
+              <Pressable
+                onPress={() =>
+                  setTutorialOptions({
+                    ...tutorialOptions,
+                    filter: false,
+                    add: true,
+                  })
+                }
+                style={pStyles.tooltipButton}>
+                <Text style={pStyles.tooltipButtonText}>Next</Text>
+              </Pressable>
+            </View>
+          }
+          contentStyle={pStyles.tooltipContent}
+          placement="left"
+          onClose={() => console.log('')}>
+          <TouchableOpacity onPress={() => setVisibleFilter(true)}>
+            <SlidersHorizontal color={WHITE} size={24} />
+          </TouchableOpacity>
+        </Tooltip>
       </View>
       <FlatList
         ref={listRef}
@@ -184,14 +245,33 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
           />
         }
       />
-
-      <PGradientButton
-        label="+"
-        btnContainer={styles.postButton}
-        gradientContainer={styles.gradientContainer}
-        textStyle={styles.postLabel}
-        onPress={handleCreatePost}
-      />
+      <View style={styles.postButton}>
+        <Tooltip
+          isVisible={tutorialOptions.add}
+          content={
+            <View style={{ ...pStyles.tooltipContainer }}>
+              <Text style={pStyles.tooltipText}>
+                {' '}
+                Tap here to make a new post.
+              </Text>
+              <Pressable
+                onPress={() => showHeaderTutorial()}
+                style={pStyles.tooltipButton}>
+                <Text style={pStyles.tooltipButtonText}>Next</Text>
+              </Pressable>
+            </View>
+          }
+          contentStyle={pStyles.tooltipContent}
+          placement="left"
+          onClose={() => console.log('')}>
+          <PGradientButton
+            label="+"
+            gradientContainer={styles.gradientContainer}
+            textStyle={styles.postLabel}
+            onPress={handleCreatePost}
+          />
+        </Tooltip>
+      </View>
       <FilterModal
         isVisible={visibleFilter}
         onClose={() => setVisibleFilter(false)}
