@@ -1,4 +1,10 @@
-import React, { LegacyRef, useEffect, useState, forwardRef } from 'react';
+import React, {
+  LegacyRef,
+  useEffect,
+  useState,
+  forwardRef,
+  ReactElement,
+} from 'react';
 import {
   View,
   ViewStyle,
@@ -21,16 +27,18 @@ import {
   GRAY700,
   DANGER,
   DANGER30,
+  BLACK75,
 } from 'shared/src/colors';
 
 export interface PTextInputProps extends TextInputProps {
   label: string;
   text: string;
-  icon?: string;
+  icon?: ReactElement | null;
   numberOfLines?: number;
   onPress?: () => void;
   onPressText?: () => void;
   error?: string;
+  showError?: boolean;
   errorStyle?: StyleProp<TextStyle>;
   containerStyle?: StyleProp<ViewStyle>;
   labelTextStyle?: StyleProp<TextStyle>;
@@ -72,6 +80,7 @@ const PTextInput = forwardRef<TextInput, PTextInputProps>((props, ref) => {
     multiline = false,
     autoCorrect = true,
     error,
+    showError = true,
     errorStyle,
     numberOfLines = 1,
     ...textInputProps
@@ -98,7 +107,12 @@ const PTextInput = forwardRef<TextInput, PTextInputProps>((props, ref) => {
         />
       </View>
       <View
-        style={[styles.view, textContainerStyle, !!error && styles.errorInput]}>
+        style={[
+          styles.view,
+          textContainerStyle,
+          !!error && styles.errorInput,
+          isFocused && styles.focused,
+        ]}>
         <TextInput
           ref={ref as LegacyRef<TextInput>}
           {...textInputProps}
@@ -106,11 +120,7 @@ const PTextInput = forwardRef<TextInput, PTextInputProps>((props, ref) => {
           placeholderTextColor={placeholderTextColor}
           onChangeText={handleOnChangeText}
           secureTextEntry={secureTextEntry}
-          style={[
-            styles.textInput,
-            textInputStyle,
-            isFocused && styles.focused,
-          ]}
+          style={[styles.textInput, textInputStyle]}
           value={text}
           keyboardType={keyboardType}
           editable={editable}
@@ -137,7 +147,9 @@ const PTextInput = forwardRef<TextInput, PTextInputProps>((props, ref) => {
           </TouchableOpacity>
         )}
       </View>
-      <Text style={[styles.error, errorStyle]}>{error ? error : null}</Text>
+      <Text style={[styles.error, errorStyle]}>
+        {error && showError ? error : null}
+      </Text>
     </View>
   );
 });
@@ -153,7 +165,6 @@ const styles = StyleSheet.create({
   },
   errorInput: {
     borderColor: DANGER,
-    backgroundColor: DANGER30,
   },
   focused: {
     borderColor: WHITE,
@@ -165,15 +176,15 @@ const styles = StyleSheet.create({
   },
   container: {},
   view: {
-    position: 'relative',
-    minHeight: 40,
+    flexDirection: 'row',
+    minHeight: 48,
     maxHeight: 140,
     borderColor: GRAY800,
     borderWidth: 1,
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 8,
-    backgroundColor: GRAY700,
+    borderRadius: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    backgroundColor: BLACK75,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -184,15 +195,17 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     marginBottom: 4,
     justifyContent: 'center',
+    alignItems: 'center',
   },
   icon: {
     position: 'absolute',
     right: 0,
-    bottom: 0,
+    top: -12,
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    paddingBottom: 8,
   },
   error: {
     color: DANGER,

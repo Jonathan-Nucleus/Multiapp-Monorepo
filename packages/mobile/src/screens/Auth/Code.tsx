@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   StyleSheet,
   Keyboard,
@@ -10,9 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import PAppContainer from '../../components/common/PAppContainer';
 import PHeader from '../../components/common/PHeader';
-import PTitle from '../../components/common/PTitle';
 import PTextInput from '../../components/common/PTextInput';
-import ErrorText from '../../components/common/ErrorTxt';
 import { BLACK, PRIMARY, WHITE } from 'shared/src/colors';
 import PGradientButton from '../../components/common/PGradientButton';
 import { Body2 } from '../../theme/fonts';
@@ -20,64 +18,75 @@ import LogoSvg from '../../assets/icons/logo.svg';
 
 import type { CodeScreen } from 'mobile/src/navigations/AuthStack';
 import { useVerifyInviteLazy } from 'shared/graphql/query/auth/useVerifyInvite';
+import PBackgroundImage from '../../components/common/PBackgroundImage';
+import { showMessage } from '../../services/ToastService';
+
+const ERROR_MSG = 'The code you entered was invalid.';
 
 const CodeView: CodeScreen = ({ navigation }) => {
   const [code, setCode] = useState('');
-  const [error, setError] = useState(false);
   const [verifyInvite] = useVerifyInviteLazy();
+  const [errorMsg, setErrorMsg] = useState('');
 
   const handleVerifyCode = async () => {
     Keyboard.dismiss();
-    setError(false);
+    setErrorMsg('');
     try {
       const { data } = await verifyInvite({ variables: { code } });
       if (data?.verifyInvite) {
         navigation.navigate('Signup', { code });
         return;
       }
-      setError(true);
+      showMessage('error', ERROR_MSG);
+      setErrorMsg(ERROR_MSG);
     } catch (err) {
-      setError(true);
+      showMessage('error', ERROR_MSG);
+      setErrorMsg(ERROR_MSG);
       console.log('err=======>', err);
     }
   };
 
+  const handleChangeCode = useCallback((val: string) => {
+    setCode(val.toUpperCase());
+    setErrorMsg('');
+  }, []);
+
   return (
-    <SafeAreaView style={styles.container}>
-      <PHeader centerIcon={<LogoSvg />} />
-      <PAppContainer>
-        <PTitle title="Join the inner circle!" />
-        {error && <ErrorText error="Verification code does not matched" />}
-        <PTextInput
-          label="Enter Code"
-          onChangeText={(val: string) => {
-            setCode(val.toUpperCase());
-            // setError(false);
-          }}
-          text={code}
-          onSubmitEditing={handleVerifyCode}
-          autoFocus={true}
-          containerStyle={styles.textContainer}
-          textContainerStyle={styles.textInputContainer}
-          textInputStyle={styles.textInput}
-        />
-        <PGradientButton
-          label="next"
-          btnContainer={styles.btnContainer}
-          onPress={handleVerifyCode}
-        />
+    <PBackgroundImage>
+      <SafeAreaView style={styles.container} edges={['left', 'right', 'top']}>
+        <PHeader centerIcon={<LogoSvg />} />
+        <PAppContainer style={styles.content}>
+          <PTextInput
+            label="Enter Code"
+            onChangeText={handleChangeCode}
+            text={code}
+            onSubmitEditing={handleVerifyCode}
+            autoFocus={true}
+            containerStyle={styles.textContainer}
+            textContainerStyle={styles.textInputContainer}
+            textInputStyle={styles.textInput}
+            error={errorMsg}
+            showError={false}
+          />
+          <PGradientButton
+            label="next"
+            btnContainer={styles.btnContainer}
+            onPress={handleVerifyCode}
+            disabled={code === ''}
+          />
+
+          {/* <View style={styles.bottom}>
+            <Text style={styles.txtOR}>OR</Text>
+            <Text style={styles.invite}>request an invite</Text>
+          </View> */}
+        </PAppContainer>
         <View style={styles.wrap}>
-          <Text style={styles.txt}>Already have an account? </Text>
           <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.hyperText}>Login</Text>
+            <Text style={styles.hyperText}>I already have an account</Text>
           </TouchableOpacity>
         </View>
-        {/*<View style={styles.bottom}>
-          <PTextLine title="OR" />
-          <Text style={styles.invite}>request an invite</Text>
-        </View>*/}
-      </PAppContainer>
-    </SafeAreaView>
+      </SafeAreaView>
+    </PBackgroundImage>
   );
 };
 
@@ -86,7 +95,10 @@ export default CodeView;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BLACK,
+  },
+  content: {
+    backgroundColor: 'transparent',
+    paddingTop: 48,
   },
   textContainer: {
     marginTop: 16,
@@ -104,25 +116,28 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   bottom: {
-    marginTop: 106,
+    marginTop: 48,
+    alignItems: 'center',
   },
   invite: {
     color: PRIMARY,
     ...Body2,
     textTransform: 'uppercase',
     textAlign: 'center',
-    marginTop: 25,
+    marginTop: 16,
   },
   wrap: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 15,
+    marginBottom: 46,
   },
   hyperText: {
     ...Body2,
     color: PRIMARY,
+  },
+  txtOR: {
+    ...Body2,
+    color: WHITE,
   },
   txt: {
     ...Body2,

@@ -1,15 +1,16 @@
+import { CheckCircle } from 'phosphor-react-native';
 import React from 'react';
 import {
   View,
   StyleSheet,
-  Text,
   ViewStyle,
   TextStyle,
   StyleProp,
 } from 'react-native';
 
-import { BLACK, SUCCESS } from 'shared/src/colors';
+import { SUCCESS, WHITE } from 'shared/src/colors';
 import { Body2 } from '../../theme/fonts';
+import PText from './PText';
 
 interface SuccessTextProps {
   message: string;
@@ -22,9 +23,12 @@ const SuccessText: React.FC<SuccessTextProps> = (props) => {
 
   return (
     <View style={[styles.successView, container]}>
-      <Text style={[styles.success, textStyle]} allowFontScaling={false}>
-        {message}
-      </Text>
+      <CheckCircle color={WHITE} />
+      <View style={styles.txtContainer}>
+        <PText style={[styles.success, textStyle]} allowFontScaling={false}>
+          {message}
+        </PText>
+      </View>
     </View>
   );
 };
@@ -35,13 +39,17 @@ const styles = StyleSheet.create({
   successView: {
     marginBottom: 18,
     backgroundColor: SUCCESS,
-    borderRadius: 16,
-    padding: 17,
+    borderRadius: 8,
+    padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
   },
+  txtContainer: {
+    flex: 1,
+    paddingLeft: 13,
+  },
   success: {
-    color: BLACK,
+    color: WHITE,
     ...Body2,
   },
 });

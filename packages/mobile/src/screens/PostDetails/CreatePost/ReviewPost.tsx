@@ -134,7 +134,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
         // it should go to different stack
         navigation.navigate('Main');
       } else {
-        showMessage('Error', 'Uh oh! We encountered a problem.');
+        showMessage('error', 'Uh oh! We encountered a problem.');
       }
     } catch (err) {
       console.log('Error', err);
