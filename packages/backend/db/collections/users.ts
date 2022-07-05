@@ -126,6 +126,7 @@ export const UNIVERSAL_INVITE_CODES = [
   "Z6QWPS",
   "UWTKXU",
   "K2Q06A",
+  "TWIST",
 ];
 
 const MICHAEL_USER_ID = "628fee97fef84ea6746e08fb";

@@ -1071,7 +1071,6 @@ const resolvers = {
         validateArgs(validator, args);
 
         const { report } = args;
-
         const postData = await db.posts.find(report.postId);
         if (!postData) {
           throw new NotFoundError("Post");
@@ -1079,6 +1078,7 @@ const resolvers = {
 
         await db.users.reportPost(report, user._id);
         await db.posts.logReport(report.postId, user._id);
+        await PrometheusMailer.reportPost(report, postData, user);
 
         return true;
       }

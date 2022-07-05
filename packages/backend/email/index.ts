@@ -3,16 +3,18 @@ import { SES } from "aws-sdk";
 import { promises as fs } from "fs";
 import path from "path";
 import ejs, { Data as EjsData } from "ejs";
-import { User } from "backend/schemas/user";
-import { HelpRequest } from "../schemas/help-request";
+import dayjs from "dayjs";
+
+import { User, ReportedPost, PostViolationOptions } from "backend/schemas/user";
+import { Fund } from "backend/schemas/fund";
+import { Post } from "backend/schemas/post";
+import { HelpRequest } from "backend/schemas/help-request";
 import {
   HelpRequestTypeMapping,
   PreferredTimeOfDayOptionsMapping,
 } from "../graphql/help-requests.graphql";
-import dayjs from "dayjs";
 
 import "dotenv/config";
-import { Fund } from "../schemas/fund";
 
 const SENDER = process.env.EMAIL_SENDER as string;
 const PROMETHEUS_URL = process.env.PROMETHEUS_URL as string;
@@ -275,6 +277,44 @@ export const PrometheusMailer = {
     } catch (err) {
       console.log("err", err);
       throw new ApolloError(`Error sending help request email`);
+    }
+  },
+
+  /**
+   * Sends an email to Prometheus admins when a user reports another post.
+   *
+   * @param report  Details of the post and reporting.
+   * @param user    User that reported the post.
+   */
+  reportPost: async function (
+    report: ReportedPost,
+    post: Post.Mongo,
+    user: User.Mongo
+  ): Promise<boolean> {
+    const { comments, postId, violations } = report;
+    try {
+      await sendEmail(CS_EMAIL, "report-post", {
+        postId,
+        comments,
+        violations: violations
+          .map(
+            (violation) =>
+              Object.values(PostViolationOptions).find(
+                (item) => item.value === violation
+              )?.label
+          )
+          .join(","),
+        userName: `${user.firstName} ${user.lastName}`,
+        userId: user._id,
+        postBody: post.body,
+      });
+
+      return true;
+    } catch (err) {
+      console.log("Error", err);
+      throw new ApolloError(
+        `Error sending report post email for post ${postId} to ${CS_EMAIL}`
+      );
     }
   },
 };
