@@ -5,13 +5,15 @@ import {
   View,
   Text,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { openComposer } from 'react-native-email-link';
 
 import PAppContainer from '../../components/common/PAppContainer';
 import PHeader from '../../components/common/PHeader';
 import PTextInput from '../../components/common/PTextInput';
-import { BLACK, PRIMARY, WHITE } from 'shared/src/colors';
+import { PRIMARY, WHITE } from 'shared/src/colors';
 import PGradientButton from '../../components/common/PGradientButton';
 import { Body2 } from '../../theme/fonts';
 import LogoSvg from '../../assets/icons/logo.svg';
@@ -20,6 +22,7 @@ import type { CodeScreen } from 'mobile/src/navigations/AuthStack';
 import { useVerifyInviteLazy } from 'shared/graphql/query/auth/useVerifyInvite';
 import PBackgroundImage from '../../components/common/PBackgroundImage';
 import { showMessage } from '../../services/ToastService';
+import PText from '../../components/common/PText';
 
 const ERROR_MSG = 'The code you entered was invalid.';
 
@@ -51,6 +54,18 @@ const CodeView: CodeScreen = ({ navigation }) => {
     setErrorMsg('');
   }, []);
 
+  const onPressRequestInvite = useCallback(() => {
+    try {
+      openComposer({
+        to: 'clientservices@prometheusalts.com',
+        subject: 'New User Seeking Invite Code From Registration Page',
+        body: 'This email will alert our CS team you are looking for a code. Stand by and a human will reach back out to you!',
+      });
+    } catch (error) {
+      Alert.alert('No email app available!');
+    }
+  }, []);
+
   return (
     <PBackgroundImage>
       <SafeAreaView style={styles.container} edges={['left', 'right', 'top']}>
@@ -75,13 +90,15 @@ const CodeView: CodeScreen = ({ navigation }) => {
             disabled={code === ''}
           />
 
-          {/* <View style={styles.bottom}>
-            <Text style={styles.txtOR}>OR</Text>
-            <Text style={styles.invite}>request an invite</Text>
-          </View> */}
+          <View style={styles.bottom}>
+            <PText style={styles.txtOR}>OR</PText>
+            <TouchableOpacity onPress={onPressRequestInvite}>
+              <PText style={styles.invite}>request an invite</PText>
+            </TouchableOpacity>
+          </View>
         </PAppContainer>
         <View style={styles.wrap}>
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
             <Text style={styles.hyperText}>I already have an account</Text>
           </TouchableOpacity>
         </View>
@@ -136,10 +153,6 @@ const styles = StyleSheet.create({
     color: PRIMARY,
   },
   txtOR: {
-    ...Body2,
-    color: WHITE,
-  },
-  txt: {
     ...Body2,
     color: WHITE,
   },
