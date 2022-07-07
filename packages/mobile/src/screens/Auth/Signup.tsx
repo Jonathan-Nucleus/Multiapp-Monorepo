@@ -1,12 +1,5 @@
-import React, { useState, Fragment, useCallback, useMemo } from 'react';
-import {
-  StyleSheet,
-  Keyboard,
-  View,
-  Text,
-  Linking,
-  TouchableOpacity,
-} from 'react-native';
+import React, { useState, Fragment, useCallback } from 'react';
+import { StyleSheet, View, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -110,7 +103,7 @@ const Signup: SignupScreen = ({ navigation, route }) => {
     });
   };
 
-  const errorMessage = () => {
+  const errorMessage = (): string => {
     const { email, firstName, lastName, password } = errors;
     if (
       email?.message &&
@@ -260,6 +253,7 @@ const Signup: SignupScreen = ({ navigation, route }) => {
                       field.onChange(text);
                     }}
                     text={field.value}
+                    textContainerStyle={styles.textContainer}
                     onPressText={() => setSecurePassEntry(!securePassEntry)}
                     subLabelTextStyle={styles.subLabelText}
                     error={error ? fieldState.error?.message : undefined}
@@ -337,5 +331,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
+  },
+  textContainer: {
+    alignItems: 'center',
   },
 });

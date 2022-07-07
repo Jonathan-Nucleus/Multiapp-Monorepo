@@ -1,10 +1,4 @@
-import React, {
-  LegacyRef,
-  useEffect,
-  useState,
-  forwardRef,
-  ReactElement,
-} from 'react';
+import React, { LegacyRef, useState, forwardRef, ReactElement } from 'react';
 import {
   View,
   ViewStyle,
@@ -14,21 +8,12 @@ import {
   TextInput,
   TextInputProps,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   Text,
 } from 'react-native';
 
 import PFormLabel from './PFormLabel';
 import { Body1, Body2, Body3 } from '../../theme/fonts';
-import {
-  WHITE,
-  BLACK,
-  GRAY800,
-  GRAY700,
-  DANGER,
-  DANGER30,
-  BLACK75,
-} from 'shared/src/colors';
+import { WHITE, BLACK, GRAY800, DANGER, BLACK75 } from 'shared/src/colors';
 
 export interface PTextInputProps extends TextInputProps {
   label: string;
@@ -195,7 +180,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     marginBottom: 4,
     justifyContent: 'center',
-    alignItems: 'center',
   },
   icon: {
     position: 'absolute',
