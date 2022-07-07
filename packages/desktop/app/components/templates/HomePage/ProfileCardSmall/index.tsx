@@ -68,7 +68,7 @@ const ProfileCardSmall: FC<ProfileProps> = ({ user }: ProfileProps) => {
         <div className="grid grid-cols-3 border-white/[.12] divide-x divide-inherit mt-5">
           <div>
             <div className="font-medium text-xl text-white">
-              {user.postIds?.length ?? 0}
+              {user.postCount}
             </div>
             <div className="text-sm text-white opacity-60">Posts</div>
           </div>

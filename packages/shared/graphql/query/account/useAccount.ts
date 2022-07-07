@@ -38,6 +38,7 @@ export type AccountData = {
     | "watchlistIds"
     | "companyFollowingIds"
     | "postIds"
+    | "postCount"
     | "linkedIn"
     | "twitter"
     | "website"
@@ -96,6 +97,7 @@ export function useAccount(
           tagline
           overview
           postIds
+          postCount
           website
           linkedIn
           twitter

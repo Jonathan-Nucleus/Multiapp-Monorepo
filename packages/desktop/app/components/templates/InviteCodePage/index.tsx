@@ -13,11 +13,18 @@ const schema = yup
   .object({ code: yup.string().required("Required") })
   .required();
 
+const INVITE_EMAIL = "clientservices@prometheusalts.com";
+const INVITE_SUBJECT = "New User Seeking Invite Code From Registration Page";
+const INVITE_BODY =
+  "This email will alert our CS team you are looking for a code. Stand by and a human will reach back out to you!";
+
 const InviteCodePage: FC = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [verifyInvite] = useVerifyInviteLazy();
-  const { register, handleSubmit, setError, formState } = useForm<yup.InferType<typeof schema>>({
+  const { register, handleSubmit, setError, formState } = useForm<
+    yup.InferType<typeof schema>
+  >({
     resolver: yupResolver(schema),
     mode: "onChange",
   });
@@ -29,9 +36,9 @@ const InviteCodePage: FC = () => {
       data?.verifyInvite
         ? await router.push(`/signup?code=${code}`)
         : setError("code", {
-          message:
-            "Sorry, that code was invalid. Try again or request another code.",
-        });
+            message:
+              "Sorry, that code was invalid. Try again or request another code.",
+          });
     } catch (e) {
       setError("code", { message: "Failed with error" });
     }
@@ -70,7 +77,9 @@ const InviteCodePage: FC = () => {
             <div className="bg-brand-overlay/[.1] h-px flex-1"></div>
           </div>
           <div className="text-center mt-4">
-            <Link href="https://prometheusalts.com/#invite-form">
+            <Link
+              href={`mailto:${INVITE_EMAIL}?subject=${INVITE_SUBJECT}&body=${INVITE_BODY}`}
+            >
               <a>
                 <Button
                   variant="text"
