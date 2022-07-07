@@ -43,9 +43,9 @@ import type {
 } from 'backend/graphql/posts.graphql';
 import { PostRoleFilterOptions } from 'backend/schemas/post';
 import { Body2Bold } from '../../../theme/fonts';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Tooltip from 'react-native-walkthrough-tooltip';
 import { EventRegister } from 'react-native-event-listeners';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PLACE_HOLDERS = 7;
 

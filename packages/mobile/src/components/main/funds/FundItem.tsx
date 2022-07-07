@@ -23,10 +23,10 @@ export interface FundItemProps {
   fund: Fund;
   showOverview?: boolean;
   showTags?: boolean;
-  index: number;
+  showTooltip?: boolean;
 }
 
-const FundItem: FC<FundItemProps> = ({ fund, index }) => {
+const FundItem: FC<FundItemProps> = ({ fund, showTooltip }) => {
   const { isWatching, toggleWatch } = useWatchFund(fund._id);
   const [showTutorialBtn, setShowTutorialBtn] = useState(false);
   const [showTutorialForStar, setShowTutorialForStar] = useState(false);
@@ -48,7 +48,7 @@ const FundItem: FC<FundItemProps> = ({ fund, index }) => {
       <View style={styles.actionBar}>
         <View style={styles.buttonContainer}>
           <Tooltip
-            isVisible={index === 0 && showTutorialBtn}
+            isVisible={showTooltip && showTutorialBtn}
             content={
               <View style={pStyles.tooltipContainer}>
                 <Text style={pStyles.tooltipText}>
@@ -66,8 +66,7 @@ const FundItem: FC<FundItemProps> = ({ fund, index }) => {
               </View>
             }
             contentStyle={pStyles.tooltipContent}
-            placement="top"
-            onClose={() => console.log('')}>
+            placement="top">
             <PGradientOutlineButton
               label={
                 fund.limitedView
@@ -75,17 +74,18 @@ const FundItem: FC<FundItemProps> = ({ fund, index }) => {
                   : 'View Fund Details'
               }
               textStyle={styles.button}
-              btnContainer={styles.buttonContainer}
+              btnContainer={styles.fullWidthBtn}
               onPress={goToFund}
             />
           </Tooltip>
         </View>
+        <View style={styles.favoriteSpacer} />
         <Tooltip
-          isVisible={index === 0 && showTutorialForStar}
+          isVisible={showTooltip && showTutorialForStar}
           content={
             <View style={pStyles.tooltipContainer}>
               <Text style={pStyles.tooltipText}>
-                Add to your View watchlist
+                Add fund to your watchlist
               </Text>
               <Pressable
                 onPress={() => {
@@ -99,15 +99,13 @@ const FundItem: FC<FundItemProps> = ({ fund, index }) => {
             </View>
           }
           contentStyle={pStyles.tooltipContent}
-          placement="top"
-          onClose={() => console.log('')}>
+          placement="left">
           <Pressable
             onPress={toggleWatch}
             style={({ pressed }) => [pressed ? styles.onPress : undefined]}>
             <Star
               size={24}
               color={isWatching ? PRIMARYSTATE : WHITE}
-              style={styles.favorite}
               weight={isWatching ? 'fill' : 'regular'}
             />
           </Pressable>
@@ -125,6 +123,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
   buttonContainer: {
     flex: 1,
@@ -133,10 +132,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textTransform: 'none',
   },
-  favorite: {
-    marginLeft: 16,
+  favoriteSpacer: {
+    width: 16,
   },
   onPress: {
     opacity: 0.5,
+  },
+  fullWidthBtn: {
+    width: '100%',
   },
 });

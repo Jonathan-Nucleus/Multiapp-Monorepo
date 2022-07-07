@@ -22,21 +22,12 @@ const MarketplaceTabs = () => {
   const [showTutorialFunds, setShowTutorialFunds] = useState(false);
   const [showTutorialManagers, setShowTutorialManagers] = useState(false);
   useEffect(() => {
-    (async () => {
-      const valueFromStorage = await AsyncStorage.getItem('fundsPageTutorial');
-      setTimeout(() => {
-        if (!valueFromStorage) {
-          setShowTutorialFunds(true);
-        } else {
-          setShowTutorialFunds(false);
-        }
-      }, 1000);
-    })();
-  });
-  useEffect(() => {
     EventRegister.addEventListener('tutorialManagers', () => {
       setShowTutorialFunds(false);
       setShowTutorialManagers(true);
+    });
+    EventRegister.addEventListener('fundsTabTutorial', () => {
+      setShowTutorialFunds(true);
     });
   }, []);
 

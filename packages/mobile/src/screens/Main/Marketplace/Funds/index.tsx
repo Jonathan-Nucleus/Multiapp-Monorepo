@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ListRenderItem,
   Pressable,
@@ -25,6 +25,8 @@ import {
   Fund,
   useFunds,
 } from 'shared/graphql/query/marketplace/useFunds';
+import { EventRegister } from 'react-native-event-listeners';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PLACE_HOLDERS = 7;
 
@@ -34,6 +36,26 @@ const Funds: FundsScreen = () => {
   const { data, refetch } = useFunds();
   const [focus, setFocus] = useState(focused);
   const [disclosureVisible, setDisclosureVisible] = useState(false);
+  const sectionListRef = useRef<SectionList>(null);
+  const [firstItemId, setFirstItemId] = useState('');
+
+  useEffect(() => {
+    const sectionListNode = sectionListRef.current;
+    (async () => {
+      const valueFromStorage = await AsyncStorage.getItem('fundsPageTutorial');
+      if (data && data.funds && data.funds.length > 0 && !valueFromStorage) {
+        setTimeout(() => {
+          sectionListNode?.scrollToLocation({
+            itemIndex: 0,
+            sectionIndex: data?.funds?.length === 1 ? 0 : 1,
+            viewPosition: 1,
+            animated: true,
+          });
+          EventRegister.emit('fundsTabTutorial');
+        }, 1000);
+      }
+    })();
+  }, [data]);
 
   if (focused !== focus) {
     console.log('refetching funds');
@@ -47,6 +69,15 @@ const Funds: FundsScreen = () => {
       data:
         data?.funds?.filter((fund) => fund.class === assetClass.value) ?? [],
     })).filter((section) => section.data.length > 0);
+
+    if (
+      sectionedData &&
+      sectionedData.length > 0 &&
+      sectionedData[0].data &&
+      sectionedData[0].data.length > 0
+    ) {
+      setFirstItemId(sectionedData[0].data[0]._id);
+    }
 
     return sectionedData;
   }, [data?.funds]);
@@ -66,13 +97,14 @@ const Funds: FundsScreen = () => {
   }
 
   const keyExtractor = (item: Fund): string => item._id;
-  const renderItem: ListRenderItem<Fund> = ({ item, index }) => {
-    return <FundItem fund={item} index={index} />;
+  const renderItem: ListRenderItem<Fund> = ({ item }) => {
+    return <FundItem fund={item} showTooltip={item._id === firstItemId} />;
   };
 
   return (
     <View style={styles.container}>
       <SectionList
+        ref={sectionListRef}
         sections={sectionedFunds}
         renderItem={renderItem}
         keyExtractor={keyExtractor}

@@ -66,7 +66,7 @@ const ManagerItem: FC<ManagerItemProps> = ({ manager }) => {
       <Pressable
         style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}
         onPress={goToCompany}>
-        <PLabel label={manager.company.name} textStyle={styles.desLabel} />
+        <PLabel label={manager?.company?.name} textStyle={styles.desLabel} />
       </Pressable>
       {funds.length > 0 ? (
         <>

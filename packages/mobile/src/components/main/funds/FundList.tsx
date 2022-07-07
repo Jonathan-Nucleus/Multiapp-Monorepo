@@ -23,7 +23,7 @@ const FundList: React.FC<FundProps> = ({ funds, accredited }) => {
       <FlatList
         data={funds}
         keyExtractor={(item) => item._id}
-        renderItem={({ item, index }) => <FundItem fund={item} index={index} />}
+        renderItem={({ item }) => <FundItem fund={item} />}
         scrollEnabled={false}
         nestedScrollEnabled
       />
