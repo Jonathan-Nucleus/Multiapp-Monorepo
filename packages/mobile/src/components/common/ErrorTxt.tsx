@@ -46,5 +46,6 @@ const styles = StyleSheet.create({
     color: WHITE,
     ...Body2,
     marginLeft: 11,
+    flex: 1,
   },
 });

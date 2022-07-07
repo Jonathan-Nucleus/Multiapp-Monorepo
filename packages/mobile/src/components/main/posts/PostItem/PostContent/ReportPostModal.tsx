@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   FlatList,
   Platform,
@@ -21,6 +21,7 @@ import CheckboxLabel from 'mobile/src/components/common/CheckboxLabel';
 import PLabel from 'mobile/src/components/common/PLabel';
 import { Body1Bold } from 'mobile/src/theme/fonts';
 import pStyles from '../../../../../theme/pStyles';
+import ErrorText from '../../../../common/ErrorTxt';
 
 interface ReportPostModalProps {
   title?: string;
@@ -69,6 +70,7 @@ const ReportPostModal: React.FC<ReportPostModalProps> = (props) => {
   const { isVisible, onPressConfirm, onPressCancel } = props;
   const [violations, setViolations] = useState<ViolationItem[]>(ViolationList);
   const [comment, setComment] = useState('');
+  const [error, setError] = useState(false);
 
   const handleChange = (id: number) => {
     const temp = violations.map((category) => {
@@ -78,7 +80,14 @@ const ReportPostModal: React.FC<ReportPostModalProps> = (props) => {
       return category;
     });
     setViolations(temp);
+    setError(false);
   };
+
+  useEffect(() => {
+    setError(false);
+    setComment('');
+    setViolations(ViolationList);
+  }, [isVisible]);
 
   const renderItem = ({ item }: { item: ViolationItem }) => (
     <CheckboxLabel
@@ -110,6 +119,14 @@ const ReportPostModal: React.FC<ReportPostModalProps> = (props) => {
             contentContainerStyle={styles.listContainer}
             keyExtractor={(item) => item.id.toString()}
           />
+          {error && (
+            <ErrorText
+              error={
+                'You must select at least one reason for reporting the post'
+              }
+              errorContainer={styles.errorContainer}
+            />
+          )}
           <PLabel label="Other comments" textStyle={styles.title} />
           <TextInput
             value={comment}
@@ -118,11 +135,16 @@ const ReportPostModal: React.FC<ReportPostModalProps> = (props) => {
             style={styles.input}
           />
           <View style={styles.buttonContainer}>
-            <TouchableOpacity onPress={onPressCancel} style={styles.cancelBtn}>
+            <TouchableOpacity onPress={onPressCancel} style={styles.doneBtn}>
               <PLabel label="Cancel" textStyle={styles.title} />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
+                if (violations.every((v) => !v.isChecked)) {
+                  setError(true);
+                  return;
+                }
+
                 const violationValues = violations.map((item) => {
                   return item.value.toUpperCase();
                 });
@@ -156,7 +178,7 @@ const styles = StyleSheet.create({
     ...Body1Bold,
   },
   listContainer: {
-    marginVertical: 16,
+    marginVertical: 8,
   },
   checkContainer: {
     backgroundColor: 'transparent',
@@ -169,12 +191,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 30,
     marginBottom: 16,
-  },
-  cancelBtn: {
-    width: '45%',
-    height: 45,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   doneBtn: {
     width: '45%',
@@ -193,5 +209,8 @@ const styles = StyleSheet.create({
     height: 136,
     borderRadius: 16,
     marginTop: 8,
+  },
+  errorContainer: {
+    marginTop: 0,
   },
 });
