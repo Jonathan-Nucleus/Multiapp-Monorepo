@@ -287,7 +287,6 @@ export const Home = memo(HomeComponent, isEqual);
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 16,
     paddingHorizontal: 0,
   },
   postButton: {
