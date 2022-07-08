@@ -1,5 +1,12 @@
 import React from 'react';
-import { StyleSheet, View, StyleProp, ViewStyle } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  StyleProp,
+  ViewStyle,
+  TouchableOpacity,
+  Linking,
+} from 'react-native';
 import FastImage from 'react-native-fast-image';
 
 import PLabel from 'mobile/src/components/common/PLabel';
@@ -23,7 +30,11 @@ const PreviewLink: React.FC<PostHeaderProps> = ({
   }
 
   return (
-    <View style={[styles.containerStyle, containerStyle]}>
+    <TouchableOpacity
+      onPress={() => {
+        Linking.openURL(previewData.url);
+      }}
+      style={[styles.containerStyle, containerStyle]}>
       <View style={styles.previewContainer}>
         <View style={styles.metaDataContainer}>
           <FastImage
@@ -38,7 +49,7 @@ const PreviewLink: React.FC<PostHeaderProps> = ({
           />
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
