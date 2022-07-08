@@ -131,7 +131,7 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
         </View>
       </Pressable>
       <LikesModal
-        likes={post.likes}
+        postId={post._id}
         isVisible={likesModalVisible}
         onClose={() => setLikesModalVisible(false)}
       />

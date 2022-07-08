@@ -7,26 +7,30 @@ import {
   FlatList,
   ScrollView,
   Pressable,
+  ActivityIndicator,
 } from 'react-native';
 import Modal from 'react-native-modal';
 
 import UserInfo from 'mobile/src/components/common/UserInfo';
 import PLabel from 'mobile/src/components/common/PLabel';
-import { BLACK, WHITE12 } from 'shared/src/colors';
+import { BLACK, WHITE12, WHITE } from 'shared/src/colors';
 import { Body1Bold } from 'mobile/src/theme/fonts';
 import pStyles from 'mobile/src/theme/pStyles';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 
-import type { Like } from 'shared/graphql/query/post/usePost';
+import { usePostLikes, Like } from 'shared/graphql/query/post/usePostLikes';
 
 interface ModalProps {
   isVisible: boolean;
   onClose: () => void;
-  likes: Like[];
+  postId: string;
 }
 
-const LikesModal: FC<ModalProps> = ({ isVisible, likes, onClose }) => {
-  const goToProfile = (userId: string) => {
+const LikesModal: FC<ModalProps> = ({ isVisible, postId, onClose }) => {
+  const { data: { post } = {}, loading } = usePostLikes(postId);
+  const { likes = [] } = post || {};
+
+  const goToProfile = (userId: string): void => {
     NavigationService.navigate('UserDetails', {
       screen: 'UserProfile',
       params: {
@@ -61,25 +65,31 @@ const LikesModal: FC<ModalProps> = ({ isVisible, likes, onClose }) => {
           <View style={pStyles.modalKnob} />
         </View>
         <ScrollView>
-          <View onStartShouldSetResponder={() => true}>
-            <FlatList
-              data={likes}
-              keyExtractor={(item) => item._id}
-              renderItem={renderItem}
-              nestedScrollEnabled
-              scrollEnabled={false}
-              style={styles.flatList}
-              ListHeaderComponent={() => (
-                <PLabel
-                  label={`${likes.length} ${
-                    likes.length === 1 ? 'Like' : 'Likes'
-                  }`}
-                  textStyle={styles.likeCountLabel}
-                />
-              )}
-              ItemSeparatorComponent={() => <View style={styles.separator} />}
-            />
-          </View>
+          {likes.length === 0 && loading ? (
+            <View style={styles.progressView}>
+              <ActivityIndicator color={WHITE} size={16} />
+            </View>
+          ) : (
+            <View onStartShouldSetResponder={() => true}>
+              <FlatList
+                data={likes}
+                keyExtractor={(item) => item._id}
+                renderItem={renderItem}
+                nestedScrollEnabled
+                scrollEnabled={false}
+                style={styles.flatList}
+                ListHeaderComponent={() => (
+                  <PLabel
+                    label={`${likes.length} ${
+                      likes.length === 1 ? 'Like' : 'Likes'
+                    }`}
+                    textStyle={styles.likeCountLabel}
+                  />
+                )}
+                ItemSeparatorComponent={() => <View style={styles.separator} />}
+              />
+            </View>
+          )}
         </ScrollView>
       </View>
     </Modal>
@@ -104,9 +114,14 @@ const styles = StyleSheet.create({
     ...Body1Bold,
     marginBottom: 16,
   },
-  flatList: { marginBottom: 24 },
+  flatList: {
+    marginBottom: 24,
+  },
   separator: {
     height: 1,
     backgroundColor: WHITE12,
+  },
+  progressView: {
+    paddingBottom: 24,
   },
 });
