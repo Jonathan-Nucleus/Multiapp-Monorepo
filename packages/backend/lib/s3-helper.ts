@@ -110,8 +110,26 @@ type MoveResult = {
   mediaReady: boolean;
 };
 
+/**
+ * Moves media associated with a post from a temporary upload location prefixed
+ * with the user's user id to a location that includes the final post id.
+ *
+ * @param userId    The id of the user that uploaded the media asset.
+ * @param posterId  The id of the poster. This is either the user id if the user
+ *                  is posting as themselves, or a company id associated with
+ *                  the user, if they are posting on behalf of that company.
+ * @param postId    The id of the post the asset is associated with.
+ * @param filename  The filename of the asset that was originally uploaded
+ *                  to the temporary upload location in the S3 bucket.
+ *
+ * @returns   An object containing the success status of the operation as well
+ *            as whether the media asset is ready for viewing. Videos are
+ *            typically not immediately available as they must first be
+ *            transcoded.
+ */
 export async function movePostMedia(
   userId: string,
+  posterId: string,
   postId: string,
   filename: string
 ): Promise<MoveResult> {
@@ -133,7 +151,7 @@ export async function movePostMedia(
   const originalKey = `${isVideo ? "uploads/" : ""}posts/${userId}/${filename}`;
   const newKey = `${
     isVideo ? "uploads/" : ""
-  }posts/${userId}/${postId}/${filename}`;
+  }posts/${posterId}/${postId}/${filename}`;
 
   const client = new S3Client({
     region: AWS_UPLOAD_REGION,

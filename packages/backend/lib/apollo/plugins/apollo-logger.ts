@@ -23,7 +23,7 @@ const apolloLoggingPlugin: ApolloServerPlugin = {
           request,
           errors,
         };
-        console.log("Did encounter error: ", JSON.stringify(error, null, 2));
+        console.log("Did encounter error: ", JSON.stringify(error));
       },
     };
   },

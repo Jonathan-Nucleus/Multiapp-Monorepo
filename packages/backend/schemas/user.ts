@@ -498,7 +498,32 @@ export const ProRoleOptions = {
     value: "other",
     label: "Other",
   },
+
+  /**
+   * @deprecated Mobile build 2.1.1
+   */
+  C_LEVEL: {
+    value: "c-level",
+    label: "C level manager",
+  },
+
+  /**
+   * @deprecated Mobile build 2.1.1
+   */
+  FOUNDER: {
+    value: "founder",
+    label: "Promotional content",
+  },
+
+  /**
+   * @deprecated Mobile build 2.1.1
+   */
+  EX_MANAGER: {
+    value: "ex-manager",
+    label: "Ex fund manager",
+  },
 } as const;
+
 export type ProRole = ValueOf<typeof ProRoleOptions>["value"];
 export type ProRoleEnum = keyof typeof ProRoleOptions;
 

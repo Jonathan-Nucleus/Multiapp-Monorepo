@@ -712,6 +712,7 @@ const resolvers = {
         if (postData.media) {
           const result = await movePostMedia(
             user._id.toString(),
+            postData.userId.toString(),
             postData._id.toString(),
             postData.media.url
           );
@@ -824,6 +825,7 @@ const resolvers = {
         if (post.media && post.media.url !== originalPost.media?.url) {
           const result = await movePostMedia(
             user._id.toString(),
+            post.userId.toString(),
             post._id.toString(),
             post.media.url
           );
