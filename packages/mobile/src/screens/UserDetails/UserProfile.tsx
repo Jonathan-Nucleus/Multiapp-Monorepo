@@ -27,7 +27,7 @@ import FundList from 'mobile/src/components/main/funds/FundList';
 import PGradientOutlineButton from 'mobile/src/components/common/PGradientOutlineButton';
 import ProfilePlaceholder from 'mobile/src/components/placeholder/ProfilePlaceholder';
 import pStyles from 'mobile/src/theme/pStyles';
-import { Body2, Body3, H6Bold } from 'mobile/src/theme/fonts';
+import { Body2, Body3, H6, H6Bold } from 'mobile/src/theme/fonts';
 import {
   WHITE,
   BLUE300,
@@ -187,7 +187,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
                   type: 'BACKGROUND',
                 })
               }
-              style={styles.pencil}>
+              style={styles.editProfilePencil}>
               <Pencil color={WHITE} size={18} />
             </TouchableOpacity>
           )}
@@ -339,10 +339,10 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
           ) : (
             isMyAccount && (
               <View style={styles.noPostContainer}>
-                <View style={styles.noPostContainer}>
-                  <NoPostSvg />
+                <View style={styles.noPostImgContainer}>
+                  <NoPostSvg width={145} height={145} />
                 </View>
-                <Text style={styles.comment}>
+                <Text style={styles.noPostComment}>
                   You don’t have any posts, yet.
                 </Text>
                 <PGradientButton
@@ -448,7 +448,7 @@ const styles = StyleSheet.create({
     borderBottomColor: WHITE12,
     borderBottomWidth: 1,
     borderTopWidth: 1,
-    marginBottom: 24,
+    marginBottom: 16,
     alignItems: 'center',
     height: 60,
   },
@@ -514,11 +514,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  editProfilePencil: {
+    position: 'absolute',
+    right: 8,
+    top: 6,
+    backgroundColor: PRIMARYSOLID,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   noPostContainer: {
-    alignSelf: 'center',
     marginBottom: 36,
+    paddingHorizontal: 32,
+    alignItems: 'center',
+  },
+  noPostImgContainer: {
+    marginBottom: 32,
+  },
+  noPostComment: {
+    ...H6,
+    color: WHITE,
+    lineHeight: 24,
+    letterSpacing: 0.15,
   },
   createPostBtn: {
+    width: '100%',
     marginTop: 25,
   },
 });
