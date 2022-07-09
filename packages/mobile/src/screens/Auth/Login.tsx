@@ -50,10 +50,10 @@ const schema = yup
   .object({
     email: yup
       .string()
-      .email('Must be a valid email')
-      .required('Required')
+      .email('Invalid email address')
+      .required('Invalid email address')
       .default(''),
-    password: yup.string().required('Required').default(''),
+    password: yup.string().required('Invalid password').default(''),
   })
   .required();
 
@@ -113,7 +113,7 @@ const Login: LoginScreen = ({ navigation }) => {
       }
     } catch (e) {
       setError(true);
-      showMessage('error', 'Invalid email address or password');
+      showMessage('error', 'Invalid email address or password.');
       console.error('login error', e);
     }
     setLoading(false);
@@ -122,7 +122,6 @@ const Login: LoginScreen = ({ navigation }) => {
   const onSubmitInvalid: SubmitErrorHandler<FormValues> = async () => {
     setError(true);
     const { email, password } = errors;
-    console.log(email, password);
     if (email?.message && password?.message) {
       showMessage('error', 'Invalid email address and password.');
     } else if (email?.message) {
