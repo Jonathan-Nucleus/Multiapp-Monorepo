@@ -38,15 +38,15 @@
 		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>This app requires access to camera to take a photos and share content on the social feed or take photos for your profile</string>
+	<string>This app requires access to your camera to take photos and share content on the social feed or your profile</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>This app requires access to microphone to record a voice for videos shared on the social feed</string>
+	<string>This app requires access to your microphone to record audio for videos shared on the social feed</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>This app requires access to photo library to share images on the social feed or for your profile</string>
+	<string>This app requires access to your photo library to share media on the social feed or on your profile</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This app requires access to photo library to upload photos to share on the social feed or for your profile</string>
+	<string>This app requires access to your photo library to upload photos to the social feed or your profile</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Metropolis-Black.otf</string>
