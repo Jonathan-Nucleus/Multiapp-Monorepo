@@ -16,6 +16,7 @@ import Topic from '../screens/Auth/Topic';
 
 import type { AppScreenProps } from './AppNavigator';
 import Terms from '../screens/Auth/Terms';
+import UserType from '../screens/Auth/UserType';
 
 const Stack = createStackNavigator();
 const AuthStacks = () => {
@@ -42,6 +43,7 @@ const AuthStacks = () => {
       <Stack.Screen name="Signup" component={Signup} />
       <Stack.Screen name="Terms" component={Terms} />
       <Stack.Screen name="Topic" component={Topic} />
+      <Stack.Screen name="UserType" component={UserType} />
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="ForgotPass" component={ForgotPass} />
       <Stack.Screen name="ResetPass" component={ResetPass} />
@@ -64,6 +66,7 @@ export type AuthStackParamList = {
     inviteCode: string;
   };
   Topic: undefined;
+  UserType: { topics: string[] };
   ForgotPass: undefined;
   ResetPass: { email: string };
 };
@@ -97,6 +100,10 @@ export type TermsScreen = (
 
 export type TopicScreen = (
   props: AuthScreenProps<'Topic'>,
+) => ReactElement | null;
+
+export type UserTypeScreen = (
+  props: AuthScreenProps<'UserType'>,
 ) => ReactElement | null;
 
 export type ForgotPassScreen = (

@@ -40,6 +40,18 @@ export function isUser(user: User.Mongo | User.Stub): user is User.Mongo {
   return (user as User.Stub).role !== "stub";
 }
 
+/** Enumeration describing the possible user types */
+export const UserTypeOptions = {
+  FUND_MANAGER: "Fund Manager",
+  RIA_WEALTH_ADVISOR: "RIA or Wealth Advisor",
+  FAMILY_OFFICE: "Representative of a Family Office",
+  INSTITUTIONAL_ALLOCATOR: "Institutional Allocator",
+  NONE: "None of the above",
+};
+
+export type UserType = ValueOf<typeof UserTypeOptions>;
+export type UserTypeEnum = keyof typeof UserTypeOptions;
+
 export namespace User {
   export interface Mongo extends ContentCreator.Mongo {
     _id: ObjectId;
@@ -145,8 +157,9 @@ export namespace User {
       reportedPosts: Omit<GraphQLEntity<ReportedPost>, "violations"> & {
         violations: PostViolationEnum;
       };
-      settings: Omit<Settings, "interests" | "notifications"> & {
+      settings: Omit<Settings, "interests" | "notifications" | "userType"> & {
         interests?: PostCategoryEnum[];
+        userType?: UserTypeEnum;
         notifications: Record<NotificationEvent, NotificationMethodEnum>;
       };
       mutedPosts: Post.GraphQL[];
@@ -192,6 +205,8 @@ export interface ProfileSection {
 
 export interface Settings {
   interests?: PostCategory[];
+
+  userType?: UserTypeEnum;
 
   /**
    * Whether or user authorizes being tagged in posts, comments, and messages
@@ -669,6 +684,7 @@ export const UserSchema = `
 
   type Settings {
     interests: [PostCategory!]
+    userType: UserType
     tagging: Boolean!
     messaging: Boolean!
     emailUnreadMessage: Boolean!
@@ -677,6 +693,7 @@ export const UserSchema = `
 
   input SettingsInput {
     interests: [PostCategory!]
+    userType: UserType!
     tagging: Boolean
     messaging: Boolean
     emailUnreadMessage: Boolean
@@ -693,6 +710,10 @@ export const UserSchema = `
 
   enum UserRole {
     ${Object.keys(UserRoleOptions).map((key) => key)}
+  }
+
+  enum UserType {
+    ${Object.keys(UserTypeOptions).map((key) => key)}
   }
 
   enum Accreditation {

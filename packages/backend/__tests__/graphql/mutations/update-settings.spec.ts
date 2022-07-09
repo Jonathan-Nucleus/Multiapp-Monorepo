@@ -27,6 +27,7 @@ describe("Mutations - updateSettings", () => {
       variables: {
         settings: {
           interests: ["test-post-category"],
+          userType: "test",
         },
       },
     });
@@ -45,6 +46,7 @@ describe("Mutations - updateSettings", () => {
       variables: {
         settings: {
           interests: [postCategory],
+          userType: "NONE",
         },
       },
     });

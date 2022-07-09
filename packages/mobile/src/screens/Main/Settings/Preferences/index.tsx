@@ -145,6 +145,7 @@ const Preferences: FC<RouterProps> = ({ navigation }) => {
     const settingsInput: SettingsInput = {
       tagging: tagging,
       interests: account?.settings?.interests ?? [],
+      userType: account?.settings?.userType ?? 'NONE',
       notifications: selectedNotifications,
       messaging: messageType.messaging,
       emailUnreadMessage: messageType.emailUnreadMessage,

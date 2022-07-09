@@ -209,6 +209,7 @@ export function useAccount(
           mutedPostIds
           settings {
             interests
+            userType
             tagging
             messaging
             emailUnreadMessage

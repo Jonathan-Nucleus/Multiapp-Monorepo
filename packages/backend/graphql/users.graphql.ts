@@ -24,6 +24,7 @@ import {
   isUser,
   NotificationMethodEnum,
   AccreditationEnum,
+  UserTypeEnum,
 } from "../schemas/user";
 import type { Company } from "../schemas/company";
 import type { PostCategory } from "../schemas/post";
@@ -36,6 +37,7 @@ type OAuthInput = User.OAuthInput;
 
 type SettingsInput = {
   interests?: string[];
+  userType?: UserTypeEnum;
   tagging: boolean;
   messaging: boolean;
   emailUnreadMessage: boolean;
