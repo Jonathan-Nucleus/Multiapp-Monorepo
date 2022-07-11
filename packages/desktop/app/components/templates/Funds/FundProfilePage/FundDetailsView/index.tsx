@@ -1,33 +1,28 @@
 import { FC, useState } from "react";
 import { FundDetails } from "shared/graphql/query/marketplace/useFund";
-import Card from "desktop/app/components/common/Card";
-import Avatar from "desktop/app/components/common/Avatar";
+import { useWatchFund } from "shared/graphql/mutation/funds/useWatchFund";
+import Card from "../../../../common/Card";
+import Avatar from "../../../../common/Avatar";
 import Button from "../../../../common/Button";
 import { Info, Share, Star, TelevisionSimple } from "phosphor-react";
-import { useWatchFund } from "shared/graphql/mutation/funds/useWatchFund";
 import { Tab } from "@headlessui/react";
 import FundMedia from "../../../../modules/funds/FundMedia";
 import ReactMarkdown from "react-markdown";
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import localData from "dayjs/plugin/localeData";
+import FundDocuments from "../FundDocuments";
 import Accordion from "../../../../common/Accordion";
 import ManagerCard from "../ManagerCard";
 import DetailedTeamMemberList from "../DetailedTeamMemberList";
-import TeamMembersList from "../../../../modules/teams/TeamMembersList";
-import DisclosureModal from "../../../../modules/funds/DisclosureModal";
-import FundDocuments from "../FundDocuments";
-
-dayjs.extend(localData);
-dayjs.extend(utc);
+import TeamMembersList from "desktop/app/components/modules/teams/TeamMembersList";
+import DisclosureModal from "desktop/app/components/modules/funds/DisclosureModal";
 
 const MONTHS = dayjs().localeData().monthsShort();
 
-interface StrategyFundProfileProps {
+interface FundDetailsViewProps {
   fund: FundDetails;
 }
 
-const StrategyFundProfile: FC<StrategyFundProfileProps> = ({ fund }) => {
+const FundDetailsView: FC<FundDetailsViewProps> = ({ fund }) => {
   const { isWatching, toggleWatch } = useWatchFund(fund._id);
   const [showDisclosureModal, setShowDisclosureModal] = useState(false);
   const fundTeam = [fund.manager, ...(fund?.team ?? [])];
@@ -314,4 +309,4 @@ const StrategyFundProfile: FC<StrategyFundProfileProps> = ({ fund }) => {
   );
 };
 
-export default StrategyFundProfile;
+export default FundDetailsView;
