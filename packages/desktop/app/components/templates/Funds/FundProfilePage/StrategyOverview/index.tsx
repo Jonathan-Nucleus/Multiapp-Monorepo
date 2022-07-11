@@ -15,6 +15,8 @@ import DetailedTeamMemberList from "../DetailedTeamMemberList";
 import DisclosureModal from "../../../../modules/funds/DisclosureModal";
 import FundDocuments from "../FundDocuments";
 import { AssetClasses } from "backend/graphql/enumerations.graphql";
+import FundMedia from "../../../../modules/funds/FundMedia";
+import ContactSpecialist from "../../../../modules/funds/ContactSpecialist";
 
 dayjs.extend(localData);
 dayjs.extend(utc);
@@ -27,12 +29,44 @@ const StrategyOverview: FC<StrategyOverviewProps> = ({ fund }) => {
   const { isWatching, toggleWatch } = useWatchFund(fund._id);
   const [showDisclosureModal, setShowDisclosureModal] = useState(false);
   const fundTeam = [fund.manager, ...(fund?.team ?? [])];
+  const [selectedVideo, setSelectedVideo] = useState(0);
+  const [showContactSpecialist, setShowContactSpecialist] = useState(false);
 
   return (
     <div className="mt-5 px-2 flex justify-center">
       <div className="lg:grid grid-cols-3 max-w-6xl">
         <div className="col-span-2">
           <div>
+            {fund.videos && fund.videos.length > 0 && (
+              <div className="mb-8">
+                <div className="bg-black rounded-2xl overflow-hidden">
+                  <FundMedia
+                    key={selectedVideo}
+                    mediaUrl={fund.videos[selectedVideo]}
+                    fundId={fund._id}
+                  />
+                </div>
+                <div className="flex flex-wrap mt-3">
+                  {fund.videos.map((video, index) => (
+                    <div
+                      key={index}
+                      className={`w-24 h-14 bg-black overflow-hidden rounded border mr-3 ${
+                        selectedVideo == index
+                          ? "border-white"
+                          : "border-transparent opacity-60"
+                      } hover:opacity-100 transition-all cursor-pointer`}
+                      onClick={() => setSelectedVideo(index)}
+                    >
+                      <FundMedia
+                        fundId={fund._id}
+                        mediaUrl={video}
+                        hideControls={true}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             <Tab.Group>
               <Tab.List className="grid grid-cols-2">
                 <Tab>
@@ -190,6 +224,21 @@ const StrategyOverview: FC<StrategyOverviewProps> = ({ fund }) => {
               </Button>
             </div>
           </Card>
+          <div className="my-6">
+            <Button
+              variant="gradient-primary"
+              className="w-full font-medium h-12"
+              onClick={() => setShowContactSpecialist(true)}
+            >
+              Contact Specialist
+            </Button>
+            {showContactSpecialist && (
+              <ContactSpecialist
+                show={showContactSpecialist}
+                onClose={() => setShowContactSpecialist(false)}
+              />
+            )}
+          </div>
           <div className="mt-9 px-3">
             <DetailedTeamMemberList members={fundTeam} />
           </div>
