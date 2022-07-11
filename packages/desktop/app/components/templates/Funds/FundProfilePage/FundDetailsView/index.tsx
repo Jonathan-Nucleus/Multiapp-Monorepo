@@ -12,7 +12,6 @@ import dayjs from "dayjs";
 import FundDocuments from "../FundDocuments";
 import Accordion from "../../../../common/Accordion";
 import ManagerCard from "../ManagerCard";
-import DetailedTeamMemberList from "../DetailedTeamMemberList";
 import TeamMembersList from "desktop/app/components/modules/teams/TeamMembersList";
 import DisclosureModal from "desktop/app/components/modules/funds/DisclosureModal";
 
@@ -187,7 +186,7 @@ const FundDetailsView: FC<FundDetailsViewProps> = ({ fund }) => {
                       </div>
                     </Card>
                   </div>
-                  {!fund.limitedView && fund.metrics.length > 0 ? (
+                  {fund.metrics.length > 0 ? (
                     <div className="mt-6 text-white/[0.3]">
                       <div className="mb-2 font-light tracking-widest">
                         Monthly Net Return
@@ -293,11 +292,7 @@ const FundDetailsView: FC<FundDetailsViewProps> = ({ fund }) => {
         <div className="lg:ml-8">
           <ManagerCard fund={fund} />
           <div className="mt-9 px-3">
-            {fund.limitedView ? (
-              <DetailedTeamMemberList members={fundTeam} />
-            ) : (
-              <TeamMembersList members={fundTeam} />
-            )}
+            <TeamMembersList members={fundTeam} />
           </div>
         </div>
       </div>
