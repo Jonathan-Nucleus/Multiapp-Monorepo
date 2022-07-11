@@ -3,10 +3,12 @@ import { useRouter } from "next/router";
 
 import FundProfilePage from "../../app/components/templates/Funds/FundProfilePage";
 import { NextPageWithLayout } from "../../app/types/next-page";
+import { useFund } from "shared/graphql/query/marketplace/useFund";
 
 const FundProfile: NextPageWithLayout = () => {
   const router = useRouter();
   const { fundId } = router.query as Record<string, string>;
+  const { data: { fund } = {} } = useFund(fundId);
 
   return (
     <>
@@ -15,7 +17,7 @@ const FundProfile: NextPageWithLayout = () => {
         <meta name="description" content="" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <FundProfilePage fundId={fundId} />
+      <FundProfilePage fund={fund} />
     </>
   );
 };
