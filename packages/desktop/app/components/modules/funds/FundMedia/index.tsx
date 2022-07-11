@@ -9,12 +9,13 @@ const { NEXT_PUBLIC_AWS_BUCKET } = publicRuntimeConfig;
 interface FundMediaProps {
   fundId: string;
   mediaUrl: string;
+  hideControls?: boolean;
 }
 
-const FundMedia: FC<FundMediaProps> = ({ fundId, mediaUrl }) => {
+const FundMedia: FC<FundMediaProps> = ({ fundId, mediaUrl, hideControls }) => {
   const key = `${fundId}/${mediaUrl}`;
   const url = `${NEXT_PUBLIC_AWS_BUCKET}/funds/${key}`;
-  return <Media url={url} key={fundId} />;
+  return <Media url={url} key={fundId} hideControls={hideControls} />;
 };
 
 export default FundMedia;
