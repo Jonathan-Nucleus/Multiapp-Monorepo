@@ -12,10 +12,10 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import localData from "dayjs/plugin/localeData";
 import Accordion from "../../../../common/Accordion";
-import ManagerCard from "../ManagerCard";
 import DetailedTeamMemberList from "../DetailedTeamMemberList";
 import DisclosureModal from "../../../../modules/funds/DisclosureModal";
 import FundDocuments from "../FundDocuments";
+import { AssetClasses } from "backend/graphql/enumerations.graphql";
 
 dayjs.extend(localData);
 dayjs.extend(utc);
@@ -33,50 +33,7 @@ const StrategyOverview: FC<StrategyOverviewProps> = ({ fund }) => {
     <div className="mt-5 px-2 flex justify-center">
       <div className="lg:grid grid-cols-3 max-w-6xl">
         <div className="col-span-2">
-          <Card className="flex flex-row bg-background-card rounded-lg overflow-hidden p-4">
-            <div className="flex flex-col flex-grow">
-              <div className="flex">
-                <Avatar user={fund.company} size={96} shape="square" />
-                <div className="self-center flex-grow mx-4">
-                  <div className="text-2xl text-white">{fund.name}</div>
-                  <div className="text-primary">{fund.company.name}</div>
-                </div>
-              </div>
-              <div className="min-h-0 flex flex-grow text-sm text-white px-1 mt-5">
-                <ul className="self-center list-disc ml-4">
-                  {fund.highlights.map((highlight) => (
-                    <li key={highlight}>{highlight}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            <div className="flex flex-col justify-between">
-              <div className="self-start flex items-center">
-                <div className="w-3 h-3 bg-success rounded-full" />
-                <div className="text-xs text-success ml-1">{fund.status}</div>
-              </div>
-              <div className="text-right leading-none">
-                <Button variant="text" className="hidden">
-                  <Share color="white" weight="light" size={24} />
-                </Button>
-                <Button
-                  variant="text"
-                  className="ml-2 py-0"
-                  onClick={toggleWatch}
-                >
-                  <Star
-                    className={
-                      isWatching ? "text-primary-medium" : "text-white"
-                    }
-                    color="currentColor"
-                    weight={isWatching ? "fill" : "light"}
-                    size={24}
-                  />
-                </Button>
-              </div>
-            </div>
-          </Card>
-          <div className="mt-3">
+          <div>
             <Tab.Group>
               <Tab.List className="grid grid-cols-2">
                 <Tab>
@@ -189,7 +146,53 @@ const StrategyOverview: FC<StrategyOverviewProps> = ({ fund }) => {
           </div>
         </div>
         <div className="lg:ml-8">
-          <ManagerCard fund={fund} />
+          <Card className="rounded-lg overflow-hidden p-0">
+            <div>
+              <div className="flex items-center px-4 py-3">
+                <Avatar user={fund.company} size={48} shape="square" />
+                <div className="flex-grow ml-3">
+                  <div className="text-sm text-white font-medium">
+                    {fund.name}
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 text-center border-y border-white/[.12] divide-x divide-inherit">
+                <div className="p-2">
+                  <div className="text-tiny tracking-widest text-white opacity-60 uppercase">
+                    Asset Class
+                  </div>
+                  <div className="text-xs text-white">
+                    {AssetClasses.find(
+                      (assetClass) => assetClass.value === fund.class
+                    )?.label ?? ""}
+                  </div>
+                </div>
+                <div className="p-2">
+                  <div className="text-tiny tracking-widest text-white opacity-60 uppercase">
+                    Strategy
+                  </div>
+                  <div className="text-xs text-white">{fund.strategy}</div>
+                </div>
+              </div>
+            </div>
+            <div className="text-right leading-none px-4 py-2">
+              <Button variant="text" className="hidden">
+                <Share color="white" weight="light" size={24} />
+              </Button>
+              <Button
+                variant="text"
+                className="ml-2 py-0"
+                onClick={toggleWatch}
+              >
+                <Star
+                  className={isWatching ? "text-primary-medium" : "text-white"}
+                  color="currentColor"
+                  weight={isWatching ? "fill" : "light"}
+                  size={24}
+                />
+              </Button>
+            </div>
+          </Card>
           <div className="mt-9 px-3">
             <DetailedTeamMemberList members={fundTeam} />
           </div>
