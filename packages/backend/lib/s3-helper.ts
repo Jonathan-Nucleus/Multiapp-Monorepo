@@ -79,7 +79,7 @@ export async function getUploadUrl(
   const remoteFilename = `${uuid()}.${fileExt}`;
   const isVideo = VIDEO_EXTS.some((ext) => fileExt === ext);
   const remoteKey = `${
-    isVideo ? "uploads/" : ""
+    isVideo && type === "post" ? "uploads/" : ""
   }${type}s/${id}/${remoteFilename}`;
 
   try {
