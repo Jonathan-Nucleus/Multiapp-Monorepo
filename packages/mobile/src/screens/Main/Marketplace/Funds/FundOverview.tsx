@@ -191,12 +191,14 @@ const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
               flex={RIGHT_FLEX}
             />
           </View>
-          <View style={styles.infoContainer}>
-            <PTitle
-              title="AUM"
-              subTitle={`$${dollarFormatter.format(fund.aum)}`}
-            />
-          </View>
+          {'aum' in fund === true && fund.aum !== null ? (
+            <View style={styles.infoContainer}>
+              <PTitle
+                title="AUM"
+                subTitle={`$${dollarFormatter.format(fund.aum!)}`}
+              />
+            </View>
+          ) : null}
           <View style={styles.infoContainer}>
             <PTitle
               title="Minimum Investment"

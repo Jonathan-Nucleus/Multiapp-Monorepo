@@ -12,7 +12,7 @@ export namespace Fund {
     companyId: ObjectId;
     level: Accreditation;
     class: AssetClass;
-    aum: number;
+    aum?: number;
     min: number;
     lockup: string;
     strategy: string;
@@ -155,7 +155,7 @@ export const FundSchema = `
     companyId: ID!
     level: Accreditation!
     class: AssetClass!
-    aum: Int!
+    aum: Int
     min: Int!
     lockup: String!
     strategy: String!
