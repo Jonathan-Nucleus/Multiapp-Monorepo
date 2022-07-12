@@ -20,7 +20,7 @@ import _compact from "lodash/compact";
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 const createNotificationsCollection = (
   notificationsCollection: Collection<Notification.Mongo>,
-  usersCollection: Collection<User.Mongo>
+  usersCollection: Collection<User.Mongo | User.Stub>
 ) => {
   return {
     /**
@@ -48,13 +48,13 @@ const createNotificationsCollection = (
       userIds: MongoId[],
       data?: NotificationOptionalData
     ): Promise<boolean> => {
-      const users = await usersCollection
+      const users = (await usersCollection
         .find({
           _id: { $in: toObjectIds(userIds) },
           deletedAt: { $exists: false },
-          $not: { role: "stub" },
+          role: { $ne: "stub" },
         })
-        .toArray();
+        .toArray()) as User.Mongo[];
       if (users.length === 0) {
         console.log(`No users were sent ${type} notification`);
         return false;
