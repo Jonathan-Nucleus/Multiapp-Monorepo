@@ -194,12 +194,18 @@ const FundCard: FC<FundCardProps> = ({
                 </div>
                 <div className="text-white text-center">{fund.strategy}</div>
               </div>
-              <div className="flex flex-col items-center justify-center px-2 py-2">
-                <div className="text-tiny text-white text-center opacity-60 tracking-widest mb-1">
-                  AUM
-                </div>
-                <div className="text-white text-center">
-                  {`$${dollarFormatter.format(fund.aum)}`}
+              <div className="px-2 py-2">
+                <div
+                  className={`flex flex-col items-center justify-center ${
+                    fund.aum ? "" : "invisible"
+                  }`}
+                >
+                  <div className="text-tiny text-white text-center opacity-60 tracking-widest mb-1">
+                    AUM
+                  </div>
+                  <div className="text-white text-center">
+                    {`$${dollarFormatter.format(fund.aum)}`}
+                  </div>
                 </div>
               </div>
               <div>
