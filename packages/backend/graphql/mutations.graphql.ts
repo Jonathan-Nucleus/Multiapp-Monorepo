@@ -733,9 +733,14 @@ const resolvers = {
         const mentionIds = postData?.mentionIds ?? [];
         await Promise.all(
           mentionIds.map((mentionId) => {
-            return db.notifications.create(user, "tagged-in-post", mentionId, {
-              postId: postData._id,
-            });
+            return db.notifications.create(
+              user,
+              "tagged-in-post",
+              [mentionId],
+              {
+                postId: postData._id,
+              }
+            );
           })
         );
 
@@ -1000,7 +1005,13 @@ const resolvers = {
             user._id.toString()
           )
         ) {
-          db.notifications.create(user, "like-post", postData.userId, {
+          let notifyUsers = [postData.userId];
+          if (postData.isCompany) {
+            const company = await db.companies.find(postData.userId);
+            notifyUsers = company ? company.memberIds : [];
+          }
+
+          db.notifications.create(user, "like-post", notifyUsers, {
             postId: postData._id,
           });
         }
@@ -1189,7 +1200,12 @@ const resolvers = {
         const newComment = await db.comments.create(comment, user._id);
 
         // Send notification
-        db.notifications.create(user, "comment-post", postData.userId, {
+        let notifyUsers = [postData.userId];
+        if (postData.isCompany) {
+          const company = await db.companies.find(postData.userId);
+          notifyUsers = company ? company.memberIds : [];
+        }
+        db.notifications.create(user, "comment-post", notifyUsers, {
           postId: postData._id,
           commentId: newComment._id,
         });
@@ -1200,7 +1216,7 @@ const resolvers = {
             return db.notifications.create(
               user,
               "tagged-in-comment",
-              mentionId,
+              [mentionId],
               {
                 postId: postData._id,
                 commentId: newComment._id,
@@ -1420,7 +1436,7 @@ const resolvers = {
 
         // Send notification
         if (follow && followed) {
-          db.notifications.create(user, "followed-by-user", userId);
+          db.notifications.create(user, "followed-by-user", [userId]);
         }
 
         return {

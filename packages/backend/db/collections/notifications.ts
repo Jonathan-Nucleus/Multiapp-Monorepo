@@ -6,7 +6,7 @@
 import _ from "lodash";
 import { Collection, ObjectId } from "mongodb";
 import { sendPushNotification } from "../../lib/firebase-helper";
-import { MongoId, toObjectId } from "../../lib/mongo-helper";
+import { MongoId, toObjectId, toObjectIds } from "../../lib/mongo-helper";
 import { InternalServerError, NotFoundError } from "../../lib/apollo/validate";
 import {
   generateNotification,
@@ -14,7 +14,8 @@ import {
   NotificationOptionalData,
   NotificationType,
 } from "../../schemas/notification";
-import { isUser, User } from "../../schemas/user";
+import { User } from "../../schemas/user";
+import _compact from "lodash/compact";
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 const createNotificationsCollection = (
@@ -44,57 +45,81 @@ const createNotificationsCollection = (
     create: async (
       currentUser: User.Mongo,
       type: NotificationType,
-      userId: MongoId,
+      userIds: MongoId[],
       data?: NotificationOptionalData
     ): Promise<boolean> => {
-      const user = await usersCollection.findOne({
-        _id: toObjectId(userId),
-        deletedAt: { $exists: false },
-      });
-      if (!user || !isUser(user)) {
-        throw new NotFoundError();
+      const users = await usersCollection
+        .find({
+          _id: { $in: toObjectIds(userIds) },
+          deletedAt: { $exists: false },
+          $not: { role: "stub" },
+        })
+        .toArray();
+      if (users.length === 0) {
+        console.log(`No users were sent ${type} notification`);
+        return false;
       }
 
-      if (
-        data?.postId &&
-        _.map(user.mutedPostIds, (item) => item.toString()).includes(
-          data.postId.toString()
-        )
-      ) {
-        return true;
-      }
+      const notificationsData = _compact(
+        users.map((user) => {
+          if (
+            data?.postId &&
+            _.map(user.mutedPostIds, (item) => item.toString()).includes(
+              data.postId.toString()
+            )
+          ) {
+            return null;
+          }
 
-      const { title, body } = generateNotification(type, currentUser);
-      const notificationData = {
-        _id: new ObjectId(),
-        type,
-        userId: user._id,
-        title,
-        body,
-        isNew: true,
-        data: {
-          ...data,
-          userId: currentUser._id,
-        },
-      };
-      await notificationsCollection.insertOne(notificationData);
-      await usersCollection.updateOne(
-        { _id: user._id },
+          const { title, body } = generateNotification(type, currentUser);
+          return {
+            user: user,
+            notification: {
+              _id: new ObjectId(),
+              type,
+              userId: user._id,
+              title,
+              body,
+              isNew: true,
+              data: {
+                ...data,
+                userId: currentUser._id,
+              },
+            },
+          };
+        })
+      );
+
+      const notifications = notificationsData.map(
+        (notification) => notification.notification
+      );
+      const notificationUsers = notificationsData.map(
+        (notification) => notification.user._id
+      );
+
+      await notificationsCollection.insertMany(notifications);
+      await usersCollection.updateMany(
+        { _id: { $in: notificationUsers } },
         {
           $inc: { notificationBadge: 1 },
           $set: { updatedAt: new Date() },
         }
       );
 
-      if (user.fcmToken) {
-        sendPushNotification(
-          title,
-          body,
-          user.fcmToken,
-          notificationData.type,
-          notificationData.data
-        );
-      }
+      await Promise.all(
+        notificationsData.map((notificationData) => {
+          const { user, notification } = notificationData;
+          if (user.fcmToken) {
+            sendPushNotification(
+              notification.title,
+              notification.body,
+              user.fcmToken,
+              notification.type,
+              notification.data
+            );
+          }
+        })
+      );
 
       return true;
     },
