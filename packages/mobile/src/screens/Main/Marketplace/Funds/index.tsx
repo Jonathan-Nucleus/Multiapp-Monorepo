@@ -36,23 +36,22 @@ const Funds: FundsScreen = () => {
   const { data, refetch } = useFunds();
   const [focus, setFocus] = useState(focused);
   const [disclosureVisible, setDisclosureVisible] = useState(false);
-  const sectionListRef = useRef<SectionList>(null);
   const [firstItemId, setFirstItemId] = useState('');
+  const sectionListRef = useRef<SectionList>(null);
 
   useEffect(() => {
-    const sectionListNode = sectionListRef.current;
     (async () => {
       const valueFromStorage = await AsyncStorage.getItem('fundsPageTutorial');
       if (data && data.funds && data.funds.length > 0 && !valueFromStorage) {
         setTimeout(() => {
-          sectionListNode?.scrollToLocation({
-            itemIndex: 0,
-            sectionIndex: data?.funds?.length === 1 ? 0 : 1,
+          sectionListRef.current?.scrollToLocation({
+            itemIndex: -1,
+            sectionIndex: 1,
             viewPosition: 1,
             animated: true,
           });
           EventRegister.emit('fundsTabTutorial');
-        }, 1000);
+        }, 1500);
       }
     })();
   }, [data]);
@@ -130,6 +129,7 @@ const Funds: FundsScreen = () => {
             />
           </>
         }
+        onScrollToIndexFailed={() => console.log('scroll index failed')}
       />
     </View>
   );

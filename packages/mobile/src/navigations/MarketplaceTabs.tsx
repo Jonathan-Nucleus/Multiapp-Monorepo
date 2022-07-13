@@ -72,14 +72,13 @@ const MarketplaceTabs = () => {
                 </View>
               }
               contentStyle={pStyles.tooltipContent}
-              placement="bottom"
-              onClose={() => console.log('')}>
+              placement="bottom">
               <Text
                 style={[
                   styles.tabBarLabel,
                   Body2,
                   { color },
-                  focused ? styles.bold : {},
+                  !showTutorialFunds && focused ? styles.bold : {},
                 ]}>
                 {route.name}
               </Text>

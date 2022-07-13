@@ -157,8 +157,7 @@ const MainHeader: React.FC<HeaderProps> = (props) => {
                 )
               }
               contentStyle={pStyles.tooltipContent}
-              placement="bottom"
-              onClose={() => console.log('')}>
+              placement="bottom">
               <Pressable
                 style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}
                 onPress={() =>

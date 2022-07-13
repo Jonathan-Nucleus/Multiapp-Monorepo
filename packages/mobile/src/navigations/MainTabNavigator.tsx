@@ -84,8 +84,7 @@ const MainTabNavigator = (): React.ReactElement => {
                   </View>
                 }
                 contentStyle={pStyles.tooltipContent}
-                placement="top"
-                onClose={() => console.log('')}>
+                placement="top">
                 <House size={size} color={WHITE} weight="fill" />
               </Tooltip>
             ) : (

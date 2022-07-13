@@ -127,6 +127,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flex: 1,
+    marginRight: 16,
   },
   button: {
     fontWeight: 'bold',

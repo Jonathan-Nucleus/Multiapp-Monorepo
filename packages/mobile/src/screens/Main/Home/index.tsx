@@ -215,8 +215,7 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
             </View>
           }
           contentStyle={pStyles.tooltipContent}
-          placement="left"
-          onClose={() => console.log('')}>
+          placement="left">
           <TouchableOpacity onPress={() => setVisibleFilter(true)}>
             <SlidersHorizontal color={WHITE} size={24} />
           </TouchableOpacity>
@@ -262,8 +261,7 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
             </View>
           }
           contentStyle={pStyles.tooltipContent}
-          placement="left"
-          onClose={() => console.log('')}>
+          placement="left">
           <PGradientButton
             label="+"
             gradientContainer={styles.gradientContainer}
