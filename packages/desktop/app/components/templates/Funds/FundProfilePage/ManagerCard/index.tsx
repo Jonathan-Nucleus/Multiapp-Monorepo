@@ -84,16 +84,18 @@ const ManagerCard: FC<ManagerCardProps> = ({ fund }) => {
             <div className="text-white">{fund.strategy}</div>
           </div>
         </div>
-        <div className="grid grid-cols-2">
-          <div className="p-4">
-            <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
-              AUM
-            </div>
-            <div className="text-white">
-              ${dollarFormatter.format(fund.aum)}
+        {fund.aum ? (
+          <div className="grid grid-cols-2">
+            <div className="p-4">
+              <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
+                AUM
+              </div>
+              <div className="text-white">
+                ${dollarFormatter.format(fund.aum)}
+              </div>
             </div>
           </div>
-        </div>
+        ) : null}
         <div className="grid grid-cols-2">
           <div className="py-4 pl-4">
             <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
