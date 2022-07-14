@@ -30,7 +30,7 @@ const navItems = [
   },
   {
     icon: <Image src={FundLogo} alt="" />,
-    title: "Funds",
+    title: "Invest",
     path: "/funds",
     active: ["/funds", "/funds/managers", "/funds/companies"],
   },

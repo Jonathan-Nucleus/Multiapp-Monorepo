@@ -112,7 +112,7 @@ const MainTabNavigator = (): React.ReactElement => {
         component={MarketplaceTabs}
         options={{
           tabBarLabel: ({ focused }) => (
-            <Text style={[styles.text, focused && styles.bold]}>funds</Text>
+            <Text style={[styles.text, focused && styles.bold]}>invest</Text>
           ),
           tabBarIcon: ({ focused }) =>
             focused ? <FundsSVG /> : <GreyFundsSVG />,
