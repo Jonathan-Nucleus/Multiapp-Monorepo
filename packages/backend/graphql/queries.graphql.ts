@@ -1,7 +1,6 @@
 import { gql } from "apollo-server";
 import * as yup from "yup";
 import _ from "lodash";
-import { getLinkPreview } from "link-preview-js";
 import {
   decodeToken,
   AccessTokenPayload,
@@ -33,9 +32,10 @@ import type { Fund } from "../schemas/fund";
 import type { Notification } from "../schemas/notification";
 
 import "dotenv/config";
+import { Client } from "peekalink";
+import { LINK_PATTERN } from "shared/src/patterns";
 
-const LINK_PATTERN =
-  /((?:(?:https|http|ftp):\/\/)?(?:www\.)?(?:[-a-zA-Z\d@:%._+~#=]{2,256}\.[a-z]{2,6}\b)+(?:\/[/\d\w.\-?=&%+#]+)?)/gim;
+const client = new Client({ apiKey: `${process.env.PEEKALINK_API_KEY}` });
 
 const schema = gql`
   type Query {
@@ -272,21 +272,22 @@ const resolvers = {
       ): Promise<LinkPreview | null> => {
         try {
           const link = body.match(LINK_PATTERN)?.[0]?.toLowerCase();
+
           if (link) {
-            const fullLink = link.startsWith("http") ? link : `http://${link}`;
-            console.log("generating preview data for", fullLink);
-            const previewData =
-              (await getLinkPreview(fullLink, {
-                headers: {
-                  "User-Agent":
-                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36",
-                  "Accept-Lanugage": "en,en-US",
-                  Accept:
-                    "text/html,application/xhtml+xml,application/xml;q=0.9,/;q=0.8",
-                },
-                followRedirects: true,
-              })) ?? null;
-            return previewData;
+            const preview = await client.preview(link);
+
+            return {
+              url: preview.url,
+              mediaType: preview.mimeType,
+              contentType: `${preview.contentType}`,
+              favicons: preview?.icon?.url ? [preview.icon.url] : [],
+              title: preview.title,
+              siteName: preview.domain,
+              description: preview.description,
+              images: preview?.image?.url ? [preview.image.url] : [],
+            };
+          } else {
+            return null;
           }
         } catch (error) {
           console.log(

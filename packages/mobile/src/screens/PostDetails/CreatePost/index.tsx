@@ -10,10 +10,7 @@ import {
   View,
 } from 'react-native';
 import { CircleSnail, Pie } from 'react-native-progress';
-import ImagePicker, {
-  ImageOrVideo,
-  Image as UploadImage,
-} from 'react-native-image-crop-picker';
+import ImagePicker, { ImageOrVideo } from 'react-native-image-crop-picker';
 import { X } from 'phosphor-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -58,8 +55,8 @@ import {
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import {
-  useLinkPreview,
   LinkPreview,
+  useLinkPreview,
 } from 'shared/graphql/query/post/useLinkPreview';
 import { useFetchUploadLink } from 'shared/graphql/mutation/posts';
 import { useAccountContext } from 'shared/context/Account';

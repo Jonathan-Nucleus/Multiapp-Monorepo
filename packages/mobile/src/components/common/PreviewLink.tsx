@@ -25,9 +25,6 @@ const PreviewLink: React.FC<PostHeaderProps> = ({
   containerStyle,
 }) => {
   const previewImage = previewData.images?.find((image) => !!image);
-  if (!previewImage) {
-    return null;
-  }
 
   return (
     <TouchableOpacity
@@ -37,10 +34,12 @@ const PreviewLink: React.FC<PostHeaderProps> = ({
       style={[styles.containerStyle, containerStyle]}>
       <View style={styles.previewContainer}>
         <View style={styles.metaDataContainer}>
-          <FastImage
-            source={{ uri: previewImage }}
-            style={styles.previewImage}
-          />
+          {previewImage && (
+            <FastImage
+              source={{ uri: previewImage }}
+              style={styles.previewImage}
+            />
+          )}
           <PLabel label={previewData.title || ''} textStyle={styles.title} />
           <PLabel
             label={previewData.description || ''}
