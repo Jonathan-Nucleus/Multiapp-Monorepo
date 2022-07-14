@@ -33,7 +33,7 @@ const PLACE_HOLDERS = 7;
 const Funds: FundsScreen = () => {
   const focused = useIsFocused();
 
-  const { data, refetch } = useFunds();
+  const { data, refetch, loading } = useFunds();
   const [focus, setFocus] = useState(focused);
   const [disclosureVisible, setDisclosureVisible] = useState(false);
   const [firstItemId, setFirstItemId] = useState('');
@@ -81,7 +81,7 @@ const Funds: FundsScreen = () => {
     return sectionedData;
   }, [data?.funds]);
 
-  if (!data?.funds) {
+  if (!data?.funds || (loading && data?.funds?.length === 0)) {
     return (
       <View style={pStyles.globalContainer}>
         {[...Array(PLACE_HOLDERS)].map((_, index) => (
