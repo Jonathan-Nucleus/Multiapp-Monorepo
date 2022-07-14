@@ -132,7 +132,7 @@ describe("Mutations - register", () => {
       },
     });
 
-    expect(getErrorCode(res)).toBe(ErrorCode.NOT_FOUND);
+    expect(getErrorCode(res)).toBe(ErrorCode.UNPROCESSABLE_ENTITY);
   });
 
   it("fails with registered user email", async () => {

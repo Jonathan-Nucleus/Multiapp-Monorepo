@@ -330,34 +330,34 @@ const createUsersCollection = (
       const isUniversalCode = UNIVERSAL_INVITE_CODES.includes(inviteCode);
 
       // Ensure user already already exists as a stub
-      const userData = isUniversalCode
-        ? ({
-            _id: new ObjectId(),
-            firstName,
-            lastName,
-            email,
-            emailToken: inviteCode,
-            role: "stub",
-          } as const)
-        : await collection.find({ email });
-      if (!userData) {
-        throw new NotFoundError();
-      }
-      if (isUser(userData)) {
-        throw new UnprocessableEntityError("User already exists.");
-      }
-      if (userData.emailToken !== inviteCode) {
-        throw new InvalidateError(
-          "user.inviteCode",
-          "invite code is not valid"
+      const userData = await collection.find({ email });
+      if (isUniversalCode && userData && isUser(userData)) {
+        throw new UnprocessableEntityError(
+          "An account already exists for that email."
         );
+      }
+
+      if (!isUniversalCode) {
+        if (!userData) {
+          throw new UnprocessableEntityError(
+            "Invite not found for that email address."
+          );
+        }
+        if (isUser(userData)) {
+          throw new UnprocessableEntityError(
+            "An account already exists for that email."
+          );
+        }
+        if (userData.emailToken !== inviteCode) {
+          throw new InvalidateError("user.inviteCode", "Invalid invite code.");
+        }
       }
 
       const salt = generateSalt();
       const hash = hashPassword(password, salt);
 
       const newUser = {
-        ...userData,
+        ...(userData ?? { _id: new ObjectId() }),
         email: email.toLowerCase(),
         emailToken: "",
         password: hash,
@@ -369,7 +369,7 @@ const createUsersCollection = (
         ...DEFAULT_USER_OPTIONS,
       };
 
-      await usersCollection.replaceOne({ _id: userData._id }, newUser, {
+      await usersCollection.replaceOne({ _id: newUser._id }, newUser, {
         upsert: true,
       });
 
