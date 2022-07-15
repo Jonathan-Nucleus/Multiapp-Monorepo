@@ -276,7 +276,7 @@ const resolvers = {
         { body }: { body: string }
       ): Promise<LinkPreview | null> => {
         try {
-          const link = body.match(LINK_PATTERN)?.[0]?.toLowerCase();
+          const link = body.match(LINK_PATTERN)?.[0];
 
           if (link) {
             const preview = await client.preview(link);
