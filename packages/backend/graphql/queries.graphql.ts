@@ -33,7 +33,12 @@ import type { Notification } from "../schemas/notification";
 
 import "dotenv/config";
 import { Client } from "peekalink";
-import { LINK_PATTERN } from "shared/src/patterns";
+
+// TODO: Update Dockerfile to enable imports from shared library
+// import { LINK_PATTERN } from "shared/src/patterns";
+
+const LINK_PATTERN =
+  /((?:(?:https|http|ftp):\/\/)?(?:www\.)?(?:[-a-zA-Z\d@:%._+~#=]{2,256}\.[a-z]{2,6}\b)+(?:\/[/\d\w.\-?=&%+#]+)?)/gim;
 
 const client = new Client({ apiKey: `${process.env.PEEKALINK_API_KEY}` });
 
