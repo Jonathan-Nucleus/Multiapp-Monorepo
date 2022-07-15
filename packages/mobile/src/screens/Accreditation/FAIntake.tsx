@@ -20,6 +20,7 @@ import { BLACK, GRAY100, GRAY600, WHITE } from 'shared/src/colors';
 import { useSaveQuestionnaire } from 'shared/graphql/mutation/account/useSaveQuestionnaire';
 import { FAIntakeScreen } from 'mobile/src/navigations/AccreditationStack';
 import { SOMETHING_WRONG } from 'shared/src/constants';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 export type FormData = {
   firmName: string;
@@ -105,126 +106,131 @@ const FAIntake: FAIntakeScreen = ({ navigation, route }) => {
         handleBack={goBack}
       />
       <SafeAreaView style={styles.container} edges={['bottom']}>
-        <PLabel
-          label="Glad to have you aboard!"
-          textStyle={styles.titleLabel}
-        />
-        <PLabel
-          label="Please fill in your details so our Wealth Management team can reach out to you."
-          textStyle={styles.descriptionLabel}
-        />
-        <View style={styles.fieldContainer}>
-          <Controller
-            control={control}
-            name="firmName"
-            render={({ field, fieldState }) => (
-              <PTextInput
-                label="Firm Name"
-                text={field.value}
-                onChangeText={field.onChange}
-                textContainerStyle={styles.textField}
-                error={fieldState.error?.message}
-              />
-            )}
+        <KeyboardAwareScrollView extraHeight={20}>
+          <PLabel
+            label="Glad to have you aboard!"
+            textStyle={styles.titleLabel}
           />
-          <Controller
-            control={control}
-            name="firmCrd"
-            render={({ field, fieldState }) => (
-              <PTextInput
-                label="Firm CRD#"
-                text={field.value}
-                onChangeText={field.onChange}
-                textContainerStyle={styles.textField}
-                error={fieldState.error?.message}
-              />
-            )}
+          <PLabel
+            label="Please fill in your details so our Wealth Management team can reach out to you."
+            textStyle={styles.descriptionLabel}
           />
-          <Controller
-            control={control}
-            name="phone"
-            render={({ field, fieldState }) => (
-              <PTextInput
-                label="Phone Number"
-                text={field.value}
-                onChangeText={field.onChange}
-                textContainerStyle={styles.textField}
-                error={fieldState.error?.message}
-              />
-            )}
-          />
-          <Controller
-            control={control}
-            name="email"
-            render={({ field, fieldState }) => (
-              <PTextInput
-                label="Email Address"
-                text={field.value}
-                onChangeText={field.onChange}
-                textContainerStyle={styles.textField}
-                error={fieldState.error?.message}
-              />
-            )}
-          />
-          <View style={styles.contactMethodContainer}>
-            <PLabel
-              label="Choose a contact method:"
-              textStyle={styles.contactLabel}
-            />
-            <SegmentedInput
+          <View style={styles.fieldContainer}>
+            <Controller
               control={control}
-              name="contactMethod"
-              options={[
-                {
-                  title: (selected) => (
-                    <View style={styles.row}>
-                      <PhoneCall size={24} color={selected ? BLACK : WHITE} />
-                      <Text
-                        style={[
-                          styles.btnLabel,
-                          selected ? styles.selectedLabel : null,
-                        ]}>
-                        Phone
-                      </Text>
-                    </View>
-                  ),
-                  value: 'PHONE',
-                },
-                {
-                  title: (selected) => (
-                    <View style={styles.row}>
-                      <Envelope size={24} color={selected ? BLACK : WHITE} />
-                      <Text
-                        style={[
-                          styles.btnLabel,
-                          selected ? styles.selectedLabel : null,
-                        ]}>
-                        Email
-                      </Text>
-                    </View>
-                  ),
-                  value: 'EMAIL',
-                },
+              name="firmName"
+              render={({ field, fieldState }) => (
+                <PTextInput
+                  label="Firm Name"
+                  text={field.value}
+                  onChangeText={field.onChange}
+                  textContainerStyle={styles.textField}
+                  error={fieldState.error?.message}
+                />
+              )}
+            />
+            <Controller
+              control={control}
+              name="firmCrd"
+              render={({ field, fieldState }) => (
+                <PTextInput
+                  label="Firm CRD#"
+                  text={field.value}
+                  onChangeText={field.onChange}
+                  textContainerStyle={styles.textField}
+                  error={fieldState.error?.message}
+                  keyboardType={'numbers-and-punctuation'}
+                />
+              )}
+            />
+            <Controller
+              control={control}
+              name="phone"
+              render={({ field, fieldState }) => (
+                <PTextInput
+                  label="Phone Number"
+                  text={field.value}
+                  onChangeText={field.onChange}
+                  textContainerStyle={styles.textField}
+                  error={fieldState.error?.message}
+                  keyboardType={'numbers-and-punctuation'}
+                />
+              )}
+            />
+            <Controller
+              control={control}
+              name="email"
+              render={({ field, fieldState }) => (
+                <PTextInput
+                  label="Email Address"
+                  text={field.value}
+                  onChangeText={field.onChange}
+                  textContainerStyle={styles.textField}
+                  error={fieldState.error?.message}
+                  keyboardType={'email-address'}
+                />
+              )}
+            />
+            <View style={styles.contactMethodContainer}>
+              <PLabel
+                label="Choose a contact method:"
+                textStyle={styles.contactLabel}
+              />
+              <SegmentedInput
+                control={control}
+                name="contactMethod"
+                options={[
+                  {
+                    title: (selected) => (
+                      <View style={styles.row}>
+                        <PhoneCall size={24} color={selected ? BLACK : WHITE} />
+                        <Text
+                          style={[
+                            styles.btnLabel,
+                            selected ? styles.selectedLabel : null,
+                          ]}>
+                          Phone
+                        </Text>
+                      </View>
+                    ),
+                    value: 'PHONE',
+                  },
+                  {
+                    title: (selected) => (
+                      <View style={styles.row}>
+                        <Envelope size={24} color={selected ? BLACK : WHITE} />
+                        <Text
+                          style={[
+                            styles.btnLabel,
+                            selected ? styles.selectedLabel : null,
+                          ]}>
+                          Email
+                        </Text>
+                      </View>
+                    ),
+                    value: 'EMAIL',
+                  },
+                ]}
+              />
+            </View>
+          </View>
+          <View style={styles.bottomContainer}>
+            <Pressable
+              style={({ pressed }) => [
+                styles.cancelButton,
+                pressed ? pStyles.pressedStyle : null,
               ]}
+              onPress={goBack}>
+              <PLabel label="Back" />
+            </Pressable>
+            <PGradientButton
+              label="Next"
+              textStyle={styles.nextButtonLabel}
+              btnContainer={styles.nextButton}
+              onPress={handleSubmit(onSubmit)}
             />
           </View>
-        </View>
-        <View style={styles.bottomContainer}>
-          <Pressable
-            style={({ pressed }) => [
-              styles.cancelButton,
-              pressed ? pStyles.pressedStyle : null,
-            ]}
-            onPress={goBack}>
-            <PLabel label="Back" />
-          </Pressable>
-          <PGradientButton
-            label="Next"
-            textStyle={styles.nextButtonLabel}
-            btnContainer={styles.nextButton}
-            onPress={handleSubmit(onSubmit)}
-          />
-        </View>
+        </KeyboardAwareScrollView>
       </SafeAreaView>
     </View>
   );
