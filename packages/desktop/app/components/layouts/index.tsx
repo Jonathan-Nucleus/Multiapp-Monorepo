@@ -6,7 +6,7 @@ import AuthLayout from "./AuthLayout";
 import MainLayout from "./MainLayout";
 import Background from "./Background";
 import { AccountProvider } from "shared/context/Account";
-import { ChatProvider } from "desktop/app/components/providers/ChatProvider";
+import { ChatProvider } from "shared/context/Chat";
 import dynamic from "next/dynamic";
 import { useChatToken } from "shared/graphql/query/account/useChatToken";
 import "react-toastify/dist/ReactToastify.css";
@@ -29,9 +29,20 @@ const RootLayout: FC<RootLayoutProps> = ({
   const appContent = (
     <Background type={background}>
       {layout == "auth" && <AuthLayout>{children}</AuthLayout>}
-      {layout == "main" && <MainLayout fluid={false}>{children}</MainLayout>}
+      {layout == "main" && (
+        <MainLayout fluid={false} fullHeight={false}>
+          {children}
+        </MainLayout>
+      )}
       {layout == "main-fluid" && (
-        <MainLayout fluid={true}>{children}</MainLayout>
+        <MainLayout fluid={true} fullHeight={false}>
+          {children}
+        </MainLayout>
+      )}
+      {layout == "main.full-height" && (
+        <MainLayout fluid={false} fullHeight={true}>
+          {children}
+        </MainLayout>
       )}
       {layout == undefined && children}
     </Background>

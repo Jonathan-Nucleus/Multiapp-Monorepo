@@ -1,111 +1,77 @@
 import React, {
-  useCallback,
   useEffect,
   useRef,
   useState,
   KeyboardEventHandler,
+  ChangeEvent,
 } from "react";
-import { Avatar, useChatContext } from "stream-chat-react";
-import { UserResponse } from "stream-chat";
-import _debounce from "lodash/debounce";
-
 import Button from "desktop/app/components/common/Button";
 import TagInput, { TagRenderer } from "desktop/app/components/common/TagInput";
-import UserResult from "./UserResult";
-import { X as XButton } from "phosphor-react";
-import { StreamType } from "../../../../types/message";
+import { CaretLeft, X as XButton } from "phosphor-react";
+import { ChatSession } from "shared/context/Chat";
+import ChatAvatar from "../ChatAvatar";
+import { Channel, User } from "shared/context/Chat/types";
+import _ from "lodash";
+import { findUsers } from "shared/context/Chat/utils";
 
 type CreateChannelProps = {
-  onClose?: () => void;
-  toggleMobile: () => void;
+  session: ChatSession;
+  onCreate: (channel: Channel) => void;
+  onClose: () => void;
 };
 
 const CreateChannel: React.FC<CreateChannelProps> = ({
+  session,
+  onCreate,
   onClose,
-  toggleMobile,
 }) => {
-  const { client, setActiveChannel } = useChatContext<StreamType>();
-
-  const [focusedUser, setFocusedUser] = useState<number>();
+  const [focusedUser, setFocusedUser] = useState(0);
   const [inputText, setInputText] = useState("");
-  const [resultsOpen, setResultsOpen] = useState(false);
-  const [searchEmpty, setSearchEmpty] = useState(false);
-  const [searching, setSearching] = useState(false);
-  const [selectedUsers, setSelectedUsers] = useState<UserResponse[]>([]);
-  const [users, setUsers] = useState<UserResponse[]>([]);
-
+  const [users, setUsers] = useState<User[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
-  const clearState = () => {
-    setInputText("");
-    setResultsOpen(false);
-    setSearchEmpty(false);
-  };
+  const [loading, setLoading] = useState(false);
+  const searchCallback = useRef(
+    _.debounce(
+      async (query: string) => {
+        setUsers([]);
+        setFocusedUser(0);
+        const _users = await findUsers(session.client, query, [
+          { last_active: -1 },
+          { id: 1 },
+        ]);
+        if (_users) {
+          setUsers(_users);
+        }
+      },
+      100,
+      { leading: true, trailing: true }
+    )
+  ).current;
 
   useEffect(() => {
-    const clickListener = () => resultsOpen && clearState();
+    const clickListener = () => setInputText("");
     document.addEventListener("click", clickListener);
-
     return () => document.removeEventListener("click", clickListener);
   }, []);
 
-  const findUsers = _debounce(
-    async () => {
-      if (searching) return;
-      setSearching(true);
-
-      try {
-        const response = await client.queryUsers(
-          {
-            id: { $ne: client.userID as string },
-            $and: [{ name: { $autocomplete: inputText } }],
-          },
-          { id: 1 },
-          { limit: 6 }
-        );
-
-        if (!response.users.length) {
-          setSearchEmpty(true);
-        } else {
-          setSearchEmpty(false);
-          setUsers(response.users);
-        }
-
-        setResultsOpen(true);
-      } catch (error) {
-        console.log({ error });
-      }
-
-      setSearching(false);
-    },
-    100,
-    { trailing: true }
-  );
-
   const createChannel = async () => {
+    setInputText("");
+    setLoading(true);
     const selectedUsersIds = selectedUsers.map((user) => user.id);
-    if (!client.userID || selectedUsers.length === 0) return;
-
-    const conversation = await client.channel("messaging", {
-      members: [...selectedUsersIds, client.userID],
+    const channel = await session.client.channel("messaging", {
+      members: [...selectedUsersIds, session.client.userID!],
     });
-
-    await conversation.watch();
-
-    setActiveChannel?.(conversation);
-    setSelectedUsers([]);
-    setUsers([]);
-    onClose?.();
+    await channel.create();
+    onCreate(channel);
   };
 
-  const addUser = (user: UserResponse) => {
+  const addUser = (user: User) => {
     if (selectedUsers.some((selectedUser) => selectedUser.id === user.id)) {
       return;
     }
-
     setSelectedUsers([...selectedUsers, user]);
-    setResultsOpen(false);
     setInputText("");
-
     inputRef.current?.focus();
   };
 
@@ -115,63 +81,68 @@ const CreateChannel: React.FC<CreateChannelProps> = ({
     inputRef.current?.focus();
   };
 
-  const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = useCallback(
-    (event) => {
-      // check for up(ArrowUp) or down(ArrowDown) key
-      if (event.key === "ArrowUp") {
-        event.preventDefault();
-        setFocusedUser((prevFocused) => {
-          if (prevFocused === undefined) return 0;
-          return prevFocused === 0 ? users.length - 1 : prevFocused - 1;
-        });
-      } else if (event.key === "ArrowDown") {
-        event.preventDefault();
-        setFocusedUser((prevFocused) => {
-          if (prevFocused === undefined) return 0;
-          return prevFocused === users.length - 1 ? 0 : prevFocused + 1;
-        });
-      } else if (event.key === "Enter") {
-        event.preventDefault();
-        if (focusedUser !== undefined) {
-          addUser(users[focusedUser]);
-          return setFocusedUser(undefined);
-        }
+  const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (event) => {
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setFocusedUser((prevFocused) => {
+        return prevFocused == 0 ? users.length - 1 : prevFocused - 1;
+      });
+    } else if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setFocusedUser((prevFocused) => {
+        return prevFocused == users.length - 1 ? 0 : prevFocused + 1;
+      });
+    } else if (event.key === "Enter") {
+      event.preventDefault();
+      if (focusedUser >= 0 && focusedUser < users.length) {
+        addUser(users[focusedUser]);
       }
-    },
-    [users, focusedUser]
-  );
+    }
+  };
 
   const renderTag: TagRenderer = ({ value, onRemove }) => {
     const user = selectedUsers.find((obj) => obj.id === value);
     if (!user) return null;
 
     return (
-      <div
-        className={`messaging-create-channel__user items-center rounded-full
-          bg-background-blue pl-2 pr-3 mr-1 inline-flex cursor-pointer`}
-        onClick={onRemove}
-      >
-        <Avatar image={(user.image as string) ?? null} size={24} />
-        <div className="text-white mr-4 text-xs">{user.name}</div>
-        <XButton color="white" />
+      <div className="inline-flex items-center rounded-full bg-background-blue cursor-pointer mr-1 my-1 pl-2 pr-3 py-2">
+        <ChatAvatar
+          user={user}
+          size={24}
+          showStatus={false}
+          clickable={false}
+        />
+        <div className="text-white text-xs mx-4">{user.name}</div>
+        <XButton color="white" onClick={onRemove} />
       </div>
     );
   };
 
   return (
-    <div className="w-full py-4 border-l border-white/[.15]">
-      <div className="text-white mb-1 px-4 py-2">New Message</div>
+    <div className="w-full py-4 lg:border-l border-white/[.15]">
+      <div className="mb-1 px-4 py-2">
+        <div className="flex items-center">
+          <Button
+            variant="text"
+            className="text-white lg:hidden mr-4"
+            onClick={onClose}
+          >
+            <CaretLeft size={24} color="currentColor" />
+          </Button>
+          <div className="text-white">New Message</div>
+        </div>
+      </div>
       <header className="border-t border-white/[.15] pt-2">
-        <div className="flex flex-col md:flex-row md:items-center items-stretch px-4">
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center px-4">
           <span className="text-white">To:</span>
-          <div className="flex-auto ml-2">
+          <div className="flex-grow relative lg:mx-3">
             <TagInput
-              className="h-12"
               ref={inputRef}
+              className="text-sm py-3"
               value={inputText}
-              onChange={(evt) => {
-                setInputText(evt.currentTarget.value);
-                findUsers();
+              onChange={async (event: ChangeEvent<HTMLInputElement>) => {
+                setInputText(event.target.value);
+                await searchCallback(event.target.value);
               }}
               onKeyDown={handleKeyDown}
               placeholder="Type username"
@@ -180,47 +151,37 @@ const CreateChannel: React.FC<CreateChannelProps> = ({
               onRemoveTag={(tag) => removeUser(tag)}
             />
             {inputText && (
-              <div className="absolute min-w-[350px] mt-2 bg-background-header">
-                <ul className="messaging-create-channel__user-results">
-                  {!!users?.length && !searchEmpty && (
-                    <div onMouseMove={() => setFocusedUser(undefined)}>
-                      {users.map((user, i) => (
-                        <div
-                          className={`messaging-create-channel__user-result
-                                cursor-pointer ${
-                                  focusedUser === i
-                                    ? "bg-info"
-                                    : focusedUser === undefined
-                                    ? "hover:bg-info"
-                                    : ""
-                                }`}
-                          onClick={() => addUser(user)}
-                          key={user.id}
-                        >
-                          <UserResult user={user} />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  {searchEmpty && (
+              <div className="w-80 bg-background-header rounded-lg shadow overflow-hidden absolute z-20 mt-2">
+                <div className="divide-y divide-inherit border-white/[.12] max-h-96 overflow-y-auto">
+                  {users.map((user, index) => (
                     <div
-                      onClick={() => {
-                        inputRef.current?.focus();
-                        clearState();
-                      }}
-                      className="create-channel__user-result empty text-white p-2"
+                      key={index}
+                      className={`cursor-pointer hover:bg-primary-overlay/[.2] transition-all ${
+                        focusedUser == index ? "bg-primary-overlay/[.2]" : ""
+                      }`}
+                      onClick={() => addUser(user)}
                     >
-                      No people found...
+                      <div className="flex items-center px-6 py-3">
+                        <ChatAvatar user={user} size={48} clickable={false} />
+                        <div className="ml-4">
+                          <div className="text-base text-white font-semibold">
+                            {user.name}
+                          </div>
+                          <div className="text-sm text-white/[.6]"></div>
+                        </div>
+                      </div>
                     </div>
-                  )}
-                </ul>
+                  ))}
+                </div>
               </div>
             )}
           </div>
           <Button
             type="button"
             variant="gradient-primary"
-            className="ml-2 mt-8 h-[40px] md:mt-0"
+            className="flex-shrink-0 text-sm text-white font-medium uppercase mt-8 lg:mt-0"
+            disabled={selectedUsers.length == 0}
+            loading={loading}
             onClick={createChannel}
           >
             Start Chat
@@ -231,4 +192,4 @@ const CreateChannel: React.FC<CreateChannelProps> = ({
   );
 };
 
-export default React.memo(CreateChannel);
+export default CreateChannel;

@@ -5,11 +5,9 @@ import Container from "../../../layouts/Container";
 import { Transition } from "@headlessui/react";
 import Watchlist from "../Watchlist";
 import Card from "../../../common/Card";
-import { useAccountContext } from "shared/context/Account";
 
 const Navbar: FC = () => {
   const [showWatchlist, setShowWatchlist] = useState(false);
-  const account = useAccountContext();
 
   return (
     <div className="bg-background-cardDark shadow-sm shadow-black">

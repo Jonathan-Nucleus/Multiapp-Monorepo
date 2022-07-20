@@ -46,7 +46,7 @@ type MentionTextareaProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends Path<TFieldValues> = Path<TFieldValues>
 > = Omit<ControllerProps<TFieldValues, TName>, "render"> & {
-  type: "post" | "comment";
+  type: "post" | "comment" | "chat";
   placeholder?: string;
   disabled?: boolean;
   inputRef?: MentionsInputProps["inputRef"];
@@ -64,7 +64,10 @@ function MentionTextarea<
   });
   const account = useAccountContext();
   const { data: { users: allUsers = [] } = {} } = useUsers();
-  const users = allUsers.filter((user) => user._id != account?._id);
+  const users =
+    controllerProps.type != "chat"
+      ? allUsers.filter((user) => user._id != account?._id)
+      : [];
 
   const dataFunc: DataFunc = (query, callback) => {
     const items = users

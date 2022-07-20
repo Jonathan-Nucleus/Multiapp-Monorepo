@@ -12,13 +12,18 @@ const Container: FC<ContainerProps> = ({
 }) => {
   return (
     <>
-      {fluid ?
+      {fluid ? (
         <div>{children}</div>
-        :
-        <div className={`2xl:max-w-[1420px] xl:max-w-screen-xl sm:mx-6 xl:mx-auto ${className ?? ""}`} {...props}>
+      ) : (
+        <div
+          className={`2xl:max-w-[1420px] xl:max-w-screen-xl sm:mx-6 xl:mx-auto ${
+            className ?? ""
+          }`}
+          {...props}
+        >
           {children}
         </div>
-      }
+      )}
     </>
   );
 };

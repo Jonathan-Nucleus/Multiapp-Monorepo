@@ -116,9 +116,16 @@ const ProfileCard: FC<ProfileCardProps> = ({
                 {!isMyProfile && (
                   <>
                     <div className="flex items-center">
-                      <Button variant="text" className="text-primary mr-5 py-0">
-                        <Chats color="currentColor" size={24} />
-                      </Button>
+                      <Link href={`/messages?user=${user._id}`}>
+                        <a>
+                          <Button
+                            variant="text"
+                            className="text-primary mr-5 py-0"
+                          >
+                            <Chats color="currentColor" size={24} />
+                          </Button>
+                        </a>
+                      </Link>
                       <Button
                         variant="gradient-primary"
                         className="w-40 text-sm font-medium"

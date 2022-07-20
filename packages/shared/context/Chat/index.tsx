@@ -1,14 +1,15 @@
-import React, {
+import { Client, StreamType } from "./types";
+import {
+  createContext,
+  FC,
+  PropsWithChildren,
   useContext,
   useEffect,
   useState,
-  PropsWithChildren,
 } from "react";
+import { Account, useAccountContext } from "../Account";
 import { StreamChat } from "stream-chat";
 import retry from "async-retry";
-
-import type { Client, StreamType } from "shared/context/Chat/types";
-import { useAccountContext, Account } from "shared/context/Account";
 
 export interface ChatSession {
   client: Client;
@@ -17,7 +18,8 @@ export interface ChatSession {
   unreadCount: number;
 }
 
-const ChatContext = React.createContext<ChatSession | undefined>(undefined);
+const ChatContext = createContext<ChatSession | undefined>(undefined);
+
 export function useChatContext(): ChatSession | undefined {
   return useContext(ChatContext);
 }
@@ -25,12 +27,10 @@ export function useChatContext(): ChatSession | undefined {
 export function useUnreadCount(): number {
   const { client, unreadCount: userUnreadCount } = useChatContext() || {};
   const [unreadCount, setUnreadCount] = useState(userUnreadCount ?? 0);
-
   useEffect(() => {
     if (client) {
       setUnreadCount(userUnreadCount ?? 0);
       const handler = client.on((event) => {
-        // DEBUG: console.log("Received messaging event", event.type, event);
         if (
           event.total_unread_count &&
           unreadCount !== event.total_unread_count
@@ -43,11 +43,9 @@ export function useUnreadCount(): number {
           setUnreadCount(0);
         }
       });
-
       return () => handler.unsubscribe();
     }
   }, [client]);
-
   return unreadCount;
 }
 
@@ -58,7 +56,7 @@ interface ChatProviderProps extends PropsWithChildren<unknown> {
   apiKey: string;
 }
 
-export const ChatProvider: React.FC<ChatProviderProps> = ({
+export const ChatProvider: FC<ChatProviderProps> = ({
   token,
   apiKey,
   children,
@@ -73,7 +71,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
       if (initialUnreadCount !== null) {
         setUnreadCount(initialUnreadCount);
       }
-
       setReady(!!chatClient);
     }
   };
@@ -152,10 +149,4 @@ export const connect = async (
     console.log("Error connect to stream chat", err);
     return null;
   }
-};
-
-const disconnect = (): void => {
-  chatClient?.disconnectUser();
-  chatClient = undefined;
-  console.log("Stopped chat");
 };

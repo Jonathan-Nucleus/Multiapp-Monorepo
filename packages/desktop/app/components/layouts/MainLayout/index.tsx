@@ -3,19 +3,23 @@ import Header from "./Header";
 import Container from "../Container";
 
 type MainLayoutProps = PropsWithChildren<unknown> & {
-  fluid?: boolean;
+  fluid: boolean;
+  fullHeight: boolean;
 };
 
 const MainLayout: FC<MainLayoutProps> = ({
   fluid,
+  fullHeight,
   children,
 }: MainLayoutProps) => {
   return (
-    <div>
+    <div className={`${fullHeight ? "flex flex-col h-screen" : ""}`}>
       <Header />
-      <Container fluid={fluid}>
-        {children}
-      </Container>
+      <div className="w-full flex-grow min-h-0">
+        <Container fluid={fluid} className="h-full">
+          {children}
+        </Container>
+      </div>
     </div>
   );
 };

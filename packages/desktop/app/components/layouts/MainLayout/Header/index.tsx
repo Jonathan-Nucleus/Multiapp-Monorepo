@@ -20,7 +20,7 @@ import { useNotifications } from "shared/graphql/query/notification/useNotificat
 import SearchView from "./SearchView";
 import Container from "../../Container";
 import { useAccountContext } from "shared/context/Account";
-import { useUnreadCount } from "desktop/app/components/providers/ChatProvider";
+import { useUnreadCount } from "shared/context/Chat";
 
 const navItems = [
   {

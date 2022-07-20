@@ -12,6 +12,7 @@ interface RenderTagProps {
 }
 
 export type TagRenderer = FC<RenderTagProps>;
+
 export interface TagInputProps extends HTMLProps<HTMLInputElement> {
   tags?: string[];
   onAddTag?: (tag: string) => void;
@@ -44,7 +45,7 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>(
           focused ? "border-primary" : "border-transparent"
         }`}
       >
-        <div className="py-1 flex flex-row">
+        <div className="flex flex-wrap">
           {tags?.map((tag) => (
             <Tag key={tag} value={tag} onRemove={() => onRemoveTag?.(tag)} />
           ))}

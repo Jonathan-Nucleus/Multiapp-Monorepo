@@ -44,6 +44,7 @@ module.exports = {
         secondary: {
           DEFAULT: "#0067E0",
           overlay: "#A5A5A5",
+          900: "#262626",
         },
         elevation: {
           overlay: "#1C1B35",

@@ -6,11 +6,11 @@ import type {
   ChannelFilters as SCChannelFilters,
   MessageResponse as SCMessage,
   UserResponse as SCUser,
-} from 'stream-chat';
+} from "stream-chat";
 
 type UserType = Pick<
   SCUser<DefaultGenerics>,
-  'id' | 'name' | 'online' | 'created_at' | 'last_active'
+  "id" | "name" | "online" | "created_at" | "last_active"
 > & {
   firstName: string;
   lastName: string;
@@ -22,7 +22,7 @@ type UserType = Pick<
 
 type MessageType = Pick<
   SCMessage<DefaultGenerics>,
-  'id' | 'userId' | 'attachments' | 'parent_id' | 'text' | 'created_at'
+  "id" | "userId" | "attachments" | "parent_id" | "text" | "created_at"
 > & {
   user: UserType;
 };
@@ -38,3 +38,7 @@ export type Message = MessageType;
 export type ChannelFilters = SCChannelFilters<StreamType>;
 export type ChannelSort = SCChanelSort<StreamType>;
 export type Client = StreamChat<StreamType>;
+export type PMessage = Message & {
+  lastMessage: boolean;
+  firstMessage: boolean;
+};

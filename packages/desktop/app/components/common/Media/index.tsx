@@ -6,7 +6,7 @@ interface MediaProps {
   url: string;
   type?: MediaType;
   aspectRatio?: number;
-  hideControls?: boolean;
+  controls?: boolean;
   onLoad?: (aspectRatio: number) => void;
 }
 
@@ -14,7 +14,7 @@ const Media: FC<MediaProps> = ({
   url,
   type: mediaType = getMediaTypeFrom(url),
   aspectRatio: ratioValue,
-  hideControls,
+  controls = true,
   onLoad,
 }) => {
   const maxHeight = 700;
@@ -30,7 +30,7 @@ const Media: FC<MediaProps> = ({
         >
           <video
             className="w-full"
-            controls={!hideControls}
+            controls={controls}
             onLoadedMetadata={(data) => {
               const target = data.currentTarget;
               onLoad?.(target.videoWidth / target.videoHeight);

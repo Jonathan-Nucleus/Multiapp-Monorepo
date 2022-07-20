@@ -5,6 +5,7 @@
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.5.10",
+    "dayjs": "^1.11.3",
     "react": "17.0.2",
     "react-native": "0.68.0",
     "stream-chat": "^6.6.0"

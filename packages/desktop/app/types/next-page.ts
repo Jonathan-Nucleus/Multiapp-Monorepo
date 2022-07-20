@@ -1,7 +1,7 @@
 import { NextPage } from "next";
 
 export interface AppPageProps {
-  layout?: "auth" | "main" | "main-fluid";
+  layout?: "auth" | "main" | "main-fluid" | "main.full-height";
   background?: "default" | "radial";
   middleware?: "auth" | "guest";
 }

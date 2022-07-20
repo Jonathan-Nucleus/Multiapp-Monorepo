@@ -15,7 +15,7 @@ interface FundMediaProps {
 const FundMedia: FC<FundMediaProps> = ({ fundId, mediaUrl, hideControls }) => {
   const key = `${fundId}/${mediaUrl}`;
   const url = `${NEXT_PUBLIC_AWS_BUCKET}/funds/${key}`;
-  return <Media url={url} key={fundId} hideControls={hideControls} />;
+  return <Media url={url} key={fundId} controls={!hideControls} />;
 };
 
 export default FundMedia;
