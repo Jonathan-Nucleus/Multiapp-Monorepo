@@ -86,6 +86,7 @@ export function usePost(postId?: string): QueryResult<PostData, PostVariables> {
               lastName
               avatar
               position
+              role
               company {
                 name
               }

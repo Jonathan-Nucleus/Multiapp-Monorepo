@@ -31,7 +31,7 @@ const PBodyText: FC<PBodyTextProps> = ({
   const [showingBody, setShowingBody] = useState(body ?? '');
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [collapsedText, setCollapsedText] = useState(body ?? '');
-  const [more, setMore] = useState(false);
+  const [more, setMore] = useState(true);
   const [initialLoaded, setInitialLoaded] = useState(false);
   const [containerWidth, setContainerWidth] = useState(0);
   const lastLine = useRef<number>(0);
@@ -74,6 +74,7 @@ const PBodyText: FC<PBodyTextProps> = ({
                 ? text
                 : text.replace(/(\r\n|\n|\r)/gm, '');
             });
+
           setShowingBody(showingLines.join(' ') ?? '');
           setCollapsedText(showingLines.join(' ') ?? '');
         }
@@ -98,7 +99,7 @@ const PBodyText: FC<PBodyTextProps> = ({
 
   const handleMoreText = useCallback(() => {
     if (body) {
-      if (isCollapsed) {
+      if (isCollapsed === true) {
         setShowingBody(body);
       } else {
         setShowingBody(collapsedText);
@@ -109,15 +110,18 @@ const PBodyText: FC<PBodyTextProps> = ({
 
   const readMoreText = useMemo(() => {
     const determinedLine =
-      (isCollapsed ? limitLine.current : lastLine.current) >
-      containerWidth - 90;
+      (isCollapsed ? limitLine.current : lastLine.current) > containerWidth / 2;
     return `${determinedLine ? '\n' : ' '}Read ${
       isCollapsed ? 'more...' : 'less'
     }`;
   }, [containerWidth, isCollapsed]);
 
   const renderText = useMemo(() => {
-    return processPost(showingBody).map((split, index) => {
+    const collap = body?.includes('@')
+      ? body?.slice(0, 130)!
+      : body?.slice(0, 100)!;
+    const val = isCollapsed === false ? showingBody : collap;
+    return processPost(val).map((split, index) => {
       if (
         (split.startsWith('$') || split.startsWith('#')) &&
         split.match(TAG_PATTERN)
@@ -164,17 +168,15 @@ const PBodyText: FC<PBodyTextProps> = ({
   return (
     <View style={styles.previewContainer} onLayout={onContainerLayout}>
       <PText
-        onTextLayout={onHiddenTextLayout}
-        style={[[styles.body, style, styles.hiddenText]]}>
-        {body}
-      </PText>
-      <PText style={[styles.body, style]} selectable={true}>
+        style={[styles.body, style]}
+        selectable={true}
+        onTextLayout={onHiddenTextLayout}>
         {renderText}
-        {more && (
+        {more === true ? (
           <PText style={styles.more} onPress={handleMoreText}>
             {readMoreText}
           </PText>
-        )}
+        ) : null}
       </PText>
     </View>
   );
@@ -195,9 +197,5 @@ const styles = StyleSheet.create({
   },
   more: {
     color: PRIMARY,
-  },
-  hiddenText: {
-    position: 'absolute',
-    opacity: 0,
   },
 });
