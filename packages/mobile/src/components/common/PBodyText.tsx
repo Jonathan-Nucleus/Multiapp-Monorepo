@@ -120,7 +120,11 @@ const PBodyText: FC<PBodyTextProps> = ({
     const collap = body?.includes('@')
       ? body?.slice(0, 130)!
       : body?.slice(0, 100)!;
-    const val = isCollapsed === false ? showingBody : collap;
+    const val = !collapseLongText
+      ? body
+      : isCollapsed === false
+      ? showingBody
+      : collap;
     return processPost(val).map((split, index) => {
       if (
         (split.startsWith('$') || split.startsWith('#')) &&
@@ -172,7 +176,7 @@ const PBodyText: FC<PBodyTextProps> = ({
         selectable={true}
         onTextLayout={onHiddenTextLayout}>
         {renderText}
-        {more === true ? (
+        {collapseLongText && more === true ? (
           <PText style={styles.more} onPress={handleMoreText}>
             {readMoreText}
           </PText>

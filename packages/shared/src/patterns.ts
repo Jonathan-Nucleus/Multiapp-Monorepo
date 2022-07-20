@@ -45,9 +45,10 @@ export const hrefFromLink = (link: string): string => {
   }
 };
 
-export const processPost = (text: string): string[] => {
-  const splits = text.split(POST_PATTERN);
+export const processPost = (text?: string): string[] => {
+  if (!text) return [];
 
+  const splits = text.split(POST_PATTERN);
   const processedSplits: string[] = [];
   for (let index = 0; index < splits.length; index++) {
     const val = splits[index];
