@@ -2,7 +2,6 @@ import { FC, useState } from "react";
 import { useRouter } from "next/router";
 import { signIn } from "next-auth/react";
 import * as yup from "yup";
-import "yup-phone";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { SubmitHandler, useForm } from "react-hook-form";
 
@@ -33,7 +32,6 @@ type FormValues = {
   firstName: string;
   lastName: string;
   email: string;
-  phoneNumber: string;
   password: string;
   confirmPassword: string;
   acceptTerms: boolean;
@@ -44,10 +42,6 @@ const schema = yup
     firstName: yup.string().required("Required"),
     lastName: yup.string().required("Required"),
     email: yup.string().email("Must be a valid email").required("Required"),
-    phoneNumber: yup
-      .string()
-      .phone(undefined, false, "Oops, looks like an invalid phone number")
-      .required("Required"),
     password: yup
       .string()
       .min(8, "Password must have a minimum length of 8 characters")
@@ -164,13 +158,6 @@ const SignupPage: FC<LoginPageProps> = ({ ssoProviders }) => {
             name="email"
             label="Email"
             autoComplete="email"
-          />
-          <Field
-            register={register}
-            state={formState}
-            name="phoneNumber"
-            label="Phone Number"
-            autoComplete="phone"
           />
           <div className="mt-4">
             <div className="flex flex-row justify-between">

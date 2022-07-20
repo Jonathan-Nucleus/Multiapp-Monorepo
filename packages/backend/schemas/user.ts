@@ -718,7 +718,7 @@ export const UserSchema = `
 
   input SettingsInput {
     interests: [PostCategory!]
-    userType: UserType!
+    userType: UserType
     tagging: Boolean
     messaging: Boolean
     emailUnreadMessage: Boolean
