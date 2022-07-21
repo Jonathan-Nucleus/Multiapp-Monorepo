@@ -6,6 +6,7 @@ import {
   StyleProp,
   TextStyle,
   TextLayoutEventData,
+  Dimensions,
 } from 'react-native';
 
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
@@ -13,6 +14,9 @@ import { WHITE, PRIMARY } from 'shared/src/colors';
 
 import { processPost, TAG_PATTERN } from 'shared/src/patterns';
 import PText from './PText';
+
+const INITIAL_READ_MORE_WIDTH = 86;
+const INITIAL_CONTAINER_WIDTH = Dimensions.get('window').width - 32;
 
 interface PBodyTextProps {
   body?: string;
@@ -28,12 +32,15 @@ const PBodyText: FC<PBodyTextProps> = ({
   numberOfLines = 2,
   style,
 }) => {
-  const [showingBody, setShowingBody] = useState(body ?? '');
+  // Remove last line break from body;
+  const initialBody = body?.replace(/\n$/, '') ?? '';
+  const [showingBody, setShowingBody] = useState(initialBody);
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const [collapsedText, setCollapsedText] = useState(body ?? '');
+  const [collapsedText, setCollapsedText] = useState(initialBody);
   const [more, setMore] = useState(true);
   const [initialLoaded, setInitialLoaded] = useState(false);
-  const [containerWidth, setContainerWidth] = useState(0);
+  const [containerWidth, setContainerWidth] = useState(INITIAL_CONTAINER_WIDTH);
+  const [btnTextWidth, setBtnTextWidth] = useState(INITIAL_READ_MORE_WIDTH);
   const lastLine = useRef<number>(0);
   const limitLine = useRef<number>(0);
 
@@ -70,13 +77,19 @@ const PBodyText: FC<PBodyTextProps> = ({
           const showingLines = txtLines
             .slice(0, numberOfLines)
             .map(({ text }, index) => {
-              return index < numberOfLines - 1
-                ? text
-                : text.replace(/(\r\n|\n|\r)/gm, '');
+              let ret = '';
+              if (index < numberOfLines - 1) {
+                ret = text;
+              } else {
+                // Remove enter key of last line
+                ret = text.replace(/(\r\n|\n|\r)/gm, '');
+              }
+
+              return ret;
             });
 
-          setShowingBody(showingLines.join(' ') ?? '');
-          setCollapsedText(showingLines.join(' ') ?? '');
+          setShowingBody(showingLines.join('') ?? '');
+          setCollapsedText(showingLines.join('') ?? '');
         }
         setInitialLoaded(true);
         lastLine.current = txtLines[txtLines.length - 1].width;
@@ -89,8 +102,20 @@ const PBodyText: FC<PBodyTextProps> = ({
     [collapseLongText, initialLoaded, numberOfLines],
   );
 
+  const onHiddenButtonTextLayout = useCallback(
+    (e: { nativeEvent: TextLayoutEventData }) => {
+      const { lines: txtLines = [] } = e.nativeEvent as TextLayoutEventData;
+      const length = txtLines.length;
+
+      if (length > 0) {
+        setBtnTextWidth(txtLines[length - 1].width);
+      }
+    },
+    [],
+  );
+
   const onContainerLayout = useCallback(
-    (e: { nativeEvent: { layout: { width: any } } }) => {
+    (e: { nativeEvent: { layout: { width: number } } }) => {
       const { width } = e.nativeEvent.layout;
       setContainerWidth(width);
     },
@@ -98,33 +123,27 @@ const PBodyText: FC<PBodyTextProps> = ({
   );
 
   const handleMoreText = useCallback(() => {
-    if (body) {
+    if (initialBody) {
       if (isCollapsed === true) {
-        setShowingBody(body);
+        setShowingBody(initialBody);
       } else {
         setShowingBody(collapsedText);
       }
       setIsCollapsed(!isCollapsed);
     }
-  }, [body, collapsedText, isCollapsed]);
+  }, [collapsedText, initialBody, isCollapsed]);
 
   const readMoreText = useMemo(() => {
     const determinedLine =
-      (isCollapsed ? limitLine.current : lastLine.current) > containerWidth / 2;
+      (isCollapsed ? limitLine.current : lastLine.current) + btnTextWidth >=
+      containerWidth;
     return `${determinedLine ? '\n' : ' '}Read ${
       isCollapsed ? 'more...' : 'less'
     }`;
-  }, [containerWidth, isCollapsed]);
+  }, [btnTextWidth, containerWidth, isCollapsed]);
 
   const renderText = useMemo(() => {
-    const collap = body?.includes('@')
-      ? body?.slice(0, 130)!
-      : body?.slice(0, 100)!;
-    const val = !collapseLongText
-      ? body
-      : isCollapsed === false
-      ? showingBody
-      : collap;
+    const val = !collapseLongText ? initialBody : showingBody;
     return processPost(val).map((split, index) => {
       if (
         (split.startsWith('$') || split.startsWith('#')) &&
@@ -163,18 +182,29 @@ const PBodyText: FC<PBodyTextProps> = ({
         );
       }
     });
-  }, [showingBody]);
+  }, [initialBody, collapseLongText, showingBody]);
 
-  if (!body) {
+  if (!initialBody) {
     return null;
   }
 
   return (
     <View style={styles.previewContainer} onLayout={onContainerLayout}>
-      <PText
-        style={[styles.body, style]}
-        selectable={true}
-        onTextLayout={onHiddenTextLayout}>
+      {collapseLongText && (
+        <PText
+          style={[styles.body, styles.hidden, style]}
+          onTextLayout={onHiddenTextLayout}>
+          {initialBody}
+        </PText>
+      )}
+      {collapseLongText && (
+        <PText
+          style={[styles.body, styles.hidden, style]}
+          onTextLayout={onHiddenButtonTextLayout}>
+          {readMoreText + ' '}
+        </PText>
+      )}
+      <PText style={[styles.body, style]} selectable={true}>
         {renderText}
         {collapseLongText && more === true ? (
           <PText style={styles.more} onPress={handleMoreText}>
@@ -201,5 +231,9 @@ const styles = StyleSheet.create({
   },
   more: {
     color: PRIMARY,
+  },
+  hidden: {
+    position: 'absolute',
+    opacity: 0,
   },
 });
