@@ -14,6 +14,8 @@ import { Body2Bold } from 'mobile/src/theme/fonts';
 import { WHITE12 } from 'shared/src/colors';
 
 import { LinkPreview } from 'shared/graphql/query/post/useLinkPreview';
+import { isValidYoutubeUrl } from '../../utils/url-utils';
+import YoutubePlayer from './YoutubePlayer';
 
 interface PostHeaderProps {
   previewData: LinkPreview;
@@ -26,7 +28,13 @@ const PreviewLink: React.FC<PostHeaderProps> = ({
 }) => {
   const previewImage = previewData.images?.find((image) => !!image);
 
-  return (
+  return isValidYoutubeUrl(previewData.url) ? (
+    <View
+      onStartShouldSetResponder={() => true} //We do this so that touch doesn't propogate to the top which will cause the screen to go to postdetails when playing/pausing video
+      style={styles.youtubePreviewContainerStyle}>
+      <YoutubePlayer videoLink={previewData.url}></YoutubePlayer>
+    </View>
+  ) : (
     <TouchableOpacity
       onPress={() => {
         Linking.openURL(previewData.url);
@@ -57,6 +65,13 @@ const styles = StyleSheet.create({
     height: 280,
     marginVertical: 16,
     width: '100%',
+  },
+  youtubePreviewContainerStyle: {
+    aspectRatio: 16 / 9,
+    width: '100%',
+    marginVertical: 16,
+    borderRadius: 8,
+    overflow: 'hidden',
   },
   previewContainer: {
     overflow: 'hidden',

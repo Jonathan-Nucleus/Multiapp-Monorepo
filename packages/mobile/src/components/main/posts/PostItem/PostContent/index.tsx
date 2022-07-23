@@ -28,7 +28,6 @@ export interface PostContentProps {
 const PostContent: React.FC<PostContentProps> = ({
   post,
   hideMenu = false,
-  sharedBy,
 }) => {
   const { user, company, body, media, preview } = post;
 

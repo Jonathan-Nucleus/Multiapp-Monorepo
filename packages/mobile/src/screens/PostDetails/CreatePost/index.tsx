@@ -261,7 +261,6 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
 
       setPreviewData(data?.linkPreview ?? undefined);
     };
-
     if (watchBody?.match(LINK_PATTERN)) {
       getData();
     } else if (previewExists) {
@@ -667,6 +666,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'relative',
   },
+
   preview: {
     marginVertical: 0,
     marginTop: 0,
