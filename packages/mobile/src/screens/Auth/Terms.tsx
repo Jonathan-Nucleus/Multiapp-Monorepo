@@ -114,7 +114,7 @@ const Terms: TermsScreen = ({ navigation, route }) => {
                   <Text
                     onPress={() =>
                       Linking.openURL(
-                        'https://prometheusalts.com/legals/disclosure-library',
+                        'https://www.prometheusalts.com/legals/terms-of-use',
                       )
                     }>
                     <Text style={styles.hyperText}> Terms</Text>
@@ -123,7 +123,7 @@ const Terms: TermsScreen = ({ navigation, route }) => {
                   <Text
                     onPress={() =>
                       Linking.openURL(
-                        'https://prometheusalts.com/legals/disclosure-library',
+                        'https://www.prometheusalts.com/legals/community-guidelines',
                       )
                     }>
                     <Text style={styles.hyperText}> Community</Text>
@@ -132,7 +132,7 @@ const Terms: TermsScreen = ({ navigation, route }) => {
                   <Text
                     onPress={() =>
                       Linking.openURL(
-                        'https://prometheusalts.com/legals/disclosure-library',
+                        'https://www.prometheusalts.com/legals/privacy-policy',
                       )
                     }>
                     <Text style={styles.hyperText}>Privacy Policy</Text>
