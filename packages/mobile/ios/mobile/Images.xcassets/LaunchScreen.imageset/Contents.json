@@ -1,16 +1,19 @@
 {
   "images" : [
     {
+      "extent": "full-screen",
       "filename" : "splash.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "extent": "full-screen",
       "filename" : "splash-1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "extent": "full-screen",
       "filename" : "splash-2.png",
       "idiom" : "universal",
       "scale" : "3x"
