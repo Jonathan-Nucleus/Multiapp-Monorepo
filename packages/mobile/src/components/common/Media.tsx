@@ -1,19 +1,13 @@
-import React, { FC, useState, useEffect, useRef, useMemo } from 'react';
-import {
-  AppState,
-  AppStateStatus,
-  StyleProp,
-  StyleSheet,
-  Pressable,
-  View,
-} from 'react-native';
-import FastImage, { ResizeMode, ImageStyle } from 'react-native-fast-image';
-import Video, { VideoProperties } from 'react-native-video';
+import React, { FC, useState, useEffect } from 'react';
+import { AppState, StyleProp, StyleSheet, Pressable, View } from 'react-native';
+import FastImage, { ImageStyle } from 'react-native-fast-image';
+import { VideoProperties } from 'react-native-video';
 import Pinchable from 'react-native-pinchable';
 
 import { Media as MediaType } from 'shared/graphql/fragments/post';
 
 import { S3_BUCKET } from 'react-native-dotenv';
+import ExtendedMedia from './ExtendedMedia';
 
 interface MediaProps {
   media: MediaType;
@@ -79,7 +73,6 @@ const Media: FC<MediaProps> = ({
   type = 'post',
 }) => {
   const [paused, setPaused] = useState(true);
-  const player = useRef<Video | null>(null);
 
   const mediaUrl = `${
     type === 'fund' ? `${S3_BUCKET}/funds` : `${S3_BUCKET}/posts`
@@ -121,10 +114,6 @@ const Media: FC<MediaProps> = ({
     setPaused(newState);
   };
 
-  const onVideoEnd = (): void => {
-    player.current?.seek(0);
-  };
-
   // TODO: Need to potentially validate the src url before feeding it to
   // react-native-video as an invalid source seems to crash the app
   return isVideo(media.url) ? (
@@ -139,27 +128,15 @@ const Media: FC<MediaProps> = ({
           : null,
       ]}>
       <View style={[styles.videoContainer, style]}>
-        <Video
-          key={media.url}
-          ref={(ref) => (player.current = ref)}
-          source={{
-            uri: media.url.includes('/') ? media.url : mediaUrl,
-          }}
-          resizeMode={resizeMode}
+        <ExtendedMedia
+          key={`${media.url}`}
+          media={media}
+          mediaUrl={mediaUrl}
           onLoad={onLoad}
-          onError={(err) => console.log('error', err)}
-          onEnd={onVideoEnd}
-          controls={controls}
-          onSeek={(data) => {
-            if (data.seekTime === 0) {
-              setPaused(true);
-            }
-          }}
-          ignoreSilentSwitch="ignore"
-          playInBackground={false}
           paused={paused}
-          repeat={false}
-          style={{ aspectRatio: media.aspectRatio }}
+          setPaused={setPaused}
+          togglePause={togglePause}
+          controls={controls}
         />
       </View>
     </Pressable>

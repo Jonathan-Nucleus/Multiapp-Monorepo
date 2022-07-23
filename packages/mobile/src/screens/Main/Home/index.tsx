@@ -235,6 +235,7 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
         viewabilityConfig={{
           viewAreaCoveragePercentThreshold: 10,
         }}
+        initialNumToRender={4}
         refreshControl={
           <RefreshControl
             onRefresh={onRefresh}
