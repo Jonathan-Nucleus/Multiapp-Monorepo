@@ -46,6 +46,7 @@ import { Body2Bold } from '../../../theme/fonts';
 import Tooltip from 'react-native-walkthrough-tooltip';
 import { EventRegister } from 'react-native-event-listeners';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import VideoProcessingBanner from '../../../components/main/posts/VideoProcessingBanner';
 
 const PLACE_HOLDERS = 7;
 
@@ -221,6 +222,7 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
         </Tooltip>
       </View>
+      <VideoProcessingBanner />
       <FlatList
         ref={listRef}
         removeClippedSubviews={true}

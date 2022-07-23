@@ -13,7 +13,7 @@ import { WHITE, PRIMARY } from 'shared/src/colors';
 
 import PostSelection from './PostSelection';
 import PostHeader from './PostHeader';
-import { PostMedia } from 'mobile/src/components/common/Media';
+import { isVideo, PostMedia } from 'mobile/src/components/common/Media';
 import PBodyText from 'mobile/src/components/common/PBodyText';
 import { AUDIENCE_OPTIONS } from './index';
 
@@ -26,6 +26,9 @@ import {
 } from 'shared/graphql/query/post/useLinkPreview';
 
 import { ReviewPostScreen } from 'mobile/src/navigations/PostDetailsStack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+export const VideoPosted = 'VideoPosted';
 
 const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
   const { ...postData } = route.params;
@@ -129,6 +132,9 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
       }
 
       if (success) {
+        if (media && isVideo(media.url)) {
+          await AsyncStorage.setItem(VideoPosted, 'true');
+        }
         isSubmitted.current = true;
         navigation.pop(2);
         // it should go to different stack
