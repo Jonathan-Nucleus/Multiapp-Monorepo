@@ -88,7 +88,6 @@ const AuthenticatedStack: AuthenticatedScreen = () => {
         }
       }
     };
-
     persistToken();
     const tokenObserver = (): void => {
       persistToken();

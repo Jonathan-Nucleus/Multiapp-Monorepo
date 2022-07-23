@@ -1,7 +1,8 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import EncryptedStorage from 'react-native-encrypted-storage';
 
 const TOKEN_KEY = 'accessToken';
-
+let GlobalToken: string | null;
 export type TokenAction = 'set' | 'cleared';
 
 /**
@@ -10,7 +11,7 @@ export type TokenAction = 'set' | 'cleared';
  * @returns   The user token or null if one has not been set.
  */
 export async function getToken(): Promise<string | null> {
-  return EncryptedStorage.getItem(TOKEN_KEY);
+  return GlobalToken ?? EncryptedStorage.getItem(TOKEN_KEY);
 }
 
 /**
@@ -18,8 +19,12 @@ export async function getToken(): Promise<string | null> {
  *
  * @param token   The token to save.
  */
-export async function setToken(token: string): Promise<void> {
-  await EncryptedStorage.setItem(TOKEN_KEY, token);
+export async function setToken(token: string, persist = true): Promise<void> {
+  if (persist) {
+    await EncryptedStorage.setItem(TOKEN_KEY, token);
+  } else {
+    GlobalToken = token;
+  }
   notify('set');
 }
 

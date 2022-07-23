@@ -14,6 +14,7 @@ import type { ApolloPersistOptions } from 'apollo3-cache-persist/types';
 import {
   attachTokenObserver,
   detachTokenObserver,
+  getToken,
   TokenAction,
 } from 'mobile/src/utils/auth-token';
 import { GRAPHQL_URI } from 'react-native-dotenv';
@@ -59,7 +60,7 @@ export const useInitializeClient =
 
       async function initializeCache(): Promise<void> {
         await persistor.restore();
-        const token = await EncryptedStorage.getItem('accessToken');
+        const token = await getToken();
 
         const errorLink = onError(
           ({ graphQLErrors, networkError, operation }) => {

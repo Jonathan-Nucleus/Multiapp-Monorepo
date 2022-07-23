@@ -58,14 +58,13 @@ const AppNavigator = (): React.ReactElement => {
 
   useEffect(() => {
     NavigationService.setNavigator(navigationRef.current);
-
     const tokenObserver = (action: TokenAction): void => {
       if (action === 'cleared') {
         setAuthenticated(false);
         navigationRef.current?.navigate('Auth');
       }
     };
-
+    
     attachTokenObserver(tokenObserver);
     return () => detachTokenObserver(tokenObserver);
   }, [authenticated]);

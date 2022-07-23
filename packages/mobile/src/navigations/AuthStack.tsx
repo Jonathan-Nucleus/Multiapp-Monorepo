@@ -29,6 +29,7 @@ const AuthStacks = () => {
 
     checkOnboardedStatus();
   }, []);
+  
 
   if (onboarded === '') {
     return null;

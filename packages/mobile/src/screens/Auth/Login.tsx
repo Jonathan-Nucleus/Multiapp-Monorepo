@@ -18,6 +18,7 @@ import {
   useForm,
 } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { showMessage } from 'mobile/src/services/ToastService';
 
@@ -58,12 +59,16 @@ const schema = yup
   .required();
 
 const Login: LoginScreen = ({ navigation }) => {
-  const [checked, setChecked] = useState(false);
+  const [checked, setChecked] = useState(true);
   const [securePassEntry, setSecurePassEntry] = useState(true);
   const [login] = useMutation(LOGIN);
   const [loginOAuth] = useLoginOAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+
+  const handleOption = (): void => {
+    setChecked(!checked);
+  };
 
   const {
     handleSubmit,
@@ -78,8 +83,11 @@ const Login: LoginScreen = ({ navigation }) => {
     ) as DefaultValues<FormValues>,
   });
 
-  const saveAuthToken = async (token: string): Promise<void> => {
-    await setToken(token);
+  const saveAuthToken = async (
+    token: string,
+    persist: boolean,
+  ): Promise<void> => {
+    await setToken(token, persist);
 
     // Allow time for apollo client to reload with new auth token
     setTimeout(() => {
@@ -106,9 +114,8 @@ const Login: LoginScreen = ({ navigation }) => {
         },
       });
       if (data.login) {
-        saveAuthToken(data.login);
-        console.log('logged user', data);
-
+        saveAuthToken(data.login, checked);
+        AsyncStorage.setItem('option', checked.toString());
         return;
       }
     } catch (e) {
@@ -153,7 +160,7 @@ const Login: LoginScreen = ({ navigation }) => {
         });
 
         if (data?.loginOAuth) {
-          saveAuthToken(data.loginOAuth);
+          saveAuthToken(data.loginOAuth, checked);
         }
       } else {
         console.log('Something went wrong');
@@ -232,8 +239,8 @@ const Login: LoginScreen = ({ navigation }) => {
           <CheckboxLabel
             id={1}
             category="Stay signed in"
-            value={!checked}
-            handleChange={() => setChecked(!checked)}
+            value={checked}
+            handleChange={handleOption}
             viewStyle={styles.checkedWrap}
           />
           <PGradientButton
