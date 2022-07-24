@@ -23,7 +23,7 @@ export const PASSWORD_PATTERN = new RegExp(
 );
 
 export const LINK_PATTERN =
-  /((?:(?:https|http|ftp):\/\/)?(?:www\.)?(?:[-a-zA-Z\d@:%._+~#=]{2,256}\.[a-z]{2,6}\b)+(?:\/[/\d\w.\-?=&%+#]+)?)/gim;
+  /((?:(?:https|http|ftp):\/\/)?(?:www\.)?(?:(?:[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?\.)+[a-z\d][a-z\d-]{0,61}[a-z\d])+(?:\/[/\d\w.\-?=&%+#]+)?)/gim;
 export const TAG_PATTERN = /(^|\W)([$|#]\D\w*)/gim;
 export const MENTION_PATTERN =
   /(?<original>(?<trigger>.)\[(?<name>([^[]*))]\((?<id>([\d\w-]*))\))/gim;
@@ -68,8 +68,5 @@ export const processPost = (text?: string): string[] => {
 };
 
 export const parseMentions = (text: string): string[] => {
-  const matches = Array.from(text.matchAll(MENTION_PATTERN)).map(
-    (match) => match[5]
-  );
-  return matches;
+  return Array.from(text.matchAll(MENTION_PATTERN)).map((match) => match[5]);
 };

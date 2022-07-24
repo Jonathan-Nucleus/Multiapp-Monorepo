@@ -138,10 +138,9 @@ const EditPostModal: FC<EditPostModalProps> = ({
   const [fetchUploadLink] = useFetchUploadLink();
   const [loading, setLoading] = useState(false);
   const [visibleEmoji, setVisibleEmoji] = useState(false);
-  const [linkPreview, setLinkPreview] = useState<string>();
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [uploadingPercent, setUploadingPercent] = useState<number>();
-
+  const previewLink = useRef<string | undefined>(undefined);
   const [preview, setPreview] = useState<LinkPreviewResponse>();
   const [previewLoading, setPreviewLoading] = useState(false);
   const [fetchLinkPreview] = useLinkPreview();
@@ -174,47 +173,17 @@ const EditPostModal: FC<EditPostModalProps> = ({
       : [];
   const suggestionsContainer = useRef<HTMLDivElement>(null);
   const changeCallback = useRef(
-    _.debounce(async (body: string | undefined) => {
-      if (!body) {
-        setLinkPreview(undefined);
-        setPreview(undefined);
-        return;
-      }
-
-      const result = body.matchAll(LINK_PATTERN);
-      const matches = Array.from(result);
-      if (matches.length > 0) {
-        const validLink = matches
-          .map((match) => match[0])
-          .find((link) => isWebLink(link));
-
-        if (validLink && validLink != linkPreview) {
-          setPreviewLoading(true);
-          const link = hrefFromLink(validLink);
-          const { data } = await fetchLinkPreview({
-            variables: {
-              body: link,
-            },
-          });
-
-          const previewData = data?.linkPreview as
-            | (LinkPreviewResponse & {
-                __typename?: string;
-              })
-            | undefined;
-
-          if (previewData) {
-            delete previewData.__typename;
-          }
-
-          setLinkPreview(link);
-          setPreview(previewData ?? undefined);
-          setPreviewLoading(false);
-        }
-      } else {
-        setLinkPreview(undefined);
-        setPreview(undefined);
-      }
+    _.debounce(async (linkToFetch: string) => {
+      setPreviewLoading(true);
+      previewLink.current = linkToFetch;
+      const link = hrefFromLink(linkToFetch);
+      const { data } = await fetchLinkPreview({
+        variables: {
+          body: link,
+        },
+      });
+      setPreview(data?.linkPreview);
+      setPreviewLoading(false);
     }, 500)
   ).current;
 
@@ -278,7 +247,25 @@ const EditPostModal: FC<EditPostModalProps> = ({
   useEffect(() => {
     const subscription = watch(({ mentionInput, media }, { name }) => {
       if (name == "mentionInput.body" && !media) {
-        changeCallback(mentionInput?.body);
+        const body = mentionInput?.body;
+        if (!body) {
+          previewLink.current = undefined;
+          setPreview(undefined);
+          return;
+        }
+        const result = body.matchAll(LINK_PATTERN);
+        const matches = Array.from(result);
+        if (matches.length > 0) {
+          const linkToFetch = matches
+            .map((match) => match[0])
+            .find((link) => isWebLink(link));
+          if (linkToFetch && linkToFetch != previewLink.current) {
+            changeCallback(linkToFetch);
+          }
+        } else {
+          previewLink.current = undefined;
+          setPreview(undefined);
+        }
       }
     });
     return () => subscription.unsubscribe();
@@ -478,14 +465,18 @@ const EditPostModal: FC<EditPostModalProps> = ({
                     }}
                   />
                 )}
-                {actionData.type !== "share" && preview && !selectedFile && (
-                  <div className="my-2 w-100 aspect-video">
+                {actionData.type != "share" && !selectedFile && (
+                  <>
                     {previewLoading ? (
-                      <Spinner />
-                    ) : (
-                      <LinkPreview previewData={preview} />
-                    )}
-                  </div>
+                      <div className="my-2 w-100 aspect-video">
+                        <Spinner />
+                      </div>
+                    ) : preview ? (
+                      <div className="my-2 w-100 aspect-video">
+                        <LinkPreview previewData={preview} />
+                      </div>
+                    ) : null}
+                  </>
                 )}
                 {actionData.type == "share" && (
                   <div className="border border-brand-overlay/[.1] rounded mt-2">
