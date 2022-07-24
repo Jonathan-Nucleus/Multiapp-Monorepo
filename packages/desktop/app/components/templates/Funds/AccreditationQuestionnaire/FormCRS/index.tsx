@@ -36,7 +36,7 @@ const FormCRS: FC<FormCRSProps> = ({ investorClass, setValue, submitStep }) => {
         className="p-6 tracking-wider text-sm text-white/[0.4]"
       >
         <a
-          href=""
+          href="https://prometheusalts.com/legals/form-adv-part-2a"
           className="text-primary"
           target="_blank"
           rel="noreferrer noopener"
@@ -46,7 +46,7 @@ const FormCRS: FC<FormCRSProps> = ({ investorClass, setValue, submitStep }) => {
         <br />
         <br />
         <a
-          href=""
+          href="https://prometheusalts.com/legals/brokerage-form-crs-relationship-summary"
           className="text-primary"
           target="_blank"
           rel="noreferrer noopener"
