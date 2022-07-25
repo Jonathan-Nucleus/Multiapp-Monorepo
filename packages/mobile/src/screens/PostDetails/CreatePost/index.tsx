@@ -1,25 +1,26 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  Keyboard,
   View,
 } from 'react-native';
 import { CircleSnail, Pie } from 'react-native-progress';
 import ImagePicker, { ImageOrVideo } from 'react-native-image-crop-picker';
 import { X } from 'phosphor-react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
-import RadioGroup, { Option } from 'react-native-radio-button-group';
 import {
   Camera,
+  FilePdf,
   VideoCamera,
   Image as GalleryImage,
 } from 'phosphor-react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import RadioGroup, { Option } from 'react-native-radio-button-group';
 
 import UserSvg from 'shared/assets/images/user.svg';
 import GlobalSvg from 'shared/assets/images/global.svg';
@@ -37,20 +38,20 @@ import { PostMedia } from 'mobile/src/components/common/Media';
 import { showMessage } from 'mobile/src/services/ToastService';
 import pStyles from 'mobile/src/theme/pStyles';
 import {
-  WHITE60,
+  BGDARK,
+  BLACK,
   PRIMARY,
   PRIMARYSOLID,
   WHITE,
   WHITE12,
-  BGDARK,
-  BLACK,
+  WHITE60,
 } from 'shared/src/colors';
 
 import {
-  useForm,
-  DefaultValues,
   Controller,
+  DefaultValues,
   useController,
+  useForm,
 } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -68,12 +69,16 @@ import { Audiences } from 'backend/graphql/enumerations.graphql';
 import PostHeader from './PostHeader';
 import PostSelection from './PostSelection';
 import ExpandingInput, {
-  User,
   OnSelectUser,
+  User,
 } from 'mobile/src/components/common/ExpandingInput';
 import MentionsList from 'mobile/src/components/main/MentionsList';
 
 import { CreatePostScreen } from 'mobile/src/navigations/PostDetailsStack';
+
+import DocumentPicker, { types } from 'react-native-document-picker';
+import PdfThumbnail from 'react-native-pdf-thumbnail';
+import { stat } from 'react-native-fs';
 
 const RadioBodyView = (props: any): React.ReactElement => {
   const { icon, label } = props;
@@ -134,6 +139,7 @@ type FormValues = {
   media?: {
     url: string;
     aspectRatio: number;
+    documentLink?: string;
   };
   body?: string;
   mentionIds: string[];
@@ -151,6 +157,7 @@ const schema = yup
       .object({
         url: yup.string().required().default(''),
         aspectRatio: yup.number().required().default(1.58),
+        documentLink: yup.string().default(''),
       })
       .default(undefined),
     body: yup
@@ -188,6 +195,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   const [mentionUsers, setMentionUsers] = useState<User[]>([]);
   const onMentionSelected = useRef<OnSelectUser>();
   const companies = account?.companies ?? [];
+  const [attachment, setAttachment] = useState<string>('');
 
   const {
     handleSubmit,
@@ -273,7 +281,13 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       return;
     }
 
-    const { userId, audience, body, media, mentionIds } = values;
+    // eslint-disable-next-line prefer-const
+    let { userId, audience, body, media, mentionIds } = values;
+
+    if (attachment && media) {
+      media = { ...media, documentLink: attachment };
+    }
+
     navigation.navigate('ChooseCategory', {
       ...(post ?? {}),
       userId,
@@ -293,7 +307,6 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       compressImageQuality: 0.8,
       compressVideoPreset: 'Passthrough',
     });
-
     await uploadImage(image);
   };
 
@@ -319,8 +332,36 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     await uploadImage(videoData);
   };
 
+  const openDocumentPicker = async (): Promise<void> => {
+    const document = await DocumentPicker.pickSingle({
+      type: types.pdf,
+    });
+
+    if (document?.uri) {
+      try {
+        const filePath = document.uri;
+        const image = await PdfThumbnail.generate(filePath, 0);
+        const statResult = await stat(image.uri);
+        const pdfImageData = {
+          size: statResult.size,
+          duration: null,
+          mime: 'image/jpeg',
+          path: image.uri,
+          width: image.width,
+          height: image.height,
+        };
+
+        await uploadFile(document.uri);
+        await uploadImage(pdfImageData);
+      } catch (e) {
+        console.log('exception...', e);
+      }
+    }
+  };
+
   const uploadImage = async (image: ImageOrVideo): Promise<void> => {
     setUploading(true);
+
     const fileUri = image.path;
 
     const filename = fileUri.substring(fileUri.lastIndexOf('/') + 1);
@@ -339,6 +380,20 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
 
     const { remoteName, uploadUrl } = data.uploadLink;
 
+    await upload(uploadUrl, fileUri);
+
+    mediaField.onChange({
+      url: remoteName,
+      documentLink: attachment,
+      aspectRatio: image.width / image.height,
+    });
+
+    setImageData(image);
+    setUploadProgress(0);
+    setUploading(false);
+  };
+
+  const upload = async (uploadUrl: string, fileUri: string): Promise<void> => {
     try {
       await new Promise((resolver, rejecter) => {
         const xhr = new XMLHttpRequest();
@@ -362,15 +417,29 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     } catch (err) {
       console.log('Error uploading file', err);
     }
+  };
 
-    mediaField.onChange({
-      url: remoteName,
-      aspectRatio: image.width / image.height,
+  const uploadFile = async (filePath: string) => {
+    setUploading(true);
+    const filename = filePath.substring(filePath.lastIndexOf('/') + 1);
+    const { data } = await fetchUploadLink({
+      variables: {
+        localFilename: filename.toLowerCase(),
+        type: 'POST',
+        id: account._id,
+      },
     });
 
-    setImageData(image);
-    setUploadProgress(0);
-    setUploading(false);
+    if (!data || !data.uploadLink) {
+      showMessage('error', 'Attachment upload failed');
+      return;
+    }
+
+    const { remoteName, uploadUrl } = data.uploadLink;
+
+    await upload(uploadUrl, filePath);
+
+    setAttachment(remoteName);
   };
 
   const clearImage = (): void => {
@@ -615,6 +684,13 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
               textStyle={styles.iconText}
               viewStyle={styles.iconButton}
               onPress={openPicker}
+            />
+            <IconButton
+              icon={<FilePdf size={32} color={WHITE} />}
+              label="PDF"
+              textStyle={styles.iconText}
+              viewStyle={styles.iconButton}
+              onPress={openDocumentPicker}
             />
           </View>
         ) : null}

@@ -84,6 +84,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
         ? {
             url: media.url,
             aspectRatio: media.aspectRatio,
+            documentLink: media.documentLink,
           }
         : undefined,
       mentionIds,

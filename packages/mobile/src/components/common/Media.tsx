@@ -1,5 +1,13 @@
 import React, { FC, useState, useEffect } from 'react';
-import { AppState, StyleProp, StyleSheet, Pressable, View } from 'react-native';
+import {
+  AppState,
+  StyleProp,
+  StyleSheet,
+  Pressable,
+  View,
+  Linking,
+  Alert,
+} from 'react-native';
 import FastImage, { ImageStyle } from 'react-native-fast-image';
 import { VideoProperties } from 'react-native-video';
 import Pinchable from 'react-native-pinchable';
@@ -8,9 +16,12 @@ import { Media as MediaType } from 'shared/graphql/fragments/post';
 
 import { S3_BUCKET } from 'react-native-dotenv';
 import ExtendedMedia from './ExtendedMedia';
+import pStyles from '../../theme/pStyles';
+import { showMessage } from '../../services/ToastService';
 
 interface MediaProps {
   media: MediaType;
+  shouldOpenLink?: boolean;
   controls?: boolean;
   style?: StyleProp<ImageStyle>;
   resizeMode?: 'contain' | 'cover';
@@ -71,12 +82,19 @@ const Media: FC<MediaProps> = ({
   controls = true,
   resizeMode = 'cover',
   type = 'post',
+  shouldOpenLink = false,
 }) => {
   const [paused, setPaused] = useState(true);
 
   const mediaUrl = `${
     type === 'fund' ? `${S3_BUCKET}/funds` : `${S3_BUCKET}/posts`
   }/${mediaId}/${media.url}`;
+
+  const externalMediaId = mediaId ? mediaId.split('/')[0] : null;
+
+  const documentLinkUrl = `${
+    type === 'fund' ? null : `${S3_BUCKET}/posts`
+  }/${externalMediaId}/${media.documentLink}`;
 
   useEffect(() => {
     if (isVideo(media.url)) {
@@ -114,6 +132,16 @@ const Media: FC<MediaProps> = ({
     setPaused(newState);
   };
 
+  const openDocumentLink = async (): Promise<void> => {
+    Linking.canOpenURL(documentLinkUrl).then((supported) => {
+      if (supported) {
+        Linking.openURL(documentLinkUrl);
+      } else {
+        showMessage('error', 'Whoops! Unable to open the url.');
+      }
+    });
+  };
+
   // TODO: Need to potentially validate the src url before feeding it to
   // react-native-video as an invalid source seems to crash the app
   return isVideo(media.url) ? (
@@ -139,6 +167,27 @@ const Media: FC<MediaProps> = ({
           controls={controls}
         />
       </View>
+    </Pressable>
+  ) : media.documentLink && shouldOpenLink ? (
+    <Pressable
+      style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}
+      onPress={openDocumentLink}>
+      <Pinchable maximumZoomScale={5}>
+        <FastImage
+          style={[
+            styles.media,
+            style,
+            { aspectRatio: media.aspectRatio },
+            media.aspectRatio < 1 && resizeMode === 'contain'
+              ? styles.contain
+              : null,
+          ]}
+          source={{
+            uri: media.url.includes('/') ? media.url : mediaUrl,
+          }}
+          resizeMode={resizeMode}
+        />
+      </Pinchable>
     </Pressable>
   ) : (
     <Pinchable maximumZoomScale={5}>

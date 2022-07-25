@@ -24,9 +24,13 @@ import { useLikePost } from 'shared/graphql/mutation/posts/useLikePost';
 
 export interface PostItemProps {
   post: Post;
+  shouldOpenDocumentLink?: boolean;
 }
 
-const PostItem: React.FC<PostItemProps> = ({ post }) => {
+const PostItem: React.FC<PostItemProps> = ({
+  post,
+  shouldOpenDocumentLink,
+}) => {
   const [likesModalVisible, setLikesModalVisible] = useState(false);
   const { isLiked, toggleLike, likeCount } = useLikePost(post._id);
 
@@ -58,7 +62,10 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
     <>
       <Pressable onPress={() => goToDetails()}>
         <View style={styles.container}>
-          <PostContent post={post} />
+          <PostContent
+            post={post}
+            shouldOpenDocumentLink={shouldOpenDocumentLink}
+          />
           <View style={[styles.postInfo, styles.contentPadding]}>
             <View style={styles.tagWrapper}>
               {post.categories.map((item, index) => (

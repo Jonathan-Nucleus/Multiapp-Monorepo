@@ -95,7 +95,9 @@
     "react-native-webview": "^11.22.7",
     "stream-chat": "^6.6.0",
     "yup": "^0.32.11",
-    "yup-phone": "^1.3.2"
+    "yup-phone": "^1.3.2",
+    "react-native-document-picker": "~8.1.1",
+    "react-native-pdf-thumbnail" : "~1.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

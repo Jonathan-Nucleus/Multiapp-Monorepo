@@ -74,6 +74,7 @@ export namespace Post {
 interface Media {
   url: string;
   aspectRatio: number;
+  documentLink?: string;
   transcoded?: boolean;
 }
 
@@ -251,11 +252,13 @@ export const PostSchema = `
   type Media {
     url: String!
     aspectRatio: Float!
+    documentLink: String
   }
 
   input MediaInput {
     url: String!
     aspectRatio: Float!
+    documentLink: String
   }
 
   input PostInput {

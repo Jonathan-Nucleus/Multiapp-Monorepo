@@ -666,6 +666,7 @@ const resolvers = {
                     .object({
                       url: yup.string().required(),
                       aspectRatio: yup.number().required(),
+                      documentLink: yup.string()
                     })
                     .notRequired()
                     .default(undefined),
@@ -673,6 +674,7 @@ const resolvers = {
                     .object({
                       url: yup.string().required(),
                       aspectRatio: yup.number().required(),
+                      documentLink: yup.string()
                     })
                     .required(),
                 }),
@@ -784,6 +786,7 @@ const resolvers = {
                     .object({
                       url: yup.string().required(),
                       aspectRatio: yup.number().required(),
+                      documentLink: yup.string()
                     })
                     .notRequired()
                     .default(undefined),
@@ -791,6 +794,7 @@ const resolvers = {
                     .object({
                       url: yup.string().required(),
                       aspectRatio: yup.number().required(),
+                      documentLink: yup.string()
                     })
                     .required(),
                 }),

@@ -44,6 +44,7 @@ export const POST_SUMMARY_FRAGMENT = gql`
     media {
       url
       aspectRatio
+      documentLink
     }
     preview {
       title

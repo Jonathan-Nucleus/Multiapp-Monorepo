@@ -199,7 +199,9 @@ const PostDetail: PostDetailScreen = ({ route }) => {
           ref={flatListRef}
           data={getComments || []}
           renderItem={renderCommentItem}
-          ListHeaderComponent={<PostItem post={post} />}
+          ListHeaderComponent={
+            <PostItem shouldOpenDocumentLink={true} post={post} />
+          }
         />
         {isReplyComment && (
           <View style={styles.replyContainer}>
