@@ -57,7 +57,7 @@ const ModalDialog: FC<ModalDialogProps> = ({
                   }
                 >
                   {title && (
-                    <Dialog.Title className="flex items-center border-b border-white/[.12] px-5 py-3">
+                    <Dialog.Title className="flex items-center border-b border-white/[.12] px-5 py-3 text-white">
                       <div className={titleClass ?? "text-xl font-medium"}>
                         {title}
                       </div>

@@ -269,7 +269,7 @@ const FundDetailsView: FC<FundDetailsViewProps> = ({ fund }) => {
             {fund.disclosure && (
               <Accordion
                 title="Fund Disclosures"
-                titleClassName="text-sm font-medium tracking-wider"
+                titleClassName="text-sm font-medium tracking-wider text-white"
                 className="mt-8"
               >
                 <p className="text-xs leading-5 text-white/[0.4] whitespace-pre-line">

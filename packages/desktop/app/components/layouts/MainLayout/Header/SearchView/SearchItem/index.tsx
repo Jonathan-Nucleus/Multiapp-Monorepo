@@ -39,7 +39,9 @@ const SearchItem: FC<SearchItemProps> = ({
             <div className="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-full border border-gray-400 text-gray-400">
               <MagnifyingGlass color="currentColor" size={24} />
             </div>
-            <div className="min-w-0 font-semibold truncate ml-2">{keyword}</div>
+            <div className="min-w-0 font-semibold truncate ml-2 text-white">
+              {keyword}
+            </div>
             <div className="flex-shrink-0 italic text-gray-400 ml-2">
               {`in ${SearchTypeOptions[item.type].title}`}
             </div>

@@ -29,7 +29,9 @@ const FundsList: FC<FundsListProps> = ({ funds }: FundsListProps) => {
     <>
       {sectionedFunds.map((section) => (
         <Fragment key={section.title}>
-          <span className="text-xl mb-2 block mt-10">{section.title}</span>
+          <span className="text-xl mb-2 block mt-10 text-white">
+            {section.title}
+          </span>
           {section.data.map((fund, index) => (
             <div key={index} className="mb-6">
               <FundCard fund={fund} />

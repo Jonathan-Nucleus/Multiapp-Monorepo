@@ -54,7 +54,7 @@ const PreferencesPage: FC = () => {
                 <div
                   className={`text-sm hover:bg-white/[.08] ${
                     selections.includes(key) ? "bg-white/[.08]" : ""
-                  } transition pl-10 py-2`}
+                  } transition pl-10 py-2 text-white`}
                 >
                   {PostCategoryOptions[key].label}
                 </div>
