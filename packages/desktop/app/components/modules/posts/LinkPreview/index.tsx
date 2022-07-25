@@ -1,6 +1,8 @@
 import { FC } from "react";
 import Image from "next/image";
 import { LinkPreview as LinkPreviewResponse } from "shared/graphql/query/post/useLinkPreview";
+import { isValidYoutubeUrl } from "../../../../../../shared/src/url-utils";
+import YoutubePlayer from "../YoutubePlayer";
 
 interface LinkPreviewProps {
   previewData: LinkPreviewResponse;
@@ -34,32 +36,38 @@ const LinkPreview: FC<LinkPreviewProps> = ({
           </a>
         </div>
       </div>
-      <a
-        href={previewData.url}
-        className="block"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        {previewImage && (
-          <div className="w-full aspect-video relative">
-            <Image
-              loader={() => previewImage}
-              src={previewImage}
-              alt=""
-              layout="fill"
-              objectFit="cover"
-              unoptimized={true}
-              priority={false}
-              className="rounded"
-            />
-          </div>
-        )}
-        {!previewFavicon && !previewImage && (
-          <div className="text-sm text-center text-gray-400">
-            Preview not available
-          </div>
-        )}
-      </a>
+      {isValidYoutubeUrl(previewData.url) ? (
+        <div className="w-full aspect-video relative">
+          <YoutubePlayer videoLink={previewData.url}></YoutubePlayer>
+        </div>
+      ) : (
+        <a
+          href={previewData.url}
+          className="block"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {previewImage && (
+            <div className="w-full aspect-video relative">
+              <Image
+                loader={() => previewImage}
+                src={previewImage}
+                alt=""
+                layout="fill"
+                objectFit="cover"
+                unoptimized={true}
+                priority={false}
+                className="rounded"
+              />
+            </div>
+          )}
+          {!previewFavicon && !previewImage && (
+            <div className="text-sm text-center text-gray-400">
+              Preview not available
+            </div>
+          )}
+        </a>
+      )}
     </div>
   );
 };

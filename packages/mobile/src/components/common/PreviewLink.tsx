@@ -14,7 +14,7 @@ import { Body2Bold } from 'mobile/src/theme/fonts';
 import { WHITE12 } from 'shared/src/colors';
 
 import { LinkPreview } from 'shared/graphql/query/post/useLinkPreview';
-import { isValidYoutubeUrl } from '../../utils/url-utils';
+import { isValidYoutubeUrl } from '../../../../shared/src/url-utils';
 import YoutubePlayer from './YoutubePlayer';
 
 interface PostHeaderProps {

@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { WebView } from 'react-native-webview';
 
-import { getVideoIdFromYoutubeLink } from '../../utils/url-utils';
+import { getVideoIdFromYoutubeLink } from '../../../../shared/src/url-utils';
 
 interface YoutubePlayerProps {
   videoLink: string;
