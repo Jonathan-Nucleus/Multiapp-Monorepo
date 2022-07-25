@@ -284,6 +284,7 @@ export const createNotification = async (
   fromUserId: MongoId,
   toUserId: MongoId,
   isNew = true,
+  isRead = false,
   type: NotificationType = "followed-by-user"
 ): Promise<Notification.Mongo> => {
   const { db } = await getIgniteDb();
@@ -298,6 +299,7 @@ export const createNotification = async (
       userId: toObjectId(fromUserId),
     },
     isNew,
+    isRead,
   };
 
   try {

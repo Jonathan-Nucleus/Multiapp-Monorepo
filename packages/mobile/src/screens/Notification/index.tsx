@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from "react";
 import {
   StyleSheet,
   FlatList,
@@ -44,8 +44,8 @@ import {
 } from 'shared/context/Notifications';
 import {
   useReadNotification,
-  useReadNotifications,
-} from 'shared/graphql/mutation/notification';
+  useReadNotifications, useSeenNotifications
+} from "shared/graphql/mutation/notification";
 
 import type { NotificationScreen } from 'mobile/src/navigations/AuthenticatedStack';
 
@@ -55,6 +55,16 @@ const Notifications: NotificationScreen = ({ navigation }) => {
   const { notifications, refetch } = useNotificationsContext();
   const [readNotification] = useReadNotification();
   const [readNotifications] = useReadNotifications();
+  const [seenNotifications] = useSeenNotifications();
+
+  useEffect(() => {
+    try {
+      seenNotifications();
+      refetch();
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
 
   const renderIcon = (val: Notification): ReactElement => {
     switch (val.type) {
@@ -80,9 +90,9 @@ const Notifications: NotificationScreen = ({ navigation }) => {
   const handleReadNotification = async (
     notification: Notification,
   ): Promise<void> => {
-    const { _id, type, data: notificationData, isNew } = notification;
+    const { _id, type, data: notificationData, isRead } = notification;
     try {
-      if (isNew) {
+      if (!isRead) {
         await readNotification({
           variables: {
             notificationId: _id,
@@ -139,7 +149,7 @@ const Notifications: NotificationScreen = ({ navigation }) => {
         onPress={() => handleReadNotification(item)}>
         <View style={styles.item}>
           <View style={styles.avatarView}>
-            {item.isNew && <View style={styles.dot} />}
+            {!item.isRead && <View style={styles.dot} />}
             <Avatar size={54} user={item.data.user} />
             <View style={styles.chat}>{renderIcon(item)}</View>
           </View>

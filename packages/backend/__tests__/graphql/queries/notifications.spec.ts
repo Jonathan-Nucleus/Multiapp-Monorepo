@@ -15,6 +15,7 @@ describe("Query - notifications", () => {
         title
         body
         isNew
+        isRead
         user {
           _id
           firstName
@@ -35,7 +36,7 @@ describe("Query - notifications", () => {
     notifications = (await Promise.all([
       createNotification(user1._id, authUser._id),
       createNotification(user1._id, authUser._id, false),
-      createNotification(user1._id, authUser._id, true, "like-post"),
+      createNotification(user1._id, authUser._id, true, true, "like-post"),
     ])) as Notification.Mongo[];
 
     server = createTestApolloServer(authUser);

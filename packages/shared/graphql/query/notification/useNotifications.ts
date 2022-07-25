@@ -28,6 +28,7 @@ export function useNotifications(): QueryResult<
           title
           body
           isNew
+          isRead
           data {
             userId
             postId

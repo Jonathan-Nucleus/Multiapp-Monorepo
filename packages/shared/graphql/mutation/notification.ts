@@ -28,6 +28,10 @@ type ReadNotificationsData = {
   readNotification: boolean;
 };
 
+type SeenNotificationsData = {
+  seenNotification: boolean;
+};
+
 type ReadNotificationsVariables = never;
 
 export function useReadNotifications(): MutationTuple<
@@ -38,6 +42,22 @@ export function useReadNotifications(): MutationTuple<
     gql`
       mutation ReadAllNotifications {
         readNotification
+      }
+    `,
+    {
+      refetchQueries: ["Notifications"],
+    }
+  );
+}
+
+export function useSeenNotifications(): MutationTuple<
+  SeenNotificationsData,
+  ReadNotificationsVariables
+> {
+  return useMutation<SeenNotificationsData, ReadNotificationsVariables>(
+    gql`
+      mutation SeenAllNotifications {
+        seenNotification
       }
     `,
     {

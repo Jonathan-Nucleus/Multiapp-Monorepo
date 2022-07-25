@@ -92,7 +92,8 @@ const schema = gql`
     ): FollowCompanyResult
     hideUser(hide: Boolean!, userId: ID!): Boolean!
 
-    readNotification(notificationId: ID): Boolean
+    readNotification(notificationId: ID): Boolean!
+    seenNotification(notificationId: ID): Boolean!
     updateFcmToken(fcmToken: String): Boolean
     helpRequest(request: HelpRequestInput!): Boolean
   }
@@ -1566,6 +1567,30 @@ const resolvers = {
         const { notificationId } = args;
 
         return db.notifications.read(user._id, notificationId);
+      }
+    ),
+
+    seenNotification: secureEndpoint(
+      async (
+        _parentIgnored,
+        args: { notificationId?: string },
+        { db, user }
+      ): Promise<boolean> => {
+        const validator = yup
+          .object()
+          .shape({
+            notificationId: yup.string().test({
+              test: isObjectId,
+              message: "Invalid notification id",
+            }),
+          })
+          .required();
+
+        validateArgs(validator, args);
+
+        const { notificationId } = args;
+
+        return db.notifications.seen(user._id, notificationId);
       }
     ),
 

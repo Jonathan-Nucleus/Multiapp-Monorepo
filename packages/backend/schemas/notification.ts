@@ -10,6 +10,7 @@ export namespace Notification {
     title: string;
     body: string;
     isNew: boolean;
+    isRead: boolean;
     data: NotificationData;
     updatedAt?: Date;
   }
@@ -68,7 +69,8 @@ export const NotificationSchema = `
     userId: ID!
     title: String!
     body: String!
-    isNew: Boolean
+    isNew: Boolean!
+    isRead: Boolean!
     data: NotificationData!
     createdAt: Date!
     updatedAt: Date

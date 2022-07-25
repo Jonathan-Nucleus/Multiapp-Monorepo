@@ -81,6 +81,7 @@ const createNotificationsCollection = (
               title,
               body,
               isNew: true,
+              isRead: false,
               data: {
                 ...data,
                 userId: currentUser._id,
@@ -133,6 +134,56 @@ const createNotificationsCollection = (
      * @returns   true
      */
     read: async (
+      userId: MongoId,
+      notificationId?: MongoId
+    ): Promise<boolean> => {
+      const willSeeNotifications = await notificationsCollection.count({
+        userId: toObjectId(userId),
+        isNew: true,
+        isRead: false,
+        ...(notificationId ? { _id: toObjectId(notificationId) } : {}),
+      });
+
+      const result = await notificationsCollection.updateMany(
+        {
+          userId: toObjectId(userId),
+          isRead: false,
+          ...(notificationId ? { _id: toObjectId(notificationId) } : {}),
+        },
+        {
+          $set: { isNew: false, isRead: true, updatedAt: new Date() },
+        }
+      );
+
+      if (!result.acknowledged) {
+        throw new InternalServerError("Not able to read notification.");
+      }
+
+      if (notificationId && !result.matchedCount) {
+        throw new NotFoundError("Notification");
+      }
+
+      await usersCollection.updateOne(
+        {
+          _id: toObjectId(userId),
+        },
+        {
+          $inc: { notificationBadge: -willSeeNotifications || 0 },
+        }
+      );
+
+      return true;
+    },
+
+    /**
+     * Mark as seen in one/all notification.
+     *
+     * @param userId            The id of the authenticated user.
+     * @param notificationId    The id of the notification.
+     *
+     * @returns   true
+     */
+    seen: async (
       userId: MongoId,
       notificationId?: MongoId
     ): Promise<boolean> => {
