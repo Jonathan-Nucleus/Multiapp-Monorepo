@@ -13,6 +13,7 @@ import PPicker from 'mobile/src/components/common/PPicker';
 import { goBack } from 'mobile/src/services/navigation/NavigationService';
 
 import { HelpRequest } from 'shared/graphql/mutation/account';
+import { useAccountContext } from 'shared/context/Account';
 
 interface Fund {
   value: string;
@@ -44,7 +45,7 @@ const EmailContact: React.FC<Props> = ({
   funds,
   initialFund,
 }) => {
-  console.log('initial fund', initialFund);
+  const user = useAccountContext();
   const {
     handleSubmit,
     control,
@@ -53,7 +54,7 @@ const EmailContact: React.FC<Props> = ({
     resolver: yupResolver(schema),
     mode: 'onChange',
     defaultValues: schema.cast(
-      { fundId: initialFund },
+      { fundId: initialFund, email: user?.email },
       { assert: false, stripUnknown: true },
     ) as DefaultValues<FormValues>,
   });
