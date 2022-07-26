@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   KeyboardAvoidingView,
   ListRenderItem,
@@ -6,6 +6,7 @@ import {
   StyleSheet,
   FlatList,
   View,
+  TouchableOpacity,
 } from 'react-native';
 import retry from 'async-retry';
 import { NotePencil } from 'phosphor-react-native';
@@ -13,9 +14,8 @@ import { NotePencil } from 'phosphor-react-native';
 import MainHeader from 'mobile/src/components/main/Header';
 import SearchInput from 'mobile/src/components/common/SearchInput';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
-import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import pStyles from 'mobile/src/theme/pStyles';
-import { WHITE, GRAY700, GRAY600 } from 'shared/src/colors';
+import { WHITE, GRAY700, GRAY600, PRIMARY } from 'shared/src/colors';
 
 import { useForm, Controller, DefaultValues } from 'react-hook-form';
 import * as yup from 'yup';
@@ -23,9 +23,13 @@ import { yupResolver } from '@hookform/resolvers/yup';
 
 import { useChatContext } from 'mobile/src/context/Chat';
 import ChannelItem from 'mobile/src/components/main/chat/ChannelItem';
-import { Channel, ChannelSort, ChannelFilters } from 'mobile/src/services/chat';
+import { Channel, ChannelSort } from 'mobile/src/services/chat';
 
 import { ChannelListScreen } from 'mobile/src/navigations/ChatStack';
+import PSpinner from '../../../components/common/PSpinner';
+import { useIsFocused } from '@react-navigation/native';
+import PText from '../../../components/common/PText';
+import { Body1Semibold, Body2Medium } from '../../../theme/fonts';
 
 const DEFAULT_SORT: ChannelSort = [
   { last_message_at: -1 },
@@ -46,6 +50,8 @@ const schema = yup
 const ChannelList: ChannelListScreen = ({ navigation, route }) => {
   const { channelId } = route.params || {};
   const { client, userId, reconnect } = useChatContext() || {};
+  const focused = useIsFocused();
+  const [retryStatus, setRetryStatus] = useState({ loading: false, count: 0 });
 
   const [channels, setChannels] = useState<Channel[]>([]);
   const { control, getValues } = useForm<yup.InferType<typeof schema>>({
@@ -116,55 +122,97 @@ const ChannelList: ChannelListScreen = ({ navigation, route }) => {
     }
   }, [client, fetchChannels, channelId, navigation]);
 
-  if (!client || !userId) {
-    // Return error state
-    return <PAppContainer noScroll />;
-  }
+  useEffect(() => {
+    retryConnect();
+  }, [focused, client]);
+
+  const retryConnect = () => {
+    if (focused && !client) {
+      setRetryStatus({ loading: true, count: 0 });
+      setTimeout(
+        () => {
+          if (!client) {
+            setRetryStatus({ loading: false, count: 1 });
+          }
+        },
+        retryStatus.count === 0 ? 3000 : 5000,
+      );
+    } else {
+      setRetryStatus({ loading: false, count: 0 });
+    }
+  };
+
+  const kavBehavior = Platform.OS === 'ios' ? 'padding' : 'height';
 
   const renderItem: ListRenderItem<Channel> = ({ item }) => (
     <ChannelItem channel={item} />
   );
 
+  const renderFailure = () => (
+    <View style={styles.noClientContainer}>
+      {retryStatus.loading ? (
+        <View style={styles.spinnerContainer}>
+          <PSpinner visible={!client} />
+        </View>
+      ) : (
+        <>
+          <PText style={styles.failedLabel}>Messages Failed to Load</PText>
+          <TouchableOpacity
+            onPress={() => {
+              reconnect?.();
+              retryConnect();
+            }}>
+            <PText style={styles.failedButton}>Tap here to try again.</PText>
+          </TouchableOpacity>
+        </>
+      )}
+    </View>
+  );
+
   return (
     <View style={pStyles.globalContainer}>
       <MainHeader />
-      <Controller
-        name="search"
-        control={control}
-        render={({ field }) => (
-          <SearchInput
-            {...field}
-            onChangeText={(text) => {
-              field.onChange(text);
-              fetchChannels();
-            }}
-            onClear={() => {
-              field.onChange('');
-              fetchChannels();
-            }}
-            containerStyle={styles.textContainerStyle}
-            style={styles.textStyle}
-            placeholder="Search messages"
-            placeholderTextColor={GRAY600}
+      {!!client && !!userId ? (
+        <>
+          <Controller
+            name="search"
+            control={control}
+            render={({ field }) => (
+              <SearchInput
+                {...field}
+                onChangeText={(text) => {
+                  field.onChange(text);
+                  fetchChannels();
+                }}
+                onClear={() => {
+                  field.onChange('');
+                  fetchChannels();
+                }}
+                containerStyle={styles.textContainerStyle}
+                style={styles.textStyle}
+                placeholder="Search messages"
+                placeholderTextColor={GRAY600}
+              />
+            )}
           />
-        )}
-      />
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <FlatList
-          data={channels}
-          renderItem={renderItem}
-          keyExtractor={(item) => `${item.data?.cid}`}
-        />
-      </KeyboardAvoidingView>
-      <PGradientButton
-        icon={<NotePencil color={WHITE} size={24} />}
-        btnContainer={styles.chatButton}
-        gradientContainer={styles.gradientContainer}
-        textStyle={styles.chatLabel}
-        onPress={() => navigation.navigate('NewChat')}
-      />
+          <KeyboardAvoidingView style={styles.flex} behavior={kavBehavior}>
+            <FlatList
+              data={channels}
+              renderItem={renderItem}
+              keyExtractor={(item) => `${item.data?.cid}`}
+            />
+          </KeyboardAvoidingView>
+          <PGradientButton
+            icon={<NotePencil color={WHITE} size={24} />}
+            btnContainer={styles.chatButton}
+            gradientContainer={styles.gradientContainer}
+            textStyle={styles.chatLabel}
+            onPress={() => navigation.navigate('NewChat')}
+          />
+        </>
+      ) : (
+        renderFailure()
+      )}
     </View>
   );
 };
@@ -198,5 +246,26 @@ const styles = StyleSheet.create({
   chatLabel: {
     fontSize: 40,
     textAlign: 'center',
+  },
+
+  noClientContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  spinnerContainer: {
+    width: 64,
+    height: 64,
+  },
+
+  failedLabel: {
+    color: WHITE,
+    ...Body1Semibold,
+  },
+  failedButton: {
+    color: PRIMARY,
+    ...Body2Medium,
+    marginTop: 8,
+    marginBottom: 18,
   },
 });

@@ -1,14 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
+import PLabel from './PLabel';
 import { StyleSheet, Animated, View } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useIsFocused } from '@react-navigation/native';
-
-import PLabel from '../../common/PLabel';
-import PSpinner from '../../common/PSpinner';
 import { WHITE12 } from 'shared/src/colors';
-import { Body2Medium } from '../../../theme/fonts';
-
-import { VideoPosted } from '../../../screens/PostDetails/CreatePost/ReviewPost';
+import { Body2Medium } from '../../theme/fonts';
+import { useIsFocused } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { VideoPosted } from '../../screens/PostDetails/CreatePost/ReviewPost';
+import PSpinner from './PSpinner';
 
 const BANNER_HEIGHT = 104;
 

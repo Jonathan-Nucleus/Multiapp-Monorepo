@@ -12,7 +12,7 @@ import { Chats, DotsThreeCircle, House, Star } from 'phosphor-react-native';
 
 import FundsSVG from 'shared/assets/images/logo-icon.svg';
 import GreyFundsSVG from 'shared/assets/images/grey-fund.svg';
-import { BLACK, GRAY400, GRAY700, WHITE, WHITE12 } from 'shared/src/colors';
+import { BLACK, GRAY400, WHITE, WHITE12 } from 'shared/src/colors';
 import { Body3 } from 'mobile/src/theme/fonts';
 
 import { Home } from 'mobile/src/screens/Main/Home';
@@ -22,7 +22,7 @@ import ChatStack, { ChatStackParamList } from './ChatStack';
 import MoreStack, { MoreStackParamList } from './MoreStack';
 import { Body5, Body5Bold } from '../theme/fonts';
 
-import { useChatContext, useUnreadCount } from 'mobile/src/context/Chat';
+import { useUnreadCount } from 'mobile/src/context/Chat';
 
 import type { AuthenticatedScreenProps } from './AuthenticatedStack';
 import pStyles from '../theme/pStyles';
@@ -31,7 +31,6 @@ import { EventRegister } from 'react-native-event-listeners';
 
 const Tab = createBottomTabNavigator();
 const MainTabNavigator = (): React.ReactElement => {
-  const { client } = useChatContext() || {};
   const unreadCount = useUnreadCount();
   const [showTutorial, setShowTutorial] = useState(false);
   useEffect(() => {
@@ -130,7 +129,7 @@ const MainTabNavigator = (): React.ReactElement => {
               {focused ? (
                 <Chats size={size} color={WHITE} weight="fill" />
               ) : (
-                <Chats size={size} color={client ? GRAY400 : GRAY700} />
+                <Chats size={size} color={GRAY400} />
               )}
               {unreadCount > 0 ? (
                 <View style={styles.badge}>
@@ -139,14 +138,6 @@ const MainTabNavigator = (): React.ReactElement => {
               ) : null}
             </View>
           ),
-        }}
-        listeners={{
-          tabPress: (evt) => {
-            if (!client) {
-              console.log('Messenger disabled');
-              evt.preventDefault();
-            }
-          },
         }}
       />
       <Tab.Screen
