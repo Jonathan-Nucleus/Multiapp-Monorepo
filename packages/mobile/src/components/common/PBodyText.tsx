@@ -39,6 +39,7 @@ const PBodyText: FC<PBodyTextProps> = ({
   const [collapsedText, setCollapsedText] = useState(initialBody);
   const [more, setMore] = useState(true);
   const [initialLoaded, setInitialLoaded] = useState(false);
+  const [initialBtnLoaded, setInitialBtnLoaded] = useState(false);
   const [containerWidth, setContainerWidth] = useState(INITIAL_CONTAINER_WIDTH);
   const [btnTextWidth, setBtnTextWidth] = useState(INITIAL_READ_MORE_WIDTH);
   const lastLine = useRef<number>(0);
@@ -107,11 +108,14 @@ const PBodyText: FC<PBodyTextProps> = ({
       const { lines: txtLines = [] } = e.nativeEvent as TextLayoutEventData;
       const length = txtLines.length;
 
-      if (length > 0) {
-        setBtnTextWidth(txtLines[length - 1].width);
+      if (!initialBtnLoaded && collapseLongText) {
+        if (length > 0) {
+          setBtnTextWidth(txtLines[length - 1].width);
+          setInitialBtnLoaded(true);
+        }
       }
     },
-    [],
+    [collapseLongText, initialBtnLoaded],
   );
 
   const onContainerLayout = useCallback(
