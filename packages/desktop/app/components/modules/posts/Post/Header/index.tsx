@@ -7,10 +7,11 @@ import dayjs from "dayjs";
 interface HeaderProps {
   post: PostSummary;
   accountId: string | undefined;
+  highlighted?: boolean;
 }
 
 const Header: FC<HeaderProps> = ({
-  post: { user, company, createdAt },
+  post: { user, company, createdAt, highlighted = false },
   accountId,
 }: HeaderProps) => {
   return (
@@ -19,12 +20,14 @@ const Header: FC<HeaderProps> = ({
         <CompanyHeader
           company={company}
           createdAt={dayjs(createdAt).format("MMM DD")}
+          highlighted={highlighted}
         />
       ) : (
         <UserHeader
           user={user!}
           accountId={accountId}
           createdAt={dayjs(createdAt).format("MMM DD")}
+          highlighted={highlighted}
         />
       )}
     </>

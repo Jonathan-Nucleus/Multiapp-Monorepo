@@ -31,7 +31,8 @@ export namespace Post {
     visible: boolean;
     reporterIds?: ObjectId[];
     updatedAt?: Date;
-    featured?: boolean;
+    featured?: boolean; // Whether this post is featured on the user's profile
+    highlighted?: boolean; // Whether this post is highlighted on the global feed
     deleted?: boolean;
   }
 
@@ -239,6 +240,7 @@ export const PostSchema = `
     createdAt: Date!
     updatedAt: Date
     featured: Boolean
+    highlighted: Boolean
 
     user: User
     company: Company

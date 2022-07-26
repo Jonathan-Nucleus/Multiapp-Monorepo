@@ -40,6 +40,9 @@ import { Client } from "peekalink";
 const LINK_PATTERN =
   /((?:(?:https|http|ftp):\/\/)?(?:www\.)?(?:[-a-zA-Z\d@:%._+~#=]{2,256}\.[a-z]{2,6}\b)+(?:\/[/\d\w.\-?=&%+#]+)?)/gim;
 
+/** Index at which highlighted posts appear on the first page of the feed. */
+const HIGHLIGHTED_POST_INDEX = 3;
+
 const client = new Client({ apiKey: `${process.env.PEEKALINK_API_KEY}` });
 
 const schema = gql`
@@ -246,7 +249,7 @@ const resolvers = {
           throw new NotFoundError();
         }
 
-        return db.posts.findByFilters(
+        const posts = await db.posts.findByFilters(
           user._id,
           user.accreditation,
           {
@@ -262,6 +265,25 @@ const resolvers = {
           before,
           limit
         );
+
+        // Insert any highlighted posts if this is the first page of posts
+        // being fetched
+        if (!before) {
+          const highlighted = await db.posts.findHighlighted();
+          if (highlighted.length > 0) {
+            const highlightedPostIndex = Math.floor(
+              Math.random() * highlighted.length
+            );
+
+            posts.splice(
+              HIGHLIGHTED_POST_INDEX,
+              0,
+              highlighted[highlightedPostIndex]
+            );
+          }
+        }
+
+        return posts;
       }
     ),
 

@@ -81,6 +81,7 @@ const PostsSection: FC<PostsSectionProps> = ({ account }) => {
     document.addEventListener("scroll", handleScroll, true);
     return () => document.removeEventListener("scroll", handleScroll, true);
   }, [onEndReached]);
+
   return (
     <>
       <div className="hidden md:block">

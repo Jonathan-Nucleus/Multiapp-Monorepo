@@ -89,6 +89,7 @@ const PostContent: React.FC<PostContentProps> = ({
             avatarSize={56}
             auxInfo={getPostTime(post.createdAt)}
             audienceInfo={post.audience}
+            highlighted={post.highlighted}
           />
         </Pressable>
         {!hideMenu && (

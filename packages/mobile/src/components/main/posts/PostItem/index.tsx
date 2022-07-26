@@ -11,7 +11,12 @@ import IconButton from 'mobile/src/components/common/IconButton';
 import Tag from 'mobile/src/components/common/Tag';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 import pStyles from 'mobile/src/theme/pStyles';
-import { PRIMARYSTATE, WHITE12, WHITE60 } from 'shared/src/colors';
+import {
+  PRIMARYSTATE,
+  PRIMARYSOLID,
+  WHITE12,
+  WHITE60,
+} from 'shared/src/colors';
 import { Body3 } from 'mobile/src/theme/fonts';
 
 import PostContent from './PostContent';
@@ -61,7 +66,11 @@ const PostItem: React.FC<PostItemProps> = ({
   return (
     <>
       <Pressable onPress={() => goToDetails()}>
-        <View style={styles.container}>
+        <View
+          style={[
+            styles.container,
+            post.highlighted ? styles.highlighted : undefined,
+          ]}>
           <PostContent
             post={post}
             shouldOpenDocumentLink={shouldOpenDocumentLink}
@@ -149,6 +158,12 @@ const PostItem: React.FC<PostItemProps> = ({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
+  },
+  highlighted: {
+    borderColor: PRIMARYSOLID,
+    borderTopWidth: 2,
+    borderBottomWidth: 2,
+    paddingTop: 8,
   },
   contentPadding: {
     paddingHorizontal: 16,

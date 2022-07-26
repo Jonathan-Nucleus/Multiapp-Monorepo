@@ -29,6 +29,7 @@ type FilterOptions = {
   roleFilter?: PostRoleFilter;
   followingUsers?: MongoId[];
   featured?: boolean;
+  highlighted?: boolean;
 };
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
@@ -53,22 +54,42 @@ const createPostsCollection = (
       }),
 
     /**
-     * Provides a list of all posts in the DB.
+     * Provides a list of all posts in the DB, excluding highlighted posts.
      *
-     * @param ids       An optional array of specific IDs to filter by.
-     * @param featured  Optionally filter by featured posts.
+     * @param ids         An optional array of specific IDs to filter by.
+     * @param featured    Optionally filter by featured posts.
+     * @param highlighted Optional flag indicating whether to include highlighted
+     *                    post. Defaults to false.
      *
      * @returns   An array of matching Post objects.
      */
     findAll: async (
       ids?: MongoId[],
-      featured = false
+      featured = false,
+      highlighted = false
     ): Promise<Post.Mongo[]> => {
       const query = ids !== undefined ? { _id: { $in: toObjectIds(ids) } } : {};
       return postsCollection
         .find({
           ...query,
           ...(featured ? { featured } : {}),
+          ...(highlighted ? {} : { highlighted: { $ne: true } }),
+          deleted: { $exists: false },
+          visible: true,
+        })
+        .sort({ _id: -1 })
+        .toArray();
+    },
+
+    /**
+     * Provides a list of all highlighted posts.
+     *
+     * @returns   An array of matching Post objects.
+     */
+    findHighlighted: async (): Promise<Post.Mongo[]> => {
+      return postsCollection
+        .find({
+          highlighted: true,
           deleted: { $exists: false },
           visible: true,
         })
@@ -103,6 +124,7 @@ const createPostsCollection = (
         roleFilter = "everyone",
         followingUsers = [],
         featured = false,
+        highlighted = false,
       } = filterOptions;
 
       const audience = accreditation === "none" ? "everyone" : accreditation;
@@ -134,7 +156,7 @@ const createPostsCollection = (
           userIds = [...followingUsers];
         }
 
-        userIds = _.difference(userIds, ignoreUsers || []);
+        userIds = _.difference(userIds, ignoreUsers);
       }
 
       const excludePostIds = ignorePosts.map((id) => id.toString());
@@ -152,6 +174,7 @@ const createPostsCollection = (
           },
           visible: true,
           deleted: { $exists: false },
+          ...(highlighted ? {} : { highlighted: { $ne: true } }),
           $or: [
             {
               userId: toObjectId(userId),

@@ -1,10 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { StyleSheet, TouchableOpacity, Text, View } from 'react-native';
+import { Star } from 'phosphor-react-native';
 
 import Avatar from './Avatar';
 import PLabel from './PLabel';
 import { Body1Bold, Body3, Body3Bold, Body4Bold } from '../../theme/fonts';
-import { WHITE60, PRIMARY, GRAY100 } from 'shared/src/colors';
+import {
+  WHITE60,
+  PRIMARY,
+  GRAY100,
+  GRAY200,
+  PRIMARYSOLID,
+} from 'shared/src/colors';
 
 import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 import QPSvg from 'shared/assets/images/QP.svg';
@@ -35,6 +42,7 @@ interface UserInfoProps {
   auxInfo?: string;
   audienceInfo?: Audience;
   showFollow?: boolean;
+  highlighted?: boolean;
 }
 
 const UserInfo: React.FC<UserInfoProps> = (props) => {
@@ -45,6 +53,7 @@ const UserInfo: React.FC<UserInfoProps> = (props) => {
     auxInfo,
     audienceInfo,
     showFollow = true,
+    highlighted = false,
   } = props;
   let userData: User | undefined;
   let companyData: Company | undefined;
@@ -123,6 +132,16 @@ const UserInfo: React.FC<UserInfoProps> = (props) => {
           <PLabel label={company.name} textStyle={styles.smallLabel} />
         ) : null}
         <View style={styles.auxInfo}>
+          {highlighted ? (
+            <>
+              <Star size={12} color={PRIMARYSOLID} weight="fill" />
+              <PLabel
+                label="Featured Post"
+                textStyle={[styles.smallLabel, styles.highlighted]}
+              />
+              <View style={styles.separator} />
+            </>
+          ) : undefined}
           {auxInfo ? (
             <PLabel label={auxInfo} textStyle={styles.smallLabel} />
           ) : null}
@@ -182,11 +201,15 @@ const styles = StyleSheet.create({
   smallLabel: {
     ...Body3,
     color: WHITE60,
-    marginBottom: 4,
   },
   auxInfo: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 4,
+  },
+  highlighted: {
+    marginLeft: 4,
+    color: GRAY200,
   },
   audienceInfo: {
     marginLeft: 4,
@@ -197,7 +220,6 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     backgroundColor: GRAY100,
     marginHorizontal: 8,
-    marginTop: -2,
   },
   follow: {
     textTransform: 'uppercase',

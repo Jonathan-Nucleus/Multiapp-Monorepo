@@ -105,6 +105,18 @@ export function usePosts(
       const newData = { ...state };
       let existingPosts = newData.posts ? newData.posts : [];
 
+      // Test if there is any new data excluding highlighted posts
+      const newIds = newPosts
+        .filter((post) => !post.highlighted)
+        .map((post) => post._id);
+      const oldIds = existingPosts.map((post) => post._id);
+      if (
+        existingPosts.length > 0 &&
+        newIds.every((postId) => oldIds.includes(postId))
+      ) {
+        return;
+      }
+
       if (!rest.variables?.before) {
         const firstIndex = existingPosts.findIndex(
           (post) => post._id === newPosts[0]?._id
@@ -167,10 +179,7 @@ export function usePosts(
                 existingPost._id.toString() === post._id.toString()
             )
         ),
-      ].sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+      ];
 
       setState(newData);
     }

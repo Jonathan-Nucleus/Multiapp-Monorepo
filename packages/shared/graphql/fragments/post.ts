@@ -22,6 +22,7 @@ export type PostSummary = Pick<
   | "createdAt"
   | "comments"
   | "likes"
+  | "highlighted"
 > & {
   user?: Pick<
     UserProfile,
@@ -61,6 +62,7 @@ export const POST_SUMMARY_FRAGMENT = gql`
     commentIds
     commentCount
     createdAt
+    highlighted
     userId
     user {
       _id

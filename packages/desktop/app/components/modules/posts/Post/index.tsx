@@ -1,14 +1,16 @@
 import { FC, HTMLProps, useState } from "react";
-import Card from "../../../common/Card";
 import { ChatCenteredText, Share, ThumbsUp } from "phosphor-react";
 import { useLikePost } from "shared/graphql/mutation/posts/useLikePost";
-import LikesModal from "./LikesModal";
-import { PostSummary } from "shared/graphql/fragments/post";
+
 import ActionMenu from "./ActionMenu";
-import Header from "./Header";
-import PostBody from "./PostBody";
-import CommentsList from "./CommentsList";
 import Button from "../../../common/Button";
+import Card from "../../../common/Card";
+import CommentsList from "./CommentsList";
+import Header from "./Header";
+import LikesModal from "./LikesModal";
+import PostBody from "./PostBody";
+
+import { PostSummary } from "shared/graphql/fragments/post";
 import { useAccountContext } from "shared/context/Account";
 
 interface PostProps extends HTMLProps<HTMLDivElement> {
@@ -36,9 +38,9 @@ const Post: FC<PostProps> = ({
   return (
     <>
       <Card
-        className={`border-0 p-0 rounded-none overflow-visible md:rounded-2xl ${
-          className ?? ""
-        }`}
+        className={`${
+          post.highlighted ? "border border-primary-solid" : "border-0"
+        } p-0 rounded-none overflow-visible md:rounded-2xl ${className ?? ""}`}
       >
         <div className="flex px-4 pt-4">
           <div>

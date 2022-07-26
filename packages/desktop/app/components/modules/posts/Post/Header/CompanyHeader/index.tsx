@@ -1,17 +1,25 @@
 import { FC } from "react";
 import Link from "next/link";
+import { Star } from "phosphor-react";
+
 import Avatar from "../../../../../common/Avatar";
-import { PostSummary } from "shared/graphql/fragments/post";
 import Button from "../../../../../common/Button";
+
+import { PostSummary } from "shared/graphql/fragments/post";
 import { useFollowCompany } from "shared/graphql/mutation/account/useFollowCompany";
 import { useAccountContext } from "shared/context/Account";
 
 interface CompanyHeaderProps {
   company: Exclude<PostSummary["company"], undefined>;
   createdAt: string;
+  highlighted?: boolean;
 }
 
-const CompanyHeader: FC<CompanyHeaderProps> = ({ company, createdAt }) => {
+const CompanyHeader: FC<CompanyHeaderProps> = ({
+  company,
+  createdAt,
+  highlighted = false,
+}) => {
   const { isFollowing, toggleFollow } = useFollowCompany(company._id);
   const account = useAccountContext();
   return (
@@ -46,7 +54,20 @@ const CompanyHeader: FC<CompanyHeaderProps> = ({ company, createdAt }) => {
                   </div>
                 )}
               </div>
-              <div className="text-xs text-white opacity-60">{createdAt}</div>
+              <div className="flex flex-row items-center text-xs text-white/[0.6]">
+                {highlighted ? (
+                  <div className="flex flex-row items-center text-white/[0.8] mr-1">
+                    <div className="text-primary-solid inline-block mr-1 mb-0.5">
+                      <Star size={14} color="currentColor" weight="fill" />
+                    </div>{" "}
+                    <span>Featured Post</span>
+                    <span className="ml-1">•</span>
+                  </div>
+                ) : (
+                  ""
+                )}
+                {createdAt}
+              </div>
             </div>
           </div>
         </div>
