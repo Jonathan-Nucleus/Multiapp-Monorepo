@@ -127,6 +127,7 @@ export const UNIVERSAL_INVITE_CODES = [
   "UWTKXU",
   "K2Q06A",
   "TWIST",
+  "BIRD",
   "VNSFG0",
   "HAHI07",
   "IV99XV",
