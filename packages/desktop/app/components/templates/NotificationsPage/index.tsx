@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useEffect } from "react";
 import { Gear, Checks, DotsThreeOutlineVertical } from "phosphor-react";
 import { Menu } from "@headlessui/react";
 import DisclosureCard from "desktop/app/components/modules/funds/DisclosureCard";
@@ -8,7 +8,7 @@ import NotificationItem from "./NotificationItem";
 import { useNotifications } from "shared/graphql/query/notification/useNotifications";
 import {
   useReadNotification,
-  useReadNotifications,
+  useReadNotifications, useSeenNotifications
 } from "shared/graphql/mutation/notification";
 import Card from "../../common/Card";
 
@@ -16,7 +16,17 @@ const NotificationPage: FC = () => {
   const { data } = useNotifications();
   const [readNotification] = useReadNotification();
   const [readNotifications] = useReadNotifications();
+  const [seenNotifications] = useSeenNotifications();
   const notifications = data?.notifications ?? [];
+
+  useEffect(() => {
+    try {
+      seenNotifications();
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
+
   const handleReadNotification = async (id?: string) => {
     try {
       await readNotification({

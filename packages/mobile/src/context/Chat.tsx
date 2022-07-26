@@ -39,10 +39,7 @@ export function useUnreadCount(): number {
       setUnreadCount(userUnreadCount ?? 0);
       const handler = client.on((event) => {
         console.log('Received messaging event', event.type, event);
-        if (
-          event.total_unread_count &&
-          unreadCount !== event.total_unread_count
-        ) {
+        if (event.total_unread_count && unreadCount !== event.total_unread_count) {
           console.log('updating unread count');
           setUnreadCount(event.total_unread_count);
         } else if (
@@ -176,7 +173,7 @@ const connect = async (
       console.log('adding token', fcmToken.token, 'to user', user._id);
       await client.addDevice(fcmToken.token, 'firebase');
     }
-
+    
     return result && result.me ? result.me.total_unread_count : 0;
   } catch (err) {
     console.log('Error connect to stream chat', err);

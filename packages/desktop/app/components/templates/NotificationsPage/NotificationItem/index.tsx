@@ -41,9 +41,9 @@ const NotificationItem: FC<NotificationItemProps> = ({
 
   return (
     <div
-      className={`${notification.isNew && "bg-background-blue"}`}
+      className={`${notification.isRead && "bg-background-blue"}`}
       onClick={async () => {
-        if (notification.isNew) {
+        if (!notification.isRead) {
           await handleReadNotification(notification._id);
         }
 
@@ -55,7 +55,7 @@ const NotificationItem: FC<NotificationItemProps> = ({
       }}
     >
       <div className="flex items-center cursor-pointer py-3">
-        <div className={notification.isNew ? "" : "invisible"}>
+        <div className={!notification.isRead ? "" : "invisible"}>
           <div className="w-2 h-2 rounded-full bg-yellow ml-2" />
         </div>
         <div className="relative ml-2">
@@ -67,7 +67,7 @@ const NotificationItem: FC<NotificationItemProps> = ({
         <div className="text-sm flex-grow ml-3 text-white">
           <div
             className={
-              notification.isNew
+              !notification.isRead
                 ? "font-semibold"
                 : "font-light text-white/[0.8]"
             }
