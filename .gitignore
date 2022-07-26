@@ -1,5 +1,8 @@
 # local env files
 .env
+.env.development.local
+.env.production.local
+.env.local
 !packages/desktop/.env
 
 # application files
