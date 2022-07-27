@@ -13,8 +13,8 @@ import { Info } from 'phosphor-react-native';
 import Disclosure from 'mobile/src/components/main/Disclosure';
 import FundItem from 'mobile/src/components/main/funds/FundItem';
 import pStyles from 'mobile/src/theme/pStyles';
-import { BLACK, WHITE, WHITE12, WHITE60 } from 'shared/src/colors';
-import { H6Bold } from 'mobile/src/theme/fonts';
+import { BLACK, GRAY200, WHITE, WHITE12, WHITE60 } from 'shared/src/colors';
+import { H6Bold, H6, Body2 } from 'mobile/src/theme/fonts';
 
 import AccreditationLock from './AccreditationLock';
 import FundsPlaceholder from '../../../../components/placeholder/FundsPlaceholder';
@@ -27,10 +27,26 @@ import {
 } from 'shared/graphql/query/marketplace/useFunds';
 import { EventRegister } from 'react-native-event-listeners';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAccountContext } from 'shared/context/Account';
+import PText from '../../../../components/common/PText';
 
 const PLACE_HOLDERS = 7;
 
+const ListEmptyComponent = () => {
+  return (
+    <View style={styles.listEmptyContainer}>
+      <PText style={styles.emptyTitle}>{"We're working on it."}</PText>
+      <PText style={styles.emptyDescription}>
+        {
+          'There are currently no funds available for accredited investors. We’re adding new funds every day, so be sure to check back!'
+        }
+      </PText>
+    </View>
+  );
+};
+
 const Funds: FundsScreen = () => {
+  const account = useAccountContext();
   const focused = useIsFocused();
 
   const { data, refetch, loading } = useFunds();
@@ -81,6 +97,10 @@ const Funds: FundsScreen = () => {
     return sectionedData;
   }, [data?.funds]);
 
+  if (account?.accreditation === 'NONE') {
+    return <AccreditationLock />;
+  }
+
   if (!data?.funds || (loading && data?.funds?.length === 0)) {
     return (
       <View style={pStyles.globalContainer}>
@@ -92,7 +112,7 @@ const Funds: FundsScreen = () => {
   }
 
   if (data && data.funds && data.funds.length === 0) {
-    return <AccreditationLock />;
+    return <ListEmptyComponent />;
   }
 
   const keyExtractor = (item: Fund): string => item._id;
@@ -162,5 +182,26 @@ const styles = StyleSheet.create({
   disclosureText: {
     color: WHITE60,
     marginLeft: 8,
+  },
+  listEmptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+  },
+  emptyTitle: {
+    ...H6,
+    lineHeight: 30,
+    letterSpacing: 1.5,
+    textAlign: 'center',
+    color: WHITE,
+  },
+  emptyDescription: {
+    ...Body2,
+    color: GRAY200,
+    textAlign: 'center',
+    lineHeight: 20,
+    letterSpacing: 0.25,
+    marginTop: 8,
   },
 });

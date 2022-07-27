@@ -59,8 +59,8 @@ const InvestorClassForm = ({
                   field.value === item.value ? "bg-info/[.6]" : "bg-info/[.1]"
                 }`}
             >
-              <div>{ICONS[item.value]}</div>
-              <div className="ml-2">{item.label}</div>
+              <div className="text-white">{ICONS[item.value]}</div>
+              <div className="ml-2 text-white">{item.label}</div>
             </div>
           </div>
         ))}

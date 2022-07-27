@@ -1,4 +1,4 @@
-import { FC, useRef, useState } from "react";
+import { FC, useCallback, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { ArrowLeft, ArrowRight } from "phosphor-react";
 
@@ -49,11 +49,13 @@ type FormData = InvestorClassData &
 interface AccreditationQuestionnaireProps {
   show: boolean;
   onClose: () => void;
+  onDone?: () => void;
 }
 
 const AccreditationQuestionnaire: FC<AccreditationQuestionnaireProps> = ({
   show,
   onClose,
+  onDone,
 }) => {
   const router = useRouter();
   const [saveQuestionnaire] = useSaveQuestionnaire();
@@ -107,6 +109,15 @@ const AccreditationQuestionnaire: FC<AccreditationQuestionnaireProps> = ({
     };
   };
 
+  const handleRefreshPage = useCallback(() => {
+    if (onDone) {
+      onDone();
+    } else {
+      onClose();
+      router.reload();
+    }
+  }, [onDone, onClose, router]);
+
   return (
     <>
       <ModalDialog
@@ -118,10 +129,7 @@ const AccreditationQuestionnaire: FC<AccreditationQuestionnaireProps> = ({
         {accreditation ? (
           <AccreditationResult
             accreditation={accreditation}
-            onClose={() => {
-              onClose();
-              router.reload();
-            }}
+            onClose={handleRefreshPage}
           />
         ) : (
           <Wizard<FormData>

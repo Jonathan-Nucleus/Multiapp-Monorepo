@@ -35,11 +35,16 @@ export function useSaveQuestionnaire(): MutationTuple<
   SaveQuestionnaireData,
   SaveQuestionnaireVariables
 > {
-  return useMutation<SaveQuestionnaireData, SaveQuestionnaireVariables>(gql`
-    mutation SaveQuestionnaire($questionnaire: QuestionnaireInput!) {
-      saveQuestionnaire(questionnaire: $questionnaire) {
-        accreditation
+  return useMutation<SaveQuestionnaireData, SaveQuestionnaireVariables>(
+    gql`
+      mutation SaveQuestionnaire($questionnaire: QuestionnaireInput!) {
+        saveQuestionnaire(questionnaire: $questionnaire) {
+          accreditation
+        }
       }
+    `,
+    {
+      refetchQueries: ["Account"],
     }
-  `);
+  );
 }

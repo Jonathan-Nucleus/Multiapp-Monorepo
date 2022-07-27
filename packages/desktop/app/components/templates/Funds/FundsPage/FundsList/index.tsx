@@ -6,10 +6,11 @@ import Skeleton from "./Skeleton";
 import { AssetClasses } from "backend/graphql/enumerations.graphql";
 
 interface FundsListProps {
+  loading?: boolean;
   funds: Fund[] | undefined;
 }
 
-const FundsList: FC<FundsListProps> = ({ funds }: FundsListProps) => {
+const FundsList: FC<FundsListProps> = ({ loading, funds }: FundsListProps) => {
   const sectionedFunds = useMemo(() => {
     if (funds) {
       return AssetClasses.map((assetClass) => ({
@@ -21,8 +22,23 @@ const FundsList: FC<FundsListProps> = ({ funds }: FundsListProps) => {
     }
   }, [funds]);
 
-  if (!funds) {
+  if (!funds || loading) {
     return <Skeleton />;
+  }
+
+  if (funds && funds.length === 0) {
+    return (
+      <div className="flex h-[50vh] flex-col items-center justify-center px-4">
+        <span className="text-xl mb-2 text-white">
+          {"We're working on it."}
+        </span>
+        <label className="max-w-lg text-sm text-gray-200 text-center">
+          {
+            "There are currently no funds available for accredited investors.\nWe’re adding new funds every day, so be sure to check back!"
+          }
+        </label>
+      </div>
+    );
   }
 
   return (
