@@ -28,7 +28,6 @@ import {
   Pause,
   Play,
   SpeakerSimpleHigh,
-  SpeakerSimpleSlash,
 } from 'phosphor-react-native';
 import { DISABLED, GRAY100, GRAY800, WHITE } from 'shared/src/colors';
 import { Media as MediaType } from 'shared/graphql/fragments/post';
@@ -37,7 +36,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const iconSize = 22;
 const controlAnimationTiming = 500;
 const doubleTapTime = 300;
-const GLOBAL_MUTE = 'GLOBAL_MUTE';
+const volumeWidth = 150;
+const GLOBAL_VOLUME_POSITION = 'GLOBAL_VOLUME_POSITION';
 
 enum SeekerStatus {
   Grant,
@@ -66,7 +66,6 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
   media,
   mediaUrl,
   resizeMode = 'contain',
-  showOnStart = false,
   paused = true,
   showHours = false,
   onEnd = () => console.log('onEnd'),
@@ -74,6 +73,8 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
   videoStyle = {},
   setPaused,
   togglePause,
+  controls = false,
+  showOnStart = false,
   ...props
 }) => {
   const initialValue = showOnStart ? 1 : 0;
@@ -100,7 +101,7 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
     duration: 0,
   });
 
-  const [soundMuted, setSoundMuted] = useState(true);
+  const [soundMuted, setSoundMuted] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [seekerStatus, setSeekerStatus] = useState({
     status: SeekerStatus.Cancel,
@@ -112,6 +113,19 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
   const controlTimeout = useRef<NodeJS.Timeout | null>();
   const playerRef = useRef<Video | null>();
   const [seekerWidth, setSeekerWidth] = useState(0);
+
+  const [volumeState, setVolumeState] = useState({
+    volume: 1,
+    volumeTrackWidth: 0,
+    volumeFillWidth: 0,
+    volumePosition: 0,
+    volumeOffset: 0,
+  });
+
+  const [vSeekerStatus, setVSeekerStatus] = useState({
+    status: SeekerStatus.Cancel,
+    position: 0,
+  });
 
   const _onEnd = (): void => {
     onEnd();
@@ -161,9 +175,100 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
     }),
   ).current;
 
+  const volumePanResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: (_evt, _gestureState) => true,
+      onMoveShouldSetPanResponder: (_evt, _gestureState) => true,
+      onPanResponderGrant: (evt, _gestureState) => {
+        setVSeekerStatus({
+          status: SeekerStatus.Grant,
+          position: evt.nativeEvent.locationX,
+        });
+      },
+
+      /**
+       * Update the volume as we change the position.
+       * If we go to 0 then turn on the mute prop
+       * to avoid that weird static-y sound.
+       */
+      onPanResponderMove: (_evt, gestureState) => {
+        setVSeekerStatus({
+          status: SeekerStatus.Move,
+          position: gestureState.dx,
+        });
+      },
+
+      /**
+       * Update the offset...
+       */
+      onPanResponderRelease: (_evt, gestureState) => {
+        setVSeekerStatus({
+          status: SeekerStatus.Release,
+          position: gestureState.dx,
+        });
+      },
+    }),
+  ).current;
+
   useEffect(() => {
-    AsyncStorage.setItem(GLOBAL_MUTE, `${soundMuted}`);
-  }, [soundMuted]);
+    switch (vSeekerStatus.status) {
+      case SeekerStatus.Grant: {
+        clearControlTimeout();
+        break;
+      }
+      case SeekerStatus.Move: {
+        const position = volumeState.volumeOffset + vSeekerStatus.position;
+
+        setVolumePosition(position);
+        const volume = calculateVolumeFromVolumePosition();
+        setVolumeState((v) => ({ ...v, volume }));
+        setSoundMuted(volume <= 0);
+
+        break;
+      }
+      case SeekerStatus.Release: {
+        setVolumeState((v) => ({ ...v, volumeOffset: v.volumePosition }));
+        setControlTimeout();
+
+        AsyncStorage.setItem(
+          GLOBAL_VOLUME_POSITION,
+          `${volumeState.volumePosition}`,
+        );
+
+        setSeekerStatus({ ...seekerStatus, status: SeekerStatus.Cancel });
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  }, [vSeekerStatus]);
+
+  const setVolumePosition = (position = 0, vOffset: number | null = null) => {
+    const pos = constrainToVolumeMinMax(position);
+
+    const volumeTrackWidth = volumeWidth - pos;
+    setVolumeState((v) => ({
+      ...v,
+      volumePosition: pos,
+      volumeFillWidth: Math.max(pos, 0),
+      volumeTrackWidth: Math.min(volumeTrackWidth, 150),
+      ...(vOffset ? { volumeOffset: vOffset } : {}),
+    }));
+  };
+
+  const calculateVolumeFromVolumePosition = () => {
+    return volumeState.volumePosition / volumeWidth;
+  };
+
+  const constrainToVolumeMinMax = (val = 0) => {
+    if (val <= 0) {
+      return 0;
+    } else if (val >= volumeWidth + 9) {
+      return volumeWidth + 9;
+    }
+    return val;
+  };
 
   useEffect(() => {
     setState((s) => ({ ...s, paused }));
@@ -261,9 +366,7 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
   };
 
   const _onScreenTouch = (): void => {
-    AsyncStorage.getItem(GLOBAL_MUTE).then((muted) => {
-      setSoundMuted(muted !== 'false');
-    });
+    initVolume();
 
     if (tapActionTimeout.current) {
       clearTimeout(tapActionTimeout.current);
@@ -278,6 +381,13 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
         tapActionTimeout.current = null;
       }, doubleTapTime);
     }
+  };
+
+  const initVolume = () => {
+    AsyncStorage.getItem(GLOBAL_VOLUME_POSITION).then((vp) => {
+      const pos = vp != null ? Number(vp) : 1;
+      setVolumePosition(pos, pos);
+    });
   };
 
   const setControlTimeout = (): void => {
@@ -486,6 +596,7 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
 
   useEffect(() => {
     setMounted(true);
+    initVolume();
 
     return () => {
       clearControlTimeout();
@@ -566,15 +677,25 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
   };
 
   const renderTopControls = (): JSX.Element => {
-    const volumeControl = renderControl(
-      <View style={styles.controls.button}>
-        {!soundMuted ? (
-          <SpeakerSimpleHigh size={iconSize} color={WHITE} weight={'fill'} />
-        ) : (
-          <SpeakerSimpleSlash size={iconSize} color={WHITE} weight={'fill'} />
-        )}
-      </View>,
-      () => setSoundMuted(!soundMuted),
+    const volumeControl = () => (
+      <View style={styles.volume.container}>
+        <View style={styles.volume.subContainer}>
+          <View
+            style={[styles.volume.fill, { width: volumeState.volumeFillWidth }]}
+          />
+          <View
+            style={[
+              styles.volume.track,
+              { width: volumeState.volumeTrackWidth },
+            ]}
+          />
+          <View
+            style={[styles.volume.handle, { left: volumeState.volumePosition }]}
+            {...volumePanResponder.panHandlers}>
+            <SpeakerSimpleHigh size={iconSize} color={WHITE} weight={'fill'} />
+          </View>
+        </View>
+      </View>
     );
 
     return (
@@ -588,8 +709,8 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
         ]}>
         <View style={[styles.controls.column]}>
           <SafeAreaView style={styles.controls.topControlGroup}>
-            {volumeControl}
             {renderFullscreen()}
+            {volumeControl()}
           </SafeAreaView>
         </View>
       </Animated.View>
@@ -701,6 +822,7 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
           resizeMode={state.resizeMode}
           paused={state.paused}
           muted={soundMuted}
+          volume={volumeState.volume}
           rate={1}
           onLoadStart={_onLoadStart}
           onProgress={_onProgress}
@@ -713,8 +835,8 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
           repeat={false}
           playWhenInactive={false}
         />
-        {renderTopControls()}
-        {renderBottomControls()}
+        {controls && renderTopControls()}
+        {controls && renderBottomControls()}
       </View>
     </TouchableWithoutFeedback>
   );
@@ -849,6 +971,7 @@ const styles = {
     },
     fullscreen: {
       flexDirection: 'row',
+      paddingLeft: 0,
     },
     playPause: {
       position: 'relative',
@@ -877,16 +1000,22 @@ const styles = {
   }),
   volume: StyleSheet.create({
     container: {
+      backgroundColor: GRAY800,
+      borderRadius: 10,
+      paddingRight: 8,
+      paddingVertical: 2,
+    },
+    subContainer: {
       alignItems: 'center',
       justifyContent: 'flex-start',
       flexDirection: 'row',
-      height: 1,
+      height: 36,
       marginLeft: 20,
       marginRight: 20,
       width: 150,
     },
     track: {
-      backgroundColor: '#333',
+      backgroundColor: DISABLED,
       height: 1,
       marginLeft: 7,
     },
