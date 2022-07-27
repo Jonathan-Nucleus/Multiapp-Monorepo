@@ -11,6 +11,7 @@ export type CompanySummary = Pick<
   | "website"
   | "linkedIn"
   | "twitter"
+  | "isChannel"
 >;
 
 export const COMPANY_SUMMARY_FRAGMENT = gql`
@@ -23,5 +24,6 @@ export const COMPANY_SUMMARY_FRAGMENT = gql`
     website
     linkedIn
     twitter
+    isChannel
   }
 `;

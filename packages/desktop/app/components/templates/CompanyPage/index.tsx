@@ -1,10 +1,13 @@
 import { FC } from "react";
+
+import DisclosureCard from "desktop/app/components/modules/funds/DisclosureCard";
+import FundCard from "../../modules/funds/FundCard";
 import PostsList from "../../modules/posts/PostsList";
 import ProfileCard from "./ProfileCard";
 import TeamMembersList from "../../modules/teams/TeamMembersList";
-import DisclosureCard from "desktop/app/components/modules/funds/DisclosureCard";
-import FundCard from "../../modules/funds/FundCard";
+
 import { CompanyProfile } from "shared/graphql/query/company/useCompany";
+import { usePosts } from "shared/graphql/query/company/usePosts";
 import { useAccountContext } from "shared/context/Account";
 
 interface CompanyPageProps {
@@ -12,6 +15,10 @@ interface CompanyPageProps {
 }
 
 const CompanyPage: FC<CompanyPageProps> = ({ company }: CompanyPageProps) => {
+  const { data: { companyProfile: { posts = [] } = {} } = {} } = usePosts(
+    company._id
+  );
+
   const funds = company.funds.map((fund) => ({ ...fund, company }));
   const members = company.members.map((member) => ({ ...member, company }));
   const account = useAccountContext();
@@ -34,27 +41,33 @@ const CompanyPage: FC<CompanyPageProps> = ({ company }: CompanyPageProps) => {
               ))}
             </div>
           ) : null}
-          <div className="w-full block lg:hidden">
-            <div className="mt-5">
-              <TeamMembersList
-                direction="horizontal"
-                members={company.members}
-              />
+          {!company.isChannel && (
+            <div className="w-full block lg:hidden">
+              <div className="mt-5">
+                <TeamMembersList
+                  direction="horizontal"
+                  members={company.members}
+                />
+              </div>
             </div>
-          </div>
-          {company.posts && (
+          )}
+          {posts && (
             <div className="py-5">
               <PostsList
                 displayFilter={false}
-                posts={company.posts}
+                posts={posts}
                 onRefresh={() => {}}
               />
             </div>
           )}
         </div>
         <div className="col-span-2 hidden lg:block">
-          <TeamMembersList members={members} showChat={true} />
-          <DisclosureCard className="mt-8" />
+          {!company.isChannel && (
+            <div className="mb-8">
+              <TeamMembersList members={members} showChat={true} />
+            </div>
+          )}
+          <DisclosureCard />
         </div>
       </div>
     </div>

@@ -209,6 +209,8 @@ const Login: LoginScreen = ({ navigation }) => {
                 keyboardType="email-address"
                 error={error ? fieldState.error?.message : ''}
                 showError={false}
+                autoCapitalize="none"
+                autoCorrect={false}
               />
             )}
           />

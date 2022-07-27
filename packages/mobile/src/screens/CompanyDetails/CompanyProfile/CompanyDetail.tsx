@@ -17,7 +17,13 @@ import PGradientOutlineButton from 'mobile/src/components/common/PGradientOutlin
 import LinkedinSvg from 'shared/assets/images/linkedin.svg';
 import TwitterSvg from 'shared/assets/images/twitter.svg';
 import FollowModal from 'mobile/src/components/main/FollowModal';
-import { Body2, Body3, H5Bold, H6Bold } from 'mobile/src/theme/fonts';
+import {
+  Body2,
+  Body2Bold,
+  Body3,
+  H5Bold,
+  H6Bold,
+} from 'mobile/src/theme/fonts';
 import {
   WHITE,
   WHITE12,
@@ -25,6 +31,7 @@ import {
   PRIMARY,
   PRIMARYSOLID,
   BLACK,
+  WHITE60,
 } from 'shared/src/colors';
 
 import { useFollowCompany } from 'shared/graphql/mutation/account/useFollowCompany';
@@ -85,7 +92,6 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
           </TouchableOpacity>
         )}
       </View>
-
       <View style={styles.content}>
         <View style={styles.companyDetail}>
           <View style={styles.relative}>
@@ -110,7 +116,7 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
             )}
           </View>
         </View>
-        <Text style={styles.val}>{name}</Text>
+        <Text style={styles.name}>{name}</Text>
         <View style={styles.row}>
           <TouchableOpacity
             onPress={() =>
@@ -135,7 +141,11 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
             <Text style={styles.comment}>Posts</Text>
           </View>
         </View>
-        <Text style={styles.decription}>{company.overview}</Text>
+        <View style={styles.descriptionContainer}>
+          {company.overview ? (
+            <Text style={styles.description}>{company.overview}</Text>
+          ) : null}
+        </View>
         {isMyCompany ? (
           <PGradientOutlineButton
             label="Edit Profile"
@@ -164,38 +174,40 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
           </View>
         )}
       </View>
-      <View style={[styles.row, styles.social]}>
-        <View style={styles.socialView}>
-          {linkedIn && linkedIn !== '' && (
-            <TouchableOpacity onPress={() => Linking.openURL(linkedIn)}>
-              <LinkedinSvg />
-            </TouchableOpacity>
-          )}
-          {twitter && twitter !== '' && (
-            <TouchableOpacity
-              onPress={() => Linking.openURL(twitter)}
-              style={styles.socialItem}>
-              <TwitterSvg />
-            </TouchableOpacity>
-          )}
-          {twitter !== '' ||
-            (linkedIn !== '' && <View style={styles.verticalLine} />)}
-          {website && website !== '' && (
-            <>
-              <TouchableOpacity onPress={() => Linking.openURL(website)}>
-                <Text style={styles.website} numberOfLines={1}>
-                  {website}
-                </Text>
+      {!company.isChannel ? (
+        <View style={[styles.row, styles.social]}>
+          <View style={styles.socialView}>
+            {linkedIn && linkedIn !== '' && (
+              <TouchableOpacity onPress={() => Linking.openURL(linkedIn)}>
+                <LinkedinSvg />
               </TouchableOpacity>
-            </>
-          )}
-        </View>
-        {/*
+            )}
+            {twitter && twitter !== '' && (
+              <TouchableOpacity
+                onPress={() => Linking.openURL(twitter)}
+                style={styles.socialItem}>
+                <TwitterSvg />
+              </TouchableOpacity>
+            )}
+            {twitter !== '' ||
+              (linkedIn !== '' && <View style={styles.verticalLine} />)}
+            {website && website !== '' && (
+              <>
+                <TouchableOpacity onPress={() => Linking.openURL(website)}>
+                  <Text style={styles.website} numberOfLines={1}>
+                    {website}
+                  </Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+          {/*
         <TouchableOpacity onPress={() => setIsVisible(true)}>
           <DotsThreeVerticalSvg />
         </TouchableOpacity>
         */}
-      </View>
+        </View>
+      ) : null}
       <Modal
         isVisible={isVisible}
         swipeDirection="down"
@@ -224,7 +236,6 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
               </View>
             </View>
           </TouchableOpacity>
-
           <PGradientOutlineButton
             label="Cancel"
             onPress={() => setIsVisible(false)}
@@ -254,7 +265,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'flex-end',
     flex: 1,
-    marginTop: 8,
+    marginTop: 16,
   },
   content: {
     paddingHorizontal: 16,
@@ -269,17 +280,25 @@ const styles = StyleSheet.create({
     marginTop: -40,
     marginBottom: 16,
   },
-  val: {
+  name: {
     color: WHITE,
+    marginTop: 8,
     ...H6Bold,
   },
-  comment: {
+  val: {
     color: WHITE,
-    ...Body3,
+    ...Body2Bold,
+  },
+  comment: {
+    color: WHITE60,
+    ...Body2,
     marginLeft: 8,
   },
-  decription: {
-    marginVertical: 16,
+  descriptionContainer: {
+    marginVertical: 12,
+  },
+  description: {
+    marginVertical: 8,
     color: WHITE,
     ...Body3,
   },
@@ -290,7 +309,7 @@ const styles = StyleSheet.create({
     borderBottomColor: WHITE12,
     borderBottomWidth: 1,
     borderTopWidth: 1,
-    marginBottom: 24,
+    marginBottom: 16,
     alignItems: 'center',
     justifyContent: 'space-between',
   },
@@ -307,6 +326,7 @@ const styles = StyleSheet.create({
   },
   button: {
     width: Dimensions.get('screen').width - 32,
+    marginBottom: 0,
   },
   socialView: {
     flexDirection: 'row',
@@ -378,6 +398,7 @@ const styles = StyleSheet.create({
   },
   editButton: {
     width: Dimensions.get('screen').width - 32,
+    marginBottom: -8,
   },
   cancelBtnTxt: {
     textTransform: 'capitalize',

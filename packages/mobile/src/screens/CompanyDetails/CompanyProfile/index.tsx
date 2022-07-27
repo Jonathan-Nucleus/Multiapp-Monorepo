@@ -115,33 +115,35 @@ const CompanyProfile: CompanyProfileScreen = ({ navigation, route }) => {
           <FundList funds={funds} accredited={account.accreditation} />
         ) : null}
         <View>
-          <Members team={company.members || []} />
-          {featuredPosts.length > 0 ? (
-            <View>
-              <Text style={styles.text}>Featured Posts</Text>
-              <FlatList
-                data={featuredPosts}
-                renderItem={renderItem}
-                keyExtractor={(item) => `${item._id}`}
-                listKey="post"
-                horizontal
-              />
-            </View>
-          ) : (
-            isMyCompany &&
-            posts &&
-            posts.length > 0 && (
-              <>
+          {!company.isChannel ? <Members team={company.members || []} /> : null}
+          <View style={styles.profileSection}>
+            {featuredPosts.length > 0 ? (
+              <View>
                 <Text style={styles.text}>Featured Posts</Text>
-                <View style={styles.noPostContainer}>
-                  <Text style={styles.noPostsText}>
-                    You don’t have any featured posts, yet.
-                  </Text>
-                </View>
-              </>
-            )
-          )}
-          <View style={styles.allPosts}>
+                <FlatList
+                  data={featuredPosts}
+                  renderItem={renderItem}
+                  keyExtractor={(item) => `${item._id}`}
+                  listKey="post"
+                  horizontal
+                />
+              </View>
+            ) : (
+              isMyCompany &&
+              posts &&
+              posts.length > 0 && (
+                <>
+                  <Text style={styles.text}>Featured Posts</Text>
+                  <View style={styles.noPostContainer}>
+                    <Text style={styles.noPostsText}>
+                      You don’t have any featured posts, yet.
+                    </Text>
+                  </View>
+                </>
+              )
+            )}
+          </View>
+          <View style={styles.profileSection}>
             {posts && posts.length > 0 ? (
               <FlatList
                 data={posts}
@@ -186,6 +188,9 @@ const CompanyProfile: CompanyProfileScreen = ({ navigation, route }) => {
 export default CompanyProfile;
 
 const styles = StyleSheet.create({
+  profileSection: {
+    marginTop: 16,
+  },
   backIcon: {
     width: 32,
     height: 32,
@@ -209,9 +214,6 @@ const styles = StyleSheet.create({
     ...Body2Bold,
     marginTop: 2,
     marginBottom: 8,
-  },
-  allPosts: {
-    paddingTop: 16,
   },
   noPostContainer: {
     alignSelf: 'center',

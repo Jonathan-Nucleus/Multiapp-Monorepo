@@ -94,7 +94,6 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('tabPress', handleSelfRefresh);
-
     return unsubscribe;
   }, [navigation, handleSelfRefresh]);
 

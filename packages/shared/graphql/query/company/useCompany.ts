@@ -1,13 +1,16 @@
 import { gql, useQuery, QueryResult } from "@apollo/client";
 import { Company as GraphQLCompany } from "backend/graphql/companies.graphql";
 import { User as GraphQLUser } from "backend/graphql/users.graphql";
-import { PostSummary } from "shared/graphql/fragments/post";
 import {
   FUND_SUMMARY_FRAGMENT,
   FUND_MANAGER_FRAGMENT,
   FundSummary,
   FundManager,
 } from "shared/graphql/fragments/fund";
+import {
+  COMPANY_SUMMARY_FRAGMENT,
+  CompanySummary,
+} from "shared/graphql/fragments/company";
 import { useEffect, useState } from "react";
 
 export type CompanyMember = Pick<
@@ -19,32 +22,24 @@ export type FollowUser = Pick<
   "_id" | "firstName" | "lastName" | "position" | "avatar"
 >;
 export type Fund = FundSummary & FundManager;
-export type CompanyProfile = Pick<
-  GraphQLCompany,
-  | "_id"
-  | "name"
-  | "tagline"
-  | "overview"
-  | "avatar"
-  | "background"
-  | "postIds"
-  | "followerIds"
-  | "followerCount"
-  | "followingIds"
-  | "followingCount"
-  | "website"
-  | "linkedIn"
-  | "twitter"
-  | "posts"
-  | "followers"
-  | "following"
-> & {
-  followers: FollowUser[];
-  following: FollowUser[];
-  funds: Fund[];
-  members: CompanyMember[];
-  posts: PostSummary[];
-};
+export type CompanyProfile = CompanySummary &
+  Pick<
+    GraphQLCompany,
+    | "background"
+    | "postIds"
+    | "followerIds"
+    | "followerCount"
+    | "followingIds"
+    | "followingCount"
+    | "posts"
+    | "followers"
+    | "following"
+  > & {
+    followers: FollowUser[];
+    following: FollowUser[];
+    funds: Fund[];
+    members: CompanyMember[];
+  };
 
 export type CompanyData = {
   companyProfile?: CompanyProfile;
@@ -67,20 +62,14 @@ export function useCompany(
     gql`
       ${FUND_SUMMARY_FRAGMENT}
       ${FUND_MANAGER_FRAGMENT}
+      ${COMPANY_SUMMARY_FRAGMENT}
       query CompanyProfile($companyId: ID!) {
         companyProfile(companyId: $companyId) {
-          _id
-          name
-          tagline
-          overview
-          avatar
+          ...CompanySummaryFields
           followerIds
           followerCount
           followingIds
           followingCount
-          website
-          linkedIn
-          twitter
           followers {
             _id
             firstName

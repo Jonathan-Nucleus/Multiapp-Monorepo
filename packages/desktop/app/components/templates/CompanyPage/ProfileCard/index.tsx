@@ -250,7 +250,7 @@ const ProfileCard: FC<CompanyPageProps> = ({
                 company.linkedIn || company.twitter || company.website
                   ? ""
                   : "hidden"
-              }`}
+              } ${company.isChannel ? "hidden" : ""}`}
             >
               {company.linkedIn && (
                 <div className="flex items-center cursor-pointer mr-8">

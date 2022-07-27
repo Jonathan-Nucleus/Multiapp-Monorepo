@@ -140,7 +140,11 @@ export const publicUserResolvers = {
     argsIgnored: NoArgs,
     { db }: ApolloServerContext
   ) =>
-    parent.companyIds?.[0] ? db.companies.find(parent.companyIds[0]) : null,
+    parent.companyIds
+      ? (await db.companies.findAll(parent.companyIds)).find(
+          (company) => !company.isChannel
+        ) ?? null
+      : null,
 
   companies: async (
     parent: User.Mongo,

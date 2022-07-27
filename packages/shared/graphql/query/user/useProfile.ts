@@ -60,6 +60,7 @@ export type UserProfile = Pick<
     | "followerIds"
     | "postIds"
     | "followingIds"
+    | "isChannel"
   >[];
 };
 
@@ -151,6 +152,7 @@ export function useProfile(
             name
             avatar
             followerIds
+            isChannel
           }
           managedFunds {
             _id
@@ -216,6 +218,7 @@ export function useProfile(
     {
       skip: !userId,
       variables: { userId: userId ?? "" },
+      fetchPolicy: "cache-and-network",
     }
   );
   useEffect(() => {

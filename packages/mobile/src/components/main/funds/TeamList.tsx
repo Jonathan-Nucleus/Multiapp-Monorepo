@@ -67,6 +67,7 @@ const TeamList: React.FC<TeamListProps> = ({ team }) => {
         renderItem={renderTeamMemberItem}
         showsVerticalScrollIndicator={false}
         horizontal={true}
+        style={styles.list}
       />
     </View>
   );
@@ -76,12 +77,13 @@ export default TeamList;
 
 const styles = StyleSheet.create({
   sectionTitle: {
-    marginTop: 16,
     ...Body1Bold,
+  },
+  list: {
+    marginHorizontal: 16,
   },
   memberContainer: {
     marginTop: 16,
-    paddingHorizontal: 16,
   },
   memberItemContainer: {
     width: Dimensions.get('screen').width / 2 - 20,

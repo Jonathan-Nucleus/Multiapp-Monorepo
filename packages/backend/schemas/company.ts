@@ -12,6 +12,7 @@ export namespace Company {
     memberIds: ObjectId[];
     fundIds?: ObjectId[];
     updatedAt?: Date;
+    isChannel?: boolean;
   }
 
   export type GraphQL = ContentCreator.GraphQL &
@@ -46,6 +47,7 @@ export const CompanySchema = `
     name: String!
     memberIds: [ID!]!
     fundIds: [ID!]!
+    isChannel: Boolean
     ${ContentCreatorSchema}
 
     members: [UserProfile!]!
