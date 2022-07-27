@@ -278,6 +278,10 @@ export const UserRoleOptions = {
   USER: "user",
   VERIFIED: "verified",
   PROFESSIONAL: "professional",
+  FA: "financial-advisor",
+  FO: "family-office",
+  IA: "institutional-allocator",
+  RIA: "reg-indep-advisor",
 } as const;
 export type UserRole = ValueOf<typeof UserRoleOptions>;
 export type UserRoleEnum = keyof typeof UserRoleOptions;

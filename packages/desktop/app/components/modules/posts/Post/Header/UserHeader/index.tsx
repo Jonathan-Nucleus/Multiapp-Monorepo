@@ -43,7 +43,7 @@ const UserHeader: FC<UserHeaderProps> = ({
                 {`${user?.firstName} ${user?.lastName}`}
               </a>
             </Link>
-            {(user?.role == "VERIFIED" || user?.role == "PROFESSIONAL") && (
+            {(user?.role === "VERIFIED" || user?.role === "PROFESSIONAL") && (
               <ShieldCheck
                 className="text-success ml-1.5"
                 color="currentColor"
@@ -53,6 +53,22 @@ const UserHeader: FC<UserHeaderProps> = ({
             )}
             {user?.role == "PROFESSIONAL" && (
               <div className="text-white text-tiny ml-1.5 text-tiny">PRO</div>
+            )}
+            {(user?.role === "FA" ||
+              user?.role === "FO" ||
+              user?.role === "IA" ||
+              user?.role === "RIA") && (
+              <>
+                <ShieldCheck
+                  className="text-primary-solid ml-1.5"
+                  color="currentColor"
+                  weight="fill"
+                  size={16}
+                />
+                <div className="text-white text-tiny ml-1.5 text-tiny">
+                  {user.role}
+                </div>
+              </>
             )}
             {!isMyProfile && !isFollowing && (
               <div className="flex items-center">

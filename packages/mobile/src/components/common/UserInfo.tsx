@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, Text, View } from 'react-native';
-import { Star } from 'phosphor-react-native';
+import { ShieldCheck, Star } from 'phosphor-react-native';
 
 import Avatar from './Avatar';
 import PLabel from './PLabel';
@@ -11,9 +11,9 @@ import {
   GRAY100,
   GRAY200,
   PRIMARYSOLID,
+  SUCCESS,
 } from 'shared/src/colors';
 
-import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 import QPSvg from 'shared/assets/images/QP.svg';
 import QCSvg from 'shared/assets/images/QC.svg';
 import AISvg from 'shared/assets/images/AI.svg';
@@ -68,8 +68,8 @@ const UserInfo: React.FC<UserInfoProps> = (props) => {
     useFollowUser(user?._id);
   const { isFollowing: isFollowingCompany, toggleFollow: toggleFollowCompany } =
     useFollowCompany(user?._id);
+
   const { role, company } = userData ?? {};
-  const isPro = role === 'PROFESSIONAL' || role === 'VERIFIED';
   const isSelf = user?._id === account?._id;
   const isFollowing = isFollowingUser || isFollowingCompany;
 
@@ -121,10 +121,29 @@ const UserInfo: React.FC<UserInfoProps> = (props) => {
               textStyle={styles.nameLabel}
             />
           ) : null}
-          {isPro && (
+          {(role === 'PROFESSIONAL' || role === 'VERIFIED') && (
             <View style={styles.proWrapper}>
-              <ShieldCheckSvg />
+              <ShieldCheck
+                size={16}
+                color={SUCCESS}
+                weight="fill"
+                style={styles.shield}
+              />
               <PLabel label="PRO" textStyle={styles.proLabel} />
+            </View>
+          )}
+          {(role === 'FA' ||
+            role === 'FO' ||
+            role === 'IA' ||
+            role === 'RIA') && (
+            <View style={styles.proWrapper}>
+              <ShieldCheck
+                size={16}
+                color={PRIMARYSOLID}
+                weight="fill"
+                style={styles.shield}
+              />
+              <PLabel label={role} textStyle={styles.proLabel} />
             </View>
           )}
         </View>
@@ -197,6 +216,9 @@ const styles = StyleSheet.create({
   proLabel: {
     marginLeft: 4,
     ...Body3Bold,
+  },
+  shield: {
+    marginTop: -2,
   },
   smallLabel: {
     ...Body3,
