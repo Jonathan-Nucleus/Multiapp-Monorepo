@@ -138,6 +138,112 @@ type FollowCompanyResult = {
   company: Company.Mongo;
 };
 
+const handleFollowUser = async (
+  { db, user }: ApolloServerContext,
+  userId: string,
+  follow: boolean,
+  asCompanyId?: string
+): Promise<FollowUserResult> => {
+  // Check user exists
+  const userData = await db.users.find({ _id: userId });
+  if (!userData) {
+    throw new NotFoundError();
+  }
+
+  if (asCompanyId) {
+    // Check company exists
+    const companyData = await db.companies.find(asCompanyId);
+    if (!companyData) {
+      throw new NotFoundError("Company");
+    }
+
+    return {
+      userAccount: await db.users.setFollowerCompany(
+        follow,
+        asCompanyId,
+        userId
+      ),
+      accountCompany: await db.companies.setFollowingUser(
+        follow,
+        userId,
+        asCompanyId
+      ),
+    };
+  }
+
+  if (!user?._id) {
+    throw new UnprocessableEntityError("Invalid user.");
+  }
+
+  const updatedAccount = await db.users.setFollowingUser(
+    follow,
+    userId,
+    user._id
+  );
+  const updatedUser = await db.users.setFollower(follow, user._id, userId);
+
+  const followed = !!updatedAccount && !!updatedUser;
+
+  if (!followed) {
+    throw new InternalServerError("Not able to follow.");
+  }
+
+  // Send notification
+  if (follow && followed) {
+    db.notifications.create(user, "followed-by-user", [userId]);
+  }
+
+  return {
+    account: updatedAccount,
+    userAccount: updatedUser,
+  };
+};
+
+const handleFollowCompany = async (
+  { db, user }: ApolloServerContext,
+  companyId: string,
+  follow: boolean,
+  asCompanyId?: string
+): Promise<FollowCompanyResult> => {
+  if (companyId === asCompanyId) {
+    throw new UnprocessableEntityError("Invalid company.");
+  }
+
+  const companyData = await db.companies.find(companyId);
+  if (!companyData) {
+    throw new NotFoundError("Company");
+  }
+
+  if (asCompanyId) {
+    const asCompanyData = await db.companies.find(asCompanyId);
+    if (!asCompanyData) {
+      throw new NotFoundError("Company");
+    }
+
+    return {
+      accountCompany: await db.companies.setFollowingCompany(
+        follow,
+        companyId,
+        asCompanyId
+      ),
+      company: await db.companies.setFollowerCompany(
+        follow,
+        asCompanyId,
+        companyId
+      ),
+    };
+  }
+
+  if (!user?._id) {
+    throw new UnprocessableEntityError("Invalid user.");
+  }
+
+  return {
+    company: await db.companies.setFollower(follow, user._id, companyId),
+    account: await db.users.setFollowingCompany(follow, companyId, user._id),
+  };
+};
+
 const resolvers = {
   Mutation: {
     register: async (
@@ -667,7 +773,7 @@ const resolvers = {
                     .object({
                       url: yup.string().required(),
                       aspectRatio: yup.number().required(),
-                      documentLink: yup.string()
+                      documentLink: yup.string(),
                     })
                     .notRequired()
                     .default(undefined),
@@ -675,7 +781,7 @@ const resolvers = {
                     .object({
                       url: yup.string().required(),
                       aspectRatio: yup.number().required(),
-                      documentLink: yup.string()
+                      documentLink: yup.string(),
                     })
                     .required(),
                 }),
@@ -787,7 +893,7 @@ const resolvers = {
                     .object({
                       url: yup.string().required(),
                       aspectRatio: yup.number().required(),
-                      documentLink: yup.string()
+                      documentLink: yup.string(),
                     })
                     .notRequired()
                     .default(undefined),
@@ -795,7 +901,7 @@ const resolvers = {
                     .object({
                       url: yup.string().required(),
                       aspectRatio: yup.number().required(),
-                      documentLink: yup.string()
+                      documentLink: yup.string(),
                     })
                     .required(),
                 }),
@@ -1353,6 +1459,7 @@ const resolvers = {
         const { fundId, watch } = args;
 
         const fund = await db.funds.find(fundId);
+
         if (!fund) {
           throw new NotFoundError("Fund");
         }
@@ -1360,6 +1467,30 @@ const resolvers = {
         // Check that the user has access to this fund if adding to watchlist
         if (compareAccreditation(user.accreditation, fund.level) < 0) {
           throw new UnprocessableEntityError("Unauthorized to watch fund");
+        }
+
+        const companyId = fund.companyId;
+
+        const companyData = await db.companies.find(companyId);
+        if (!companyData) {
+          throw new NotFoundError("Company");
+        }
+
+        const followCompanyMembers = async (): Promise<void> => {
+          for (const userId of companyData.memberIds) {
+            await handleFollowUser({ db, user }, userId.toString(), true);
+          }
+        };
+
+        if (watch) {
+          try {
+            await handleFollowCompany({ db, user }, companyId.toString(), true);
+            await followCompanyMembers();
+          } catch (e) {
+            throw new InternalServerError(
+              `Not able to add follower ${user._id}.`
+            );
+          }
         }
 
         return db.users.setOnWatchlist(watch, fundId, user._id);
@@ -1395,59 +1526,7 @@ const resolvers = {
           throw new UnprocessableEntityError("Invalid user.");
         }
 
-        // Check user exists
-        const userData = await db.users.find({ _id: userId });
-        if (!userData) {
-          throw new NotFoundError();
-        }
-
-        if (asCompanyId) {
-          // Check company exists
-          const companyData = await db.companies.find(asCompanyId);
-          if (!companyData) {
-            throw new NotFoundError("Company");
-          }
-
-          return {
-            userAccount: await db.users.setFollowerCompany(
-              follow,
-              asCompanyId,
-              userId
-            ),
-            accountCompany: await db.companies.setFollowingUser(
-              follow,
-              userId,
-              asCompanyId
-            ),
-          };
-        }
-
-        const updatedAccount = await db.users.setFollowingUser(
-          follow,
-          userId,
-          user._id
-        );
-        const updatedUser = await db.users.setFollower(
-          follow,
-          user._id,
-          userId
-        );
-
-        const followed = !!updatedAccount && !!updatedUser;
-
-        if (!followed) {
-          throw new InternalServerError("Not able to follow.");
-        }
-
-        // Send notification
-        if (follow && followed) {
-          db.notifications.create(user, "followed-by-user", [userId]);
-        }
-
-        return {
-          account: updatedAccount,
-          userAccount: updatedUser,
-        };
+        return handleFollowUser({ db, user }, userId, follow, asCompanyId);
       }
     ),
 
@@ -1476,43 +1555,12 @@ const resolvers = {
 
         const { follow, companyId, asCompanyId } = args;
 
-        if (companyId === asCompanyId) {
-          throw new UnprocessableEntityError("Invalid company.");
-        }
-
-        const companyData = await db.companies.find(companyId);
-        if (!companyData) {
-          throw new NotFoundError("Company");
-        }
-
-        if (asCompanyId) {
-          const asCompanyData = await db.companies.find(asCompanyId);
-          if (!asCompanyData) {
-            throw new NotFoundError("Company");
-          }
-
-          return {
-            accountCompany: await db.companies.setFollowingCompany(
-              follow,
-              companyId,
-              asCompanyId
-            ),
-            company: await db.companies.setFollowerCompany(
-              follow,
-              asCompanyId,
-              companyId
-            ),
-          };
-        }
-
-        return {
-          company: await db.companies.setFollower(follow, user._id, companyId),
-          account: await db.users.setFollowingCompany(
-            follow,
-            companyId,
-            user._id
-          ),
-        };
+        return handleFollowCompany(
+          { db, user },
+          companyId,
+          follow,
+          asCompanyId
+        );
       }
     ),
 

@@ -785,7 +785,7 @@ const createUsersCollection = (
     setOnWatchlist: async (
       add: boolean,
       fundId: MongoId,
-      userId: MongoId
+      userId: MongoId,
     ): Promise<User.Mongo> => {
       const result = add
         ? await usersCollection.findOneAndUpdate(
@@ -794,7 +794,11 @@ const createUsersCollection = (
               role: { $ne: "stub" },
               deletedAt: { $exists: false },
             },
-            { $addToSet: { watchlistIds: toObjectId(fundId) } },
+            {
+              $addToSet: {
+                watchlistIds: toObjectId(fundId),
+              },
+            },
             { returnDocument: "after" }
           )
         : await usersCollection.findOneAndUpdate(
@@ -803,7 +807,11 @@ const createUsersCollection = (
               role: { $ne: "stub" },
               deletedAt: { $exists: false },
             },
-            { $pull: { watchlistIds: toObjectId(fundId) } },
+            {
+              $pull: {
+                watchlistIds: toObjectId(fundId),
+              },
+            },
             { returnDocument: "after" }
           );
 

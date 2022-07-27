@@ -116,6 +116,7 @@ export function useCompany(
     {
       skip: !companyId,
       variables: { companyId: companyId ?? "" },
+      fetchPolicy: "cache-and-network",
     }
   );
   useEffect(() => {

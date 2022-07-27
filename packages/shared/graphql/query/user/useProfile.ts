@@ -218,7 +218,7 @@ export function useProfile(
     {
       skip: !userId,
       variables: { userId: userId ?? "" },
-      fetchPolicy: "cache-and-network",
+      fetchPolicy: "cache-and-network"
     }
   );
   useEffect(() => {
