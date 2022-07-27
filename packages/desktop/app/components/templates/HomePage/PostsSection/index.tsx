@@ -23,11 +23,16 @@ interface PostsSectionProps {
 const PostsSection: FC<PostsSectionProps> = ({ account }) => {
   const scrollOffset = useRef(0);
   const isFetchingMore = useRef(false);
-  const {
-    data: { posts } = {},
-    refetch,
-    fetchMore,
-  } = usePosts(undefined, undefined, undefined, POSTS_PER_SCROLL);
+  const [categories, setCategories] = useState<PostCategory[]>();
+  const [roleFilter, setRoleFilter] = useState<PostRoleFilter>(
+    "PROFESSIONAL_FOLLOW"
+  );
+  const { data: { posts } = {}, fetchMore } = usePosts(
+    categories,
+    roleFilter,
+    undefined,
+    POSTS_PER_SCROLL
+  );
   const triggeredOffset = useRef(false);
   const [postAction, setPostAction] = useState<PostActionType>();
 
@@ -43,15 +48,6 @@ const PostsSection: FC<PostsSectionProps> = ({ account }) => {
     });
     isFetchingMore.current = false;
   }, [fetchMore, posts]);
-
-  const onRefresh = useCallback(
-    (categories?: PostCategory[], filter?: PostRoleFilter) =>
-      refetch({
-        categories,
-        roleFilter: filter,
-      }),
-    [refetch]
-  );
 
   useEffect(() => {
     const handleScroll = (event: Event) => {
@@ -91,7 +87,17 @@ const PostsSection: FC<PostsSectionProps> = ({ account }) => {
         />
       </div>
       <div className="mt-8">
-        <PostsList posts={posts} onRefresh={onRefresh} />
+        <PostsList
+          posts={posts}
+          initialFilter={{ categories, roleFilter }}
+          onFilterChange={({
+            categories: _categories,
+            roleFilter: _roleFilter,
+          }) => {
+            setCategories(_categories);
+            setRoleFilter(_roleFilter);
+          }}
+        />
       </div>
       <div className="block md:hidden fixed bottom-5 right-5">
         <Button

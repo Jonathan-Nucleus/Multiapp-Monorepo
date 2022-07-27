@@ -83,7 +83,7 @@ export const contentCreatorResolvers = {
     ) =>
       parent.postIds
         ? db.posts.findByFilters(
-            user._id,
+            parent._id,
             user.accreditation,
             {
               postIds: parent.postIds,

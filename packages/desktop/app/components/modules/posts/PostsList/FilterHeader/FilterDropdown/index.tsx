@@ -91,7 +91,10 @@ const FilterDropdown: FC<FilterDropdownProps> = ({
               variant="gradient-primary"
               className="font-medium px-10"
               onClick={() =>
-                onApplyFilter(selectedCategories, selectedPostedFrom)
+                onApplyFilter({
+                  categories: selectedCategories,
+                  roleFilter: selectedPostedFrom,
+                })
               }
             >
               Apply Filters

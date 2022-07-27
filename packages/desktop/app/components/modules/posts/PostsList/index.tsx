@@ -3,24 +3,22 @@ import Post from "../Post";
 import { Post as PostType } from "shared/graphql/query/post/usePosts";
 import { PostCategory, PostRoleFilter } from "backend/graphql/posts.graphql";
 import PostSkeleton from "desktop/app/components/modules/posts/Post/Skeleton";
-import FilterHeader from "./FilterHeader";
+import FilterHeader, { FilterSettings } from "./FilterHeader";
 import EditPostModal, { PostActionType } from "../EditPostModal";
 
 export type { PostCategory, PostRoleFilter };
-
 interface PostsListProps {
   posts: PostType[] | undefined;
   displayFilter?: boolean;
-  onRefresh?: (
-    categories: PostCategory[] | undefined,
-    filter?: PostRoleFilter
-  ) => void;
+  initialFilter?: FilterSettings;
+  onFilterChange?: (filterSettings: FilterSettings) => void;
 }
 
 const PostsList: FC<PostsListProps> = ({
   posts,
   displayFilter = true,
-  onRefresh,
+  initialFilter,
+  onFilterChange,
 }) => {
   const [postAction, setPostAction] = useState<PostActionType | undefined>();
 
@@ -30,11 +28,10 @@ const PostsList: FC<PostsListProps> = ({
 
   return (
     <>
-      {displayFilter && (
+      {displayFilter && initialFilter && (
         <FilterHeader
-          onFilterChange={(categories, filter) => {
-            onRefresh?.(categories.length > 0 ? categories : undefined, filter);
-          }}
+          initialSettings={initialFilter}
+          onFilterChange={onFilterChange}
         />
       )}
       <div>

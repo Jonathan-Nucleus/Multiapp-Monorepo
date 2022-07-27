@@ -53,7 +53,9 @@ const PLACE_HOLDERS = 7;
 const HomeComponent: HomeScreen = ({ navigation }) => {
   const [selectedCategories, setSelectedCategories] =
     useState<PostCategory[]>();
-  const [selectedRole, setSelectedRole] = useState<PostRoleFilter>('EVERYONE');
+  const [selectedRole, setSelectedRole] = useState<PostRoleFilter>(
+    'PROFESSIONAL_FOLLOW',
+  );
   const [visibleFilter, setVisibleFilter] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const currentFocus = useIsFocused();

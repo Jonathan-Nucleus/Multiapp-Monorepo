@@ -10,32 +10,48 @@ import {
   PostRoleFilterOptions,
 } from "backend/schemas/post";
 
-export type FilterChangeCallback = (
-  categories: PostCategory[],
-  filter: PostRoleFilterEnum
-) => void;
-
-interface FilterHeaderProps {
-  onFilterChange: FilterChangeCallback;
+export type FilterSettings = {
+  categories?: PostCategory[];
+  roleFilter: PostRoleFilterEnum;
+};
+export type FilterChangeCallback = (filterSettings: FilterSettings) => void;
+export interface FilterHeaderProps {
+  initialSettings: FilterSettings;
+  onFilterChange?: FilterChangeCallback;
 }
 
-const FilterHeader: FC<FilterHeaderProps> = ({ onFilterChange }) => {
-  const [categories, setCategories] = useState<PostCategory[]>([]);
-  const [postedFrom, setPostedFrom] = useState<PostRoleFilterEnum>("EVERYONE");
-  const onRemoveCategory = (category: PostCategory) => {
-    filterChangeCallback(
-      [...categories].filter((item) => item != category),
-      postedFrom
-    );
-  };
-  const filterChangeCallback: FilterChangeCallback = (
-    _categories,
-    _postedFrom
-  ) => {
+const FilterHeader: FC<FilterHeaderProps> = ({
+  initialSettings,
+  onFilterChange,
+}) => {
+  const {
+    categories: initialCategories = [],
+    roleFilter: initialRole = "PROFESSIONAL_FOLLOW",
+  } = initialSettings || {};
+  const [categories, setCategories] =
+    useState<PostCategory[]>(initialCategories);
+  const [postedFrom, setPostedFrom] = useState<PostRoleFilterEnum>(initialRole);
+
+  const filterChangeCallback: FilterChangeCallback = ({
+    categories: _categories = [],
+    roleFilter: _postedFrom,
+  }) => {
     setCategories(_categories);
     setPostedFrom(_postedFrom);
-    onFilterChange(_categories, _postedFrom);
+    onFilterChange?.({
+      categories: _categories.length > 0 ? _categories : undefined,
+      roleFilter: _postedFrom,
+    });
   };
+
+  const onRemoveCategory = (category: PostCategory) => {
+    const newCategories = [...categories].filter((item) => item != category);
+    filterChangeCallback({
+      categories: newCategories.length > 0 ? newCategories : undefined,
+      roleFilter: postedFrom,
+    });
+  };
+
   return (
     <Popover as="div">
       {({ open }) => (

@@ -1,8 +1,8 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 
 import DisclosureCard from "desktop/app/components/modules/funds/DisclosureCard";
 import FundCard from "../../modules/funds/FundCard";
-import PostsList from "../../modules/posts/PostsList";
+import PostsList, { PostCategory } from "../../modules/posts/PostsList";
 import ProfileCard from "./ProfileCard";
 import TeamMembersList from "../../modules/teams/TeamMembersList";
 
@@ -15,8 +15,10 @@ interface CompanyPageProps {
 }
 
 const CompanyPage: FC<CompanyPageProps> = ({ company }: CompanyPageProps) => {
+  const [categories, setCategories] = useState<PostCategory[]>();
   const { data: { companyProfile: { posts = [] } = {} } = {} } = usePosts(
-    company._id
+    company._id,
+    categories
   );
 
   const funds = company.funds.map((fund) => ({ ...fund, company }));
@@ -54,9 +56,11 @@ const CompanyPage: FC<CompanyPageProps> = ({ company }: CompanyPageProps) => {
           {posts && (
             <div className="py-5">
               <PostsList
-                displayFilter={false}
                 posts={posts}
-                onRefresh={() => {}}
+                initialFilter={{ categories, roleFilter: "EVERYONE" }}
+                onFilterChange={({ categories: _categories }) =>
+                  setCategories(_categories)
+                }
               />
             </div>
           )}
