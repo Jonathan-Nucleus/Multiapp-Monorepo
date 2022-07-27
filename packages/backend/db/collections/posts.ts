@@ -138,22 +138,28 @@ const createPostsCollection = (
 
       let userIds: MongoId[] = [];
       if (roleFilter !== "everyone") {
-        if (
-          roleFilter === "professional-follow" ||
-          roleFilter === "professional-only"
-        ) {
+        // Add all channels to the list of included users
+        userIds = _.map(
+          await companiesCollection.find({ isChannel: true }).toArray(),
+          "_id"
+        );
+
+        const includeBoth = roleFilter === "professional-follow";
+
+        // Add professionals
+        if (roleFilter === "professional-only" || includeBoth) {
           const proIds = _.map(
             await usersCollection
               .find({ role: "professional", deletedAt: { $exists: false } })
               .toArray(),
             "_id"
           );
-          userIds = [...proIds];
+          userIds = [...userIds, ...proIds];
         }
-        if (roleFilter === "professional-follow") {
+
+        // Add users being followed
+        if (roleFilter === "follow-only" || includeBoth) {
           userIds = [...userIds, ...followingUsers];
-        } else if (roleFilter === "follow-only") {
-          userIds = [...followingUsers];
         }
 
         userIds = _.difference(userIds, ignoreUsers);
@@ -185,12 +191,10 @@ const createPostsCollection = (
             },
             {
               audience: { $in: audienceLevels },
-              userId: {
-                $nin: toObjectIds(ignoreUsers),
-                ...(roleFilter !== "everyone"
+              userId:
+                userIds.length > 0
                   ? { $in: toObjectIds(userIds) }
-                  : {}),
-              },
+                  : { $nin: toObjectIds(ignoreUsers) },
               ...(categories !== undefined
                 ? { categories: { $in: categories } }
                 : {}),
