@@ -101,15 +101,16 @@ export function usePosts(
 
   useEffect(() => {
     if (networkStatus === NetworkStatus.ready) {
+      const existingPosts = [...(state?.posts ?? [])];
       const newPosts = data?.posts || [];
-      const newData = { ...state };
-      let existingPosts = newData.posts ? newData.posts : [];
 
-      // Test if there is any new data excluding highlighted posts
       const newIds = newPosts
         .filter((post) => !post.highlighted)
         .map((post) => post._id);
       const oldIds = existingPosts.map((post) => post._id);
+
+      // Skip state update if there is no new post data excluding highlighted
+      // posts
       if (
         existingPosts.length > 0 &&
         newIds.every((postId) => oldIds.includes(postId))
@@ -117,71 +118,55 @@ export function usePosts(
         return;
       }
 
-      if (!rest.variables?.before) {
-        const firstIndex = existingPosts.findIndex(
-          (post) => post._id === newPosts[0]?._id
+      // Replace overlapping post entries with new data
+      const intersection = newIds.filter((postId) => oldIds.includes(postId));
+      if (intersection.length > 0) {
+        const firstIndex = oldIds.indexOf(intersection[0]);
+        const lastIndex = oldIds.indexOf(intersection[intersection.length - 1]);
+
+        existingPosts.splice(
+          firstIndex,
+          lastIndex - firstIndex + 1,
+          ...newPosts
         );
-        const lastIndex = existingPosts.findIndex(
-          (post) => post._id === newPosts[newPosts.length - 1]?._id
-        );
 
-        // Splice out potentially deleted posts
-        if (firstIndex !== lastIndex) {
-          existingPosts.splice(0, lastIndex + 1).splice(0, 0, ...newPosts);
-        }
-
-        // Update remaining posts from local cache
-        for (
-          let index = Math.max(0, newPosts.length - 1);
-          index < existingPosts.length;
-          index++
-        ) {
-          const existingPost = existingPosts[index];
-          const cachePost = rest.client.cache.readFragment({
-            id: `Post:${existingPost._id}`,
-            fragment: gql`
-              ${POST_SUMMARY_FRAGMENT}
-            `,
-          }) as PostSummary | null;
-
-          const { sharedPost } = existingPost;
-          const cacheSharedPost = sharedPost
-            ? (rest.client.cache.readFragment({
-                id: `Post:${sharedPost._id}`,
-                fragment: gql`
-                  ${POST_SUMMARY_FRAGMENT}
-                `,
-              }) as PostSummary | null)
-            : null;
-
-          if (cachePost) {
-            existingPosts[index] = {
-              ...cachePost,
-              sharedPost: cacheSharedPost ?? undefined,
-            };
-          }
-        }
+        console.log("spliced posts", [...existingPosts]);
       } else {
-        existingPosts = existingPosts.map((existingPost) => {
-          const updatedPost = newPosts.find(
-            (newPost) => newPost._id === existingPost._id
-          );
-          return updatedPost || existingPost;
-        });
+        existingPosts.splice(0, 0, ...newPosts);
       }
 
-      newData.posts = [
-        ...existingPosts,
-        ...newPosts.filter(
-          (post) =>
-            !existingPosts.some(
-              (existingPost) =>
-                existingPost._id.toString() === post._id.toString()
-            )
-        ),
-      ];
+      // Update remaining posts from local cache
+      existingPosts.forEach((post, index) => {
+        if (intersection.includes(post._id)) {
+          return;
+        }
 
-      setState(newData);
+        const cachePost = rest.client.cache.readFragment({
+          id: `Post:${post._id}`,
+          fragment: gql`
+            ${POST_SUMMARY_FRAGMENT}
+          `,
+        }) as PostSummary | null;
+
+        const { sharedPost } = post;
+        const cacheSharedPost = sharedPost
+          ? (rest.client.cache.readFragment({
+              id: `Post:${sharedPost._id}`,
+              fragment: gql`
+                ${POST_SUMMARY_FRAGMENT}
+              `,
+            }) as PostSummary | null)
+          : null;
+
+        if (cachePost) {
+          existingPosts[index] = {
+            ...cachePost,
+            sharedPost: cacheSharedPost ?? undefined,
+          };
+        }
+      });
+
+      setState({ posts: existingPosts });
     }
   }, [data, networkStatus]);
 
