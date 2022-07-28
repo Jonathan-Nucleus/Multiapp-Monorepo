@@ -80,3 +80,32 @@ significantly longer. This is normal.
 If running a local mongo database, start the local instance by running
 `yarn db`. Make sure the database is seeded with appropriate seed data.
 **Note:** Running a local mongo database will cause posts with videos to fail.
+
+### DB Migrations
+
+We use [`migrate-mongo`](https://github.com/seppevs/migrate-mongo) as our
+migration tool.
+
+The migration is configured with a `.env` file that requires the following env
+variable:
+
+```
+MIGRATE_MONGO_URI=<mongo connnection uri>
+```
+
+With `<mongo connnection uri>` being the connection uri to the db including
+credentials and the target database.
+
+To create a new migration for a feature that will require a change the data
+schema in the database, use these steps:
+
+1. Run `yarn migrate-mongo create <name of migration>`. Where
+   `<name of migration>` is a small description of the change.
+2. Edit the outputted file in the `migrations` directory with the necessary
+   migration changes.
+3. Test migration on a local database
+4. Submit separate PRs for migration and code.
+5. Once both the migration and code PRs have been approved, merge the migration
+   PR.
+6. Run the migration (run `yarn migrate-mongo up`)
+7. Once migration is complete, merge the code PR to deploy the new codebase.
