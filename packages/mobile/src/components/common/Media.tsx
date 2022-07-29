@@ -6,22 +6,23 @@ import {
   Pressable,
   View,
   Linking,
-  Alert,
 } from 'react-native';
 import FastImage, { ImageStyle } from 'react-native-fast-image';
 import { VideoProperties } from 'react-native-video';
 import Pinchable from 'react-native-pinchable';
+import { S3_BUCKET } from 'react-native-dotenv';
 
 import { Media as MediaType } from 'shared/graphql/fragments/post';
 
-import { S3_BUCKET } from 'react-native-dotenv';
 import ExtendedMedia from './ExtendedMedia';
-import pStyles from '../../theme/pStyles';
+import PText from './PText';
 import { showMessage } from '../../services/ToastService';
+import pStyles from '../../theme/pStyles';
+import { BLACK75, WHITE } from 'shared/src/colors';
+import { Body2Semibold } from '../../theme/fonts';
 
 interface MediaProps {
   media: MediaType;
-  shouldOpenLink?: boolean;
   controls?: boolean;
   style?: StyleProp<ImageStyle>;
   resizeMode?: 'contain' | 'cover';
@@ -82,7 +83,6 @@ const Media: FC<MediaProps> = ({
   controls = true,
   resizeMode = 'cover',
   type = 'post',
-  shouldOpenLink = false,
 }) => {
   const [paused, setPaused] = useState(true);
 
@@ -133,6 +133,10 @@ const Media: FC<MediaProps> = ({
   };
 
   const openDocumentLink = async (): Promise<void> => {
+    if (!documentLinkUrl) {
+      return;
+    }
+
     Linking.canOpenURL(documentLinkUrl).then((supported) => {
       if (supported) {
         Linking.openURL(documentLinkUrl);
@@ -168,10 +172,11 @@ const Media: FC<MediaProps> = ({
         />
       </View>
     </Pressable>
-  ) : media.documentLink && shouldOpenLink ? (
+  ) : (
     <Pressable
       style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}
-      onPress={openDocumentLink}>
+      onPress={openDocumentLink}
+      disabled={!media.documentLink}>
       <Pinchable maximumZoomScale={5}>
         <FastImage
           style={[
@@ -188,24 +193,12 @@ const Media: FC<MediaProps> = ({
           resizeMode={resizeMode}
         />
       </Pinchable>
+      {media.documentLink ? (
+        <View style={styles.pdfTag}>
+          <PText style={styles.pdfTagText}>PDF</PText>
+        </View>
+      ) : null}
     </Pressable>
-  ) : (
-    <Pinchable maximumZoomScale={5}>
-      <FastImage
-        style={[
-          styles.media,
-          style,
-          { aspectRatio: media.aspectRatio },
-          media.aspectRatio < 1 && resizeMode === 'contain'
-            ? styles.contain
-            : null,
-        ]}
-        source={{
-          uri: media.url.includes('/') ? media.url : mediaUrl,
-        }}
-        resizeMode={resizeMode}
-      />
-    </Pinchable>
   );
 };
 
@@ -245,5 +238,19 @@ const styles = StyleSheet.create({
   contain: {
     height: '100%',
     width: undefined,
+  },
+  pdfTag: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    backgroundColor: BLACK75,
+  },
+  pdfTagText: {
+    color: WHITE,
+    letterSpacing: 1.125,
+    ...Body2Semibold,
   },
 });

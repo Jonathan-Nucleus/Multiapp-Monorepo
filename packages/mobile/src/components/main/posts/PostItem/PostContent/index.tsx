@@ -23,13 +23,11 @@ export interface PostContentProps {
   post: Post;
   hideMenu?: boolean;
   sharedBy?: string;
-  shouldOpenDocumentLink?: boolean;
 }
 
 const PostContent: React.FC<PostContentProps> = ({
   post,
   hideMenu = false,
-  shouldOpenDocumentLink = false,
 }) => {
   const { user, company, body, media, preview } = post;
 
@@ -108,7 +106,6 @@ const PostContent: React.FC<PostContentProps> = ({
             mediaId={post._id}
             media={media}
             style={styles.media}
-            shouldOpenLink={shouldOpenDocumentLink}
           />
         ) : preview ? (
           <PreviewLink previewData={preview} />

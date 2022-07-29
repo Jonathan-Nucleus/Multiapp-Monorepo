@@ -23,7 +23,7 @@ import { BLACK, PRIMARYSOLID, PRIMARYSOLID7, WHITE } from 'shared/src/colors';
 import pStyles from 'mobile/src/theme/pStyles';
 import { Body2Bold, Body3Bold } from 'mobile/src/theme/fonts';
 
-import { useForm, Controller, DefaultValues } from 'react-hook-form';
+import { useForm, DefaultValues } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 
@@ -199,9 +199,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
           ref={flatListRef}
           data={getComments || []}
           renderItem={renderCommentItem}
-          ListHeaderComponent={
-            <PostItem shouldOpenDocumentLink={true} post={post} />
-          }
+          ListHeaderComponent={<PostItem post={post} />}
         />
         {isReplyComment && (
           <View style={styles.replyContainer}>
