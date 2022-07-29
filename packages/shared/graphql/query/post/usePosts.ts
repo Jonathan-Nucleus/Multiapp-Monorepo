@@ -47,6 +47,7 @@ export function usePosts(
   const [queryCategories, setCategories] = useState(categories);
   const [queryRoleFilter, setRoleFilter] = useState(roleFilter);
   const isFetchMore = useRef(false);
+  const didUpdateState = useRef(false);
   const lastNetworkStatus = useRef(0);
   const { data, loading, networkStatus, ...rest } = useQuery<
     PostsData,
@@ -81,10 +82,15 @@ export function usePosts(
         limit,
       },
       fetchPolicy: "cache-and-network",
-      skip: isFetchMore.current,
+      skip: isFetchMore.current || didUpdateState.current,
       notifyOnNetworkStatusChange: true,
     }
   );
+
+  // Reset flag once a single rerender after a state update has been initiated
+  if (didUpdateState.current) {
+    didUpdateState.current = false;
+  }
 
   if (networkStatus < 7) {
     lastNetworkStatus.current = networkStatus;
@@ -97,6 +103,8 @@ export function usePosts(
     setCategories(categories);
     setRoleFilter(roleFilter);
     setState(undefined);
+
+    didUpdateState.current = true;
   }
 
   useEffect(() => {
@@ -109,15 +117,6 @@ export function usePosts(
         .map((post) => post._id);
       const oldIds = existingPosts.map((post) => post._id);
 
-      // Skip state update if there is no new post data excluding highlighted
-      // posts
-      if (
-        existingPosts.length > 0 &&
-        newIds.every((postId) => oldIds.includes(postId))
-      ) {
-        return;
-      }
-
       // Replace overlapping post entries with new data
       const intersection = newIds.filter((postId) => oldIds.includes(postId));
       if (intersection.length > 0) {
@@ -129,16 +128,15 @@ export function usePosts(
           lastIndex - firstIndex + 1,
           ...newPosts
         );
-
-        console.log("spliced posts", [...existingPosts]);
       } else {
         existingPosts.splice(0, 0, ...newPosts);
       }
 
       // Update remaining posts from local cache
-      existingPosts.forEach((post, index) => {
+      const updatedPosts = existingPosts.reduce((acc, post) => {
         if (intersection.includes(post._id)) {
-          return;
+          acc.push(post);
+          return acc;
         }
 
         const cachePost = rest.client.cache.readFragment({
@@ -159,14 +157,17 @@ export function usePosts(
           : null;
 
         if (cachePost) {
-          existingPosts[index] = {
+          acc.push({
             ...cachePost,
             sharedPost: cacheSharedPost ?? undefined,
-          };
+          });
         }
-      });
 
-      setState({ posts: existingPosts });
+        return acc;
+      }, [] as Post[]);
+
+      setState({ posts: updatedPosts });
+      didUpdateState.current = true;
     }
   }, [data, networkStatus]);
 
@@ -193,7 +194,9 @@ export function usePosts(
         ...(newData.posts ? newData.posts : []),
         ...result.data.posts,
       ];
+
       setState(newData);
+      didUpdateState.current = true;
     }
 
     isFetchMore.current = false;

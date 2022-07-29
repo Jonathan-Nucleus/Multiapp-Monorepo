@@ -16,7 +16,7 @@ import SharePostItem from 'mobile/src/components/main/posts/SharePostItem';
 
 import { Post } from 'shared/graphql/query/post/usePosts';
 
-import { useAccount } from 'shared/graphql/query/account/useAccount';
+import { useAccountContext } from 'shared/context/Account';
 import { getPostTime } from '../../../../../utils/dateTimeUtil';
 
 export interface PostContentProps {
@@ -31,13 +31,13 @@ const PostContent: React.FC<PostContentProps> = ({
 }) => {
   const { user, company, body, media, preview } = post;
 
-  const { data: { account } = {} } = useAccount({ fetchPolicy: 'cache-only' });
+  const account = useAccountContext();
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const [kebobMenuVisible, setKebobMenuVisible] = useState(false);
   const [kebobIsClosing, setKebobIsClosing] = useState(false);
 
   const isMyPost =
-    user?._id === account?._id || account?.companyIds?.includes(post.userId);
+    post.userId === account._id || account.companyIds?.includes(post.userId);
 
   useEffect(() => {
     return () => {

@@ -209,8 +209,8 @@ const PBodyText: FC<PBodyTextProps> = ({
         </PText>
       )}
       <PText style={[styles.body, style]} selectable={true}>
-        {renderText}
-        {collapseLongText && more === true ? (
+        {!collapseLongText ? renderText : initialBtnLoaded ? renderText : ''}
+        {initialBtnLoaded && collapseLongText && more === true ? (
           <PText style={styles.more} onPress={handleMoreText}>
             {readMoreText}
           </PText>

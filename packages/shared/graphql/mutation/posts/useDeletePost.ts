@@ -25,6 +25,16 @@ export function useDeletePost(): MutationTuple<
     `,
     {
       refetchQueries: ["Posts", "Post", "AccountPosts", "Account"],
+      update(cache, { data }, { variables }) {
+        if (data?.deletePost && variables) {
+          const normalizedId = cache.identify({
+            id: variables.postId,
+            __typename: "Post",
+          });
+          cache.evict({ id: normalizedId });
+          cache.gc();
+        }
+      },
     }
   );
 }

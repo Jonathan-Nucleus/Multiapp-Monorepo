@@ -71,6 +71,9 @@ const OwnPostActionModal: React.FC<OwnPostActionModalProps> = ({
           screen: 'Main',
           params: {
             screen: 'Home',
+            params: {
+              refreshToken: new Date().toISOString(),
+            },
           },
         });
       } else {
