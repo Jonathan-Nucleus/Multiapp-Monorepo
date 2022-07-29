@@ -26,12 +26,11 @@ export type CompanyProfile = CompanySummary &
   Pick<
     GraphQLCompany,
     | "background"
-    | "postIds"
+    | "postCount"
     | "followerIds"
     | "followerCount"
     | "followingIds"
     | "followingCount"
-    | "posts"
     | "followers"
     | "following"
   > & {
@@ -66,6 +65,7 @@ export function useCompany(
       query CompanyProfile($companyId: ID!) {
         companyProfile(companyId: $companyId) {
           ...CompanySummaryFields
+          postCount
           followerIds
           followerCount
           followingIds

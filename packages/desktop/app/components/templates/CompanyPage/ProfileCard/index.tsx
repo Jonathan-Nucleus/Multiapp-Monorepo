@@ -129,7 +129,7 @@ const ProfileCard: FC<CompanyPageProps> = ({
               <div className="flex-grow grid grid-cols-3 divide-x divide-inherit">
                 <div className="flex flex-wrap items-center justify-center text-center cursor-pointer px-4">
                   <div className="text-xl text-white font-medium mx-1">
-                    {company.postIds?.length ?? 0}
+                    {company.postCount}
                   </div>
                   <div className="text-xs text-white opacity-60 mx-1">
                     Posts
@@ -140,7 +140,7 @@ const ProfileCard: FC<CompanyPageProps> = ({
                   onClick={() => setVisible(true)}
                 >
                   <div className="text-xl text-white font-medium mx-1">
-                    {company.followerIds?.length ?? 0}
+                    {company.followerCount}
                   </div>
                   <div className="text-xs text-white opacity-60 mx-1">
                     Followers
@@ -151,7 +151,7 @@ const ProfileCard: FC<CompanyPageProps> = ({
                   onClick={() => setVisible(true)}
                 >
                   <div className="text-xl text-white font-medium mx-1">
-                    {company.followingIds?.length ?? 0}
+                    {company.followingCount}
                   </div>
                   <div className="text-xs text-white opacity-60 mx-1">
                     Following
@@ -197,7 +197,7 @@ const ProfileCard: FC<CompanyPageProps> = ({
                 <div className="flex items-center divide-x divide-inherit border-white/[.12]">
                   <div className="text-center px-4">
                     <div className="text-xl text-white font-medium">
-                      {company.postIds?.length ?? 0}
+                      {company.postCount}
                     </div>
                     <div className="text-xs text-white opacity-60">Posts</div>
                   </div>
@@ -206,7 +206,7 @@ const ProfileCard: FC<CompanyPageProps> = ({
                     onClick={() => setVisible(true)}
                   >
                     <div className="text-xl text-white font-medium">
-                      {company.followerIds?.length ?? 0}
+                      {company.followerCount}
                     </div>
                     <div className="text-xs text-white opacity-60">
                       Followers
@@ -217,7 +217,7 @@ const ProfileCard: FC<CompanyPageProps> = ({
                     onClick={() => setVisible(true)}
                   >
                     <div className="text-xl text-white font-medium">
-                      {company.followingIds?.length ?? 0}
+                      {company.followingCount}
                     </div>
                     <div className="text-xs text-white opacity-60">
                       Following

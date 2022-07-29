@@ -147,11 +147,11 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
     website,
     linkedIn,
     twitter,
-    followerIds,
     followers,
-    followingIds,
     following,
-    postIds,
+    followerCount,
+    followingCount,
+    postCount,
   } = profile;
 
   return (
@@ -230,7 +230,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
                 styles.follow,
                 pressed ? pStyles.pressedStyle : {},
               ]}>
-              <Text style={styles.val}>{followerIds?.length ?? 0}</Text>
+              <Text style={styles.val}>{followerCount}</Text>
               <Text style={styles.comment}>Followers</Text>
             </Pressable>
             <Pressable
@@ -239,11 +239,11 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
                 styles.follow,
                 pressed ? pStyles.pressedStyle : {},
               ]}>
-              <Text style={styles.val}>{followingIds?.length ?? 0}</Text>
+              <Text style={styles.val}>{followingCount}</Text>
               <Text style={styles.comment}>Following</Text>
             </Pressable>
             <View style={styles.follow}>
-              <Text style={styles.val}>{postIds?.length ?? 0}</Text>
+              <Text style={styles.val}>{postCount}</Text>
               <Text style={styles.comment}>Posts</Text>
             </View>
           </View>

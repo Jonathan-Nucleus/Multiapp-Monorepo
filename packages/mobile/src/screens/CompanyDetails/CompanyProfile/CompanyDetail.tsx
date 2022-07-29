@@ -54,9 +54,9 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
     name,
     avatar,
     background,
-    postIds,
-    followerIds,
-    followingIds,
+    postCount,
+    followerCount,
+    followingCount,
     website,
     linkedIn,
     twitter,
@@ -119,25 +119,21 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
         <Text style={styles.name}>{name}</Text>
         <View style={styles.row}>
           <TouchableOpacity
-            onPress={() =>
-              followerIds && followerIds.length > 0 && setVisibleFollow(true)
-            }>
+            onPress={() => followerCount > 0 && setVisibleFollow(true)}>
             <View style={styles.follow}>
-              <Text style={styles.val}>{followerIds?.length ?? 0}</Text>
+              <Text style={styles.val}>{followerCount}</Text>
               <Text style={styles.comment}>Followers</Text>
             </View>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() =>
-              followingIds && followingIds.length > 0 && setVisibleFollow(true)
-            }>
+            onPress={() => followingCount > 0 && setVisibleFollow(true)}>
             <View style={styles.follow}>
-              <Text style={styles.val}>{followingIds?.length ?? 0}</Text>
+              <Text style={styles.val}>{followingCount}</Text>
               <Text style={styles.comment}>Following</Text>
             </View>
           </TouchableOpacity>
           <View style={styles.follow}>
-            <Text style={styles.val}>{postIds?.length ?? 0}</Text>
+            <Text style={styles.val}>{postCount}</Text>
             <Text style={styles.comment}>Posts</Text>
           </View>
         </View>

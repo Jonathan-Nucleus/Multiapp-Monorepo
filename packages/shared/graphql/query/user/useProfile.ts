@@ -29,7 +29,6 @@ export type UserProfile = Pick<
   | "followingCount"
   | "following"
   | "watchlistIds"
-  | "postIds"
   | "postCount"
   | "linkedIn"
   | "twitter"
@@ -97,7 +96,6 @@ export function useProfile(
           followerCount
           followingIds
           followingCount
-          postIds
           postCount
           following {
             _id
@@ -218,7 +216,7 @@ export function useProfile(
     {
       skip: !userId,
       variables: { userId: userId ?? "" },
-      fetchPolicy: "cache-and-network"
+      fetchPolicy: "cache-and-network",
     }
   );
   useEffect(() => {
