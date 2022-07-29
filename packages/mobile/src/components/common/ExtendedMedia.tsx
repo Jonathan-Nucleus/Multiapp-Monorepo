@@ -19,6 +19,7 @@ import {
   Modal,
   StyleProp,
   ViewStyle,
+  TouchableOpacity,
 } from 'react-native';
 import padStart from 'lodash/padStart';
 
@@ -28,16 +29,16 @@ import {
   Pause,
   Play,
   SpeakerSimpleHigh,
+  SpeakerSimpleSlash,
 } from 'phosphor-react-native';
-import { DISABLED, GRAY100, GRAY800, WHITE } from 'shared/src/colors';
+import { DISABLED, GRAY100, GRAY20, GRAY800, WHITE } from 'shared/src/colors';
 import { Media as MediaType } from 'shared/graphql/fragments/post';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const iconSize = 22;
 const controlAnimationTiming = 500;
 const doubleTapTime = 300;
-const volumeWidth = 150;
-const GLOBAL_VOLUME_POSITION = 'GLOBAL_VOLUME_POSITION';
+const GLOBAL_MUTE = 'GLOBAL_MUTE';
 
 enum SeekerStatus {
   Grant,
@@ -66,6 +67,7 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
   media,
   mediaUrl,
   resizeMode = 'contain',
+  showOnStart = false,
   paused = true,
   showHours = false,
   onEnd = () => console.log('onEnd'),
@@ -74,7 +76,6 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
   setPaused,
   togglePause,
   controls = false,
-  showOnStart = false,
   ...props
 }) => {
   const initialValue = showOnStart ? 1 : 0;
@@ -101,7 +102,8 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
     duration: 0,
   });
 
-  const [soundMuted, setSoundMuted] = useState(false);
+  const [startBtnVisible, setStartBtnVisible] = useState(true);
+  const [soundMuted, setSoundMuted] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [seekerStatus, setSeekerStatus] = useState({
     status: SeekerStatus.Cancel,
@@ -112,20 +114,11 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
   const tapActionTimeout = useRef<NodeJS.Timeout | null>();
   const controlTimeout = useRef<NodeJS.Timeout | null>();
   const playerRef = useRef<Video | null>();
+  const topControlRef = useRef<View | null>();
+
+  const [topControllerPosition, setTopControllerPosition] = useState(0);
+
   const [seekerWidth, setSeekerWidth] = useState(0);
-
-  const [volumeState, setVolumeState] = useState({
-    volume: 1,
-    volumeTrackWidth: 0,
-    volumeFillWidth: 0,
-    volumePosition: 0,
-    volumeOffset: 0,
-  });
-
-  const [vSeekerStatus, setVSeekerStatus] = useState({
-    status: SeekerStatus.Cancel,
-    position: 0,
-  });
 
   const _onEnd = (): void => {
     onEnd();
@@ -139,6 +132,7 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
     }));
 
     setSeekerOffset(0);
+    setStartBtnVisible(true);
 
     setTimeout(() => {
       playerRef?.current?.seek(0);
@@ -174,101 +168,6 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
       },
     }),
   ).current;
-
-  const volumePanResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: (_evt, _gestureState) => true,
-      onMoveShouldSetPanResponder: (_evt, _gestureState) => true,
-      onPanResponderGrant: (evt, _gestureState) => {
-        setVSeekerStatus({
-          status: SeekerStatus.Grant,
-          position: evt.nativeEvent.locationX,
-        });
-      },
-
-      /**
-       * Update the volume as we change the position.
-       * If we go to 0 then turn on the mute prop
-       * to avoid that weird static-y sound.
-       */
-      onPanResponderMove: (_evt, gestureState) => {
-        setVSeekerStatus({
-          status: SeekerStatus.Move,
-          position: gestureState.dx,
-        });
-      },
-
-      /**
-       * Update the offset...
-       */
-      onPanResponderRelease: (_evt, gestureState) => {
-        setVSeekerStatus({
-          status: SeekerStatus.Release,
-          position: gestureState.dx,
-        });
-      },
-    }),
-  ).current;
-
-  useEffect(() => {
-    switch (vSeekerStatus.status) {
-      case SeekerStatus.Grant: {
-        clearControlTimeout();
-        break;
-      }
-      case SeekerStatus.Move: {
-        const position = volumeState.volumeOffset + vSeekerStatus.position;
-
-        setVolumePosition(position);
-        const volume = calculateVolumeFromVolumePosition();
-        setVolumeState((v) => ({ ...v, volume }));
-        setSoundMuted(volume <= 0);
-
-        break;
-      }
-      case SeekerStatus.Release: {
-        setVolumeState((v) => ({ ...v, volumeOffset: v.volumePosition }));
-        setControlTimeout();
-
-        AsyncStorage.setItem(
-          GLOBAL_VOLUME_POSITION,
-          `${volumeState.volumePosition}`,
-        );
-
-        setSeekerStatus({ ...seekerStatus, status: SeekerStatus.Cancel });
-        break;
-      }
-      default: {
-        break;
-      }
-    }
-  }, [vSeekerStatus]);
-
-  const setVolumePosition = (position = 0, vOffset: number | null = null) => {
-    const pos = constrainToVolumeMinMax(position);
-
-    const volumeTrackWidth = volumeWidth - pos;
-    setVolumeState((v) => ({
-      ...v,
-      volumePosition: pos,
-      volumeFillWidth: Math.max(pos, 0),
-      volumeTrackWidth: Math.min(volumeTrackWidth, 150),
-      ...(vOffset ? { volumeOffset: vOffset } : {}),
-    }));
-  };
-
-  const calculateVolumeFromVolumePosition = () => {
-    return volumeState.volumePosition / volumeWidth;
-  };
-
-  const constrainToVolumeMinMax = (val = 0) => {
-    if (val <= 0) {
-      return 0;
-    } else if (val >= volumeWidth + 9) {
-      return volumeWidth + 9;
-    }
-    return val;
-  };
 
   useEffect(() => {
     setState((s) => ({ ...s, paused }));
@@ -366,7 +265,19 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
   };
 
   const _onScreenTouch = (): void => {
-    initVolume();
+    topControlRef.current?.measure((_ox, _oy, _width, _height, _px, py) => {
+      if (py < 0) {
+        setTopControllerPosition(-py + 36);
+      } else {
+        setTopControllerPosition(0);
+      }
+    });
+
+    setStartBtnVisible(false);
+    AsyncStorage.getItem(GLOBAL_MUTE).then((muted) => {
+      console.log(muted);
+      setSoundMuted(muted !== 'false');
+    });
 
     if (tapActionTimeout.current) {
       clearTimeout(tapActionTimeout.current);
@@ -383,17 +294,10 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
     }
   };
 
-  const initVolume = () => {
-    AsyncStorage.getItem(GLOBAL_VOLUME_POSITION).then((vp) => {
-      const pos = vp != null ? Number(vp) : 1;
-      setVolumePosition(pos, pos);
-    });
-  };
-
   const setControlTimeout = (): void => {
     controlTimeout.current = setTimeout(() => {
       _hideControls();
-    }, 15000);
+    }, 3000);
   };
 
   const clearControlTimeout = (): void => {
@@ -596,7 +500,6 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
 
   useEffect(() => {
     setMounted(true);
-    initVolume();
 
     return () => {
       clearControlTimeout();
@@ -677,29 +580,26 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
   };
 
   const renderTopControls = (): JSX.Element => {
-    const volumeControl = () => (
-      <View style={styles.volume.container}>
-        <View style={styles.volume.subContainer}>
-          <View
-            style={[styles.volume.fill, { width: volumeState.volumeFillWidth }]}
-          />
-          <View
-            style={[
-              styles.volume.track,
-              { width: volumeState.volumeTrackWidth },
-            ]}
-          />
-          <View
-            style={[styles.volume.handle, { left: volumeState.volumePosition }]}
-            {...volumePanResponder.panHandlers}>
-            <SpeakerSimpleHigh size={iconSize} color={WHITE} weight={'fill'} />
-          </View>
-        </View>
-      </View>
+    const volumeControl = renderControl(
+      <View style={styles.controls.button}>
+        {!soundMuted ? (
+          <SpeakerSimpleHigh size={iconSize} color={WHITE} weight={'fill'} />
+        ) : (
+          <SpeakerSimpleSlash size={iconSize} color={WHITE} weight={'fill'} />
+        )}
+      </View>,
+      () => {
+        setSoundMuted(!soundMuted);
+        AsyncStorage.setItem(GLOBAL_MUTE, `${!soundMuted}`);
+      },
+      { paddingRight: 0 },
     );
 
     return (
       <Animated.View
+        ref={(ref: View) => {
+          topControlRef.current = ref;
+        }}
         style={[
           styles.controls.top,
           {
@@ -707,10 +607,14 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
             marginTop: animations.topControl.marginTop,
           },
         ]}>
-        <View style={[styles.controls.column]}>
+        <View
+          style={[
+            styles.controls.column,
+            { paddingTop: state.isFullscreen ? 16 : topControllerPosition },
+          ]}>
           <SafeAreaView style={styles.controls.topControlGroup}>
             {renderFullscreen()}
-            {volumeControl()}
+            {volumeControl}
           </SafeAreaView>
         </View>
       </Animated.View>
@@ -741,7 +645,10 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
             marginBottom: animations.bottomControl.marginBottom,
           },
         ]}>
-        <SafeAreaView>
+        <View
+          style={{
+            paddingBottom: 16,
+          }}>
           <View
             style={[
               styles.controls.row,
@@ -752,7 +659,7 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
             <View style={{ flex: 1 }}>{renderSeekbar()}</View>
             {renderTimer()}
           </View>
-        </SafeAreaView>
+        </View>
       </Animated.View>
     );
   };
@@ -822,7 +729,6 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
           resizeMode={state.resizeMode}
           paused={state.paused}
           muted={soundMuted}
-          volume={volumeState.volume}
           rate={1}
           onLoadStart={_onLoadStart}
           onProgress={_onProgress}
@@ -837,6 +743,18 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
         />
         {controls && renderTopControls()}
         {controls && renderBottomControls()}
+        {startBtnVisible && (
+          <TouchableOpacity
+            style={styles.player.startBtnContainer}
+            onPress={() => {
+              _onScreenTouch();
+              togglePlayPause();
+            }}>
+            <View style={styles.player.startBtn}>
+              <Play size={36} color={WHITE} weight={'fill'} />
+            </View>
+          </TouchableOpacity>
+        )}
       </View>
     </TouchableWithoutFeedback>
   );
@@ -874,6 +792,18 @@ const styles = {
       right: 0,
       bottom: 0,
       left: 0,
+    },
+    startBtnContainer: {
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    startBtn: {
+      padding: 16,
+      borderRadius: 100,
+      backgroundColor: GRAY20,
     },
   }),
   error: StyleSheet.create({
@@ -941,13 +871,11 @@ const styles = {
       justifyContent: 'center',
     },
     top: {
-      flex: 1,
       alignItems: 'stretch',
       justifyContent: 'flex-start',
     },
     bottom: {
       alignItems: 'stretch',
-      flex: 2,
       justifyContent: 'flex-end',
     },
     topControlGroup: {
@@ -1000,22 +928,16 @@ const styles = {
   }),
   volume: StyleSheet.create({
     container: {
-      backgroundColor: GRAY800,
-      borderRadius: 10,
-      paddingRight: 8,
-      paddingVertical: 2,
-    },
-    subContainer: {
       alignItems: 'center',
       justifyContent: 'flex-start',
       flexDirection: 'row',
-      height: 36,
+      height: 1,
       marginLeft: 20,
       marginRight: 20,
       width: 150,
     },
     track: {
-      backgroundColor: DISABLED,
+      backgroundColor: '#333',
       height: 1,
       marginLeft: 7,
     },
