@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import Post from "../Post";
 import { Post as PostType } from "shared/graphql/query/post/usePosts";
 import { PostCategory, PostRoleFilter } from "backend/graphql/posts.graphql";
@@ -11,6 +11,7 @@ interface PostsListProps {
   posts: PostType[] | undefined;
   displayFilter?: boolean;
   initialFilter?: FilterSettings;
+  displayBanner?: boolean;
   onFilterChange?: (filterSettings: FilterSettings) => void;
 }
 
@@ -18,9 +19,25 @@ const PostsList: FC<PostsListProps> = ({
   posts,
   displayFilter = true,
   initialFilter,
+  displayBanner = false,
   onFilterChange,
 }) => {
   const [postAction, setPostAction] = useState<PostActionType | undefined>();
+  const [lastVideoPostId, setLastVideoPostId] = useState<string | undefined>();
+
+  useEffect(() => {
+    if (posts) {
+      const lastPost = posts.find(({ _id }) => _id === lastVideoPostId);
+      if (lastPost) {
+        setLastVideoPostId(undefined);
+      }
+    }
+  }, [lastVideoPostId, posts]);
+
+  const handleCloseModal = (videoPostid?: string) => {
+    setPostAction(undefined);
+    setLastVideoPostId(videoPostid);
+  };
 
   if (!posts) {
     return <PostSkeleton />;
@@ -33,6 +50,13 @@ const PostsList: FC<PostsListProps> = ({
           initialSettings={initialFilter}
           onFilterChange={onFilterChange}
         />
+      )}
+      {(lastVideoPostId || displayBanner) && (
+        <div className="mt-4 p-3 rounded-lg bg-background-popover">
+          <span className="text-white/[0.87] text-sm">
+            Your video is processing and will display shortly.
+          </span>
+        </div>
       )}
       <div>
         {posts.map((post) => (
@@ -55,7 +79,7 @@ const PostsList: FC<PostsListProps> = ({
         <EditPostModal
           actionData={postAction}
           show={!!postAction}
-          onClose={() => setPostAction(undefined)}
+          onClose={handleCloseModal}
         />
       )}
     </>

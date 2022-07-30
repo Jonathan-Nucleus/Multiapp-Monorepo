@@ -35,6 +35,7 @@ const PostsSection: FC<PostsSectionProps> = ({ account }) => {
   );
   const triggeredOffset = useRef(false);
   const [postAction, setPostAction] = useState<PostActionType>();
+  const [lastVideoPostId, setLastVideoPostId] = useState<string | undefined>();
 
   const onEndReached = useCallback(async () => {
     if (isFetchingMore.current) return;
@@ -48,6 +49,15 @@ const PostsSection: FC<PostsSectionProps> = ({ account }) => {
     });
     isFetchingMore.current = false;
   }, [fetchMore, posts]);
+
+  useEffect(() => {
+    if (posts) {
+      const lastPost = posts.find(({ _id }) => _id === lastVideoPostId);
+      if (lastPost) {
+        setLastVideoPostId(undefined);
+      }
+    }
+  }, [lastVideoPostId, posts]);
 
   useEffect(() => {
     const handleScroll = (event: Event) => {
@@ -78,6 +88,11 @@ const PostsSection: FC<PostsSectionProps> = ({ account }) => {
     return () => document.removeEventListener("scroll", handleScroll, true);
   }, [onEndReached]);
 
+  const handleCloseModal = (postId?: string) => {
+    setPostAction(undefined);
+    setLastVideoPostId(postId);
+  };
+
   return (
     <>
       <div className="hidden md:block">
@@ -90,6 +105,7 @@ const PostsSection: FC<PostsSectionProps> = ({ account }) => {
         <PostsList
           posts={posts}
           initialFilter={{ categories, roleFilter }}
+          displayBanner={!!lastVideoPostId}
           onFilterChange={({
             categories: _categories,
             roleFilter: _roleFilter,
@@ -112,7 +128,7 @@ const PostsSection: FC<PostsSectionProps> = ({ account }) => {
         <EditPostModal
           actionData={postAction}
           show={!!postAction}
-          onClose={() => setPostAction(undefined)}
+          onClose={handleCloseModal}
         />
       )}
     </>

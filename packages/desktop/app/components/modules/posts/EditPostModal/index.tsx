@@ -47,6 +47,7 @@ import {
   useLinkPreview,
   LinkPreview as LinkPreviewResponse,
 } from "shared/graphql/query/post/useLinkPreview";
+import { getMediaTypeFrom } from "shared/src/media";
 
 const audienceOptions = Object.keys(AudienceOptions).map((key) => {
   if (key == "EVERYONE") {
@@ -119,7 +120,7 @@ export type PostActionType =
 interface EditPostModalProps {
   actionData: PostActionType;
   show: boolean;
-  onClose: () => void;
+  onClose: (videoPostId?: string) => void;
 }
 
 const EditPostModal: FC<EditPostModalProps> = ({
@@ -295,7 +296,12 @@ const EditPostModal: FC<EditPostModalProps> = ({
           },
         });
         if (data && data.createPost) {
-          closeModal();
+          // When media type is only video, pass postId as param
+          onClose(
+            getMediaTypeFrom(media?.url ?? "") === "video"
+              ? data.createPost?._id
+              : undefined
+          );
           return;
         }
       } else if (actionData.type == "edit") {
@@ -314,7 +320,12 @@ const EditPostModal: FC<EditPostModalProps> = ({
           },
         });
         if (data && data.editPost) {
-          closeModal();
+          // When media type is only video, pass postId as param
+          onClose(
+            getMediaTypeFrom(media?.url ?? "") === "video"
+              ? data.editPost?._id
+              : undefined
+          );
         }
       } else if (actionData.type == "share") {
         const { data } = await sharePost({
@@ -328,7 +339,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
           },
         });
         if (data && data.sharePost) {
-          closeModal();
+          onClose();
         }
       }
     } catch (err) {}
@@ -384,10 +395,6 @@ const EditPostModal: FC<EditPostModalProps> = ({
     }
   }, [account._id, fetchUploadLink, selectedFile, setValue, watch]);
 
-  const closeModal = () => {
-    onClose();
-  };
-
   return (
     <ModalDialog
       className="w-full md:w-auto max-w-full md:h-[80vh] relative"
@@ -403,7 +410,12 @@ const EditPostModal: FC<EditPostModalProps> = ({
               {actionData.type == "share" && "Share Post"}
             </div>
             <Button variant="text">
-              <X color="white" weight="bold" size={24} onClick={closeModal} />
+              <X
+                color="white"
+                weight="bold"
+                size={24}
+                onClick={() => onClose()}
+              />
             </Button>
           </div>
           <div className="flex flex-col md:flex-row flex-grow md:min-h-0">
@@ -561,7 +573,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
             <Button
               variant="text"
               className="text-primary font-medium"
-              onClick={closeModal}
+              onClick={() => onClose()}
             >
               Cancel
             </Button>
