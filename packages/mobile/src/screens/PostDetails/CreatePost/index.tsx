@@ -341,7 +341,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     if (document?.fileCopyUri) {
       try {
         // Rename file to avoid trouble with spaces
-        const originalPath = document.fileCopyUri.replace('%20', ' ');
+        const originalPath = document.fileCopyUri.replace(/%20/g, ' ');
         const fileDirectory = originalPath.substring(
           0,
           originalPath.lastIndexOf('/'),
