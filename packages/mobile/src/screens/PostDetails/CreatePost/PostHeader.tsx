@@ -40,7 +40,8 @@ const PostHeader: React.FC<PostHeaderProps> = (props) => {
       rightIcon={
         <Pressable
           onPress={handleNext}
-          style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}>
+          style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}
+          disabled={!rightValidation}>
           <PLabel
             label={rightLabel}
             textStyle={rightValidation ? styles.rightText : styles.disabledText}
@@ -52,10 +53,6 @@ const PostHeader: React.FC<PostHeaderProps> = (props) => {
 };
 
 const styles = StyleSheet.create({
-  headerContainer: {
-    paddingTop: 0,
-    marginBottom: 0,
-  },
   headerTitle: {
     ...Body1Bold,
   },
@@ -66,7 +63,6 @@ const styles = StyleSheet.create({
     ...Body1Bold,
     color: GRAY800,
   },
-  sideStyle: {},
 });
 
 export default PostHeader;

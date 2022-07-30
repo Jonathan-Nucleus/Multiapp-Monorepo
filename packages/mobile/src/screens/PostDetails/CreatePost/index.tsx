@@ -78,7 +78,7 @@ import { CreatePostScreen } from 'mobile/src/navigations/PostDetailsStack';
 
 import DocumentPicker, { types } from 'react-native-document-picker';
 import PdfThumbnail from 'react-native-pdf-thumbnail';
-import { stat } from 'react-native-fs';
+import { stat, moveFile } from 'react-native-fs';
 
 const RadioBodyView = (props: any): React.ReactElement => {
   const { icon, label } = props;
@@ -307,7 +307,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       compressImageQuality: 0.8,
       compressVideoPreset: 'Passthrough',
     });
-    await uploadImage(image);
+    await uploadMedia(image);
   };
 
   const takePhoto = async (): Promise<void> => {
@@ -320,7 +320,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       includeExif: true,
     });
 
-    await uploadImage(image);
+    await uploadMedia(image);
   };
 
   const takeVideo = async (): Promise<void> => {
@@ -329,17 +329,28 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       compressVideoPreset: 'Passthrough',
     });
 
-    await uploadImage(videoData);
+    await uploadMedia(videoData);
   };
 
   const openDocumentPicker = async (): Promise<void> => {
     const document = await DocumentPicker.pickSingle({
       type: types.pdf,
+      copyTo: 'cachesDirectory',
     });
 
-    if (document?.uri) {
+    if (document?.fileCopyUri) {
       try {
-        const filePath = document.uri;
+        // Rename file to avoid trouble with spaces
+        const originalPath = document.fileCopyUri.replace('%20', ' ');
+        const fileDirectory = originalPath.substring(
+          0,
+          originalPath.lastIndexOf('/'),
+        );
+        const filePath = `${fileDirectory}/${new Date()
+          .getTime()
+          .toString()}.pdf`;
+        await moveFile(originalPath, filePath);
+
         const image = await PdfThumbnail.generate(filePath, 0);
         const statResult = await stat(image.uri);
         const pdfImageData = {
@@ -351,18 +362,18 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
           height: image.height,
         };
 
-        await uploadFile(document.uri);
-        await uploadImage(pdfImageData);
+        await uploadFile(filePath);
+        await uploadMedia(pdfImageData);
       } catch (e) {
         console.log('exception...', e);
       }
     }
   };
 
-  const uploadImage = async (image: ImageOrVideo): Promise<void> => {
+  const uploadMedia = async (media: ImageOrVideo): Promise<void> => {
     setUploading(true);
 
-    const fileUri = image.path;
+    const fileUri = media.path;
 
     const filename = fileUri.substring(fileUri.lastIndexOf('/') + 1);
     const { data } = await fetchUploadLink({
@@ -374,23 +385,43 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     });
 
     if (!data || !data.uploadLink) {
-      showMessage('error', 'Image upload failed');
+      showMessage('error', 'Media upload failed');
       return;
     }
 
     const { remoteName, uploadUrl } = data.uploadLink;
-
     await upload(uploadUrl, fileUri);
 
     mediaField.onChange({
       url: remoteName,
       documentLink: attachment,
-      aspectRatio: image.width / image.height,
+      aspectRatio: media.width / media.height,
     });
 
-    setImageData(image);
+    setImageData(media);
     setUploadProgress(0);
     setUploading(false);
+  };
+
+  const uploadFile = async (filePath: string): Promise<void> => {
+    setUploading(true);
+    const filename = filePath.substring(filePath.lastIndexOf('/') + 1);
+    const { data } = await fetchUploadLink({
+      variables: {
+        localFilename: filename.toLowerCase(),
+        type: 'POST',
+        id: account._id,
+      },
+    });
+
+    if (!data || !data.uploadLink) {
+      showMessage('error', 'Attachment upload failed');
+      return;
+    }
+
+    const { remoteName, uploadUrl } = data.uploadLink;
+    await upload(uploadUrl, filePath);
+    setAttachment(remoteName);
   };
 
   const upload = async (uploadUrl: string, fileUri: string): Promise<void> => {
@@ -417,29 +448,6 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     } catch (err) {
       console.log('Error uploading file', err);
     }
-  };
-
-  const uploadFile = async (filePath: string) => {
-    setUploading(true);
-    const filename = filePath.substring(filePath.lastIndexOf('/') + 1);
-    const { data } = await fetchUploadLink({
-      variables: {
-        localFilename: filename.toLowerCase(),
-        type: 'POST',
-        id: account._id,
-      },
-    });
-
-    if (!data || !data.uploadLink) {
-      showMessage('error', 'Attachment upload failed');
-      return;
-    }
-
-    const { remoteName, uploadUrl } = data.uploadLink;
-
-    await upload(uploadUrl, filePath);
-
-    setAttachment(remoteName);
   };
 
   const clearImage = (): void => {
@@ -687,7 +695,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
             />
             <IconButton
               icon={<FilePdf size={32} color={WHITE} />}
-              label="PDF"
+              label="Attach PDF"
               textStyle={styles.iconText}
               viewStyle={styles.iconButton}
               onPress={openDocumentPicker}
@@ -742,7 +750,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'relative',
   },
-
   preview: {
     marginVertical: 0,
     marginTop: 0,
@@ -759,9 +766,9 @@ const styles = StyleSheet.create({
     borderTopColor: WHITE12,
     borderTopWidth: 1,
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly',
     width: '100%',
-    paddingHorizontal: 25,
+    paddingHorizontal: 8,
     height: 96,
     zIndex: 2,
   },
@@ -770,6 +777,7 @@ const styles = StyleSheet.create({
   },
   iconButton: {
     flexDirection: 'column',
+    flex: 1,
   },
   iconText: {
     marginTop: 5,

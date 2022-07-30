@@ -729,6 +729,7 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
           resizeMode={state.resizeMode}
           paused={state.paused}
           muted={soundMuted}
+          ignoreSilentSwitch="ignore"
           rate={1}
           onLoadStart={_onLoadStart}
           onProgress={_onProgress}
