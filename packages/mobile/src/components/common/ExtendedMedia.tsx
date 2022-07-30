@@ -807,36 +807,6 @@ const styles = {
       backgroundColor: GRAY20,
     },
   }),
-  error: StyleSheet.create({
-    container: {
-      backgroundColor: 'rgba( 0, 0, 0, 0.5 )',
-      position: 'absolute',
-      top: 0,
-      right: 0,
-      bottom: 0,
-      left: 0,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    icon: {
-      marginBottom: 16,
-    },
-    text: {
-      backgroundColor: 'transparent',
-      color: '#f27474',
-    },
-  }),
-  loader: StyleSheet.create({
-    container: {
-      position: 'absolute',
-      top: 0,
-      right: 0,
-      bottom: 0,
-      left: 0,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-  }),
   controls: StyleSheet.create({
     button: {
       backgroundColor: GRAY800,
@@ -854,22 +824,8 @@ const styles = {
       alignItems: 'center',
       justifyContent: 'space-between',
     },
-    vignette: {
-      resizeMode: 'stretch',
-    },
     control: {
       padding: 12,
-    },
-    text: {
-      backgroundColor: 'transparent',
-      color: '#FFF',
-      fontSize: 14,
-      textAlign: 'center',
-    },
-    pullRight: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
     },
     top: {
       alignItems: 'stretch',
@@ -895,9 +851,6 @@ const styles = {
       marginRight: 12,
       marginBottom: 0,
     },
-    volume: {
-      flexDirection: 'row',
-    },
     fullscreen: {
       flexDirection: 'row',
       paddingLeft: 0,
@@ -906,15 +859,6 @@ const styles = {
       position: 'relative',
       padding: 6,
       zIndex: 0,
-    },
-    title: {
-      alignItems: 'center',
-      flex: 0.6,
-      flexDirection: 'column',
-      padding: 0,
-    },
-    titleText: {
-      textAlign: 'center',
     },
     timer: {
       width: 60,
@@ -925,35 +869,6 @@ const styles = {
       color: '#FFF',
       fontSize: 11,
       textAlign: 'right',
-    },
-  }),
-  volume: StyleSheet.create({
-    container: {
-      alignItems: 'center',
-      justifyContent: 'flex-start',
-      flexDirection: 'row',
-      height: 1,
-      marginLeft: 20,
-      marginRight: 20,
-      width: 150,
-    },
-    track: {
-      backgroundColor: '#333',
-      height: 1,
-      marginLeft: 7,
-    },
-    fill: {
-      backgroundColor: '#FFF',
-      height: 1,
-    },
-    handle: {
-      position: 'absolute',
-      marginTop: -24,
-      marginLeft: -24,
-      padding: 16,
-    },
-    icon: {
-      marginLeft: 7,
     },
   }),
   seekbar: StyleSheet.create({
