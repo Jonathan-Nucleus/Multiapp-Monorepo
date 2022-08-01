@@ -1,4 +1,4 @@
-import { FC, Fragment, useState } from "react";
+import { FC, Fragment, useCallback, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -9,6 +9,7 @@ import {
   Chats,
   Pencil,
   Globe,
+  ShieldCheck,
 } from "phosphor-react";
 import { Menu, Transition } from "@headlessui/react";
 
@@ -62,6 +63,36 @@ const ProfileCard: FC<ProfileCardProps> = ({
   }
 
   const { background } = user;
+
+  const renderPro = useCallback(() => {
+    const isVerified =
+      user?.role === "VERIFIED" || user?.role === "PROFESSIONAL";
+    const hasSpecRole =
+      user?.role === "FA" ||
+      user?.role === "FO" ||
+      user?.role === "IA" ||
+      user?.role === "RIA";
+    if (!isVerified && !hasSpecRole) {
+      return null;
+    }
+
+    return (
+      <div className={"flex flex-row items-center ml-2"}>
+        <ShieldCheck
+          className={`${
+            isVerified ? "text-success" : "text-primary-solid"
+          } ml-1.5`}
+          color="currentColor"
+          weight="fill"
+          size={16}
+        />
+        <div className="text-white text-tiny ml-1.5 text-tiny">
+          {hasSpecRole ? user.role : user.role === "PROFESSIONAL" ? "PRO" : ""}
+        </div>
+      </div>
+    );
+  }, [user]);
+
   return (
     <>
       <div className="relative">
@@ -101,8 +132,11 @@ const ProfileCard: FC<ProfileCardProps> = ({
               </div>
               <div className="flex flex-grow items-center justify-between ml-3 mt-8">
                 <div>
-                  <div className="text-xl text-white font-medium">
-                    {user.firstName} {user.lastName}
+                  <div className={"flex flex-row items-center"}>
+                    <div className="text-xl text-white font-medium">
+                      {user.firstName} {user.lastName}
+                    </div>
+                    {renderPro()}
                   </div>
                   <div className="text-sm text-white">{user.position}</div>
                   <div>
@@ -204,8 +238,11 @@ const ProfileCard: FC<ProfileCardProps> = ({
             </div>
             <div className="lg:hidden flex justify-between items-center mt-4 mx-4">
               <div>
-                <div className="text-white">
-                  {user.firstName} {user.lastName}
+                <div className={"flex flex-row items-center"}>
+                  <div className="text-white">
+                    {user.firstName} {user.lastName}
+                  </div>
+                  {renderPro()}
                 </div>
                 <div className="text-sm text-white opacity-60">
                   {user.position}
