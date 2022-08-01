@@ -21,6 +21,18 @@ const nextConfig = withTM({
       ...config.resolve.alias,
       react: path.join(__dirname, "node_modules", "react"),
     };
+    config.module.rules.unshift({
+      test: /pdf\.worker\.(min\.)?js/,
+      use: [
+        {
+          loader: "file-loader",
+          options: {
+            name: "[contenthash].[ext]",
+            publicPath: "_next/static/worker",
+            outputPath: "static/worker"
+          }
+        }
+      ]});
     return config;
   },
   experimental: {

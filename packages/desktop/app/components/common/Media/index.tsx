@@ -8,6 +8,7 @@ interface MediaProps {
   aspectRatio?: number;
   controls?: boolean;
   onLoad?: (aspectRatio: number) => void;
+  documentLink?: string;
 }
 
 const Media: FC<MediaProps> = ({
@@ -16,10 +17,19 @@ const Media: FC<MediaProps> = ({
   aspectRatio: ratioValue,
   controls = true,
   onLoad,
+  documentLink,
 }) => {
   const maxHeight = 700;
-  // When ratio value is invalid, use aspect square instead
   const aspectRatio = ratioValue != 0 ? ratioValue : 1;
+
+  const openDocument = (): void => {
+    if (!documentLink) return;
+    const newWindow = window.open();
+    if (newWindow) {
+      newWindow.location.href = documentLink;
+    }
+  };
+
   return (
     <div className="bg-black relative">
       {mediaType == "video" && (
@@ -51,7 +61,8 @@ const Media: FC<MediaProps> = ({
             style={
               aspectRatio ? { paddingBottom: `${100 / aspectRatio}%` } : {}
             }
-            className="relative"
+            className={`relative ${documentLink ? "cursor-pointer" : ""}`}
+            onClick={openDocument}
           >
             <div className="absolute inset-0">
               <Image
@@ -65,6 +76,11 @@ const Media: FC<MediaProps> = ({
                   onLoad?.(naturalWidth / naturalHeight);
                 }}
               />
+              {documentLink && (
+                <div className="bg-black/[0.8] text-white absolute top-4 right-4 px-4 py-2 rounded-md">
+                  PDF
+                </div>
+              )}
             </div>
           </div>
         </div>

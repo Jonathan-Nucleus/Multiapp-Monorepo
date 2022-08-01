@@ -15,7 +15,16 @@ interface PostMediaProps {
 const PostMedia: FC<PostMediaProps> = ({ userId, media, postId }) => {
   const key = postId ? `${postId}/${media.url}` : `${media.url}`;
   const url = `${NEXT_PUBLIC_AWS_BUCKET}/posts/${userId}/${key}`;
-  return <Media url={url} aspectRatio={media.aspectRatio} />;
+  const documentLink = media.documentLink
+    ? `${NEXT_PUBLIC_AWS_BUCKET}/posts/${userId}/${media.documentLink}`
+    : undefined;
+  return (
+    <Media
+      url={url}
+      aspectRatio={media.aspectRatio}
+      documentLink={documentLink}
+    />
+  );
 };
 
 export default PostMedia;

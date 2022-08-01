@@ -1,25 +1,36 @@
-import { FC, useState, useEffect, useRef } from "react";
+import { FC, useState, useEffect, useRef, useCallback } from "react";
 import {
   Buildings,
-  User,
-  X,
-  GlobeHemisphereEast,
+  CaretDown,
   CircleWavy,
+  FilePdf,
+  GlobeHemisphereEast,
   Image as ImageIcon,
   Smiley,
-  CaretDown,
+  User,
+  X,
 } from "phosphor-react";
+import _ from "lodash";
 
-import CategorySelector, { categoriesSchema } from "./CategorySelector";
-import Avatar from "desktop/app/components/common/Avatar";
-import Button from "desktop/app/components/common/Button";
-import Input from "desktop/app/components/common/Input";
-import Label from "desktop/app/components/common/Label";
-import Spinner from "desktop/app/components/common/Spinner";
-
-import { DefaultValues, SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { DefaultValues, SubmitHandler, useForm } from "react-hook-form";
+
+import Avatar from "desktop/app/components/common/Avatar";
+import Button from "desktop/app/components/common/Button";
+import CategorySelector, { categoriesSchema } from "./CategorySelector";
+import Dropdown from "../../../common/Dropdown";
+import EmojiPicker from "../../../common/EmojiPicker";
+import Input from "desktop/app/components/common/Input";
+import Label from "desktop/app/components/common/Label";
+import LinkPreview from "../LinkPreview";
+import MentionTextarea, { mentionTextSchema } from "../MentionTextarea";
+import ModalDialog from "../../../common/ModalDialog";
+import Spinner from "desktop/app/components/common/Spinner";
+
+import { getInitials } from "../../../../lib/utilities";
+import { generateThumbnail } from "desktop/app/lib/pdf-thumbnail";
+
 import {
   useCreatePost,
   useFetchUploadLink,
@@ -28,19 +39,12 @@ import { Audience, PostCategory } from "backend/graphql/posts.graphql";
 import { Audiences } from "backend/graphql/enumerations.graphql";
 import { PostSummary } from "shared/graphql/fragments/post";
 import { useEditPost } from "shared/graphql/mutation/posts/useEditPost";
-import ModalDialog from "../../../common/ModalDialog";
 import { hrefFromLink, isWebLink, LINK_PATTERN } from "shared/src/patterns";
-import LinkPreview from "../LinkPreview";
-import _ from "lodash";
-import EmojiPicker from "../../../common/EmojiPicker";
-import MentionTextarea, { mentionTextSchema } from "../MentionTextarea";
 import { useAccountContext } from "shared/context/Account";
 import MediaPreview from "./MediaPreview";
 import { AudienceOptions } from "backend/schemas/post";
 import { AccreditationEnum, AccreditationOptions } from "backend/schemas/user";
-import { getInitials } from "../../../../lib/utilities";
 import { useSharePost } from "shared/graphql/mutation/posts/useSharePost";
-import Dropdown from "../../../common/Dropdown";
 import Post from "../Post";
 
 import {
@@ -81,6 +85,7 @@ type FormValues = {
   media?: {
     url: string;
     aspectRatio: number;
+    documentLink?: string;
   };
   categories: PostCategory[];
   mentionInput: {
@@ -104,6 +109,7 @@ const schema = yup
       .object({
         url: yup.string().required().default(""),
         aspectRatio: yup.number().required().default(1.58),
+        documentLink: yup.string().default(""),
       })
       .default(undefined)
       .notRequired(),
@@ -205,6 +211,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
           ? {
               aspectRatio: post.media.aspectRatio,
               url: post.media.url,
+              documentLink: post.media.documentLink,
             }
           : undefined,
         categories: post.categories,
@@ -345,13 +352,11 @@ const EditPostModal: FC<EditPostModalProps> = ({
     } catch (err) {}
   };
 
-  useEffect(() => {
-    const uploadMedia = async (file: File) => {
-      setUploadingPercent(0);
-      setLoading(true);
+  const upload = useCallback(
+    async (uploadFile: File, showProgress = true) => {
       const { data } = await fetchUploadLink({
         variables: {
-          localFilename: file.name,
+          localFilename: uploadFile.name,
           type: "POST",
           id: account._id,
         },
@@ -376,24 +381,35 @@ const EditPostModal: FC<EditPostModalProps> = ({
             rejecter(error);
           };
           xhr.upload.onprogress = (evt) => {
-            setUploadingPercent((evt.loaded / evt.total) * 100);
+            showProgress && setUploadingPercent((evt.loaded / evt.total) * 100);
           };
           xhr.open("PUT", uploadUrl);
-          xhr.send(file);
+          xhr.send(uploadFile);
         });
       } catch (err) {
         console.log("Error uploading file", err);
       }
+
+      return remoteName;
+    },
+    [account._id, fetchUploadLink]
+  );
+
+  useEffect(() => {
+    const uploadMedia = async (file: File) => {
+      setUploadingPercent(0);
+      setLoading(true);
+
+      const url = await upload(file);
+      setValue("media", { ...watch("media"), url });
+
       setUploadingPercent(undefined);
       setLoading(false);
-      return remoteName;
     };
     if (selectedFile) {
-      uploadMedia(selectedFile).then((url) => {
-        setValue("media", { ...watch("media"), url });
-      });
+      uploadMedia(selectedFile);
     }
-  }, [account._id, fetchUploadLink, selectedFile, setValue, watch]);
+  }, [account._id, fetchUploadLink, selectedFile, setValue, watch, upload]);
 
   return (
     <ModalDialog
@@ -530,6 +546,40 @@ const EditPostModal: FC<EditPostModalProps> = ({
                       }}
                       className="hidden"
                       accept="image/*, video/*"
+                    />
+                  </Label>
+                  <Label
+                    className={`flex items-center cursor-pointer hover:opacity-80 transition select-none ml-4 ${
+                      actionData.type == "share"
+                        ? "pointer-events-none opacity-40"
+                        : ""
+                    }`}
+                  >
+                    <div className="text-white">
+                      <FilePdf color="currentColor" weight="light" size={24} />
+                    </div>
+                    <div className="text-sm text-white/[.6] font-normal ml-2">
+                      Attach PDF
+                    </div>
+                    <Input
+                      id="pdf-select"
+                      type="file"
+                      value=""
+                      onInput={async (event) => {
+                        const file = event.currentTarget.files?.[0];
+                        if (file) {
+                          const previewFile = await generateThumbnail(file);
+                          setSelectedFile(previewFile ?? undefined);
+
+                          const pdfUrl = await upload(file, false);
+                          setValue("media", {
+                            ...watch("media"),
+                            documentLink: pdfUrl,
+                          });
+                        }
+                      }}
+                      className="hidden"
+                      accept=".pdf"
                     />
                   </Label>
                   <div
