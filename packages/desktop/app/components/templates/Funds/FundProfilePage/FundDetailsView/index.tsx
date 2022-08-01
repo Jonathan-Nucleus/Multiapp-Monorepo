@@ -1,19 +1,22 @@
 import { FC, useState } from "react";
-import { FundDetails } from "shared/graphql/query/marketplace/useFund";
-import { useWatchFund } from "shared/graphql/mutation/funds/useWatchFund";
-import Card from "../../../../common/Card";
-import Avatar from "../../../../common/Avatar";
-import Button from "../../../../common/Button";
-import { Info, Share, Star, TelevisionSimple } from "phosphor-react";
 import { Tab } from "@headlessui/react";
-import FundMedia from "../../../../modules/funds/FundMedia";
 import ReactMarkdown from "react-markdown";
 import dayjs from "dayjs";
-import FundDocuments from "../FundDocuments";
+import { Info, Share, Star, TelevisionSimple } from "phosphor-react";
+
 import Accordion from "../../../../common/Accordion";
+import Avatar from "../../../../common/Avatar";
+import Button from "../../../../common/Button";
+import Card from "../../../../common/Card";
+import DisclosureModal from "desktop/app/components/modules/funds/DisclosureModal";
+import FundMedia from "../../../../modules/funds/FundMedia";
+import FundDocuments from "../FundDocuments";
 import ManagerCard from "../ManagerCard";
 import TeamMembersList from "desktop/app/components/modules/teams/TeamMembersList";
-import DisclosureModal from "desktop/app/components/modules/funds/DisclosureModal";
+
+import { FundDetails } from "shared/graphql/query/marketplace/useFund";
+import { useWatchFund } from "shared/graphql/mutation/funds/useWatchFund";
+import { useDocumentToken } from "shared/graphql/query/account/useDocumentToken";
 
 const MONTHS = dayjs().localeData().monthsShort();
 
@@ -24,6 +27,8 @@ interface FundDetailsViewProps {
 const FundDetailsView: FC<FundDetailsViewProps> = ({ fund }) => {
   const { isWatching, toggleWatch } = useWatchFund(fund._id);
   const [showDisclosureModal, setShowDisclosureModal] = useState(false);
+  const [fetchDocumentToken] = useDocumentToken();
+
   const fundTeam = [fund.manager, ...(fund?.team ?? [])];
   const sortedReturns = fund.metrics.sort(
     (a, b) => a.date.getTime() - b.date.getTime()
@@ -36,6 +41,33 @@ const FundDetailsView: FC<FundDetailsViewProps> = ({ fund }) => {
   const years = [...Array(!isNaN(numYears) ? numYears : 0)]
     .map((_, index) => earliestYear + index)
     .reverse();
+
+  const presentation = fund.documents
+    ?.filter((doc) => doc.category === "PRESENTATION")
+    ?.sort((a, b) => b.date.getTime() - a.date.getTime())?.[0];
+
+  const goToPresentation = async (): Promise<void> => {
+    if (!presentation) {
+      return;
+    }
+
+    try {
+      const { data } = await fetchDocumentToken({
+        variables: {
+          fundId: fund._id,
+          document: presentation.url,
+        },
+      });
+
+      if (data && data.documentToken) {
+        window.open(
+          `https://api-dev.prometheusalts.com/pdf-watermark?token=${data.documentToken}`
+        );
+      }
+    } catch (err) {
+      console.log(err instanceof Error ? err.message : err);
+    }
+  };
 
   return (
     <div className="mt-5 px-2 flex justify-center">
@@ -143,9 +175,12 @@ const FundDetailsView: FC<FundDetailsViewProps> = ({ fund }) => {
                       </ReactMarkdown>
                     </div>
                   </div>
-                  {fund.presentationUrl ? (
+                  {presentation ? (
                     <div className="mt-5 mb-6">
-                      <Button variant="outline-primary">
+                      <Button
+                        variant="outline-primary"
+                        onClick={goToPresentation}
+                      >
                         <TelevisionSimple color="currentColor" size={24} />
                         <span className="ml-3">View Presentation</span>
                       </Button>

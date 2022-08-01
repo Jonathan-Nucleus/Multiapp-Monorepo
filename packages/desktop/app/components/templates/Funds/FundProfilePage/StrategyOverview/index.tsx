@@ -1,22 +1,25 @@
 import { FC, useState } from "react";
-import { FundDetails } from "shared/graphql/query/marketplace/useFund";
-import Card from "desktop/app/components/common/Card";
-import Avatar from "desktop/app/components/common/Avatar";
-import Button from "../../../../common/Button";
-import { Info, Share, Star, TelevisionSimple } from "phosphor-react";
-import { useWatchFund } from "shared/graphql/mutation/funds/useWatchFund";
-import { Tab } from "@headlessui/react";
 import ReactMarkdown from "react-markdown";
+import { Tab } from "@headlessui/react";
+import { Info, Share, Star, TelevisionSimple } from "phosphor-react";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import localData from "dayjs/plugin/localeData";
+
 import Accordion from "../../../../common/Accordion";
+import Avatar from "desktop/app/components/common/Avatar";
+import Button from "../../../../common/Button";
+import Card from "desktop/app/components/common/Card";
 import DetailedTeamMemberList from "../DetailedTeamMemberList";
 import DisclosureModal from "../../../../modules/funds/DisclosureModal";
 import FundDocuments from "../FundDocuments";
-import { AssetClasses } from "backend/graphql/enumerations.graphql";
 import FundMedia from "../../../../modules/funds/FundMedia";
 import ContactSpecialist from "../../../../modules/funds/ContactSpecialist";
+
+import { FundDetails } from "shared/graphql/query/marketplace/useFund";
+import { useWatchFund } from "shared/graphql/mutation/funds/useWatchFund";
+import { useDocumentToken } from "shared/graphql/query/account/useDocumentToken";
+import { AssetClasses } from "backend/graphql/enumerations.graphql";
 
 dayjs.extend(localData);
 dayjs.extend(utc);
@@ -31,6 +34,34 @@ const StrategyOverview: FC<StrategyOverviewProps> = ({ fund }) => {
   const fundTeam = [fund.manager, ...(fund?.team ?? [])];
   const [selectedVideo, setSelectedVideo] = useState(0);
   const [showContactSpecialist, setShowContactSpecialist] = useState(false);
+  const [fetchDocumentToken] = useDocumentToken();
+
+  const presentation = fund.documents
+    ?.filter((doc) => doc.category === "PRESENTATION")
+    ?.sort((a, b) => b.date.getTime() - a.date.getTime())?.[0];
+
+  const goToPresentation = async (): Promise<void> => {
+    if (!presentation) {
+      return;
+    }
+
+    try {
+      const { data } = await fetchDocumentToken({
+        variables: {
+          fundId: fund._id,
+          document: presentation.url,
+        },
+      });
+
+      if (data && data.documentToken) {
+        window.open(
+          `https://api-dev.prometheusalts.com/pdf-watermark?token=${data.documentToken}`
+        );
+      }
+    } catch (err) {
+      console.log(err instanceof Error ? err.message : err);
+    }
+  };
 
   return (
     <div className="mt-5 px-2 flex justify-center">
@@ -120,9 +151,12 @@ const StrategyOverview: FC<StrategyOverviewProps> = ({ fund }) => {
                       </ReactMarkdown>
                     </div>
                   </div>
-                  {fund.presentationUrl && (
+                  {presentation && (
                     <div className="mt-5 mb-6">
-                      <Button variant="outline-primary">
+                      <Button
+                        variant="outline-primary"
+                        onClick={goToPresentation}
+                      >
                         <TelevisionSimple color="currentColor" size={24} />
                         <span className="ml-3">View Presentation</span>
                       </Button>
