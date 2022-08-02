@@ -288,6 +288,14 @@ const EditPostModal: FC<EditPostModalProps> = ({
   }) => {
     setLoading(true);
     try {
+      const previewData = preview as LinkPreviewResponse & {
+        __typename?: string;
+      };
+
+      if (previewData) {
+        delete previewData.__typename;
+      }
+
       if (actionData.type == "create") {
         const { data } = await createPost({
           variables: {
@@ -295,7 +303,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
               audience,
               categories,
               media,
-              preview,
+              preview: previewData,
               body: mentionInput.body,
               mentionIds: mentionInput.mentions?.map((mention) => mention.id),
               ...(user != account?._id ? { companyId: user } : {}),
@@ -320,7 +328,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
               audience,
               categories,
               media,
-              preview,
+              preview: previewData,
               body: mentionInput.body,
               mentionIds: mentionInput.mentions?.map((mention) => mention.id),
             },
