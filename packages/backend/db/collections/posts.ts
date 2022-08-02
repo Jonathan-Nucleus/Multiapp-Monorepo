@@ -452,7 +452,7 @@ const createPostsCollection = (
       }
 
       const { userId: postUserId } = result.value;
-      if (postUserId === userId) {
+      if (postUserId.toString() === userId.toString()) {
         await usersCollection.updateOne(
           { _id: toObjectId(postUserId) },
           { $inc: { postCount: -1 } }

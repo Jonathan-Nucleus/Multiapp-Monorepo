@@ -49,6 +49,7 @@ export function usePosts(
     `,
     {
       variables: { userId, ...(categories ? { categories } : {}) },
+      fetchPolicy: "cache-and-network",
     }
   );
   useEffect(() => {

@@ -34,19 +34,22 @@ interface ProfileCardProps {
 }
 
 const ProfileCard: FC<ProfileCardProps> = ({
-  user,
+  user: userData,
   isEditable = false,
   onSelectToEditProfile,
 }) => {
-  const [isVisible, setVisible] = useState(false);
   const account = useAccountContext();
+  const isMyProfile = account?._id == userData._id;
+  const user = isMyProfile ? account : userData;
+
+  const { isFollowing, toggleFollow } = useFollowUser(user._id);
+  const [isVisible, setVisible] = useState(false);
   const [followersModalTab, setFollowersModalTab] = useState(0);
   const [showHideUser, setShowHideUser] = useState(false);
-  const { isFollowing, toggleFollow } = useFollowUser(user._id);
-  const isMyProfile = account?._id == user._id;
-  let overviewShort: string | undefined = undefined;
   const [showFullOverView, setShowFullOverView] = useState(false);
   const [mediaToEdit, setMediaToEdit] = useState<MediaType>();
+
+  let overviewShort: string | undefined = undefined;
   {
     const regexpSpace = /\s/g;
     const result = user?.overview?.matchAll(regexpSpace);

@@ -31,8 +31,10 @@ export type AccountData = {
     | "overview"
     | "background"
     | "companyIds"
+    | "followerCount"
     | "followerIds"
     | "followers"
+    | "followingCount"
     | "followingIds"
     | "following"
     | "watchlistIds"
@@ -104,6 +106,8 @@ export function useAccount(
           companyIds
           followerIds
           followingIds
+          followerCount
+          followingCount
           following {
             _id
             firstName
