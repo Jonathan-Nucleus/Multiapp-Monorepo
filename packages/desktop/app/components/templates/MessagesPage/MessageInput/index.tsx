@@ -125,12 +125,13 @@ const MessageInput: FC<MessageInputProps> = ({ channel }) => {
                     type="chat"
                     suggestionsContainer={undefined}
                     onKeyDown={(event) => {
-                      if (event.key == "Enter" && !event.shiftKey) {
+                      if (loading) {
+                        event.preventDefault();
+                      } else if (event.key == "Enter" && !event.shiftKey) {
                         event.preventDefault();
                         handleSubmit(onSubmit)();
                       }
                     }}
-                    disabled={loading}
                   />
                 </div>
               </div>
