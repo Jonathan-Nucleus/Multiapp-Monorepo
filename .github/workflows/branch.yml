@@ -1,0 +1,199 @@
+name: QA Build and Deploy
+on:
+  pull_request:
+    types:
+      - labeled
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  build-frontend:
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'frontend') }}
+
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::254221267068:role/ManagementGithubIntegrati-GithubDeploymentRole3181-V2XB7LNRRLT1
+          aws-region: us-east-1
+      - name: Prebuild
+        env:
+          AWS_ACCOUNT_ID: "254221267068"
+          AWS_REPO_REGION: us-east-1
+          DOCKERHUB_SECRET: arn:aws:secretsmanager:us-east-1:254221267068:secret:staging/backend/dockerhub-denwlQ
+        run: |-
+          echo Logging in to Amazon ECR...
+          aws ecr get-login-password --region $AWS_REPO_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REPO_REGION.amazonaws.com
+          SECRET=$(aws secretsmanager get-secret-value --secret-id $DOCKERHUB_SECRET --query 'SecretString' --output text)
+          docker login --password $(echo $SECRET | jq '.password' -r) --username $(echo $SECRET | jq '.username' -r)
+      - name: Build
+        env:
+          AWS_ACCOUNT_ID: "254221267068"
+          AWS_REPO_REGION: us-east-1
+          CERT_SECRET: arn:aws:secretsmanager:us-east-1:254221267068:secret:staging/backend/certificate-RTDUje
+          IMAGE_REPO_NAME: frontend
+        run: |-
+          echo Build started on `date`
+          echo Building the Docker image...
+          cd packages/desktop
+          mkdir ssl || exit 0
+          SECRET=$(aws secretsmanager get-secret-value --secret-id $CERT_SECRET --query 'SecretString' --output text)
+          echo $(echo $SECRET | jq '.key') > ./ssl/server.key
+          echo $(echo $SECRET | jq '.cert')> ./ssl/server.crt
+          cd ../..
+          docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REPO_REGION.amazonaws.com/$IMAGE_REPO_NAME:$GITHUB_SHA --build-arg commit_hash=$GITHUB_SHA --output type=registry -f packages/desktop/Dockerfile .
+          docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REPO_REGION.amazonaws.com/$IMAGE_REPO_NAME:$GITHUB_SHA
+  deploy-frontend-to-QA1:
+    name: Deploy Frontend to QA1
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'qa1') }}
+    runs-on: ubuntu-latest
+    needs: build-frontend
+    permissions:
+      id-token: write
+      contents: read
+      actions: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::364088001936:role/DevGithubIntegration-GithubDeploymentRole31815B7A-Q19E91WPKT2R
+          aws-region: us-east-1
+      - name: Deploy to ECS
+        env:
+          AWS_ACCOUNT_ID: "254221267068"
+          AWS_REPO_REGION: us-east-1
+          IMAGE_REPO_NAME: frontend
+        run: |-
+          pip install ecs-deploy > /dev/null
+          ecs deploy Frontend-Qa1-FrontendCluster268760AC-XcuA8dEj7093 Frontend-Qa1-FrontendServiceE3ABA99B-w5DUiv1d3bVG --timeout 900 --image frontend $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REPO_REGION.amazonaws.com/$IMAGE_REPO_NAME:$GITHUB_SHA
+  deploy-frontend-to-QA2:
+    name: Deploy Frontend to QA2
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'qa2') }}
+    runs-on: ubuntu-latest
+    needs: build-frontend
+    permissions:
+      id-token: write
+      contents: read
+      actions: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::364088001936:role/DevGithubIntegration-GithubDeploymentRole31815B7A-Q19E91WPKT2R
+          aws-region: us-east-1
+      - name: Deploy to ECS
+        env:
+          AWS_ACCOUNT_ID: "254221267068"
+          AWS_REPO_REGION: us-east-1
+          IMAGE_REPO_NAME: frontend
+        run: |-
+          pip install ecs-deploy > /dev/null
+          ecs deploy Frontend-Qa2-FrontendCluster268760AC-igFJLHAAZkxH Frontend-Qa2-FrontendServiceE3ABA99B-RmfFU0rOMLky --timeout 900 --image frontend $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REPO_REGION.amazonaws.com/$IMAGE_REPO_NAME:$GITHUB_SHA
+
+
+  build-backend:
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'backend') }}
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::254221267068:role/ManagementGithubIntegrati-GithubDeploymentRole3181-V2XB7LNRRLT1
+          aws-region: us-east-1
+      - name: Prebuild
+        env:
+          AWS_ACCOUNT_ID: "254221267068"
+          AWS_REPO_REGION: us-east-1
+          DOCKERHUB_SECRET: arn:aws:secretsmanager:us-east-1:254221267068:secret:staging/backend/dockerhub-denwlQ
+        run: |-
+          echo Logging in to Amazon ECR...
+          aws ecr get-login-password --region $AWS_REPO_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REPO_REGION.amazonaws.com
+          SECRET=$(aws secretsmanager get-secret-value --secret-id $DOCKERHUB_SECRET --query 'SecretString' --output text)
+          docker login --password $(echo $SECRET | jq '.password' -r) --username $(echo $SECRET | jq '.username' -r)
+      - name: Build
+        env:
+          AWS_ACCOUNT_ID: "254221267068"
+          AWS_REPO_REGION: us-east-1
+          CERT_SECRET: arn:aws:secretsmanager:us-east-1:254221267068:secret:staging/backend/certificate-RTDUje
+          IMAGE_REPO_NAME: apollo
+        run: |-
+          echo Build started on `date`
+          echo Building the Docker image...
+          cd packages/backend
+          mkdir ssl || exit 0
+          SECRET=$(aws secretsmanager get-secret-value --secret-id $CERT_SECRET --query 'SecretString' --output text)
+          echo $(echo $SECRET | jq '.key') > ./ssl/server.key
+          echo $(echo $SECRET | jq '.cert')> ./ssl/server.crt
+          docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REPO_REGION.amazonaws.com/$IMAGE_REPO_NAME:$GITHUB_SHA --build-arg commit_hash=$GITHUB_SHA --output type=registry .
+          docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REPO_REGION.amazonaws.com/$IMAGE_REPO_NAME:$GITHUB_SHA
+
+  deploy-backend-to-QA1:
+    name: Deploy Backend to QA1
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'qa1') }}
+    runs-on: ubuntu-latest
+    needs: build-backend
+    permissions:
+      id-token: write
+      contents: read
+      actions: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::364088001936:role/DevGithubIntegration-GithubDeploymentRole31815B7A-Q19E91WPKT2R
+          aws-region: us-east-1
+      - name: Deploy to ECS
+        env:
+          AWS_ACCOUNT_ID: "254221267068"
+          AWS_REPO_REGION: us-east-1
+          IMAGE_REPO_NAME: apollo
+        run: |-
+          pip install ecs-deploy > /dev/null
+          ecs deploy Backend-Qa1-BackendCluster5086059C-RYTyU1Uefjxm Backend-Qa1-ApolloService3742ABB1-XWL5H6RrqYtw --timeout 900 --image backend $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REPO_REGION.amazonaws.com/$IMAGE_REPO_NAME:$GITHUB_SHA
+  deploy-backend-to-QA2:
+    name: Deploy Backend to QA2
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'qa2') }}
+    runs-on: ubuntu-latest
+    needs: build-backend
+    permissions:
+      id-token: write
+      contents: read
+      actions: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::364088001936:role/DevGithubIntegration-GithubDeploymentRole31815B7A-Q19E91WPKT2R
+          aws-region: us-east-1
+      - name: Deploy to ECS
+        env:
+          AWS_ACCOUNT_ID: "254221267068"
+          AWS_REPO_REGION: us-east-1
+          IMAGE_REPO_NAME: apollo
+        run: |-
+          pip install ecs-deploy > /dev/null
+          ecs deploy Backend-Qa2-BackendCluster5086059C-rTLNuCzOJJ1A Backend-Qa2-ApolloService3742ABB1-jSo4zOAOBYSS --timeout 900 --image backend $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REPO_REGION.amazonaws.com/$IMAGE_REPO_NAME:$GITHUB_SHA
