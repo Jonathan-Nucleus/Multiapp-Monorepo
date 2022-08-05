@@ -148,6 +148,9 @@ export const UNIVERSAL_INVITE_CODES = [
   "AMUBL8",
   "EFIA31",
   "DPI4WC",
+  "HLANE",
+  "BASS",
+  "BANK",
 ];
 
 const MICHAEL_USER_ID = "628fee97fef84ea6746e08fb";
@@ -785,7 +788,7 @@ const createUsersCollection = (
     setOnWatchlist: async (
       add: boolean,
       fundId: MongoId,
-      userId: MongoId,
+      userId: MongoId
     ): Promise<User.Mongo> => {
       const result = add
         ? await usersCollection.findOneAndUpdate(
