@@ -1,0 +1,50 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+app_identifier = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+apple_id = CredentialsManager::AppfileConfig.try_fetch_value(:apple_id)
+itc_team_id = CredentialsManager::AppfileConfig.try_fetch_value(:itc_team_id)
+team_id = CredentialsManager::AppfileConfig.try_fetch_value(:team_id)
+
+keychain_secret = ENV["KEYCHAIN_SECRET"];
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+    unlock_keychain(path: "login", password: keychain_secret)   
+
+    increment_build_number(xcodeproj: "mobile.xcodeproj", skip_info_plist: true)
+    cocoapods(use_bundle_exec: false)
+    commit_version_bump(
+      message: "Bump mobile build number",
+      include: ["packages/mobile/ios/Podfile.lock"],
+      xcodeproj: "mobile.xcodeproj"      
+    )
+    
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "mobile.xcodeproj",
+      profile_name: "Fastlane Distribution",
+      code_sign_identity: "iPhone Distribution"
+    )    
+    build_app(
+      workspace: "mobile.xcworkspace", 
+      scheme: "mobile",
+    )
+    upload_to_testflight(username: apple_id)
+  end
+end

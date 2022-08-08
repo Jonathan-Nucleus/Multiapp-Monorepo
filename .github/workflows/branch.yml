@@ -6,6 +6,9 @@ on:
       - opened
       - synchronize
       - reopened
+    paths-ignore:
+      - packages/mobile/ios/Podfile.lock
+      - packages/mobile/ios/mobile.xcodeproj/project.pbxproj
 
 jobs:
   build-frontend:
@@ -103,7 +106,6 @@ jobs:
           pip install ecs-deploy > /dev/null
           ecs deploy Frontend-Qa2-FrontendCluster268760AC-igFJLHAAZkxH Frontend-Qa2-FrontendServiceE3ABA99B-RmfFU0rOMLky --timeout 900 --image frontend $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REPO_REGION.amazonaws.com/$IMAGE_REPO_NAME:$GITHUB_SHA
 
-
   build-backend:
     runs-on: ubuntu-latest
     if: ${{ contains(github.event.pull_request.labels.*.name, 'backend') }}
@@ -197,3 +199,90 @@ jobs:
         run: |-
           pip install ecs-deploy > /dev/null
           ecs deploy Backend-Qa2-BackendCluster5086059C-rTLNuCzOJJ1A Backend-Qa2-ApolloService3742ABB1-jSo4zOAOBYSS --timeout 900 --image backend $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REPO_REGION.amazonaws.com/$IMAGE_REPO_NAME:$GITHUB_SHA
+
+  build-mobile-QA1:
+    runs-on:
+      - self-hosted
+      - macOS
+      - ARM64
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'mobile') && contains(github.event.pull_request.labels.*.name, 'qa1') }}
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Configure environment
+        run: |-
+          cd packages/mobile
+          chmod 744 config-mobile.sh
+          ./config-mobile.sh qa1
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build
+        env:
+          LC_ALL: en_US.UTF-8
+          LANG: en_US.UTF-8
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APP_STORE_CONNECT_TEAM_ID: ${{ secrets.APP_STORE_CONNECT_TEAM_ID }}
+          DEVELOPER_APP_IDENTIFIER: ${{ secrets.DEVELOPER_APP_IDENTIFIER }}
+          DEVELOPER_PORTAL_TEAM_ID: ${{ secrets.DEVELOPER_PORTAL_TEAM_ID }}
+          FASTLANE_APPLE_ID: ${{ secrets.FASTLANE_APPLE_ID }}
+          KEYCHAIN_SECRET: ${{ secrets.KEYCHAIN_SECRET }}
+        run: |-
+          cd packages/mobile/ios
+          fastlane beta
+
+      - name: Push changes
+        run: |
+          git config --global user.name 'Fastlane Distribution'
+          git config --global user.email 'noreply@prometheusalts.com'
+          git push
+  build-mobile-QA2:
+    runs-on:
+      - self-hosted
+      - macOS
+      - ARM64
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'mobile') && contains(github.event.pull_request.labels.*.name, 'qa2') }}
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Configure environment
+        run: |-
+          cd packages/mobile
+          chmod 744 config-mobile.sh
+          ./config-mobile.sh qa2
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build
+        env:
+          LC_ALL: en_US.UTF-8
+          LANG: en_US.UTF-8
+          FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APP_STORE_CONNECT_TEAM_ID: ${{ secrets.APP_STORE_CONNECT_TEAM_ID }}
+          DEVELOPER_APP_IDENTIFIER: ${{ secrets.DEVELOPER_APP_IDENTIFIER }}
+          DEVELOPER_PORTAL_TEAM_ID: ${{ secrets.DEVELOPER_PORTAL_TEAM_ID }}
+          FASTLANE_APPLE_ID: ${{ secrets.FASTLANE_APPLE_ID }}
+          KEYCHAIN_SECRET: ${{ secrets.KEYCHAIN_SECRET }}
+        run: |-
+          cd packages/mobile/ios
+          fastlane beta
+
+      - name: Push changes
+        run: |
+          git config --global user.name 'Fastlane Distribution'
+          git config --global user.email 'noreply@prometheusalts.com'
+          git push
