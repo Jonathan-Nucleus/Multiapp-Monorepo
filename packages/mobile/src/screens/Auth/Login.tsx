@@ -28,19 +28,18 @@ import PTextInput from '../../components/common/PTextInput';
 import PGradientButton from '../../components/common/PGradientButton';
 import { LOGIN } from 'shared/graphql/mutation/auth';
 import { Body2 } from '../../theme/fonts';
-import { BLACK, PRIMARY, WHITE, WHITE12 } from 'shared/src/colors';
+import { PRIMARY, WHITE } from 'shared/src/colors';
 import LogoSvg from '../../assets/icons/logo.svg';
-import AppleSvg from '../../assets/icons/apple.svg';
-import GoogleSvg from '../../assets/icons/google.svg';
-import LinkedinSvg from '../../assets/icons/linkedin.svg';
 
-import { setToken, TokenAction } from 'mobile/src/utils/auth-token';
+import { setToken } from 'mobile/src/utils/auth-token';
 import type { LoginScreen } from 'mobile/src/navigations/AuthStack';
 
 import { authenticate } from 'mobile/src/services/auth/google-provider';
 import { useLoginOAuth } from 'shared/graphql/mutation/auth/useLoginOAuth';
 import CheckboxLabel from '../../components/common/CheckboxLabel';
 import PBackgroundImage from '../../components/common/PBackgroundImage';
+
+import { AF_CLICK_LOGIN, AFLogEvent } from '../../utils/AppsFlyerUtil';
 
 type FormValues = {
   email: string;
@@ -102,6 +101,7 @@ const Login: LoginScreen = ({ navigation }) => {
   };
 
   const onSubmit: SubmitHandler<FormValues> = async ({ email, password }) => {
+    AFLogEvent(AF_CLICK_LOGIN, { email });
     Keyboard.dismiss();
     setLoading(true);
     setError(false);

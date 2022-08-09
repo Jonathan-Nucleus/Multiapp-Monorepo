@@ -16,6 +16,9 @@ GETSTREAM_ACCESS_KEY=p2n5abqg47rf
 
 DD_APP_ID={datadog app id}
 DD_TOKEN={datadog token}
+AF_DEV_KEY={AppsFlyer devKey}
+AF_APP_ID={AppsFlyer app id}
+
 ```
 
 ## Building for iOS

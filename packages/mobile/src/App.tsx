@@ -17,6 +17,8 @@ import {
   DdSdkReactNative,
   DdSdkReactNativeConfiguration,
 } from '@datadog/mobile-react-native';
+import appsFlyer from 'react-native-appsflyer';
+import { AFInit } from './utils/AppsFlyerUtil';
 
 const config = new DdSdkReactNativeConfiguration(
   process.env.DD_TOKEN ?? '',
@@ -35,6 +37,20 @@ const App = (): ReactElement => {
   useEffect(() => {
     start();
     DdSdkReactNative.initialize(config);
+
+    // AppsFlyer initialization!
+    let AFGCDListener = appsFlyer.onInstallConversionData((res) => {
+      const isFirstLaunch = res?.data?.is_first_launch;
+      console.log(
+        `First launch: ${isFirstLaunch && JSON.parse(isFirstLaunch) === true}`,
+      );
+    });
+
+    AFInit();
+
+    return () => {
+      AFGCDListener();
+    };
   }, []);
 
   const client = useInitializeClient();
