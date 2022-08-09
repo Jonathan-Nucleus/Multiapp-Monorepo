@@ -13,11 +13,6 @@ const schema = yup
   .object({ code: yup.string().required("Required") })
   .required();
 
-const INVITE_EMAIL = "clientservices@prometheusalts.com";
-const INVITE_SUBJECT = "New User Seeking Invite Code From Registration Page";
-const INVITE_BODY =
-  "This email will alert our CS team you are looking for a code. Stand by and a human will reach back out to you!";
-
 const InviteCodePage: FC = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -72,14 +67,12 @@ const InviteCodePage: FC = () => {
         </form>
         <div className="mt-12">
           <div className="flex items-center justify-center w-full">
-            <div className="bg-brand-overlay/[.1] h-px flex-1"></div>
+            <div className="bg-brand-overlay/[.1] h-px flex-1"/>
             <div className="text-center text-white mx-4">Or</div>
-            <div className="bg-brand-overlay/[.1] h-px flex-1"></div>
+            <div className="bg-brand-overlay/[.1] h-px flex-1"/>
           </div>
           <div className="text-center mt-4">
-            <Link
-              href={`mailto:${INVITE_EMAIL}?subject=${INVITE_SUBJECT}&body=${INVITE_BODY}`}
-            >
+            <Link href={"https://prometheusalts.com/sign-up"}>
               <a>
                 <Button
                   variant="text"

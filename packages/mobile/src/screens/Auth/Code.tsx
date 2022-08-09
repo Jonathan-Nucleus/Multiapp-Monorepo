@@ -5,10 +5,9 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Alert,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { openComposer } from 'react-native-email-link';
 
 import PAppContainer from '../../components/common/PAppContainer';
 import PHeader from '../../components/common/PHeader';
@@ -55,15 +54,7 @@ const CodeView: CodeScreen = ({ navigation }) => {
   }, []);
 
   const onPressRequestInvite = useCallback(() => {
-    try {
-      openComposer({
-        to: 'clientservices@prometheusalts.com',
-        subject: 'New User Seeking Invite Code From Registration Page',
-        body: 'This email will alert our CS team you are looking for a code. Stand by and a human will reach back out to you!',
-      });
-    } catch (error) {
-      Alert.alert('No email app available!');
-    }
+    Linking.openURL('https://prometheusalts.com/sign-up');
   }, []);
 
   return (
