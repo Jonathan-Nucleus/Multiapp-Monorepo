@@ -64,7 +64,7 @@ const AppNavigator = (): React.ReactElement => {
         navigationRef.current?.navigate('Auth');
       }
     };
-    
+
     attachTokenObserver(tokenObserver);
     return () => detachTokenObserver(tokenObserver);
   }, [authenticated]);

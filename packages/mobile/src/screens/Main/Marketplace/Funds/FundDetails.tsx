@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -9,6 +9,7 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import { CaretLeft } from 'phosphor-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import analytics from '@react-native-firebase/analytics';
 
 import MainHeader from 'mobile/src/components/main/Header';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
@@ -40,12 +41,21 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'documents'>(
     'overview',
   );
+  const fund = data?.fund;
 
   useFocusEffect(() => () => {
     stopVideos();
   });
 
-  const fund = data?.fund;
+  useEffect(() => {
+    if (fund && process.env.ENV === 'prod') {
+      analytics().logScreenView({
+        screen_name: `${route.name} - ${fund.company.name}`,
+        screen_class: `${route.name} - ${fund.company.name}`,
+      });
+    }
+  }, [fund, route.name]);
+
   if (!fund) {
     return (
       <View style={pStyles.globalContainer}>
