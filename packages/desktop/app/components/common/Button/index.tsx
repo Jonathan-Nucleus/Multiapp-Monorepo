@@ -8,6 +8,7 @@ export interface ButtonProps extends HTMLProps<HTMLButtonElement> {
 }
 
 const Button: FC<ButtonProps> = ({
+  id,
   type = "button",
   variant,
   disabled,
@@ -18,6 +19,7 @@ const Button: FC<ButtonProps> = ({
 }: ButtonProps) => {
   return (
     <button
+      id={id}
       type={type}
       className={`inline-flex items-center justify-center font-bold tracking-widest focus:outline-none rounded-full transition ${
         variant == "primary"

@@ -18,7 +18,7 @@ const AddPost: FC<AddPostProps> = ({ account, onClick }) => {
     return <Skeleton />;
   }
   return (
-    <div>
+    <div id="home-page-add-post">
       <Card className="bg-background-blue p-4">
         <div className="flex items-center">
           <Avatar user={account} size={56} />

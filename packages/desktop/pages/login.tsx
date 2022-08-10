@@ -25,7 +25,7 @@ const Login: NextPageWithLayout<LoginProps> = ({}) => {
   );
 };
 
-Login.layout = "auth";
+Login.layout = "onboarding";
 Login.middleware = "guest";
 
 export const getServerSideProps: GetServerSideProps = async () => {

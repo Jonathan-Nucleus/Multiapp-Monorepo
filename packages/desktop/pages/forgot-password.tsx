@@ -15,7 +15,7 @@ const ForgotPassword: NextPageWithLayout = () => {
   );
 };
 
-ForgotPassword.layout = "auth";
+ForgotPassword.layout = "onboarding";
 ForgotPassword.middleware = "guest";
 
 export default ForgotPassword;

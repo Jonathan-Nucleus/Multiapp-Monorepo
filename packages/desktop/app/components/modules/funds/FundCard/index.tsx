@@ -118,6 +118,7 @@ const FundCard: FC<FundCardProps> = ({
               <Link href={`/funds/${fund._id}`}>
                 <a className="w-full">
                   <Button
+                    id={`button-view-fund-${fund._id}`}
                     variant="gradient-primary"
                     className="w-full text-sm font-medium uppercase"
                   >
@@ -161,6 +162,7 @@ const FundCard: FC<FundCardProps> = ({
               <Link href={`/funds/${fund._id}`}>
                 <a className="w-full">
                   <Button
+                    id={`button-view-fund-${fund._id}`}
                     variant="gradient-primary"
                     className="w-full text-sm font-medium uppercase"
                   >
@@ -229,7 +231,12 @@ const FundCard: FC<FundCardProps> = ({
                 <div className="w-3 h-3 bg-success rounded-full" />
                 <div className="text-xs text-success ml-1">{fund.status}</div>
               </div>
-              <Button variant="text" className="ml-2" onClick={toggleWatch}>
+              <Button
+                id={`button-toggle-watch-fund-${fund._id}`}
+                variant="text"
+                className="ml-2"
+                onClick={toggleWatch}
+              >
                 <Star
                   className={isWatching ? "text-primary-medium" : "text-white"}
                   color="currentColor"
@@ -314,6 +321,7 @@ const FundCard: FC<FundCardProps> = ({
             <Link href={`/funds/${fund._id}`}>
               <a>
                 <Button
+                  id={`button-view-fund-${fund._id}`}
                   variant="outline-primary"
                   className="w-full text-xs text-white font-bold uppercase"
                 >
@@ -324,7 +332,12 @@ const FundCard: FC<FundCardProps> = ({
               </a>
             </Link>
           </div>
-          <Button variant="text" className="ml-5" onClick={toggleWatch}>
+          <Button
+            id={`button-toggle-watch-fund-${fund._id}`}
+            variant="text"
+            className="ml-5"
+            onClick={toggleWatch}
+          >
             <Star
               className={isWatching ? "text-primary-medium" : "text-white"}
               color="currentColor"

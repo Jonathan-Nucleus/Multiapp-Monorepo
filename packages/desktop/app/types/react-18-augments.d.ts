@@ -4,13 +4,6 @@
 // on React 18 as soon as possible. Ideally, this file should not exist.
 
 import { PickerProps } from "emoji-mart";
-import { MentionsInputProps } from "react-mentions";
-
-declare module "react-file-utils" {
-  export declare const ImageDropzone: React.PropsWithChildren<
-    React.FC<ImageDropzoneProps>
-  >;
-}
 
 declare module "emoji-mart" {
   export declare const Picker: React.FC<PickerProps>;

@@ -1,22 +1,21 @@
-import { ChangeEvent, FC, useState } from "react";
-import Checkbox from "../../common/Checkbox";
-import Label from "../../common/Label";
-import Button from "../../common/Button";
-import Link from "next/link";
-import { PostCategoryOptions } from "backend/schemas/post";
-import { UPDATE_SETTINGS } from "shared/graphql/mutation/account";
+import { FC, useEffect, useState } from "react";
+import CategoryPreference from "./CategoryPreference";
+import BuildingFeed from "./BuildingFeed";
 import { useMutation } from "@apollo/client";
+import { UPDATE_SETTINGS } from "shared/graphql/mutation/account";
+import { toast } from "../../common/Toast";
+import UserTypeSettings from "./UserTypeSettings";
+import AnimatingLogo from "./AnimatingLogo";
 import { useRouter } from "next/router";
 
-const categories = Object.keys(PostCategoryOptions);
-
 const PreferencesPage: FC = () => {
-  const [selections, setSelections] = useState<string[]>([]);
+  const [step, setStep] = useState(0);
   const [updateSettings] = useMutation(UPDATE_SETTINGS);
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const onSubmit = async () => {
-    setLoading(true);
+  const onSubmit = async (selections: string[]) => {
+    setStep(1);
+    const timeout = 2000;
+    const startTime = new Date().getTime();
     const { data } = await updateSettings({
       variables: {
         settings: {
@@ -24,79 +23,41 @@ const PreferencesPage: FC = () => {
         },
       },
     });
-    if (data && data.updateSettings) {
-      await router.replace("/");
-    }
-    setLoading(false);
+    const endTime = new Date().getTime();
+    setTimeout(() => {
+      if (data && data.updateSettings) {
+        setStep(2);
+      } else {
+        toast.error("Failed to update preferences");
+        setStep(0);
+      }
+    }, Math.max(timeout - (endTime - startTime), 0));
   };
+  useEffect(() => {
+    if (step == 3) {
+      setTimeout(async () => {
+        await router.push("/");
+      }, 1000);
+    }
+  }, [router, step]);
   return (
-    <div className="px-3">
-      <div className="container mx-auto max-w-xl">
-        <h1 className="text-white text-2xl mt-4">
-          Select at least 3 topics to help us personalize your experience.
-        </h1>
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-          {categories.map((key) => (
-            <div
-              key={key}
-              className="flex items-center bg-background rounded-full overflow-hidden relative cursor-pointer"
-            >
-              <div
-                className="w-full bg-primary-solid/[.24]"
-                onClick={() => {
-                  if (!selections.includes(key)) {
-                    setSelections([...selections, key]);
-                  } else {
-                    setSelections(selections.filter((item) => item != key));
-                  }
-                }}
-              >
-                <div
-                  className={`text-sm hover:bg-white/[.08] ${
-                    selections.includes(key) ? "bg-white/[.08]" : ""
-                  } transition pl-10 py-2 text-white`}
-                >
-                  {PostCategoryOptions[key].label}
-                </div>
-              </div>
-              <Checkbox
-                className="absolute left-3"
-                checked={selections.includes(key)}
-                onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                  if (event.target.checked) {
-                    setSelections([...selections, key]);
-                  } else {
-                    setSelections(selections.filter((item) => item != key));
-                  }
-                }}
-              />
-            </div>
-          ))}
-        </div>
-        <div className="mt-10 flex flex-row justify-between md:pl-24 pb-10">
-          <div className="md:mx-auto">
-            <Link href={"/"}>
-              <a>
-                <Button variant="text" className="text-xs text-primary">
-                  Skip
-                </Button>
-              </a>
-            </Link>
-          </div>
-          <div>
-            <Button
-              variant="gradient-primary"
-              className="w-32 text-sm font-medium"
-              disabled={selections.length < 3}
-              loading={loading}
-              onClick={onSubmit}
-            >
-              Finish
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <>
+      {step == 0 && (
+        <CategoryPreference
+          show={step == 0}
+          onNext={(selections) => onSubmit(selections)}
+        />
+      )}
+      {step == 1 && <BuildingFeed show={step == 1} />}
+      {step == 2 && (
+        <UserTypeSettings
+          show={step == 2}
+          onBack={() => setStep(0)}
+          onComplete={() => setStep(3)}
+        />
+      )}
+      {step == 3 && <AnimatingLogo show={step == 3} />}
+    </>
   );
 };
 

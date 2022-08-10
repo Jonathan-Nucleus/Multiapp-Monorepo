@@ -12,7 +12,10 @@ on:
 
 jobs:
   build-frontend:
-    runs-on: ubuntu-latest
+    runs-on:
+      - self-hosted
+      - Linux
+      - ARM64
     if: ${{ contains(github.event.pull_request.labels.*.name, 'frontend') }}
 
     permissions:
@@ -35,7 +38,6 @@ jobs:
           echo Logging in to Amazon ECR...
           aws ecr get-login-password --region $AWS_REPO_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REPO_REGION.amazonaws.com
           SECRET=$(aws secretsmanager get-secret-value --secret-id $DOCKERHUB_SECRET --query 'SecretString' --output text)
-          docker login --password $(echo $SECRET | jq '.password' -r) --username $(echo $SECRET | jq '.username' -r)
       - name: Build
         env:
           AWS_ACCOUNT_ID: "254221267068"
@@ -56,7 +58,10 @@ jobs:
   deploy-frontend-to-QA1:
     name: Deploy Frontend to QA1
     if: ${{ contains(github.event.pull_request.labels.*.name, 'qa1') }}
-    runs-on: ubuntu-latest
+    runs-on:
+      - self-hosted
+      - Linux
+      - ARM64
     needs: build-frontend
     permissions:
       id-token: write

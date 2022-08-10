@@ -18,21 +18,21 @@ const SCROLL_OFFSET_THRESHOLD = 3000;
 
 interface PostsSectionProps {
   account: Account;
+  onPostsLoaded: () => void;
 }
 
-const PostsSection: FC<PostsSectionProps> = ({ account }) => {
+const PostsSection: FC<PostsSectionProps> = ({ account, onPostsLoaded }) => {
   const scrollOffset = useRef(0);
   const isFetchingMore = useRef(false);
   const [categories, setCategories] = useState<PostCategory[]>();
   const [roleFilter, setRoleFilter] = useState<PostRoleFilter>(
     "PROFESSIONAL_FOLLOW"
   );
-  const { data: { posts } = {}, fetchMore } = usePosts(
-    categories,
-    roleFilter,
-    undefined,
-    POSTS_PER_SCROLL
-  );
+  const {
+    data: { posts } = {},
+    fetchMore,
+    loading,
+  } = usePosts(categories, roleFilter, undefined, POSTS_PER_SCROLL);
   const triggeredOffset = useRef(false);
   const [postAction, setPostAction] = useState<PostActionType>();
   const [lastVideoPostId, setLastVideoPostId] = useState<string | undefined>();
@@ -58,6 +58,12 @@ const PostsSection: FC<PostsSectionProps> = ({ account }) => {
       }
     }
   }, [lastVideoPostId, posts]);
+
+  useEffect(() => {
+    if (!loading && posts) {
+      onPostsLoaded();
+    }
+  }, [loading, onPostsLoaded, posts]);
 
   useEffect(() => {
     const handleScroll = (event: Event) => {

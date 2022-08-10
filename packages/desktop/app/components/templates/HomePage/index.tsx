@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import CompanyCard from "./CompanyCard";
 import FeaturedProfessionals from "./FeaturedProfessionals";
 import InviteFriends from "desktop/app/components/modules/users/InviteFriends";
@@ -8,9 +8,11 @@ import Watchlist from "desktop/app/components/modules/funds/Watchlist";
 import PostsSection from "./PostsSection";
 import Card from "desktop/app/components/common/Card";
 import { useAccountContext } from "shared/context/Account";
+import Tutorials from "./Tutorials";
 
 const HomePage: FC = () => {
   const account = useAccountContext();
+  const [showTutorial, setShowTutorial] = useState(false);
 
   return (
     <div className="mt-5 lg:mt-10">
@@ -24,7 +26,10 @@ const HomePage: FC = () => {
         <div className="min-w-0 flex-grow lg:mx-4">
           <div className="px-4">
             <FeaturedProfessionals />
-            <PostsSection account={account} />
+            <PostsSection
+              account={account}
+              onPostsLoaded={() => setShowTutorial(true)}
+            />
           </div>
         </div>
         <div className="w-[350px] hidden lg:block flex-shrink-0">
@@ -39,6 +44,7 @@ const HomePage: FC = () => {
           <DisclosureCard className="mt-5" title="Prometheus Disclosures" />
         </div>
       </div>
+      <Tutorials show={showTutorial} />
     </div>
   );
 };

@@ -3,6 +3,7 @@ import Button from "../../../../../common/Button";
 import { signOut } from "next-auth/react";
 import ModalDialog from "../../../../../common/ModalDialog";
 import { DialogProps } from "desktop/app/types/common-props";
+import { LocalStorage } from "../../../../../../lib/storageHelper";
 
 const SignOutModal: FC<DialogProps> = ({ show, onClose }) => {
   const [loading, setLoading] = useState(false);
@@ -25,7 +26,7 @@ const SignOutModal: FC<DialogProps> = ({ show, onClose }) => {
             onClick={async () => {
               setLoading(true);
               await signOut();
-              localStorage.clear();
+              LocalStorage.clear();
             }}
           >
             Yes

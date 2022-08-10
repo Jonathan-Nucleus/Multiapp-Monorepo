@@ -30,14 +30,12 @@ const Signup: NextPageWithLayout<LoginProps> = ({}) => {
         <meta name="description" content="" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {!loading && data?.verifyInvite && (
-        <SignupPage ssoProviders={[]} />
-      )}
+      {!loading && data?.verifyInvite && <SignupPage ssoProviders={[]} />}
     </div>
   );
 };
 
-Signup.layout = "auth";
+Signup.layout = "onboarding";
 Signup.middleware = "guest";
 
 export const getServerSideProps: GetServerSideProps = async () => {

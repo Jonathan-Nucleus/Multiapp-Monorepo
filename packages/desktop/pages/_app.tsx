@@ -8,7 +8,6 @@ import { ThemeProvider } from "next-themes";
 import { getSession, SessionProvider } from "next-auth/react";
 import { NextPageWithLayout } from "../app/types/next-page";
 import { initializeDatadogRum } from "../app/lib/datadog";
-import AppAuthOptions from "../app/config/auth";
 import Head from "next/head";
 
 initializeDatadogRum();
@@ -75,7 +74,7 @@ MyApp.getInitialProps = async (
   const middleware = context.Component.middleware;
   let redirect;
   if (middleware == "auth" && !session?.access_token) {
-    redirect = `${AppAuthOptions.pages?.signIn}?redirect=${context.router.asPath}`;
+    redirect = `/welcome?redirect=${context.router.asPath}`;
   } else if (middleware == "guest" && session?.access_token) {
     redirect = "/";
   }

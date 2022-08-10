@@ -22,13 +22,15 @@ import Container from "../../Container";
 import { useAccountContext } from "shared/context/Account";
 import { useUnreadCount } from "shared/context/Chat";
 
-const navItems = [
+export const navItems = [
   {
+    id: "site-header-home",
     icon: <House color="white" size={24} />,
     title: "Home",
     path: "/",
   },
   {
+    id: "site-header-invest",
     icon: <Image src={FundLogo} alt="" />,
     title: "Invest",
     path: "/funds",
@@ -36,6 +38,7 @@ const navItems = [
   },
   /* Remove this for now as it is not in scope for MVP.
   {
+    id: "site-header-chart",
     icon: <ChartLineUp color="white" size={24} />,
     title: "Portfolio",
     path: "/portfolio",
@@ -63,14 +66,9 @@ const Header: FC = () => {
             </div>
           </div>
           <div className="flex flex-row items-center">
-            {navItems.map((item) => (
-              <div key={item.path} className="mx-3">
-                <NavItem
-                  icon={item.icon}
-                  title={item.title}
-                  path={item.path}
-                  activePath={item.active}
-                />
+            {navItems.map((item, index) => (
+              <div key={index} className="mx-3">
+                <NavItem item={item} activePath={item.active} />
               </div>
             ))}
           </div>

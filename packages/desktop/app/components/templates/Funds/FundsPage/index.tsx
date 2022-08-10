@@ -8,12 +8,14 @@ import DisclosureModal from "../../../modules/funds/DisclosureModal";
 import AccreditationQuestionnaire from "../AccreditationQuestionnaire";
 import Container from "../../../layouts/Container";
 import { useAccountContext } from "shared/context/Account";
+import Tutorials from "./Tutorials";
 
 const FundsPage: FC = () => {
   const account = useAccountContext();
   const [isVerifying, setIsVerifying] = useState(false);
   const { data: { funds } = {}, loading, refetch } = useFunds();
   const [showDisclosureModal, setShowDisclosureModal] = useState(false);
+  const [firstFund, setFirstFund] = useState("");
 
   const handleRefreshPage = useCallback(() => {
     setIsVerifying(false);
@@ -33,7 +35,7 @@ const FundsPage: FC = () => {
           </header>
         </div>
         <div className="my-9">
-          {account?.accreditation === "NONE" ? (
+          {account?.accreditation == "NONE" ? (
             <div className="backdrop-blur text-center px-4 pt-36 pb-64">
               <div className="text-2xl text-white flex items-center justify-center">
                 <Lock color="currentColor" size={48} weight="light" />
@@ -52,7 +54,11 @@ const FundsPage: FC = () => {
               </div>
             </div>
           ) : (
-            <FundsList funds={funds} loading={loading} />
+            <FundsList
+              funds={funds}
+              loading={loading}
+              onLoaded={setFirstFund}
+            />
           )}
         </div>
         {funds && funds.length !== 0 && (
@@ -77,6 +83,7 @@ const FundsPage: FC = () => {
           onDone={handleRefreshPage}
         />
       </Container>
+      {firstFund && <Tutorials fundId={firstFund} />}
     </>
   );
 };

@@ -1,4 +1,4 @@
-import { FC, Fragment, useMemo } from "react";
+import { FC, Fragment, useEffect, useMemo } from "react";
 import FundCard from "desktop/app/components/modules/funds/FundCard";
 import { Fund } from "shared/graphql/query/marketplace/useFunds";
 import Skeleton from "./Skeleton";
@@ -8,9 +8,14 @@ import { AssetClasses } from "backend/graphql/enumerations.graphql";
 interface FundsListProps {
   loading?: boolean;
   funds: Fund[] | undefined;
+  onLoaded: (fundId: string) => void;
 }
 
-const FundsList: FC<FundsListProps> = ({ loading, funds }: FundsListProps) => {
+const FundsList: FC<FundsListProps> = ({
+  loading,
+  funds,
+  onLoaded,
+}: FundsListProps) => {
   const sectionedFunds = useMemo(() => {
     if (funds) {
       return AssetClasses.map((assetClass) => ({
@@ -22,11 +27,17 @@ const FundsList: FC<FundsListProps> = ({ loading, funds }: FundsListProps) => {
     }
   }, [funds]);
 
+  useEffect(() => {
+    if (sectionedFunds.length > 0) {
+      onLoaded(sectionedFunds[0].data[0]._id);
+    }
+  }, [onLoaded, sectionedFunds]);
+
   if (!funds || loading) {
     return <Skeleton />;
   }
 
-  if (funds && funds.length === 0) {
+  if (funds.length === 0) {
     return (
       <div className="flex h-[50vh] flex-col items-center justify-center px-4">
         <span className="text-xl mb-2 text-white">

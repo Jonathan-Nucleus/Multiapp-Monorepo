@@ -14,10 +14,10 @@ const Navbar: FC = () => {
       <Container>
         <nav>
           <ul className="grid grid-cols-2 md:flex">
-            <li className="md:w-44">
+            <li id="funds-navbar-item-funds" className="md:w-44">
               <NavItem path={"/funds"} title="Funds" />
             </li>
-            <li className="md:w-44">
+            <li id="funds-navbar-item-managers" className="md:w-44">
               <NavItem path={"/funds/managers"} title="Fund Managers" />
             </li>
             <li className="md:w-44 hidden">

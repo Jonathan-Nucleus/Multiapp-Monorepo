@@ -58,6 +58,7 @@ const FilterHeader: FC<FilterHeaderProps> = ({
         <>
           <Popover.Button as="div" className="inline-block select-none">
             <Button
+              id="posts-list-filter"
               variant="text"
               className="bg-transparent rounded font-normal tracking-normal px-2 py-1"
             >

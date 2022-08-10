@@ -1,4 +1,4 @@
-import { CheckCircle } from "phosphor-react";
+import { CheckCircle, Info } from "phosphor-react";
 import { FC } from "react";
 import { toast as toaster } from "react-toastify";
 
@@ -18,6 +18,13 @@ const Toast: FC<ToastProps> = ({ variant = "success", message }) => {
         {variant == "success" && (
           <CheckCircle
             className="flex-shrink-0 text-white"
+            size={32}
+            weight="light"
+          />
+        )}
+        {variant == "error" && (
+          <Info
+            className="flex-shrink-0 text-white/[.6]"
             size={32}
             weight="light"
           />

@@ -76,7 +76,7 @@ const InviteFriends: FC<InviteFriendsProps> = ({ onClose }) => {
   };
 
   return (
-    <Card className="p-0">
+    <Card id="invite-card" className="p-0">
       <div className="flex items-center border-b border-white/[.12] p-4">
         <div className="text-white">Invite Your Friends</div>
         {onClose && (

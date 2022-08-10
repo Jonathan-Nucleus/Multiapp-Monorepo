@@ -6,6 +6,8 @@ module.exports = {
     extend: {
       backgroundImage: {
         radial: "url('~shared/assets/images/background.png')",
+        welcomeInsights: "url('~shared/assets/images/welcome-insights.png')",
+        welcomeFunds: "url('~shared/assets/images/welcome-funds.png')",
       },
       fontSize: {
         tiny: "0.625rem",
@@ -79,6 +81,9 @@ module.exports = {
         yellow: {
           DEFAULT: "#F2A63F",
         },
+      },
+      translate: {
+        verticalCenter: "calc(50vh - 50%)",
       },
     },
   },

@@ -15,7 +15,7 @@ const InviteCode: NextPageWithLayout = () => {
   );
 };
 
-InviteCode.layout = "auth";
+InviteCode.layout = "onboarding";
 InviteCode.middleware = "guest";
 
 export default InviteCode;

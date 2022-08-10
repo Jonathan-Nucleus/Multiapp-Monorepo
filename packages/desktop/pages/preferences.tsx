@@ -15,7 +15,7 @@ const Preferences: NextPageWithLayout = () => {
   );
 };
 
-Preferences.layout = "auth";
+Preferences.layout = "onboarding";
 Preferences.middleware = "auth";
 
 export default Preferences;

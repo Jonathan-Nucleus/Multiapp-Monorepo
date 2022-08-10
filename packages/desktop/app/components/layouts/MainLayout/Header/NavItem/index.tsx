@@ -1,18 +1,15 @@
-import { FC, ReactElement } from "react";
+import { FC } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { navItems } from "../index";
 
 interface NavItemProps {
-  icon: ReactElement;
-  title: string;
-  path: string;
+  item: typeof navItems[0];
   activePath?: string[] | string;
 }
 
 const NavItem: FC<NavItemProps> = ({
-  icon,
-  title,
-  path,
+  item: { id, title, icon, path },
   activePath = [path],
 }: NavItemProps) => {
   const router = useRouter();
@@ -21,7 +18,10 @@ const NavItem: FC<NavItemProps> = ({
       ? router.pathname == activePath
       : activePath.includes(router.pathname);
   return (
-    <div className={"rounded-full" + (active ? " bg-primary-solid/[.3]" : "")}>
+    <div
+      id={id}
+      className={"rounded-full" + (active ? " bg-primary-solid/[.3]" : "")}
+    >
       <Link href={path}>
         <a className="cursor-pointer px-4 py-1 flex flex-row items-center">
           <span className="flex-shrink-0 flex items-center">{icon}</span>

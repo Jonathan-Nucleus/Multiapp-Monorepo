@@ -6,20 +6,8 @@ export const LOGIN = gql`
   }
 `;
 
-export const REGISTER = gql`
-  mutation Register($user: UserInput!) {
-    register(user: $user)
-  }
-`;
-
 export const FORGOT_PASSWORD = gql`
   mutation RequestPasswordReset($email: String!) {
     requestPasswordReset(email: $email)
-  }
-`;
-
-export const RESET_PASSWORD = gql`
-  mutation ResetPassword($email: String!, $password: String!, $token: String!) {
-    resetPassword(email: $email, password: $password, token: $password)
   }
 `;

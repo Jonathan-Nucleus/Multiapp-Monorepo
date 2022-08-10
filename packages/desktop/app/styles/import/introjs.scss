@@ -1,0 +1,52 @@
+.tooltipCommon {
+  @apply min-w-[200px] bg-gray-200 rounded-2xl #{!important};
+
+  .introjs-arrow {
+    @apply border-8;
+
+    &.top {
+      @apply border-b-gray-200 left-6 -top-4;
+    }
+
+    &.left {
+      @apply border-r-gray-200 -left-4 top-4;
+    }
+
+    &.bottom {
+      @apply border-t-gray-200 left-4 -bottom-4;
+    }
+
+    &.right {
+      @apply border-l-gray-200 -right-4 top-4;
+    }
+
+    &.top-right {
+      @apply border-b-gray-200 right-4 -top-4;
+    }
+  }
+
+  .introjs-tooltip-header {
+    @apply hidden;
+  }
+
+  .introjs-tooltiptext {
+    @apply text-sm text-gray-900 text-center font-medium p-4;
+  }
+
+  .introjs-tooltipbuttons {
+    @apply border-t-0 mx-4 p-0;
+
+    .introjs-prevbutton {
+      @apply hidden;
+    }
+
+    .introjs-button {
+      @apply w-full bg-gray-900 text-sm text-white text-center font-medium rounded-full mb-4 px-0 py-2;
+      text-shadow: none;
+    }
+  }
+}
+
+.introjs-highlight {
+  box-shadow: rgb(0 0 0 / 50%) 0 0 0 5000px !important;
+}

@@ -18,7 +18,7 @@ const ResetPassword: NextPageWithLayout = () => {
   );
 };
 
-ResetPassword.layout = "auth";
+ResetPassword.layout = "onboarding";
 ResetPassword.middleware = "guest";
 
 export default ResetPassword;

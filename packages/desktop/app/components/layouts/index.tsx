@@ -12,6 +12,8 @@ import { useChatToken } from "shared/graphql/query/account/useChatToken";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import AnalyticsScripts from "./AnalyticsScripts";
+import OnboardingLayout from "./OnboardingLayout";
+import { LocalStorage } from "../../lib/storageHelper";
 
 type RootLayoutProps = PropsWithChildren<AppPageProps> & {
   getstreamKey: string;
@@ -20,7 +22,9 @@ type RootLayoutProps = PropsWithChildren<AppPageProps> & {
 const RootLayout: FC<RootLayoutProps> = ({
   middleware,
   layout,
-  background = layout == "auth" ? "radial" : "default",
+  background = layout == "auth" || layout == "onboarding"
+    ? "radial"
+    : "default",
   children,
   getstreamKey,
 }: RootLayoutProps) => {
@@ -29,6 +33,9 @@ const RootLayout: FC<RootLayoutProps> = ({
   const appContent = (
     <Background type={background}>
       {layout == "auth" && <AuthLayout>{children}</AuthLayout>}
+      {layout == "onboarding" && (
+        <OnboardingLayout>{children}</OnboardingLayout>
+      )}
       {layout == "main" && (
         <MainLayout fluid={false} fullHeight={false}>
           {children}
@@ -79,7 +86,7 @@ const RootLayout: FC<RootLayoutProps> = ({
           <AccountProvider
             onUnauthenticated={async () => {
               await signOut();
-              localStorage.clear();
+              LocalStorage.clear();
             }}
           >
             <ChatProvider apiKey={getstreamKey} token={chatData?.chatToken}>
