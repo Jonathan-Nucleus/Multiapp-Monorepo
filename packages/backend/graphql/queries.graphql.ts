@@ -168,9 +168,12 @@ const resolvers = {
 
       validateArgs(validator, args);
 
-      // Check version/build number to determine whether mobile build requires
-      // an update due to a breaking change
-      // const { version, build } = args;
+      const { build } = args;
+      const buildNumber = parseInt(build);
+      const minRequiredBuild = parseInt(process.env.MIN_MOBILE_BUILD ?? "");
+      if (!Number.isNaN(buildNumber) && !Number.isNaN(minRequiredBuild)) {
+        return buildNumber < minRequiredBuild;
+      }
 
       return false;
     },
