@@ -85,6 +85,7 @@ const UserHeader: FC<UserHeaderProps> = ({
               </div>
             )}
           </div>
+          <div className="text-xs text-white/[0.6]">{user?.company?.name}</div>
           <div className="text-xs text-white/[0.6]">{user?.position}</div>
           <div className="flex flex-row items-center text-xs text-white/[0.6]">
             {highlighted ? (
