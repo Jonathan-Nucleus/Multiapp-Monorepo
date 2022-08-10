@@ -4,6 +4,9 @@ PODS:
     - AppAuth/ExternalUserAgent (= 1.4.0)
   - AppAuth/Core (1.4.0)
   - AppAuth/ExternalUserAgent (1.4.0)
+  - AppsFlyerFramework (6.8.0):
+    - AppsFlyerFramework/Main (= 6.8.0)
+  - AppsFlyerFramework/Main (6.8.0)
   - boost (1.76.0)
   - BVLinearGradient (2.5.6):
     - React
@@ -417,6 +420,9 @@ PODS:
   - react-native-app-auth (6.4.3):
     - AppAuth (= 1.4.0)
     - React-Core
+  - react-native-appsflyer (6.8.0):
+    - AppsFlyerFramework (= 6.8.0)
+    - React
   - react-native-document-picker (8.1.1):
     - React-Core
   - react-native-encrypted-storage (4.0.2):
@@ -645,6 +651,7 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - react-native-app-auth (from `../node_modules/react-native-app-auth`)
+  - react-native-appsflyer (from `../node_modules/react-native-appsflyer`)
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
   - react-native-encrypted-storage (from `../node_modules/react-native-encrypted-storage`)
   - react-native-heic-converter (from `../node_modules/react-native-heic-converter`)
@@ -689,6 +696,7 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - AppAuth
+    - AppsFlyerFramework
     - CocoaAsyncSocket
     - DatadogSDK
     - DatadogSDKBridge
@@ -772,6 +780,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/logger"
   react-native-app-auth:
     :path: "../node_modules/react-native-app-auth"
+  react-native-appsflyer:
+    :path: "../node_modules/react-native-appsflyer"
   react-native-document-picker:
     :path: "../node_modules/react-native-document-picker"
   react-native-encrypted-storage:
@@ -855,6 +865,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   AppAuth: 31bcec809a638d7bd2f86ea8a52bd45f6e81e7c7
+  AppsFlyerFramework: a8de532f81b1d3c1dfc451f0ecded91ebb6a0e47
   boost: a7c83b31436843459a1961bfd74b96033dc77234
   BVLinearGradient: e3aad03778a456d77928f594a649e96995f1c872
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
@@ -881,7 +892,7 @@ SPEC CHECKSUMS:
   Flipper-RSocket: d9d9ade67cbecf6ac10730304bf5607266dd2541
   FlipperKit: cbdee19bdd4e7f05472a66ce290f1b729ba3cb86
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
-  glog: 476ee3e89abb49e07f822b48323c51c57124b572
+  glog: 72967d82937d9ee58f236577e0f1f47436b6e8ad
   GoogleAppMeasurement: 4c19f031220c72464d460c9daa1fb5d1acce958e
   GoogleDataTransport: 5fffe35792f8b96ec8d6775f5eccd83c998d5a3b
   GoogleUtilities: e0913149f6b0625b553d70dae12b49fc62914fd1
@@ -894,7 +905,7 @@ SPEC CHECKSUMS:
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
   PLCrashReporter: 2a08001f8e6a30abe405ee8f13d2753cfb5d682a
   PromisesObjC: ab77feca74fa2823e7af4249b8326368e61014cb
-  RCT-Folly: 4d8508a426467c48885f1151029bc15fa5d7b3b8
+  RCT-Folly: c4b972745ff748fcfa1aae9dccea0b67148ef4d8
   RCTRequired: bab4a7c3d7eb9553b13773ee190f279712efd1fc
   RCTTypeSafety: efbeb6e450ff6cef8e19c2cb5314c6d8bfeeef77
   React: 28e4d45839b7d0fd9512af899e0379a17a5172ec
@@ -908,6 +919,7 @@ SPEC CHECKSUMS:
   React-jsinspector: 90f0bfd5d04e0b066c29216a110ffb9a6c34f23f
   React-logger: 8474fefa09d05f573a13c044cb0dfd751d4e52e3
   react-native-app-auth: fd1eaa667c0bc014199456d14a6440cb74de814e
+  react-native-appsflyer: 2e1a9f1e9767d8c0f63d7766d4a7b01de8484d4e
   react-native-document-picker: f68191637788994baed5f57d12994aa32cf8bf88
   react-native-encrypted-storage: e78d848ce0fb663c2ce306e37921d026809322e6
   react-native-heic-converter: dab6fa746df207995c145cdd3cebb989ca799a1b
