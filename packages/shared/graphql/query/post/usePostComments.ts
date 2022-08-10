@@ -33,6 +33,7 @@ export function usePostComments(
               lastName
               avatar
               position
+              role
               company {
                 name
               }

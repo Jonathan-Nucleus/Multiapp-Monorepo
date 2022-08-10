@@ -1,12 +1,13 @@
 import { FC } from "react";
 import Link from "next/link";
-import { ShieldCheck, Star } from "phosphor-react";
+import { Star } from "phosphor-react";
 
 import Avatar from "../../../../../common/Avatar";
 import Button from "../../../../../common/Button";
 
 import { PostSummary } from "shared/graphql/fragments/post";
 import { useFollowUser } from "shared/graphql/mutation/account/useFollowUser";
+import UserBadge from "../../../../users/UserBadge";
 
 interface UserHeaderProps {
   user: Exclude<PostSummary["user"], undefined>;
@@ -43,33 +44,7 @@ const UserHeader: FC<UserHeaderProps> = ({
                 {`${user?.firstName} ${user?.lastName}`}
               </a>
             </Link>
-            {(user?.role === "VERIFIED" || user?.role === "PROFESSIONAL") && (
-              <ShieldCheck
-                className="text-success ml-1.5"
-                color="currentColor"
-                weight="fill"
-                size={16}
-              />
-            )}
-            {user?.role == "PROFESSIONAL" && (
-              <div className="text-white text-tiny ml-1.5 text-tiny">PRO</div>
-            )}
-            {(user?.role === "FA" ||
-              user?.role === "FO" ||
-              user?.role === "IA" ||
-              user?.role === "RIA") && (
-              <>
-                <ShieldCheck
-                  className="text-primary-solid ml-1.5"
-                  color="currentColor"
-                  weight="fill"
-                  size={16}
-                />
-                <div className="text-white text-tiny ml-1.5 text-tiny">
-                  {user.role}
-                </div>
-              </>
-            )}
+            <UserBadge role={user.role} />
             {!isMyProfile && !isFollowing && (
               <div className="flex items-center">
                 <div className="mx-1 text-white opacity-60">•</div>

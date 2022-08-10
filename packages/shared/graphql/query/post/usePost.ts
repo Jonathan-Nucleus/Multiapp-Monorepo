@@ -21,7 +21,7 @@ export type Comment = Pick<
 > & {
   user: Pick<
     GraphQLPost["comments"][number]["user"],
-    "_id" | "firstName" | "lastName" | "avatar" | "position"
+    "_id" | "firstName" | "lastName" | "avatar" | "position" | "role"
   > & {
     company?: Pick<GraphQLCompany, "name">;
   };

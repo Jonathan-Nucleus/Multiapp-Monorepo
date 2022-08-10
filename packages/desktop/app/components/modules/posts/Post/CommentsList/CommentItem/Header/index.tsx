@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Link from "next/link";
 import { useAccountContext } from "shared/context/Account";
+import UserBadge from "../../../../../users/UserBadge";
 
 dayjs.extend(relativeTime);
 
@@ -42,8 +43,9 @@ const Header: FC<HeaderProps> = ({
           </a>
         </Link>
         <div className="ml-3">
-          <div className="text-sm text-white/[.6]">
+          <div className="flex items-center text-sm text-white/[.6]">
             {comment.user.firstName} {comment.user.lastName}
+            <UserBadge role={comment.user.role} />
           </div>
           <div className="text-xs text-white/[.38]">
             {comment.user.position && comment.user.company && (
