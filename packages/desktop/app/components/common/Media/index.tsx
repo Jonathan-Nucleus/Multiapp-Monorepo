@@ -1,6 +1,7 @@
-import { FC } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { getMediaTypeFrom, MediaType } from "shared/src/media";
+import { useInView } from "react-intersection-observer";
 
 interface MediaProps {
   url: string;
@@ -21,6 +22,31 @@ const Media: FC<MediaProps> = ({
 }) => {
   const maxHeight = 700;
   const aspectRatio = ratioValue != 0 ? ratioValue : 1;
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [videoPaused, setVideoPaused] = useState(false);
+  const { ref: inViewRef, inView: isVideoInView } = useInView({
+    threshold: 0.5,
+  });
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!isVideoInView) {
+      if (video) {
+        const isPlaying =
+          video.currentTime > 0 &&
+          !video.paused &&
+          !video.ended &&
+          video.readyState > 2;
+        if (isPlaying) {
+          video.pause();
+          setVideoPaused(true);
+        }
+      }
+    } else if (videoPaused) {
+      video?.play().then();
+      setVideoPaused(false);
+    }
+  }, [isVideoInView, videoPaused]);
 
   const openDocument = (): void => {
     if (!documentLink) return;
@@ -39,6 +65,10 @@ const Media: FC<MediaProps> = ({
           }`}
         >
           <video
+            ref={(element) => {
+              inViewRef(element);
+              videoRef.current = element;
+            }}
             className="w-full"
             controls={controls}
             onLoadedMetadata={(data) => {
