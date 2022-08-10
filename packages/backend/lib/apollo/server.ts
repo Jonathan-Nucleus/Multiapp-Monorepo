@@ -1,5 +1,6 @@
 import { ApolloServer } from "apollo-server";
 import jwt from "jsonwebtoken";
+import "dotenv/config";
 
 import { ApolloServerContext, formatError } from "./apollo-helper";
 import type { DeserializedUser } from "../../db/collections/users";
@@ -8,8 +9,6 @@ import { isUser, User } from "../../schemas/user";
 import { getIgniteDb } from "../../db";
 import schema from "../../graphql";
 import apolloLogger from "./plugins/apollo-logger";
-
-import "dotenv/config";
 
 const IGNITE_SECRET = process.env.IGNITE_SECRET;
 if (!IGNITE_SECRET) throw new Error("IGNITE_SECRET env var undefined");
