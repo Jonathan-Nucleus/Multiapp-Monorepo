@@ -1,7 +1,34 @@
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import Script from "next/script";
+import getConfig from "next/config";
+
+const { publicRuntimeConfig } = getConfig();
+
+const { DATADOG_RUM_ENVIRONMENT } = publicRuntimeConfig;
+
+const GA_MEASUREMENT_ID = "G-MFTEK524Q4";
 
 const AnalyticsScripts: FC = () => {
+  const [windowFocus, setWindowFocus] = useState(true);
+
+  useEffect(() => {
+    const handleActivityFalse = () => {
+      setWindowFocus(false);
+    };
+
+    const handleActivityTrue = () => {
+      setWindowFocus(true);
+    };
+
+    window.addEventListener("focus", handleActivityTrue);
+    window.addEventListener("blur", handleActivityFalse);
+
+    return () => {
+      window.removeEventListener("focus", handleActivityTrue);
+      window.removeEventListener("blur", handleActivityFalse);
+    };
+  }, [windowFocus]);
+
   return (
     <>
       {/* Full Story Script */}
@@ -34,16 +61,19 @@ const AnalyticsScripts: FC = () => {
 
       {/* Global site tag (gtag.js) - Google Analytics */}
       <Script
-        src="https://www.googletagmanager.com/gtag/js?id=G-MFTEK524Q4"
+        src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
         strategy="afterInteractive"
       />
       <Script id="google-analytics" strategy="afterInteractive">
         {`
           window.dataLayer = window.dataLayer || [];
+          window['ga-disable-${GA_MEASUREMENT_ID}'] = ${
+          !windowFocus || DATADOG_RUM_ENVIRONMENT !== "production"
+        };
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
           
-          gtag('config', 'G-MFTEK524Q4');
+          gtag('config', ${GA_MEASUREMENT_ID});
         `}
       </Script>
     </>

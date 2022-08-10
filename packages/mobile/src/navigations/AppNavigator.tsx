@@ -13,6 +13,7 @@ import {
 } from '@react-navigation/stack';
 import SplashScreen from 'react-native-splash-screen';
 import analytics from '@react-native-firebase/analytics';
+import { AppState } from 'react-native';
 
 import * as NavigationService from '../services/navigation/NavigationService';
 import {
@@ -45,6 +46,7 @@ const Stack = createStackNavigator();
 const verifying = false;
 
 const AppNavigator = (): React.ReactElement => {
+  const appState = useRef(AppState.currentState);
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const routeNameRef = useRef<string | undefined>(undefined);
   const navigationRef = useRef<NavigationContainerRef<AppParamList> | null>(
@@ -55,6 +57,27 @@ const AppNavigator = (): React.ReactElement => {
     DeviceInfo.getVersion(),
     DeviceInfo.getBuildNumber(),
   );
+
+  useEffect(() => {
+    analytics().setAnalyticsCollectionEnabled(process.env.ENV === 'prod');
+
+    const subscription = AppState.addEventListener(
+      'change',
+      async (nextAppState) => {
+        const enabled =
+          appState.current.match(/inactive|background/) &&
+          nextAppState === 'active' &&
+          process.env.ENV === 'prod';
+        await analytics().setAnalyticsCollectionEnabled(enabled ?? false);
+
+        appState.current = nextAppState;
+      },
+    );
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   useEffect(() => {
     NavigationService.setNavigator(navigationRef.current);
@@ -92,7 +115,7 @@ const AppNavigator = (): React.ReactElement => {
     console.log('Prev: ', prev);
     routeNameRef.current = current;
 
-    if (prev !== current) {
+    if (prev !== current && process.env.ENV === 'prod') {
       await analytics().logScreenView({
         screen_name: current,
         screen_class: current,
