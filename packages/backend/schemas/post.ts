@@ -117,7 +117,7 @@ export const PostCategoryOptions = {
     value: "macro",
     label: "Macro",
   },
-  CRYTPO: {
+  CRYPTO: {
     value: "crypto",
     label: "Crypto",
   },
