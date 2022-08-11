@@ -112,7 +112,10 @@ jobs:
           ecs deploy Frontend-Qa2-FrontendCluster268760AC-igFJLHAAZkxH Frontend-Qa2-FrontendServiceE3ABA99B-RmfFU0rOMLky --timeout 900 --image frontend $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REPO_REGION.amazonaws.com/$IMAGE_REPO_NAME:$GITHUB_SHA
 
   build-backend:
-    runs-on: ubuntu-latest
+    runs-on:
+      - self-hosted
+      - Linux
+      - ARM64
     if: ${{ contains(github.event.pull_request.labels.*.name, 'backend') }}
     permissions:
       contents: read
