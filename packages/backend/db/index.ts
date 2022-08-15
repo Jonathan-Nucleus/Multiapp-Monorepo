@@ -52,12 +52,19 @@ function connect(
   return new Promise<{ db: Db; client: MongoClient }>(
     (resolve, reject): void => {
       if (!mongoUrl) {
+        console.error("No mongo URI provided.");
         return reject(new Error("No database provided"));
       }
 
       MongoClient.connect(mongoUrl, (err, client) => {
-        if (err) return reject(err);
-        if (!client) return reject(new Error("Unable to connect to database."));
+        if (err) {
+          console.error("Error occurred during connect mongo db", err);
+          return reject(err);
+        }
+        if (!client) {
+          console.error("Unable to connect to database.");
+          return reject(new Error("Unable to connect to database."));
+        }
 
         const path = mongoUrl.split("/").pop();
         const dbName = path?.split("?").shift();
@@ -67,6 +74,7 @@ function connect(
           return resolve({ db, client });
         }
 
+        console.error("No database provided.");
         return reject(new Error("No database provided"));
       });
     }

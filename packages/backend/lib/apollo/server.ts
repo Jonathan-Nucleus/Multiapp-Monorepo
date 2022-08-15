@@ -18,7 +18,6 @@ export const createApolloServer = (mongoUrl?: string): ApolloServer =>
     schema,
     context: async (context): Promise<ApolloServerContext> => {
       const db = await getIgniteDb(mongoUrl);
-
       const request = context.req;
       const token =
         request?.headers?.authorization?.split(" ")?.[1].trim() || "";
