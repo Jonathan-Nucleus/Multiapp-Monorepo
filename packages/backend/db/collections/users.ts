@@ -844,12 +844,18 @@ const createUsersCollection = (
       const result = follow
         ? await usersCollection.findOneAndUpdate(
             { _id: toObjectId(userId), deletedAt: { $exists: false } },
-            { $addToSet: { followingIds: toObjectId(followUserId) } },
+            {
+              $addToSet: { followingIds: toObjectId(followUserId) },
+              $inc: { followingCount: 1 },
+            },
             { returnDocument: "after" }
           )
         : await usersCollection.findOneAndUpdate(
             { _id: toObjectId(userId), deletedAt: { $exists: false } },
-            { $pull: { followingIds: toObjectId(followUserId) } },
+            {
+              $pull: { followingIds: toObjectId(followUserId) },
+              $inc: { followingCount: -1 },
+            },
             { returnDocument: "after" }
           );
 
@@ -881,12 +887,18 @@ const createUsersCollection = (
       const result = following
         ? await usersCollection.findOneAndUpdate(
             { _id: toObjectId(userId), deletedAt: { $exists: false } },
-            { $addToSet: { followerIds: toObjectId(followerId) } },
+            {
+              $addToSet: { followerIds: toObjectId(followerId) },
+              $inc: { followerCount: 1 },
+            },
             { returnDocument: "after" }
           )
         : await usersCollection.findOneAndUpdate(
             { _id: toObjectId(userId), deletedAt: { $exists: false } },
-            { $pull: { followerIds: toObjectId(followerId) } },
+            {
+              $pull: { followerIds: toObjectId(followerId) },
+              $inc: { followerCount: -1 },
+            },
             { returnDocument: "after" }
           );
 
@@ -920,12 +932,16 @@ const createUsersCollection = (
             { _id: toObjectId(userId), deletedAt: { $exists: false } },
             {
               $addToSet: { companyFollowingIds: toObjectId(followCompanyId) },
+              $inc: { companyFollowingCount: 1 },
             },
             { returnDocument: "after" }
           )
         : await usersCollection.findOneAndUpdate(
             { _id: toObjectId(userId), deletedAt: { $exists: false } },
-            { $pull: { companyFollowingIds: toObjectId(followCompanyId) } },
+            {
+              $pull: { companyFollowingIds: toObjectId(followCompanyId) },
+              $inc: { companyFollowingCount: -1 },
+            },
             { returnDocument: "after" }
           );
 
@@ -961,12 +977,16 @@ const createUsersCollection = (
               $addToSet: {
                 companyFollowerIds: toObjectId(followerCompanyId),
               },
+              $inc: { companyFollowerCount: 1 },
             },
             { returnDocument: "after" }
           )
         : await usersCollection.findOneAndUpdate(
             { _id: toObjectId(userId), deletedAt: { $exists: false } },
-            { $pull: { companyFollowerIds: toObjectId(followerCompanyId) } },
+            {
+              $pull: { companyFollowerIds: toObjectId(followerCompanyId) },
+              $inc: { companyFollowerCount: -1 },
+            },
             { returnDocument: "after" }
           );
 

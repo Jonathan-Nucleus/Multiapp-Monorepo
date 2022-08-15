@@ -193,7 +193,7 @@ const createCommentsCollection = (
         { _id: toObjectId(commentId), deleted: { $exists: false } },
         {
           $pull: { likeIds: toObjectId(userId) },
-          $inc: { postCount: -1 },
+          $inc: { likeCount: -1 },
         },
         { returnDocument: "after" }
       );
