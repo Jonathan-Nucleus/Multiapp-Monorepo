@@ -104,7 +104,7 @@ const PostsSection: FC<PostsSectionProps> = ({ account, onPostsLoaded }) => {
       <div className="hidden md:block">
         <AddPost
           account={account}
-          onClick={(file) => setPostAction({ type: "create", file })}
+          onClick={(files) => setPostAction({ type: "create", files })}
         />
       </div>
       <div className="mt-8">

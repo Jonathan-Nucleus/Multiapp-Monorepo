@@ -8,7 +8,7 @@ import { WHITE12 } from 'shared/src/colors';
 
 import { Post } from 'shared/graphql/query/post/usePosts';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
-import { getPostTime } from "../../../utils/dateTimeUtil";
+import { getPostTime } from '../../../utils/dateTimeUtil';
 
 interface FeedItemProps {
   post: Post;
@@ -64,12 +64,12 @@ const FeaturedItem: React.FC<FeedItemProps> = ({ post }) => {
             numberOfLines={2}
           />
         ) : null}
-        {media ? (
+        {media && media.length > 0 ? (
           <PostMedia
             userId={post.userId}
             mediaId={post._id}
             style={styles.postImage}
-            media={media}
+            media={media[0]}
           />
         ) : null}
       </View>

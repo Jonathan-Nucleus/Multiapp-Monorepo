@@ -1,5 +1,4 @@
 import getConfig from "next/config";
-import { Media as MediaType } from "shared/graphql/fragments/post";
 import { FC } from "react";
 import Media from "../../../common/Media";
 
@@ -15,7 +14,7 @@ interface FundMediaProps {
 const FundMedia: FC<FundMediaProps> = ({ fundId, mediaUrl, hideControls }) => {
   const key = `${fundId}/${mediaUrl}`;
   const url = `${NEXT_PUBLIC_AWS_BUCKET}/funds/${key}`;
-  return <Media url={url} key={fundId} controls={!hideControls} />;
+  return <Media url={url} key={fundId} hideControls={hideControls} />;
 };
 
 export default FundMedia;

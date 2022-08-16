@@ -5,22 +5,17 @@ import {
 } from '@react-navigation/stack';
 import { CompositeScreenProps } from '@react-navigation/native';
 
-import CreatePost from '../screens/PostDetails/CreatePost';
+import CreatePost, { LocalMedia } from '../screens/PostDetails/CreatePost';
 import SharePost from '../screens/PostDetails/SharePost';
 import PostDetail from '../screens/PostDetails/PostDetail';
 import ChooseCategory from '../screens/PostDetails/CreatePost/ChooseCategory';
 import ReviewPost from '../screens/PostDetails/CreatePost/ReviewPost';
 
 import type { AuthenticatedScreenProps } from './AuthenticatedStack';
-
-import type {
-  Audience,
-  Post,
-  PostCategory,
-} from 'shared/graphql/query/post/usePosts';
+import type { Post, PostCategory } from 'shared/graphql/query/post/usePosts';
 
 const Stack = createStackNavigator();
-const PostDetailsStack = () => {
+const PostDetailsStack = (): ReactElement => {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false, gestureEnabled: true }}
@@ -58,8 +53,7 @@ export type PostDetailsStackParamList = {
     audience: Post['audience'];
     body?: Post['body'];
     mentionIds: Post['mentionIds'];
-    media?: Post['media'];
-    localMediaPath?: string;
+    media?: LocalMedia[];
     categories?: PostCategory[];
   };
   ReviewPost: PostDetailsStackParamList['ChooseCategory'] & {

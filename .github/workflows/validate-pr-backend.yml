@@ -2,27 +2,22 @@ name: Validate PR (Backend)
 on:
   pull_request:
     branches:
-      - 'main'
+      - "main"
     paths:
-      - 'packages/backend/**'
-      - 'package.json'
-      - '.github/workflows/validate-pr-backend.yml'
+      - "packages/backend/**"
+      - "package.json"
+      - ".github/workflows/validate-pr-backend.yml"
 
 jobs:
   validate-pr-backend:
     name: Validate PR (Backend)
-    runs-on: ubuntu-latest
+    runs-on:
+      - self-hosted
+      - linux
+      - x64
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
-
-      - name: Setup node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: 16
-
-      - name: Install yarn
-        run: npm install -g yarn
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile

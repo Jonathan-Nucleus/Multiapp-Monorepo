@@ -17,7 +17,7 @@ export namespace Post {
     isCompany: boolean;
     audience: Audience;
     body?: string;
-    media?: Media;
+    media?: Media[];
     preview?: LinkPreview;
     mentionIds?: ObjectId[];
     categories: PostCategory[];
@@ -72,7 +72,7 @@ export namespace Post {
     Pick<Mongo, "audience" | "categories">;
 }
 
-interface Media {
+export interface Media {
   url: string;
   aspectRatio: number;
   documentLink?: string;
@@ -218,14 +218,14 @@ export const PostRoleFilterOptions = {
 export type PostRoleFilter = ValueOf<typeof PostRoleFilterOptions>["value"];
 export type PostRoleFilterEnum = keyof typeof PostRoleFilterOptions;
 
-export const PostSchema = `
+export const PostSchema = `  
   type Post {
     _id: ID!
     userId: ID!
     isCompany: Boolean!
     audience: Audience!
     body: String
-    media: Media
+    media: [Media!]
     preview: LinkPreview
     mentionIds: [ID!]
     categories: [PostCategory!]!
@@ -267,7 +267,7 @@ export const PostSchema = `
     companyId: ID
     audience: Audience!
     body: String
-    media: MediaInput
+    media: [MediaInput!]
     preview: LinkPreviewInput
     categories: [PostCategory!]!
     mentionIds: [ID!]
@@ -278,7 +278,7 @@ export const PostSchema = `
     userId: ID!
     audience: Audience!
     body: String
-    media: MediaInput
+    media: [MediaInput!]
     preview: LinkPreviewInput
     categories: [PostCategory!]!
     mentionIds: [ID!]

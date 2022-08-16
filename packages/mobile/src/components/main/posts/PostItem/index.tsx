@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Pressable, Text } from 'react-native';
+import { View, StyleSheet, Text, Pressable } from 'react-native';
 import {
   ThumbsUp,
   ChatCenteredText,
   Share as ShareIcon,
 } from 'phosphor-react-native';
+import { TapGestureHandler } from 'react-native-gesture-handler';
 
 import PLabel from 'mobile/src/components/common/PLabel';
 import IconButton from 'mobile/src/components/common/IconButton';
@@ -61,7 +62,7 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
 
   return (
     <>
-      <Pressable onPress={() => goToDetails()}>
+      <TapGestureHandler onEnded={() => goToDetails()}>
         <View
           style={[
             styles.container,
@@ -138,7 +139,7 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
           </View>
           <View style={styles.divider} />
         </View>
-      </Pressable>
+      </TapGestureHandler>
       <LikesModal
         postId={post._id}
         isVisible={likesModalVisible}

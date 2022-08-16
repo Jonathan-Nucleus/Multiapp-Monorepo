@@ -29,11 +29,15 @@ interface MediaProps {
   onLoad?: VideoProperties['onLoad'];
   mediaId: string;
   type?: 'post' | 'fund';
+  onPress?: () => void;
 }
 
 const SUPPORTED_EXTENSION = ['mp4'];
 
 export function isVideo(src: string): boolean {
+  if (!src || src === '') {
+    return false;
+  }
   let filename = src;
   const query = src.indexOf('?');
   if (query >= 0) {
@@ -83,6 +87,7 @@ const Media: FC<MediaProps> = ({
   controls = true,
   resizeMode = 'cover',
   type = 'post',
+  onPress,
 }) => {
   const [paused, setPaused] = useState(true);
 
@@ -148,7 +153,7 @@ const Media: FC<MediaProps> = ({
 
   // TODO: Need to potentially validate the src url before feeding it to
   // react-native-video as an invalid source seems to crash the app
-  return isVideo(media.url) ? (
+  return isVideo(media.url) && media.url ? (
     <Pressable
       onPress={togglePause}
       style={[
@@ -205,14 +210,16 @@ const Media: FC<MediaProps> = ({
 type PostMediaProps = Omit<MediaProps, 'type' | 'mediaId'> & {
   userId: string;
   mediaId?: string;
+  onPress?: () => void;
 };
 export const PostMedia: FC<PostMediaProps> = ({
   mediaId,
   userId,
+  onPress,
   ...props
 }) => {
   const key = mediaId ? `${userId}/${mediaId}` : userId;
-  return <Media {...props} type="post" mediaId={key} />;
+  return <Media {...props} type="post" mediaId={key} onPress={onPress} />;
 };
 
 type FundMediaProps = Omit<MediaProps, 'type'>;

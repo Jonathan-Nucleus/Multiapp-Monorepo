@@ -4,7 +4,7 @@ import { faker } from "@faker-js/faker";
 import { randomInt, randomArray } from "./helpers";
 import { Company } from "../../schemas/company";
 import { Fund } from "../../schemas/fund";
-import { AccreditationOptions } from "../../schemas/user";
+import { User, AccreditationOptions } from "../../schemas/user";
 
 // The name of the mongo collection
 const COLLECTION = "funds";
@@ -100,7 +100,7 @@ export default async function (
   try {
     const fundsCollection = await db.createCollection<Fund.Mongo>(COLLECTION);
     const companiesCollection = db.collection<Company.Mongo>("companies");
-    const usersCollection = db.collection<Company.Mongo>("users");
+    const usersCollection = db.collection<User.Mongo>("users");
 
     await fundsCollection.insertMany(funds);
     await Promise.all(

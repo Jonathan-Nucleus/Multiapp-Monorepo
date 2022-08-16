@@ -42,7 +42,7 @@ import {
 } from "../schemas/user";
 import type { Company } from "../schemas/company";
 import { AudienceOptions, PostCategoryOptions } from "../schemas/post";
-import type { Post } from "../schemas/post";
+import type { Post, Media as PostMedia } from "../schemas/post";
 import type { Comment } from "../schemas/comment";
 import {
   HelpRequest,
@@ -766,25 +766,26 @@ const resolvers = {
                       .required()
                   )
                   .required(),
-                body: yup.string(),
-                media: yup.object().when("body", {
-                  is: (body?: string) => body && body.length > 0,
-                  then: yup
-                    .object({
-                      url: yup.string().required(),
-                      aspectRatio: yup.number().required(),
+                body: yup
+                  .string()
+                  .notRequired()
+                  .when("media", {
+                    is: (media: PostMedia[]) => !media || media.length === 0,
+                    then: yup.string().required("Required"),
+                  }),
+                media: yup
+                  .array()
+                  .of(
+                    yup.object({
+                      url: yup.string().required().default(""),
+                      aspectRatio: yup.number().required().default(1.58),
                       documentLink: yup.string(),
+                      transcoded: yup.boolean(),
                     })
-                    .notRequired()
-                    .default(undefined),
-                  otherwise: yup
-                    .object({
-                      url: yup.string().required(),
-                      aspectRatio: yup.number().required(),
-                      documentLink: yup.string(),
-                    })
-                    .required(),
-                }),
+                  )
+                  .ensure()
+                  .default([])
+                  .notRequired(),
                 mentionIds: yup.array().of(
                   yup.string().test({
                     test: isObjectId,
@@ -815,25 +816,29 @@ const resolvers = {
           throw new BadRequestError("Not authorized");
         }
 
-        const postData = await db.posts.create(post, user._id, !post.media);
+        const postData = await db.posts.create(post, user._id);
 
         // Move AWS media to the appropriate post folder
         if (postData.media) {
-          const result = await movePostMedia(
-            user._id.toString(),
-            postData.userId.toString(),
-            postData._id.toString(),
-            postData.media.url
+          const moveMediaResults = await Promise.all(
+            postData.media?.map(async (media) =>
+              movePostMedia(
+                user._id.toString(),
+                user._id.toString(),
+                postData._id.toString(),
+                media.url
+              )
+            )
           );
-
-          if (!result.success) {
+          if (moveMediaResults.some((result) => !result)) {
             console.log(
-              "Error moving media asset",
-              postData.media.url,
+              "Error moving media assets",
+              postData.media?.map((item) => item.url),
               "for post",
-              postData._id
+              postData._id,
+              moveMediaResults
             );
-          } else if (result.mediaReady) {
+          } else if (moveMediaResults.every((result) => result.mediaReady)) {
             await db.posts.setVisible(postData._id, true, postData.userId);
           }
         }
@@ -886,25 +891,26 @@ const resolvers = {
                       .required()
                   )
                   .required(),
-                body: yup.string(),
-                media: yup.object().when("body", {
-                  is: (body?: string) => body && body.length > 0,
-                  then: yup
-                    .object({
-                      url: yup.string().required(),
-                      aspectRatio: yup.number().required(),
+                body: yup
+                  .string()
+                  .notRequired()
+                  .when("media", {
+                    is: (media: PostMedia[]) => !media || media.length === 0,
+                    then: yup.string().required("Required"),
+                  }),
+                media: yup
+                  .array()
+                  .of(
+                    yup.object({
+                      url: yup.string().required().default(""),
+                      aspectRatio: yup.number().required().default(1.58),
                       documentLink: yup.string(),
+                      transcoded: yup.boolean(),
                     })
-                    .notRequired()
-                    .default(undefined),
-                  otherwise: yup
-                    .object({
-                      url: yup.string().required(),
-                      aspectRatio: yup.number().required(),
-                      documentLink: yup.string(),
-                    })
-                    .required(),
-                }),
+                  )
+                  .ensure()
+                  .default([])
+                  .notRequired(),
                 mentionIds: yup.array().of(
                   yup.string().test({
                     test: isObjectId,
@@ -938,23 +944,31 @@ const resolvers = {
         }
 
         // Move AWS media to the appropriate post folder
-        if (post.media && post.media.url !== originalPost.media?.url) {
-          const result = await movePostMedia(
-            user._id.toString(),
-            post.userId.toString(),
-            post._id.toString(),
-            post.media.url
+        if (post.media) {
+          const originalMedia =
+            originalPost.media?.map((media) => media.url) ?? [];
+          const moveMediaResults = await Promise.all(
+            post.media
+              ?.filter((media) => !originalMedia.includes(media.url))
+              .map(async (media) =>
+                movePostMedia(
+                  user._id.toString(),
+                  user._id.toString(),
+                  post._id.toString(),
+                  media.url
+                )
+              )
           );
-
-          if (!result.success) {
+          if (moveMediaResults.some((result) => !result.success)) {
             console.log(
-              "Error moving media asset",
-              post.media.url,
+              "Error moving media assets",
+              post.media?.map((item) => item.url),
               "for post",
-              post._id
+              post._id,
+              moveMediaResults
             );
-          } else {
-            await db.posts.setVisible(post._id, result.mediaReady, post.userId);
+          } else if (moveMediaResults.every((result) => result.mediaReady)) {
+            await db.posts.setVisible(post._id, true, post.userId);
           }
         }
 

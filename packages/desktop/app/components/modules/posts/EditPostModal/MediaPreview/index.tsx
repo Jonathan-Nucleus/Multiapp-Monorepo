@@ -1,11 +1,13 @@
 import { FC, useMemo, useState } from "react";
-import { Media as PostMediaType } from "shared/graphql/fragments/post";
-import { MediaType } from "shared/src/media";
+
+import Button from "../../../../common/Button";
 import Media from "../../../../common/Media";
 import PostMedia from "../../PostMedia";
-import Button from "../../../../common/Button";
-import { XCircle } from "phosphor-react";
 import Spinner from "../../../../common/Spinner";
+import { XCircle } from "phosphor-react";
+
+import { Media as PostMediaType } from "shared/graphql/fragments/post";
+import { MediaType } from "shared/src/media";
 
 interface MediaPreviewProps {
   media?: PostMediaType;
@@ -13,6 +15,9 @@ interface MediaPreviewProps {
   postId?: string;
   userId: string;
   percent?: number;
+  removable?: boolean;
+  maxHeight?: number;
+  className?: string;
   onLoaded: (aspectRatio: number) => void;
   onRemove: () => void;
 }
@@ -23,6 +28,8 @@ const MediaPreview: FC<MediaPreviewProps> = ({
   userId,
   postId,
   percent,
+  removable = true,
+  maxHeight,
   onLoaded,
   onRemove,
 }) => {
@@ -40,14 +47,15 @@ const MediaPreview: FC<MediaPreviewProps> = ({
   return (
     <>
       {(filePreview || media) && (
-        <div className="my-2">
-          <div className="relative rounded-lg overflow-hidden">
+        <div className="h-full">
+          <div className="relative rounded-lg overflow-hidden h-full">
             <>
               {filePreview && (
                 <Media
                   type={filePreview.type}
                   url={filePreview.url}
                   aspectRatio={aspectRatio}
+                  maxHeight={maxHeight}
                   onLoad={(aspectRatio) => {
                     URL.revokeObjectURL(filePreview.url);
                     setAspectRatio(aspectRatio);
@@ -64,13 +72,15 @@ const MediaPreview: FC<MediaPreviewProps> = ({
                 <Spinner indeterminate={false} percent={percent} size={40} />
               </div>
             )}
-            <Button
-              variant="text"
-              className="!absolute top-2 right-1 py-0"
-              onClick={onRemove}
-            >
-              <XCircle size={32} color="#5F5F5F" weight="fill" />
-            </Button>
+            {removable && (
+              <Button
+                variant="text"
+                className="!absolute top-2 right-1 py-0"
+                onClick={onRemove}
+              >
+                <XCircle size={32} color="#5F5F5F" weight="fill" />
+              </Button>
+            )}
           </div>
         </div>
       )}

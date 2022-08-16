@@ -1,21 +1,28 @@
 import React, { FC } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Dimensions } from 'react-native';
 
 import { WHITE12 } from 'shared/src/colors';
 
 import PostContent from './PostItem/PostContent';
 import { PostSummary } from 'shared/graphql/fragments/post';
 
+const DEVICE_WIDTH = Dimensions.get('window').width;
+
 type Post = PostSummary;
-interface SharePostItem {
+interface SharePostItemProps {
   post: Post;
-  sharedBy: string;
+  onPress?: () => void;
 }
 
-const SharePostItem: FC<SharePostItem> = ({ post, sharedBy }) => {
+const SharePostItem: FC<SharePostItemProps> = ({ post, onPress }) => {
   return (
     <View style={styles.postContainer}>
-      <PostContent post={post} sharedBy={sharedBy} hideMenu />
+      <PostContent
+        post={post}
+        hideMenu
+        itemWidth={DEVICE_WIDTH - 66}
+        onPress={onPress}
+      />
     </View>
   );
 };

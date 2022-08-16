@@ -29,7 +29,11 @@ const PAppContainer = forwardRef<KeyboardAwareScrollView, AppContainerProps>(
       modal = false,
     } = props;
 
-    const content = (
+    const content = disableKeyboardScroll ? (
+      <View style={[styles.container, modal ? styles.modal : null, style]}>
+        {children}
+      </View>
+    ) : (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View style={[styles.container, modal ? styles.modal : null, style]}>
           {children}

@@ -7,7 +7,9 @@ interface MediaProps {
   url: string;
   type?: MediaType;
   aspectRatio?: number;
-  controls?: boolean;
+  hideControls?: boolean;
+  maxHeight?: number;
+  multiple?: boolean;
   onLoad?: (aspectRatio: number) => void;
   documentLink?: string;
 }
@@ -16,12 +18,13 @@ const Media: FC<MediaProps> = ({
   url,
   type: mediaType = getMediaTypeFrom(url),
   aspectRatio: ratioValue,
-  controls = true,
+  hideControls,
+  maxHeight = 700,
+  multiple = false,
   onLoad,
   documentLink,
 }) => {
-  const maxHeight = 700;
-  const aspectRatio = ratioValue != 0 ? ratioValue : 1;
+  const aspectRatio = ratioValue !== 0 ? ratioValue : 1;
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [videoPaused, setVideoPaused] = useState(false);
   const { ref: inViewRef, inView: isVideoInView } = useInView({
@@ -57,10 +60,10 @@ const Media: FC<MediaProps> = ({
   };
 
   return (
-    <div className="bg-black relative">
+    <div className={`bg-black relative h-full ${multiple ? "rounded-lg" : ""}`}>
       {mediaType == "video" && (
         <div
-          className={`mx-auto max-h[${maxHeight}] ${
+          className={`mx-auto h-full max-h[${maxHeight}] ${
             aspectRatio ? `aspect-[${aspectRatio}]` : ""
           }`}
         >
@@ -69,8 +72,8 @@ const Media: FC<MediaProps> = ({
               inViewRef(element);
               videoRef.current = element;
             }}
-            className="w-full"
-            controls={controls}
+            className="w-full h-full"
+            controls={!hideControls}
             onLoadedMetadata={(data) => {
               const target = data.currentTarget;
               onLoad?.(target.videoWidth / target.videoHeight);
@@ -85,13 +88,15 @@ const Media: FC<MediaProps> = ({
           style={
             aspectRatio ? { maxWidth: `${maxHeight * aspectRatio}px` } : {}
           }
-          className="mx-auto"
+          className="mx-auto h-full"
         >
           <div
             style={
               aspectRatio ? { paddingBottom: `${100 / aspectRatio}%` } : {}
             }
-            className={`relative ${documentLink ? "cursor-pointer" : ""}`}
+            className={`relative w-full h-full ${
+              documentLink ? "cursor-pointer" : ""
+            }`}
             onClick={openDocument}
           >
             <div className="absolute inset-0">
@@ -99,9 +104,10 @@ const Media: FC<MediaProps> = ({
                 loader={() => url}
                 src={url}
                 alt=""
+                className={aspectRatio === 1 && multiple ? "rounded-lg" : ""}
                 layout="fill"
                 unoptimized={true}
-                objectFit="contain"
+                objectFit={multiple ? "cover" : "contain"}
                 onLoadingComplete={({ naturalWidth, naturalHeight }) => {
                   onLoad?.(naturalWidth / naturalHeight);
                 }}

@@ -24,9 +24,16 @@ import EmojiPicker from "../../../common/EmojiPicker";
 import Input from "desktop/app/components/common/Input";
 import Label from "desktop/app/components/common/Label";
 import LinkPreview from "../LinkPreview";
+import MediaPreview from "./MediaPreview";
+import MediaSelector, {
+  mediaSchema,
+  Media,
+} from "./MediaPreview/MediaSelector";
 import MentionTextarea, { mentionTextSchema } from "../MentionTextarea";
 import ModalDialog from "../../../common/ModalDialog";
+import Post from "../Post";
 import Spinner from "desktop/app/components/common/Spinner";
+import { toast } from "../../../common/Toast";
 
 import { getInitials } from "../../../../lib/utilities";
 import { generateThumbnail } from "desktop/app/lib/pdf-thumbnail";
@@ -41,11 +48,9 @@ import { PostSummary } from "shared/graphql/fragments/post";
 import { useEditPost } from "shared/graphql/mutation/posts/useEditPost";
 import { hrefFromLink, isWebLink, LINK_PATTERN } from "shared/src/patterns";
 import { useAccountContext } from "shared/context/Account";
-import MediaPreview from "./MediaPreview";
 import { AudienceOptions } from "backend/schemas/post";
 import { AccreditationEnum, AccreditationOptions } from "backend/schemas/user";
 import { useSharePost } from "shared/graphql/mutation/posts/useSharePost";
-import Post from "../Post";
 
 import {
   useLinkPreview,
@@ -82,11 +87,7 @@ const audienceOptions = Object.keys(AudienceOptions).map((key) => {
 type FormValues = {
   user: string;
   audience: Audience;
-  media?: {
-    url: string;
-    aspectRatio: number;
-    documentLink?: string;
-  };
+  media: Media[];
   categories: PostCategory[];
   mentionInput: {
     body?: string;
@@ -105,23 +106,16 @@ const schema = yup
       .oneOf<Audience>(Audiences)
       .default("EVERYONE")
       .required(),
-    media: yup
-      .object({
-        url: yup.string().required().default(""),
-        aspectRatio: yup.number().required().default(1.58),
-        documentLink: yup.string().default(""),
-      })
-      .default(undefined)
-      .notRequired(),
+    media: mediaSchema,
     categories: categoriesSchema,
     mentionInput: mentionTextSchema,
   })
   .required();
 
 export type PostActionType =
-  | { type: "create"; post?: undefined; file?: File }
-  | { type: "edit"; post: PostSummary; file?: never }
-  | { type: "share"; post: PostSummary; file?: never };
+  | { type: "create"; post?: PostSummary; files?: FileList }
+  | { type: "edit"; post: PostSummary; files?: never[] }
+  | { type: "share"; post: PostSummary; files?: never[] };
 
 interface EditPostModalProps {
   actionData: PostActionType;
@@ -130,54 +124,26 @@ interface EditPostModalProps {
 }
 
 const EditPostModal: FC<EditPostModalProps> = ({
-  actionData,
+  actionData: { type: actionType, post: actionPost },
   show,
   onClose,
 }) => {
   const account = useAccountContext();
-  const [selectedFile, setSelectedFile] = useState(actionData.file);
-  const [showCategories, setShowCategories] = useState(
-    actionData.type == "edit"
-  );
   const [createPost] = useCreatePost();
   const [editPost] = useEditPost();
   const [sharePost] = useSharePost();
   const [fetchUploadLink] = useFetchUploadLink();
-  const [loading, setLoading] = useState(false);
-  const [visibleEmoji, setVisibleEmoji] = useState(false);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
-  const [uploadingPercent, setUploadingPercent] = useState<number>();
-  const previewLink = useRef<string | undefined>(undefined);
-  const [preview, setPreview] = useState<LinkPreviewResponse>();
-  const [previewLoading, setPreviewLoading] = useState(false);
   const [fetchLinkPreview] = useLinkPreview();
 
-  useEffect(() => {
-    // Should focus textarea automatically when component mounted.
-    // currently we are using setTimeout since focus() method does not work
-    // when click to open from "Edit Post" button menu.
-    // #headlessui, #menu, #https://blog.maisie.ink/react-ref-autofocus/
-    if (inputRef?.current) {
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 100);
-    }
-  }, []);
-  const userOptions =
-    account.companies.length > 0
-      ? [
-          {
-            icon: <User color="currentColor" weight="fill" size={24} />,
-            title: `${account.firstName} ${account.lastName}`,
-            value: account._id,
-          },
-          ...account.companies.map((company) => ({
-            icon: <Buildings color="currentColor" weight="fill" size={24} />,
-            title: company.name,
-            value: company._id,
-          })),
-        ]
-      : [];
+  const [showCategories, setShowCategories] = useState(actionType == "edit");
+  const [loading, setLoading] = useState(false);
+  const [uploadingPercent, setUploadingPercent] = useState<number>();
+  const [preview, setPreview] = useState<LinkPreviewResponse>();
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [visibleEmoji, setVisibleEmoji] = useState(false);
+
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const previewLink = useRef<string | undefined>(undefined);
   const suggestionsContainer = useRef<HTMLDivElement>(null);
   const changeCallback = useRef(
     _.debounce(async (linkToFetch: string) => {
@@ -194,42 +160,57 @@ const EditPostModal: FC<EditPostModalProps> = ({
     }, 500)
   ).current;
 
-  let defaultValues = {};
-  {
-    if (actionData.type == "create") {
-      defaultValues = {
-        user: account._id,
-        audience: "EVERYONE",
-        categories: [],
-      };
-    } else if (actionData.type == "edit") {
-      const post = actionData.post;
-      defaultValues = {
-        user: post.userId,
-        audience: post.audience,
-        media: post.media
-          ? {
-              aspectRatio: post.media.aspectRatio,
-              url: post.media.url,
-              documentLink: post.media.documentLink,
-            }
-          : undefined,
-        categories: post.categories,
-        mentionInput: {
-          body: post.body,
-        },
-      };
-    } else if (actionData.type == "share") {
-      const post = actionData.post;
-      defaultValues = {
-        user: account._id,
-        mentionInput: {
-          body: "",
-        },
-        audience: post.audience,
-        categories: post.categories,
-      };
+  useEffect(() => {
+    // Should focus textarea automatically when component mounted.
+    // currently we are using setTimeout since focus() method does not work
+    // when click to open from "Edit Post" button menu.
+    // #headlessui, #menu, #https://blog.maisie.ink/react-ref-autofocus/
+    if (inputRef?.current) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
     }
+  }, []);
+
+  const userOptions =
+    account.companies.length > 0
+      ? [
+          {
+            icon: <User color="currentColor" weight="fill" size={24} />,
+            title: `${account.firstName} ${account.lastName}`,
+            value: account._id,
+          },
+          ...account.companies.map((company) => ({
+            icon: <Buildings color="currentColor" weight="fill" size={24} />,
+            title: company.name,
+            value: company._id,
+          })),
+        ]
+      : [];
+
+  let defaultValues = {};
+  if (actionType == "create") {
+    defaultValues = {
+      user: account._id,
+      audience: "EVERYONE",
+      categories: [],
+      media: [],
+    };
+  } else if (actionType == "edit" && actionPost) {
+    defaultValues = {
+      user: actionPost.userId,
+      audience: actionPost.audience,
+      media: actionPost.media ?? [],
+      categories: actionPost.categories,
+      mentionInput: { body: actionPost.body ?? "" },
+    };
+  } else if (actionType == "share" && actionPost) {
+    defaultValues = {
+      user: account._id,
+      mentionInput: { body: "" },
+      audience: actionPost.audience,
+      categories: actionPost.categories,
+    };
   }
 
   const {
@@ -238,29 +219,24 @@ const EditPostModal: FC<EditPostModalProps> = ({
     getValues,
     setValue,
     watch,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<yup.InferType<typeof schema>>({
     resolver: yupResolver(schema),
     defaultValues: schema.cast(defaultValues) as DefaultValues<FormValues>,
     mode: "onChange",
   });
-
-  const onEmojiClick = (emojiObject: any) => {
-    const body = getValues("mentionInput.body");
-    setValue("mentionInput.body", body + emojiObject.native);
-    setVisibleEmoji(false);
-    inputRef?.current?.focus();
-  };
+  const currentMedia = watch("media") ?? [];
 
   useEffect(() => {
     const subscription = watch(({ mentionInput, media }, { name }) => {
-      if (name == "mentionInput.body" && !media) {
+      if (name == "mentionInput.body" && (!media || media.length === 0)) {
         const body = mentionInput?.body;
         if (!body) {
           previewLink.current = undefined;
           setPreview(undefined);
           return;
         }
+
         const result = body.matchAll(LINK_PATTERN);
         const matches = Array.from(result);
         if (matches.length > 0) {
@@ -270,10 +246,11 @@ const EditPostModal: FC<EditPostModalProps> = ({
           if (linkToFetch && linkToFetch != previewLink.current) {
             changeCallback(linkToFetch);
           }
-        } else {
-          previewLink.current = undefined;
-          setPreview(undefined);
+          return;
         }
+
+        previewLink.current = undefined;
+        setPreview(undefined);
       }
     });
     return () => subscription.unsubscribe();
@@ -296,13 +273,20 @@ const EditPostModal: FC<EditPostModalProps> = ({
         delete previewData.__typename;
       }
 
-      if (actionData.type == "create") {
+      const sendingMedias = media?.map(
+        ({ url, aspectRatio, documentLink }) => ({
+          url,
+          aspectRatio,
+          documentLink,
+        })
+      );
+      if (actionType == "create") {
         const { data } = await createPost({
           variables: {
             post: {
               audience,
               categories,
-              media,
+              media: sendingMedias ?? [],
               preview: previewData,
               body: mentionInput.body,
               mentionIds: mentionInput.mentions?.map((mention) => mention.id),
@@ -312,22 +296,23 @@ const EditPostModal: FC<EditPostModalProps> = ({
         });
         if (data && data.createPost) {
           // When media type is only video, pass postId as param
+          const mediaTypes = media?.map((media) =>
+            getMediaTypeFrom(media?.url ?? "")
+          );
           onClose(
-            getMediaTypeFrom(media?.url ?? "") === "video"
-              ? data.createPost?._id
-              : undefined
+            mediaTypes?.includes("video") ? data.createPost?._id : undefined
           );
           return;
         }
-      } else if (actionData.type == "edit") {
+      } else if (actionType == "edit" && actionPost) {
         const { data } = await editPost({
           variables: {
             post: {
-              _id: actionData.post._id,
-              userId: actionData.post.userId,
+              _id: actionPost._id,
+              userId: actionPost.userId,
               audience,
               categories,
-              media,
+              media: sendingMedias ? sendingMedias : [],
               preview: previewData,
               body: mentionInput.body,
               mentionIds: mentionInput.mentions?.map((mention) => mention.id),
@@ -336,16 +321,17 @@ const EditPostModal: FC<EditPostModalProps> = ({
         });
         if (data && data.editPost) {
           // When media type is only video, pass postId as param
+          const mediaTypes = media?.map((media) =>
+            getMediaTypeFrom(media?.url ?? "")
+          );
           onClose(
-            getMediaTypeFrom(media?.url ?? "") === "video"
-              ? data.editPost?._id
-              : undefined
+            mediaTypes?.includes("video") ? data.editPost?._id : undefined
           );
         }
-      } else if (actionData.type == "share") {
+      } else if (actionType == "share" && actionPost) {
         const { data } = await sharePost({
           variables: {
-            postId: actionData.post._id,
+            postId: actionPost._id,
             post: {
               body: mentionInput.body ?? "",
               mentionIds: mentionInput.mentions?.map((mention) => mention.id),
@@ -358,6 +344,13 @@ const EditPostModal: FC<EditPostModalProps> = ({
         }
       }
     } catch (err) {}
+  };
+
+  const onEmojiClick = (emojiObject: any) => {
+    const body = getValues("mentionInput.body");
+    setValue("mentionInput.body", body + emojiObject.native);
+    setVisibleEmoji(false);
+    inputRef?.current?.focus();
   };
 
   const upload = useCallback(
@@ -396,6 +389,8 @@ const EditPostModal: FC<EditPostModalProps> = ({
         });
       } catch (err) {
         console.log("Error uploading file", err);
+        toast.error("Error uploading file.");
+        return;
       }
 
       return remoteName;
@@ -403,21 +398,52 @@ const EditPostModal: FC<EditPostModalProps> = ({
     [account._id, fetchUploadLink]
   );
 
-  useEffect(() => {
-    const uploadMedia = async (file: File) => {
+  const uploadMedia = useCallback(
+    async (file: File) => {
       setUploadingPercent(0);
       setLoading(true);
 
       const url = await upload(file);
-      setValue("media", { ...watch("media"), url });
 
       setUploadingPercent(undefined);
       setLoading(false);
-    };
-    if (selectedFile) {
-      uploadMedia(selectedFile);
+
+      return url;
+    },
+    [upload]
+  );
+
+  const handleChangeMedia = async (files: File[]) => {
+    if (files.length > 0) {
+      if (currentMedia.length + files.length > 5) {
+        toast.error("You can upload up to 5 files.");
+        return;
+      }
+
+      const newMedia = await Promise.all(
+        files.map(async (file) => ({
+          file: file,
+          url: (await uploadMedia(file)) ?? "",
+          aspectRatio: 1.58,
+          documentLink: undefined,
+        }))
+      );
+
+      setValue("media", [
+        ...currentMedia,
+        ...newMedia.filter((media) => media.url !== ""),
+      ]);
     }
-  }, [account._id, fetchUploadLink, selectedFile, setValue, watch, upload]);
+  };
+
+  const handleRemoveMedia = (idx: number) => {
+    const media = currentMedia.filter((media, index) => index !== idx);
+    setValue("media", media);
+  };
+
+  const closeModal = () => {
+    onClose();
+  };
 
   return (
     <ModalDialog
@@ -429,9 +455,9 @@ const EditPostModal: FC<EditPostModalProps> = ({
         <div className="h-full md:flex flex-col">
           <div className="flex items-center justify-between p-4 border-b border-white/[.12]">
             <div className="text-xl text-white font-medium">
-              {actionData.type == "create" && "Create Post"}
-              {actionData.type == "edit" && "Edit Post"}
-              {actionData.type == "share" && "Share Post"}
+              {actionType == "create" && "Create Post"}
+              {actionType == "edit" && "Edit Post"}
+              {actionType == "share" && "Share Post"}
             </div>
             <Button variant="text">
               <X
@@ -460,7 +486,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
                     items={audienceOptions}
                     control={control}
                     name="audience"
-                    readonly={actionData.type == "share"}
+                    readonly={actionType == "share"}
                   />
                 </div>
               </div>
@@ -475,7 +501,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
                     control={control}
                     name="mentionInput"
                     placeholder={`Create a post${
-                      actionData.type !== "share"
+                      actionType !== "share"
                         ? "\nUse $ before ticker symbols: ex: $TSLA\nUse @ to tag a user, page or fund"
                         : ""
                     }`}
@@ -484,41 +510,52 @@ const EditPostModal: FC<EditPostModalProps> = ({
                     }
                   />
                 </div>
-                {actionData.type != "share" && (
-                  <MediaPreview
-                    media={watch("media") ? actionData.post?.media : undefined}
-                    file={selectedFile}
-                    postId={actionData.post?._id}
-                    userId={actionData.post?.userId ?? account._id}
-                    percent={uploadingPercent}
-                    onLoaded={(aspectRatio) => {
-                      const media = watch("media");
-                      setValue("media", { ...media, aspectRatio });
-                    }}
-                    onRemove={() => {
-                      setSelectedFile(undefined);
-                      setValue("media", undefined);
-                    }}
-                  />
-                )}
-                {actionData.type != "share" && !selectedFile && (
-                  <>
-                    {previewLoading ? (
-                      <div className="my-2 w-100 aspect-video">
+                <div className="w-full">
+                  {actionType != "share" && (
+                    <div className="flex flex-row overflow-x-auto w-full items-center mb-3">
+                      {currentMedia.length === 1 && (
+                        <div className="w-full flex-shrink-0 h-full">
+                          <MediaPreview
+                            media={currentMedia[0]}
+                            className="my-0"
+                            maxHeight={294}
+                            removable={true}
+                            file={
+                              (currentMedia[0].file as unknown as File) ??
+                              undefined
+                            }
+                            postId={actionPost?._id}
+                            userId={actionPost?.userId ?? account._id}
+                            percent={uploadingPercent}
+                            onLoaded={(aspectRatio) => {
+                              const newMedia = [
+                                { ...currentMedia[0], aspectRatio },
+                              ];
+                              setValue("media", newMedia);
+                            }}
+                            onRemove={() => handleRemoveMedia(0)}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                {actionType !== "share" &&
+                  preview &&
+                  currentMedia.length === 0 && (
+                    <div className="my-2 w-100 aspect-video">
+                      {previewLoading ? (
                         <Spinner />
-                      </div>
-                    ) : preview ? (
-                      <div className="my-2 w-100 aspect-video">
+                      ) : (
                         <LinkPreview previewData={preview} />
-                      </div>
-                    ) : null}
-                  </>
-                )}
-                {actionData.type == "share" && (
+                      )}
+                    </div>
+                  )}
+                {actionType == "share" && actionPost && (
                   <div className="border border-brand-overlay/[.1] rounded mt-2">
                     <div className="rounded overflow-hidden">
                       <Post
-                        post={actionData.post}
+                        post={actionPost}
                         isPreview={true}
                         className="shadow-none"
                       />
@@ -530,7 +567,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
                 <div className="flex items-center">
                   <Label
                     className={`flex items-center cursor-pointer hover:opacity-80 transition select-none ${
-                      actionData.type == "share"
+                      actionType == "share" || !!currentMedia[0]?.documentLink
                         ? "pointer-events-none opacity-40"
                         : ""
                     }`}
@@ -549,16 +586,20 @@ const EditPostModal: FC<EditPostModalProps> = ({
                       id="image-select"
                       type="file"
                       value=""
-                      onInput={async (event) => {
-                        setSelectedFile(event.currentTarget.files?.[0]);
-                      }}
+                      onInput={(event) =>
+                        handleChangeMedia(
+                          Array.from(event.currentTarget.files ?? [])
+                        )
+                      }
                       className="hidden"
-                      accept="image/*, video/*"
+                      accept={`image/*${
+                        currentMedia.length === 0 ? ", video/*" : ""
+                      }`}
                     />
                   </Label>
                   <Label
                     className={`flex items-center cursor-pointer hover:opacity-80 transition select-none ml-4 ${
-                      actionData.type == "share"
+                      actionType == "share" || currentMedia.length >= 1
                         ? "pointer-events-none opacity-40"
                         : ""
                     }`}
@@ -577,17 +618,21 @@ const EditPostModal: FC<EditPostModalProps> = ({
                         const file = event.currentTarget.files?.[0];
                         if (file) {
                           const previewFile = await generateThumbnail(file);
-                          setSelectedFile(previewFile ?? undefined);
+                          if (!previewFile) {
+                            return;
+                          }
 
+                          await handleChangeMedia([previewFile]);
                           const pdfUrl = await upload(file, false);
-                          setValue("media", {
-                            ...watch("media"),
-                            documentLink: pdfUrl,
-                          });
+                          const { media: updatedMedia } = getValues();
+                          setValue("media", [
+                            { ...updatedMedia[0], documentLink: pdfUrl },
+                          ]);
                         }
                       }}
                       className="hidden"
                       accept=".pdf"
+                      disabled={currentMedia.length >= 1}
                     />
                   </Label>
                   <div
@@ -613,7 +658,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
                 </div>
               )}
             </div>
-            {showCategories && (
+            {showCategories ? (
               <div className="w-full md:border-l border-white/[.12] md:w-80">
                 <CategorySelector
                   control={control}
@@ -625,13 +670,26 @@ const EditPostModal: FC<EditPostModalProps> = ({
                   }
                 />
               </div>
-            )}
+            ) : currentMedia.length > 1 ? (
+              <div className="w-full md:border-l border-white/[.12] md:w-80">
+                <MediaSelector
+                  control={control}
+                  name="media"
+                  userId={account._id}
+                  error={
+                    errors.media ? "Please select up to 5 photo/videos." : ""
+                  }
+                  onHandleChange={handleChangeMedia}
+                  onRemoveMedia={handleRemoveMedia}
+                />
+              </div>
+            ) : null}
           </div>
           <div className="border-t border-white/[.12] flex items-center justify-between p-4">
             <Button
               variant="text"
               className="text-primary font-medium"
-              onClick={() => onClose()}
+              onClick={closeModal}
             >
               Cancel
             </Button>
@@ -640,28 +698,30 @@ const EditPostModal: FC<EditPostModalProps> = ({
                 type="button"
                 variant="gradient-primary"
                 className="w-48 font-medium"
-                disabled={loading}
+                disabled={loading || !isValid}
                 loading={loading}
                 onClick={() => handleSubmit(onSubmit)()}
               >
-                {actionData.type == "edit" ? "Save Updates" : "Post"}
+                {actionType == "edit" ? "Save Updates" : "Post"}
               </Button>
             ) : (
               <Button
                 type="button"
                 variant="gradient-primary"
                 className="w-48 font-medium"
-                disabled={loading}
+                disabled={
+                  loading || (actionType !== "share" && currentMedia.length > 5)
+                }
                 loading={loading}
                 onClick={() => {
-                  if (actionData.type == "create") {
+                  if (actionType == "create") {
                     setShowCategories(true);
-                  } else if (actionData.type == "share") {
+                  } else if (actionType == "share") {
                     handleSubmit(onSubmit)();
                   }
                 }}
               >
-                {actionData.type == "share" ? "Share" : "Next"}
+                {actionType == "share" ? "Share" : "Next"}
               </Button>
             )}
           </div>

@@ -10,9 +10,17 @@ interface PostMediaProps {
   userId: string;
   postId?: string;
   media: MediaType;
+  multiple?: boolean;
+  aspectRatio?: number;
 }
 
-const PostMedia: FC<PostMediaProps> = ({ userId, media, postId }) => {
+const PostMedia: FC<PostMediaProps> = ({
+  userId,
+  media,
+  postId,
+  multiple,
+  aspectRatio,
+}) => {
   const key = postId ? `${postId}/${media.url}` : `${media.url}`;
   const url = `${NEXT_PUBLIC_AWS_BUCKET}/posts/${userId}/${key}`;
   const documentLink = media.documentLink
@@ -21,8 +29,9 @@ const PostMedia: FC<PostMediaProps> = ({ userId, media, postId }) => {
   return (
     <Media
       url={url}
-      aspectRatio={media.aspectRatio}
+      aspectRatio={aspectRatio ?? (multiple ? 1 : media.aspectRatio)}
       documentLink={documentLink}
+      multiple={multiple}
     />
   );
 };

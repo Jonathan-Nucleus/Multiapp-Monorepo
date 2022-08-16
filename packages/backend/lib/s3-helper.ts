@@ -11,6 +11,7 @@ import { S3RequestPresigner } from "@aws-sdk/s3-request-presigner";
 import type { SignatureV4Init } from "@aws-sdk/signature-v4";
 import { v4 as uuid } from "uuid";
 import { formatUrl } from "@aws-sdk/util-format-url";
+import { isVideo as isVideoFile } from "./utils";
 
 import { InternalServerError } from "./apollo/validate";
 
@@ -21,8 +22,6 @@ const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY;
 const AWS_UPLOAD_REGION = process.env.AWS_REGION;
 const MRAP_ENDPOINT = process.env.MRAP_ENDPOINT;
 const S3_BUCKET = process.env.AWS_S3_BUCKET;
-
-const VIDEO_EXTS = ["mp4", "mov", "avi"];
 
 interface AWSCredentialsResponse {
   AccessKeyId: string;
@@ -77,7 +76,7 @@ export async function getUploadUrl(
   }
 
   const remoteFilename = `${uuid()}.${fileExt}`;
-  const isVideo = VIDEO_EXTS.some((ext) => fileExt === ext);
+  const isVideo = isVideoFile(remoteFilename);
   const remoteKey = `${
     isVideo && type === "post" ? "uploads/" : ""
   }${type}s/${id}/${remoteFilename}`;
@@ -145,9 +144,7 @@ export async function movePostMedia(
     throw new InternalServerError("Missing AWS configuration");
   }
 
-  const isVideo = VIDEO_EXTS.some((ext) =>
-    filename.toLowerCase().trim().endsWith(ext)
-  );
+  const isVideo = isVideoFile(filename);
   const originalKey = `${isVideo ? "uploads/" : ""}posts/${userId}/${filename}`;
   const newKey = `${
     isVideo ? "uploads/" : ""
@@ -185,6 +182,9 @@ export async function movePostMedia(
     };
   } catch (err) {
     console.error(err);
-    throw new InternalServerError("Error moving media asset");
+    return {
+      success: false,
+      mediaReady: false,
+    };
   }
 }

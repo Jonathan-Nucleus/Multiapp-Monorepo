@@ -33,7 +33,7 @@ function CategorySelector<
 >({ error, ...controllerProps }: CategorySelectorProps<TFieldValues, TName>) {
   return (
     <div className="flex flex-col h-full">
-      <div className="text-white/[.6] p-4 border-t md:border-t-0 border-b border-white/[.12]">
+      <div className="text-white/[.6] px-4 pt-4 pb-1 border-t md:border-t-0 border-white/[.12]">
         <div className="text-sm">Categories</div>
         <div className="text-xs mt-2">
           Select a{" "}
@@ -42,7 +42,7 @@ function CategorySelector<
         </div>
         {error && <div className="text-xs text-error mt-2">{error}</div>}
       </div>
-      <div className="py-2 min-h-0 overflow-y-auto">
+      <div className="py-2 min-h-0 overflow-y-auto border-t border-white/[.12] mt-2">
         <Controller
           {...controllerProps}
           render={({ field }) => (

@@ -69,7 +69,7 @@ const ChooseCategory: ChooseCategoryScreen = ({ route, navigation }) => {
 
   const handleChange = (categoryIndex: number): void => {
     const { value } = categoriesField;
-    let newValue = [...value];
+    const newValue = [...value];
 
     const index = value.indexOf(CATEGORY_OPTIONS[categoryIndex].value);
     if (index >= 0) {

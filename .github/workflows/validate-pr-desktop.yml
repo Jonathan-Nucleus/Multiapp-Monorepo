@@ -2,27 +2,22 @@ name: Validate PR (Desktop)
 on:
   pull_request:
     branches:
-      - 'main'
+      - "main"
     paths:
-      - 'packages/desktop/**'
-      - 'package.json'
-      - '.github/workflows/validate-pr-desktop.yml'
+      - "packages/desktop/**"
+      - "package.json"
+      - ".github/workflows/validate-pr-desktop.yml"
 
 jobs:
   validate-pr-desktop:
     name: Validate PR (Desktop)
-    runs-on: ubuntu-latest
+    runs-on:
+      - self-hosted
+      - linux
+      - x64
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
-
-      - name: Setup node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: 16
-
-      - name: Install yarn
-        run: npm install -g yarn
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile

@@ -7,7 +7,6 @@ import React, {
   useState,
 } from 'react';
 import {
-  FlatList,
   FlatListProps,
   ListRenderItem,
   Pressable,
@@ -17,6 +16,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
 import isEqual from 'react-fast-compare';
 import { SlidersHorizontal } from 'phosphor-react-native';
 import { useIsFocused } from '@react-navigation/native';
@@ -139,7 +139,9 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
   >(({ changed }) => {
     changed.forEach((token) => {
       const item = token.item as Post;
-      const hasVideo = isVideo(item.media?.url ?? '');
+      const hasVideo = item.media
+        ? item.media.map((mediaItem) => isVideo(mediaItem.url ?? '')).length > 0
+        : false;
       if (!token.isViewable && hasVideo) {
         const key = `${item.userId}/${item._id}`;
         stopVideo(key);
@@ -183,7 +185,7 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
     });
   };
 
-  const showHeaderTutorial = () => {
+  const showHeaderTutorial = (): void => {
     EventRegister.emit('headerTutorial');
     setTutorialOptions({ ...tutorialOptions, add: false, filter: false });
   };

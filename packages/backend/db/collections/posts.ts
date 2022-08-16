@@ -19,7 +19,7 @@ import {
 } from "../../lib/apollo/validate";
 import { User, Accreditation } from "../../schemas/user";
 import { Company } from "../../schemas/company";
-import { createSearchStage } from "../../lib/utils";
+import { createSearchStage, isVideo } from "../../lib/utils";
 
 type FilterOptions = {
   postIds?: MongoId[];
@@ -217,17 +217,27 @@ const createPostsCollection = (
      *
      * @returns   Persisted post data with id.
      */
-    create: async (
-      post: Post.Input,
-      userId: MongoId,
-      visible = true
-    ): Promise<Post.Mongo> => {
+    create: async (post: Post.Input, userId: MongoId): Promise<Post.Mongo> => {
       const { companyId, mentionIds, ...otherData } = post;
       const isCompany = !!companyId;
+
+      // Update media entries to reflect video files that have not yet been
+      // transcoded.
+      const media = post.media?.map((item) => ({
+        ...item,
+        ...(isVideo(item.url) ? { transcoded: false } : {}),
+      }));
+
+      // A post is only visible by default if it does not have media
+      // attachments. Otherwise, it is only visible once all media items
+      // have successfully been moved into the appropriate S3 bucket.
+      const visible = !media;
+
       const postData: Post.Mongo = {
         ...otherData,
         _id: new ObjectId(),
         mentionIds: mentionIds ? toObjectIds(mentionIds) : undefined,
+        media,
         visible,
         userId: toObjectId(companyId ?? userId),
         isCompany,
@@ -237,6 +247,7 @@ const createPostsCollection = (
       };
 
       const insertResult = await postsCollection.insertOne(postData);
+
       if (!insertResult.acknowledged) {
         throw new InternalServerError("Not able to add a post.");
       }
@@ -513,12 +524,13 @@ const createPostsCollection = (
       const result = await postsCollection.findOneAndUpdate(
         {
           _id: toObjectId(postId),
+          "media.transcoded": false,
           deleted: { $exists: false },
         },
         {
           $set: {
-            "media.url": mediaUrl,
-            "media.transcoded": true,
+            "media.$.url": mediaUrl,
+            "media.$.transcoded": true,
             visible: true,
           },
         },

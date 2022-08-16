@@ -10,7 +10,7 @@ import { Account } from "shared/context/Account";
 
 interface AddPostProps {
   account: Account;
-  onClick: (file?: File) => void;
+  onClick: (files?: FileList) => void;
 }
 
 const AddPost: FC<AddPostProps> = ({ account, onClick }) => {
@@ -45,10 +45,11 @@ const AddPost: FC<AddPostProps> = ({ account, onClick }) => {
             <Input
               type="file"
               value=""
+              multiple
               onInput={async (event) => {
-                const file = event.currentTarget.files?.[0];
-                if (file) {
-                  onClick?.(file);
+                const files = event.currentTarget.files;
+                if (files) {
+                  onClick?.(files);
                 }
               }}
               className="hidden"

@@ -9,13 +9,24 @@ interface IconButtonProps {
   viewStyle?: object;
   textStyle?: object;
   onPress?: () => void;
+  disabled?: boolean;
 }
 
 const IconButton: React.FC<IconButtonProps> = (props) => {
-  const { icon, label, viewStyle, textStyle, onPress } = props;
+  const {
+    icon,
+    label,
+    viewStyle,
+    textStyle,
+    onPress,
+    disabled = false,
+  } = props;
 
   return (
-    <TouchableOpacity onPress={onPress} style={[styles.wrapper, viewStyle]}>
+    <TouchableOpacity
+      onPress={onPress}
+      style={[styles.wrapper, viewStyle, disabled ? styles.disabled : null]}
+      disabled={disabled}>
       {icon}
       <PLabel label={label} textStyle={[styles.textStyle, textStyle]} />
     </TouchableOpacity>
@@ -32,5 +43,8 @@ const styles = StyleSheet.create({
   },
   textStyle: {
     marginLeft: 5,
+  },
+  disabled: {
+    opacity: 0.5,
   },
 });

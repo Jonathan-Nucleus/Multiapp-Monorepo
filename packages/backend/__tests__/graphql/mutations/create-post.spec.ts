@@ -48,10 +48,12 @@ describe("Mutations - createPost", () => {
     audience: Object.keys(AudienceOptions)[0],
     categories: [Object.keys(PostCategoryOptions)[0]],
     body: "test post body",
-    media: {
-      url: "test.png",
-      aspectRatio: 1.58,
-    },
+    media: [
+      {
+        url: "test.png",
+        aspectRatio: 1.58,
+      },
+    ],
   };
 
   beforeAll(async () => {
@@ -101,9 +103,11 @@ describe("Mutations - createPost", () => {
       variables: {
         post: {
           ...postData,
-          media: {
-            url: postData.media.url,
-          },
+          media: [
+            {
+              url: postData.media[0].url,
+            },
+          ],
           categories: ["test"],
         },
       },
@@ -118,9 +122,11 @@ describe("Mutations - createPost", () => {
       variables: {
         post: {
           ...postData,
-          media: {
-            aspectRatio: postData.media.aspectRatio,
-          },
+          media: [
+            {
+              aspectRatio: postData.media[0].aspectRatio,
+            },
+          ],
           categories: ["test"],
         },
       },

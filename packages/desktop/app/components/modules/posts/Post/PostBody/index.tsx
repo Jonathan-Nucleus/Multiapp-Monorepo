@@ -20,19 +20,52 @@ const PostBody: FC<PostBodyProps> = ({
         <div className="pb-2">
           {post.body && <BodyText text={post.body ?? ""} />}
         </div>
-        {post.preview && !post.media && !post.sharedPost && (
-          <div className="my-4">
-            <LinkPreview previewData={post.preview} />
-          </div>
-        )}
+        {post.preview &&
+          (!post.media || (post.media && post.media.length === 0)) &&
+          !post.sharedPost && (
+            <div className="my-4">
+              <LinkPreview previewData={post.preview} />
+            </div>
+          )}
       </div>
-      {post.media && (
-        <div className="relative h-auto mt-5 border-b border-white/[.12]">
-          <PostMedia
-            media={post.media}
-            userId={post.userId}
-            postId={post._id}
-          />
+      {post.media && post.media.length > 0 && (
+        <div
+          className={`mt-5 border-b border-white/[.12] grid gap-2 ${
+            post.media.length > 1 ? "mx-2 grid-cols-2" : "grid-cols-1"
+          }`}
+        >
+          {post.media.slice(0, 2).map((media, index) => (
+            <div key={index}>
+              <PostMedia
+                media={media}
+                userId={post.userId}
+                postId={post._id}
+                multiple={post.media && post.media?.length > 1}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+      {post.media && post.media.length > 2 && (
+        <div
+          className={`m-2 border-b border-white/[.12] grid gap-2 ${
+            post.media.length === 4 ? "grid-cols-2" : "grid-cols-3"
+          }`}
+        >
+          {post.media.slice(2, 5).map((media, index) => (
+            <div
+              key={index}
+              className={`${post.media?.length === 3 ? "col-span-3" : ""}`}
+            >
+              <PostMedia
+                media={media}
+                userId={post.userId}
+                postId={post._id}
+                multiple={post.media && post.media?.length > 1}
+                aspectRatio={post.media?.length === 3 ? 3 : undefined}
+              />
+            </div>
+          ))}
         </div>
       )}
       {post.sharedPost && (

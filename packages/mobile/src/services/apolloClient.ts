@@ -7,7 +7,6 @@ import {
   NormalizedCacheObject,
 } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
-import EncryptedStorage from 'react-native-encrypted-storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AsyncStorageWrapper, CachePersistor } from 'apollo3-cache-persist';
 import type { ApolloPersistOptions } from 'apollo3-cache-persist/types';
@@ -63,17 +62,19 @@ export const useInitializeClient =
         const token = await getToken();
 
         const errorLink = onError(
-          ({ graphQLErrors, networkError, operation }) => {
+          ({ graphQLErrors, networkError, operation, response }) => {
             if (graphQLErrors) {
               console.log('operation: ', operation);
               graphQLErrors.forEach(({ message, locations, path }) => {
                 console.log(
-                  '[GraphQL error]: Message: ',
+                  '[GraphQL error]: Message:',
                   message,
-                  ', Location: ',
+                  ', Location:',
                   locations,
-                  ', Path: ',
+                  ', Path:',
                   path,
+                  ', Stack',
+                  JSON.stringify(response, null, 2),
                 );
               });
             }

@@ -47,10 +47,12 @@ describe("Mutations - editPost", () => {
     body: faker.lorem.sentence(),
     audience: "EVERYONE",
     categories: ["NEWS"],
-    media: {
-      url: "test.png",
-      aspectRatio: 1.58,
-    },
+    media: [
+      {
+        url: "test.png",
+        aspectRatio: 1.58,
+      },
+    ],
     mentionIds: [toObjectId().toString()],
   };
 

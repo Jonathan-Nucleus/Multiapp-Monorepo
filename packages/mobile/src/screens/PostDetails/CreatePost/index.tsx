@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -8,6 +8,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
+  Dimensions,
 } from 'react-native';
 import { CircleSnail, Pie } from 'react-native-progress';
 import ImagePicker, { ImageOrVideo } from 'react-native-image-crop-picker';
@@ -45,6 +46,7 @@ import {
   WHITE,
   WHITE12,
   WHITE60,
+  BGDARK100,
 } from 'shared/src/colors';
 
 import {
@@ -75,6 +77,9 @@ import ExpandingInput, {
 import MentionsList from 'mobile/src/components/main/MentionsList';
 
 import { CreatePostScreen } from 'mobile/src/navigations/PostDetailsStack';
+import { Media } from 'shared/graphql/fragments/post';
+
+const DEVICE_WIDTH = Dimensions.get('window').width;
 
 import DocumentPicker, { types } from 'react-native-document-picker';
 import PdfThumbnail from 'react-native-pdf-thumbnail';
@@ -136,11 +141,13 @@ export const AUDIENCE_OPTIONS: Option<Audience>[] = [
 type FormValues = {
   userId: string;
   audience: Audience;
-  media?: {
-    url: string;
-    aspectRatio: number;
-    documentLink?: string;
-  };
+  media?:
+    | {
+        url: string;
+        aspectRatio: number;
+        documentLink?: string;
+        path?: string;
+      }[];
   body?: string;
   mentionIds: string[];
 };
@@ -154,17 +161,23 @@ const schema = yup
       .default('EVERYONE')
       .required(),
     media: yup
-      .object({
-        url: yup.string().required().default(''),
-        aspectRatio: yup.number().required().default(1.58),
-        documentLink: yup.string().default(''),
-      })
-      .default(undefined),
+      .array()
+      .of(
+        yup.object({
+          url: yup.string().required().default(''),
+          aspectRatio: yup.number().required().default(1.58),
+          documentLink: yup.string().default(''),
+          path: yup.string(),
+        }),
+      )
+      .ensure()
+      .default([])
+      .notRequired(),
     body: yup
       .string()
       .notRequired()
       .when('media', {
-        is: (media: FormValues['media']) => !media,
+        is: (media: FormValues['media']) => !media || media.length === 0,
         then: yup.string().required('Required'),
       }),
     mentionIds: yup
@@ -174,6 +187,10 @@ const schema = yup
       .default([]),
   })
   .required();
+
+export type LocalMedia = Media & {
+  path?: string;
+};
 
 const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   const { post } = route.params;
@@ -188,9 +205,6 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   const [audienceModalVisible, setAudienceModalVisible] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageData, setImageData] = useState<ImageOrVideo | undefined>(
-    undefined,
-  );
 
   const [mentionUsers, setMentionUsers] = useState<User[]>([]);
   const onMentionSelected = useRef<OnSelectUser>();
@@ -200,6 +214,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   const {
     handleSubmit,
     setValue,
+    getValues,
     watch,
     control,
     reset,
@@ -213,6 +228,13 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     mode: 'onChange',
   });
   const postUserId = watch('userId');
+  const { field: mediaField } = useController({ name: 'media', control });
+  const { field: mentionsField } = useController({
+    name: 'mentionIds',
+    control,
+  });
+  const watchBody = watch('body', '');
+  const previewExists = !!previewData;
 
   useEffect(() => {
     reset(
@@ -221,7 +243,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
             userId: post.userId,
             body: post.body ?? '',
             audience: post.audience,
-            media: post.media ?? undefined,
+            media: post.media ? (post.media as LocalMedia[]) : [],
             mentionIds: post.mentionIds ?? [],
           }
         : { userId: account?._id },
@@ -248,13 +270,6 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     }
   }, [account, setValue, post]);
 
-  const { field: mediaField } = useController({ name: 'media', control });
-  const { field: mentionsField } = useController({
-    name: 'mentionIds',
-    control,
-  });
-  const watchBody = watch('body', '');
-  const previewExists = !!previewData;
   useEffect(() => {
     const getData = async (): Promise<void> => {
       if (!watchBody) {
@@ -276,39 +291,147 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     }
   }, [watchBody, fetchPreviewData, previewExists]);
 
-  const onSubmit = (values: FormValues): void => {
-    if (!account) {
+  const onSubmit = useCallback(
+    (values: FormValues): void => {
+      if (!account) {
+        return;
+      }
+
+      const { userId, audience, body, mentionIds } = values;
+      let { media } = values;
+      if (attachment && media) {
+        media = [{ ...media[0], documentLink: attachment }];
+      }
+
+      navigation.navigate('ChooseCategory', {
+        ...(post ?? {}),
+        userId,
+        audience,
+        body,
+        media: media?.map(({ url, aspectRatio, path, documentLink }) => ({
+          url,
+          aspectRatio,
+          path,
+          documentLink,
+        })),
+        mentionIds, // TODO: Parse from body and add here
+      });
+    },
+    [account, navigation, post, attachment],
+  );
+
+  const uploadMedia = useCallback(
+    async (media: ImageOrVideo): Promise<void> => {
+      setUploading(true);
+
+      const fileUri = media.path;
+
+      const filename = fileUri.substring(fileUri.lastIndexOf('/') + 1);
+      const { data } = await fetchUploadLink({
+        variables: {
+          localFilename: filename.toLowerCase(),
+          type: 'POST',
+          id: account._id,
+        },
+      });
+
+      if (!data || !data.uploadLink) {
+        showMessage('error', 'Media upload failed');
+        return;
+      }
+
+      const { remoteName, uploadUrl } = data.uploadLink;
+      await upload(uploadUrl, fileUri);
+
+      const mediaValue = getValues('media') ?? [];
+      mediaField.onChange(
+        Array.from(
+          new Set([
+            ...mediaValue,
+            {
+              url: remoteName,
+              aspectRatio: media.width / media.height,
+              documentLink: attachment,
+              path: media.path,
+              width: media.width,
+              height: media.height,
+            },
+          ]),
+        ),
+      );
+
+      setUploadProgress(0);
+      setUploading(false);
+    },
+    [account._id, attachment, fetchUploadLink, getValues, mediaField],
+  );
+
+  const uploadFile = async (filePath: string): Promise<void> => {
+    setUploading(true);
+    const filename = filePath.substring(filePath.lastIndexOf('/') + 1);
+    const { data } = await fetchUploadLink({
+      variables: {
+        localFilename: filename.toLowerCase(),
+        type: 'POST',
+        id: account._id,
+      },
+    });
+
+    if (!data || !data.uploadLink) {
+      showMessage('error', 'Attachment upload failed');
       return;
     }
 
-    // eslint-disable-next-line prefer-const
-    let { userId, audience, body, media, mentionIds } = values;
-
-    if (attachment && media) {
-      media = { ...media, documentLink: attachment };
-    }
-
-    navigation.navigate('ChooseCategory', {
-      ...(post ?? {}),
-      userId,
-      audience,
-      body,
-      media: media ?? undefined,
-      localMediaPath: imageData?.path,
-      mentionIds, // TODO: Parse from body and add here
-    });
+    const { remoteName, uploadUrl } = data.uploadLink;
+    await upload(uploadUrl, filePath);
+    setAttachment(remoteName);
   };
 
-  const openPicker = async (): Promise<void> => {
+  const upload = async (uploadUrl: string, fileUri: string): Promise<void> => {
+    try {
+      await new Promise((resolver, rejecter) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = () => {
+          if (xhr.status === 200) {
+            resolver(true);
+          } else {
+            const error = new Error(xhr.response);
+            rejecter(error);
+          }
+        };
+        xhr.onerror = (error) => {
+          rejecter(error);
+        };
+        xhr.upload.onprogress = (evt) => {
+          setUploadProgress(evt.loaded / evt.total);
+        };
+        xhr.open('PUT', uploadUrl);
+        xhr.send({ uri: fileUri });
+      });
+    } catch (err) {
+      console.log('Error uploading file', err);
+    }
+  };
+
+  const openPicker = useCallback(async (): Promise<void> => {
+    if (mediaField.value && mediaField.value.length === 5) {
+      showMessage('error', 'You can upload only upload up to 5 photos');
+      return;
+    }
+
     const image = await ImagePicker.openPicker({
       width: 300,
       height: 400,
       cropping: false,
       compressImageQuality: 0.8,
       compressVideoPreset: 'Passthrough',
+      forceJpg: true,
+      multiple: false,
+      mediaType: mediaField.value.length >= 1 ? 'photo' : 'any',
     });
+
     await uploadMedia(image);
-  };
+  }, [mediaField.value, uploadMedia]);
 
   const takePhoto = async (): Promise<void> => {
     const image = await ImagePicker.openCamera({
@@ -370,90 +493,15 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     }
   };
 
-  const uploadMedia = async (media: ImageOrVideo): Promise<void> => {
-    setUploading(true);
-
-    const fileUri = media.path;
-
-    const filename = fileUri.substring(fileUri.lastIndexOf('/') + 1);
-    const { data } = await fetchUploadLink({
-      variables: {
-        localFilename: filename.toLowerCase(),
-        type: 'POST',
-        id: account._id,
-      },
-    });
-
-    if (!data || !data.uploadLink) {
-      showMessage('error', 'Media upload failed');
-      return;
-    }
-
-    const { remoteName, uploadUrl } = data.uploadLink;
-    await upload(uploadUrl, fileUri);
-
-    mediaField.onChange({
-      url: remoteName,
-      documentLink: attachment,
-      aspectRatio: media.width / media.height,
-    });
-
-    setImageData(media);
-    setUploadProgress(0);
-    setUploading(false);
-  };
-
-  const uploadFile = async (filePath: string): Promise<void> => {
-    setUploading(true);
-    const filename = filePath.substring(filePath.lastIndexOf('/') + 1);
-    const { data } = await fetchUploadLink({
-      variables: {
-        localFilename: filename.toLowerCase(),
-        type: 'POST',
-        id: account._id,
-      },
-    });
-
-    if (!data || !data.uploadLink) {
-      showMessage('error', 'Attachment upload failed');
-      return;
-    }
-
-    const { remoteName, uploadUrl } = data.uploadLink;
-    await upload(uploadUrl, filePath);
-    setAttachment(remoteName);
-  };
-
-  const upload = async (uploadUrl: string, fileUri: string): Promise<void> => {
-    try {
-      await new Promise((resolver, rejecter) => {
-        const xhr = new XMLHttpRequest();
-        xhr.onload = () => {
-          if (xhr.status === 200) {
-            resolver(true);
-          } else {
-            const error = new Error(xhr.response);
-            rejecter(error);
-          }
-        };
-        xhr.onerror = (error) => {
-          rejecter(error);
-        };
-        xhr.upload.onprogress = (evt) => {
-          setUploadProgress(evt.loaded / evt.total);
-        };
-        xhr.open('PUT', uploadUrl);
-        xhr.send({ uri: fileUri });
-      });
-    } catch (err) {
-      console.log('Error uploading file', err);
-    }
-  };
-
-  const clearImage = (): void => {
-    mediaField.onChange(undefined);
-    setImageData(undefined);
-  };
+  const clearImage = useCallback(
+    (index: number): void => {
+      if (mediaField.value && mediaField.value.length > index) {
+        mediaField.value.splice(index, 1);
+        mediaField.onChange(mediaField.value);
+      }
+    },
+    [mediaField],
+  );
 
   const postAsData: Option[] = [
     {
@@ -616,44 +664,9 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
                       )}
                     </View>
                   ) : null}
-                  {imageData || mediaField.value ? (
-                    <View style={styles.attachment}>
-                      <PostMedia
-                        userId={account._id}
-                        media={
-                          imageData
-                            ? {
-                                url: imageData.path,
-                                aspectRatio: imageData.width / imageData.height,
-                              }
-                            : mediaField.value!
-                        }
-                        onLoad={({ naturalSize }) => {
-                          if (naturalSize.orientation === 'portrait') {
-                            mediaField.onChange({
-                              ...mediaField.value,
-                              aspectRatio:
-                                Math.min(
-                                  naturalSize.width,
-                                  naturalSize.height,
-                                ) /
-                                Math.max(naturalSize.width, naturalSize.height),
-                            });
-                          }
-                        }}
-                        style={styles.preview}
-                      />
-                      <Pressable
-                        onPress={clearImage}
-                        style={styles.closeButton}>
-                        <X color={WHITE} size={24} />
-                      </Pressable>
-                    </View>
-                  ) : null}
                   {watchBody &&
                   !uploading &&
-                  !imageData &&
-                  !post?.media?.url &&
+                  !post?.media?.[0] &&
                   previewData ? (
                     <PreviewLink
                       previewData={previewData}
@@ -663,6 +676,60 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
                 </>
               }
             />
+            <View style={styles.flex}>
+              {!uploading && mediaField.value && (
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  scrollEnabled={mediaField.value.length > 1}>
+                  {mediaField.value.map((media, index) => {
+                    return (
+                      <View
+                        key={index}
+                        style={[
+                          styles.attachment,
+                          mediaField.value.length > 1
+                            ? styles.previewContainer
+                            : styles.onPreviewContainer,
+                        ]}>
+                        <PostMedia
+                          userId={account._id}
+                          mediaId={post?._id}
+                          media={{ ...media, url: media.path ?? media.url }}
+                          onLoad={({ naturalSize }) => {
+                            if (naturalSize.orientation === 'portrait') {
+                              mediaField.onChange({
+                                ...mediaField.value[index],
+                                aspectRatio:
+                                  Math.min(
+                                    naturalSize.width,
+                                    naturalSize.height,
+                                  ) /
+                                  Math.max(
+                                    naturalSize.width,
+                                    naturalSize.height,
+                                  ),
+                              });
+                            }
+                          }}
+                          style={[
+                            styles.preview,
+                            mediaField.value.length > 1
+                              ? styles.multiPreview
+                              : styles.onePreview,
+                          ]}
+                        />
+                        <Pressable
+                          onPress={() => clearImage(index)}
+                          style={styles.closeButton}>
+                          <X color={WHITE} size={24} />
+                        </Pressable>
+                      </View>
+                    );
+                  })}
+                </ScrollView>
+              )}
+            </View>
           </ScrollView>
           <MentionsList users={mentionUsers} onPress={onPress} />
         </View>
@@ -678,6 +745,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
               textStyle={styles.iconText}
               viewStyle={styles.iconButton}
               onPress={takePhoto}
+              disabled={!!mediaField.value[0]?.documentLink}
             />
             <IconButton
               icon={<VideoCamera size={32} color={WHITE} />}
@@ -685,6 +753,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
               textStyle={styles.iconText}
               viewStyle={styles.iconButton}
               onPress={takeVideo}
+              disabled={mediaField.value.length >= 1}
             />
             <IconButton
               icon={<GalleryImage size={32} color={WHITE} />}
@@ -692,6 +761,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
               textStyle={styles.iconText}
               viewStyle={styles.iconButton}
               onPress={openPicker}
+              disabled={!!mediaField.value[0]?.documentLink}
             />
             <IconButton
               icon={<FilePdf size={32} color={WHITE} />}
@@ -699,6 +769,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
               textStyle={styles.iconText}
               viewStyle={styles.iconButton}
               onPress={openDocumentPicker}
+              disabled={mediaField.value.length >= 1}
             />
           </View>
         ) : null}
@@ -753,8 +824,21 @@ const styles = StyleSheet.create({
   preview: {
     marginVertical: 0,
     marginTop: 0,
-    width: '100%',
     backgroundColor: BLACK,
+    borderRadius: 0,
+  },
+  onePreview: {
+    width: DEVICE_WIDTH - 32,
+  },
+  multiPreview: {
+    width: (276 * DEVICE_WIDTH) / 390,
+  },
+  previewContainer: {
+    marginRight: 20,
+    backgroundColor: BGDARK100,
+  },
+  onPreviewContainer: {
+    backgroundColor: BGDARK100,
   },
   closeButton: {
     position: 'absolute',

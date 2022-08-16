@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, Dimensions } from 'react-native';
 
 import UserSvg from 'shared/assets/images/user.svg';
 import GlobalSvg from 'shared/assets/images/global.svg';
@@ -9,7 +9,7 @@ import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import PreviewLink from 'mobile/src/components/common/PreviewLink';
 import { showMessage } from 'mobile/src/services/ToastService';
 import pStyles from 'mobile/src/theme/pStyles';
-import { WHITE, PRIMARY } from 'shared/src/colors';
+import { WHITE, BLACK, BGDARK100 } from 'shared/src/colors';
 
 import PostSelection from './PostSelection';
 import PostHeader from './PostHeader';
@@ -24,28 +24,26 @@ import {
   useLinkPreview,
   LinkPreview,
 } from 'shared/graphql/query/post/useLinkPreview';
+import { Media as SharedPostMedia } from 'shared/graphql/fragments/post';
 
 import { ReviewPostScreen } from 'mobile/src/navigations/PostDetailsStack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const VideoPosted = 'VideoPosted';
+const DEVICE_WIDTH = Dimensions.get('window').width;
+interface EditPostMedia extends SharedPostMedia {
+  path?: string;
+}
 
 const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
   const { ...postData } = route.params;
-  const {
-    userId,
-    audience,
-    categories,
-    body,
-    mentionIds,
-    media,
-    localMediaPath,
-  } = postData;
+  const { userId, audience, categories, body, mentionIds, media } = postData;
 
   const account = useAccountContext();
   const [createPost] = useCreatePost();
   const [editPost] = useEditPost();
   const [fetchPreviewData] = useLinkPreview();
+
   const [previewData, setPreviewData] = useState<LinkPreview>();
   const [isSubmitting, setSubmitting] = useState(false);
   const isSubmitted = useRef(false);
@@ -57,9 +55,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
       }
 
       const { data } = await fetchPreviewData({
-        variables: {
-          body,
-        },
+        variables: { body },
       });
 
       setPreviewData(data?.linkPreview ?? undefined);
@@ -81,11 +77,11 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
       audience,
       categories,
       media: media
-        ? {
-            url: media.url,
-            aspectRatio: media.aspectRatio,
-            documentLink: media.documentLink,
-          }
+        ? media.map((mediaItem) => ({
+            url: mediaItem.url,
+            aspectRatio: mediaItem.aspectRatio,
+            documentLink: mediaItem.documentLink,
+          }))
         : undefined,
       mentionIds,
     };
@@ -133,7 +129,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
       }
 
       if (success) {
-        if (media && isVideo(media.url)) {
+        if (media && media.some((item) => isVideo(item.url))) {
           await AsyncStorage.setItem(VideoPosted, 'true');
         }
         isSubmitted.current = true;
@@ -167,7 +163,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
         handleNext={handleSubmit}
         handleBack={() => navigation.goBack()}
       />
-      <PAppContainer modal>
+      <PAppContainer modal disableKeyboardScroll>
         <View style={styles.usersPart}>
           <Avatar user={account} size={32} />
           <PostSelection icon={<UserSvg />} label={postAsLabel} />
@@ -176,24 +172,43 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
         <Text style={styles.body} selectable={true}>
           {body ? <PBodyText body={body} collapseLongText={false} /> : null}
         </Text>
-        {media ? (
-          <View style={[styles.postImage, { aspectRatio: media.aspectRatio }]}>
-            <PostMedia
-              userId={account._id}
-              media={
-                localMediaPath
-                  ? {
-                      url: localMediaPath,
-                      aspectRatio: media.aspectRatio,
-                    }
-                  : media
-              }
-              style={styles.preview}
-              resizeMode="contain"
-            />
-          </View>
-        ) : null}
-        {!localMediaPath && !route.params?.media?.url && previewData && (
+        <View style={styles.flex}>
+          {media && media.length > 0 && (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              scrollEnabled={media.length > 1}>
+              {media.map((item, index: number) => {
+                return (
+                  <View
+                    key={index}
+                    style={[
+                      styles.attachment,
+                      media.length > 1
+                        ? styles.previewContainer
+                        : styles.onePreviewContainer,
+                    ]}>
+                    <PostMedia
+                      userId={account._id}
+                      mediaId={postData._id}
+                      media={{
+                        ...item,
+                        url: item.path ?? item.url,
+                      }}
+                      style={[
+                        styles.preview,
+                        media.length > 1
+                          ? styles.multiPreview
+                          : styles.onePreview,
+                      ]}
+                    />
+                  </View>
+                );
+              })}
+            </ScrollView>
+          )}
+        </View>
+        {media && !media[0]?.url && previewData && (
           <PreviewLink previewData={previewData} />
         )}
         {categories && categories.length > 0 && (
@@ -215,25 +230,45 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
 export default ReviewPost;
 
 const styles = StyleSheet.create({
+  flex: {
+    flex: 1,
+  },
   usersPart: {
     marginTop: 16,
     flexDirection: 'row',
     alignItems: 'center',
   },
-  postImage: {
-    width: '100%',
-    marginBottom: 16,
+  attachment: {
+    marginVertical: 16,
     borderRadius: 16,
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative',
+  },
+  preview: {
+    marginVertical: 0,
+    marginTop: 0,
+    backgroundColor: BLACK,
+    borderRadius: 0,
+  },
+  onePreview: {
+    width: DEVICE_WIDTH - 32,
+  },
+  multiPreview: {
+    width: (276 * DEVICE_WIDTH) / 390,
+  },
+  previewContainer: {
+    marginRight: 20,
+    backgroundColor: BGDARK100,
+  },
+  onePreviewContainer: {
+    backgroundColor: BGDARK100,
   },
   body: {
     marginVertical: 16,
     lineHeight: 20,
     color: WHITE,
-  },
-  tagLink: {
-    color: PRIMARY,
   },
   tagContainer: {
     flexDirection: 'row',
@@ -245,8 +280,5 @@ const styles = StyleSheet.create({
     marginRight: 8,
     marginBottom: 8,
     borderRadius: 16,
-  },
-  preview: {
-    marginVertical: 0,
   },
 });

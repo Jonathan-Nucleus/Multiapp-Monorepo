@@ -1,6 +1,13 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
+import React, { useRef, useEffect, useState, ReactElement } from 'react';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Pressable,
+  Dimensions,
+} from 'react-native';
 import { DotsThreeVertical } from 'phosphor-react-native';
+import Carousel, { Pagination } from 'react-native-snap-carousel';
 
 import UserInfo from 'mobile/src/components/common/UserInfo';
 import { PostMedia } from 'mobile/src/components/common/Media';
@@ -8,27 +15,33 @@ import PBodyText from 'mobile/src/components/common/PBodyText';
 import PreviewLink from 'mobile/src/components/common/PreviewLink';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 import pStyles from 'mobile/src/theme/pStyles';
-import { WHITE60 } from 'shared/src/colors';
+import { BLACK, PRIMARYSOLID, WHITE60 } from 'shared/src/colors';
 
 import UserPostActionModal from './UserPostActionModal';
 import OwnPostActionModal from './OwnPostActionModal';
 import SharePostItem from 'mobile/src/components/main/posts/SharePostItem';
+import { Media as MediaType } from 'shared/graphql/fragments/post';
 
 import { Post } from 'shared/graphql/query/post/usePosts';
 
 import { useAccountContext } from 'shared/context/Account';
 import { getPostTime } from '../../../../../utils/dateTimeUtil';
+const DEVICE_WIDTH = Dimensions.get('window').width;
 
 export interface PostContentProps {
   post: Post;
   hideMenu?: boolean;
-  sharedBy?: string;
+  itemWidth?: number;
+  onPress?: () => void;
 }
 
 const PostContent: React.FC<PostContentProps> = ({
   post,
   hideMenu = false,
+  itemWidth = DEVICE_WIDTH - 32,
+  onPress,
 }) => {
+  const [slideIndex, setSlideIndex] = useState(0);
   const { user, company, body, media, preview } = post;
 
   const account = useAccountContext();
@@ -76,6 +89,16 @@ const PostContent: React.FC<PostContentProps> = ({
     }
   };
 
+  const renderPostMedia = ({ item }: { item: MediaType }): ReactElement => (
+    <PostMedia
+      userId={post.userId}
+      mediaId={post._id}
+      media={item}
+      style={styles.media}
+      onPress={onPress}
+    />
+  );
+
   return (
     <View style={styles.container}>
       <View style={[styles.headerWrapper, styles.contentPadding]}>
@@ -100,19 +123,34 @@ const PostContent: React.FC<PostContentProps> = ({
       </View>
       <View style={styles.contentPadding}>
         <PBodyText body={body} collapseLongText={true} style={styles.body} />
-        {media ? (
-          <PostMedia
-            userId={post.userId}
-            mediaId={post._id}
-            media={media}
-            style={styles.media}
-          />
+        {media && media.length > 0 ? (
+          <View>
+            <Carousel
+              data={media}
+              scrollEnabled={media.length > 1}
+              canCancelContentTouches={true}
+              sliderWidth={itemWidth}
+              itemWidth={itemWidth}
+              renderItem={renderPostMedia}
+              keyExtractor={(item) => item.url}
+              onSnapToItem={(index) => setSlideIndex(index)}
+              contentContainerCustomStyle={styles.carouselItem}
+            />
+            <Pagination
+              containerStyle={styles.paginationContainer}
+              activeDotIndex={slideIndex}
+              dotsLength={media.length}
+              dotStyle={styles.dot}
+              inactiveDotScale={1}
+              inactiveDotStyle={styles.inactiveDot}
+            />
+          </View>
         ) : preview ? (
           <PreviewLink previewData={preview} />
         ) : null}
         {post.sharedPost && (
           <View style={styles.sharedPostContainer}>
-            <SharePostItem post={post.sharedPost} sharedBy={post._id} />
+            <SharePostItem post={post.sharedPost} onPress={onPress} />
           </View>
         )}
       </View>
@@ -158,5 +196,28 @@ const styles = StyleSheet.create({
   },
   sharedPostContainer: {
     marginBottom: 16,
+  },
+  paginationContainer: {
+    paddingHorizontal: 0,
+    paddingTop: 0,
+    paddingBottom: 16,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: PRIMARYSOLID,
+  },
+  inactiveDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: PRIMARYSOLID,
+    backgroundColor: BLACK,
+  },
+  carouselItem: {
+    maxHeight: 524,
+    alignItems: 'center',
   },
 });

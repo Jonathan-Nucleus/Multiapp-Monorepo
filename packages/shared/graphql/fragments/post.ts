@@ -34,7 +34,7 @@ export type PostSummary = Pick<
   company?: Pick<Company, "_id" | "name" | "avatar">;
 };
 
-export type Media = Exclude<Post["media"], undefined>;
+export type Media = Exclude<Post["media"], undefined>[number];
 
 export const POST_SUMMARY_FRAGMENT = gql`
   fragment PostSummaryFields on Post {

@@ -322,10 +322,7 @@ const CreatePost: SharePostScreen = ({ navigation, route }) => {
               viewBelow={
                 postData?.post ? (
                   <View style={styles.sharePostContainer}>
-                    <SharePostItem
-                      post={postData.post}
-                      sharedBy={'share-new-post'}
-                    />
+                    <SharePostItem post={postData.post} />
                   </View>
                 ) : null
               }

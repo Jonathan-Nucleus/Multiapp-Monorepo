@@ -29,3 +29,8 @@ export const createSearchStage = (
 
   return stage;
 };
+
+const VIDEO_EXTS = ["mp4", "mov", "avi"];
+export function isVideo(filename: string): boolean {
+  return VIDEO_EXTS.some((ext) => filename.toLowerCase().trim().endsWith(ext));
+}
