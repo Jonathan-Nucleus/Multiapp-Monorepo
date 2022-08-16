@@ -38,6 +38,7 @@ export type MediaSelectorProps<
 > = Omit<ControllerProps<TFieldValues, TName>, "render"> & {
   error?: string;
   userId: string;
+  postId?: string;
   onHandleChange: (files: File[]) => void;
   onRemoveMedia?: (index: number) => void;
 };
@@ -48,6 +49,7 @@ function MediaSelector<
 >({
   error,
   userId,
+  postId,
   onHandleChange,
   onRemoveMedia,
   ...controllerProps
@@ -108,6 +110,7 @@ function MediaSelector<
               }}
               onRemove={() => onRemoveMedia && onRemoveMedia(index)}
               userId={userId}
+              postId={postId}
             />
           </div>
         ))}

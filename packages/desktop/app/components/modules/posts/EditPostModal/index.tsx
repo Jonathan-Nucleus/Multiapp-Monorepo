@@ -135,7 +135,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
   const [fetchUploadLink] = useFetchUploadLink();
   const [fetchLinkPreview] = useLinkPreview();
 
-  const [showCategories, setShowCategories] = useState(actionType == "edit");
+  const [showCategories, setShowCategories] = useState(false);
   const [loading, setLoading] = useState(false);
   const [uploadingPercent, setUploadingPercent] = useState<number>();
   const [preview, setPreview] = useState<LinkPreviewResponse>();
@@ -200,7 +200,11 @@ const EditPostModal: FC<EditPostModalProps> = ({
     defaultValues = {
       user: actionPost.userId,
       audience: actionPost.audience,
-      media: actionPost.media ?? [],
+      media:
+        actionPost.media?.map((item) => ({
+          ...item,
+          ...(item.documentLink ? {} : { documentLink: undefined }),
+        })) ?? [],
       categories: actionPost.categories,
       mentionInput: { body: actionPost.body ?? "" },
     };
@@ -676,6 +680,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
                   control={control}
                   name="media"
                   userId={account._id}
+                  postId={actionPost?._id}
                   error={
                     errors.media ? "Please select up to 5 photo/videos." : ""
                   }
@@ -714,11 +719,12 @@ const EditPostModal: FC<EditPostModalProps> = ({
                 }
                 loading={loading}
                 onClick={() => {
-                  if (actionType == "create") {
-                    setShowCategories(true);
-                  } else if (actionType == "share") {
+                  if (actionType === "share") {
                     handleSubmit(onSubmit)();
+                    return;
                   }
+
+                  setShowCategories(true);
                 }}
               >
                 {actionType == "share" ? "Share" : "Next"}

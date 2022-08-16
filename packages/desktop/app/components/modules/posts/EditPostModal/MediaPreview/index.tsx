@@ -64,7 +64,12 @@ const MediaPreview: FC<MediaPreviewProps> = ({
                 />
               )}
               {!filePreview && media && (
-                <PostMedia userId={userId} media={media} postId={postId} />
+                <PostMedia
+                  userId={userId}
+                  media={media}
+                  postId={postId}
+                  maxHeight={maxHeight}
+                />
               )}
             </>
             {percent != undefined && (
