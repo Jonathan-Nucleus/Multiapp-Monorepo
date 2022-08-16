@@ -294,3 +294,91 @@ jobs:
           git config --global user.name 'Fastlane Distribution'
           git config --global user.email 'noreply@prometheusalts.com'
           git push
+
+  build-transcoder:
+    runs-on:
+      - ubuntu-latest
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'transcoder') }}
+
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::254221267068:role/ManagementGithubIntegrati-GithubDeploymentRole3181-V2XB7LNRRLT1
+          aws-region: us-east-1
+      - name: Build-Watch
+        run: |-
+          cd packages/services/video-transcode-watchfolder-lambda-handler
+          yarn install
+          zip -r watch-lambda.zip *
+      - name: archive watch zip
+        uses: actions/upload-artifact@v3
+        with:
+          name: watch-zip
+          path: packages/services/video-transcode-watchfolder-lambda-handler/watch-lambda.zip
+      - name: Build-Finished
+        run: |-
+          cd packages/services/video-transcode-lambda-handler
+          yarn install
+          zip -r finished-lambda.zip *
+      - name: archive finished zip
+        uses: actions/upload-artifact@v3
+        with:
+          name: finished-zip
+          path: packages/services/video-transcode-lambda-handler/finished-lambda.zip
+
+  deploy-transcoder-to-QA1:
+    name: Deploy Transcoder to QA1
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'qa1') }}
+    runs-on: ubuntu-latest
+    needs: build-transcoder
+    permissions:
+      id-token: write
+      contents: read
+      actions: read
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::364088001936:role/DevGithubIntegration-GithubDeploymentRole31815B7A-Q19E91WPKT2R
+          aws-region: us-east-1
+      - name: Download all zips
+        uses: actions/download-artifact@v3
+      - name: Deploy Lambdas
+        env:
+          AWS_ACCOUNT_ID: "254221267068"
+          AWS_REPO_REGION: us-east-1
+        run: |-
+          find .
+          aws lambda update-function-code --function-name arn:aws:lambda:us-east-1:364088001936:function:Qa1-Transcoder-TranscodingTriggerFunction217D3B64-TVgt4Fz34BIJ --zip-file fileb://watch-zip/watch-lambda.zip --publish
+          aws lambda update-function-code --function-name arn:aws:lambda:us-east-1:364088001936:function:Qa1-Transcoder-TranscodingFinishedFunctionBB4C1801-Ujym9IbSQxTA --zip-file fileb://finished-zip/finished-lambda.zip --publish
+  deploy-transcoder-to-QA2:
+    name: Deploy Transcoder to QA2
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'qa2') }}
+    runs-on: ubuntu-latest
+    needs: build-transcoder
+    permissions:
+      id-token: write
+      contents: read
+      actions: read
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::364088001936:role/DevGithubIntegration-GithubDeploymentRole31815B7A-Q19E91WPKT2R
+          aws-region: us-east-1
+      - name: Download all zips
+        uses: actions/download-artifact@v3
+      - name: Deploy Lambdas
+        env:
+          AWS_ACCOUNT_ID: "254221267068"
+          AWS_REPO_REGION: us-east-1
+        run: |-
+          find .
+          aws lambda update-function-code --function-name arn:aws:lambda:us-east-1:364088001936:function:Qa2-Transcoder-TranscodingTriggerFunction217D3B64-ofDPFGo329hb --zip-file fileb://watch-zip/watch-lambda.zip --publish
+          aws lambda update-function-code --function-name arn:aws:lambda:us-east-1:364088001936:function:Qa2-Transcoder-TranscodingFinishedFunctionBB4C1801-ifYxtf3TSla5 --zip-file fileb://finished-zip/finished-lambda.zip --publish
