@@ -18,8 +18,6 @@ import { useAccount } from 'shared/graphql/query/account/useAccount';
 import UserCommentActionModal from './UserCommentActionModal';
 import OwnCommentActionModal from './OwnCommentActionModal';
 
-type CommentUser = Comment['user'];
-
 interface CommentItemProps {
   comment: Comment;
   onReply?: (comment: Comment) => void;
@@ -163,7 +161,7 @@ const styles = StyleSheet.create({
   actionContainer: {
     marginLeft: 32,
     flexDirection: 'row',
-    marginVertical: 8,
+    marginBottom: 8,
   },
   smallLabel: {
     ...Body3,

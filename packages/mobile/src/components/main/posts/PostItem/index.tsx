@@ -5,7 +5,6 @@ import {
   ChatCenteredText,
   Share as ShareIcon,
 } from 'phosphor-react-native';
-import { TapGestureHandler } from 'react-native-gesture-handler';
 
 import PLabel from 'mobile/src/components/common/PLabel';
 import IconButton from 'mobile/src/components/common/IconButton';
@@ -62,84 +61,81 @@ const PostItem: React.FC<PostItemProps> = ({ post }) => {
 
   return (
     <>
-      <TapGestureHandler onEnded={() => goToDetails()}>
-        <View
-          style={[
-            styles.container,
-            post.highlighted ? styles.highlighted : undefined,
-          ]}>
-          <PostContent post={post} />
-          <View style={[styles.postInfo, styles.contentPadding]}>
-            <View style={styles.tagWrapper}>
-              {post.categories.map((item, index) => (
-                <React.Fragment key={item}>
-                  <Tag
-                    label={PostCategories[item]}
-                    viewStyle={styles.tagStyle}
-                  />
-                  {index < post.categories.length - 1 ? (
-                    <Text style={styles.tagSeparator}>•</Text>
-                  ) : null}
-                </React.Fragment>
-              ))}
-            </View>
-            <View style={styles.otherInfo}>
-              {likeCount > 0 && (
-                <Pressable
-                  onPress={() => setLikesModalVisible(true)}
-                  style={({ pressed }) =>
-                    pressed ? pStyles.pressedStyle : {}
-                  }>
-                  <PLabel
-                    label={`${likeCount} ${likeCount === 1 ? 'Like' : 'Likes'}`}
-                    textStyle={styles.smallLabel}
-                  />
-                </Pressable>
-              )}
-              {post.commentCount > 0 && (
+      <View
+        style={[
+          styles.container,
+          post.highlighted ? styles.highlighted : undefined,
+        ]}>
+        <PostContent post={post} />
+        <View style={[styles.postInfo, styles.contentPadding]}>
+          <Pressable onPress={() => goToDetails()} style={styles.tagWrapper}>
+            {post.categories.map((item, index) => (
+              <React.Fragment key={item}>
+                <Tag label={PostCategories[item]} viewStyle={styles.tagStyle} />
+                {index < post.categories.length - 1 ? (
+                  <Text style={styles.tagSeparator}>•</Text>
+                ) : null}
+              </React.Fragment>
+            ))}
+          </Pressable>
+          <View style={styles.otherInfo}>
+            {likeCount > 0 && (
+              <Pressable
+                onPress={() => setLikesModalVisible(true)}
+                style={({ pressed }) => (pressed ? pStyles.pressedStyle : {})}>
+                <PLabel
+                  label={`${likeCount} ${likeCount === 1 ? 'Like' : 'Likes'}`}
+                  textStyle={styles.smallLabel}
+                />
+              </Pressable>
+            )}
+            {post.commentCount > 0 && (
+              <Pressable
+                onPress={() => goToDetails()}
+                style={({ pressed }) => (pressed ? pStyles.pressedStyle : {})}>
                 <PLabel
                   label={`${post.commentCount} ${
                     post.commentCount === 1 ? 'Comment' : 'Comments'
                   }`}
                   textStyle={styles.smallLabel}
                 />
-              )}
-              {post.shareCount > 0 && (
-                <PLabel
-                  label={`${post.shareCount} ${
-                    post.shareCount === 1 ? 'Share' : 'Shares'
-                  }`}
-                  textStyle={styles.smallLabel}
-                />
-              )}
-            </View>
+              </Pressable>
+            )}
+            {post.shareCount > 0 && (
+              <PLabel
+                label={`${post.shareCount} ${
+                  post.shareCount === 1 ? 'Share' : 'Shares'
+                }`}
+                textStyle={styles.smallLabel}
+              />
+            )}
           </View>
-          <View style={[styles.bottomWrapper, styles.contentPadding]}>
-            <IconButton
-              icon={
-                <ThumbsUp
-                  weight={isLiked ? 'fill' : 'light'}
-                  color={isLiked ? PRIMARYSTATE : WHITE60}
-                  size={20}
-                />
-              }
-              label="Like"
-              onPress={toggleLike}
-            />
-            <IconButton
-              icon={<ChatCenteredText color={WHITE60} size={20} />}
-              label="Comment"
-              onPress={() => goToDetails(true)}
-            />
-            <IconButton
-              icon={<ShareIcon color={WHITE60} size={20} />}
-              label="Share"
-              onPress={sharePost}
-            />
-          </View>
-          <View style={styles.divider} />
         </View>
-      </TapGestureHandler>
+        <View style={[styles.bottomWrapper, styles.contentPadding]}>
+          <IconButton
+            icon={
+              <ThumbsUp
+                weight={isLiked ? 'fill' : 'light'}
+                color={isLiked ? PRIMARYSTATE : WHITE60}
+                size={20}
+              />
+            }
+            label="Like"
+            onPress={toggleLike}
+          />
+          <IconButton
+            icon={<ChatCenteredText color={WHITE60} size={20} />}
+            label="Comment"
+            onPress={() => goToDetails(true)}
+          />
+          <IconButton
+            icon={<ShareIcon color={WHITE60} size={20} />}
+            label="Share"
+            onPress={sharePost}
+          />
+        </View>
+        <View style={styles.divider} />
+      </View>
       <LikesModal
         postId={post._id}
         isVisible={likesModalVisible}

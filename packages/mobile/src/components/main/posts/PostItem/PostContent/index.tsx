@@ -71,6 +71,34 @@ const PostContent: React.FC<PostContentProps> = ({
     timeoutRef.current = setTimeout(() => setKebobIsClosing(false), 500);
   };
 
+  const goToDetails = (comment?: boolean): void => {
+    const currentRoute = NavigationService.currentRoute();
+    if (!comment && currentRoute?.name === 'PostDetail') {
+      return;
+    }
+
+    NavigationService.navigate('PostDetails', {
+      screen: 'PostDetail',
+      params: {
+        postId: post._id,
+        focusComment: comment,
+      },
+    });
+  };
+
+  const goToSharedPost = (): void => {
+    if (!post.sharedPost) {
+      return;
+    }
+
+    NavigationService.navigate('PostDetails', {
+      screen: 'PostDetail',
+      params: {
+        postId: post.sharedPost?._id,
+      },
+    });
+  };
+
   const goToProfile = (): void => {
     if (user) {
       NavigationService.navigate('UserDetails', {
@@ -95,7 +123,7 @@ const PostContent: React.FC<PostContentProps> = ({
       mediaId={post._id}
       media={item}
       style={styles.media}
-      onPress={onPress}
+      onPress={onPress || goToDetails}
     />
   );
 
@@ -103,7 +131,7 @@ const PostContent: React.FC<PostContentProps> = ({
     <View style={styles.container}>
       <View style={[styles.headerWrapper, styles.contentPadding]}>
         <Pressable
-          onPress={() => goToProfile()}
+          onPress={onPress || goToProfile}
           style={({ pressed }) => (pressed ? pStyles.pressedStyle : {})}>
           <UserInfo
             user={user || company}
@@ -122,7 +150,9 @@ const PostContent: React.FC<PostContentProps> = ({
         )}
       </View>
       <View style={styles.contentPadding}>
-        <PBodyText body={body} collapseLongText={true} style={styles.body} />
+        <Pressable onPress={() => goToDetails()}>
+          <PBodyText body={body} collapseLongText={true} style={styles.body} />
+        </Pressable>
         {media && media.length > 0 ? (
           <View>
             <Carousel
@@ -150,7 +180,7 @@ const PostContent: React.FC<PostContentProps> = ({
         ) : null}
         {post.sharedPost && (
           <View style={styles.sharedPostContainer}>
-            <SharePostItem post={post.sharedPost} onPress={onPress} />
+            <SharePostItem post={post.sharedPost} onPress={goToSharedPost} />
           </View>
         )}
       </View>
@@ -183,7 +213,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   body: {
-    marginBottom: 16,
+    marginBottom: 0,
   },
   media: {
     marginTop: 0,
@@ -217,7 +247,6 @@ const styles = StyleSheet.create({
     backgroundColor: BLACK,
   },
   carouselItem: {
-    maxHeight: 524,
     alignItems: 'center',
   },
 });

@@ -178,31 +178,33 @@ const Media: FC<MediaProps> = ({
       </View>
     </Pressable>
   ) : (
-    <Pressable
-      style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}
-      onPress={openDocumentLink}
-      disabled={!media.documentLink}>
-      <Pinchable maximumZoomScale={5}>
-        <FastImage
-          style={[
-            styles.media,
-            style,
-            { aspectRatio: media.aspectRatio },
-            media.aspectRatio < 1 && resizeMode === 'contain'
-              ? styles.contain
-              : null,
-          ]}
-          source={{
-            uri: media.url.includes('/') ? media.url : mediaUrl,
-          }}
-          resizeMode={resizeMode}
-        />
-      </Pinchable>
-      {media.documentLink ? (
-        <View style={styles.pdfTag}>
-          <PText style={styles.pdfTagText}>PDF</PText>
-        </View>
-      ) : null}
+    <Pressable onPress={onPress} disabled={!!media.documentLink}>
+      <Pressable
+        style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}
+        onPress={openDocumentLink}
+        disabled={!media.documentLink}>
+        <Pinchable maximumZoomScale={5}>
+          <FastImage
+            style={[
+              styles.media,
+              style,
+              { aspectRatio: media.aspectRatio },
+              media.aspectRatio < 1 && resizeMode === 'contain'
+                ? styles.contain
+                : null,
+            ]}
+            source={{
+              uri: media.url.includes('/') ? media.url : mediaUrl,
+            }}
+            resizeMode={resizeMode}
+          />
+        </Pinchable>
+        {media.documentLink ? (
+          <View style={styles.pdfTag}>
+            <PText style={styles.pdfTagText}>PDF</PText>
+          </View>
+        ) : null}
+      </Pressable>
     </Pressable>
   );
 };
