@@ -210,7 +210,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   const [mentionUsers, setMentionUsers] = useState<User[]>([]);
   const onMentionSelected = useRef<OnSelectUser>();
   const companies = account?.companies ?? [];
-  const [attachment, setAttachment] = useState<string>('');
+  const [document, setDocument] = useState<string>('');
 
   const {
     handleSubmit,
@@ -229,7 +229,10 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     mode: 'onChange',
   });
   const postUserId = watch('userId');
-  const { field: mediaField } = useController({ name: 'attachments', control });
+  const { field: attachmentsField } = useController({
+    name: 'attachments',
+    control,
+  });
   const { field: mentionsField } = useController({
     name: 'mentionIds',
     control,
@@ -302,8 +305,8 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
 
       const { userId, audience, body, mentionIds } = values;
       let { attachments } = values;
-      if (attachment && attachments) {
-        attachments = [{ ...attachments[0], documentLink: attachment }];
+      if (document && attachments) {
+        attachments = [{ ...attachments[0], documentLink: document }];
       }
 
       navigation.navigate('ChooseCategory', {
@@ -322,14 +325,14 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
         mentionIds, // TODO: Parse from body and add here
       });
     },
-    [account, navigation, post, attachment],
+    [account, navigation, post, document],
   );
 
-  const uploadMedia = useCallback(
-    async (attachments: ImageOrVideo): Promise<void> => {
+  const uploadAttachment = useCallback(
+    async (attachment: ImageOrVideo): Promise<void> => {
       setUploading(true);
 
-      const fileUri = attachments.path;
+      const fileUri = attachment.path;
 
       const filename = fileUri.substring(fileUri.lastIndexOf('/') + 1);
       const { data } = await fetchUploadLink({
@@ -348,27 +351,23 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       const { remoteName, uploadUrl } = data.uploadLink;
       await upload(uploadUrl, fileUri);
 
-      const mediaValue = getValues('attachments') ?? [];
-      mediaField.onChange(
-        Array.from(
-          new Set([
-            ...mediaValue,
-            {
-              url: remoteName,
-              aspectRatio: attachments.width / attachments.height,
-              documentLink: attachment,
-              path: attachments.path,
-              width: attachments.width,
-              height: attachments.height,
-            },
-          ]),
-        ),
-      );
+      const attachments = getValues('attachments') ?? [];
+      attachmentsField.onChange([
+        ...attachments,
+        {
+          url: remoteName,
+          aspectRatio: attachment.width / attachment.height,
+          documentLink: document,
+          path: attachment.path,
+          width: attachment.width,
+          height: attachment.height,
+        },
+      ]);
 
       setUploadProgress(0);
       setUploading(false);
     },
-    [account._id, attachment, fetchUploadLink, getValues, mediaField],
+    [account._id, document, fetchUploadLink, getValues, attachmentsField],
   );
 
   const uploadFile = async (filePath: string): Promise<void> => {
@@ -389,7 +388,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
 
     const { remoteName, uploadUrl } = data.uploadLink;
     await upload(uploadUrl, filePath);
-    setAttachment(remoteName);
+    setDocument(remoteName);
   };
 
   const upload = async (uploadUrl: string, fileUri: string): Promise<void> => {
@@ -419,7 +418,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   };
 
   const openPicker = useCallback(async (): Promise<void> => {
-    if (mediaField.value && mediaField.value.length === 5) {
+    if (attachmentsField.value && attachmentsField.value.length === 5) {
       showMessage('error', 'You can upload only upload up to 5 photos');
       return;
     }
@@ -432,11 +431,11 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       compressVideoPreset: 'Passthrough',
       forceJpg: true,
       multiple: false,
-      mediaType: mediaField.value.length >= 1 ? 'photo' : 'any',
+      mediaType: attachmentsField.value.length >= 1 ? 'photo' : 'any',
     });
 
-    await uploadMedia(image);
-  }, [mediaField.value, uploadMedia]);
+    await uploadAttachment(image);
+  }, [attachmentsField.value, uploadAttachment]);
 
   const takePhoto = async (): Promise<void> => {
     const image = await ImagePicker.openCamera({
@@ -448,7 +447,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       includeExif: true,
     });
 
-    await uploadMedia(image);
+    await uploadAttachment(image);
   };
 
   const takeVideo = async (): Promise<void> => {
@@ -457,19 +456,19 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       compressVideoPreset: 'Passthrough',
     });
 
-    await uploadMedia(videoData);
+    await uploadAttachment(videoData);
   };
 
   const openDocumentPicker = async (): Promise<void> => {
-    const document = await DocumentPicker.pickSingle({
+    const selectedDocument = await DocumentPicker.pickSingle({
       type: types.pdf,
       copyTo: 'cachesDirectory',
     });
 
-    if (document?.fileCopyUri) {
+    if (selectedDocument?.fileCopyUri) {
       try {
         // Rename file to avoid trouble with spaces
-        const originalPath = document.fileCopyUri.replace(/%20/g, ' ');
+        const originalPath = selectedDocument.fileCopyUri.replace(/%20/g, ' ');
         const fileDirectory = originalPath.substring(
           0,
           originalPath.lastIndexOf('/'),
@@ -491,7 +490,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
         };
 
         await uploadFile(filePath);
-        await uploadMedia(pdfImageData);
+        await uploadAttachment(pdfImageData);
       } catch (e) {
         console.log('exception...', e);
       }
@@ -500,12 +499,12 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
 
   const clearImage = useCallback(
     (index: number): void => {
-      if (mediaField.value && mediaField.value.length > index) {
-        mediaField.value.splice(index, 1);
-        mediaField.onChange(mediaField.value);
+      if (attachmentsField.value && attachmentsField.value.length > index) {
+        attachmentsField.value.splice(index, 1);
+        attachmentsField.onChange(attachmentsField.value);
       }
     },
-    [mediaField],
+    [attachmentsField],
   );
 
   const postAsData: Option[] = [
@@ -682,18 +681,18 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
               }
             />
             <View style={styles.flex}>
-              {!uploading && mediaField.value && (
+              {!uploading && attachmentsField.value && (
                 <ScrollView
                   horizontal
                   showsHorizontalScrollIndicator={false}
-                  scrollEnabled={mediaField.value.length > 1}>
-                  {mediaField.value.map((attachments, index) => {
+                  scrollEnabled={attachmentsField.value.length > 1}>
+                  {attachmentsField.value.map((attachments, index) => {
                     return (
                       <View
                         key={index}
                         style={[
                           styles.attachment,
-                          mediaField.value.length > 1
+                          attachmentsField.value.length > 1
                             ? styles.previewContainer
                             : styles.onPreviewContainer,
                         ]}>
@@ -706,23 +705,21 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
                           }}
                           onLoad={({ naturalSize }) => {
                             if (naturalSize.orientation === 'portrait') {
-                              mediaField.onChange({
-                                ...mediaField.value[index],
-                                aspectRatio:
-                                  Math.min(
-                                    naturalSize.width,
-                                    naturalSize.height,
-                                  ) /
-                                  Math.max(
-                                    naturalSize.width,
-                                    naturalSize.height,
-                                  ),
-                              });
+                              const updatedAttachments = [
+                                ...attachmentsField.value,
+                              ];
+                              updatedAttachments[index].aspectRatio =
+                                Math.min(
+                                  naturalSize.width,
+                                  naturalSize.height,
+                                ) /
+                                Math.max(naturalSize.width, naturalSize.height);
+                              attachmentsField.onChange(updatedAttachments);
                             }
                           }}
                           style={[
                             styles.preview,
-                            mediaField.value.length > 1
+                            attachmentsField.value.length > 1
                               ? styles.multiPreview
                               : styles.onePreview,
                           ]}
@@ -753,7 +750,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
               textStyle={styles.iconText}
               viewStyle={styles.iconButton}
               onPress={takePhoto}
-              disabled={!!mediaField.value[0]?.documentLink}
+              disabled={!!attachmentsField.value[0]?.documentLink}
             />
             <IconButton
               icon={<VideoCamera size={32} color={WHITE} />}
@@ -761,7 +758,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
               textStyle={styles.iconText}
               viewStyle={styles.iconButton}
               onPress={takeVideo}
-              disabled={mediaField.value.length >= 1}
+              disabled={attachmentsField.value.length >= 1}
             />
             <IconButton
               icon={<GalleryImage size={32} color={WHITE} />}
@@ -769,7 +766,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
               textStyle={styles.iconText}
               viewStyle={styles.iconButton}
               onPress={openPicker}
-              disabled={!!mediaField.value[0]?.documentLink}
+              disabled={!!attachmentsField.value[0]?.documentLink}
             />
             <IconButton
               icon={<FilePdf size={32} color={WHITE} />}
@@ -777,7 +774,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
               textStyle={styles.iconText}
               viewStyle={styles.iconButton}
               onPress={openDocumentPicker}
-              disabled={mediaField.value.length >= 1}
+              disabled={attachmentsField.value.length >= 1}
             />
           </View>
         ) : null}
