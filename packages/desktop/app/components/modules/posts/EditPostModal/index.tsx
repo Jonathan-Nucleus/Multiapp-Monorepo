@@ -24,11 +24,11 @@ import EmojiPicker from "../../../common/EmojiPicker";
 import Input from "desktop/app/components/common/Input";
 import Label from "desktop/app/components/common/Label";
 import LinkPreview from "../LinkPreview";
-import MediaPreview from "./MediaPreview";
+import AttachmentPreview from "./AttachmentPreview";
 import MediaSelector, {
   mediaSchema,
   Media,
-} from "./MediaPreview/MediaSelector";
+} from "./AttachmentPreview/MediaSelector";
 import MentionTextarea, { mentionTextSchema } from "../MentionTextarea";
 import ModalDialog from "../../../common/ModalDialog";
 import Post from "../Post";
@@ -87,7 +87,7 @@ const audienceOptions = Object.keys(AudienceOptions).map((key) => {
 type FormValues = {
   user: string;
   audience: Audience;
-  media: Media[];
+  attachments: Media[];
   categories: PostCategory[];
   mentionInput: {
     body?: string;
@@ -106,7 +106,7 @@ const schema = yup
       .oneOf<Audience>(Audiences)
       .default("EVERYONE")
       .required(),
-    media: mediaSchema,
+    attachments: mediaSchema,
     categories: categoriesSchema,
     mentionInput: mentionTextSchema,
   })
@@ -194,14 +194,14 @@ const EditPostModal: FC<EditPostModalProps> = ({
       user: account._id,
       audience: "EVERYONE",
       categories: [],
-      media: [],
+      attachments: [],
     };
   } else if (actionType == "edit" && actionPost) {
     defaultValues = {
       user: actionPost.userId,
       audience: actionPost.audience,
-      media:
-        actionPost.media?.map((item) => ({
+      attachments:
+        actionPost.attachments?.map((item) => ({
           ...item,
           ...(item.documentLink ? {} : { documentLink: undefined }),
         })) ?? [],
@@ -229,11 +229,14 @@ const EditPostModal: FC<EditPostModalProps> = ({
     defaultValues: schema.cast(defaultValues) as DefaultValues<FormValues>,
     mode: "onChange",
   });
-  const currentMedia = watch("media") ?? [];
+  const currentAttachments = watch("attachments") ?? [];
 
   useEffect(() => {
-    const subscription = watch(({ mentionInput, media }, { name }) => {
-      if (name == "mentionInput.body" && (!media || media.length === 0)) {
+    const subscription = watch(({ mentionInput, attachments }, { name }) => {
+      if (
+        name == "mentionInput.body" &&
+        (!attachments || attachments.length === 0)
+      ) {
         const body = mentionInput?.body;
         if (!body) {
           previewLink.current = undefined;
@@ -263,7 +266,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
   const onSubmit: SubmitHandler<FormValues> = async ({
     user,
     audience,
-    media,
+    attachments,
     categories,
     mentionInput,
   }) => {
@@ -277,7 +280,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
         delete previewData.__typename;
       }
 
-      const sendingMedias = media?.map(
+      const sendingAttachments = attachments?.map(
         ({ url, aspectRatio, documentLink }) => ({
           url,
           aspectRatio,
@@ -290,7 +293,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
             post: {
               audience,
               categories,
-              media: sendingMedias ?? [],
+              attachments: sendingAttachments ?? [],
               preview: previewData,
               body: mentionInput.body,
               mentionIds: mentionInput.mentions?.map((mention) => mention.id),
@@ -299,9 +302,9 @@ const EditPostModal: FC<EditPostModalProps> = ({
           },
         });
         if (data && data.createPost) {
-          // When media type is only video, pass postId as param
-          const mediaTypes = media?.map((media) =>
-            getMediaTypeFrom(media?.url ?? "")
+          // When attachments type is only video, pass postId as param
+          const mediaTypes = attachments?.map((attachments) =>
+            getMediaTypeFrom(attachments?.url ?? "")
           );
           onClose(
             mediaTypes?.includes("video") ? data.createPost?._id : undefined
@@ -316,7 +319,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
               userId: actionPost.userId,
               audience,
               categories,
-              media: sendingMedias ? sendingMedias : [],
+              attachments: sendingAttachments ? sendingAttachments : [],
               preview: previewData,
               body: mentionInput.body,
               mentionIds: mentionInput.mentions?.map((mention) => mention.id),
@@ -324,9 +327,9 @@ const EditPostModal: FC<EditPostModalProps> = ({
           },
         });
         if (data && data.editPost) {
-          // When media type is only video, pass postId as param
-          const mediaTypes = media?.map((media) =>
-            getMediaTypeFrom(media?.url ?? "")
+          // When attachments type is only video, pass postId as param
+          const mediaTypes = attachments?.map((attachments) =>
+            getMediaTypeFrom(attachments?.url ?? "")
           );
           onClose(
             mediaTypes?.includes("video") ? data.editPost?._id : undefined
@@ -419,7 +422,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
 
   const handleChangeMedia = async (files: File[]) => {
     if (files.length > 0) {
-      if (currentMedia.length + files.length > 5) {
+      if (currentAttachments.length + files.length > 5) {
         toast.error("You can upload up to 5 files.");
         return;
       }
@@ -433,16 +436,18 @@ const EditPostModal: FC<EditPostModalProps> = ({
         }))
       );
 
-      setValue("media", [
-        ...currentMedia,
-        ...newMedia.filter((media) => media.url !== ""),
+      setValue("attachments", [
+        ...currentAttachments,
+        ...newMedia.filter((attachments) => attachments.url !== ""),
       ]);
     }
   };
 
   const handleRemoveMedia = (idx: number) => {
-    const media = currentMedia.filter((media, index) => index !== idx);
-    setValue("media", media);
+    const attachments = currentAttachments.filter(
+      (attachments, index) => index !== idx
+    );
+    setValue("attachments", attachments);
   };
 
   const closeModal = () => {
@@ -517,15 +522,15 @@ const EditPostModal: FC<EditPostModalProps> = ({
                 <div className="w-full">
                   {actionType != "share" && (
                     <div className="flex flex-row overflow-x-auto w-full items-center mb-3">
-                      {currentMedia.length === 1 && (
+                      {currentAttachments.length === 1 && (
                         <div className="w-full flex-shrink-0 h-full">
-                          <MediaPreview
-                            media={currentMedia[0]}
+                          <AttachmentPreview
+                            attachment={currentAttachments[0]}
                             className="my-0"
                             maxHeight={294}
                             removable={true}
                             file={
-                              (currentMedia[0].file as unknown as File) ??
+                              (currentAttachments[0].file as unknown as File) ??
                               undefined
                             }
                             postId={actionPost?._id}
@@ -533,9 +538,9 @@ const EditPostModal: FC<EditPostModalProps> = ({
                             percent={uploadingPercent}
                             onLoaded={(aspectRatio) => {
                               const newMedia = [
-                                { ...currentMedia[0], aspectRatio },
+                                { ...currentAttachments[0], aspectRatio },
                               ];
-                              setValue("media", newMedia);
+                              setValue("attachments", newMedia);
                             }}
                             onRemove={() => handleRemoveMedia(0)}
                           />
@@ -546,7 +551,7 @@ const EditPostModal: FC<EditPostModalProps> = ({
                 </div>
                 {actionType !== "share" &&
                   preview &&
-                  currentMedia.length === 0 && (
+                  currentAttachments.length === 0 && (
                     <div className="my-2 w-100 aspect-video">
                       {previewLoading ? (
                         <Spinner />
@@ -571,7 +576,8 @@ const EditPostModal: FC<EditPostModalProps> = ({
                 <div className="flex items-center">
                   <Label
                     className={`flex items-center cursor-pointer hover:opacity-80 transition select-none ${
-                      actionType == "share" || !!currentMedia[0]?.documentLink
+                      actionType == "share" ||
+                      !!currentAttachments[0]?.documentLink
                         ? "pointer-events-none opacity-40"
                         : ""
                     }`}
@@ -597,13 +603,13 @@ const EditPostModal: FC<EditPostModalProps> = ({
                       }
                       className="hidden"
                       accept={`image/*${
-                        currentMedia.length === 0 ? ", video/*" : ""
+                        currentAttachments.length === 0 ? ", video/*" : ""
                       }`}
                     />
                   </Label>
                   <Label
                     className={`flex items-center cursor-pointer hover:opacity-80 transition select-none ml-4 ${
-                      actionType == "share" || currentMedia.length >= 1
+                      actionType == "share" || currentAttachments.length >= 1
                         ? "pointer-events-none opacity-40"
                         : ""
                     }`}
@@ -628,15 +634,15 @@ const EditPostModal: FC<EditPostModalProps> = ({
 
                           await handleChangeMedia([previewFile]);
                           const pdfUrl = await upload(file, false);
-                          const { media: updatedMedia } = getValues();
-                          setValue("media", [
+                          const { attachments: updatedMedia } = getValues();
+                          setValue("attachments", [
                             { ...updatedMedia[0], documentLink: pdfUrl },
                           ]);
                         }
                       }}
                       className="hidden"
                       accept=".pdf"
-                      disabled={currentMedia.length >= 1}
+                      disabled={currentAttachments.length >= 1}
                     />
                   </Label>
                   <div
@@ -674,15 +680,17 @@ const EditPostModal: FC<EditPostModalProps> = ({
                   }
                 />
               </div>
-            ) : currentMedia.length > 1 ? (
+            ) : currentAttachments.length > 1 ? (
               <div className="w-full md:border-l border-white/[.12] md:w-80">
                 <MediaSelector
                   control={control}
-                  name="media"
+                  name="attachments"
                   userId={account._id}
                   postId={actionPost?._id}
                   error={
-                    errors.media ? "Please select up to 5 photo/videos." : ""
+                    errors.attachments
+                      ? "Please select up to 5 photo/videos."
+                      : ""
                   }
                   onHandleChange={handleChangeMedia}
                   onRemoveMedia={handleRemoveMedia}
@@ -715,7 +723,8 @@ const EditPostModal: FC<EditPostModalProps> = ({
                 variant="gradient-primary"
                 className="w-48 font-medium"
                 disabled={
-                  loading || (actionType !== "share" && currentMedia.length > 5)
+                  loading ||
+                  (actionType !== "share" && currentAttachments.length > 5)
                 }
                 loading={loading}
                 onClick={() => {

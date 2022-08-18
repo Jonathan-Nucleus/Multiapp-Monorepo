@@ -9,7 +9,7 @@ import * as yup from "yup";
 
 import Label from "../../../../common/Label";
 import Input from "../../../../common/Input";
-import MediaPreview from ".";
+import AttachmentPreview from ".";
 
 export const mediaSchema = yup
   .array()
@@ -95,8 +95,8 @@ function MediaSelector<
       <div className="py-2 min-h-0 overflow-y-auto">
         {field.value.map((media: Media, index: number) => (
           <div key={media.url} className="w-full h-40 flex-shrink-0 px-8 mb-2">
-            <MediaPreview
-              media={media}
+            <AttachmentPreview
+              attachment={media}
               className="my-0"
               maxHeight={150}
               file={media.file}

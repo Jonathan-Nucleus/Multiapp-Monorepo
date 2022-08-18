@@ -36,7 +36,7 @@ import {
   stopVideos,
   stopVideo,
   MessageMedia,
-} from 'mobile/src/components/common/Media';
+} from 'mobile/src/components/common/Attachment';
 import { Body1Bold, Body3, Body2Bold } from 'mobile/src/theme/fonts';
 import pStyles from 'mobile/src/theme/pStyles';
 import {
@@ -390,7 +390,7 @@ const Channel: ChannelScreen = ({ navigation, route }) => {
                     {isVideo(image.uri) ? (
                       <MessageMedia
                         mediaId={`video-${index}`}
-                        media={{ url: image.uri, aspectRatio: 1 }}
+                        attachment={{ url: image.uri, aspectRatio: 1 }}
                         style={styles.video}
                       />
                     ) : (

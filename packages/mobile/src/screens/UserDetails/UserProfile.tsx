@@ -41,7 +41,7 @@ import TwitterSvg from 'shared/assets/images/twitter.svg';
 import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 import NoPostSvg from 'shared/assets/images/no-post.svg';
 import PostItemPlaceholder from 'mobile/src/components/placeholder/PostItemPlaceholder';
-import { stopVideos } from 'mobile/src/components/common/Media';
+import { stopVideos } from 'mobile/src/components/common/Attachment';
 
 import { useProfile } from 'shared/graphql/query/user/useProfile';
 import { usePosts, Post } from 'shared/graphql/query/user/usePosts';

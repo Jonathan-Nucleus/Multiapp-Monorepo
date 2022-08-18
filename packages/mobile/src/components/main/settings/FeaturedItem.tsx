@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
 
 import PLabel from '../../common/PLabel';
-import { PostMedia } from '../../common/Media';
+import { PostAttachment } from '../../common/Attachment';
 import UserInfo from '../../common/UserInfo';
 import { WHITE12 } from 'shared/src/colors';
 
@@ -16,7 +16,7 @@ interface FeedItemProps {
 }
 
 const FeaturedItem: React.FC<FeedItemProps> = ({ post }) => {
-  const { user, company, body, media } = post;
+  const { user, company, body, attachments } = post;
   const goToDetails = (): void => {
     NavigationService.navigate('PostDetails', {
       screen: 'PostDetail',
@@ -64,12 +64,12 @@ const FeaturedItem: React.FC<FeedItemProps> = ({ post }) => {
             numberOfLines={2}
           />
         ) : null}
-        {media && media.length > 0 ? (
-          <PostMedia
+        {attachments && attachments.length > 0 ? (
+          <PostAttachment
             userId={post.userId}
             mediaId={post._id}
             style={styles.postImage}
-            media={media[0]}
+            attachment={attachments[0]}
           />
         ) : null}
       </View>

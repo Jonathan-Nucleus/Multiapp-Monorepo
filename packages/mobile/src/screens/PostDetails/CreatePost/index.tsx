@@ -35,7 +35,7 @@ import IconButton from 'mobile/src/components/common/IconButton';
 import PModal from 'mobile/src/components/common/PModal';
 import RoundIcon from 'mobile/src/components/common/RoundIcon';
 import PreviewLink from 'mobile/src/components/common/PreviewLink';
-import { PostMedia } from 'mobile/src/components/common/Media';
+import { PostAttachment } from 'mobile/src/components/common/Attachment';
 import { showMessage } from 'mobile/src/services/ToastService';
 import pStyles from 'mobile/src/theme/pStyles';
 import {
@@ -77,7 +77,7 @@ import ExpandingInput, {
 import MentionsList from 'mobile/src/components/main/MentionsList';
 
 import { CreatePostScreen } from 'mobile/src/navigations/PostDetailsStack';
-import { Media } from 'shared/graphql/fragments/post';
+import { Attachment } from 'shared/graphql/fragments/post';
 
 const DEVICE_WIDTH = Dimensions.get('window').width;
 
@@ -141,7 +141,7 @@ export const AUDIENCE_OPTIONS: Option<Audience>[] = [
 type FormValues = {
   userId: string;
   audience: Audience;
-  media?:
+  attachments?:
     | {
         url: string;
         aspectRatio: number;
@@ -160,7 +160,7 @@ const schema = yup
       .oneOf<Audience>(Audiences)
       .default('EVERYONE')
       .required(),
-    media: yup
+    attachments: yup
       .array()
       .of(
         yup.object({
@@ -176,8 +176,9 @@ const schema = yup
     body: yup
       .string()
       .notRequired()
-      .when('media', {
-        is: (media: FormValues['media']) => !media || media.length === 0,
+      .when('attachments', {
+        is: (attachments: FormValues['attachments']) =>
+          !attachments || attachments.length === 0,
         then: yup.string().required('Required'),
       }),
     mentionIds: yup
@@ -188,7 +189,7 @@ const schema = yup
   })
   .required();
 
-export type LocalMedia = Media & {
+export type LocalMedia = Attachment & {
   path?: string;
 };
 
@@ -228,7 +229,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     mode: 'onChange',
   });
   const postUserId = watch('userId');
-  const { field: mediaField } = useController({ name: 'media', control });
+  const { field: mediaField } = useController({ name: 'attachments', control });
   const { field: mentionsField } = useController({
     name: 'mentionIds',
     control,
@@ -243,7 +244,9 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
             userId: post.userId,
             body: post.body ?? '',
             audience: post.audience,
-            media: post.media ? (post.media as LocalMedia[]) : [],
+            attachments: post.attachments
+              ? (post.attachments as LocalMedia[])
+              : [],
             mentionIds: post.mentionIds ?? [],
           }
         : { userId: account?._id },
@@ -298,9 +301,9 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       }
 
       const { userId, audience, body, mentionIds } = values;
-      let { media } = values;
-      if (attachment && media) {
-        media = [{ ...media[0], documentLink: attachment }];
+      let { attachments } = values;
+      if (attachment && attachments) {
+        attachments = [{ ...attachments[0], documentLink: attachment }];
       }
 
       navigation.navigate('ChooseCategory', {
@@ -308,12 +311,14 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
         userId,
         audience,
         body,
-        media: media?.map(({ url, aspectRatio, path, documentLink }) => ({
-          url,
-          aspectRatio,
-          path,
-          documentLink,
-        })),
+        attachments: attachments?.map(
+          ({ url, aspectRatio, path, documentLink }) => ({
+            url,
+            aspectRatio,
+            path,
+            documentLink,
+          }),
+        ),
         mentionIds, // TODO: Parse from body and add here
       });
     },
@@ -321,10 +326,10 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
   );
 
   const uploadMedia = useCallback(
-    async (media: ImageOrVideo): Promise<void> => {
+    async (attachments: ImageOrVideo): Promise<void> => {
       setUploading(true);
 
-      const fileUri = media.path;
+      const fileUri = attachments.path;
 
       const filename = fileUri.substring(fileUri.lastIndexOf('/') + 1);
       const { data } = await fetchUploadLink({
@@ -343,18 +348,18 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       const { remoteName, uploadUrl } = data.uploadLink;
       await upload(uploadUrl, fileUri);
 
-      const mediaValue = getValues('media') ?? [];
+      const mediaValue = getValues('attachments') ?? [];
       mediaField.onChange(
         Array.from(
           new Set([
             ...mediaValue,
             {
               url: remoteName,
-              aspectRatio: media.width / media.height,
+              aspectRatio: attachments.width / attachments.height,
               documentLink: attachment,
-              path: media.path,
-              width: media.width,
-              height: media.height,
+              path: attachments.path,
+              width: attachments.width,
+              height: attachments.height,
             },
           ]),
         ),
@@ -666,7 +671,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
                   ) : null}
                   {watchBody &&
                   !uploading &&
-                  !post?.media?.[0] &&
+                  !post?.attachments?.[0] &&
                   previewData ? (
                     <PreviewLink
                       previewData={previewData}
@@ -682,7 +687,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
                   horizontal
                   showsHorizontalScrollIndicator={false}
                   scrollEnabled={mediaField.value.length > 1}>
-                  {mediaField.value.map((media, index) => {
+                  {mediaField.value.map((attachments, index) => {
                     return (
                       <View
                         key={index}
@@ -692,10 +697,13 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
                             ? styles.previewContainer
                             : styles.onPreviewContainer,
                         ]}>
-                        <PostMedia
+                        <PostAttachment
                           userId={account._id}
                           mediaId={post?._id}
-                          media={{ ...media, url: media.path ?? media.url }}
+                          attachment={{
+                            ...attachments,
+                            url: attachments.path ?? attachments.url,
+                          }}
                           onLoad={({ naturalSize }) => {
                             if (naturalSize.orientation === 'portrait') {
                               mediaField.onChange({

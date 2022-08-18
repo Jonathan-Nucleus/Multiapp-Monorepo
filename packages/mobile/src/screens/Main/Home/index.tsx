@@ -29,7 +29,7 @@ import {
   isVideo,
   stopVideo,
   stopVideos,
-} from 'mobile/src/components/common/Media';
+} from 'mobile/src/components/common/Attachment';
 import pStyles from 'mobile/src/theme/pStyles';
 
 import { Post, usePosts } from 'shared/graphql/query/post/usePosts';
@@ -139,8 +139,9 @@ const HomeComponent: HomeScreen = ({ navigation }) => {
   >(({ changed }) => {
     changed.forEach((token) => {
       const item = token.item as Post;
-      const hasVideo = item.media
-        ? item.media.map((mediaItem) => isVideo(mediaItem.url ?? '')).length > 0
+      const hasVideo = item.attachments
+        ? item.attachments.map((attachment) => isVideo(attachment.url ?? ''))
+            .length > 0
         : false;
       if (!token.isViewable && hasVideo) {
         const key = `${item.userId}/${item._id}`;

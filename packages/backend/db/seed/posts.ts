@@ -65,7 +65,7 @@ export default async function (
           visible: true,
           isCompany: false,
           body: faker.lorem.paragraph(),
-          media: [
+          attachments: [
             {
               url: stockImages[randomInt(0, stockImages.length - 1)],
               aspectRatio: 1,

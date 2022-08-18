@@ -3,7 +3,7 @@ import Button from "../../../common/Button";
 import { Image as PhotoImage, PaperPlaneRight, Smiley } from "phosphor-react";
 import Label from "../../../common/Label";
 import Input from "../../../common/Input";
-import MediaPreview from "../../../modules/posts/EditPostModal/MediaPreview";
+import AttachmentPreview from "../../../modules/posts/EditPostModal/AttachmentPreview";
 import EmojiPicker from "../../../common/EmojiPicker";
 import * as yup from "yup";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -168,7 +168,7 @@ const MessageInput: FC<MessageInputProps> = ({ channel }) => {
               {selectedMedias.map((media, index) => (
                 <div key={index} className="px-2">
                   <div className="w-40 h-32 bg-black rounded-lg overflow-hidden relative">
-                    <MediaPreview
+                    <AttachmentPreview
                       file={media.file}
                       userId={account._id}
                       onLoaded={() => {}}

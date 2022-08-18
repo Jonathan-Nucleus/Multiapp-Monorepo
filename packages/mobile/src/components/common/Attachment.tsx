@@ -12,17 +12,17 @@ import { VideoProperties } from 'react-native-video';
 import Pinchable from 'react-native-pinchable';
 import { S3_BUCKET } from 'react-native-dotenv';
 
-import { Media as MediaType } from 'shared/graphql/fragments/post';
+import { Attachment as AttachmentType } from 'shared/graphql/fragments/post';
 
-import ExtendedMedia from './ExtendedMedia';
+import VideoPlayer from './VideoPlayer';
 import PText from './PText';
 import { showMessage } from '../../services/ToastService';
 import pStyles from '../../theme/pStyles';
 import { BLACK75, WHITE } from 'shared/src/colors';
 import { Body2Semibold } from '../../theme/fonts';
 
-interface MediaProps {
-  media: MediaType;
+interface AttachmentProps {
+  attachment: AttachmentType;
   controls?: boolean;
   style?: StyleProp<ImageStyle>;
   resizeMode?: 'contain' | 'cover';
@@ -79,9 +79,9 @@ export function stopVideo(id: string): void {
   videoPlaybackStartedSubscribers.get(id)?.('stop-this-video');
 }
 
-const Media: FC<MediaProps> = ({
+const Attachment: FC<AttachmentProps> = ({
   mediaId,
-  media,
+  attachment,
   style,
   onLoad,
   controls = true,
@@ -91,18 +91,18 @@ const Media: FC<MediaProps> = ({
 }) => {
   const [paused, setPaused] = useState(true);
 
-  const mediaUrl = `${
+  const attachmentUrl = `${
     type === 'fund' ? `${S3_BUCKET}/funds` : `${S3_BUCKET}/posts`
-  }/${mediaId}/${media.url}`;
+  }/${mediaId}/${attachment.url}`;
 
   const externalMediaId = mediaId ? mediaId.split('/')[0] : null;
 
   const documentLinkUrl = `${
     type === 'fund' ? null : `${S3_BUCKET}/posts`
-  }/${externalMediaId}/${media.documentLink}`;
+  }/${externalMediaId}/${attachment.documentLink}`;
 
   useEffect(() => {
-    if (isVideo(media.url)) {
+    if (isVideo(attachment.url)) {
       const appStateSubscription = AppState.addEventListener(
         'change',
         (newState) => {
@@ -125,7 +125,7 @@ const Media: FC<MediaProps> = ({
         appStateSubscription.remove();
       };
     }
-  }, [media.url, mediaId, paused]);
+  }, [attachment.url, mediaId, paused]);
 
   const togglePause = (): void => {
     const newState = !paused;
@@ -153,22 +153,22 @@ const Media: FC<MediaProps> = ({
 
   // TODO: Need to potentially validate the src url before feeding it to
   // react-native-video as an invalid source seems to crash the app
-  return isVideo(media.url) && media.url ? (
+  return isVideo(attachment.url) && attachment.url ? (
     <Pressable
       onPress={togglePause}
       style={[
         styles.media,
         style,
-        { aspectRatio: media.aspectRatio },
-        media.aspectRatio < 1 && resizeMode === 'contain'
+        { aspectRatio: attachment.aspectRatio },
+        attachment.aspectRatio < 1 && resizeMode === 'contain'
           ? styles.contain
           : null,
       ]}>
       <View style={[styles.videoContainer, style]}>
-        <ExtendedMedia
-          key={`${media.url}`}
-          media={media}
-          mediaUrl={mediaUrl}
+        <VideoPlayer
+          key={`${attachment.url}`}
+          media={attachment}
+          mediaUrl={attachmentUrl}
           onLoad={onLoad}
           paused={paused}
           setPaused={setPaused}
@@ -178,28 +178,30 @@ const Media: FC<MediaProps> = ({
       </View>
     </Pressable>
   ) : (
-    <Pressable onPress={onPress} disabled={!!media.documentLink}>
+    <Pressable onPress={onPress} disabled={!!attachment.documentLink}>
       <Pressable
         style={({ pressed }) => (pressed ? pStyles.pressedStyle : null)}
         onPress={openDocumentLink}
-        disabled={!media.documentLink}>
+        disabled={!attachment.documentLink}>
         <Pinchable maximumZoomScale={5}>
           <FastImage
             style={[
               styles.media,
               style,
-              { aspectRatio: media.aspectRatio },
-              media.aspectRatio < 1 && resizeMode === 'contain'
+              { aspectRatio: attachment.aspectRatio },
+              attachment.aspectRatio < 1 && resizeMode === 'contain'
                 ? styles.contain
                 : null,
             ]}
             source={{
-              uri: media.url.includes('/') ? media.url : mediaUrl,
+              uri: attachment.url.includes('/')
+                ? attachment.url
+                : attachmentUrl,
             }}
             resizeMode={resizeMode}
           />
         </Pinchable>
-        {media.documentLink ? (
+        {attachment.documentLink ? (
           <View style={styles.pdfTag}>
             <PText style={styles.pdfTagText}>PDF</PText>
           </View>
@@ -209,29 +211,29 @@ const Media: FC<MediaProps> = ({
   );
 };
 
-type PostMediaProps = Omit<MediaProps, 'type' | 'mediaId'> & {
+type PostAttachmentProps = Omit<AttachmentProps, 'type' | 'mediaId'> & {
   userId: string;
   mediaId?: string;
   onPress?: () => void;
 };
-export const PostMedia: FC<PostMediaProps> = ({
+export const PostAttachment: FC<PostAttachmentProps> = ({
   mediaId,
   userId,
   onPress,
   ...props
 }) => {
   const key = mediaId ? `${userId}/${mediaId}` : userId;
-  return <Media {...props} type="post" mediaId={key} onPress={onPress} />;
+  return <Attachment {...props} type="post" mediaId={key} onPress={onPress} />;
 };
 
-type FundMediaProps = Omit<MediaProps, 'type'>;
+type FundMediaProps = Omit<AttachmentProps, 'type'>;
 export const FundMedia: FC<FundMediaProps> = (props) => {
-  return <Media {...props} type="fund" />;
+  return <Attachment {...props} type="fund" />;
 };
 
-type MessageMediaProps = Omit<MediaProps, 'type'>;
+type MessageMediaProps = Omit<AttachmentProps, 'type'>;
 export const MessageMedia: FC<MessageMediaProps> = (props) => {
-  return <Media {...props} type="post" />;
+  return <Attachment {...props} type="post" />;
 };
 
 const styles = StyleSheet.create({

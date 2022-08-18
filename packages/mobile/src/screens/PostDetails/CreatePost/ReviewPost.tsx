@@ -13,7 +13,10 @@ import { WHITE, BLACK, BGDARK100 } from 'shared/src/colors';
 
 import PostSelection from './PostSelection';
 import PostHeader from './PostHeader';
-import { isVideo, PostMedia } from 'mobile/src/components/common/Media';
+import {
+  isVideo,
+  PostAttachment,
+} from 'mobile/src/components/common/Attachment';
 import PBodyText from 'mobile/src/components/common/PBodyText';
 import { AUDIENCE_OPTIONS } from './index';
 
@@ -24,20 +27,17 @@ import {
   useLinkPreview,
   LinkPreview,
 } from 'shared/graphql/query/post/useLinkPreview';
-import { Media as SharedPostMedia } from 'shared/graphql/fragments/post';
 
 import { ReviewPostScreen } from 'mobile/src/navigations/PostDetailsStack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const VideoPosted = 'VideoPosted';
 const DEVICE_WIDTH = Dimensions.get('window').width;
-interface EditPostMedia extends SharedPostMedia {
-  path?: string;
-}
 
 const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
   const { ...postData } = route.params;
-  const { userId, audience, categories, body, mentionIds, media } = postData;
+  const { userId, audience, categories, body, mentionIds, attachments } =
+    postData;
 
   const account = useAccountContext();
   const [createPost] = useCreatePost();
@@ -76,11 +76,11 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
       body,
       audience,
       categories,
-      media: media
-        ? media.map((mediaItem) => ({
-            url: mediaItem.url,
-            aspectRatio: mediaItem.aspectRatio,
-            documentLink: mediaItem.documentLink,
+      attachments: attachments
+        ? attachments.map((attachment) => ({
+            url: attachment.url,
+            aspectRatio: attachment.aspectRatio,
+            documentLink: attachment.documentLink,
           }))
         : undefined,
       mentionIds,
@@ -129,7 +129,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
       }
 
       if (success) {
-        if (media && media.some((item) => isVideo(item.url))) {
+        if (attachments && attachments.some((item) => isVideo(item.url))) {
           await AsyncStorage.setItem(VideoPosted, 'true');
         }
         isSubmitted.current = true;
@@ -173,31 +173,31 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
           {body ? <PBodyText body={body} collapseLongText={false} /> : null}
         </Text>
         <View style={styles.flex}>
-          {media && media.length > 0 && (
+          {attachments && attachments.length > 0 && (
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              scrollEnabled={media.length > 1}>
-              {media.map((item, index: number) => {
+              scrollEnabled={attachments.length > 1}>
+              {attachments.map((item, index: number) => {
                 return (
                   <View
                     key={index}
                     style={[
                       styles.attachment,
-                      media.length > 1
+                      attachments.length > 1
                         ? styles.previewContainer
                         : styles.onePreviewContainer,
                     ]}>
-                    <PostMedia
+                    <PostAttachment
                       userId={account._id}
                       mediaId={postData._id}
-                      media={{
+                      attachment={{
                         ...item,
                         url: item.path ?? item.url,
                       }}
                       style={[
                         styles.preview,
-                        media.length > 1
+                        attachments.length > 1
                           ? styles.multiPreview
                           : styles.onePreview,
                       ]}
@@ -208,7 +208,7 @@ const ReviewPost: ReviewPostScreen = ({ route, navigation }) => {
             </ScrollView>
           )}
         </View>
-        {media && !media[0]?.url && previewData && (
+        {attachments && !attachments[0]?.url && previewData && (
           <PreviewLink previewData={previewData} />
         )}
         {categories && categories.length > 0 && (

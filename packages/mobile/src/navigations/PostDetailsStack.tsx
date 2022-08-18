@@ -5,7 +5,9 @@ import {
 } from '@react-navigation/stack';
 import { CompositeScreenProps } from '@react-navigation/native';
 
-import CreatePost, { LocalMedia } from '../screens/PostDetails/CreatePost';
+import CreatePost, {
+  LocalMedia as LocalAttachment,
+} from '../screens/PostDetails/CreatePost';
 import SharePost from '../screens/PostDetails/SharePost';
 import PostDetail from '../screens/PostDetails/PostDetail';
 import ChooseCategory from '../screens/PostDetails/CreatePost/ChooseCategory';
@@ -39,7 +41,7 @@ export type PostDetailsStackParamList = {
       | 'audience'
       | 'categories'
       | 'body'
-      | 'media'
+      | 'attachments'
       | 'mentionIds'
       | 'userId'
     >;
@@ -53,7 +55,7 @@ export type PostDetailsStackParamList = {
     audience: Post['audience'];
     body?: Post['body'];
     mentionIds: Post['mentionIds'];
-    media?: LocalMedia[];
+    attachments?: LocalAttachment[];
     categories?: PostCategory[];
   };
   ReviewPost: PostDetailsStackParamList['ChooseCategory'] & {

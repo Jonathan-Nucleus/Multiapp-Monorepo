@@ -32,7 +32,7 @@ import {
   SpeakerSimpleSlash,
 } from 'phosphor-react-native';
 import { DISABLED, GRAY100, GRAY20, GRAY800, WHITE } from 'shared/src/colors';
-import { Media as MediaType } from 'shared/graphql/fragments/post';
+import { Attachment as AttachmentType } from 'shared/graphql/fragments/post';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const iconSize = 22;
@@ -47,8 +47,8 @@ enum SeekerStatus {
   Cancel,
 }
 
-interface ExtendedMediaProps {
-  media: MediaType;
+interface VideoPlayerProps {
+  media: AttachmentType;
   mediaUrl: string;
   resizeMode?: 'contain' | 'cover';
   showOnStart?: boolean;
@@ -63,7 +63,7 @@ interface ExtendedMediaProps {
   controls?: boolean;
 }
 
-const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
+const VideoPlayer: React.FC<VideoPlayerProps> = ({
   media,
   mediaUrl,
   resizeMode = 'contain',
@@ -776,7 +776,7 @@ const ExtendedMedia: React.FC<ExtendedMediaProps> = ({
   );
 };
 
-export default ExtendedMedia;
+export default VideoPlayer;
 
 const styles = {
   player: StyleSheet.create({

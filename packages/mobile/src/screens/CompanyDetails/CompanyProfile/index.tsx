@@ -26,7 +26,7 @@ import CompanyDetail from './CompanyDetail';
 import FundList from 'mobile/src/components/main/funds/FundList';
 import ProfilePlaceholder from '../../../components/placeholder/ProfilePlaceholder';
 import PostItemPlaceholder from 'mobile/src/components/placeholder/PostItemPlaceholder';
-import { stopVideos } from 'mobile/src/components/common/Media';
+import { stopVideos } from 'mobile/src/components/common/Attachment';
 
 import { Post } from 'shared/graphql/query/post/usePosts';
 import { useAccount } from 'shared/graphql/query/account/useAccount';

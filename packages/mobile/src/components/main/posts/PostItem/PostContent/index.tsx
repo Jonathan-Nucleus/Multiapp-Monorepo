@@ -10,7 +10,7 @@ import { DotsThreeVertical } from 'phosphor-react-native';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 
 import UserInfo from 'mobile/src/components/common/UserInfo';
-import { PostMedia } from 'mobile/src/components/common/Media';
+import { PostAttachment } from 'mobile/src/components/common/Attachment';
 import PBodyText from 'mobile/src/components/common/PBodyText';
 import PreviewLink from 'mobile/src/components/common/PreviewLink';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
@@ -20,7 +20,7 @@ import { BLACK, PRIMARYSOLID, WHITE60 } from 'shared/src/colors';
 import UserPostActionModal from './UserPostActionModal';
 import OwnPostActionModal from './OwnPostActionModal';
 import SharePostItem from 'mobile/src/components/main/posts/SharePostItem';
-import { Media as MediaType } from 'shared/graphql/fragments/post';
+import { Attachment as AttachmentType } from 'shared/graphql/fragments/post';
 
 import { Post } from 'shared/graphql/query/post/usePosts';
 
@@ -42,7 +42,7 @@ const PostContent: React.FC<PostContentProps> = ({
   onPress,
 }) => {
   const [slideIndex, setSlideIndex] = useState(0);
-  const { user, company, body, media, preview } = post;
+  const { user, company, body, attachments, preview } = post;
 
   const account = useAccountContext();
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -117,11 +117,15 @@ const PostContent: React.FC<PostContentProps> = ({
     }
   };
 
-  const renderPostMedia = ({ item }: { item: MediaType }): ReactElement => (
-    <PostMedia
+  const renderPostMedia = ({
+    item,
+  }: {
+    item: AttachmentType;
+  }): ReactElement => (
+    <PostAttachment
       userId={post.userId}
       mediaId={post._id}
-      media={item}
+      attachment={item}
       style={styles.media}
       onPress={onPress || goToDetails}
     />
@@ -153,11 +157,11 @@ const PostContent: React.FC<PostContentProps> = ({
         <Pressable onPress={() => goToDetails()}>
           <PBodyText body={body} collapseLongText={true} style={styles.body} />
         </Pressable>
-        {media && media.length > 0 ? (
+        {attachments && attachments.length > 0 ? (
           <View>
             <Carousel
-              data={media}
-              scrollEnabled={media.length > 1}
+              data={attachments}
+              scrollEnabled={attachments.length > 1}
               canCancelContentTouches={true}
               sliderWidth={itemWidth}
               itemWidth={itemWidth}
@@ -169,7 +173,7 @@ const PostContent: React.FC<PostContentProps> = ({
             <Pagination
               containerStyle={styles.paginationContainer}
               activeDotIndex={slideIndex}
-              dotsLength={media.length}
+              dotsLength={attachments.length}
               dotStyle={styles.dot}
               inactiveDotScale={1}
               inactiveDotStyle={styles.inactiveDot}

@@ -22,7 +22,7 @@ describe("Mutations - editPost", () => {
         _id
         audience
         body
-        media {
+        attachments {
           url
           aspectRatio
         }
@@ -47,7 +47,7 @@ describe("Mutations - editPost", () => {
     body: faker.lorem.sentence(),
     audience: "EVERYONE",
     categories: ["NEWS"],
-    media: [
+    attachments: [
       {
         url: "test.png",
         aspectRatio: 1.58,

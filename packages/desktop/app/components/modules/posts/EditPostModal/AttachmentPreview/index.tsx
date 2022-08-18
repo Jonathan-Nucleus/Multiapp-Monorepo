@@ -2,15 +2,15 @@ import { FC, useMemo, useState } from "react";
 
 import Button from "../../../../common/Button";
 import Media from "../../../../common/Media";
-import PostMedia from "../../PostMedia";
+import PostAttachment from "../../PostAttachment";
 import Spinner from "../../../../common/Spinner";
 import { XCircle } from "phosphor-react";
 
-import { Media as PostMediaType } from "shared/graphql/fragments/post";
+import { Attachment as PostAttachmentType } from "shared/graphql/fragments/post";
 import { MediaType } from "shared/src/media";
 
-interface MediaPreviewProps {
-  media?: PostMediaType;
+interface AttachmentPreviewProps {
+  attachment?: PostAttachmentType;
   file?: File;
   postId?: string;
   userId: string;
@@ -22,8 +22,8 @@ interface MediaPreviewProps {
   onRemove: () => void;
 }
 
-const MediaPreview: FC<MediaPreviewProps> = ({
-  media,
+const AttachmentPreview: FC<AttachmentPreviewProps> = ({
+  attachment,
   file,
   userId,
   postId,
@@ -43,10 +43,12 @@ const MediaPreview: FC<MediaPreviewProps> = ({
       return null;
     }
   }, [file]);
-  const [aspectRatio, setAspectRatio] = useState(media?.aspectRatio ?? 0.5);
+  const [aspectRatio, setAspectRatio] = useState(
+    attachment?.aspectRatio ?? 0.5
+  );
   return (
     <>
-      {(filePreview || media) && (
+      {(filePreview || attachment) && (
         <div className="h-full">
           <div className="relative rounded-lg overflow-hidden h-full">
             <>
@@ -63,10 +65,10 @@ const MediaPreview: FC<MediaPreviewProps> = ({
                   }}
                 />
               )}
-              {!filePreview && media && (
-                <PostMedia
+              {!filePreview && attachment && (
+                <PostAttachment
                   userId={userId}
-                  media={media}
+                  attachment={attachment}
                   postId={postId}
                   maxHeight={maxHeight}
                 />
@@ -93,4 +95,4 @@ const MediaPreview: FC<MediaPreviewProps> = ({
   );
 };
 
-export default MediaPreview;
+export default AttachmentPreview;

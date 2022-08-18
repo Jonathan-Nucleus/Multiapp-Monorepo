@@ -769,23 +769,31 @@ const resolvers = {
                 body: yup
                   .string()
                   .notRequired()
-                  .when("media", {
-                    is: (media: PostMedia[]) => !media || media.length === 0,
+                  .when("attachments", {
+                    is: (attachments: PostMedia[]) =>
+                      !attachments || attachments.length === 0,
                     then: yup.string().required("Required"),
                   }),
-                media: yup
+                attachments: yup
                   .array()
                   .of(
                     yup.object({
-                      url: yup.string().required().default(""),
-                      aspectRatio: yup.number().required().default(1.58),
+                      url: yup.string().required(),
+                      aspectRatio: yup.number().required(),
                       documentLink: yup.string(),
-                      transcoded: yup.boolean(),
                     })
                   )
                   .ensure()
                   .default([])
                   .notRequired(),
+                media: yup
+                  .object({
+                    url: yup.string().required(),
+                    aspectRatio: yup.number().required(),
+                    documentLink: yup.string(),
+                  })
+                  .notRequired()
+                  .default(undefined),
                 mentionIds: yup.array().of(
                   yup.string().test({
                     test: isObjectId,
@@ -816,29 +824,39 @@ const resolvers = {
           throw new BadRequestError("Not authorized");
         }
 
-        const postData = await db.posts.create(post, user._id);
+        // For backward/forward-compatability, if the media field is present
+        // on the post data, copy the data over to the new attachments field.
+        // Also copy the first item from the attachments field to media.
+        const migratedPost = {
+          ...post,
+          ...(post.media ? { attachments: [post.media] } : {}),
+          ...(post.attachments ? { media: post.attachments[0] } : {}),
+        };
+        const postData = await db.posts.create(migratedPost, user._id);
 
         // Move AWS media to the appropriate post folder
-        if (postData.media) {
-          const moveMediaResults = await Promise.all(
-            postData.media?.map(async (media) =>
+        if (postData.attachments) {
+          const moveAttachmentsResults = await Promise.all(
+            postData.attachments?.map(async (attachment) =>
               movePostMedia(
                 user._id.toString(),
                 user._id.toString(),
                 postData._id.toString(),
-                media.url
+                attachment.url
               )
-            )
+            ) ?? []
           );
-          if (moveMediaResults.some((result) => !result)) {
+          if (moveAttachmentsResults.some((result) => !result)) {
             console.log(
-              "Error moving media assets",
-              postData.media?.map((item) => item.url),
+              "Error moving attachments",
+              postData.attachments?.map((item) => item.url),
               "for post",
               postData._id,
-              moveMediaResults
+              moveAttachmentsResults
             );
-          } else if (moveMediaResults.every((result) => result.mediaReady)) {
+          } else if (
+            moveAttachmentsResults.every((result) => result.mediaReady)
+          ) {
             await db.posts.setVisible(postData._id, true, postData.userId);
           }
         }
@@ -894,23 +912,31 @@ const resolvers = {
                 body: yup
                   .string()
                   .notRequired()
-                  .when("media", {
-                    is: (media: PostMedia[]) => !media || media.length === 0,
+                  .when("attachments", {
+                    is: (attachments: PostMedia[]) =>
+                      !attachments || attachments.length === 0,
                     then: yup.string().required("Required"),
                   }),
-                media: yup
+                attachments: yup
                   .array()
                   .of(
                     yup.object({
-                      url: yup.string().required().default(""),
-                      aspectRatio: yup.number().required().default(1.58),
+                      url: yup.string().required(),
+                      aspectRatio: yup.number().required(),
                       documentLink: yup.string(),
-                      transcoded: yup.boolean(),
                     })
                   )
                   .ensure()
                   .default([])
                   .notRequired(),
+                media: yup
+                  .object({
+                    url: yup.string().required(),
+                    aspectRatio: yup.number().required(),
+                    documentLink: yup.string(),
+                  })
+                  .notRequired()
+                  .default(undefined),
                 mentionIds: yup.array().of(
                   yup.string().test({
                     test: isObjectId,
@@ -928,7 +954,16 @@ const resolvers = {
 
         validateArgs(validator, args);
 
-        const { post } = args;
+        const { post: postData } = args;
+        // For backward/forward-compatability, if the media field is present
+        // on the post data, copy the data over to the new attachments field.
+        // Also copy the first item from the attachments field to media.
+        const post = {
+          ...postData,
+          ...(postData.media ? { attachments: [postData.media] } : {}),
+          ...(postData.attachments ? { media: postData.attachments[0] } : {}),
+        };
+
         if (
           user._id.toString() !== post.userId &&
           !user.companyIds?.find(
@@ -944,30 +979,34 @@ const resolvers = {
         }
 
         // Move AWS media to the appropriate post folder
-        if (post.media) {
-          const originalMedia =
-            originalPost.media?.map((media) => media.url) ?? [];
-          const moveMediaResults = await Promise.all(
-            post.media
-              ?.filter((media) => !originalMedia.includes(media.url))
-              .map(async (media) =>
+        if (post.attachments) {
+          const originalAttachments =
+            originalPost.attachments?.map((attachment) => attachment.url) ?? [];
+          const moveAttachmentsResults = await Promise.all(
+            post.attachments
+              ?.filter(
+                (attachment) => !originalAttachments.includes(attachment.url)
+              )
+              .map(async (attachment) =>
                 movePostMedia(
                   user._id.toString(),
                   user._id.toString(),
                   post._id.toString(),
-                  media.url
+                  attachment.url
                 )
               )
           );
-          if (moveMediaResults.some((result) => !result.success)) {
+          if (moveAttachmentsResults.some((result) => !result.success)) {
             console.log(
-              "Error moving media assets",
-              post.media?.map((item) => item.url),
+              "Error moving attachments",
+              post.attachments?.map((item) => item.url),
               "for post",
               post._id,
-              moveMediaResults
+              moveAttachmentsResults
             );
-          } else if (moveMediaResults.every((result) => result.mediaReady)) {
+          } else if (
+            moveAttachmentsResults.every((result) => result.mediaReady)
+          ) {
             await db.posts.setVisible(post._id, true, post.userId);
           }
         }
@@ -1084,7 +1123,7 @@ const resolvers = {
     ) => {
       try {
         const { mediaUrl, postId } = decodeTranscoderToken(token);
-        await db.posts.updatePostMedia(postId, mediaUrl);
+        await db.posts.updatePostAttachment(postId, mediaUrl);
 
         return true;
       } catch (err) {

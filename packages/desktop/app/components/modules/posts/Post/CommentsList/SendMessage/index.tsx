@@ -8,7 +8,7 @@ import Input from "../../../../../common/Input";
 import EmojiPicker from "../../../../../common/EmojiPicker";
 import Label from "../../../../../common/Label";
 import { useAccountContext } from "shared/context/Account";
-import MediaPreview from "../../../EditPostModal/MediaPreview";
+import AttachmentPreview from "../../../EditPostModal/AttachmentPreview";
 import * as yup from "yup";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -184,7 +184,7 @@ const SendMessage: FC<SendMessageProps> = ({
                 </Label>
               </div>
             </div>
-            <MediaPreview
+            <AttachmentPreview
               file={selectedFile}
               userId={account._id}
               onLoaded={() => {}}

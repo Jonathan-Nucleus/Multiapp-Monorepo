@@ -20,7 +20,7 @@ import PMarkdown from 'mobile/src/components/common/PMarkdown';
 import Accordion from 'mobile/src/components/common/Accordion';
 import TeamList from 'mobile/src/components/main/funds/TeamList';
 import DetailedTeamList from 'mobile/src/components/main/funds/DetailedTeamList';
-import { FundMedia } from 'mobile/src/components/common/Media';
+import { FundMedia } from 'mobile/src/components/common/Attachment';
 import Disclosure from 'mobile/src/components/main/Disclosure';
 import pStyles from 'mobile/src/theme/pStyles';
 import {
@@ -84,7 +84,7 @@ const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
       onPress={() => setVideoIndex(index)}>
       <View pointerEvents="none">
         <FundMedia
-          media={{ url: vid, aspectRatio: 1.58 }}
+          attachment={{ url: vid, aspectRatio: 1.58 }}
           mediaId={fund._id}
           style={styles.videoPreviewItem}
           controls={false}
@@ -126,7 +126,7 @@ const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
       {video ? (
         <View style={styles.videoContainer}>
           <FundMedia
-            media={{ url: video, aspectRatio: 1.58 }}
+            attachment={{ url: video, aspectRatio: 1.58 }}
             mediaId={fund._id}
           />
         </View>

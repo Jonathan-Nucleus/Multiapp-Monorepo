@@ -24,7 +24,7 @@ import {
   WHITE60,
 } from 'shared/src/colors';
 
-import { stopVideos } from 'mobile/src/components/common/Media';
+import { stopVideos } from 'mobile/src/components/common/Attachment';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 import FundProfileInfo from 'mobile/src/components/main/funds/FundProfileInfo';
 import FundOverview from './FundOverview';

@@ -212,8 +212,6 @@ const createPostsCollection = (
      *
      * @param post    The new post data.
      * @param userId  The ID of the user creating the post.
-     * @param visible Optional param indicating whether the post should be
-     *                visible on creation. Defaults to true.
      *
      * @returns   Persisted post data with id.
      */
@@ -221,23 +219,23 @@ const createPostsCollection = (
       const { companyId, mentionIds, ...otherData } = post;
       const isCompany = !!companyId;
 
-      // Update media entries to reflect video files that have not yet been
+      // Update attachment entries to reflect video files that have not yet been
       // transcoded.
-      const media = post.media?.map((item) => ({
+      const attachments = post.attachments?.map((item) => ({
         ...item,
         ...(isVideo(item.url) ? { transcoded: false } : {}),
       }));
 
-      // A post is only visible by default if it does not have media
-      // attachments. Otherwise, it is only visible once all media items
-      // have successfully been moved into the appropriate S3 bucket.
-      const visible = !media;
+      // A post is only visible by default if it does not have attachments/
+      // Otherwise, it is only visible once all attachments have successfully
+      // been moved into the appropriate S3 bucket.
+      const visible = !attachments;
 
       const postData: Post.Mongo = {
         ...otherData,
         _id: new ObjectId(),
         mentionIds: mentionIds ? toObjectIds(mentionIds) : undefined,
-        media,
+        attachments,
         visible,
         userId: toObjectId(companyId ?? userId),
         isCompany,
@@ -510,27 +508,27 @@ const createPostsCollection = (
     },
 
     /**
-     * Updates the status of a transcoding media item to complete.
+     * Updates the status of a transcoding attachment item to complete.
      *
      * @param postId    The ID of the post.
-     * @param mediaUrl  The final name of the media file.
+     * @param attachmentUrl  The final name of the attachment.
      *
      * @returns   The updated Post or null if it could not be updated.
      */
-    updatePostMedia: async (
+    updatePostAttachment: async (
       postId: MongoId,
-      mediaUrl: string
+      attachmentUrl: string
     ): Promise<Post.Mongo> => {
       const result = await postsCollection.findOneAndUpdate(
         {
           _id: toObjectId(postId),
-          "media.transcoded": false,
+          "attachments.transcoded": false,
           deleted: { $exists: false },
         },
         {
           $set: {
-            "media.$.url": mediaUrl,
-            "media.$.transcoded": true,
+            "attachments.$.url": attachmentUrl,
+            "attachments.$.transcoded": true,
             visible: true,
           },
         },

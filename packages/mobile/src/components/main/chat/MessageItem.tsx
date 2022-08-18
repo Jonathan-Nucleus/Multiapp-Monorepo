@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, Linking, Pressable } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import dayjs from 'dayjs';
 
-import { MessageMedia } from 'mobile/src/components/common/Media';
+import { MessageMedia } from 'mobile/src/components/common/Attachment';
 import FullScreenImageModal from 'mobile/src/components/common/FullScreenImageModal';
 import PBodyText from 'mobile/src/components/common/PBodyText';
 import { WHITE, PRIMARYSOLID, GRAY700, GRAY600 } from 'shared/src/colors';
@@ -97,7 +97,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
                   attachment.type === 'video' ? (
                     <MessageMedia
                       mediaId={`${message.id}-${index}`}
-                      media={{ url: mediaUrl, aspectRatio: 1 }}
+                      attachment={{ url: mediaUrl, aspectRatio: 1 }}
                     />
                   ) : (
                     <FastImage

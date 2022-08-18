@@ -8,7 +8,7 @@ export type PostSummary = Pick<
   | "_id"
   | "body"
   | "categories"
-  | "media"
+  | "attachments"
   | "preview"
   | "audience"
   | "mentionIds"
@@ -34,7 +34,7 @@ export type PostSummary = Pick<
   company?: Pick<Company, "_id" | "name" | "avatar">;
 };
 
-export type Media = Exclude<Post["media"], undefined>[number];
+export type Attachment = Exclude<Post["attachments"], undefined>[number];
 
 export const POST_SUMMARY_FRAGMENT = gql`
   fragment PostSummaryFields on Post {
@@ -42,7 +42,7 @@ export const POST_SUMMARY_FRAGMENT = gql`
     body
     categories
     audience
-    media {
+    attachments {
       url
       aspectRatio
       documentLink

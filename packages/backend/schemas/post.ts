@@ -17,7 +17,11 @@ export namespace Post {
     isCompany: boolean;
     audience: Audience;
     body?: string;
-    media?: Media[];
+
+    // @deprecated since version 2.3.0 (8/17/2022). Use `attachments` instead
+    media?: Media;
+
+    attachments?: Media[];
     preview?: LinkPreview;
     mentionIds?: ObjectId[];
     categories: PostCategory[];
@@ -56,7 +60,7 @@ export namespace Post {
   // have been transformed to their Mongo types.
   export type Input = Pick<
     GraphQL,
-    "body" | "media" | "preview" | "mentionIds"
+    "body" | "media" | "attachments" | "preview" | "mentionIds"
   > &
     Pick<Mongo, "audience" | "categories"> & {
       companyId?: string;
@@ -67,7 +71,13 @@ export namespace Post {
 
   export type Update = Pick<
     GraphQL,
-    "_id" | "body" | "mentionIds" | "media" | "preview" | "userId"
+    | "_id"
+    | "body"
+    | "mentionIds"
+    | "media"
+    | "attachments"
+    | "preview"
+    | "userId"
   > &
     Pick<Mongo, "audience" | "categories">;
 }
@@ -225,7 +235,8 @@ export const PostSchema = `
     isCompany: Boolean!
     audience: Audience!
     body: String
-    media: [Media!]
+    media: Media @deprecated(reason: "use 'attachments'.")
+    attachments: [Media!]
     preview: LinkPreview
     mentionIds: [ID!]
     categories: [PostCategory!]!
@@ -267,7 +278,8 @@ export const PostSchema = `
     companyId: ID
     audience: Audience!
     body: String
-    media: [MediaInput!]
+    media: MediaInput @deprecated(reason: "use 'attachments'.")
+    attachments: [MediaInput!]
     preview: LinkPreviewInput
     categories: [PostCategory!]!
     mentionIds: [ID!]
@@ -278,7 +290,8 @@ export const PostSchema = `
     userId: ID!
     audience: Audience!
     body: String
-    media: [MediaInput!]
+    media: MediaInput @deprecated(reason: "use 'attachments'.")
+    attachments: [MediaInput!]
     preview: LinkPreviewInput
     categories: [PostCategory!]!
     mentionIds: [ID!]
