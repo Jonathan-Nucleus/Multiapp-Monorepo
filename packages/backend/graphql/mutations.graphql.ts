@@ -840,7 +840,7 @@ const resolvers = {
             postData.attachments?.map(async (attachment) =>
               movePostMedia(
                 user._id.toString(),
-                user._id.toString(),
+                postData.userId.toString(),
                 postData._id.toString(),
                 attachment.url
               )
@@ -990,7 +990,7 @@ const resolvers = {
               .map(async (attachment) =>
                 movePostMedia(
                   user._id.toString(),
-                  user._id.toString(),
+                  post.userId.toString(),
                   post._id.toString(),
                   attachment.url
                 )
