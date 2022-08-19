@@ -1,9 +1,11 @@
-import { FC } from "react";
+import { FC, useMemo, useState } from "react";
 import LinkPreview from "../../LinkPreview";
 import PostAttachment from "../../PostAttachment";
 import { Post as PostType } from "shared/graphql/query/post/usePosts";
 import Post from "..";
 import BodyText from "./BodyText";
+import GalleryView from "../../GalleryView";
+import { getMediaTypeFrom } from "shared/src/media";
 
 interface PostBodyProps {
   post: PostType;
@@ -14,6 +16,14 @@ const PostBody: FC<PostBodyProps> = ({
   post,
   isPreview = false,
 }: PostBodyProps) => {
+  const [galleryIndex, setGalleryIndex] = useState<number>();
+  const postImages = useMemo(() => {
+    return (
+      post.attachments?.filter(
+        (item) => getMediaTypeFrom(item.url) == "image"
+      ) ?? []
+    );
+  }, [post.attachments]);
   return (
     <>
       <div className="px-4">
@@ -35,13 +45,17 @@ const PostBody: FC<PostBodyProps> = ({
             post.attachments.length > 1 ? "mx-2 grid-cols-2" : "grid-cols-1"
           }`}
         >
-          {post.attachments.slice(0, 2).map((attachments, index) => (
-            <div key={index}>
+          {post.attachments.slice(0, 2).map((attachment, index) => (
+            <div
+              key={index}
+              className="cursor-pointer"
+              onClick={() => setGalleryIndex(index)}
+            >
               <PostAttachment
-                attachment={attachments}
+                attachment={attachment}
                 userId={post.userId}
                 postId={post._id}
-                multiple={post.attachments && post.attachments?.length > 1}
+                multiple={post.attachments!.length > 1}
               />
             </div>
           ))}
@@ -53,23 +67,33 @@ const PostBody: FC<PostBodyProps> = ({
             post.attachments.length === 4 ? "grid-cols-2" : "grid-cols-3"
           }`}
         >
-          {post.attachments.slice(2, 5).map((attachments, index) => (
+          {post.attachments.slice(2, 5).map((attachment, index) => (
             <div
               key={index}
               className={`${
-                post.attachments?.length === 3 ? "col-span-3" : ""
-              }`}
+                post.attachments?.length == 3 ? "col-span-3" : ""
+              } cursor-pointer`}
+              onClick={() => setGalleryIndex(index + 2)}
             >
               <PostAttachment
-                attachment={attachments}
+                attachment={attachment}
                 userId={post.userId}
                 postId={post._id}
-                multiple={post.attachments && post.attachments?.length > 1}
-                aspectRatio={post.attachments?.length === 3 ? 3 : undefined}
+                multiple={post.attachments!.length > 1}
               />
             </div>
           ))}
         </div>
+      )}
+      {galleryIndex != undefined && postImages.length > 0 && (
+        <GalleryView
+          show={true}
+          postId={post._id}
+          userId={post.userId}
+          images={postImages}
+          index={galleryIndex}
+          onClose={() => setGalleryIndex(undefined)}
+        />
       )}
       {post.sharedPost && (
         <div className="border border-brand-overlay/[.1] rounded overflow-hidden mx-4 mt-4">
