@@ -18,6 +18,7 @@ import Google from "shared/assets/images/google.svg";
 import LogoWithText from "shared/assets/images/logo-gradient.svg";
 import { toast } from "../../common/Toast";
 import { Transition } from "@headlessui/react";
+import AnimatingLogo from "../../modules/onboarding/AnimatingLogo";
 
 const PROVIDER_ICONS: Record<string, string> = {
   apple: Apple,
@@ -90,16 +91,7 @@ const LoginPage: FC<LoginPageProps> = ({ ssoProviders }: LoginPageProps) => {
           <Image src={LogoWithText} alt="" width={238} height={42} />
         </div>
       )}
-      <Transition
-        show={step == 2}
-        enter="transition-all ease-out duration-1000"
-        enterFrom="translate-y-0"
-        enterTo="translate-y-verticalCenter"
-      >
-        <div className="text-center py-20">
-          <Image src={LogoWithText} alt="" width={238} height={42} />
-        </div>
-      </Transition>
+      <AnimatingLogo show={step == 2} />
       <Transition
         show={step == 0}
         enter="transition-opacity ease-linear duration-1000"

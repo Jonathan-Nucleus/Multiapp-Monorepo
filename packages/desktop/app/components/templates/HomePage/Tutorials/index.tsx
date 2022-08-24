@@ -40,7 +40,7 @@ const steps: Step[] = [
   },
   {
     element: "#invite-card",
-    intro: "Tap more to<br/>invite your network!",
+    intro: "Send a private invite code to your friends",
     position: "left",
     highlightClass: "rounded-2xl",
   },

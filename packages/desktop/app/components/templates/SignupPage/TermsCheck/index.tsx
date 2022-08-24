@@ -10,6 +10,7 @@ import { signIn } from "next-auth/react";
 import { toast } from "../../../common/Toast";
 import { Transition } from "@headlessui/react";
 import { useRouter } from "next/router";
+import AnimatingLogo from "../../../modules/onboarding/AnimatingLogo";
 
 interface TermsCheckProps {
   formData: FormValues;
@@ -66,16 +67,7 @@ const TermsCheck: FC<TermsCheckProps> = ({ formData, code, onBack }) => {
             <Image src={LogoWithText} alt="" width={238} height={42} />
           </div>
         )}
-        <Transition
-          show={step == 2}
-          enter="transition-all ease-out duration-1000"
-          enterFrom="translate-y-0"
-          enterTo="translate-y-verticalCenter"
-        >
-          <div className="text-center py-20">
-            <Image src={LogoWithText} alt="" width={238} height={42} />
-          </div>
-        </Transition>
+        <AnimatingLogo show={step == 2} />
         <Transition
           show={step == 0}
           enter="transition-opacity ease-linear duration-1000"

@@ -5,7 +5,7 @@ import { useMutation } from "@apollo/client";
 import { UPDATE_SETTINGS } from "shared/graphql/mutation/account";
 import { toast } from "../../common/Toast";
 import UserTypeSettings from "./UserTypeSettings";
-import AnimatingLogo from "./AnimatingLogo";
+import AnimatingLogo from "../../modules/onboarding/AnimatingLogo";
 import { useRouter } from "next/router";
 
 const PreferencesPage: FC = () => {
