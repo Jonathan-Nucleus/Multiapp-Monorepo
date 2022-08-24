@@ -8,7 +8,6 @@ const RequestCode: NextPageWithLayout = () => {
       <Head>
         <title>Get an Invite</title>
         <meta name="description" content="" />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <RequestCodePage />
     </div>

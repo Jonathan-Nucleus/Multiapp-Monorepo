@@ -22,7 +22,6 @@ const Search: NextPageWithLayout = () => {
       <Head>
         <title>Search {validRoute.title} - Prometheus</title>
         <meta name="description" content="" />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <SearchPage type={validRoute.type} query={query} />
     </div>

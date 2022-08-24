@@ -8,7 +8,6 @@ const Companies: NextPageWithLayout = () => {
       <Head>
         <title>Companies - Prometheus</title>
         <meta name="description" content="" />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <CompaniesPage />
     </div>

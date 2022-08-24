@@ -11,7 +11,6 @@ const Messages: NextPageWithLayout = () => {
       <Head>
         <title>Messages</title>
         <meta name="description" content="" />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <MessagesPage user={user} />
     </div>

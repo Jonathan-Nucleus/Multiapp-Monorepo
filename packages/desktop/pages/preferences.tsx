@@ -8,7 +8,6 @@ const Preferences: NextPageWithLayout = () => {
       <Head>
         <title>Preferences</title>
         <meta name="description" content="" />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <PreferencesPage />
     </div>

@@ -28,7 +28,6 @@ const Signup: NextPageWithLayout<LoginProps> = ({}) => {
       <Head>
         <title>Signup - Prometheus</title>
         <meta name="description" content="" />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       {!loading && data?.verifyInvite && <SignupPage ssoProviders={[]} />}
     </div>

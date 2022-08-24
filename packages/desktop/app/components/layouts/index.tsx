@@ -14,6 +14,7 @@ import { ToastContainer } from "react-toastify";
 import AnalyticsScripts from "./AnalyticsScripts";
 import OnboardingLayout from "./OnboardingLayout";
 import { LocalStorage } from "../../lib/storageHelper";
+import Head from "next/head";
 
 type RootLayoutProps = PropsWithChildren<AppPageProps> & {
   getstreamKey: string;
@@ -57,6 +58,9 @@ const RootLayout: FC<RootLayoutProps> = ({
 
   return (
     <>
+      <Head>
+        <link rel="icon" href="favicon.ico" />
+      </Head>
       <NextNProgress
         color="#29D"
         startPosition={0.3}

@@ -18,7 +18,6 @@ const Login: NextPageWithLayout<LoginProps> = ({}) => {
       <Head>
         <title>Prometheus Login</title>
         <meta name="description" content="" />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <LoginPage ssoProviders={[]} />
     </div>
