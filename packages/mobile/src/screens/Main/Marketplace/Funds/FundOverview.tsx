@@ -113,7 +113,7 @@ const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
 
       if (data && data.documentToken) {
         Linking.openURL(
-          `${process.env.WATRMARKING_SERVICE_URL}?token=${data.documentToken}`,
+          `${process.env.NEXT_PUBLIC_WATERMARKING_SERVICE_URL}?token=${data.documentToken}`,
         );
       }
     } catch (err) {

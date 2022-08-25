@@ -18,7 +18,7 @@ interface FundDocumentsProps {
 }
 
 const { publicRuntimeConfig = {} } = getConfig();
-const { WATRMARKING_SERVICE_URL } = publicRuntimeConfig;
+const { NEXT_PUBLIC_WATERMARKING_SERVICE_URL } = publicRuntimeConfig;
 
 const FundDocuments: FC<FundDocumentsProps> = ({ fundId, documents }) => {
   const [showMore, setShowMore] = useState(false);
@@ -46,7 +46,7 @@ const FundDocuments: FC<FundDocumentsProps> = ({ fundId, documents }) => {
       });
 
       if (data && data.documentToken) {
-        window.open(`${WATRMARKING_SERVICE_URL}?token=${data.documentToken}`);
+        window.open(`${NEXT_PUBLIC_WATERMARKING_SERVICE_URL}?token=${data.documentToken}`);
       }
     } catch (err) {
       console.log(err instanceof Error ? err.message : err);

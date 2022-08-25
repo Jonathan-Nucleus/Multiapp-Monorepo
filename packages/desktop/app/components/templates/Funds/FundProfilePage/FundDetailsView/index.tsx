@@ -21,7 +21,7 @@ import getConfig from "next/config";
 
 const MONTHS = dayjs().localeData().monthsShort();
 const { publicRuntimeConfig = {} } = getConfig();
-const { WATRMARKING_SERVICE_URL } = publicRuntimeConfig;
+const { NEXT_PUBLIC_WATERMARKING_SERVICE_URL } = publicRuntimeConfig;
 
 interface FundDetailsViewProps {
   fund: FundDetails;
@@ -63,7 +63,7 @@ const FundDetailsView: FC<FundDetailsViewProps> = ({ fund }) => {
       });
 
       if (data && data.documentToken) {
-        window.open(`${WATRMARKING_SERVICE_URL}?token=${data.documentToken}`);
+        window.open(`${NEXT_PUBLIC_WATERMARKING_SERVICE_URL}?token=${data.documentToken}`);
       }
     } catch (err) {
       console.log(err instanceof Error ? err.message : err);

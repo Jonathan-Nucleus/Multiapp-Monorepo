@@ -26,7 +26,7 @@ dayjs.extend(localData);
 dayjs.extend(utc);
 
 const { publicRuntimeConfig = {} } = getConfig();
-const { WATRMARKING_SERVICE_URL } = publicRuntimeConfig;
+const { NEXT_PUBLIC_WATERMARKING_SERVICE_URL } = publicRuntimeConfig;
 
 interface StrategyOverviewProps {
   fund: FundDetails;
@@ -59,7 +59,7 @@ const StrategyOverview: FC<StrategyOverviewProps> = ({ fund }) => {
 
       if (data && data.documentToken) {
         window.open(
-          `${WATRMARKING_SERVICE_URL}?token=${data.documentToken}`
+          `${NEXT_PUBLIC_WATERMARKING_SERVICE_URL}?token=${data.documentToken}`
         );
       }
     } catch (err) {
