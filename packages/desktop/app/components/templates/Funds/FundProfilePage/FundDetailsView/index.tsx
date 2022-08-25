@@ -17,8 +17,11 @@ import TeamMembersList from "desktop/app/components/modules/teams/TeamMembersLis
 import { FundDetails } from "shared/graphql/query/marketplace/useFund";
 import { useWatchFund } from "shared/graphql/mutation/funds/useWatchFund";
 import { useDocumentToken } from "shared/graphql/query/account/useDocumentToken";
+import getConfig from "next/config";
 
 const MONTHS = dayjs().localeData().monthsShort();
+const { publicRuntimeConfig = {} } = getConfig();
+const { WATRMARKING_SERVICE_URL } = publicRuntimeConfig;
 
 interface FundDetailsViewProps {
   fund: FundDetails;
@@ -60,9 +63,7 @@ const FundDetailsView: FC<FundDetailsViewProps> = ({ fund }) => {
       });
 
       if (data && data.documentToken) {
-        window.open(
-          `https://api-dev.prometheusalts.com/pdf-watermark?token=${data.documentToken}`
-        );
+        window.open(`${WATRMARKING_SERVICE_URL}?token=${data.documentToken}`);
       }
     } catch (err) {
       console.log(err instanceof Error ? err.message : err);

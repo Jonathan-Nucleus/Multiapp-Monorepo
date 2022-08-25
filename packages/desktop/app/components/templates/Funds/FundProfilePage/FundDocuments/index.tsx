@@ -10,11 +10,15 @@ import {
 import { File } from "phosphor-react";
 import Button from "../../../../common/Button";
 import { useDocumentToken } from "shared/graphql/query/account/useDocumentToken";
+import getConfig from "next/config";
 
 interface FundDocumentsProps {
   fundId: string;
   documents: FundDetails["documents"];
 }
+
+const { publicRuntimeConfig = {} } = getConfig();
+const { WATRMARKING_SERVICE_URL } = publicRuntimeConfig;
 
 const FundDocuments: FC<FundDocumentsProps> = ({ fundId, documents }) => {
   const [showMore, setShowMore] = useState(false);
@@ -42,9 +46,7 @@ const FundDocuments: FC<FundDocumentsProps> = ({ fundId, documents }) => {
       });
 
       if (data && data.documentToken) {
-        window.open(
-          `https://api-dev.prometheusalts.com/pdf-watermark?token=${data.documentToken}`
-        );
+        window.open(`${WATRMARKING_SERVICE_URL}?token=${data.documentToken}`);
       }
     } catch (err) {
       console.log(err instanceof Error ? err.message : err);

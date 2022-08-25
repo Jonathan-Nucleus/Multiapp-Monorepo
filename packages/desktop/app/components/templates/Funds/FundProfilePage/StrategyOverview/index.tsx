@@ -20,9 +20,13 @@ import { FundDetails } from "shared/graphql/query/marketplace/useFund";
 import { useWatchFund } from "shared/graphql/mutation/funds/useWatchFund";
 import { useDocumentToken } from "shared/graphql/query/account/useDocumentToken";
 import { AssetClasses } from "backend/graphql/enumerations.graphql";
+import getConfig from "next/config";
 
 dayjs.extend(localData);
 dayjs.extend(utc);
+
+const { publicRuntimeConfig = {} } = getConfig();
+const { WATRMARKING_SERVICE_URL } = publicRuntimeConfig;
 
 interface StrategyOverviewProps {
   fund: FundDetails;
@@ -55,7 +59,7 @@ const StrategyOverview: FC<StrategyOverviewProps> = ({ fund }) => {
 
       if (data && data.documentToken) {
         window.open(
-          `https://api-dev.prometheusalts.com/pdf-watermark?token=${data.documentToken}`
+          `${WATRMARKING_SERVICE_URL}?token=${data.documentToken}`
         );
       }
     } catch (err) {
