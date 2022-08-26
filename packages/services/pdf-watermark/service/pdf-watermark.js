@@ -1,10 +1,13 @@
-const axios = require("axios").default;
 const pdfLib = require("pdf-lib");
-const { degrees, PDFDocument, rgb, StandardFonts } = pdfLib;
-const bucketURL = process.env.AWS_S3_BUCKET_URL;
-const jwtSecret = process.env.JWT_SECRET;
 const jwtClient = require("jsonwebtoken");
-const fs = require("fs");
+const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
+
+const { degrees, PDFDocument, rgb, StandardFonts } = pdfLib;
+
+const S3_BUCKET = process.env.AWS_S3_BUCKET_NAME;
+const JWT_SECRET = process.env.JWT_SECRET;
+const AWS_UPLOAD_REGION = process.env.AWS_REGION;
+
 let pdfWatermark = {
   applyWatermark: async (req, res, _next) => {
     const token = req.query.token;
@@ -12,7 +15,7 @@ let pdfWatermark = {
     let decoded;
 
     try {
-      decoded = jwtClient.verify(token, jwtSecret);
+      decoded = jwtClient.verify(token, JWT_SECRET);
       console.log(decoded);
     } catch (e) {
       console.error(e);
@@ -37,25 +40,34 @@ let pdfWatermark = {
     const watermark = decoded.watermark;
     const file = decoded.file;
     const filename = file.split("/").pop().split("?")[0];
-    let url = bucketURL + "/" + file;
-    console.log(`Retrieving PDF from: ${url}`);
-
-    // TODO: get rid of this once env variables no longer get the protocol stripped.
-    if (!bucketURL.includes("http")) {
-      url = "https://" + url;
-    }
+    console.log(`Retrieving PDF from: ${S3_BUCKET}/${file}`);
 
     try {
-      const existingPdfBytes = await axios
-        .get(url, { responseType: "arraybuffer" })
-        .then((response) => response.data);
+      const s3Client = new S3Client({
+        region: AWS_UPLOAD_REGION,
+      });
+      const getCommand = new GetObjectCommand({
+        Bucket: S3_BUCKET,
+        Key: file,
+      });
+      const response = await s3Client.send(getCommand);
+      console.log("response", response);
+      const existingPdfBytes = await new Promise((resolve, reject) => {
+        const chunks = [];
+        const stream = response.Body;
+        if (!stream) resolve(chunks);
+
+        stream.on("data", (chunk) => chunks.push(chunk));
+        stream.once("end", () => resolve(Buffer.concat(chunks)));
+        stream.once("error", reject);
+      });
 
       const pdfDoc = await PDFDocument.load(existingPdfBytes);
       const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
       const pages = pdfDoc.getPages();
       const { width, height } = pages[0].getSize();
-      for (it in pages) {
+      for (const it in pages) {
         let page = pages[it];
         page.drawText(watermark, {
           x:
