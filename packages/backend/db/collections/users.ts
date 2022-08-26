@@ -151,6 +151,7 @@ export const UNIVERSAL_INVITE_CODES = [
   "HLANE",
   "BASS",
   "BANK",
+  "COMMUNE",
 ];
 
 const MICHAEL_USER_ID = "628fee97fef84ea6746e08fb";

@@ -10,6 +10,7 @@ import { toObjectId } from "../../../lib/mongo-helper";
 
 jest.mock("@aws-sdk/client-s3");
 jest.mock("@aws-sdk/s3-request-presigner");
+jest.setTimeout(30000);
 
 describe("Mutations - uploadLink", () => {
   const query = gql`
