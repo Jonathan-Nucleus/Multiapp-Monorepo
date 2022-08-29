@@ -200,7 +200,7 @@ const FundCard: FC<FundCardProps> = ({
                 <div className="px-2 py-2">
                   <div className={"flex flex-col items-center justify-center"}>
                     <div className="text-tiny text-white text-center opacity-60 tracking-widest mb-1">
-                      AUM
+                      Fund AUM
                     </div>
                     <div className="text-white text-center">
                       {`$${dollarFormatter.format(fund.aum)}`}

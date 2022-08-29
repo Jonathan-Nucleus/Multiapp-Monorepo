@@ -194,7 +194,7 @@ const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
           {'aum' in fund === true && fund.aum !== null ? (
             <View style={styles.infoContainer}>
               <PTitle
-                title="AUM"
+                title="Fund AUM"
                 subTitle={`$${dollarFormatter.format(fund.aum!)}`}
               />
             </View>

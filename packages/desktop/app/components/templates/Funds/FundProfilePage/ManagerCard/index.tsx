@@ -88,7 +88,7 @@ const ManagerCard: FC<ManagerCardProps> = ({ fund }) => {
           <div className="grid grid-cols-2">
             <div className="p-4">
               <div className="text-tiny tracking-widest text-white opacity-60 uppercase mb-1">
-                AUM
+                Fund AUM
               </div>
               <div className="text-white">
                 ${dollarFormatter.format(fund.aum)}
