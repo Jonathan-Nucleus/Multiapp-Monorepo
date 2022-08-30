@@ -39,6 +39,14 @@ const FormCRS: FormCRSScreen = ({ navigation, route }) => {
     );
   };
 
+  const goToPP = (): void => {
+    Linking.openURL('https://prometheusalts.com/legals/privacy-policy');
+  };
+
+  const goToTC = (): void => {
+    Linking.openURL('https://www.prometheusalts.com/legals/terms-of-use');
+  };
+
   return (
     <View style={pStyles.globalContainer}>
       <AccreditationHeader
@@ -56,6 +64,12 @@ const FormCRS: FormCRSScreen = ({ navigation, route }) => {
           </PText>
           <PText onPress={goToCRS} style={styles.link}>
             Prometheus Financial, LLC Brokerage Form CRS Relationship Summary
+          </PText>
+          <PText onPress={goToPP} style={styles.link}>
+            Prometheus Privacy Policy
+          </PText>
+          <PText onPress={goToTC} style={styles.link}>
+            Prometheus Terms and Conditions
           </PText>
           <PGradientButton
             label="I Acknowledge"

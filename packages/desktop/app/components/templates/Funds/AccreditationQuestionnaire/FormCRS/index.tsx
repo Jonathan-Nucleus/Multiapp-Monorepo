@@ -53,6 +53,26 @@ const FormCRS: FC<FormCRSProps> = ({ investorClass, setValue, submitStep }) => {
         >
           Prometheus Financial, LLC Brokerage Form CRS Relationship Summary
         </a>
+        <br />
+        <br />
+        <a
+          href="https://prometheusalts.com/legals/privacy-policy"
+          className="text-primary"
+          target="_blank"
+          rel="noreferrer noopener"
+        >
+          Prometheus Privacy Policy
+        </a>
+        <br />
+        <br />
+        <a
+          href="https://www.prometheusalts.com/legals/terms-of-use"
+          className="text-primary"
+          target="_blank"
+          rel="noreferrer noopener"
+        >
+          Prometheus Terms and Conditions
+        </a>
         <div className="flex justify-center mt-8">
           <Button
             variant="primary"
