@@ -11,7 +11,7 @@ export type FundManager = FundManagerFragment["manager"] &
   Pick<UserProfile, "managedFundsIds" | "position" | "role"> & {
     company: Pick<Company, "_id" | "name" | "avatar">;
   };
-export type FundListItem = Pick<FundSummary, "_id" | "name">;
+export type FundListItem = Pick<FundSummary, "_id" | "name" | "limitedView">;
 export type FundManagersData = {
   fundManagers?: {
     managers: FundManager[];
@@ -41,6 +41,7 @@ export function useFundManagers(): QueryResult<
           funds {
             _id
             name
+            limitedView
           }
           managers {
             _id

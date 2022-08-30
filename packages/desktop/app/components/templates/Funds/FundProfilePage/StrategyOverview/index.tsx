@@ -177,7 +177,11 @@ const StrategyOverview: FC<StrategyOverviewProps> = ({ fund }) => {
                   </div>
                   {fund.disclosure && (
                     <Accordion
-                      title="Fund Disclosures"
+                      title={
+                        fund.limitedView
+                          ? "Important Notes"
+                          : "Fund Disclosures"
+                      }
                       titleClassName="text-sm font-medium tracking-wider text-white"
                       className="mt-5"
                     >

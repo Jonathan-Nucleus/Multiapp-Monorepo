@@ -106,7 +106,11 @@ const CompanyItem: FC<CompanyItemProps> = ({ company }: CompanyItemProps) => {
         </div>
         <div className="text-white font-medium mt-2">{company.name}</div>
         <div className="border-t border-white/[.12] my-4" />
-        <div className="text-xs text-white">FUNDS MANAGED</div>
+        <div className="text-xs text-white">
+          {company.funds.filter((fund) => fund.limitedView).length > 0
+            ? "Strategies Managed"
+            : "Funds Managed"}
+        </div>
         <div className="mb-2">
           <div className="text-sm text-primary">{company.name} Fund</div>
           {company.funds.map((fund) => (

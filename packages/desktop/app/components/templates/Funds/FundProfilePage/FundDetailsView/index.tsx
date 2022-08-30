@@ -304,7 +304,9 @@ const FundDetailsView: FC<FundDetailsViewProps> = ({ fund }) => {
             </Tab.Group>
             {fund.disclosure && (
               <Accordion
-                title="Fund Disclosures"
+                title={
+                  fund.limitedView ? "Important Notes" : "Fund Disclosures"
+                }
                 titleClassName="text-sm font-medium tracking-wider text-white"
                 className="mt-8"
               >

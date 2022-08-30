@@ -7,7 +7,10 @@ export type Company = Pick<
   GraphQLCompany,
   "_id" | "name" | "avatar" | "postIds" | "followerIds"
 > & {
-  funds: Pick<GraphQLCompany["funds"][number], "_id" | "name" | "managerId">[];
+  funds: Pick<
+    GraphQLCompany["funds"][number],
+    "_id" | "name" | "managerId" | "limitedView"
+  >[];
   fundManagers: Pick<
     GraphQLCompany["fundManagers"][number],
     "_id" | "firstName" | "lastName" | "avatar" | "position" | "role"
@@ -43,6 +46,7 @@ export function useFundCompanies(): QueryResult<
             _id
             name
             managerId
+            limitedView
           }
           fundManagers {
             _id

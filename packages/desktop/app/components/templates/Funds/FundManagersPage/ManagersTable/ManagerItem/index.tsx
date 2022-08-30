@@ -169,7 +169,9 @@ const ManagerItem: FC<ManagerItemProps> = ({
             </div>
             <div className="border-t border-white/[.12] mt-4">
               <div className="text-tiny text-white font-medium mt-4">
-                Funds Managed
+                {funds.filter((fund) => fund.limitedView).length > 0
+                  ? "Strategies Managed"
+                  : "Funds Managed"}
               </div>
               <div className="text-sm text-primary mt-2">
                 {funds.map((fund) => (
