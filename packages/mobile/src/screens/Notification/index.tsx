@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useState } from "react";
+import React, { ReactElement, useEffect, useState } from 'react';
 import {
   StyleSheet,
   FlatList,
@@ -7,6 +7,7 @@ import {
   ListRenderItem,
   Pressable,
   RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 import {
   Checks,
@@ -44,15 +45,18 @@ import {
 } from 'shared/context/Notifications';
 import {
   useReadNotification,
-  useReadNotifications, useSeenNotifications
-} from "shared/graphql/mutation/notification";
+  useReadNotifications,
+  useSeenNotifications,
+} from 'shared/graphql/mutation/notification';
 
 import type { NotificationScreen } from 'mobile/src/navigations/AuthenticatedStack';
 
 const Notifications: NotificationScreen = ({ navigation }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const { notifications, refetch } = useNotificationsContext();
+  const [lastFetchItemId, setLastFetchItemId] = useState<string>();
+  const { notifications, refetch, fetchMore, loading } =
+    useNotificationsContext();
   const [readNotification] = useReadNotification();
   const [readNotifications] = useReadNotifications();
   const [seenNotifications] = useSeenNotifications();
@@ -163,6 +167,17 @@ const Notifications: NotificationScreen = ({ navigation }) => {
       </Pressable>
     );
   };
+  const onEndReached = (): void => {
+    const lastItem = notifications[notifications.length - 1]._id;
+    if (lastFetchItemId !== lastItem) {
+      setLastFetchItemId(lastItem);
+      fetchMore({
+        variables: {
+          before: lastItem,
+        },
+      });
+    }
+  };
 
   return (
     <View style={pStyles.globalContainer}>
@@ -179,6 +194,8 @@ const Notifications: NotificationScreen = ({ navigation }) => {
         </Pressable>
       </View>
       <FlatList
+        onEndReached={onEndReached}
+        onEndReachedThreshold={0.1}
         data={notifications}
         renderItem={renderListItem}
         keyExtractor={(item) => item._id}
@@ -190,6 +207,18 @@ const Notifications: NotificationScreen = ({ navigation }) => {
             colors={[WHITE]}
             tintColor={WHITE}
           />
+        }
+        ListFooterComponent={() =>
+          loading ? (
+            <ActivityIndicator
+              style={styles.activityIndicator}
+              size="small"
+              color={WHITE}
+              animating={true}
+            />
+          ) : (
+            <></>
+          )
         }
       />
       <Modal
@@ -250,6 +279,9 @@ const styles = StyleSheet.create({
   flatList: {
     flex: 1,
     marginTop: 16,
+  },
+  activityIndicator: {
+    marginVertical: 40,
   },
   chat: {
     position: 'absolute',

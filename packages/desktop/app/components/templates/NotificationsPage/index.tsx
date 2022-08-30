@@ -1,6 +1,7 @@
 import React, { FC, useEffect } from "react";
 import { Gear, Checks, DotsThreeOutlineVertical } from "phosphor-react";
 import { Menu } from "@headlessui/react";
+import Spinner from "../../common/Spinner";
 import DisclosureCard from "desktop/app/components/modules/funds/DisclosureCard";
 
 import Button from "../../common/Button";
@@ -8,17 +9,20 @@ import NotificationItem from "./NotificationItem";
 import { useNotifications } from "shared/graphql/query/notification/useNotifications";
 import {
   useReadNotification,
-  useReadNotifications, useSeenNotifications
+  useReadNotifications,
+  useSeenNotifications,
 } from "shared/graphql/mutation/notification";
 import Card from "../../common/Card";
+import { usePagination } from "../../../hooks/usePagination";
 
 const NotificationPage: FC = () => {
-  const { data } = useNotifications();
+  const { data, fetchMore, loading } = useNotifications();
+
   const [readNotification] = useReadNotification();
   const [readNotifications] = useReadNotifications();
   const [seenNotifications] = useSeenNotifications();
   const notifications = data?.notifications ?? [];
-
+  usePagination(notifications, fetchMore);
   useEffect(() => {
     try {
       seenNotifications();
@@ -45,7 +49,6 @@ const NotificationPage: FC = () => {
       console.log(err);
     }
   };
-
   return (
     <div className="lg:ml-48 xl:ml-80 max-w-6xl m-auto mt-8 pl-12">
       <div className="flex items-center mb-4 px-2 max-w-2xl mr-96">
@@ -59,7 +62,7 @@ const NotificationPage: FC = () => {
           <span className="ml-2">Mark all as read</span>
         </Button>
         {/**
-          * Remove until post-launch
+          * Remove until notification settings have been fully implemented.
           <Button
           variant="text"
           className="flex items-center text-sm text-primary font-medium tracking-wider md:flex"
@@ -115,6 +118,11 @@ const NotificationPage: FC = () => {
               ))}
             </div>
           </Card>
+          {loading && (
+            <div className=" inset-0 flex items-center justify-center">
+              <Spinner className="text-white my-8" />
+            </div>
+          )}
         </div>
         <div className="w-80 ml-8">
           <DisclosureCard />

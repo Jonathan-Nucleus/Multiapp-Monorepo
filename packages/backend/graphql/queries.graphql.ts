@@ -69,7 +69,7 @@ const schema = gql`
     professionals(featured: Boolean): [UserProfile!]
     userProfile(userId: ID!): UserProfile
     companyProfile(companyId: ID!): Company
-    notifications: [Notification!]
+    notifications(before: ID, limit: Int): [Notification!]
     mentionUsers(search: String): [UserProfile!]
     globalSearch(search: String): GlobalSearchResult
     users: [UserProfile!]!
@@ -559,10 +559,34 @@ const resolvers = {
     notifications: secureEndpoint(
       async (
         parentIgnored,
-        argsIgnored,
+        args: {
+          before?: string;
+          limit?: number;
+        },
         { db, user }
-      ): Promise<Notification.Mongo[]> =>
-        db.notifications.findAllByUser(user._id)
+      ): Promise<Notification.Mongo[]> => {
+        const validator = yup
+          .object()
+          .shape({
+            before: yup
+              .string()
+              .notRequired()
+              .test({
+                test: isObjectId,
+                message: "Invalid post id",
+              })
+              .notRequired(),
+            limit: yup.number().integer().min(0).notRequired(),
+          })
+          .required();
+
+        validateArgs(validator, args);
+        return db.notifications.findByFilters(
+          user._id,
+          args.before,
+          args.limit
+        );
+      }
     ),
 
     mentionUsers: secureEndpoint(

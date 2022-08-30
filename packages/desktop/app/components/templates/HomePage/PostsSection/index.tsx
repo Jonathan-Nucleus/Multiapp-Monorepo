@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState, useCallback, memo } from "react";
+import { FC, useEffect, useState, memo } from "react";
 import PostsList, {
   PostCategory,
   PostRoleFilter,
@@ -10,11 +10,10 @@ import AddPost from "./AddPost";
 import Button from "../../../common/Button";
 import { Plus } from "phosphor-react";
 import { usePosts } from "shared/graphql/query/post/usePosts";
-import _ from "lodash";
 import { Account } from "shared/context/Account";
+import { usePagination } from "../../../../hooks/usePagination";
 
 const POSTS_PER_SCROLL = 15;
-const SCROLL_OFFSET_THRESHOLD = 3000;
 
 interface PostsSectionProps {
   account: Account;
@@ -22,8 +21,6 @@ interface PostsSectionProps {
 }
 
 const PostsSection: FC<PostsSectionProps> = ({ account, onPostsLoaded }) => {
-  const scrollOffset = useRef(0);
-  const isFetchingMore = useRef(false);
   const [categories, setCategories] = useState<PostCategory[]>();
   const [roleFilter, setRoleFilter] = useState<PostRoleFilter>(
     "PROFESSIONAL_FOLLOW"
@@ -33,22 +30,10 @@ const PostsSection: FC<PostsSectionProps> = ({ account, onPostsLoaded }) => {
     fetchMore,
     loading,
   } = usePosts(categories, roleFilter, undefined, POSTS_PER_SCROLL);
-  const triggeredOffset = useRef(false);
+
   const [postAction, setPostAction] = useState<PostActionType>();
   const [lastVideoPostId, setLastVideoPostId] = useState<string | undefined>();
-
-  const onEndReached = useCallback(async () => {
-    if (isFetchingMore.current) return;
-
-    isFetchingMore.current = true;
-    const lastItem = _.last(posts)?._id;
-    await fetchMore({
-      variables: {
-        before: lastItem,
-      },
-    });
-    isFetchingMore.current = false;
-  }, [fetchMore, posts]);
+  usePagination(posts, fetchMore);
 
   useEffect(() => {
     if (posts) {
@@ -64,35 +49,6 @@ const PostsSection: FC<PostsSectionProps> = ({ account, onPostsLoaded }) => {
       onPostsLoaded();
     }
   }, [loading, onPostsLoaded, posts]);
-
-  useEffect(() => {
-    const handleScroll = (event: Event) => {
-      const target = event.target;
-      if (
-        target &&
-        target instanceof HTMLElement &&
-        target.id == "app-layout"
-      ) {
-        if (
-          target.clientHeight + target.scrollTop >
-            target.scrollHeight - SCROLL_OFFSET_THRESHOLD &&
-          !triggeredOffset.current
-        ) {
-          // Fetch more posts only when scroll down.
-          if (target.scrollTop >= scrollOffset.current) {
-            triggeredOffset.current = true;
-            onEndReached();
-          }
-        } else {
-          triggeredOffset.current = false;
-        }
-
-        scrollOffset.current = target.scrollTop;
-      }
-    };
-    document.addEventListener("scroll", handleScroll, true);
-    return () => document.removeEventListener("scroll", handleScroll, true);
-  }, [onEndReached]);
 
   const handleCloseModal = (postId?: string) => {
     setPostAction(undefined);

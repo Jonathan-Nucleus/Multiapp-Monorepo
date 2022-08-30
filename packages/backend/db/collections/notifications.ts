@@ -222,14 +222,23 @@ const createNotificationsCollection = (
      * Provides a list of notifications by user
      *
      * @param userId        The authenticated user id
-     *
+     * @param before        Optional notification id to load items before.
+     * @param limit         Optional limit for search result. Defaults to 10.
      * @returns {Notification[]}  An array of Notification object.
      */
-    findAllByUser: async (userId: MongoId): Promise<Notification.Mongo[]> => {
+    findByFilters: async (
+      userId: MongoId,
+      before?: string,
+      limit = 10
+    ): Promise<Notification.Mongo[]> => {
       return notificationsCollection
         .find({
+          _id: {
+            $lt: toObjectId(before),
+          },
           userId: toObjectId(userId),
         })
+        .limit(limit)
         .sort({ _id: -1 })
         .toArray();
     },

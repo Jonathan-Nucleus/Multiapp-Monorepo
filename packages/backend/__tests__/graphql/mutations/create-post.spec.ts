@@ -353,7 +353,7 @@ describe("Mutations - createPost", () => {
       .collection(DbCollection.POSTS)
       .countDocuments();
 
-    const oldNotifyCount = (await notifications.findAllByUser(user1._id))
+    const oldNotifyCount = (await notifications.findByFilters(user1._id))
       .length;
 
     const res = await server.executeOperation({
@@ -385,7 +385,7 @@ describe("Mutations - createPost", () => {
     const newPostCount = await db
       .collection(DbCollection.POSTS)
       .countDocuments();
-    const newNotifyCount = (await notifications.findAllByUser(user1._id))
+    const newNotifyCount = (await notifications.findByFilters(user1._id))
       .length;
 
     expect(newUser.postIds?.map((id) => id.toString())).toContain(
