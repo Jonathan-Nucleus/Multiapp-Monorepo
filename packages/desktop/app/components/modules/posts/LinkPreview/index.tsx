@@ -3,6 +3,7 @@ import Image from "next/image";
 import { LinkPreview as LinkPreviewResponse } from "shared/graphql/query/post/useLinkPreview";
 import { isValidYoutubeUrl } from "../../../../../../shared/src/url-utils";
 import YoutubePlayer from "../YoutubePlayer";
+import Media from "../../../common/Media";
 
 interface LinkPreviewProps {
   previewData: LinkPreviewResponse;
@@ -36,10 +37,14 @@ const LinkPreview: FC<LinkPreviewProps> = ({
           </a>
         </div>
       </div>
-      {isValidYoutubeUrl(previewData.url) ? (
-        <div className="w-full aspect-video relative">
-          <YoutubePlayer videoLink={previewData.url}></YoutubePlayer>
-        </div>
+      {previewData.mediaType === "video" ? (
+        isValidYoutubeUrl(previewData.url) ? (
+          <div className="w-full aspect-video relative">
+            <YoutubePlayer videoLink={previewData.url}></YoutubePlayer>
+          </div>
+        ) : (
+          <Media type={"video"} url={previewData.url} aspectRatio={1} />
+        )
       ) : (
         <a
           href={previewData.url}

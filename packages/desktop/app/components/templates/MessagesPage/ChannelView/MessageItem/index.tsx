@@ -4,6 +4,8 @@ import { Check } from "phosphor-react";
 import dayjs from "dayjs";
 import ChatAvatar from "../../ChatAvatar";
 import Media from "../../../../common/Media";
+import LinkPreview from "../../../../modules/posts/LinkPreview";
+import { MediaType } from "shared/src/media";
 
 interface MessageItemProps {
   message: PMessage;
@@ -14,22 +16,31 @@ const MessageItem: FC<MessageItemProps> = ({ message, isMine }) => {
   const attachments = message.attachments ? (
     <div>
       {message.attachments.map((attachment, index) => {
-        const { image_url, asset_url } = attachment;
-        const mediaUrl = image_url || asset_url;
+        const { title_link, image_url, asset_url, og_scrape_url, type } =
+          attachment;
+        const mediaUrl = asset_url || image_url;
         if (!mediaUrl) {
           return null;
         }
+        const previewData =
+          og_scrape_url && type
+            ? {
+                url: title_link ?? mediaUrl,
+                mediaType: type,
+                images: [mediaUrl],
+                title: attachment.title,
+              }
+            : null;
         return (
           <div
             key={index}
             className="rounded-lg bg-black relative overflow-hidden"
           >
-            {attachment.type == "video" && (
-              <Media type={"video"} url={mediaUrl} aspectRatio={1} />
-            )}
-            {attachment.type == "image" && (
-              <Media type={"image"} url={mediaUrl} aspectRatio={1} />
-            )}
+            {previewData ? (
+              <LinkPreview previewData={previewData} />
+            ) : type ? (
+              <Media type={type as MediaType} url={mediaUrl} aspectRatio={1} />
+            ) : null}
           </div>
         );
       })}

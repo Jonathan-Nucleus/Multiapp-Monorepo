@@ -102,6 +102,7 @@ const MessageInput: FC<MessageInputProps> = ({ channel }) => {
       text: mentionInput?.body,
       attachments: attachments.length > 0 ? attachments : undefined,
     });
+    await channel.update();
     reset();
     setSelectedMedias([]);
     setLoading(false);
