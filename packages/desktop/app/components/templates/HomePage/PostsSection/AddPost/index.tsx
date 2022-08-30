@@ -37,7 +37,10 @@ const AddPost: FC<AddPostProps> = ({ account, onClick }) => {
           </Button>
         </div>
         <div className="mx-16 mt-2">
-          <Label className="inline-flex items-center cursor-pointer hover:opacity-80 transition">
+          <Label
+            className="inline-flex items-center cursor-pointer hover:opacity-80 transition"
+            onClick={() => onClick?.()}
+          >
             <ImageIcon color="white" size={24} />
             <span className="text-white opacity-60 font-normal tracking-normal ml-2">
               Photo/Video
@@ -45,7 +48,7 @@ const AddPost: FC<AddPostProps> = ({ account, onClick }) => {
             <Input
               type="file"
               value=""
-              multiple
+              disabled={true}
               onInput={async (event) => {
                 const files = event.currentTarget.files;
                 if (files) {
