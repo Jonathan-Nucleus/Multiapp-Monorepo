@@ -24,6 +24,7 @@ const NotificationItem: FC<NotificationItemProps> = ({
   let notificationIcon;
   switch (notification.type) {
     case "COMMENT_POST":
+    case "CREATE_POST":
       notificationIcon = <ChatCenteredText size={16} />;
       break;
     case "LIKE_POST":

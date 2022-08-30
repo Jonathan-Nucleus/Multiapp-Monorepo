@@ -73,6 +73,7 @@ const Notifications: NotificationScreen = ({ navigation }) => {
   const renderIcon = (val: Notification): ReactElement => {
     switch (val.type) {
       case 'COMMENT_POST':
+      case 'CREATE_POST':
         return <ChatCenteredText size={18} color={WHITE} />;
       case 'LIKE_POST':
         return <ThumbsUp size={18} color={WHITE} />;
@@ -109,7 +110,8 @@ const Notifications: NotificationScreen = ({ navigation }) => {
         (type === 'COMMENT_POST' ||
           type === 'LIKE_POST' ||
           type === 'TAGGED_IN_POST' ||
-          type === 'TAGGED_IN_COMMENT') &&
+          type === 'TAGGED_IN_COMMENT' ||
+          type === 'CREATE_POST') &&
         notificationData.postId
       ) {
         navigation.navigate('PostDetails', {

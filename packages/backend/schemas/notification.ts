@@ -50,6 +50,10 @@ export const NotificationTypeOptions = {
     label: "Tagged in comment",
     value: "tagged-in-comment",
   },
+  CREATE_POST: {
+    label: "Create a post",
+    value: "create-post",
+  },
 } as const;
 export type NotificationType = ValueOf<typeof NotificationTypeOptions>["value"];
 export type NotificationTypeEnum = keyof typeof NotificationTypeOptions;
@@ -113,6 +117,9 @@ export const generateNotification = (
       break;
     case "tagged-in-comment":
       body = `${user.fullName} tagged you in a comment`;
+      break;
+    case "create-post":
+      body = `${user.fullName} has created a new post`;
       break;
     default:
       break;

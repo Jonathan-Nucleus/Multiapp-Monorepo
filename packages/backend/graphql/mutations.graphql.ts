@@ -876,6 +876,21 @@ const resolvers = {
           })
         );
 
+        // Send Notification to followers
+        const followerIds = user?.followerIds ?? [];
+        await Promise.all(
+          followerIds.map((followerId) => {
+            return db.notifications.create(
+              user,
+              "create-post",
+              [followerId],
+              {
+                postId: postData._id,
+              }
+            );
+          })
+        );
+
         return postData;
       }
     ),
