@@ -9,11 +9,14 @@ import {
   Trash,
   WarningOctagon,
   XSquare,
+  PushPinSlash,
+  PushPin,
 } from "phosphor-react";
 import ConfirmHideUserModal from "../ConfirmHideUserModal";
 import ReportPostModal from "../ReportPostModal";
 import { PostSummary } from "shared/graphql/fragments/post";
 import { useHidePost, useMutePost } from "shared/graphql/mutation/posts";
+import { useFeaturePost } from "shared/graphql/mutation/posts/useFeaturePost";
 import ConfirmDeleteModal from "../ConfirmDeleteModal";
 import FollowUserMenu from "./FollowUserMenu";
 import FollowCompanyMenu from "./FollowCompanyMenu";
@@ -36,6 +39,7 @@ const ActionMenu: FC<ActionMenuProps> = ({
   const [showReportPost, setShowReportPost] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [mutePost] = useMutePost();
+  const [featurePost] = useFeaturePost();
   const [hidePost] = useHidePost();
   const { user, company } = post;
   const toggleMutePost = async () => {
@@ -52,6 +56,14 @@ const ActionMenu: FC<ActionMenuProps> = ({
       variables: { hide: true, postId: post._id },
       refetchQueries: ["Posts"],
     });
+  };
+  const togglePinPost = async () => {
+    const { data } = await featurePost({
+      variables: { postId: post._id, feature: !post.featured },
+    });
+    data?.featurePost.featured
+      ? toast.success("Post pinned to your profile")
+      : toast.success("Post unpinned from your profile");
   };
   return (
     <>
@@ -154,6 +166,27 @@ const ActionMenu: FC<ActionMenuProps> = ({
                       <div className="ml-4">Turn on notifications</div>
                     ) : (
                       <div className="ml-4">Turn off notifications</div>
+                    )}
+                  </div>
+                </Menu.Item>
+                <Menu.Item>
+                  <div
+                    className="flex items-center text-sm text-white cursor-pointer hover:bg-background-blue px-4 py-3"
+                    onClick={() => togglePinPost()}
+                  >
+                    {post?.featured ? (
+                      <PushPinSlash
+                        fill="currentColor"
+                        weight="light"
+                        size={24}
+                      />
+                    ) : (
+                      <PushPin fill="currentColor" weight="light" size={24} />
+                    )}
+                    {post?.featured ? (
+                      <div className="ml-4">Unpin Post from Profile</div>
+                    ) : (
+                      <div className="ml-4">Pin Post to Profile</div>
                     )}
                   </div>
                 </Menu.Item>

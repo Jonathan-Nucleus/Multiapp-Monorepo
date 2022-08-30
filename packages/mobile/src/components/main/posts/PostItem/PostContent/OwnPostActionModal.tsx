@@ -1,5 +1,12 @@
 import React, { useMemo } from 'react';
-import { Pencil, Trash, BellSlash } from 'phosphor-react-native';
+import {
+  Pencil,
+  Trash,
+  BellSlash,
+  PushPin,
+  PushPinSlash,
+  Bell,
+} from 'phosphor-react-native';
 
 import SelectionModal from 'mobile/src/components/common/SelectionModal';
 import { showMessage } from 'mobile/src/services/ToastService';
@@ -10,6 +17,8 @@ import { SOMETHING_WRONG } from 'shared/src/constants';
 import { Post } from 'shared/graphql/query/post/usePosts';
 import { useMutePost } from 'shared/graphql/mutation/posts';
 import { useDeletePost } from 'shared/graphql/mutation/posts/useDeletePost';
+import { useFeaturePost } from 'shared/graphql/mutation/posts/useFeaturePost';
+import { useAccountContext } from 'shared/context/Account';
 
 interface OwnPostActionModalProps {
   post?: Post;
@@ -24,7 +33,9 @@ const OwnPostActionModal: React.FC<OwnPostActionModalProps> = ({
 }) => {
   const [mutePost] = useMutePost();
   const [deletePost] = useDeletePost();
-
+  const [featurePost] = useFeaturePost();
+  const account = useAccountContext();
+  const isMuted = (post && account?.mutedPostIds?.includes(post._id)) ?? false;
   const menuData = useMemo(
     () => [
       {
@@ -37,13 +48,30 @@ const OwnPostActionModal: React.FC<OwnPostActionModalProps> = ({
         icon: <Trash size={26} color={WHITE} />,
         key: 'delete' as const,
       },
+      isMuted
+        ? {
+            label: 'Turn on notifications for this post',
+            icon: <Bell size={26} color={WHITE} />,
+            key: 'mute' as const,
+          }
+        : {
+            label: 'Turn off notifications for this post',
+            icon: <BellSlash size={26} color={WHITE} />,
+            key: 'mute' as const,
+          },
       {
-        label: 'Turn off notifications for this post',
-        icon: <BellSlash size={26} color={WHITE} />,
-        key: 'mute' as const,
+        label: post?.featured
+          ? 'Unpin Post from Profile'
+          : 'Pin Post to Profile',
+        icon: post?.featured ? (
+          <PushPinSlash size={26} color={WHITE} />
+        ) : (
+          <PushPin size={26} color={WHITE} />
+        ),
+        key: 'togglePin' as const,
       },
     ],
-    [],
+    [post],
   );
 
   if (!post) {
@@ -98,6 +126,18 @@ const OwnPostActionModal: React.FC<OwnPostActionModalProps> = ({
     }
   };
 
+  const handleTogglePin = async (): Promise<void> => {
+    try {
+      const { data } = await featurePost({
+        variables: { postId: post._id, feature: !post.featured },
+      });
+      data?.featurePost.featured
+        ? showMessage('info', 'Post pinned to your profile')
+        : showMessage('info', 'Post unpinned from your profile');
+    } catch (err) {
+      showMessage('error', SOMETHING_WRONG);
+    }
+  };
   return (
     <SelectionModal
       isVisible={visible}
@@ -114,6 +154,8 @@ const OwnPostActionModal: React.FC<OwnPostActionModalProps> = ({
             return handleDeletePost();
           case 'mute':
             return handleMutePost();
+          case 'togglePin':
+            return handleTogglePin();
         }
       }}
     />

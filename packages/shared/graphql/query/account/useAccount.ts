@@ -77,6 +77,8 @@ export type AccountData = {
 };
 
 /**
+ * @deprecated - use useAccountContext instead
+ *
  * GraphQL query that fetches the account details for the current user
  */
 export function useAccount(
