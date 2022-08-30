@@ -155,7 +155,12 @@ const PostContent: React.FC<PostContentProps> = ({
       </View>
       <View style={styles.contentPadding}>
         <Pressable onPress={() => goToDetails()}>
-          <PBodyText body={body} collapseLongText={true} style={styles.body} />
+          <PBodyText
+            body={body}
+            collapseLongText={true}
+            style={styles.body}
+            post={post}
+          />
         </Pressable>
         {attachments && attachments.length > 0 ? (
           <View>

@@ -2,13 +2,16 @@ import { FC, ReactElement, useCallback, useMemo, useState } from "react";
 import { hrefFromLink, processPost } from "shared/src/patterns";
 import { useAccountContext } from "shared/context/Account";
 import Link from "next/link";
+import { Post } from "shared/graphql/query/post/usePosts";
 import Button from "../../../../../common/Button";
+import { logEvent } from "../../../../../../lib/ga";
 
 interface BodyTextProps {
   text: string;
+  post?: Post;
 }
 
-const BodyText: FC<BodyTextProps> = ({ text }) => {
+const BodyText: FC<BodyTextProps> = ({ text, post }) => {
   const { _id: accountId } = useAccountContext();
   const [isBodyClamped, setIsBodyClamped] = useState(false);
   const [isBodyExpanded, setIsBodyExpanded] = useState(false);
@@ -60,6 +63,21 @@ const BodyText: FC<BodyTextProps> = ({ text }) => {
     });
     return _elements;
   }, [accountId, text]);
+  const handleExpandButton = () => {
+    if (!isBodyExpanded && post) {
+      logEvent({
+        action: "read_more_feed",
+        params: {
+          event_category: "Read More In Feed",
+          event_label: "Button Clicked",
+          value: text.slice(0, 10),
+          author: `${post.user?.firstName} ${post.user?.lastName}`,
+          id: post._id,
+        },
+      });
+    }
+    setIsBodyExpanded(!isBodyExpanded);
+  };
   return (
     <>
       <div
@@ -76,7 +94,7 @@ const BodyText: FC<BodyTextProps> = ({ text }) => {
         <Button
           variant="text"
           className="text-primary tracking-normal font-normal py-0"
-          onClick={() => setIsBodyExpanded(!isBodyExpanded)}
+          onClick={handleExpandButton}
         >
           {isBodyExpanded ? "Read Less" : "Read More"}
         </Button>

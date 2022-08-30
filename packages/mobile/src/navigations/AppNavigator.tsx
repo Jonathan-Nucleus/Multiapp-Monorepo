@@ -12,7 +12,6 @@ import {
   StackScreenProps,
 } from '@react-navigation/stack';
 import SplashScreen from 'react-native-splash-screen';
-import analytics from '@react-native-firebase/analytics';
 import { AppState } from 'react-native';
 
 import * as NavigationService from '../services/navigation/NavigationService';
@@ -36,6 +35,7 @@ import { Accreditation } from 'shared/graphql/mutation/account/useSaveQuestionna
 import { useRequiresUpdate } from 'shared/graphql/query/user/useRequiresUpdate';
 
 import { AccountProvider } from 'shared/context/Account';
+import { logScreenView, setAnalyticsEnabled } from '../utils/FirebaseUtil';
 
 const defaultScreenOptions = {
   headerShown: false,
@@ -59,7 +59,7 @@ const AppNavigator = (): React.ReactElement => {
   );
 
   useEffect(() => {
-    analytics().setAnalyticsCollectionEnabled(process.env.ENV === 'prod');
+    setAnalyticsEnabled(process.env.ENV === 'prod');
 
     const subscription = AppState.addEventListener(
       'change',
@@ -68,7 +68,7 @@ const AppNavigator = (): React.ReactElement => {
           appState.current.match(/inactive|background/) &&
           nextAppState === 'active' &&
           process.env.ENV === 'prod';
-        await analytics().setAnalyticsCollectionEnabled(enabled ?? false);
+        await setAnalyticsEnabled(enabled ?? false);
 
         appState.current = nextAppState;
       },
@@ -116,10 +116,9 @@ const AppNavigator = (): React.ReactElement => {
     routeNameRef.current = current;
 
     if (prev !== current && process.env.ENV === 'prod') {
-      await analytics().logScreenView({
-        screen_name: current,
-        screen_class: current,
-      });
+      if (current) {
+        logScreenView(current, current);
+      }
     }
   };
 

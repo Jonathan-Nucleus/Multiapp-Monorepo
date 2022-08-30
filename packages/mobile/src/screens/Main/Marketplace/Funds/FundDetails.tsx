@@ -9,7 +9,6 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import { CaretLeft } from 'phosphor-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import analytics from '@react-native-firebase/analytics';
 
 import MainHeader from 'mobile/src/components/main/Header';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
@@ -34,6 +33,7 @@ import FundsPlaceholder from 'mobile/src/components/placeholder/FundsPlaceholder
 import { useFund } from 'shared/graphql/query/marketplace/useFund';
 
 import { FundDetailsScreen } from 'mobile/src/navigations/AuthenticatedStack';
+import { logEvent, logScreenView } from '../../../../utils/FirebaseUtil';
 
 const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
   const { fundId } = route.params;
@@ -49,10 +49,10 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     if (fund && process.env.ENV === 'prod') {
-      analytics().logScreenView({
-        screen_name: `${route.name} - ${fund.company.name}`,
-        screen_class: `${route.name} - ${fund.company.name}`,
-      });
+      logScreenView(
+        `${route.name} - ${fund.company.name}`,
+        `${route.name} - ${fund.company.name}`,
+      );
     }
   }, [fund, route.name]);
 
@@ -69,6 +69,12 @@ const FundDetails: FundDetailsScreen = ({ route, navigation }) => {
   }
 
   const contactSpecialist = (): void => {
+    logEvent('contact_fund_specialist', {
+      event_category: 'Contact Fund Specialist',
+      event_label: 'Button Clicked',
+      value: fund.name,
+      id: fund._id,
+    });
     navigation.navigate('Contact', {
       fundId: fund._id,
     });

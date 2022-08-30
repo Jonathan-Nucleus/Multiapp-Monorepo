@@ -28,7 +28,7 @@ const PostBody: FC<PostBodyProps> = ({
     <>
       <div className="px-4">
         <div className="pb-2">
-          {post.body && <BodyText text={post.body ?? ""} />}
+          {post.body && <BodyText text={post.body ?? ""} post={post} />}
         </div>
         {post.preview &&
           (!post.attachments ||

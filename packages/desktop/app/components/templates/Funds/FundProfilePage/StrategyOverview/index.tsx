@@ -15,6 +15,7 @@ import DisclosureModal from "../../../../modules/funds/DisclosureModal";
 import FundDocuments from "../FundDocuments";
 import FundMedia from "../../../../modules/funds/FundMedia";
 import ContactSpecialist from "../../../../modules/funds/ContactSpecialist";
+import { logEvent } from "../../../../../lib/ga";
 
 import { FundDetails } from "shared/graphql/query/marketplace/useFund";
 import { useWatchFund } from "shared/graphql/mutation/funds/useWatchFund";
@@ -65,6 +66,19 @@ const StrategyOverview: FC<StrategyOverviewProps> = ({ fund }) => {
     } catch (err) {
       console.log(err instanceof Error ? err.message : err);
     }
+  };
+
+  const handleContactSpecialist = () => {
+    logEvent({
+      action: "contact_fund_specialist",
+      params: {
+        event_category: "Contact Fund Specialist",
+        event_label: "Button Clicked",
+        value: fund.name,
+        id: fund._id,
+      },
+    });
+    setShowContactSpecialist(true);
   };
 
   return (
@@ -270,7 +284,7 @@ const StrategyOverview: FC<StrategyOverviewProps> = ({ fund }) => {
             <Button
               variant="gradient-primary"
               className="w-full font-medium h-12"
-              onClick={() => setShowContactSpecialist(true)}
+              onClick={handleContactSpecialist}
             >
               Contact Specialist
             </Button>

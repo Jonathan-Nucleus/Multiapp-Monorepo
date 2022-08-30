@@ -7,18 +7,20 @@ import {
   TextStyle,
   TextLayoutEventData,
 } from 'react-native';
-
+import { Post } from 'shared/graphql/query/post/usePosts';
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
 import { WHITE, PRIMARY } from 'shared/src/colors';
 
 import { processPost, TAG_PATTERN } from 'shared/src/patterns';
 import PText from './PText';
+import { logEvent } from '../../utils/FirebaseUtil';
 
 interface PBodyTextProps {
   body?: string;
   hideLinkPreview?: boolean;
   collapseLongText?: boolean;
   numberOfLines?: number;
+  post?: Post;
   style?: StyleProp<TextStyle>;
 }
 
@@ -27,6 +29,7 @@ const PBodyText: FC<PBodyTextProps> = ({
   collapseLongText = false,
   numberOfLines = 2,
   style,
+  post,
 }) => {
   // Remove last line break from body;
   const initialBody = body?.replace(/\n$/, '') ?? '';
@@ -70,6 +73,15 @@ const PBodyText: FC<PBodyTextProps> = ({
   );
 
   const handleMoreText = (): void => {
+    if (!collapsed && post) {
+      logEvent('read_more_feed', {
+        event_category: 'Read More In Feed',
+        event_label: 'Button Clicked',
+        value: body?.slice(0, 10) ?? '',
+        author: `${post.user?.firstName} ${post.user?.lastName}`,
+        id: post._id,
+      });
+    }
     setCollapsed(!collapsed);
   };
 
