@@ -216,7 +216,6 @@ const FundProfileInfo: FC<FundProfileInfo> = ({
         )}
         {fund.highlights && fund.highlights.length > 0 && (
           <View>
-            <PLabel label="Fund Highlights" textStyle={styles.sectionTitle} />
             {fund.highlights.map((item, index) => (
               <View key={index} style={styles.highlightItem}>
                 <View style={styles.bullet} />

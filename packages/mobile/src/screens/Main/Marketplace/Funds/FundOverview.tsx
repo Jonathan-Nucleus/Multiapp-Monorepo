@@ -248,7 +248,7 @@ const FundOverview: FC<FundOverviewProps> = ({ fund, ...viewProps }) => {
       ) : null}
       {fund.disclosure ? (
         <Accordion
-          title="Fund Disclosures"
+          title={fund.limitedView ? 'Important Notes' : 'Fund Disclosures'}
           titleStyle={styles.fundDisclosureHeader}
           containerStyle={styles.fundDisclosure}>
           <PText style={styles.fundDisclosureText}>{fund.disclosure}</PText>
