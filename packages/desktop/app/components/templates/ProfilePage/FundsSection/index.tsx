@@ -17,7 +17,7 @@ const FundsSection: FC<FundsSectionProps> = ({ userId, showNoFundsLabel }) => {
       return (
         <>
           <div className="text-sm text-white opacity-60 py-4">
-            You don’t have any featured posts, yet.
+            You don’t have any funds, yet.
           </div>
         </>
       );

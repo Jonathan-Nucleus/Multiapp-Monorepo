@@ -12,6 +12,7 @@ interface PostsListProps {
   displayFilter?: boolean;
   initialFilter?: FilterSettings;
   displayBanner?: boolean;
+  isFeaturedList?: boolean;
   onFilterChange?: (filterSettings: FilterSettings) => void;
 }
 
@@ -21,6 +22,7 @@ const PostsList: FC<PostsListProps> = ({
   initialFilter,
   displayBanner = false,
   onFilterChange,
+  isFeaturedList = false,
 }) => {
   const [postAction, setPostAction] = useState<PostActionType | undefined>();
   const [lastVideoPostId, setLastVideoPostId] = useState<string | undefined>();
@@ -50,6 +52,11 @@ const PostsList: FC<PostsListProps> = ({
           initialSettings={initialFilter}
           onFilterChange={onFilterChange}
         />
+      )}
+      {isFeaturedList && (
+        <div className="my-2 mx-2">
+          <span className="font-medium text-white/[0.77] ">Featured</span>
+        </div>
       )}
       {(lastVideoPostId || displayBanner) && (
         <div className="mt-4 p-3 rounded-lg bg-background-popover">

@@ -8,6 +8,7 @@ import PostsSection from "./PostsSection";
 import FundsSection from "./FundsSection";
 import EditProfileModal from "./ProfileCard/EditModal";
 import ProfileCardSkeleton from "./ProfileCard/Skeleton";
+import FeaturedPostsSection from "./FeaturedPostsSection";
 
 interface ProfilePageProps extends UserProfileProps {
   loading: boolean;
@@ -50,6 +51,9 @@ const ProfilePage: FC<ProfilePageProps> = ({ user, loading, isMyProfile }) => {
                   showNoFundsLabel={isMyProfile}
                 />
               )}
+              <div className="pt-1">
+                {user && <FeaturedPostsSection userId={user._id} />}
+              </div>
               <div className="pt-4">
                 {user && (
                   <PostsSection userId={user._id} showAddPost={isMyProfile} />
