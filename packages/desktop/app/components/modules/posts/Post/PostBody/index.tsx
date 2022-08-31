@@ -6,6 +6,7 @@ import Post from "..";
 import BodyText from "./BodyText";
 import GalleryView from "../../GalleryView";
 import { getMediaTypeFrom } from "shared/src/media";
+import { logEvent } from "../../../../../lib/ga";
 
 interface PostBodyProps {
   post: PostType;
@@ -24,6 +25,21 @@ const PostBody: FC<PostBodyProps> = ({
       ) ?? []
     );
   }, [post.attachments]);
+  const handleGalleryIndex = (idx: number | undefined) => {
+    setGalleryIndex(idx);
+    if (post && post.attachments && idx !== undefined) {
+      logEvent({
+        action: "enlarge_photo",
+        params: {
+          event_category: "Enlarge Photo In Post",
+          event_label: "Button Clicked",
+          value: post.attachments[idx].url,
+          author: `${post.user?.firstName} ${post.user?.lastName}`,
+          id: post._id,
+        },
+      });
+    }
+  };
   return (
     <>
       <div className="px-4">
@@ -49,7 +65,7 @@ const PostBody: FC<PostBodyProps> = ({
             <div
               key={index}
               className="cursor-pointer"
-              onClick={() => setGalleryIndex(index)}
+              onClick={() => handleGalleryIndex(index)}
             >
               <PostAttachment
                 attachment={attachment}
@@ -73,7 +89,7 @@ const PostBody: FC<PostBodyProps> = ({
               className={`${
                 post.attachments?.length == 3 ? "col-span-3" : ""
               } cursor-pointer`}
-              onClick={() => setGalleryIndex(index + 2)}
+              onClick={() => handleGalleryIndex(index + 2)}
             >
               <PostAttachment
                 attachment={attachment}
@@ -92,7 +108,7 @@ const PostBody: FC<PostBodyProps> = ({
           userId={post.userId}
           images={postImages}
           index={galleryIndex}
-          onClose={() => setGalleryIndex(undefined)}
+          onClose={() => handleGalleryIndex(undefined)}
         />
       )}
       {post.sharedPost && (
