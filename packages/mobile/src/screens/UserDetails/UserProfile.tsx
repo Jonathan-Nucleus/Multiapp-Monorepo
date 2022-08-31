@@ -19,7 +19,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import MainHeader from 'mobile/src/components/main/Header';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
-import PLabel from 'mobile/src/components/common/PLabel';
 import PostItem from 'mobile/src/components/main/posts/PostItem';
 import FeaturedItem from 'mobile/src/components/main/settings/FeaturedItem';
 import FollowModal from 'mobile/src/components/main/FollowModal';
@@ -38,7 +37,6 @@ import {
 
 import LinkedinSvg from 'shared/assets/images/linkedin.svg';
 import TwitterSvg from 'shared/assets/images/twitter.svg';
-import ShieldCheckSvg from 'shared/assets/images/shield-check.svg';
 import NoPostSvg from 'shared/assets/images/no-post.svg';
 import PostItemPlaceholder from 'mobile/src/components/placeholder/PostItemPlaceholder';
 import { stopVideos } from 'mobile/src/components/common/Attachment';
@@ -56,6 +54,7 @@ import { UserProfileScreen } from 'mobile/src/navigations/UserDetailsStack';
 import Avatar from '../../components/common/Avatar';
 
 import { S3_BUCKET } from 'react-native-dotenv';
+import ProfileBadge from './ProfileBadge';
 
 const PLACE_HOLDERS = 4;
 
@@ -84,7 +83,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
   const featuredPosts = featuredPostsData?.userProfile?.posts ?? [];
 
   const isMyAccount = useMemo(() => {
-    return userId === account?._id ? true : false;
+    return userId === account?._id;
   }, [account, userId]);
 
   const renderItem: ListRenderItem<Post> = ({ item }) => (
@@ -213,12 +212,7 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
             <Text style={styles.val}>
               {firstName} {lastName}
             </Text>
-            {role !== 'USER' ? (
-              <View style={styles.proWrapper}>
-                <ShieldCheckSvg />
-                <PLabel label="PRO" textStyle={styles.proLabel} />
-              </View>
-            ) : null}
+            <ProfileBadge role={role} />
           </View>
           <Text style={styles.positionInfo}>
             {position ? `${position}` : ''}
@@ -477,15 +471,6 @@ const styles = StyleSheet.create({
   },
   socialIcon: {
     marginHorizontal: 16,
-  },
-  proWrapper: {
-    flexDirection: 'row',
-    marginLeft: 8,
-    alignItems: 'center',
-  },
-  proLabel: {
-    marginLeft: 8,
-    ...Body3,
   },
   button: {
     width: Dimensions.get('screen').width / 2 - 24,

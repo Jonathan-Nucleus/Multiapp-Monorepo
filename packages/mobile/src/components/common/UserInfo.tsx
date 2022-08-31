@@ -1,17 +1,16 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, Text, View } from 'react-native';
-import { ShieldCheck, Star } from 'phosphor-react-native';
+import { Star } from 'phosphor-react-native';
 
 import Avatar from './Avatar';
 import PLabel from './PLabel';
-import { Body1Bold, Body3, Body3Bold, Body4Bold } from '../../theme/fonts';
+import { Body1Bold, Body3, Body4Bold } from '../../theme/fonts';
 import {
   WHITE60,
   PRIMARY,
   GRAY100,
   GRAY200,
   PRIMARYSOLID,
-  SUCCESS,
 } from 'shared/src/colors';
 
 import QPSvg from 'shared/assets/images/QP.svg';
@@ -25,6 +24,7 @@ import { useAccountContext } from 'shared/context/Account';
 import { Audience } from 'backend/graphql/posts.graphql';
 import { UserProfile } from 'backend/graphql/users.graphql';
 import { Company as CompanyProfile } from 'backend/graphql/companies.graphql';
+import ProfileBadge from '../../screens/UserDetails/ProfileBadge';
 
 type User = Partial<
   Pick<UserProfile, '_id' | 'firstName' | 'lastName' | 'avatar' | 'role'>
@@ -121,31 +121,7 @@ const UserInfo: React.FC<UserInfoProps> = (props) => {
               textStyle={styles.nameLabel}
             />
           ) : null}
-          {(role === 'PROFESSIONAL' || role === 'VERIFIED') && (
-            <View style={styles.proWrapper}>
-              <ShieldCheck
-                size={16}
-                color={SUCCESS}
-                weight="fill"
-                style={styles.shield}
-              />
-              <PLabel label="PRO" textStyle={styles.proLabel} />
-            </View>
-          )}
-          {(role === 'FA' ||
-            role === 'FO' ||
-            role === 'IA' ||
-            role === 'RIA') && (
-            <View style={styles.proWrapper}>
-              <ShieldCheck
-                size={16}
-                color={PRIMARYSOLID}
-                weight="fill"
-                style={styles.shield}
-              />
-              <PLabel label={role} textStyle={styles.proLabel} />
-            </View>
-          )}
+          {role && <ProfileBadge role={role} />}
         </View>
         {company ? (
           <PLabel label={company.name} textStyle={styles.smallLabel} />
@@ -207,18 +183,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 4,
-  },
-  proWrapper: {
-    flexDirection: 'row',
-    marginLeft: 4,
-    alignItems: 'center',
-  },
-  proLabel: {
-    marginLeft: 4,
-    ...Body3Bold,
-  },
-  shield: {
-    marginTop: -2,
   },
   smallLabel: {
     ...Body3,
