@@ -13,12 +13,18 @@ import * as yup from "yup";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import MentionTextarea from "../../../MentionTextarea";
+import {
+  Media,
+  mediaSchema,
+} from "../../../EditPostModal/AttachmentPreview/MediaSelector";
 
 interface SendMessageProps {
   type: "create-comment" | "edit-comment";
   message?: string;
+  attachments?: Media[];
+  commentId?: string;
   placeholder?: string;
-  onSend: (message: string, mediaUrl?: string) => Promise<void>;
+  onSend: (message: string, attachments?: Media[]) => Promise<void>;
   onCancel?: () => void;
 }
 
@@ -30,7 +36,7 @@ type FormValues = {
       name: string;
     }[];
   };
-  mediaUrl?: string;
+  attachments: Media[];
 };
 
 const schema = yup
@@ -51,14 +57,16 @@ const schema = yup
           .default([]),
       })
       .required(),
-    mediaUrl: yup.string().notRequired(),
+    attachments: mediaSchema,
   })
   .required();
 
 const SendMessage: FC<SendMessageProps> = ({
   type,
   message = "",
+  attachments = undefined,
   placeholder,
+  commentId,
   onSend,
   onCancel,
 }: SendMessageProps) => {
@@ -66,7 +74,6 @@ const SendMessage: FC<SendMessageProps> = ({
   const [fetchUploadLink] = useFetchUploadLink();
   const [visibleEmoji, setVisibleEmoji] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File>();
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const suggestionsContainer = useRef<HTMLDivElement>(null);
   const {
@@ -75,15 +82,23 @@ const SendMessage: FC<SendMessageProps> = ({
     getValues,
     setValue,
     reset,
+    watch,
     formState: { isValid },
   } = useForm<yup.InferType<typeof schema>>({
     resolver: yupResolver(schema),
     defaultValues: {
       mentionInput: { body: message, mentions: [] },
-      mediaUrl: undefined,
+      attachments:
+        attachments?.map((item) => ({
+          ...item,
+          ...(item.documentLink ? {} : { documentLink: undefined }),
+        })) ?? [],
     },
     mode: "onChange",
   });
+
+  const currentAttachments = watch("attachments") ?? [];
+
   const onEmojiClick = (emojiObject: any) => {
     const body = getValues("mentionInput.body");
     setValue("mentionInput.body", body + emojiObject.native);
@@ -113,15 +128,20 @@ const SendMessage: FC<SendMessageProps> = ({
     }
     return remoteName;
   };
-  const onSubmit: SubmitHandler<FormValues> = async ({ mentionInput }) => {
+  const onSubmit: SubmitHandler<FormValues> = async ({
+    attachments,
+    mentionInput,
+  }) => {
     setLoading(true);
-    let mediaUrl;
-    if (selectedFile) {
-      mediaUrl = await uploadMedia(selectedFile);
-    }
-    await onSend(mentionInput.body, mediaUrl);
+    const sendingAttachments = attachments?.map(
+      ({ url, aspectRatio, documentLink }) => ({
+        url,
+        aspectRatio,
+        documentLink,
+      })
+    );
+    await onSend(mentionInput.body, sendingAttachments ?? []);
     reset();
-    setSelectedFile(undefined);
     setLoading(false);
   };
 
@@ -165,7 +185,7 @@ const SendMessage: FC<SendMessageProps> = ({
                 >
                   <Smiley size={20} color="#00AAE0" weight="fill" />
                 </Button>
-                <Label className="hidden cursor-pointer hover:opacity-80 ml-1">
+                <Label className="cursor-pointer hover:opacity-80 ml-1">
                   <PhotoImage
                     size={20}
                     color="currentColor"
@@ -175,8 +195,19 @@ const SendMessage: FC<SendMessageProps> = ({
                   <Input
                     type="file"
                     value=""
-                    onInput={(event) => {
-                      setSelectedFile(event.currentTarget.files?.[0]);
+                    onInput={async (event) => {
+                      const file = event.currentTarget.files?.[0];
+
+                      if (file != null) {
+                        setValue("attachments", [
+                          {
+                            file: file,
+                            url: (await uploadMedia(file)) ?? "",
+                            aspectRatio: 1.58,
+                            documentLink: undefined,
+                          },
+                        ]);
+                      }
                     }}
                     accept="image/*, video/*"
                     className="hidden"
@@ -184,12 +215,29 @@ const SendMessage: FC<SendMessageProps> = ({
                 </Label>
               </div>
             </div>
-            <AttachmentPreview
-              file={selectedFile}
-              userId={account._id}
-              onLoaded={() => {}}
-              onRemove={() => setSelectedFile(undefined)}
-            />
+            {currentAttachments.length === 1 && (
+              <div className={"max-w-xs mt-4"}>
+                <AttachmentPreview
+                  attachment={currentAttachments[0]}
+                  file={
+                    (currentAttachments[0].file as unknown as File) ??
+                    undefined
+                  }
+                  userId={account._id}
+                  postId={commentId}
+                  onLoaded={(aspectRatio) => {
+                    const newMedia = [
+                      { ...currentAttachments[0], aspectRatio },
+                    ];
+                    setValue("attachments", newMedia);
+                  }}
+                  onRemove={() => {
+                    setValue("attachments", []);
+                  }}
+                  secondary={true}
+                />
+              </div>
+            )}
             {type == "edit-comment" && (
               <div className="ml-3">
                 <Button

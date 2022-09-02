@@ -17,7 +17,7 @@ export type Like = Pick<
 
 export type Comment = Pick<
   GraphQLPost["comments"][number],
-  "_id" | "body" | "commentId" | "mediaUrl" | "likeIds" | "createdAt"
+  "_id" | "body" | "commentId" | "attachments" | "likeIds" | "createdAt"
 > & {
   user: Pick<
     GraphQLPost["comments"][number]["user"],
@@ -79,7 +79,11 @@ export function usePost(postId?: string): QueryResult<PostData, PostVariables> {
             body
             commentId
             createdAt
-            mediaUrl
+            attachments {
+              url
+              aspectRatio
+              documentLink
+            }
             user {
               _id
               firstName

@@ -18,6 +18,7 @@ interface AttachmentPreviewProps {
   removable?: boolean;
   maxHeight?: number;
   className?: string;
+  secondary?: boolean;
   onLoaded: (aspectRatio: number) => void;
   onRemove: () => void;
 }
@@ -32,6 +33,7 @@ const AttachmentPreview: FC<AttachmentPreviewProps> = ({
   maxHeight,
   onLoaded,
   onRemove,
+  secondary = false,
 }) => {
   const filePreview = useMemo<{ type: MediaType; url: string } | null>(() => {
     if (file) {
@@ -50,8 +52,8 @@ const AttachmentPreview: FC<AttachmentPreviewProps> = ({
     <>
       {(filePreview || attachment) && (
         <div className="h-full">
-          <div className="relative rounded-lg overflow-hidden h-full">
-            <>
+          <div className="relative rounded-lg h-full">
+            <div className={"overflow-hidden rounded-lg"}>
               {filePreview && (
                 <Media
                   type={filePreview.type}
@@ -73,7 +75,7 @@ const AttachmentPreview: FC<AttachmentPreviewProps> = ({
                   maxHeight={maxHeight}
                 />
               )}
-            </>
+            </div>
             {percent != undefined && (
               <div className="absolute inset-0 bg-black/[.87] flex items-center justify-center">
                 <Spinner indeterminate={false} percent={percent} size={40} />
@@ -82,10 +84,16 @@ const AttachmentPreview: FC<AttachmentPreviewProps> = ({
             {removable && (
               <Button
                 variant="text"
-                className="!absolute top-2 right-1 py-0"
+                className={`!absolute ${
+                  secondary ? "top-0.5 -right-10" : "top-2 right-1"
+                } py-0`}
                 onClick={onRemove}
               >
-                <XCircle size={32} color="#5F5F5F" weight="fill" />
+                <XCircle
+                  size={32}
+                  color={secondary ? "white" : "#5F5F5F"}
+                  weight={secondary ? "regular" : "fill"}
+                />
               </Button>
             )}
           </div>

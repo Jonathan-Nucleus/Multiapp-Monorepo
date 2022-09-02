@@ -26,7 +26,11 @@ export function usePostComments(
             body
             commentId
             createdAt
-            mediaUrl
+            attachments {
+              url
+              aspectRatio
+              documentLink
+            }
             user {
               _id
               firstName

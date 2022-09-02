@@ -350,7 +350,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
       }
 
       const { remoteName, uploadUrl } = data.uploadLink;
-      await upload(uploadUrl, fileUri);
+      await upload(uploadUrl, fileUri, setUploadProgress);
 
       const attachments = getValues('attachments') ?? [];
       attachmentsField.onChange([
@@ -388,34 +388,8 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     }
 
     const { remoteName, uploadUrl } = data.uploadLink;
-    await upload(uploadUrl, filePath);
+    await upload(uploadUrl, filePath, setUploadProgress);
     setDocument(remoteName);
-  };
-
-  const upload = async (uploadUrl: string, fileUri: string): Promise<void> => {
-    try {
-      await new Promise((resolver, rejecter) => {
-        const xhr = new XMLHttpRequest();
-        xhr.onload = () => {
-          if (xhr.status === 200) {
-            resolver(true);
-          } else {
-            const error = new Error(xhr.response);
-            rejecter(error);
-          }
-        };
-        xhr.onerror = (error) => {
-          rejecter(error);
-        };
-        xhr.upload.onprogress = (evt) => {
-          setUploadProgress(evt.loaded / evt.total);
-        };
-        xhr.open('PUT', uploadUrl);
-        xhr.send({ uri: fileUri });
-      });
-    } catch (err) {
-      console.log('Error uploading file', err);
-    }
   };
 
   const openPicker = useCallback(async (): Promise<void> => {
@@ -785,6 +759,36 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
 };
 
 export default CreatePost;
+
+export const upload = async (
+  uploadUrl: string,
+  fileUri: string,
+  setUploadProgress: React.Dispatch<React.SetStateAction<number>>,
+): Promise<void> => {
+  try {
+    await new Promise((resolver, rejecter) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          resolver(true);
+        } else {
+          const error = new Error(xhr.response);
+          rejecter(error);
+        }
+      };
+      xhr.onerror = (error) => {
+        rejecter(error);
+      };
+      xhr.upload.onprogress = (evt) => {
+        setUploadProgress(evt.loaded / evt.total);
+      };
+      xhr.open('PUT', uploadUrl);
+      xhr.send({ uri: fileUri });
+    });
+  } catch (err) {
+    console.log('Error uploading file', err);
+  }
+};
 
 const styles = StyleSheet.create({
   container: {

@@ -55,7 +55,7 @@ const createCommentsCollection = (
       comment: Comment.Input,
       userId: MongoId
     ): Promise<Comment.Mongo> => {
-      const { body, postId, commentId, mentionIds, mediaUrl } = comment;
+      const { body, postId, commentId, mentionIds, attachments } = comment;
       const commentData = {
         _id: new ObjectId(),
         body,
@@ -63,7 +63,7 @@ const createCommentsCollection = (
         commentId: commentId ? toObjectId(commentId) : undefined,
         mentionIds: mentionIds ? toObjectIds(mentionIds) : undefined,
         userId: toObjectId(userId),
-        mediaUrl,
+        attachments,
         likeCount: 0,
       };
       await commentsCollection.insertOne(commentData);
@@ -91,9 +91,10 @@ const createCommentsCollection = (
       comment: Comment.Update,
       userId: MongoId
     ): Promise<Comment.Mongo> => {
-      const { _id, body, mentionIds } = comment;
+      const { _id, body, mentionIds, attachments } = comment;
       const updateFilter: UpdateFilter<Comment.Mongo> = {
         $set: {
+          attachments,
           body,
           updatedAt: new Date(),
           ...(mentionIds ? { mentionIds: toObjectIds(mentionIds) } : {}),

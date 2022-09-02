@@ -3,6 +3,7 @@ import { ObjectId } from "mongodb";
 import type { GraphQLEntity } from "../lib/mongo-helper";
 import type { User } from "./user";
 import type { Post } from "./post";
+import { Media } from "./post";
 
 export namespace Comment {
   export interface Mongo {
@@ -13,8 +14,10 @@ export namespace Comment {
     commentId?: ObjectId;
     likeIds?: ObjectId[];
     likeCount: number;
-    mentionIds?: ObjectId[];
+    // @deprecated and use `attachments` instead
     mediaUrl?: string;
+    mentionIds?: ObjectId[];
+    attachments?: Media[];
     updatedAt?: Date;
     deleted?: boolean;
   }
@@ -30,12 +33,12 @@ export namespace Comment {
 
   export type Input = Pick<
     GraphQL,
-    "body" | "postId" | "commentId" | "mentionIds" | "mediaUrl"
+    "body" | "postId" | "commentId" | "mentionIds" | "attachments" | "mediaUrl"
   >;
 
   export type Update = Pick<
     GraphQL,
-    "_id" | "body" | "mentionIds" | "mediaUrl"
+    "_id" | "body" | "mentionIds" | "attachments" | "mediaUrl"
   >;
 }
 
@@ -47,9 +50,10 @@ export const CommentSchema = `
     postId: ID!
     commentId: ID
     likeIds: [ID!]
+    mediaUrl: String
     likeCount: Int!
     mentionIds: [ID!]
-    mediaUrl: String
+    attachments: [Media]
     createdAt: Date!
     updatedAt: Date
 
@@ -66,6 +70,7 @@ export const CommentSchema = `
     commentId: ID
     mentionIds: [ID!]
     mediaUrl: String
+    attachments: [MediaInput]
   }
 
   input CommentUpdate {
@@ -73,5 +78,6 @@ export const CommentSchema = `
     body: String!
     mentionIds: [ID!]
     mediaUrl: String
+    attachments: [MediaInput]
   }
 `;

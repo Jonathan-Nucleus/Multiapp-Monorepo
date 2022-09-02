@@ -12,7 +12,12 @@ import {
 } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CaretLeft, PaperPlaneRight } from 'phosphor-react-native';
+import {
+  CaretLeft,
+  Image as GalleryImage,
+  PaperPlaneRight,
+  X,
+} from 'phosphor-react-native';
 
 import Header from 'mobile/src/components/main/Header';
 import PLabel from 'mobile/src/components/common/PLabel';
@@ -36,11 +41,18 @@ import MentionsList from 'mobile/src/components/main/MentionsList';
 import {
   useCommentPost,
   useEditCommentPost,
+  useFetchUploadLink,
 } from 'shared/graphql/mutation/posts';
 import { usePost, Comment } from 'shared/graphql/query/post/usePost';
 import { parseMentions } from 'shared/src/patterns';
 
 import { PostDetailScreen } from 'mobile/src/navigations/PostDetailsStack';
+import ImagePicker, { ImageOrVideo } from 'react-native-image-crop-picker';
+import { showMessage } from '../../services/ToastService';
+import { useAccountContext } from 'shared/context/Account';
+import { CircleSnail, Pie } from 'react-native-progress';
+import { upload } from './CreatePost';
+import { PostAttachment } from '../../components/common/Attachment';
 
 type CommentUser = Comment['user'];
 
@@ -60,6 +72,8 @@ const PostDetail: PostDetailScreen = ({ route }) => {
   const { data, refetch } = usePost(postId);
   const [commentPost] = useCommentPost();
   const [editComment] = useEditCommentPost();
+  const account = useAccountContext();
+  const [fetchUploadLink] = useFetchUploadLink();
 
   const [selectedUser, setSelectedUser] = useState<CommentUser | undefined>(
     undefined,
@@ -71,7 +85,14 @@ const PostDetail: PostDetailScreen = ({ route }) => {
   const flatListRef = useRef<FlatList<Comment> | null>(null);
   const focusCommentRef = useRef(focusComment);
   const [mentionUsers, setMentionUsers] = useState<User[]>([]);
+  const [uploading, setUploading] = useState(false);
   const onMentionSelected = useRef<OnSelectUser>();
+
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [imageData, setImageData] = useState<ImageOrVideo | undefined>(
+    undefined,
+  );
+  const [remoteURL, setRemoteURL] = useState('');
 
   const post = data?.post;
   const comments = post?.comments;
@@ -106,7 +127,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
 
   const onSubmit = async ({ message }: FormValues): Promise<void> => {
     try {
-      let success = false;
+      let success;
       if (isEditComment && focusCommentId) {
         const result = await editComment({
           variables: {
@@ -114,7 +135,14 @@ const PostDetail: PostDetailScreen = ({ route }) => {
               _id: focusCommentId,
               body: message,
               mentionIds: parseMentions(message),
-              mediaUrl: '',
+              attachments: imageData
+                ? [
+                    {
+                      url: remoteURL,
+                      aspectRatio: imageData.width / imageData.height,
+                    },
+                  ]
+                : [],
             },
           },
         });
@@ -127,6 +155,14 @@ const PostDetail: PostDetailScreen = ({ route }) => {
               body: message,
               postId: post._id,
               mentionIds: parseMentions(message),
+              attachments: imageData
+                ? [
+                    {
+                      url: remoteURL,
+                      aspectRatio: imageData.width / imageData.height,
+                    },
+                  ]
+                : [],
               ...(focusCommentId ? { commentId: focusCommentId } : {}),
             },
           },
@@ -149,6 +185,49 @@ const PostDetail: PostDetailScreen = ({ route }) => {
     }
   };
 
+  const openPicker = async (): Promise<void> => {
+    const image = await ImagePicker.openPicker({
+      width: 300,
+      height: 400,
+      cropping: false,
+      compressImageQuality: 0.8,
+      compressVideoPreset: 'Passthrough',
+    });
+    await uploadMedia(image);
+  };
+
+  const uploadMedia = async (media: ImageOrVideo): Promise<void> => {
+    setUploading(true);
+
+    const fileUri = media.path;
+
+    const filename = fileUri.substring(fileUri.lastIndexOf('/') + 1);
+    const { data } = await fetchUploadLink({
+      variables: {
+        localFilename: filename.toLowerCase(),
+        type: 'POST',
+        id: account._id,
+      },
+    });
+
+    if (!data || !data.uploadLink) {
+      showMessage('error', 'Media upload failed');
+      return;
+    }
+
+    const { remoteName, uploadUrl } = data.uploadLink;
+    await upload(uploadUrl, fileUri, setUploadProgress);
+
+    setImageData(media);
+    setRemoteURL(remoteName);
+    setUploadProgress(0);
+    setUploading(false);
+  };
+
+  const clearImage = (): void => {
+    setImageData(undefined);
+  };
+
   const initInputComment = (): void => {
     reset(
       schema.cast(
@@ -162,6 +241,7 @@ const PostDetail: PostDetailScreen = ({ route }) => {
     setEditComment(false);
     focusCommentRef.current = false;
     inputRef?.current?.blur();
+    setImageData(undefined);
   };
 
   const renderCommentItem: ListRenderItem<typeof getComments[number]> = ({
@@ -179,12 +259,26 @@ const PostDetail: PostDetailScreen = ({ route }) => {
         setValue('message', comment.body);
         setEditComment(true);
         setFocusCommentId(comment._id);
+        if (comment.attachments && comment.attachments.length > 0) {
+          setImageData({
+            path: comment.attachments[0].url,
+            width: 160,
+            height: 160 / (comment.attachments[0].aspectRatio ?? 1.58),
+          } as ImageOrVideo);
+        }
         setTimeout(() => {
           inputRef?.current?.focus();
         }, 500);
       }}
     />
   );
+
+  const renderGalleryImage = () =>
+    !uploading ? (
+      <Pressable onPress={openPicker} style={{ marginRight: 6 }}>
+        <GalleryImage size={32} color={WHITE} />
+      </Pressable>
+    ) : null;
 
   return (
     <SafeAreaView style={pStyles.globalContainer} edges={['bottom']}>
@@ -223,6 +317,38 @@ const PostDetail: PostDetailScreen = ({ route }) => {
             />
           </View>
           <View style={styles.inputContainer}>
+            {uploading ? (
+              <View style={[styles.attachment, styles.uploadIndicator]}>
+                {uploadProgress === 0 ? (
+                  <CircleSnail color={PRIMARYSOLID} size={40} />
+                ) : (
+                  <Pie
+                    color={PRIMARYSOLID}
+                    size={40}
+                    progress={uploadProgress}
+                  />
+                )}
+              </View>
+            ) : null}
+            {imageData ? (
+              <View style={styles.attachment}>
+                <PostAttachment
+                  userId={account._id}
+                  mediaId={focusCommentId ?? undefined}
+                  attachment={{
+                    url: imageData.path,
+                    aspectRatio: imageData.width / imageData.height,
+                  }}
+                  style={styles.preview}
+                />
+                <Pressable onPress={clearImage} style={styles.closeButton}>
+                  <X color={BLACK} size={14} />
+                </Pressable>
+              </View>
+            ) : (
+              renderGalleryImage()
+            )}
+
             <ExpandingInput
               control={control}
               name="message"
@@ -342,5 +468,36 @@ const styles = StyleSheet.create({
     height: 45,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  attachment: {
+    marginVertical: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+    marginRight: 8,
+  },
+  preview: {
+    marginVertical: 0,
+    marginTop: 0,
+    width: 64,
+    backgroundColor: BLACK,
+    borderRadius: 8,
+  },
+  closeButton: {
+    position: 'absolute',
+    right: -6,
+    top: -6,
+    borderRadius: 8,
+    backgroundColor: 'white',
+    padding: 2,
+  },
+
+  uploadIndicator: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 64,
+    aspectRatio: 1.6,
   },
 });

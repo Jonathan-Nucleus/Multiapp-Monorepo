@@ -6,7 +6,7 @@ import { DotsThreeVertical } from 'phosphor-react-native';
 import PLabel from 'mobile/src/components/common/PLabel';
 import PBodyText from 'mobile/src/components/common/PBodyText';
 import UserInfo from 'mobile/src/components/common/UserInfo';
-import { PRIMARY, WHITE } from 'shared/src/colors';
+import { BLACK, PRIMARY, WHITE } from 'shared/src/colors';
 import { Body3 } from 'mobile/src/theme/fonts';
 
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
@@ -17,6 +17,7 @@ import { useAccount } from 'shared/graphql/query/account/useAccount';
 
 import UserCommentActionModal from './UserCommentActionModal';
 import OwnCommentActionModal from './OwnCommentActionModal';
+import { PostAttachment } from '../../../common/Attachment';
 
 interface CommentItemProps {
   comment: Comment;
@@ -25,7 +26,7 @@ interface CommentItemProps {
 }
 
 const CommentItem: FC<CommentItemProps> = ({ comment, onReply, onEdit }) => {
-  const { commentId, user, body, createdAt } = comment;
+  const { commentId, user, body, createdAt, attachments } = comment;
 
   const { data: { account } = {} } = useAccount({ fetchPolicy: 'cache-only' });
   const [likeComment] = useLikeComment();
@@ -105,6 +106,17 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply, onEdit }) => {
         collapseLongText={false}
         hideLinkPreview={true}
       />
+      {attachments != null && attachments.length > 0 && (
+        <PostAttachment
+          mediaId={comment._id}
+          userId={comment.user._id}
+          attachment={{
+            url: attachments[0].url,
+            aspectRatio: attachments[0].aspectRatio ?? 1.58,
+          }}
+          style={styles.image}
+        />
+      )}
       <View style={styles.actionContainer}>
         <PLabel
           label={moment(createdAt).fromNow()}
@@ -170,5 +182,14 @@ const styles = StyleSheet.create({
   },
   likedLabel: {
     color: PRIMARY,
+  },
+
+  image: {
+    marginVertical: 0,
+    marginTop: 0,
+    height: 160,
+    backgroundColor: BLACK,
+    borderRadius: 8,
+    marginLeft: 40,
   },
 });

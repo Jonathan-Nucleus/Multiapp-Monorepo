@@ -7,6 +7,7 @@ import { useCommentPost } from "shared/graphql/mutation/posts";
 import { parseMentions } from "shared/src/patterns";
 import Spinner from "../../../../common/Spinner";
 import { usePostComments } from "shared/graphql/query/post/usePostComments";
+import { Media } from "../../EditPostModal/AttachmentPreview/MediaSelector";
 
 interface CommentsListProps {
   show: boolean;
@@ -35,14 +36,14 @@ const CommentsList: FC<CommentsListProps> = ({ show, postId }) => {
       );
     }
   }, [post]);
-  const addNewComment = async (message: string, mediaUrl?: string) => {
+  const addNewComment = async (message: string, attachments?: Media[]) => {
     await commentPost({
       variables: {
         comment: {
           body: message,
           postId,
           mentionIds: parseMentions(message),
-          mediaUrl,
+          attachments,
         },
       },
     });
@@ -51,7 +52,7 @@ const CommentsList: FC<CommentsListProps> = ({ show, postId }) => {
   const replyToComment = async (
     commentId: string,
     message: string,
-    mediaUrl?: string
+    attachments?: Media[]
   ) => {
     await commentPost({
       variables: {
@@ -60,7 +61,7 @@ const CommentsList: FC<CommentsListProps> = ({ show, postId }) => {
           commentId,
           postId,
           mentionIds: parseMentions(message),
-          mediaUrl,
+          attachments,
         },
       },
     });

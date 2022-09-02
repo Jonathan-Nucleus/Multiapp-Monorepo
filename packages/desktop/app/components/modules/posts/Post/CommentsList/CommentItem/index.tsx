@@ -11,13 +11,16 @@ import { useAccountContext } from "shared/context/Account";
 import Header from "./Header";
 import BodyText from "../../PostBody/BodyText";
 import LikesModal from "./LikesModal";
+import PostAttachment from "../../../PostAttachment";
+import { Attachment as AttachmentType } from "shared/graphql/fragments/post";
+import { Media } from "../../../EditPostModal/AttachmentPreview/MediaSelector";
 
 interface CommentItemProps {
   comment: Comment;
   onReply?: (
     commentId: string,
     comment: string,
-    mediaUrl?: string
+    attachments?: Media[]
   ) => Promise<void>;
 }
 
@@ -42,7 +45,7 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply }) => {
   const handleDeleteComment = async () => {
     await deleteComment({ variables: { commentId: comment._id } });
   };
-  const handleEditComment = async (message: string, mediaUrl?: string) => {
+  const handleEditComment = async (message: string, attachments?: Media[]) => {
     try {
       const { data } = await editComment({
         variables: {
@@ -50,7 +53,7 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply }) => {
             _id: comment._id,
             body: message,
             mentionIds: [], // Implement mentions
-            mediaUrl: mediaUrl ?? "",
+            attachments,
           },
         },
       });
@@ -59,6 +62,8 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply }) => {
       }
     } catch (err) {}
   };
+
+  const attachments = comment.attachments;
 
   return (
     <div>
@@ -73,6 +78,8 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply }) => {
           <SendMessage
             type="edit-comment"
             message={comment.body}
+            attachments={attachments}
+            commentId={comment._id}
             onSend={handleEditComment}
             onCancel={() => setShowEditor(false)}
           />
@@ -80,6 +87,18 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply }) => {
       ) : (
         <div className="ml-12 mt-2">
           <BodyText text={comment.body} />
+          <div className={"max-w-xs rounded-lg overflow-hidden mt-4 mb-2"}>
+            {attachments != null && attachments.length > 0 && (
+              <PostAttachment
+                attachment={{ url: attachments[0].url } as AttachmentType}
+                userId={comment.user._id}
+                postId={comment._id}
+                multiple={false}
+                aspectRatio={attachments[0].aspectRatio ?? 1.58}
+              />
+            )}
+          </div>
+
           <div className="flex items-center mt-2">
             <div>
               <Button
@@ -114,8 +133,8 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply }) => {
             <div className="mt-2">
               <SendMessage
                 type="create-comment"
-                onSend={async (message, mediaUrl) => {
-                  await onReply(comment._id, message, mediaUrl);
+                onSend={async (message, attachments) => {
+                  await onReply(comment._id, message, attachments);
                   setShowReplyForm(false);
                 }}
               />

@@ -7,6 +7,7 @@ import {
   POST_SUMMARY_FRAGMENT,
   PostSummary,
 } from "shared/graphql/fragments/post";
+import { Media } from "backend/schemas/post";
 
 export type { PostCategory };
 export { PostCategories };
@@ -77,7 +78,7 @@ type CommentPostVariables = {
   comment: {
     postId: string;
     commentId?: string;
-    mediaUrl?: string;
+    attachments?: Media[];
     body: string;
     mentionIds?: string[];
   };
@@ -108,7 +109,11 @@ export function useCommentPost(): MutationTuple<
             firstName
             lastName
           }
-          mediaUrl
+          attachments {
+            url
+            aspectRatio
+            documentLink
+          }
         }
       }
     `,
@@ -121,7 +126,7 @@ type EditCommentPostVariables = {
     _id: string;
     body: string;
     mentionIds: string[];
-    mediaUrl?: string;
+    attachments?: Media[];
   };
 };
 
@@ -139,9 +144,12 @@ export function useEditCommentPost(): MutationTuple<
         editComment(comment: $comment) {
           _id
           body
-          postId
           createdAt
-          mediaUrl
+          attachments {
+            url
+            aspectRatio
+            documentLink
+          }
         }
       }
     `,

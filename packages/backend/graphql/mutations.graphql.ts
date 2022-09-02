@@ -1384,6 +1384,28 @@ const resolvers = {
           commentId: newComment._id,
         });
 
+        // Move AWS media to the appropriate post folder
+        if (newComment.attachments) {
+          const moveAttachmentsResults = await Promise.all(
+            newComment.attachments.map(async (attachment) =>
+              movePostMedia(
+                user._id.toString(),
+                user._id.toString(),
+                newComment._id.toString(),
+                attachment.url
+              )
+            ) ?? []
+          );
+          if (moveAttachmentsResults.some((result) => !result.success)) {
+            console.log(
+              "Error moving media assets",
+              "for comment",
+              newComment._id,
+              moveAttachmentsResults
+            );
+          }
+        }
+
         const mentionIds = newComment?.mentionIds ?? [];
         await Promise.all(
           mentionIds.map((mentionId) => {
@@ -1434,6 +1456,28 @@ const resolvers = {
         validateArgs(validator, args);
 
         const { comment } = args;
+
+        // Move AWS media to the appropriate post folder
+        if (comment.attachments) {
+          const moveAttachmentsResults = await Promise.all(
+            comment.attachments.map(async (attachment) =>
+              movePostMedia(
+                user._id.toString(),
+                user._id.toString(),
+                comment._id.toString(),
+                attachment.url
+              )
+            ) ?? []
+          );
+          if (moveAttachmentsResults.some((result) => !result.success)) {
+            console.log(
+              "Error moving media assets",
+              "for comments",
+              comment._id,
+              moveAttachmentsResults
+            );
+          }
+        }
 
         return db.comments.edit(comment, user._id);
       }
