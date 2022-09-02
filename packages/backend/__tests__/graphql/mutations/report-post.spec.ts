@@ -1,5 +1,5 @@
 import faker from "@faker-js/faker";
-import { ApolloServer, gql } from "apollo-server";
+import { ApolloServer, gql } from "apollo-server-express";
 import _ from "lodash";
 import { createTestApolloServer } from "../../../lib/apollo/server";
 import { ErrorCode } from "../../../lib/apollo/validate";

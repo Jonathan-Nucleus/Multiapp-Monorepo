@@ -1,4 +1,4 @@
-import { ApolloError } from "apollo-server";
+import { ApolloError } from "apollo-server-express";
 import { SES } from "aws-sdk";
 import { promises as fs } from "fs";
 import path from "path";

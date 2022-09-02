@@ -1,4 +1,4 @@
-import { gql } from "apollo-server";
+import { gql } from "apollo-server-express";
 import { GraphQLScalarType } from "graphql";
 import { PartialSchema } from "../lib/apollo/apollo-helper";
 

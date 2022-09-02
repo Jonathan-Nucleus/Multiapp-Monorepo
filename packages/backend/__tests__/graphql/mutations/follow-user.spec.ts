@@ -1,4 +1,4 @@
-import { ApolloServer, gql } from "apollo-server";
+import { ApolloServer, gql } from "apollo-server-express";
 import _ from "lodash";
 import * as FirebaseModule from "../../../lib/firebase-helper";
 import { createTestApolloServer } from "../../../lib/apollo/server";

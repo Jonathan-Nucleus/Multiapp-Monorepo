@@ -1,4 +1,4 @@
-import { ApolloError, UserInputError } from "apollo-server";
+import { ApolloError, UserInputError } from "apollo-server-express";
 import * as yup from "yup";
 import _ from "lodash";
 import { ObjectId } from "mongodb";

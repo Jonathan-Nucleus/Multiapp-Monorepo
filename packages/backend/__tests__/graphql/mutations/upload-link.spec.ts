@@ -1,5 +1,5 @@
 import faker from "@faker-js/faker";
-import { ApolloServer, gql } from "apollo-server";
+import { ApolloServer, gql } from "apollo-server-express";
 import { S3RequestPresigner } from "@aws-sdk/s3-request-presigner";
 import { formatUrl } from "@aws-sdk/util-format-url";
 import { createTestApolloServer } from "../../../lib/apollo/server";

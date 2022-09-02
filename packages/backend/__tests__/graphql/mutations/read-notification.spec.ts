@@ -1,4 +1,4 @@
-import { ApolloServer, gql } from "apollo-server";
+import { ApolloServer, gql } from "apollo-server-express";
 import { createTestApolloServer } from "../../../lib/apollo/server";
 import { User } from "../../../schemas/user";
 import { Notification } from "../../../schemas/notification";

@@ -1,4 +1,4 @@
-import { gql } from "apollo-server";
+import { gql } from "apollo-server-express";
 import * as yup from "yup";
 import _ from "lodash";
 import { PrometheusMailer } from "../email";
@@ -880,14 +880,9 @@ const resolvers = {
         const followerIds = user?.followerIds ?? [];
         await Promise.all(
           followerIds.map((followerId) => {
-            return db.notifications.create(
-              user,
-              "create-post",
-              [followerId],
-              {
-                postId: postData._id,
-              }
-            );
+            return db.notifications.create(user, "create-post", [followerId], {
+              postId: postData._id,
+            });
           })
         );
 

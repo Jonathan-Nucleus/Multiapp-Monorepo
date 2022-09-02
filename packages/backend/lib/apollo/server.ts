@@ -1,4 +1,9 @@
-import { ApolloServer } from "apollo-server";
+import { ApolloServer } from "apollo-server-express";
+import {
+  ApolloServerPluginDrainHttpServer,
+  ApolloServerPluginLandingPageLocalDefault,
+} from "apollo-server-core";
+import { Server } from "http";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
 
@@ -13,9 +18,21 @@ import apolloLogger from "./plugins/apollo-logger";
 const IGNITE_SECRET = process.env.IGNITE_SECRET;
 if (!IGNITE_SECRET) throw new Error("IGNITE_SECRET env var undefined");
 
-export const createApolloServer = (mongoUrl?: string): ApolloServer =>
+export const createApolloServer = (
+  server: Server,
+  mongoUrl?: string
+): ApolloServer =>
   new ApolloServer({
     schema,
+    formatError,
+    csrfPrevention: true,
+    cache: "bounded",
+    introspection: false,
+    plugins: [
+      apolloLogger,
+      ApolloServerPluginDrainHttpServer({ httpServer: server }),
+      ApolloServerPluginLandingPageLocalDefault({ embed: true }),
+    ],
     context: async (context): Promise<ApolloServerContext> => {
       const db = await getIgniteDb(mongoUrl);
       const request = context.req;
@@ -40,9 +57,6 @@ export const createApolloServer = (mongoUrl?: string): ApolloServer =>
 
       return { db };
     },
-    formatError,
-    introspection: false,
-    plugins: [apolloLogger],
   });
 
 export const createTestApolloServer = (

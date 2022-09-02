@@ -1,4 +1,4 @@
-import { gql } from "apollo-server";
+import { gql } from "apollo-server-express";
 import { PartialSchema, secureEndpoint } from "../lib/apollo/apollo-helper";
 
 import type { Company } from "../schemas/company";
