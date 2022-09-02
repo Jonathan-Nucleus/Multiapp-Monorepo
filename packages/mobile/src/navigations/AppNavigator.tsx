@@ -29,12 +29,8 @@ import AuthStack, { AuthStackParamList } from './AuthStack';
 import AuthenticatedStack, {
   AuthenticatedStackParamList,
 } from './AuthenticatedStack';
-
-import { MediaType } from 'backend/graphql/mutations.graphql';
-import { Accreditation } from 'shared/graphql/mutation/account/useSaveQuestionnaire';
 import { useRequiresUpdate } from 'shared/graphql/query/user/useRequiresUpdate';
-
-import { AccountProvider } from 'shared/context/Account';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { logScreenView, setAnalyticsEnabled } from '../utils/FirebaseUtil';
 
 const defaultScreenOptions = {
@@ -96,6 +92,11 @@ const AppNavigator = (): React.ReactElement => {
   // already logged in
   if (authenticated === null || !verifying) {
     (async (): Promise<void> => {
+      const value = await AsyncStorage.getItem('option');
+      if (value !== 'true' && value !== null) {
+        setAuthenticated(false);
+        return;
+      }
       const token = await getToken();
       setAuthenticated(!!token);
     })();
@@ -140,6 +141,7 @@ const AppNavigator = (): React.ReactElement => {
           <Stack.Screen name="Authenticated" component={AuthenticatedStack} />
         </Stack.Navigator>
       </NavigationContainer>
+
       {requiresUpdate ? <UpdateModal isVisible={true} /> : null}
     </>
   );

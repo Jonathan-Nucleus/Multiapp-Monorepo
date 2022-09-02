@@ -27,7 +27,7 @@ const ContactSuccess: React.FC<ContactSuccessProProps> = ({ navigation }) => {
         <View style={styles.bottom}>
           <PGradientOutlineButton
             label="Back to App"
-            btnContainer={styles.btnContainer}
+            btnContainerStyle={styles.btnContainer}
             onPress={() =>
               navigation.navigate('Main', {
                 screen: 'Home',
@@ -53,12 +53,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 16,
-  },
-  appContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'red',
   },
   title: {
     ...Body1,

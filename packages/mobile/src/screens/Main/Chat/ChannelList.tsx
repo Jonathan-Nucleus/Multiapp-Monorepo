@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { ReactElement, useState, useEffect, useCallback } from 'react';
 import {
   KeyboardAvoidingView,
   ListRenderItem,
@@ -7,20 +7,18 @@ import {
   FlatList,
   View,
   TouchableOpacity,
+  Text,
 } from 'react-native';
 import retry from 'async-retry';
-import { NotePencil } from 'phosphor-react-native';
-
+import { NotePencil, Trash, Archive, SignOut } from 'phosphor-react-native';
 import MainHeader from 'mobile/src/components/main/Header';
 import SearchInput from 'mobile/src/components/common/SearchInput';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
 import pStyles from 'mobile/src/theme/pStyles';
-import { WHITE, GRAY700, GRAY600, PRIMARY } from 'shared/src/colors';
-
+import { WHITE, GRAY700, GRAY600, PRIMARY, GRAY800 } from 'shared/src/colors';
 import { useForm, Controller, DefaultValues } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-
 import { useChatContext } from 'mobile/src/context/Chat';
 import ChannelItem from 'mobile/src/components/main/chat/ChannelItem';
 import { Channel, ChannelSort } from 'mobile/src/services/chat';
@@ -30,6 +28,8 @@ import PSpinner from '../../../components/common/PSpinner';
 import { useIsFocused } from '@react-navigation/native';
 import PText from '../../../components/common/PText';
 import { Body1Semibold, Body2Medium } from '../../../theme/fonts';
+import { Swipeable } from 'react-native-gesture-handler';
+import { PRIMARYSOLID } from '../../../theme/colors';
 
 const DEFAULT_SORT: ChannelSort = [
   { last_message_at: -1 },
@@ -65,7 +65,6 @@ const ChannelList: ChannelListScreen = ({ navigation, route }) => {
 
   const fetchChannels = useCallback(async () => {
     if (!client) {
-      console.log('no client');
       return;
     }
 
@@ -89,9 +88,8 @@ const ChannelList: ChannelListScreen = ({ navigation, route }) => {
           watch: true,
         }),
       {
-        onRetry: (error) => {
+        onRetry: () => {
           reconnect?.();
-          console.log('retrying', error);
         },
       },
     );
@@ -107,7 +105,6 @@ const ChannelList: ChannelListScreen = ({ navigation, route }) => {
     if (client) {
       fetchChannels();
       const handler = client.on((event) => {
-        console.log('received event in channel list', event.type);
         switch (event.type) {
           case 'user.watching.start':
           case 'user.watching.stop':
@@ -126,7 +123,7 @@ const ChannelList: ChannelListScreen = ({ navigation, route }) => {
     retryConnect();
   }, [focused, client]);
 
-  const retryConnect = () => {
+  const retryConnect = (): void => {
     if (focused && !client) {
       setRetryStatus({ loading: true, count: 0 });
       setTimeout(
@@ -144,11 +141,52 @@ const ChannelList: ChannelListScreen = ({ navigation, route }) => {
 
   const kavBehavior = Platform.OS === 'ios' ? 'padding' : 'height';
 
-  const renderItem: ListRenderItem<Channel> = ({ item }) => (
-    <ChannelItem channel={item} />
+  const swipeActions = (item: Channel): ReactElement => (
+    <>
+      <TouchableOpacity
+        style={styles.archiveAction}
+        onPress={async () => {
+          await item.hide();
+          fetchChannels();
+        }}>
+        <Archive size={28} color={WHITE} />
+        <Text style={styles.textAction}>Archive</Text>
+      </TouchableOpacity>
+      {item.data && (item.data as any).member_count > 2 ? (
+        <TouchableOpacity
+          style={styles.leaveAction}
+          onPress={async () => {
+            if (userId) {
+              await item.removeMembers([userId]);
+            }
+            fetchChannels();
+          }}>
+          <SignOut size={28} color={WHITE} />
+          <Text style={styles.textAction}>Leave</Text>
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity
+          style={styles.deleteAction}
+          onPress={async () => {
+            await item.delete();
+            fetchChannels();
+          }}>
+          <Trash size={28} color={WHITE} />
+          <Text style={styles.textAction}>Delete</Text>
+        </TouchableOpacity>
+      )}
+    </>
   );
 
-  const renderFailure = () => (
+  const renderItem: ListRenderItem<Channel> = ({ item }) => (
+    <Swipeable
+      renderRightActions={() => swipeActions(item)}
+      overshootLeft={false}>
+      <ChannelItem channel={item} />
+    </Swipeable>
+  );
+
+  const renderFailure = (): ReactElement => (
     <View style={styles.noClientContainer}>
       {retryStatus.loading ? (
         <View style={styles.spinnerContainer}>
@@ -195,6 +233,16 @@ const ChannelList: ChannelListScreen = ({ navigation, route }) => {
               />
             )}
           />
+          <TouchableOpacity
+            style={styles.archivedChat}
+            onPress={() => {
+              navigation.navigate('ArchivedChats', {
+                channels: channels,
+              });
+            }}>
+            <Archive size={28} color={WHITE} />
+            <Text style={styles.archivedChatText}>View Archived Chats</Text>
+          </TouchableOpacity>
           <KeyboardAvoidingView style={styles.flex} behavior={kavBehavior}>
             <FlatList
               data={channels}
@@ -247,7 +295,46 @@ const styles = StyleSheet.create({
     fontSize: 40,
     textAlign: 'center',
   },
-
+  archiveAction: {
+    width: 75,
+    backgroundColor: PRIMARYSOLID,
+    textAlign: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  deleteAction: {
+    width: 75,
+    backgroundColor: GRAY800,
+    textAlign: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  leaveAction: {
+    width: 75,
+    backgroundColor: GRAY800,
+    textAlign: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  textAction: {
+    fontSize: 12,
+    color: WHITE,
+  },
+  archivedChat: {
+    height: 50,
+    marginLeft: 25,
+    width: '90%',
+    alignSelf: 'center',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
+  archivedChatText: {
+    marginLeft: 25,
+    fontSize: 15,
+    color: WHITE,
+  },
   noClientContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -257,7 +344,6 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
   },
-
   failedLabel: {
     color: WHITE,
     ...Body1Semibold,

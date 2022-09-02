@@ -78,8 +78,9 @@ const styles = StyleSheet.create({
   },
   flex: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingLeft: 15,
+    alignItems: 'flex-start',
+    justifyContent: 'center'
   },
 });
 

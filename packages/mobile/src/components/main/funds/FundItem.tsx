@@ -74,7 +74,7 @@ const FundItem: FC<FundItemProps> = ({ fund, showTooltip }) => {
                   : 'View Fund Details'
               }
               textStyle={styles.button}
-              btnContainer={styles.fullWidthBtn}
+              btnContainerStyle={styles.fullWidthBtn}
               onPress={goToFund}
             />
           </Tooltip>

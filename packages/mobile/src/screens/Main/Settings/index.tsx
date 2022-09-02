@@ -9,10 +9,8 @@ import {
   Pressable,
   Linking,
 } from 'react-native';
-import { clearToken } from 'mobile/src/utils/auth-token';
 import {
   CaretRight,
-  SlidersHorizontal,
   Gear,
   ShieldWarning,
   EnvelopeSimple,
@@ -20,20 +18,22 @@ import {
   Headset,
   ShieldCheck,
 } from 'phosphor-react-native';
-
-import { GRAY100, WHITE, WHITE12, SUCCESS } from 'shared/src/colors';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Avatar from 'mobile/src/components/common/Avatar';
 import MainHeader from 'mobile/src/components/main/Header';
 import PLabel from 'mobile/src/components/common/PLabel';
 import Disclosure from 'mobile/src/components/main/Disclosure';
-import pStyles from 'mobile/src/theme/pStyles';
-import { Body3, H6Bold, Body4Bold, Body2Bold } from 'mobile/src/theme/fonts';
-import { useAccountContext } from 'shared/context/Account';
 import AIUserSvg from 'shared/assets/images/ai-user.svg';
 import QPSvg from 'shared/assets/images/QP.svg';
 import QCSvg from 'shared/assets/images/QC.svg';
 import AISvg from 'shared/assets/images/AI.svg';
+import pStyles from 'mobile/src/theme/pStyles';
+import { GRAY100, WHITE, WHITE12, SUCCESS } from 'shared/src/colors';
+import { Body3, H6Bold, Body4Bold, Body2Bold } from 'mobile/src/theme/fonts';
+
+import { useAccountContext } from 'shared/context/Account';
+import { clearToken } from 'mobile/src/utils/auth-token';
 
 import { SettingsScreen } from 'mobile/src/navigations/MoreStack';
 
@@ -130,6 +130,7 @@ const Settings: SettingsScreen = ({ navigation }) => {
   const handleLogout = async (): Promise<void> => {
     try {
       clearToken();
+      AsyncStorage.setItem('option', 'true');
       navigation.replace('Auth', {
         screen: 'Login',
       });

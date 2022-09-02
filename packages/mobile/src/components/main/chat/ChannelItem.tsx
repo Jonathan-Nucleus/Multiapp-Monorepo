@@ -24,7 +24,7 @@ dayjs.updateLocale('en', {
 });
 
 import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
-import { WHITE, GRAY100, PRIMARYSOLID } from 'shared/src/colors';
+import { WHITE, GRAY100, PRIMARYSOLID, BLACK } from 'shared/src/colors';
 import { Body2, Body2Bold } from 'mobile/src/theme/fonts';
 
 import { useAccountContext } from 'shared/context/Account';
@@ -91,6 +91,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     position: 'relative',
+    backgroundColor: BLACK
   },
   unreadIndicator: {
     position: 'absolute',

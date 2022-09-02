@@ -150,7 +150,7 @@ const CompanyDetail: FC<CompanyDetailProps> = ({ company, isMyCompany }) => {
                 companyId: company._id,
               })
             }
-            gradientContainer={styles.editButton}
+            containerStyle={styles.editButton}
           />
         ) : (
           <View style={styles.row}>

@@ -167,7 +167,7 @@ const CompanyProfile: CompanyProfileScreen = ({ navigation, route }) => {
                   </Text>
                   <PGradientOutlineButton
                     label="Create a Post"
-                    btnContainer={styles.createPostBtn}
+                    btnContainerStyle={styles.createPostBtn}
                     onPress={() =>
                       navigation.navigate('PostDetails', {
                         screen: 'CreatePost',

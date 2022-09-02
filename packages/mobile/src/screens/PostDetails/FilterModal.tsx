@@ -4,7 +4,6 @@ import {
   View,
   Dimensions,
   FlatList,
-  ScrollView,
   TouchableOpacity,
   Text,
   ListRenderItem,
@@ -12,16 +11,7 @@ import {
 import Modal from 'react-native-modal';
 import { Circle, RadioButton, XCircle } from 'phosphor-react-native';
 
-import {
-  BGDARK,
-  BLACK,
-  GRAY1,
-  GRAY800,
-  PRIMARY,
-  PRIMARYSOLID,
-  WHITE,
-  WHITE12,
-} from 'shared/src/colors';
+import { BGDARK, BLACK, GRAY1, PRIMARYSOLID, WHITE } from 'shared/src/colors';
 import { Body1Bold, Body2Bold } from '../../theme/fonts';
 import { PostCategories } from 'backend/graphql/enumerations.graphql';
 import type {
@@ -154,7 +144,7 @@ const FilterModal: FC<ModalProps> = ({
               onClose();
               onFilter(selectedRole, selectedTopics);
             }}
-            btnContainer={styles.button}
+            btnContainerStyle={styles.button}
           />
         </View>
       </View>

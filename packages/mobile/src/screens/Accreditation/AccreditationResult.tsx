@@ -102,7 +102,7 @@ const AccreditationResult: AccreditationResultScreen = ({
               <PGradientOutlineButton
                 label="Back to App"
                 onPress={() => navigation.navigate('Main')}
-                btnContainer={styles.btn}
+                btnContainerStyle={styles.btn}
               />
             )}
           </View>

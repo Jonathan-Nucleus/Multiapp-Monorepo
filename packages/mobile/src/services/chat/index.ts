@@ -1,9 +1,4 @@
-import {
-  UserFilters,
-  PrimitiveFilter,
-  UserSort,
-  UserOptions,
-} from 'stream-chat';
+import { PrimitiveFilter, UserSort, UserOptions } from 'stream-chat';
 import _ from 'lodash';
 import dayjs from 'dayjs';
 
@@ -11,8 +6,6 @@ import type {
   User,
   Channel,
   Message,
-  ChannelFilters,
-  ChannelSort,
   Client,
   StreamType,
 } from 'shared/context/Chat/types';
@@ -34,7 +27,7 @@ export function channelName(channel: Channel, userId: string): string {
   const { members } = channel.state;
   const users = Object.keys(members).filter((key) => key !== userId);
   const userNames = users
-    .slice(0, 3)
+    .slice(0, 2)
     .map((id) => `${members[id].user?.firstName} ${members[id].user?.lastName}`)
     .join(', ');
 

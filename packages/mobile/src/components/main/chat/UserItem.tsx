@@ -1,26 +1,32 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View, Pressable } from 'react-native';
-import { Channel } from 'stream-chat';
-import { X } from 'phosphor-react-native';
+import { Check } from 'phosphor-react-native';
 
-import * as NavigationService from 'mobile/src/services/navigation/NavigationService';
-import { WHITE } from 'shared/src/colors';
+import { PRIMARYSOLID, WHITE } from 'shared/src/colors';
 import { Body2, Body2Bold } from 'mobile/src/theme/fonts';
 
 import ChatAvatar from 'mobile/src/components/main/chat/ChatAvatar';
-import { useChatContext } from 'mobile/src/context/Chat';
-import { channelName, User } from 'mobile/src/services/chat';
+import { useCheck } from 'mobile/src/context/Chat';
+import { User } from 'mobile/src/services/chat';
 
 interface UserItemProps {
   user: User;
   onPress?: (user: User) => void;
-  onRemove?: (user: User) => void;
+  selectedUsers: User[];
 }
 
-const UserItem: React.FC<UserItemProps> = ({ user, onPress, onRemove }) => {
+const UserItem: React.FC<UserItemProps> = ({
+  user,
+  onPress,
+  selectedUsers,
+}) => {
+  const { select } = useCheck();
   return (
     <Pressable
-      onPress={() => onPress?.(user)}
+      onPress={() => {
+        onPress?.(user);
+        select(true);
+      }}
       style={({ pressed }) => (pressed ? styles.pressed : null)}>
       <View style={[styles.row, styles.container]}>
         <ChatAvatar user={user} />
@@ -36,13 +42,11 @@ const UserItem: React.FC<UserItemProps> = ({ user, onPress, onRemove }) => {
             }`}</Text>
           ) : null}
         </View>
-        {onRemove ? (
-          <Pressable
-            style={({ pressed }) => (pressed ? styles.pressed : null)}
-            onPress={() => onRemove(user)}>
-            <X size={24} color={WHITE} />
-          </Pressable>
-        ) : null}
+        {selectedUsers.map((selected) =>
+          selected.id === user.id ? (
+            <Check size={24} color={PRIMARYSOLID} />
+          ) : null,
+        )}
       </View>
     </Pressable>
   );

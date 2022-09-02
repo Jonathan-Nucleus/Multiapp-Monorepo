@@ -249,16 +249,16 @@ const UserProfile: UserProfileScreen = ({ navigation, route }) => {
             <PGradientOutlineButton
               label="Edit Profile"
               onPress={() => navigation.navigate('EditUserProfile')}
-              gradientContainer={styles.editButton}
+              containerStyle={styles.editButton}
             />
           ) : (
             <View style={[styles.row, styles.between]}>
               <PGradientOutlineButton
                 label="Message"
                 onPress={messageUser}
-                gradientContainer={styles.button}
+                containerStyle={styles.button}
                 disabled={!client}
-                isLoading={messagesLoading}
+                loading={messagesLoading}
               />
               <PGradientButton
                 label={isFollowing ? 'Unfollow' : 'Follow'}

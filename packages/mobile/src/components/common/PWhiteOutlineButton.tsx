@@ -9,66 +9,61 @@ import {
   StyleProp,
 } from 'react-native';
 import { UIActivityIndicator } from 'react-native-indicators';
-import LinearGradient from 'react-native-linear-gradient';
 
 import { Body2 } from '../../theme/fonts';
 import { WHITE, DISABLEDTXT, BLACK } from 'shared/src/colors';
 
-interface OutlineButtonProps {
-  btnContainerStyle?: StyleProp<ViewStyle>;
-  containerStyle?: StyleProp<ViewStyle>;
+interface ButtonProps {
+  btnContainer?: StyleProp<ViewStyle>;
+  outlineContainer?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
   label: string;
   onPress: () => void;
   disabled?: boolean;
-  loading?: boolean;
+  isLoading?: boolean;
 }
 
-const PGradientOutlineButton: React.FC<OutlineButtonProps> = (props) => {
+const PWhiteOutlineButton: React.FC<ButtonProps> = (props) => {
   const {
-    btnContainerStyle,
-    containerStyle,
+    btnContainer,
+    outlineContainer,
     textStyle,
     label,
     onPress,
     disabled = false,
-    loading = false,
+    isLoading = false,
   } = props;
 
   return (
     <TouchableOpacity
       onPress={onPress}
-      disabled={disabled || loading}
-      style={btnContainerStyle}>
-      <LinearGradient
-        colors={disabled ? ['#FFFFFF61', '#FFFFFF61'] : ['#844AFF', '#00AAE0']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={[styles.outlineButton, containerStyle]}>
-        {loading ? (
+      disabled={disabled || isLoading}
+      style={btnContainer}>
+      <View style={[styles.button, outlineContainer]}>
+        {isLoading ? (
           <UIActivityIndicator color={WHITE} size={24} />
         ) : (
-          <View style={styles.outlineTxtWrap}>
+          <View style={styles.txtWrap}>
             <Text
               allowFontScaling={false}
               style={[
-                styles.outlineTextStyle,
+                styles.textStyle,
                 textStyle,
-                disabled && styles.outlineDisabledLabel,
+                disabled && styles.disabledLabel,
               ]}>
               {label}
             </Text>
           </View>
         )}
-      </LinearGradient>
+      </View>
     </TouchableOpacity>
   );
 };
 
-export default PGradientOutlineButton;
+export default PWhiteOutlineButton;
 
 const styles = StyleSheet.create({
-  outlineButton: {
+  button: {
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
@@ -76,17 +71,20 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     height: 40,
     borderColor: WHITE,
-    borderWidth: 1,
+    borderWidth: 1
   },
-  outlineDisabledLabel: {
+  disabled: {
+    backgroundColor: 'red',
+  },
+  disabledLabel: {
     color: DISABLEDTXT,
   },
-  outlineTextStyle: {
+  textStyle: {
     color: WHITE,
     ...Body2,
     textTransform: 'capitalize',
   },
-  outlineTxtWrap: {
+  txtWrap: {
     alignItems: 'center',
     justifyContent: 'center',
     width: '99%',

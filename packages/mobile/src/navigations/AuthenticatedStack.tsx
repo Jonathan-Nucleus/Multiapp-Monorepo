@@ -1,6 +1,5 @@
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import {
-  NavigationContainer,
   NavigatorScreenParams,
   CompositeScreenProps,
 } from '@react-navigation/native';
@@ -42,7 +41,6 @@ import {
 import { clearToken } from 'mobile/src/utils/auth-token';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 
-import { MediaType } from 'backend/graphql/mutations.graphql';
 import { Accreditation } from 'shared/graphql/mutation/account/useSaveQuestionnaire';
 import NotificationsManager from 'mobile/src/services/NotificationsManager';
 

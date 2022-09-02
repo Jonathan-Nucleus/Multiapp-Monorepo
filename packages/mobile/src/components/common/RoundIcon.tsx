@@ -5,7 +5,7 @@ import { GRAY1, GRAY2 } from 'shared/src/colors';
 
 interface RoundIconProps {
   icon: React.ReactNode;
-  onPress?: (e: Event) => void;
+  onPress?: () => void;
 }
 
 const RoundIcon: React.FC<RoundIconProps> = (props) => {

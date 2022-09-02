@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import EncryptedStorage from 'react-native-encrypted-storage';
 
 const TOKEN_KEY = 'accessToken';
@@ -28,12 +27,9 @@ export async function setToken(token: string, persist = true): Promise<void> {
   notify('set');
 }
 
-/**
- * Clears any token stored in the encrypted storge of the user device.
- */
 export async function clearToken(): Promise<void> {
   try {
-    await EncryptedStorage.clear();
+    await EncryptedStorage.removeItem(TOKEN_KEY);
   } catch (err) {
     console.log('Error while clearing token', err);
   }

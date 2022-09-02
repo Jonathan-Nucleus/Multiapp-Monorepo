@@ -34,8 +34,6 @@ import LogoSvg from '../../assets/icons/logo.svg';
 import { setToken } from 'mobile/src/utils/auth-token';
 import type { LoginScreen } from 'mobile/src/navigations/AuthStack';
 
-import { authenticate } from 'mobile/src/services/auth/google-provider';
-import { useLoginOAuth } from 'shared/graphql/mutation/auth/useLoginOAuth';
 import CheckboxLabel from '../../components/common/CheckboxLabel';
 import PBackgroundImage from '../../components/common/PBackgroundImage';
 
@@ -61,7 +59,6 @@ const Login: LoginScreen = ({ navigation }) => {
   const [checked, setChecked] = useState(true);
   const [securePassEntry, setSecurePassEntry] = useState(true);
   const [login] = useMutation(LOGIN);
-  const [loginOAuth] = useLoginOAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
@@ -123,6 +120,7 @@ const Login: LoginScreen = ({ navigation }) => {
       showMessage('error', 'Invalid email address or password.');
       console.error('login error', e);
     }
+
     setLoading(false);
   };
 
@@ -140,48 +138,10 @@ const Login: LoginScreen = ({ navigation }) => {
     }
   };
 
-  const googleLogin = async (): Promise<void> => {
-    try {
-      const result = await authenticate();
-      if (result) {
-        const { token, payload } = result;
-        const { email, family_name, given_name } = payload;
-
-        const { data } = await loginOAuth({
-          variables: {
-            user: {
-              email,
-              firstName: given_name,
-              lastName: family_name,
-              tokenId: token,
-              provider: 'google',
-            },
-          },
-        });
-
-        if (data?.loginOAuth) {
-          saveAuthToken(data.loginOAuth, checked);
-        }
-      } else {
-        console.log('Something went wrong');
-      }
-    } catch (err) {
-      console.log('google login err', err);
-      showMessage(
-        'error',
-        'Linked accounts not supported. Try a different login method.',
-      );
-    }
-  };
-
   const onPressResetPass = useCallback(() => {
     setError(false);
     navigation.navigate('ForgotPass');
   }, [navigation]);
-
-  const linkedInLogin = async (): Promise<void> => {
-    console.log('Logging in via linked in');
-  };
 
   return (
     <PBackgroundImage>
@@ -237,7 +197,6 @@ const Login: LoginScreen = ({ navigation }) => {
               />
             )}
           />
-
           <CheckboxLabel
             id={1}
             category="Stay signed in"

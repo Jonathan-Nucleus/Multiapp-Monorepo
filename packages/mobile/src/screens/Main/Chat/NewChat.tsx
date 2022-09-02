@@ -1,11 +1,10 @@
-import React, { FC, useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
-  ListRenderItem,
   StyleSheet,
-  FlatList,
   View,
+  ScrollView,
   Text,
   Pressable,
 } from 'react-native';
@@ -14,7 +13,7 @@ import { CommonActions } from '@react-navigation/native';
 
 import PHeader from 'mobile/src/components/common/PHeader';
 import SearchInput from 'mobile/src/components/common/SearchInput';
-import { Body1Bold, Body3Bold } from 'mobile/src/theme/fonts';
+import { Body1Bold, Body2 } from 'mobile/src/theme/fonts';
 import PAppContainer from 'mobile/src/components/common/PAppContainer';
 import pStyles from 'mobile/src/theme/pStyles';
 import {
@@ -31,17 +30,11 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 
 import { useChatContext } from 'mobile/src/context/Chat';
-import {
-  findUsers,
-  createChannel,
-  Channel,
-  ChannelSort,
-  ChannelFilters,
-  User,
-} from 'mobile/src/services/chat';
+import { findUsers, createChannel, User } from 'mobile/src/services/chat';
 import UserItem from 'mobile/src/components/main/chat/UserItem';
 
 import { NewChatScreen } from 'mobile/src/navigations/ChatStack';
+import SelectedUserItem from '../../../components/main/chat/SelectedUserItem';
 
 type FormValues = {
   search?: string;
@@ -55,9 +48,8 @@ const schema = yup
 
 const NewChat: NewChatScreen = ({ navigation }) => {
   const { client, userId } = useChatContext() || {};
-  const [users, setUsers] = useState<User[]>([]);
+  const [groupedUsers, setGroupedUsers] = useState<any>({});
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
-
   const { control, handleSubmit, getValues } = useForm<
     yup.InferType<typeof schema>
   >({
@@ -81,7 +73,7 @@ const NewChat: NewChatScreen = ({ navigation }) => {
     ]);
 
     if (searchResults) {
-      setUsers(searchResults);
+      sortUsers(searchResults);
     }
   }, [client, getValues]);
 
@@ -90,9 +82,28 @@ const NewChat: NewChatScreen = ({ navigation }) => {
   }, [performSearch]);
 
   if (!client || !userId) {
-    // Return error state
     return <PAppContainer noScroll />;
   }
+
+  const sortUsers = (arrUsers: User[]) => {
+    if (arrUsers && arrUsers.length) {
+      arrUsers.sort((item1: User, item2: User) => {
+        return item1.firstName.localeCompare(item2.firstName);
+      });
+
+      let objUsers: any = {};
+      arrUsers.forEach((item: User) => {
+        const firstChar: string = item.firstName.charAt(0).toUpperCase();
+        if (firstChar && Number.isNaN(Number.parseInt(firstChar))) {
+          if (!objUsers[firstChar]) {
+            objUsers[firstChar] = [];
+          }
+          objUsers[firstChar].push(item);
+        }
+      });
+      setGroupedUsers(objUsers);
+    }
+  };
 
   const onSubmit = async (): Promise<void> => {
     if (!client || selectedUsers.length === 0) {
@@ -114,7 +125,10 @@ const NewChat: NewChatScreen = ({ navigation }) => {
   };
 
   const onSelected = (user: User): void => {
-    setSelectedUsers([...selectedUsers, user]);
+    const userExists: any = selectedUsers.find(
+      (selected) => selected.id === user.id,
+    );
+    !userExists && setSelectedUsers([...selectedUsers, user]);
   };
 
   const onRemove = (user: User): void => {
@@ -122,10 +136,6 @@ const NewChat: NewChatScreen = ({ navigation }) => {
       ...selectedUsers.filter((selectedUser) => selectedUser.id !== user.id),
     ]);
   };
-
-  const renderItem: ListRenderItem<User> = ({ item }) => (
-    <UserItem user={item} onPress={onSelected} />
-  );
 
   const disableNext = selectedUsers.length === 0;
   return (
@@ -175,26 +185,48 @@ const NewChat: NewChatScreen = ({ navigation }) => {
       />
       {selectedUsers.length > 0 ? (
         <View style={styles.sendingToContainer}>
-          <Text style={styles.sendingTo}>Sending to:</Text>
-          {selectedUsers.map((user) => (
-            <UserItem key={user.id} user={user} onRemove={onRemove} />
-          ))}
-          <View style={styles.separator} />
+          <Text style={styles.sendingTo}>To :</Text>
+          <ScrollView
+            showsVerticalScrollIndicator={true}
+            indicatorStyle={'white'}>
+            <View style={styles.selectedUsersWrapper}>
+              {selectedUsers.map((user) => (
+                <SelectedUserItem
+                  key={user.id}
+                  user={user}
+                  onRemove={onRemove}
+                />
+              ))}
+            </View>
+          </ScrollView>
         </View>
-      ) : null}
+      ) : (
+        <Text style={styles.sendingTo}>To :</Text>
+      )}
+
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <FlatList
-          data={users.filter(
-            (user) =>
-              !selectedUsers.some(
-                (selectedUser) => selectedUser.id === user.id,
-              ),
-          )}
-          renderItem={renderItem}
-          keyExtractor={(item) => `${item.id}`}
-        />
+        <ScrollView style={styles.usersWrapper}>
+          {Object.keys(groupedUsers).map((letter: any) => {
+            return (
+              <>
+                <View style={styles.sortLetterBox}>
+                  <Text style={styles.sortLetter}>{letter}</Text>
+                </View>
+                {groupedUsers[letter].map((item: any) => {
+                  return (
+                    <UserItem
+                      selectedUsers={selectedUsers}
+                      user={item}
+                      onPress={onSelected}
+                    />
+                  );
+                })}
+              </>
+            );
+          })}
+        </ScrollView>
       </KeyboardAvoidingView>
     </View>
   );
@@ -225,7 +257,7 @@ const styles = StyleSheet.create({
     ...Body1Bold,
   },
   disabled: {
-    color: GRAY600,
+    display: 'none',
   },
   textContainerStyle: {
     marginVertical: 16,
@@ -238,15 +270,50 @@ const styles = StyleSheet.create({
     color: WHITE,
   },
   sendingToContainer: {
-    marginTop: 16,
+    maxHeight: '25%',
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  selectedUsersWrapper: {
+    width: '100%',
+    display: 'flex',
+    overflowY: 'scroll',
+    flexWrap: 'wrap',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
   },
   sendingTo: {
-    paddingLeft: 16,
+    marginTop: 10,
+    paddingLeft: 18,
     color: WHITE,
-    ...Body3Bold,
+    ...Body2,
   },
   separator: {
     height: 24,
     backgroundColor: GRAY900,
+  },
+  sortLetterBox: {
+    height: 30,
+    marginTop: 15,
+    width: '100%',
+    display: 'flex',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    color: WHITE,
+    backgroundColor: GRAY700,
+  },
+  sortLetter: {
+    marginLeft: 20,
+    color: WHITE,
+    ...Body2,
+  },
+  usersWrapper: {
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
   },
 });

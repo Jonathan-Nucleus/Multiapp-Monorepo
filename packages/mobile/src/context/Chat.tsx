@@ -1,16 +1,16 @@
 import React, {
   useContext,
   useEffect,
-  useRef,
   useState,
-  useCallback,
   PropsWithChildren,
+  Dispatch,
+  SetStateAction,
+  createContext,
+  FC,
 } from 'react';
 import retry from 'async-retry';
-import { StyleSheet, View, Text, AppState } from 'react-native';
+import { StyleSheet, AppState } from 'react-native';
 import { StreamChat } from 'stream-chat';
-
-import pStyles from 'mobile/src/theme/pStyles';
 
 import type { Client, StreamType } from 'mobile/src/services/chat';
 import { readToken } from 'mobile/src/services/PushNotificationService';
@@ -193,3 +193,50 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
+// Chat: Selected User Context Start //
+
+interface ViewProps {
+  check: boolean;
+  select: Dispatch<SetStateAction<boolean>>;
+  remove: Dispatch<SetStateAction<boolean>>;
+}
+
+const CheckContext = createContext<ViewProps | null>(null);
+
+const CheckProvider: FC<{ children: any }> = ({ children }) => {
+  const [check, setCheck] = useState<boolean>(false);
+
+  const select = () => {
+    setCheck(true);
+  };
+
+  const remove = () => {
+    setCheck(false);
+  };
+
+  return (
+    <CheckContext.Provider
+      value={{
+        check: check,
+        select: select,
+        remove: remove,
+      }}>
+      {children}
+    </CheckContext.Provider>
+  );
+};
+
+export const useCheck = (): ViewProps => {
+  const context = useContext(CheckContext);
+  if (!context) {
+    throw new Error('Missing Check Context!');
+  }
+
+  const { check, select, remove } = context;
+  return { check, select, remove };
+};
+
+export { CheckProvider };
+
+// Chat: Selected User Context End //

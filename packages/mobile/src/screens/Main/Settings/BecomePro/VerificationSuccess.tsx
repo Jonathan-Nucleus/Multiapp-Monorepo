@@ -19,7 +19,7 @@ const VerificationSuccess: React.FC<VerificationSuccessProProps> = ({
       <View style={styles.bottom}>
         <PGradientOutlineButton
           label="Back to App"
-          btnContainer={styles.btnContainer}
+          btnContainerStyle={styles.btnContainer}
           onPress={() => {
             navigation.navigate('Settings');
           }}
@@ -37,12 +37,6 @@ const styles = StyleSheet.create({
     backgroundColor: BLACK,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  appContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'red',
   },
   text: {
     color: WHITE,
