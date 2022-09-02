@@ -252,6 +252,16 @@ const resolvers = {
           throw new NotFoundError();
         }
 
+        // Include all channels and companies that have funds
+        const fundCompanies = await db.companies.fundCompanies();
+        const channels = await db.companies.channels();
+        const includeCompanies = [
+          ...new Set([
+            ...channels.map((channel) => channel._id.toString()),
+            ...fundCompanies.map((company) => company._id.toString()),
+          ]),
+        ];
+
         const posts = await db.posts.findByFilters(
           user._id,
           user.accreditation,
@@ -260,6 +270,7 @@ const resolvers = {
             roleFilter,
             ignorePosts: userData.hiddenPostIds,
             ignoreUsers: userData.hiddenUserIds,
+            includeUsers: includeCompanies,
             followingUsers: [
               ...(userData.followingIds || []),
               ...(userData.companyFollowingIds || []),

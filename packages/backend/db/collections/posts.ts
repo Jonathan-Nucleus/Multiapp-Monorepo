@@ -24,11 +24,30 @@ import { createSearchStage, isVideo } from "../../lib/utils";
 type FilterOptions = {
   postIds?: MongoId[];
   categories?: PostCategory[];
-  ignorePosts?: MongoId[];
-  ignoreUsers?: MongoId[];
   roleFilter?: PostRoleFilter;
+
+  /** Posts to always ignore in the result set. */
+  ignorePosts?: MongoId[];
+
+  /** Users to always ignore in the result set. */
+  ignoreUsers?: MongoId[];
+
+  /** Users to always include in the result set. */
+  includeUsers?: MongoId[];
+
+  /**
+   * Users being followed. These users are only included in the result set if
+   * the appropriate `roleFilter` option is selected.
+   */
   followingUsers?: MongoId[];
+
+  /** Flag indicating whether only featured posts should be returned. */
   featured?: boolean;
+
+  /**
+   * Flag indicating whether highlghted posts should be included in the result
+   * set.
+   * */
   highlighted?: boolean;
 };
 
@@ -121,6 +140,7 @@ const createPostsCollection = (
         postIds,
         ignorePosts = [],
         ignoreUsers = [],
+        includeUsers = [],
         roleFilter = "everyone",
         followingUsers = [],
         featured = false,
@@ -138,12 +158,7 @@ const createPostsCollection = (
 
       let userIds: MongoId[] = [];
       if (roleFilter !== "everyone") {
-        // Add all channels to the list of included users
-        userIds = _.map(
-          await companiesCollection.find({ isChannel: true }).toArray(),
-          "_id"
-        );
-
+        userIds = includeUsers;
         const includeBoth = roleFilter === "professional-follow";
 
         // Add professionals

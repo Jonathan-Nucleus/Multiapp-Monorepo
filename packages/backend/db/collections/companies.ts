@@ -40,6 +40,9 @@ const createCompaniesCollection = (
     fundCompanies: async (): Promise<Company.Mongo[]> =>
       companiesCollection.find({ "fundIds.0": { $exists: true } }).toArray(),
 
+    channels: async (): Promise<Company.Mongo[]> =>
+      companiesCollection.find({ isChannel: true }).toArray(),
+
     /**
      * Updates a company's profile data.
      *
