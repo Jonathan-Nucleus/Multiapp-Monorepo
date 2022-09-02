@@ -10,12 +10,6 @@ import {
 import { X } from 'phosphor-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import RadioGroup, { Option } from 'react-native-radio-button-group';
-import {
-  MentionInput,
-  MentionSuggestionsProps,
-} from 'react-native-controlled-mentions';
-
 import UserSvg from 'shared/assets/images/user.svg';
 import GlobalSvg from 'shared/assets/images/global.svg';
 import AISvg from 'shared/assets/images/AI.svg';
@@ -33,6 +27,9 @@ import ExpandingInput, {
   User,
   OnSelectUser,
 } from 'mobile/src/components/common/ExpandingInput';
+import PRadioGroup, {
+  PRadioOption,
+} from 'mobile/src/components/common/PRadioGroup';
 import MentionsList from 'mobile/src/components/main/MentionsList';
 import { showMessage } from 'mobile/src/services/ToastService';
 import pStyles from 'mobile/src/theme/pStyles';
@@ -71,7 +68,7 @@ const RadioBodyView = (props: any) => {
   );
 };
 
-export const AUDIENCE_OPTIONS: Option<Audience>[] = [
+export const AUDIENCE_OPTIONS: PRadioOption<Audience>[] = [
   {
     id: 'EVERYONE',
     value: 'Everyone',
@@ -197,7 +194,7 @@ const CreatePost: SharePostScreen = ({ navigation, route }) => {
     }
   };
 
-  const postAsData: Option[] = [
+  const postAsData: PRadioOption[] = [
     {
       id: account?._id ?? '',
       value: `${account?.firstName} ${account?.lastName}`,
@@ -276,10 +273,10 @@ const CreatePost: SharePostScreen = ({ navigation, route }) => {
                 title="Post As"
                 subTitle="You can post as yourself or a company you manage.">
                 <View style={styles.radioGroupStyle}>
-                  <RadioGroup
+                  <PRadioGroup
                     options={postAsData}
-                    activeButtonId={field.value}
-                    circleStyle={styles.radioCircle}
+                    activeOptionId={field.value}
+                    optionStyle={styles.radioCircle}
                     onChange={(option) => field.onChange(option.id)}
                   />
                 </View>

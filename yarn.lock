@@ -14410,12 +14410,6 @@ react-native-progress@^5.0.0:
   dependencies:
     prop-types "^15.7.2"
 
-"react-native-radio-button-group@git+https://github.com/henry-makailabs/react-native-radio-button-group.git":
-  version "1.0.3"
-  resolved "git+https://github.com/henry-makailabs/react-native-radio-button-group.git#14387f401842925713ac59d0ae7bf3b8dcf482c3"
-  dependencies:
-    prop-types "^15.7.2"
-
 react-native-reanimated@^2.5.0:
   version "2.9.1"
   resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-2.9.1.tgz#d9a932e312c13c05b4f919e43ebbf76d996e0bc1"

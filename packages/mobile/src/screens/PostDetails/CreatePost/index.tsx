@@ -21,8 +21,6 @@ import {
 } from 'phosphor-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import RadioGroup, { Option } from 'react-native-radio-button-group';
-
 import UserSvg from 'shared/assets/images/user.svg';
 import GlobalSvg from 'shared/assets/images/global.svg';
 import AISvg from 'shared/assets/images/AI.svg';
@@ -36,6 +34,9 @@ import PModal from 'mobile/src/components/common/PModal';
 import RoundIcon from 'mobile/src/components/common/RoundIcon';
 import PreviewLink from 'mobile/src/components/common/PreviewLink';
 import { PostAttachment } from 'mobile/src/components/common/Attachment';
+import PRadioGroup, {
+  PRadioOption,
+} from 'mobile/src/components/common/PRadioGroup';
 import { showMessage } from 'mobile/src/services/ToastService';
 import pStyles from 'mobile/src/theme/pStyles';
 import {
@@ -95,7 +96,7 @@ const RadioBodyView = (props: any): React.ReactElement => {
   );
 };
 
-export const AUDIENCE_OPTIONS: Option<Audience>[] = [
+export const AUDIENCE_OPTIONS: PRadioOption<Audience>[] = [
   {
     id: 'EVERYONE',
     value: 'Everyone',
@@ -507,7 +508,7 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
     [attachmentsField],
   );
 
-  const postAsData: Option[] = [
+  const postAsData: PRadioOption[] = [
     {
       id: account?._id ?? '',
       value: `${account?.firstName} ${account?.lastName}`,
@@ -584,10 +585,10 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
                 title="Post As"
                 subTitle="You can post as yourself or a company you manage.">
                 <View style={styles.radioGroupStyle}>
-                  <RadioGroup
+                  <PRadioGroup
                     options={postAsData}
-                    activeButtonId={field.value}
-                    circleStyle={styles.radioCircle}
+                    activeOptionId={field.value}
+                    optionStyle={styles.radioCircle}
                     onChange={(option) => field.onChange(option.id)}
                   />
                 </View>
@@ -618,10 +619,10 @@ const CreatePost: CreatePostScreen = ({ navigation, route }) => {
                 title="Audience"
                 subTitle="Who can see your post?">
                 <View style={styles.radioGroupStyle}>
-                  <RadioGroup
+                  <PRadioGroup
                     options={AUDIENCE_OPTIONS}
-                    activeButtonId={field.value}
-                    circleStyle={styles.radioCircle}
+                    activeOptionId={field.value}
+                    optionStyle={styles.radioCircle}
                     onChange={(option) => field.onChange(option.id)}
                   />
                 </View>
