@@ -15,7 +15,6 @@ import { Body1, Body3, H6Bold } from 'mobile/src/theme/fonts';
 import { WHITE, WHITE12, BLACK, BGDARK200, WHITE60 } from 'shared/src/colors';
 
 import RecentDoc from 'shared/assets/images/recent-doc.svg';
-import { AssetClasses } from 'shared/graphql/fragments/fund';
 import {
   FundDetails,
   DocumentCategories,
@@ -48,7 +47,7 @@ const FundDocuments: FC<FundDocumentsProps> = ({ fund, ...viewProps }) => {
 
       if (data && data.documentToken) {
         Linking.openURL(
-          `${process.env.NEXT_PUBLIC_WATERMARKING_SERVICE_URL}?token=${data.documentToken}`,
+          `${process.env.WATRMARKING_SERVICE_URL}?token=${data.documentToken}`,
         );
       }
     } catch (err) {

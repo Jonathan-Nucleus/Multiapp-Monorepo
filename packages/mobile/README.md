@@ -10,7 +10,7 @@ the following variables:
 ```
 ENV=dev
 GRAPHQL_URI=https://api-dev2.prometheusalts.com
-NEXT_PUBLIC_WATERMARKING_SERVICE_URL=https://api-dev2.prometheusalts.com/pdf-watermark
+WATRMARKING_SERVICE_URL=https://api-dev2.prometheusalts.com/pdf-watermark
 S3_BUCKET=https://media-dev2.prometheusalts.com
 GETSTREAM_ACCESS_KEY=p2n5abqg47rf
 
