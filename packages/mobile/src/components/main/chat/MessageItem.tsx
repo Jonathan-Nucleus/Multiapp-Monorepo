@@ -73,6 +73,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
               ]}>
               <PBodyText
                 style={styles.messageText}
+                containerStyle={styles.messageTextContainer}
                 body={message.text}
                 collapseLongText={false}
                 hideLinkPreview={true}
@@ -182,6 +183,9 @@ const styles = StyleSheet.create({
     color: WHITE,
     lineHeight: 20,
     ...Body2,
+  },
+  messageTextContainer: {
+    paddingBottom: 0,
   },
   messageSpacer: {
     marginBottom: 8,

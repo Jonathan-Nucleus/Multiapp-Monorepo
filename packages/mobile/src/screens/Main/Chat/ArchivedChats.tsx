@@ -1,3 +1,4 @@
+import React, { ReactElement, useCallback, useEffect, useState } from 'react';
 import {
   FlatList,
   KeyboardAvoidingView,
@@ -9,22 +10,18 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import retry from 'async-retry';
-import React, { useCallback, useEffect, useState } from 'react';
-import pStyles from '../../../theme/pStyles';
-import PHeader from '../../../components/common/PHeader';
-import { GRAY800, PRIMARYSOLID, WHITE, WHITE12 } from 'shared/src/colors';
+import { Swipeable } from 'react-native-gesture-handler';
 import { CommonActions } from '@react-navigation/native';
-import {
-  CaretLeft,
-  FolderOpen,
-  SignOut,
-  Trash,
-} from 'phosphor-react-native';
-import { Body1, Body1Bold } from '../../../theme/fonts';
+import retry from 'async-retry';
+import { CaretLeft, FolderOpen, SignOut } from 'phosphor-react-native';
+
+import PHeader from '../../../components/common/PHeader';
+import pStyles from '../../../theme/pStyles';
+import { GRAY800, PRIMARYSOLID, WHITE, WHITE12 } from 'shared/src/colors';
+import { Body1 } from '../../../theme/fonts';
+
 import { Channel, ChannelSort } from 'mobile/src/services/chat';
 import { ArchivedChatsScreen } from '../../../navigations/ChatStack';
-import { Swipeable } from 'react-native-gesture-handler';
 import ArchivedItem from '../../../components/main/chat/ArchivedItem';
 import { useChatContext } from '../../../context/Chat';
 
@@ -56,7 +53,7 @@ const ArchivedChats: ArchivedChatsScreen = ({ navigation, route }) => {
           watch: true,
         }),
       {
-        onRetry: (_error: any) => {
+        onRetry: () => {
           reconnect?.();
         },
       },
@@ -91,7 +88,7 @@ const ArchivedChats: ArchivedChatsScreen = ({ navigation, route }) => {
     </Swipeable>
   );
 
-  const swipeActions = (item: any) => (
+  const swipeActions = (item: any): ReactElement => (
     <>
       <TouchableOpacity
         style={styles.archiveAction}
@@ -112,17 +109,7 @@ const ArchivedChats: ArchivedChatsScreen = ({ navigation, route }) => {
           <SignOut size={28} color={WHITE} />
           <Text style={styles.textAction}>Leave</Text>
         </TouchableOpacity>
-      ) : (
-        <TouchableOpacity
-          style={styles.deleteAction}
-          onPress={async () => {
-            await item.delete();
-            fetchArchived();
-          }}>
-          <Trash size={28} color={WHITE} />
-          <Text style={styles.textAction}>Delete</Text>
-        </TouchableOpacity>
-      )}
+      ) : null}
     </>
   );
 
@@ -173,37 +160,14 @@ const styles = StyleSheet.create({
     color: WHITE,
     textAlign: 'center',
   },
-  membersText: {
-    ...Body1Bold,
-    color: WHITE,
-    textAlign: 'left',
-    paddingLeft: 15,
-  },
   headerTitleContainer: {
     flex: 1,
     paddingLeft: 80,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  participants: {
-    height: 50,
-    width: '100%',
-    padding: 15,
-    ...Body1Bold,
-    color: WHITE,
-    textAlign: 'left',
-    display: 'flex',
-    justifyContent: 'flex-start',
-  },
   participantsList: {
     height: '100%',
-  },
-  participantsSeparator: {
-    borderBottomColor: '#545454',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    marginLeft: 15,
-    marginRight: 15,
-    flex: 1,
   },
   archiveAction: {
     width: 75,
@@ -213,13 +177,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   leaveAction: {
-    width: 75,
-    backgroundColor: GRAY800,
-    textAlign: 'center',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  deleteAction: {
     width: 75,
     backgroundColor: GRAY800,
     textAlign: 'center',

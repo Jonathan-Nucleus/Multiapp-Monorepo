@@ -10,7 +10,7 @@ import {
   Text,
 } from 'react-native';
 import retry from 'async-retry';
-import { NotePencil, Trash, Archive, SignOut } from 'phosphor-react-native';
+import { NotePencil, Archive, SignOut } from 'phosphor-react-native';
 import MainHeader from 'mobile/src/components/main/Header';
 import SearchInput from 'mobile/src/components/common/SearchInput';
 import PGradientButton from 'mobile/src/components/common/PGradientButton';
@@ -164,17 +164,7 @@ const ChannelList: ChannelListScreen = ({ navigation, route }) => {
           <SignOut size={28} color={WHITE} />
           <Text style={styles.textAction}>Leave</Text>
         </TouchableOpacity>
-      ) : (
-        <TouchableOpacity
-          style={styles.deleteAction}
-          onPress={async () => {
-            await item.delete();
-            fetchChannels();
-          }}>
-          <Trash size={28} color={WHITE} />
-          <Text style={styles.textAction}>Delete</Text>
-        </TouchableOpacity>
-      )}
+      ) : null}
     </>
   );
 
@@ -298,13 +288,6 @@ const styles = StyleSheet.create({
   archiveAction: {
     width: 75,
     backgroundColor: PRIMARYSOLID,
-    textAlign: 'center',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  deleteAction: {
-    width: 75,
-    backgroundColor: GRAY800,
     textAlign: 'center',
     justifyContent: 'center',
     alignItems: 'center',

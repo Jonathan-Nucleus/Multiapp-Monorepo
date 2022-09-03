@@ -4,6 +4,7 @@ import {
   StyleSheet,
   Linking,
   StyleProp,
+  ViewStyle,
   TextStyle,
   TextLayoutEventData,
 } from 'react-native';
@@ -22,6 +23,7 @@ interface PBodyTextProps {
   numberOfLines?: number;
   post?: Post;
   style?: StyleProp<TextStyle>;
+  containerStyle?: StyleProp<ViewStyle>;
 }
 
 const PBodyText: FC<PBodyTextProps> = ({
@@ -29,6 +31,7 @@ const PBodyText: FC<PBodyTextProps> = ({
   collapseLongText = false,
   numberOfLines = 2,
   style,
+  containerStyle,
   post,
 }) => {
   // Remove last line break from body;
@@ -138,7 +141,7 @@ const PBodyText: FC<PBodyTextProps> = ({
   }
 
   return (
-    <View style={styles.previewContainer}>
+    <View style={[styles.previewContainer, containerStyle]}>
       {collapseLongText && (
         <PText
           style={[styles.body, styles.hidden, style]}
