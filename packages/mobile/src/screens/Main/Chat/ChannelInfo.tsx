@@ -95,16 +95,16 @@ const ChannelInfo: ChannelInfoScreen = ({ navigation, route }) => {
           }}
           outlineContainer={styles.button}
         />
-        <PWhiteOutlineButton
-          label={usersNo > 1 ? 'Leave Group' : 'Delete Chat'}
-          onPress={async () => {
-            usersNo > 1
-              ? await channel.current.removeMembers([userId])
-              : await channel.current.delete();
-            navigation.pop(2);
-          }}
-          outlineContainer={styles.button}
-        />
+        {usersNo > 1 ? (
+          <PWhiteOutlineButton
+            label={'Leave Group'}
+            onPress={async () => {
+              await channel.current.removeMembers([userId]);
+              navigation.pop(2);
+            }}
+            outlineContainer={styles.button}
+          />
+        ) : null}
       </View>
     </View>
   );
