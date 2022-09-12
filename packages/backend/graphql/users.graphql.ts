@@ -97,6 +97,12 @@ export const contentCreatorResolvers = {
         : []
   ),
 
+  comments: async (
+    parent: User.Mongo | Company.Mongo,
+    argsIgnored: NoArgs,
+    { db }: ApolloServerContext
+  ) => (parent._id ? db.comments.findByUser(parent._id) : []),
+
   followers: async (
     parent: User.Mongo | Company.Mongo,
     argsIgnored: NoArgs,

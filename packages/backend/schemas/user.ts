@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 import { ValueOf, GraphQLEntity } from "../lib/mongo-helper";
 
 import { Post, PostCategory, PostCategoryEnum } from "./post";
+import { Comment } from "./comment";
 import { Company } from "./company";
 import { Fund } from "./fund";
 import { HelpRequestType, HelpRequestTypeEnum } from "./help-request";
@@ -29,6 +30,7 @@ export namespace ContentCreator {
 
   export type GraphQL = GraphQLEntity<Mongo> & {
     posts: Post.GraphQL[];
+    comments: Comment.GraphQL[];
     followers: User.Profile[];
     following: User.Profile[];
     companyFollowers: User.Profile[];

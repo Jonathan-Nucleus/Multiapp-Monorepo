@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://cdn.jsdelivr.net/npm/@xz/fonts@1/serve/metropolis.min.css");
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-bg: #fff;
+    --color-fg: #000;
+  }
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: "Metropolis", -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+    Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-fg);
+  color-scheme: light;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}

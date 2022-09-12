@@ -257,6 +257,7 @@ const createPostsCollection = (
         likeCount: 0,
         commentCount: 0,
         shareCount: 0,
+        disableComments: false,
       };
 
       const insertResult = await postsCollection.insertOne(postData);
@@ -408,6 +409,7 @@ const createPostsCollection = (
         likeCount: 0,
         commentCount: 0,
         shareCount: 0,
+        disableComments: false,
       };
 
       const insertResult = await postsCollection.insertOne(postData);

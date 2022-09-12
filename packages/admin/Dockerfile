@@ -2,7 +2,6 @@ FROM node:16-bullseye-slim AS build
 WORKDIR /ignite
 
 # Copy all relevant package.json files to the new the image
-RUN apt -y update && apt install -y git
 COPY ./package.json yarn.lock ./
 COPY ./packages/admin/package.json ./packages/admin/
 COPY ./packages/desktop/package.json ./packages/desktop/
@@ -40,8 +39,8 @@ COPY --from=build --chown=nextjs:nodejs /ignite/packages/admin/.next/standalone 
 COPY --from=build --chown=nextjs:nodejs /ignite/packages/admin/.next/static ./packages/admin/.next/static
 
 COPY --from=build /ignite/packages/admin/next.config.js ./packages/admin
-COPY --from=build --chown=nextjs:nodejs /ignite/packages/admin/app/lib/injectConfig.js ./packages/admin/
-COPY --from=build --chown=nextjs:nodejs /ignite/packages/admin/app/lib/entrypoint.sh ./packages/admin/
+COPY --from=build --chown=nextjs:nodejs /ignite/packages/admin/app/backend/config/injectConfig.js ./packages/admin/
+COPY --from=build --chown=nextjs:nodejs /ignite/packages/admin/app/backend/config/entrypoint.sh ./packages/admin/
 
 USER nextjs
 

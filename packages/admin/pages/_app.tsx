@@ -1,14 +1,14 @@
-import "../app/styles/app.scss";
+import "../app/frontend/styles/app.scss";
 import getConfig from "next/config";
 import App, { AppProps, AppInitialProps, AppContext } from "next/app";
 import Head from "next/head";
 import { ThemeProvider } from "next-themes";
 import { getSession, SessionProvider } from "next-auth/react";
 
-import RootLayout from "../app/components/layouts/index";
-import SecureApolloProvider from "../app/components/providers/SecureApolloProvider";
+import RootLayout from "../app/frontend/components/layouts/index";
+import SecureApolloProvider from "../app/frontend/components/providers/SecureApolloProvider";
 import { NextPageWithLayout } from "../app/types/next-page";
-import AppAuthOptions from "../app/config/auth";
+import AppAuthOptions from "../app/backend/config/auth";
 
 type MyAppProps = {
   runtimeVars: {

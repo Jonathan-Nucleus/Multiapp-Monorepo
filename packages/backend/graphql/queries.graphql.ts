@@ -76,12 +76,12 @@ const schema = gql`
   }
 
   type FundManagers {
-    managers: [User!]!
+    managers: [UserProfile!]!
     funds: [Fund!]!
   }
 
   type GlobalSearchResult {
-    users: [User!]!
+    users: [UserProfile!]!
     companies: [Company!]!
     posts: [Post!]!
     funds: [Fund!]!

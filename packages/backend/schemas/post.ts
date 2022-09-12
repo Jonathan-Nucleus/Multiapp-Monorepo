@@ -38,6 +38,7 @@ export namespace Post {
     featured?: boolean; // Whether this post is featured on the user's profile
     highlighted?: boolean; // Whether this post is highlighted on the global feed
     deleted?: boolean;
+    disableComments?: boolean;
   }
 
   export type GraphQL = GraphQLEntity<
@@ -252,6 +253,7 @@ export const PostSchema = `
     updatedAt: Date
     featured: Boolean
     highlighted: Boolean
+    disableComments: Boolean
 
     user: User
     company: Company

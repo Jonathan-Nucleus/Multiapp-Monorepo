@@ -8,6 +8,7 @@ directory and add the following variables:
 ```
 NEXTAUTH_URL={base url for desktop application, e.g., https://localhost:3000}
 NEXTAUTH_SECRET={secret ≥ 32 characters}
+ADMIN_SECRET={secret ≥ 32 characters}
 ```
 
 Next, create a `.env.development.local` file in the desktop application
@@ -15,7 +16,14 @@ directory and add the following variables:
 
 ```
 NEXT_PUBLIC_GRAPHQL_URI={url to the backend graphql server}
-NEXT_PUBLIC_AWS_BUCKET=https://media-dev.prometheusalts.com
+NEXT_PUBLIC_AWS_BUCKET=https://media2-dev.prometheusalts.com
+APP_ENV={development | staging | production }
+MONGO_URI=mongodb+srv://<username>:<password>@pro-dev.hd1k6.mongodb.net/prometheusalts?retryWrites=true&w=majority
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_REGION=us-east-1
+MRAP_ENDPOINT={mrap endpoint for aws bucket}
+AWS_S3_BUCKET={aws bucket name}
 ```
 
 Run the development server:

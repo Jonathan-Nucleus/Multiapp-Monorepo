@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { GetServerSideProps } from "next";
-import LoginPage from "../app/components/templates/LoginPage";
+import LoginPage from "../app/frontend/components/templates/LoginPage";
 import { NextPageWithLayout } from "../app/types/next-page";
 import { getProviders } from "next-auth/react";
 

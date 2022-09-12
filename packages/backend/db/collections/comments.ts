@@ -43,6 +43,14 @@ const createCommentsCollection = (
         .toArray();
     },
 
+    findByUser: async (id: MongoId): Promise<Comment.Mongo[]> => {
+      const query =
+        id !== undefined ? toObjectId(id) : {};
+       
+        return commentsCollection
+        .find({userId:  query}).toArray();
+    },
+
     /**
      * Create a new comment on a post.
      *
