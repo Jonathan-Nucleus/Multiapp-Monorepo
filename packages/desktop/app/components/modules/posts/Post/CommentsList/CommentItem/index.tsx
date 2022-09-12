@@ -14,6 +14,7 @@ import LikesModal from "./LikesModal";
 import PostAttachment from "../../../PostAttachment";
 import { Attachment as AttachmentType } from "shared/graphql/fragments/post";
 import { Media } from "../../../EditPostModal/AttachmentPreview/MediaSelector";
+import GalleryView from "../../../GalleryView";
 
 interface CommentItemProps {
   comment: Comment;
@@ -34,6 +35,7 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply }) => {
   const [showEditor, setShowEditor] = useState(false);
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [showLikesModal, setShowLikesModal] = useState(false);
+  const [galleryIndex, setGalleryIndex] = useState<number>();
   const toggleLike = async () => {
     await likeComment({
       variables: {
@@ -62,6 +64,9 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply }) => {
       }
     } catch (err) {}
   };
+  const handleGalleryIndex = (idx: number | undefined) => {
+    setGalleryIndex(idx);
+  };
 
   const attachments = comment.attachments;
 
@@ -89,13 +94,18 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply }) => {
           <BodyText text={comment.body} />
           <div className={"max-w-xs rounded-lg overflow-hidden mt-4 mb-2"}>
             {attachments != null && attachments.length > 0 && (
-              <PostAttachment
-                attachment={{ url: attachments[0].url } as AttachmentType}
-                userId={comment.user._id}
-                postId={comment._id}
-                multiple={false}
-                aspectRatio={attachments[0].aspectRatio ?? 1.58}
-              />
+              <div
+                className="cursor-pointer"
+                onClick={() => handleGalleryIndex(0)}
+              >
+                <PostAttachment
+                  attachment={{ url: attachments[0].url } as AttachmentType}
+                  userId={comment.user._id}
+                  postId={comment._id}
+                  multiple={false}
+                  aspectRatio={attachments[0].aspectRatio ?? 1.58}
+                />
+              </div>
             )}
           </div>
 
@@ -147,6 +157,16 @@ const CommentItem: FC<CommentItemProps> = ({ comment, onReply }) => {
           likes={comment.likes}
           show={showLikesModal}
           onClose={() => setShowLikesModal(false)}
+        />
+      )}
+      {galleryIndex != undefined && attachments && attachments.length > 0 && (
+        <GalleryView
+          show={true}
+          postId={comment._id}
+          userId={comment.user._id}
+          images={attachments}
+          index={galleryIndex}
+          onClose={() => handleGalleryIndex(undefined)}
         />
       )}
     </div>
