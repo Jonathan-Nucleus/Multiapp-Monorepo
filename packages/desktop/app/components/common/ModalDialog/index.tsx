@@ -1,7 +1,14 @@
 import { Dialog, Transition } from "@headlessui/react";
-import React, { FC, Fragment, PropsWithChildren, ReactNode } from "react";
+import React, {
+  FC,
+  Fragment,
+  PropsWithChildren,
+  ReactNode,
+  useEffect,
+} from "react";
 import { X } from "phosphor-react";
 import Button from "../Button";
+import { useRouter } from "next/router";
 
 type ModalDialogProps = PropsWithChildren<{
   title?: ReactNode;
@@ -19,6 +26,11 @@ const ModalDialog: FC<ModalDialogProps> = ({
   onClose,
   children,
 }: ModalDialogProps) => {
+  const { events } = useRouter();
+  useEffect(() => {
+    events.on("routeChangeStart", onClose);
+    return () => events.off("routeChangeStart", onClose);
+  }, [events, onClose]);
   return (
     <>
       <Transition appear show={show} as={Fragment}>
