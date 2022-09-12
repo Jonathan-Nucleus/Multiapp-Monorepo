@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { last } from "lodash";
 import { Notification } from "shared/graphql/query/notification/useNotifications";
 import { Post } from "shared/graphql/query/post/usePosts";
+
 export function usePagination(
   data: ArrayLike<Notification | Post> | undefined,
   fetchMore: Function
@@ -24,7 +25,7 @@ export function usePagination(
       });
       isFetchingMore.current = false;
     }
-  }, [fetchMore, data, isFetchingMore]);
+  }, [data, lastFetchItemId, fetchMore]);
 
   useEffect(() => {
     const handleScroll = (event: Event) => {
